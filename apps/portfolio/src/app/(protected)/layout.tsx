@@ -37,11 +37,11 @@ export default async function ProtectedLayout({
               <Breadcrumb>
                 <BreadcrumbList>
                   <BreadcrumbItem>
-                    <BreadcrumbPage>Portfolio</BreadcrumbPage>
+                    <BreadcrumbPage>Jayant Goyal</BreadcrumbPage>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator className="md:block" />
                   <BreadcrumbItem>
-                    <BreadcrumbPage>{data.HERO.name}</BreadcrumbPage>
+                    <BreadcrumbPage>Portfolio</BreadcrumbPage>
                   </BreadcrumbItem>
                 </BreadcrumbList>
               </Breadcrumb>
