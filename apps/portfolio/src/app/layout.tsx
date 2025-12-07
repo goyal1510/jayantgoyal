@@ -12,7 +12,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const { data } = await getPortfolioDataFromHeaders();
 
   return {
-    title: `Portfolio | ${data.HERO.name} Goyal`,
+    title: `Portfolio | ${data.HERO.name}`,
     description:
       "Portfolio site scaffolded from the Turborepo Tailwind starter.",
     icons: {

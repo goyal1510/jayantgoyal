@@ -10,7 +10,7 @@ const geist = Geist({ subsets: ["latin"], preload: false });
 export async function generateMetadata(): Promise<Metadata> {
 
   return {
-    title: `Currency Calculator | Jayant Goyal`,
+    title: `Currency Calculator | Jayant`,
     description:
       "Currency Calculator.",
     icons: {

@@ -556,85 +556,50 @@ export function CalculationsHistory() {
         </div>
 
         <Sheet open={isDetailOpen} onOpenChange={setIsDetailOpen}>
-          <SheetContent side="right" className="w-full sm:max-w-xl">
+          <SheetContent side="right" className="flex h-full w-full flex-col sm:max-w-xl">
             {!currentEntry ? (
               renderEmptyState()
             ) : (
               <>
                 <SheetHeader className="pb-2">
-                  <SheetTitle className="flex flex-wrap items-center gap-2 text-base">
-                    <History className="h-4 w-4" />
-                    {formatDateDisplay(currentEntry.ist_timestamp || currentEntry.created_at)}
-                    <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-normal">
-                      {formatTimeDisplay(currentEntry.ist_timestamp || currentEntry.created_at)} IST
-                    </span>
-                  </SheetTitle>
+                  <div className="space-y-2">
+                    <SheetTitle className="flex items-start gap-2 text-base leading-tight sm:text-lg">
+                      <History className="mt-0.5 h-4 w-4 text-muted-foreground" />
+                      <span className="line-clamp-2">
+                        {currentEntry.note || "No note added"}
+                      </span>
+                    </SheetTitle>
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                      <span className="rounded-full bg-muted px-2 py-0.5">
+                        {formatDateDisplay(currentEntry.ist_timestamp || currentEntry.created_at)}
+                      </span>
+                      <span className="rounded-full bg-muted px-2 py-0.5">
+                        {formatTimeDisplay(currentEntry.ist_timestamp || currentEntry.created_at)}{" "}
+                        IST
+                      </span>
+                      {selectedDate ? (
+                        <span className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">
+                          Filtered to {formatDateKeyLabel(selectedDate)}
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
                 </SheetHeader>
 
-                <div className="space-y-4 p-4 pt-0">
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="space-y-2">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-                          Active entry
-                        </span>
-                        {selectedDate ? (
-                          <span className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">
-                            Filtered to {formatDateKeyLabel(selectedDate)}
-                          </span>
-                        ) : null}
-                      </div>
-                      {currentEntry.note ? (
-                        <div className="rounded-lg border bg-muted/50 px-3 py-2 text-sm">
-                          {currentEntry.note}
-                        </div>
-                      ) : (
-                        <p className="text-sm text-muted-foreground">No note added.</p>
-                      )}
-                    </div>
-                    <div className="flex flex-col items-end gap-2">
-                      <div className="text-xs text-muted-foreground">Total value</div>
-                      <div
-                        className={`text-3xl font-bold ${
+                <div className="flex-1 space-y-4 overflow-y-auto p-4 pt-0">
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    <div className="rounded-lg border bg-muted/40 p-3">
+                      <p className="text-xs text-muted-foreground">Total amount</p>
+                      <p
+                        className={`text-xl font-semibold ${
                           getTotalAmount(currentEntry.denominations) >= 0
                             ? "text-emerald-600"
                             : "text-destructive"
                         }`}
                       >
                         ₹{getTotalAmount(currentEntry.denominations).toLocaleString()}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => navigateEntry("prev")}
-                          disabled={!canGoOlder || loading}
-                        >
-                          <ChevronLeft className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => navigateEntry("next")}
-                          disabled={!canGoNewer || loading}
-                        >
-                          <ChevronRight className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleDelete(currentEntry.id)}
-                          disabled={deletingId === currentEntry.id}
-                          className="gap-1"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                          {deletingId === currentEntry.id ? "Deleting..." : "Delete"}
-                        </Button>
-                      </div>
+                      </p>
                     </div>
-                  </div>
-
-                  <div className="grid gap-3 sm:grid-cols-3">
                     <div className="rounded-lg border bg-muted/40 p-3">
                       <p className="text-xs text-muted-foreground">Unique denominations</p>
                       <p className="text-xl font-semibold">{uniqueDenominationsUsed}</p>
@@ -643,12 +608,6 @@ export function CalculationsHistory() {
                       <p className="text-xs text-muted-foreground">Total notes counted</p>
                       <p className={`text-xl font-semibold ${noteCountBadge}`}>
                         {totalNotesCount}
-                      </p>
-                    </div>
-                    <div className="rounded-lg border bg-muted/40 p-3">
-                      <p className="text-xs text-muted-foreground">Active position</p>
-                      <p className="text-xl font-semibold">
-                        {activeEntryPosition} / {filteredEntries.length}
                       </p>
                     </div>
                   </div>
@@ -664,7 +623,7 @@ export function CalculationsHistory() {
                       </span>
                     </div>
                     <div
-                      className="overflow-x-auto"
+                      className="overflow-hidden rounded-lg border bg-background shadow-sm"
                       style={{
                         width: "100%",
                         maxWidth: "100vw",
@@ -679,8 +638,8 @@ export function CalculationsHistory() {
                       `}</style>
                       <table className="w-full">
                         <thead className="bg-muted/60">
-                          <tr className="border-b border-border">
-                            <th className="sticky left-0 z-20 w-28 border-r border-border bg-muted/70 px-3 py-2 text-left text-sm font-semibold text-muted-foreground">
+                          <tr>
+                            <th className="sticky left-0 z-20 w-28 bg-muted/70 px-3 py-2 text-left text-sm font-semibold text-muted-foreground">
                               Denomination
                             </th>
                             <th className="w-24 px-3 py-2 text-center text-sm font-semibold text-muted-foreground">
@@ -698,9 +657,9 @@ export function CalculationsHistory() {
                             .map((denom) => (
                               <tr
                                 key={denom.id}
-                                className="border-b border-border transition-colors hover:bg-background"
+                                className="group/row bg-background transition-colors hover:bg-muted"
                               >
-                                <td className="sticky left-0 z-10 w-28 border-r border-border bg-muted/50 px-3 py-2">
+                                <td className="sticky left-0 z-10 w-28 bg-background px-3 py-2 transition-colors group-hover/row:bg-muted">
                                   <div className="text-base font-semibold text-foreground">
                                     ₹{denom.denomination}
                                   </div>
@@ -733,6 +692,39 @@ export function CalculationsHistory() {
                       </table>
                     </div>
                   </div>
+                </div>
+
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t bg-background/90 px-4 py-3 backdrop-blur sm:px-5">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => navigateEntry("prev")}
+                      disabled={!canGoOlder || loading}
+                      aria-label="Previous entry"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => navigateEntry("next")}
+                      disabled={!canGoNewer || loading}
+                      aria-label="Next entry"
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleDelete(currentEntry.id)}
+                    disabled={deletingId === currentEntry.id}
+                    className="gap-1 sm:w-auto"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    {deletingId === currentEntry.id ? "Deleting..." : "Delete"}
+                  </Button>
                 </div>
               </>
             )}
