@@ -9,7 +9,8 @@ export type PortfolioProfileKey = keyof typeof PORTFOLIO_PROFILES
 export type PortfolioData = (typeof PORTFOLIO_PROFILES)[PortfolioProfileKey]
 
 const HOSTNAME_MAP: Record<string, PortfolioProfileKey> = {
-  "jayant.sujago.com": "jayant",
+  "portfolio.jayantgoyal.com": "jayant",
+  "jayantgoyal.com": "jayant",
 } as const
 
 export const DEFAULT_PORTFOLIO_PROFILE: PortfolioProfileKey = "jayant"
