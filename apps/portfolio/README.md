@@ -1,12 +1,10 @@
-## Getting Started
+## Portfolio
 
 From the repo root:
 
 ```bash
-pnpm dev --filter jayant
+pnpm dev --filter portfolio
 ```
-
-The app runs on [http://localhost:3001](http://localhost:3001).
 
 ## UI Toolkit (shadcn)
 
