@@ -1,9 +1,7 @@
-'use client';
+"use client"
+
+import { CurrencyCalculatorForm } from "@/components/currency-calculator-form"
 
 export default function Page() {
-  return (
-    <div className="space-y-16">
-      
-    </div>
-  );
+  return <CurrencyCalculatorForm />
 }

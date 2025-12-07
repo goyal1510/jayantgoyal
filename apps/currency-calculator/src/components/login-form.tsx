@@ -59,7 +59,7 @@ export function LoginForm({
           }
 
           toast.success("Logged in as guest.")
-          router.push("/")
+          router.push("/new")
           router.refresh()
         } catch (error) {
           // Preserve error shape for potential future handling.

@@ -1,9 +1,7 @@
-'use client';
+"use client"
+
+import { CalculationsHistory } from "@/components/calculations-history"
 
 export default function Page() {
-  return (
-    <div className="space-y-16">
-      
-    </div>
-  );
+  return <CalculationsHistory />
 }

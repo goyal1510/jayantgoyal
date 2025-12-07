@@ -30,6 +30,6 @@ export async function loginWithPassword(
     return { error: error.message };
   }
 
-  revalidatePath("/", "layout");
-  redirect("/");
+  revalidatePath("/new", "layout");
+  redirect("/new");
 }
