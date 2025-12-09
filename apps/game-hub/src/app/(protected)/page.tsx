@@ -2,24 +2,10 @@ import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 
 import { GAME_META } from "@/lib/games"
-import { createSupabaseServerClient } from "@/lib/supabase/server"
 import { cn } from "@/lib/utils"
 
-export default async function Page() {
-  let displayName = "Player"
-  try {
-    const supabase = await createSupabaseServerClient()
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-
-    displayName =
-      (user?.user_metadata?.full_name as string | undefined)?.trim() ||
-      user?.email?.split("@")[0] ||
-      displayName
-  } catch (error) {
-    console.error("Unable to load user info; continuing with defaults.", error)
-  }
+export default function Page() {
+  const displayName = "Player"
 
   const statCards = Object.entries(GAME_META).map(([slug, meta]) => ({
     slug,
