@@ -34,25 +34,20 @@ const navItems = [
     isActive: false,
   },
   {
-    title: "Tic Tac Toe",
-    url: "/tic-tac-toe",
-    icon: Grid3X3,
-  },
-  {
     title: "Rock Paper Scissors",
     url: "/rock-paper-scissors",
     icon: Gamepad2,
   },
   {
+    title: "Tic Tac Toe",
+    url: "/tic-tac-toe",
+    icon: Grid3X3,
+  },
+  {
     title: "Dare X",
     url: "/dare-x",
     icon: HandHeart,
-  },
-  {
-    title: "History",
-    url: "/history",
-    icon: History,
-  },
+  }
 ]
 
 const teams = [

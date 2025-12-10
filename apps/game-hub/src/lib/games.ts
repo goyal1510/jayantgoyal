@@ -16,7 +16,7 @@ export const GAME_META: Record<
   },
   "dare-x": {
     name: "Dare X",
-    description: "Two-player local dare challenge.",
+    description: "Multi-player local dare challenge.",
     modes: ["local_pvp"],
   },
 }
