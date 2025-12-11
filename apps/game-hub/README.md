@@ -1,17 +1,29 @@
-## Portfolio
+# Game Hub
 
+Mini-game hub (Tic Tac Toe, Rock Paper Scissors, Dare X) built with Next.js 16 and Supabase auth.
+
+## Features
+- **Tic Tac Toe:** Local PvP and vs-computer modes with move history and quick resets.
+- **Rock Paper Scissors:** Fast computer rounds with running win/loss/draw tallies.
+- **Dare X:** Party dares with built-in prompts, custom dare lists (import/export), player rotation, and completion tracking.
+- Supabase-backed auth (email/password, guest login, profile updates, account deletion) plus a shared themed shell from `@repo/ui`.
+
+## Run locally
 From the repo root:
-
 ```bash
-pnpm dev --filter portfolio
+pnpm dev --filter ghub
 ```
 
-## UI Toolkit (shadcn)
+## Environment
+Create `.env.local` in `apps/game-hub` (or the repo root) with:
+```
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...   # required for /api/account/delete
+GUEST_EMAIL_LOGIN=...           # optional, enables guest login
+GUEST_PASSWORD_LOGIN=...
+```
 
-- Tailwind v4 tokens live in `src/app/globals.css`; shared UI primitives live under `src/components/ui` (seeded with a shadcn-style `Button`).
-- `components.json` configures the shadcn CLI. Add components with `pnpm dlx shadcn@latest add <component>`; utilities are under `src/lib/utils.ts`.
-
-## Supabase Auth
-
-- Copy `.env.example` to `.env.local` and set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and (optionally) `SUPABASE_SERVICE_ROLE_KEY` for server-side admin tasks.
-- Use `createSupabaseBrowserClient` in client components and `createSupabaseServerClient` in server components/route handlers; both live in `src/lib/supabase/`.
+## Notes
+- Game metadata lives in `src/lib/games.ts`.
+- Supabase clients are in `src/lib/supabase/`; guest login is handled via `/api/guest-login`.

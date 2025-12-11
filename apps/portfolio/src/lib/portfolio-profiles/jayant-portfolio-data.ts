@@ -212,8 +212,8 @@ const PROJECTS = [
     image: "/assets/ProjectImages/work-7.png",
     tags: ["React", "Supabase", "CSS", "CRUD Operations"],
     githubLink:
-      "https://github.com/goyal1510/jayant-org-in/tree/main/apps/currency-calculator",
-    liveLink: "https://currency-calculator.jayant.org.in/",
+      "https://github.com/goyal1510/jayantgoyal/tree/main/apps/currency-calculator",
+    liveLink: "https://ccal.jayantgoyal.com",
   },
   {
     name: "Custom Drag & Drop Calculator",
@@ -223,8 +223,8 @@ const PROJECTS = [
     image: "/assets/ProjectImages/work-1.png",
     tags: ["React", "Zustand", "Tailwind CSS", "Vite", "Drag & Drop"],
     githubLink:
-      "https://github.com/goyal1510/jayant-org-in/tree/main/apps/cddc",
-    liveLink: "https://cddc.jayant.org.in/",
+      "https://github.com/goyal1510/jayantgoyal/tree/main/apps/custom-drag-drop-calculator",
+    liveLink: "https://customcal.jayantgoyal.com",
   },
   {
     name: "E-commerce Application",
@@ -235,42 +235,31 @@ const PROJECTS = [
     image: "/assets/ProjectImages/work-3.png",
     tags: ["React", "Redux", "React Router", "API Integration"],
     githubLink:
-      "https://github.com/goyal1510/jayant-org-in/tree/main/apps/ecommerce",
+      "https://github.com/goyal1510/jayant-ecommerce-website",
     liveLink: "https://ecommerce.jayant.org.in/",
   },
   {
-    name: "Todo App",
-    shortDescription: "Built a task management app with React and Vite.",
-    fullDescription:
-      "Built a task management app with React and Vite. Enabled adding, editing, completing, and deleting tasks. Designed a clean, user-friendly UI for creating, updating, and tracking to-do lists.",
-    image: "/assets/ProjectImages/work-6.png",
-    tags: ["React", "Vite", "Task Management", "CRUD Operations"],
-    githubLink:
-      "https://github.com/goyal1510/jayant-org-in/tree/main/apps/todo-app",
-    liveLink: "https://todo-app.jayant.org.in/",
-  },
-  {
-    name: "Game Spot",
+    name: "Game Hub",
     shortDescription:
       "Developed a Game Hub featuring three interactive games: Rock Paper Scissors, Dare You, and Tic Tac Toe.",
     fullDescription:
       "Developed a Game Hub featuring three interactive games: Rock Paper Scissors, Dare You, and Tic Tac Toe. Utilized HTML, CSS, and JavaScript to ensure simplicity and ease of use. A gaming platform where users can explore and play various games.",
     image: "/assets/ProjectImages/work-2.png",
-    tags: ["HTML", "CSS", "JavaScript", "Interactive Games"],
+    tags: ["Next.js","Interactive Games"],
     githubLink:
-      "https://github.com/goyal1510/jayant-org-in/tree/main/apps/game-spot",
-    liveLink: "https://game-spot.jayant.org.in/",
+      "https://github.com/goyal1510/jayantgoyal/tree/main/apps/game-hub",
+    liveLink: "https://ghub.jayantgoyal.com",
   },
   {
-    name: "Jayant Weather App",
+    name: "Weather App",
     shortDescription:
       "Developed a weather application using JavaScript, OpenWeather API, and Tailwind CSS.",
     fullDescription:
       "Developed a weather application using JavaScript, OpenWeather API, and Tailwind CSS. Implemented city-based search and geolocation-based weather retrieval. Designed a responsive UI for a seamless experience across devices.",
     image: "/assets/ProjectImages/work-4.png",
     tags: ["JavaScript", "OpenWeather API", "Tailwind CSS", "Geolocation"],
-    githubLink: "https://github.com/goyal1510/jayant-org-in/tree/main/apps/weather",
-    liveLink: "https://weather.jayant.org.in/",
+    githubLink: "https://github.com/goyal1510/jayantgoyal/tree/main/apps/weather",
+    liveLink: "https://weather.jayantgoyal.com",
   },
 ] as const
 

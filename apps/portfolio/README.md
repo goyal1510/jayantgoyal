@@ -1,17 +1,29 @@
-## Portfolio
+# Portfolio
 
+Personal Next.js 16 portfolio for Jayant with animated sections, host-aware profiles, and an optional Supabase-powered auth shell.
+
+## Features
+- Host-aware portfolio data (see `src/lib/portfolio-data.ts`) so different domains can map to different profiles; defaults to the Jayant profile.
+- Rich sections for hero, about, skills, experience, projects, certificates, and contact with resume download and motion flourishes.
+- Supabase auth flows for email/password, guest login, profile updates, and account deletion (service-role protected).
+- Theming and UI primitives come from `@repo/ui` with Tailwind v4 tokens in `src/app/globals.css`.
+
+## Run locally
 From the repo root:
-
 ```bash
 pnpm dev --filter portfolio
 ```
 
-## UI Toolkit (shadcn)
+## Environment
+Create `.env.local` in `apps/portfolio` (or the repo root) with:
+```
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...   # required for /api/account/delete
+GUEST_EMAIL_LOGIN=...           # optional, enables “Continue as guest”
+GUEST_PASSWORD_LOGIN=...
+```
 
-- Tailwind v4 tokens live in `src/app/globals.css`; shared UI primitives live under `src/components/ui` (seeded with a shadcn-style `Button`).
-- `components.json` configures the shadcn CLI. Add components with `pnpm dlx shadcn@latest add <component>`; utilities are under `src/lib/utils.ts`.
-
-## Supabase Auth
-
-- Copy `.env.example` to `.env.local` and set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and (optionally) `SUPABASE_SERVICE_ROLE_KEY` for server-side admin tasks.
-- Use `createSupabaseBrowserClient` in client components and `createSupabaseServerClient` in server components/route handlers; both live in `src/lib/supabase/`.
+## Content updates
+- Edit `src/lib/portfolio-profiles/jayant-portfolio-data.ts` to change copy, links, or assets.
+- Map new hosts or profiles in `src/lib/portfolio-data.ts` if you want alternate portfolios per domain.
