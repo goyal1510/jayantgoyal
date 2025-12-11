@@ -236,7 +236,7 @@ const PROJECTS = [
     tags: ["React", "Redux", "React Router", "API Integration"],
     githubLink:
       "https://github.com/goyal1510/jayant-ecommerce-website",
-    liveLink: "https://ecommerce.jayant.org.in/",
+    liveLink: "https://ecommerce.jayantgoyal.com/",
   },
   {
     name: "Game Hub",
