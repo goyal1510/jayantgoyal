@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { usePathname } from "next/navigation"
-import { Home } from "lucide-react"
+import { Code2 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
 import { TeamSwitcher } from "@/components/team-switcher"
@@ -12,26 +12,34 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
-
-const navItems = [
-  {
-    title: "Hello",
-    url: "/hello",
-    icon: Home,
-    isActive: true,
-  },
-]
+import { toolCategories } from "@/lib/tools"
 
 const teams = [
   {
     name: "Tech",
-    logo: Home,
+    logo: Code2,
   },
 ]
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
-  const activeUrl = !pathname || pathname === "/" ? "/hello" : pathname
+  const activeUrl = pathname || "/"
+
+  // Build nav items from tool categories
+  const navItems = toolCategories.map((category) => ({
+    title: category.title,
+    url: `#${category.id}`,
+    icon: category.icon as React.ElementType,
+    items: category.tools.map((tool) => ({
+      title: tool.title,
+      url: tool.path,
+    })),
+  }))
+
+  // Determine which category should be open based on active tool
+  const activeCategoryId = toolCategories.find((category) =>
+    category.tools.some((tool) => tool.path === activeUrl)
+  )?.id
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -39,7 +47,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <TeamSwitcher teams={teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={navItems} activeUrl={activeUrl} />
+        <NavMain items={navItems} activeUrl={activeUrl} activeId={activeCategoryId} />
       </SidebarContent>
       <SidebarRail />
     </Sidebar>

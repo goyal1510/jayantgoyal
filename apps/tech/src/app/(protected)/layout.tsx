@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { Separator } from "@/components/ui/separator";
@@ -6,6 +7,7 @@ import ThemeToogle from "@/components/theme-toogle";
 import {
   Breadcrumb,
   BreadcrumbItem,
+  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
@@ -38,14 +40,16 @@ export default async function ProtectedLayout({
                   </BreadcrumbItem>
                   <BreadcrumbSeparator className="md:block" />
                   <BreadcrumbItem>
-                    <BreadcrumbPage>Tech</BreadcrumbPage>
+                    <BreadcrumbLink asChild>
+                      <Link href="/">Tech Tools</Link>
+                    </BreadcrumbLink>
                   </BreadcrumbItem>
                 </BreadcrumbList>
               </Breadcrumb>
             </div>
             <ThemeToogle />
           </header>
-          <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
+          <div className="flex flex-1 flex-col gap-4 p-4">{children}</div>
         </SidebarInset>
       </SidebarProvider>
   );
