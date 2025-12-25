@@ -10,9 +10,9 @@ const geist = Geist({ subsets: ["latin"], preload: false });
 export async function generateMetadata(): Promise<Metadata> {
 
   return {
-    title: `Currency Calculator | Jayant`,
+    title: `Tech | Jayant`,
     description:
-      "Currency Calculator.",
+      "Tech.",
     icons: {
       icon: [
         { url: "/assets/Jayant_favicon_io/favicon.ico" },

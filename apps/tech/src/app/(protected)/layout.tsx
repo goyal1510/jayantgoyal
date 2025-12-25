@@ -38,7 +38,7 @@ export default async function ProtectedLayout({
                   </BreadcrumbItem>
                   <BreadcrumbSeparator className="md:block" />
                   <BreadcrumbItem>
-                    <BreadcrumbPage>Currency Calcuator</BreadcrumbPage>
+                    <BreadcrumbPage>Tech</BreadcrumbPage>
                   </BreadcrumbItem>
                 </BreadcrumbList>
               </Breadcrumb>
