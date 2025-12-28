@@ -50,6 +50,7 @@ export function LoginForm({
         try {
           const response = await fetch("/api/guest-login", {
             method: "POST",
+            credentials: "include",
           })
           const data = await response.json()
 
@@ -59,8 +60,8 @@ export function LoginForm({
           }
 
           toast.success("Logged in as guest.")
-          router.push("/")
-          router.refresh()
+          // Use window.location for full page navigation to ensure cookies are read
+          window.location.href = "/"
         } catch (error) {
           // Preserve error shape for potential future handling.
           void error
@@ -68,7 +69,7 @@ export function LoginForm({
         }
       })()
     })
-  }, [router])
+  }, [])
 
   React.useEffect(() => {
     if (state?.error) {

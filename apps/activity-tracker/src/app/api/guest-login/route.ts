@@ -1,8 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { createServerClient } from "@supabase/ssr";
 
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-
-export async function POST() {
+export async function POST(request: NextRequest) {
   const guestEmail = process.env.GUEST_EMAIL_LOGIN;
   const guestPassword = process.env.GUEST_PASSWORD_LOGIN;
 
@@ -13,7 +12,31 @@ export async function POST() {
     );
   }
 
-  const supabase = await createSupabaseServerClient();
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return NextResponse.json(
+      { error: "Supabase configuration is missing." },
+      { status: 500 }
+    );
+  }
+
+  const response = NextResponse.json({ success: true });
+
+  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) => {
+          response.cookies.set(name, value, options);
+        });
+      },
+    },
+  });
+
   const { error } = await supabase.auth.signInWithPassword({
     email: guestEmail,
     password: guestPassword,
@@ -23,5 +46,5 @@ export async function POST() {
     return NextResponse.json({ error: error.message }, { status: 401 });
   }
 
-  return NextResponse.json({ success: true });
+  return response;
 }
