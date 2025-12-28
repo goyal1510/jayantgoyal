@@ -48,7 +48,7 @@ const ABOUT = {
     "React.js & Next.js Development",
     "TypeScript & JavaScript",
     "REST API Design & Implementation",
-    "Database Management (MongoDB, Supabase)",
+    "Database Management (PostgreSQL, Supabase)",
     "UI/UX Design & User Experience",
   ],
 }
@@ -211,7 +211,7 @@ const PROJECTS = [
     fullDescription:
       "Developed a personal calculator to total cash denomination, store multiple calculations per date, and add optional notes. Integrated Supabase for backend storage with full CRUD functionality. Built with React and custom external CSS for a clean, responsive UI and smooth user interactions. Features include bundle counting, historical tracking, and data persistence.",
     image: "/assets/ProjectImages/work-7.png",
-    tags: ["React", "Supabase", "CSS", "CRUD Operations"],
+    tags: ["Next.js", "Supabase", "CSS", "CRUD Operations"],
     githubLink:
       "https://github.com/goyal1510/jayantgoyal/tree/main/apps/currency-calculator",
     liveLink: "https://ccal.jayantgoyal.com",
@@ -222,7 +222,7 @@ const PROJECTS = [
     fullDescription:
       "Built a drag-and-drop calculator using React and Zustand. Added dark mode, backspace, clear all, and duplicate prevention. Styled with Tailwind CSS and optimized with Vite. Features a calculator builder with drag-and-drop functionality.",
     image: "/assets/ProjectImages/work-1.png",
-    tags: ["React", "Zustand", "Tailwind CSS", "Vite", "Drag & Drop"],
+    tags: ["Next.js", "Tailwind CSS", "Drag & Drop"],
     githubLink:
       "https://github.com/goyal1510/jayantgoyal/tree/main/apps/custom-drag-drop-calculator",
     liveLink: "https://customcal.jayantgoyal.com",
@@ -254,11 +254,11 @@ const PROJECTS = [
   {
     name: "Weather App",
     shortDescription:
-      "Developed a weather application using JavaScript, OpenWeather API, and Tailwind CSS.",
+      "Developed a weather application using Next.js, TypeScript, OpenWeather API, and Tailwind CSS.",
     fullDescription:
-      "Developed a weather application using JavaScript, OpenWeather API, and Tailwind CSS. Implemented city-based search and geolocation-based weather retrieval. Designed a responsive UI for a seamless experience across devices.",
+      "Developed a weather application using Next.js, TypeScript, OpenWeather API, and Tailwind CSS. Implemented city-based search and geolocation-based weather retrieval. Designed a responsive UI for a seamless experience across devices.",
     image: "/assets/ProjectImages/work-4.png",
-    tags: ["JavaScript", "OpenWeather API", "Tailwind CSS", "Geolocation"],
+    tags: ["Next.js","TypeScript", "OpenWeather API", "Tailwind CSS", "Geolocation"],
     githubLink: "https://github.com/goyal1510/jayantgoyal/tree/main/apps/weather",
     liveLink: "https://weather.jayantgoyal.com",
   },
