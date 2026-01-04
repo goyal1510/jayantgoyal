@@ -196,8 +196,7 @@ function AboutSection({
           </CardHeader>
           <CardContent className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              Aspiring Full Stack Developer skilled in React.js, JavaScript,
-              Express.js, and MongoDB. Passionate about building innovative
+              Aspiring Full Stack Developer skilled in Next.js, React.js, JavaScript, TypeScript and Supabase. Passionate about building innovative
               solutions and collaborating with teams to ship meaningful
               experiences.
             </p>

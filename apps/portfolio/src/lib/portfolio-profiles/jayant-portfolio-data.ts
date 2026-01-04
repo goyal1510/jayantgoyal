@@ -167,9 +167,10 @@ const SKILL_SETS = [
     icon: BrainCog,
     color: "text-indigo-500 dark:text-indigo-400",
     items: [
-      { name: "Git", level: 90 },
-      // { name: "GitHub", level: 88 },
       { name: "Vercel", level: 95 },
+      { name: "Git", level: 90 }
+      // { name: "GitHub", level: 88 },
+      
       // { name: "Vite", level: 80 },
       // { name: "NPM", level: 92 },
       // { name: "PNPM", level: 85 },
