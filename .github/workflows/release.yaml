@@ -4,6 +4,8 @@ on:
   pull_request:
     types: [closed]
     branches: [main]
+  push:
+    branches: [main]
 
 # Permissions for release workflow
 permissions:
@@ -12,7 +14,9 @@ permissions:
 
 jobs:
   detect-changes:
-    if: github.event.pull_request.merged == true
+    if: |
+      github.event_name == 'push' ||
+      (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
     runs-on: ubuntu-latest
     outputs:
       activity-tracker: ${{ steps.changes.outputs.activity-tracker }}
@@ -22,15 +26,37 @@ jobs:
       portfolio: ${{ steps.changes.outputs.portfolio }}
       tech: ${{ steps.changes.outputs.tech }}
       weather: ${{ steps.changes.outputs.weather }}
+      pr_title: ${{ steps.changes.outputs.pr_title }}
+      pr_body: ${{ steps.changes.outputs.pr_body }}
+      pr_number: ${{ steps.changes.outputs.pr_number }}
+      commit_sha: ${{ steps.changes.outputs.commit_sha }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Detect changed apps
         id: changes
         run: |
-          # Get list of changed files in the PR
-          CHANGED_FILES=$(gh pr view ${{ github.event.pull_request.number }} --json files -q '.files[].path')
+          # Determine if this is a PR merge or direct push
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            # Get list of changed files in the PR
+            CHANGED_FILES=$(gh pr view ${{ github.event.pull_request.number }} --json files -q '.files[].path')
+            PR_TITLE="${{ github.event.pull_request.title }}"
+            PR_BODY="${{ github.event.pull_request.body }}"
+            PR_NUMBER="${{ github.event.pull_request.number }}"
+            COMMIT_SHA="${{ github.event.pull_request.merge_commit_sha }}"
+          else
+            # For direct push, get changed files from git diff
+            CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+            # Get commit message for release notes
+            COMMIT_MSG=$(git log -1 --pretty=%B ${{ github.sha }})
+            PR_TITLE="Direct push to main"
+            PR_BODY="$COMMIT_MSG"
+            PR_NUMBER=""
+            COMMIT_SHA="${{ github.sha }}"
+          fi
 
           # Check each app for changes (excluding supabase-manager)
           if echo "$CHANGED_FILES" | grep -q "^apps/activity-tracker/"; then
@@ -74,6 +100,12 @@ jobs:
           else
             echo "weather=false" >> $GITHUB_OUTPUT
           fi
+
+          # Store PR/commit info for release notes
+          echo "pr_title=$PR_TITLE" >> $GITHUB_OUTPUT
+          echo "pr_body=$PR_BODY" >> $GITHUB_OUTPUT
+          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+          echo "commit_sha=$COMMIT_SHA" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -107,23 +139,26 @@ jobs:
         if: steps.check_release.outputs.exists == 'false'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_BODY: ${{ github.event.pull_request.body }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ needs.detect-changes.outputs.pr_body }}
+          PR_NUMBER: ${{ needs.detect-changes.outputs.pr_number }}
+          PR_TITLE: ${{ needs.detect-changes.outputs.pr_title }}
+          COMMIT_SHA: ${{ needs.detect-changes.outputs.commit_sha }}
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           {
             echo "## Changes"
             echo ""
             printf '%s\n' "$PR_BODY"
-            echo ""
-            echo "---"
-            echo "PR: #${PR_NUMBER}"
+            if [ -n "$PR_NUMBER" ]; then
+              echo ""
+              echo "---"
+              echo "PR: #${PR_NUMBER}"
+            fi
           } > /tmp/release-notes.md
 
           gh release create "activity-tracker-v${VERSION}" \
             --title "[Activity Tracker] ${PR_TITLE}" \
-            --target "${{ github.event.pull_request.merge_commit_sha }}" \
+            --target "${COMMIT_SHA}" \
             --notes-file /tmp/release-notes.md
 
       - name: Skip release (already exists)
@@ -161,23 +196,26 @@ jobs:
         if: steps.check_release.outputs.exists == 'false'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_BODY: ${{ github.event.pull_request.body }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ needs.detect-changes.outputs.pr_body }}
+          PR_NUMBER: ${{ needs.detect-changes.outputs.pr_number }}
+          PR_TITLE: ${{ needs.detect-changes.outputs.pr_title }}
+          COMMIT_SHA: ${{ needs.detect-changes.outputs.commit_sha }}
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           {
             echo "## Changes"
             echo ""
             printf '%s\n' "$PR_BODY"
-            echo ""
-            echo "---"
-            echo "PR: #${PR_NUMBER}"
+            if [ -n "$PR_NUMBER" ]; then
+              echo ""
+              echo "---"
+              echo "PR: #${PR_NUMBER}"
+            fi
           } > /tmp/release-notes.md
 
           gh release create "currency-calculator-v${VERSION}" \
             --title "[Currency Calculator] ${PR_TITLE}" \
-            --target "${{ github.event.pull_request.merge_commit_sha }}" \
+            --target "${COMMIT_SHA}" \
             --notes-file /tmp/release-notes.md
 
       - name: Skip release (already exists)
@@ -215,23 +253,26 @@ jobs:
         if: steps.check_release.outputs.exists == 'false'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_BODY: ${{ github.event.pull_request.body }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ needs.detect-changes.outputs.pr_body }}
+          PR_NUMBER: ${{ needs.detect-changes.outputs.pr_number }}
+          PR_TITLE: ${{ needs.detect-changes.outputs.pr_title }}
+          COMMIT_SHA: ${{ needs.detect-changes.outputs.commit_sha }}
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           {
             echo "## Changes"
             echo ""
             printf '%s\n' "$PR_BODY"
-            echo ""
-            echo "---"
-            echo "PR: #${PR_NUMBER}"
+            if [ -n "$PR_NUMBER" ]; then
+              echo ""
+              echo "---"
+              echo "PR: #${PR_NUMBER}"
+            fi
           } > /tmp/release-notes.md
 
           gh release create "custom-drag-drop-calculator-v${VERSION}" \
             --title "[Custom Drag Drop Calculator] ${PR_TITLE}" \
-            --target "${{ github.event.pull_request.merge_commit_sha }}" \
+            --target "${COMMIT_SHA}" \
             --notes-file /tmp/release-notes.md
 
       - name: Skip release (already exists)
@@ -269,23 +310,26 @@ jobs:
         if: steps.check_release.outputs.exists == 'false'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_BODY: ${{ github.event.pull_request.body }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ needs.detect-changes.outputs.pr_body }}
+          PR_NUMBER: ${{ needs.detect-changes.outputs.pr_number }}
+          PR_TITLE: ${{ needs.detect-changes.outputs.pr_title }}
+          COMMIT_SHA: ${{ needs.detect-changes.outputs.commit_sha }}
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           {
             echo "## Changes"
             echo ""
             printf '%s\n' "$PR_BODY"
-            echo ""
-            echo "---"
-            echo "PR: #${PR_NUMBER}"
+            if [ -n "$PR_NUMBER" ]; then
+              echo ""
+              echo "---"
+              echo "PR: #${PR_NUMBER}"
+            fi
           } > /tmp/release-notes.md
 
           gh release create "game-hub-v${VERSION}" \
             --title "[Game Hub] ${PR_TITLE}" \
-            --target "${{ github.event.pull_request.merge_commit_sha }}" \
+            --target "${COMMIT_SHA}" \
             --notes-file /tmp/release-notes.md
 
       - name: Skip release (already exists)
@@ -323,23 +367,26 @@ jobs:
         if: steps.check_release.outputs.exists == 'false'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_BODY: ${{ github.event.pull_request.body }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ needs.detect-changes.outputs.pr_body }}
+          PR_NUMBER: ${{ needs.detect-changes.outputs.pr_number }}
+          PR_TITLE: ${{ needs.detect-changes.outputs.pr_title }}
+          COMMIT_SHA: ${{ needs.detect-changes.outputs.commit_sha }}
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           {
             echo "## Changes"
             echo ""
             printf '%s\n' "$PR_BODY"
-            echo ""
-            echo "---"
-            echo "PR: #${PR_NUMBER}"
+            if [ -n "$PR_NUMBER" ]; then
+              echo ""
+              echo "---"
+              echo "PR: #${PR_NUMBER}"
+            fi
           } > /tmp/release-notes.md
 
           gh release create "portfolio-v${VERSION}" \
             --title "[Portfolio] ${PR_TITLE}" \
-            --target "${{ github.event.pull_request.merge_commit_sha }}" \
+            --target "${COMMIT_SHA}" \
             --notes-file /tmp/release-notes.md
 
       - name: Skip release (already exists)
@@ -377,23 +424,26 @@ jobs:
         if: steps.check_release.outputs.exists == 'false'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_BODY: ${{ github.event.pull_request.body }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ needs.detect-changes.outputs.pr_body }}
+          PR_NUMBER: ${{ needs.detect-changes.outputs.pr_number }}
+          PR_TITLE: ${{ needs.detect-changes.outputs.pr_title }}
+          COMMIT_SHA: ${{ needs.detect-changes.outputs.commit_sha }}
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           {
             echo "## Changes"
             echo ""
             printf '%s\n' "$PR_BODY"
-            echo ""
-            echo "---"
-            echo "PR: #${PR_NUMBER}"
+            if [ -n "$PR_NUMBER" ]; then
+              echo ""
+              echo "---"
+              echo "PR: #${PR_NUMBER}"
+            fi
           } > /tmp/release-notes.md
 
           gh release create "tech-v${VERSION}" \
             --title "[Tech] ${PR_TITLE}" \
-            --target "${{ github.event.pull_request.merge_commit_sha }}" \
+            --target "${COMMIT_SHA}" \
             --notes-file /tmp/release-notes.md
 
       - name: Skip release (already exists)
@@ -431,23 +481,26 @@ jobs:
         if: steps.check_release.outputs.exists == 'false'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_BODY: ${{ github.event.pull_request.body }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ needs.detect-changes.outputs.pr_body }}
+          PR_NUMBER: ${{ needs.detect-changes.outputs.pr_number }}
+          PR_TITLE: ${{ needs.detect-changes.outputs.pr_title }}
+          COMMIT_SHA: ${{ needs.detect-changes.outputs.commit_sha }}
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           {
             echo "## Changes"
             echo ""
             printf '%s\n' "$PR_BODY"
-            echo ""
-            echo "---"
-            echo "PR: #${PR_NUMBER}"
+            if [ -n "$PR_NUMBER" ]; then
+              echo ""
+              echo "---"
+              echo "PR: #${PR_NUMBER}"
+            fi
           } > /tmp/release-notes.md
 
           gh release create "weather-v${VERSION}" \
             --title "[Weather] ${PR_TITLE}" \
-            --target "${{ github.event.pull_request.merge_commit_sha }}" \
+            --target "${COMMIT_SHA}" \
             --notes-file /tmp/release-notes.md
 
       - name: Skip release (already exists)
