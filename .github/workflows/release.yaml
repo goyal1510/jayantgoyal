@@ -1,0 +1,457 @@
+name: Release Apps
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+# Permissions for release workflow
+permissions:
+  contents: write       # Create releases and tags
+  pull-requests: read   # Read PR files for change detection
+
+jobs:
+  detect-changes:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    outputs:
+      activity-tracker: ${{ steps.changes.outputs.activity-tracker }}
+      currency-calculator: ${{ steps.changes.outputs.currency-calculator }}
+      custom-drag-drop-calculator: ${{ steps.changes.outputs.custom-drag-drop-calculator }}
+      game-hub: ${{ steps.changes.outputs.game-hub }}
+      portfolio: ${{ steps.changes.outputs.portfolio }}
+      tech: ${{ steps.changes.outputs.tech }}
+      weather: ${{ steps.changes.outputs.weather }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect changed apps
+        id: changes
+        run: |
+          # Get list of changed files in the PR
+          CHANGED_FILES=$(gh pr view ${{ github.event.pull_request.number }} --json files -q '.files[].path')
+
+          # Check each app for changes (excluding supabase-manager)
+          if echo "$CHANGED_FILES" | grep -q "^apps/activity-tracker/"; then
+            echo "activity-tracker=true" >> $GITHUB_OUTPUT
+          else
+            echo "activity-tracker=false" >> $GITHUB_OUTPUT
+          fi
+
+          if echo "$CHANGED_FILES" | grep -q "^apps/currency-calculator/"; then
+            echo "currency-calculator=true" >> $GITHUB_OUTPUT
+          else
+            echo "currency-calculator=false" >> $GITHUB_OUTPUT
+          fi
+
+          if echo "$CHANGED_FILES" | grep -q "^apps/custom-drag-drop-calculator/"; then
+            echo "custom-drag-drop-calculator=true" >> $GITHUB_OUTPUT
+          else
+            echo "custom-drag-drop-calculator=false" >> $GITHUB_OUTPUT
+          fi
+
+          if echo "$CHANGED_FILES" | grep -q "^apps/game-hub/"; then
+            echo "game-hub=true" >> $GITHUB_OUTPUT
+          else
+            echo "game-hub=false" >> $GITHUB_OUTPUT
+          fi
+
+          if echo "$CHANGED_FILES" | grep -q "^apps/portfolio/"; then
+            echo "portfolio=true" >> $GITHUB_OUTPUT
+          else
+            echo "portfolio=false" >> $GITHUB_OUTPUT
+          fi
+
+          if echo "$CHANGED_FILES" | grep -q "^apps/tech/"; then
+            echo "tech=true" >> $GITHUB_OUTPUT
+          else
+            echo "tech=false" >> $GITHUB_OUTPUT
+          fi
+
+          if echo "$CHANGED_FILES" | grep -q "^apps/weather/"; then
+            echo "weather=true" >> $GITHUB_OUTPUT
+          else
+            echo "weather=false" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release-activity-tracker:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.activity-tracker == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get version from package.json
+        id: version
+        run: |
+          VERSION=$(node -p "require('./apps/activity-tracker/package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Activity Tracker version: $VERSION"
+
+      - name: Check if release exists
+        id: check_release
+        run: |
+          if gh release view "activity-tracker-v${{ steps.version.outputs.version }}" > /dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        if: steps.check_release.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          {
+            echo "## Changes"
+            echo ""
+            printf '%s\n' "$PR_BODY"
+            echo ""
+            echo "---"
+            echo "PR: #${PR_NUMBER}"
+          } > /tmp/release-notes.md
+
+          gh release create "activity-tracker-v${VERSION}" \
+            --title "[Activity Tracker] ${PR_TITLE}" \
+            --target "${{ github.event.pull_request.merge_commit_sha }}" \
+            --notes-file /tmp/release-notes.md
+
+      - name: Skip release (already exists)
+        if: steps.check_release.outputs.exists == 'true'
+        run: |
+          echo "Release activity-tracker-v${{ steps.version.outputs.version }} already exists, skipping..."
+
+  release-currency-calculator:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.currency-calculator == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get version from package.json
+        id: version
+        run: |
+          VERSION=$(node -p "require('./apps/currency-calculator/package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Currency Calculator version: $VERSION"
+
+      - name: Check if release exists
+        id: check_release
+        run: |
+          if gh release view "currency-calculator-v${{ steps.version.outputs.version }}" > /dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        if: steps.check_release.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          {
+            echo "## Changes"
+            echo ""
+            printf '%s\n' "$PR_BODY"
+            echo ""
+            echo "---"
+            echo "PR: #${PR_NUMBER}"
+          } > /tmp/release-notes.md
+
+          gh release create "currency-calculator-v${VERSION}" \
+            --title "[Currency Calculator] ${PR_TITLE}" \
+            --target "${{ github.event.pull_request.merge_commit_sha }}" \
+            --notes-file /tmp/release-notes.md
+
+      - name: Skip release (already exists)
+        if: steps.check_release.outputs.exists == 'true'
+        run: |
+          echo "Release currency-calculator-v${{ steps.version.outputs.version }} already exists, skipping..."
+
+  release-custom-drag-drop-calculator:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.custom-drag-drop-calculator == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get version from package.json
+        id: version
+        run: |
+          VERSION=$(node -p "require('./apps/custom-drag-drop-calculator/package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Custom Drag Drop Calculator version: $VERSION"
+
+      - name: Check if release exists
+        id: check_release
+        run: |
+          if gh release view "custom-drag-drop-calculator-v${{ steps.version.outputs.version }}" > /dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        if: steps.check_release.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          {
+            echo "## Changes"
+            echo ""
+            printf '%s\n' "$PR_BODY"
+            echo ""
+            echo "---"
+            echo "PR: #${PR_NUMBER}"
+          } > /tmp/release-notes.md
+
+          gh release create "custom-drag-drop-calculator-v${VERSION}" \
+            --title "[Custom Drag Drop Calculator] ${PR_TITLE}" \
+            --target "${{ github.event.pull_request.merge_commit_sha }}" \
+            --notes-file /tmp/release-notes.md
+
+      - name: Skip release (already exists)
+        if: steps.check_release.outputs.exists == 'true'
+        run: |
+          echo "Release custom-drag-drop-calculator-v${{ steps.version.outputs.version }} already exists, skipping..."
+
+  release-game-hub:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.game-hub == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get version from package.json
+        id: version
+        run: |
+          VERSION=$(node -p "require('./apps/game-hub/package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Game Hub version: $VERSION"
+
+      - name: Check if release exists
+        id: check_release
+        run: |
+          if gh release view "game-hub-v${{ steps.version.outputs.version }}" > /dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        if: steps.check_release.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          {
+            echo "## Changes"
+            echo ""
+            printf '%s\n' "$PR_BODY"
+            echo ""
+            echo "---"
+            echo "PR: #${PR_NUMBER}"
+          } > /tmp/release-notes.md
+
+          gh release create "game-hub-v${VERSION}" \
+            --title "[Game Hub] ${PR_TITLE}" \
+            --target "${{ github.event.pull_request.merge_commit_sha }}" \
+            --notes-file /tmp/release-notes.md
+
+      - name: Skip release (already exists)
+        if: steps.check_release.outputs.exists == 'true'
+        run: |
+          echo "Release game-hub-v${{ steps.version.outputs.version }} already exists, skipping..."
+
+  release-portfolio:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.portfolio == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get version from package.json
+        id: version
+        run: |
+          VERSION=$(node -p "require('./apps/portfolio/package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Portfolio version: $VERSION"
+
+      - name: Check if release exists
+        id: check_release
+        run: |
+          if gh release view "portfolio-v${{ steps.version.outputs.version }}" > /dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        if: steps.check_release.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          {
+            echo "## Changes"
+            echo ""
+            printf '%s\n' "$PR_BODY"
+            echo ""
+            echo "---"
+            echo "PR: #${PR_NUMBER}"
+          } > /tmp/release-notes.md
+
+          gh release create "portfolio-v${VERSION}" \
+            --title "[Portfolio] ${PR_TITLE}" \
+            --target "${{ github.event.pull_request.merge_commit_sha }}" \
+            --notes-file /tmp/release-notes.md
+
+      - name: Skip release (already exists)
+        if: steps.check_release.outputs.exists == 'true'
+        run: |
+          echo "Release portfolio-v${{ steps.version.outputs.version }} already exists, skipping..."
+
+  release-tech:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.tech == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get version from package.json
+        id: version
+        run: |
+          VERSION=$(node -p "require('./apps/tech/package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Tech version: $VERSION"
+
+      - name: Check if release exists
+        id: check_release
+        run: |
+          if gh release view "tech-v${{ steps.version.outputs.version }}" > /dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        if: steps.check_release.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          {
+            echo "## Changes"
+            echo ""
+            printf '%s\n' "$PR_BODY"
+            echo ""
+            echo "---"
+            echo "PR: #${PR_NUMBER}"
+          } > /tmp/release-notes.md
+
+          gh release create "tech-v${VERSION}" \
+            --title "[Tech] ${PR_TITLE}" \
+            --target "${{ github.event.pull_request.merge_commit_sha }}" \
+            --notes-file /tmp/release-notes.md
+
+      - name: Skip release (already exists)
+        if: steps.check_release.outputs.exists == 'true'
+        run: |
+          echo "Release tech-v${{ steps.version.outputs.version }} already exists, skipping..."
+
+  release-weather:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.weather == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get version from package.json
+        id: version
+        run: |
+          VERSION=$(node -p "require('./apps/weather/package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Weather version: $VERSION"
+
+      - name: Check if release exists
+        id: check_release
+        run: |
+          if gh release view "weather-v${{ steps.version.outputs.version }}" > /dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        if: steps.check_release.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          {
+            echo "## Changes"
+            echo ""
+            printf '%s\n' "$PR_BODY"
+            echo ""
+            echo "---"
+            echo "PR: #${PR_NUMBER}"
+          } > /tmp/release-notes.md
+
+          gh release create "weather-v${VERSION}" \
+            --title "[Weather] ${PR_TITLE}" \
+            --target "${{ github.event.pull_request.merge_commit_sha }}" \
+            --notes-file /tmp/release-notes.md
+
+      - name: Skip release (already exists)
+        if: steps.check_release.outputs.exists == 'true'
+        run: |
+          echo "Release weather-v${{ steps.version.outputs.version }} already exists, skipping..."
+
