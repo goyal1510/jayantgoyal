@@ -158,7 +158,7 @@ function HeroSection({
             </Link>
           </Button>
           <Button asChild size="lg" variant="outline" className="group h-11">
-          <Link href="/assets/Jayant_Resume.pdf" target="_blank" rel="noreferrer">
+            <Link href="/assets/Jayant_Resume.pdf" download="Jayant_Resume.pdf">
               Download CV
               <Download className="ml-2 size-4 transition-transform group-hover:translate-y-0.5" />
             </Link>
