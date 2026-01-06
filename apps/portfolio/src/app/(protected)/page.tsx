@@ -30,6 +30,7 @@ import { Separator } from "@/components/ui/separator";
 import type { PortfolioData } from "@/lib/portfolio-data";
 import { usePortfolioData } from "@/lib/use-portfolio-data";
 import { cn } from "@/lib/utils";
+import { GithubCalendarComponent } from "@/components/github-calendar";
 
 type SectionId = PortfolioData["NAV_ITEMS"][number]["id"];
 type Project = PortfolioData["PROJECTS"][number];
@@ -65,6 +66,7 @@ export default function Page() {
       <HeroSection hero={HERO} contact={CONTACT} />
       <AboutSection about={ABOUT} education={EDUCATION} />
       <SkillsSection skillSets={SKILL_SETS} techIcons={TECH_ICONS} />
+      <GithubActivitySection contact={CONTACT} />
       <ExperienceSection experience={EXPERIENCE} />
       <ProjectsSection
         projects={PROJECTS}
@@ -684,6 +686,32 @@ function CertificatesSection({
           </div>
         </div>
       ) : null}
+    </section>
+  );
+}
+
+function GithubActivitySection({
+  contact,
+}: {
+  contact: PortfolioData["CONTACT"];
+}) {
+  const githubSocial = contact.socials.find((social) => social.label === "GitHub");
+  const githubUrl = githubSocial?.href;
+  const githubUsername = githubUrl?.match(/github\.com\/([^\/]+)/)?.[1] || "goyal1510";
+
+  return (
+    <section
+      id="github-activity"
+      className={cn("px-4 sm:px-6 lg:px-8", sectionScrollMargin)}
+    >
+      <SectionHeader
+        title="Development Activity"
+        description="Consistent daily coding and open source contributions"
+      />
+      <Separator className="my-8" />
+      <div className="mx-auto max-w-4xl">
+        <GithubCalendarComponent username={githubUsername} githubUrl={githubUrl} />
+      </div>
     </section>
   );
 }
