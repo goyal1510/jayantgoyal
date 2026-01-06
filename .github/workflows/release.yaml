@@ -101,11 +101,17 @@ jobs:
             echo "weather=false" >> $GITHUB_OUTPUT
           fi
 
-          # Store PR/commit info for release notes
-          echo "pr_title=$PR_TITLE" >> $GITHUB_OUTPUT
-          echo "pr_body=$PR_BODY" >> $GITHUB_OUTPUT
-          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
-          echo "commit_sha=$COMMIT_SHA" >> $GITHUB_OUTPUT
+          # Store PR/commit info for release notes (properly escape multiline content)
+          {
+            echo "pr_title<<EOF"
+            echo "$PR_TITLE"
+            echo "EOF"
+            echo "pr_body<<EOF"
+            echo "$PR_BODY"
+            echo "EOF"
+            echo "pr_number=$PR_NUMBER"
+            echo "commit_sha=$COMMIT_SHA"
+          } >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
