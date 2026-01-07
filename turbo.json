@@ -6,7 +6,10 @@
     "NEXT_PUBLIC_SUPABASE_ANON_KEY",
     "SUPABASE_SERVICE_ROLE_KEY",
     "GUEST_EMAIL_LOGIN",
-    "GUEST_PASSWORD_LOGIN"
+    "GUEST_PASSWORD_LOGIN",
+    "RESEND_API_KEY",
+    "RESEND_FROM_EMAIL",
+    "NEXT_PUBLIC_SITE_URL"
   ],
   "tasks": {
     "build": {
@@ -16,7 +19,9 @@
         "NEXT_PUBLIC_SUPABASE_ANON_KEY",
         "SUPABASE_SERVICE_ROLE_KEY",
         "GUEST_EMAIL_LOGIN",
-    "GUEST_PASSWORD_LOGIN"
+        "GUEST_PASSWORD_LOGIN",
+        "RESEND_API_KEY",
+        "NEXT_PUBLIC_SITE_URL"
       ],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]

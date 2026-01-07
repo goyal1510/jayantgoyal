@@ -1,6 +1,6 @@
 {
   "name": "portfolio",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "type": "module",
   "private": true,
   "scripts": {
@@ -31,6 +31,7 @@
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "react-github-calendar": "^5.0.4",
+    "resend": "^6.6.0",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0"
   },
