@@ -2,7 +2,10 @@
 
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy initialization to avoid build-time errors
+function getResendClient() {
+  return new Resend(process.env.RESEND_API_KEY);
+}
 
 type ContactFormState = {
   error?: string;
@@ -42,6 +45,9 @@ export async function submitContactForm(
     // Resend requires verified domains for 'from' field. Use a verified domain or Resend's test domain.
     // The user's email is set in replyTo so replies will go to them.
     const fromEmail = process.env.RESEND_FROM_EMAIL || "Portfolio Contact <onboarding@resend.dev>";
+    
+    // Initialize Resend client only when needed (at runtime, not build time)
+    const resend = getResendClient();
     
     const { data, error } = await resend.emails.send({
       from: fromEmail, // Use verified domain or Resend's test domain

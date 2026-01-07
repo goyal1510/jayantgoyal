@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy initialization to avoid build-time errors
+function getResendClient() {
+  return new Resend(process.env.RESEND_API_KEY);
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -40,6 +43,9 @@ export async function POST(request: NextRequest) {
     // Resend requires verified domains for 'from' field. Use a verified domain or Resend's test domain.
     // The user's email is set in replyTo so replies will go to them.
     const fromEmail = process.env.RESEND_FROM_EMAIL || "Portfolio Contact <onboarding@resend.dev>";
+    
+    // Initialize Resend client only when needed (at runtime, not build time)
+    const resend = getResendClient();
     
     // Send email using Resend
     const { data, error } = await resend.emails.send({
