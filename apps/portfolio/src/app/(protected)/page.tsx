@@ -31,6 +31,7 @@ import type { PortfolioData } from "@/lib/portfolio-data";
 import { usePortfolioData } from "@/lib/use-portfolio-data";
 import { cn } from "@/lib/utils";
 import { GithubCalendarComponent } from "@/components/github-calendar";
+import { ContactForm } from "@/components/contact-form";
 
 type SectionId = PortfolioData["NAV_ITEMS"][number]["id"];
 type Project = PortfolioData["PROJECTS"][number];
@@ -788,57 +789,8 @@ function ContactSection({
               I will reply via email as soon as possible.
             </CardDescription>
           </CardHeader>
-              <CardContent>
-                <form
-                  className="space-y-4"
-                  action={`mailto:${contact.email}`}
-                  method="POST"
-                  encType="text/plain"
-                >
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="space-y-1 text-sm">
-                  <span className="text-muted-foreground">Name</span>
-                  <input
-                    name="name"
-                    required
-                    className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none ring-2 ring-transparent transition focus:ring-primary/30"
-                    placeholder="Your name"
-                  />
-                </label>
-                <label className="space-y-1 text-sm">
-                  <span className="text-muted-foreground">Email</span>
-                  <input
-                    name="email"
-                    type="email"
-                    required
-                    className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none ring-2 ring-transparent transition focus:ring-primary/30"
-                    placeholder="you@example.com"
-                  />
-                </label>
-              </div>
-              <label className="space-y-1 text-sm">
-                <span className="text-muted-foreground">Subject</span>
-                <input
-                  name="subject"
-                  required
-                  className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none ring-2 ring-transparent transition focus:ring-primary/30"
-                  placeholder="Project idea, role, or question"
-                />
-              </label>
-              <label className="space-y-1 text-sm">
-                <span className="text-muted-foreground">Message</span>
-                <textarea
-                  name="message"
-                  required
-                  rows={5}
-                  className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none ring-2 ring-transparent transition focus:ring-primary/30"
-                  placeholder="Share a few details..."
-                />
-              </label>
-              <Button type="submit" className="w-full">
-                Send message
-              </Button>
-            </form>
+          <CardContent>
+            <ContactForm />
           </CardContent>
         </Card>
       </div>
