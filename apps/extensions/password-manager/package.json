@@ -1,0 +1,33 @@
+{
+  "name": "password-manager",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "vite build --watch --mode development",
+    "build": "vite build",
+    "lint": "eslint --max-warnings 0",
+    "check-types": "tsc --noEmit",
+    "generate-icons": "node scripts/generate-icons.js"
+  },
+  "dependencies": {
+    "@repo/ui": "workspace:*",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/tailwind-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/chrome": "^0.0.268",
+    "@types/node": "^22.15.30",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.39.1",
+    "typescript": "5.9.2",
+    "vite": "^6.0.5",
+    "vite-plugin-static-copy": "^3.1.2",
+    "pngjs": "^7.0.0"
+  }
+}
