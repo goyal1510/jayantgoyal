@@ -54,15 +54,15 @@ const DEFAULT_NAMES = {
 }
 
 export function TicTacToe() {
-  const [mode, setMode] = useState<Mode>("local_pvp")
+  const [mode, setMode] = useState<Mode>("vs_computer")
   const [board, setBoard] = useState<Cell[]>(Array<Cell>(9).fill(""))
   const [turnO, setTurnO] = useState(true)
   const [winner, setWinner] = useState<WinnerResult>(null)
   const [isDraw, setIsDraw] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [showSetupSheet, setShowSetupSheet] = useState(true)
-  const [playerO, setPlayerO] = useState(DEFAULT_NAMES.O)
-  const [playerX, setPlayerX] = useState(DEFAULT_NAMES.X)
+  const [playerO, setPlayerO] = useState("You (O)")
+  const [playerX, setPlayerX] = useState("Computer (X)")
   const [moveHistory, setMoveHistory] = useState<Move[]>([])
 
   const playerLabels = useMemo(() => {
