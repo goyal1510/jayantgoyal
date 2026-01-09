@@ -1,4 +1,4 @@
-export type GameSlug = "rock-paper-scissors" | "tic-tac-toe" | "dare-x"
+export type GameSlug = "rock-paper-scissors" | "tic-tac-toe" | "dare-x" | "connect-four" | "memory-match"
 
 export const GAME_META: Record<
   GameSlug,
@@ -18,5 +18,15 @@ export const GAME_META: Record<
     name: "Dare X",
     description: "Multi-player local dare challenge.",
     modes: ["local_pvp"],
+  },
+  "connect-four": {
+    name: "Connect Four",
+    description: "Drop pieces to connect four in a row.",
+    modes: ["local_pvp", "vs_computer"],
+  },
+  "memory-match": {
+    name: "Memory Match",
+    description: "Find matching pairs of cards.",
+    modes: ["local_pvp", "vs_computer"],
   },
 }

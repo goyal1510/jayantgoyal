@@ -8,6 +8,8 @@ import {
   Grid3X3,
   HandHeart,
   History,
+  Layers,
+  Brain,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -47,7 +49,17 @@ const navItems = [
     title: "Dare X",
     url: "/dare-x",
     icon: HandHeart,
-  }
+  },
+  {
+    title: "Connect Four",
+    url: "/connect-four",
+    icon: Layers,
+  },
+  {
+    title: "Memory Match",
+    url: "/memory-match",
+    icon: Brain,
+  },
 ]
 
 const teams = [
