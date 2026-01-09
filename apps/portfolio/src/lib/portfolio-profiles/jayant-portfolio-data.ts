@@ -243,11 +243,11 @@ const PROJECTS = [
   {
     name: "Game Hub",
     shortDescription:
-      "Developed a Game Hub featuring three interactive games: Rock Paper Scissors, Dare You, and Tic Tac Toe.",
+      "Developed a Game Hub featuring five interactive games: Rock Paper Scissors, Tic Tac Toe, Connect Four, Memory Match, and Dare X.",
     fullDescription:
-      "Developed a Game Hub featuring three interactive games: Rock Paper Scissors, Dare You, and Tic Tac Toe. Utilized HTML, CSS, and JavaScript to ensure simplicity and ease of use. A gaming platform where users can explore and play various games.",
+      "Developed a Game Hub featuring five interactive games: Rock Paper Scissors, Tic Tac Toe, Connect Four, Memory Match, and Dare X. Built with Next.js 16, TypeScript, and Supabase for authentication. Features include animated coin drops in Connect Four, winning line highlighting, AI opponents with strategic gameplay, multiple difficulty levels in Memory Match, and comprehensive game state management. Includes both Player vs Player and Player vs Computer modes for most games.",
     image: "/assets/ProjectImages/work-2.png",
-    tags: ["Next.js","Interactive Games"],
+    tags: ["Next.js", "TypeScript", "Supabase", "Interactive Games", "AI Opponents"],
     githubLink:
       "https://github.com/goyal1510/jayantgoyal/tree/main/apps/game-hub",
     liveLink: "https://ghub.jayantgoyal.com",
