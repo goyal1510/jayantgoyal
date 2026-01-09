@@ -104,3 +104,18 @@
     scroll-behavior: smooth;
   }
 }
+
+@keyframes coin-drop {
+  from {
+    transform: translateY(-400%);
+    opacity: 0.8;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.coin-drop-animation {
+  animation: coin-drop 0.8s ease-out;
+}

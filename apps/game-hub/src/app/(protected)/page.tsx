@@ -1,6 +1,6 @@
 import Link from "next/link"
 import type { ElementType } from "react"
-import { ArrowRight, Gamepad2, Grid3X3, HandHeart, Scissors } from "lucide-react"
+import { ArrowRight, Gamepad2, Grid3X3, HandHeart, Scissors, Layers, Brain } from "lucide-react"
 
 import { GAME_META } from "@/lib/games"
 import { cn } from "@/lib/utils"
@@ -39,6 +39,24 @@ const CARD_THEMES: Record<
     accent:
       "bg-emerald-100/80 border-emerald-200/70 dark:bg-emerald-500/10 dark:border-emerald-500/30",
     accentText: "text-emerald-800 dark:text-emerald-50",
+    border: "border-slate-200/60 dark:border-slate-800",
+  },
+  "connect-four": {
+    gradient:
+      "from-orange-200/50 via-slate-50 to-white dark:from-orange-500/25 dark:via-slate-900 dark:to-slate-950",
+    icon: Layers,
+    accent:
+      "bg-orange-100/80 border-orange-200/70 dark:bg-orange-500/10 dark:border-orange-500/30",
+    accentText: "text-orange-800 dark:text-orange-50",
+    border: "border-slate-200/60 dark:border-slate-800",
+  },
+  "memory-match": {
+    gradient:
+      "from-pink-200/50 via-slate-50 to-white dark:from-pink-500/25 dark:via-slate-900 dark:to-slate-950",
+    icon: Brain,
+    accent:
+      "bg-pink-100/80 border-pink-200/70 dark:bg-pink-500/10 dark:border-pink-500/30",
+    accentText: "text-pink-800 dark:text-pink-50",
     border: "border-slate-200/60 dark:border-slate-800",
   },
 }
