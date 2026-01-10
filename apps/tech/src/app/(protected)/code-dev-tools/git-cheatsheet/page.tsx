@@ -3,6 +3,9 @@
 import * as React from "react"
 import { getToolByPath } from "@/lib/tools"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Copy } from "lucide-react"
+import { toast } from "sonner"
 
 const gitCommands = [
   {
@@ -54,6 +57,11 @@ const gitCommands = [
 export default function GitCheatsheetPage() {
   const tool = getToolByPath("/code-dev-tools/git-cheatsheet")
 
+  const copyToClipboard = (command: string) => {
+    navigator.clipboard.writeText(command)
+    toast.success("Command copied to clipboard")
+  }
+
   if (!tool) {
     return <div>Tool not found</div>
   }
@@ -68,9 +76,20 @@ return (
               <div className="space-y-3">
                 {section.commands.map((item, index) => (
                   <div key={index} className="space-y-1">
-                    <code className="block font-mono text-sm bg-muted px-2 py-1 rounded">
-                      {item.cmd}
-                    </code>
+                    <div className="flex items-center gap-2">
+                      <code className="flex-1 font-mono text-sm bg-muted px-2 py-1 rounded">
+                        {item.cmd}
+                      </code>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => copyToClipboard(item.cmd)}
+                        title="Copy command"
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                    </div>
                     <p className="text-sm text-muted-foreground ml-2">{item.desc}</p>
                   </div>
                 ))}
