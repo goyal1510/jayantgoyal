@@ -747,6 +747,13 @@ export const toolCategories: ToolCategory[] = [
         icon: Smile,
         path: "/other/emoji-picker",
       },
+      {
+        id: "personal-information-form",
+        title: "Personal Information Form",
+        description: "Fill out personal information including name, phone number, date of birth, age, and gender.",
+        icon: User,
+        path: "/other/personal-information-form",
+      },
     ],
   },
 ]
