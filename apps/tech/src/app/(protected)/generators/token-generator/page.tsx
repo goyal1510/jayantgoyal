@@ -6,18 +6,32 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Copy, RefreshCw } from "lucide-react"
+import { Copy, RefreshCw, CopyCheck } from "lucide-react"
 import { toast } from "sonner"
 
 export default function TokenGeneratorPage() {
   const tool = getToolByPath("/generators/token-generator")
-  const [length, setLength] = React.useState(32)
+  const [length, setLength] = React.useState(12)
   const [includeUppercase, setIncludeUppercase] = React.useState(true)
   const [includeLowercase, setIncludeLowercase] = React.useState(true)
   const [includeNumbers, setIncludeNumbers] = React.useState(true)
   const [includeSymbols, setIncludeSymbols] = React.useState(false)
   const [customChars, setCustomChars] = React.useState("")
-  const [token, setToken] = React.useState("")
+  const [tokenCount, setTokenCount] = React.useState(1)
+  const [tokens, setTokens] = React.useState<string[]>([])
+
+  const generateSingleToken = React.useCallback((charset: string): string => {
+    let result = ""
+    const array = new Uint8Array(length)
+    crypto.getRandomValues(array)
+    
+    for (let i = 0; i < length; i++) {
+      const byte = array[i] ?? 0
+      result += charset[byte % charset.length]
+    }
+    
+    return result
+  }, [length])
 
   const generateToken = React.useCallback(() => {
     let charset = ""
@@ -33,25 +47,28 @@ export default function TokenGeneratorPage() {
       return
     }
 
-    let result = ""
-    const array = new Uint8Array(length)
-    crypto.getRandomValues(array)
-    
-    for (let i = 0; i < length; i++) {
-      const byte = array[i] ?? 0
-      result += charset[byte % charset.length]
+    const generatedTokens: string[] = []
+    for (let i = 0; i < tokenCount; i++) {
+      generatedTokens.push(generateSingleToken(charset))
     }
     
-    setToken(result)
-  }, [length, includeUppercase, includeLowercase, includeNumbers, includeSymbols, customChars])
+    setTokens(generatedTokens)
+  }, [length, includeUppercase, includeLowercase, includeNumbers, includeSymbols, customChars, tokenCount, generateSingleToken])
 
   React.useEffect(() => {
     generateToken()
   }, [generateToken])
 
-  const copyToClipboard = () => {
+  const copyToClipboard = (token: string) => {
     navigator.clipboard.writeText(token)
     toast.success("Token copied to clipboard")
+  }
+
+  const copyAllToClipboard = () => {
+    if (tokens.length === 0) return
+    const allTokens = tokens.join("\n")
+    navigator.clipboard.writeText(allTokens)
+    toast.success(`${tokens.length} token${tokens.length > 1 ? 's' : ''} copied to clipboard`)
   }
 
   if (!tool) {
@@ -76,6 +93,18 @@ export default function TokenGeneratorPage() {
                 max="1000"
                 value={length}
                 onChange={(e) => setLength(Math.max(1, Math.min(1000, parseInt(e.target.value) || 1)))}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="tokenCount">Number of Passwords</Label>
+              <Input
+                id="tokenCount"
+                type="number"
+                min="1"
+                max="100"
+                value={tokenCount}
+                onChange={(e) => setTokenCount(Math.max(1, Math.min(100, parseInt(e.target.value) || 1)))}
               />
             </div>
 
@@ -152,32 +181,64 @@ export default function TokenGeneratorPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Generated Token</CardTitle>
-            <CardDescription>Your secure random token</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>Token</Label>
-              <div className="flex gap-2">
-                <Input
-                  value={token}
-                  readOnly
-                  className="font-mono text-sm"
-                />
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Generated Tokens</CardTitle>
+                <CardDescription>
+                  {tokens.length > 0 
+                    ? `${tokens.length} token${tokens.length > 1 ? 's' : ''} generated`
+                    : "Your secure random tokens"
+                  }
+                </CardDescription>
+              </div>
+              {tokens.length > 0 && (
                 <Button
                   variant="outline"
-                  size="icon"
-                  onClick={copyToClipboard}
-                  disabled={!token}
+                  size="sm"
+                  onClick={copyAllToClipboard}
                 >
-                  <Copy className="h-4 w-4" />
+                  <CopyCheck className="h-4 w-4 mr-2" />
+                  Copy All
                 </Button>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {tokens.length === 0 ? (
+              <div className="flex items-center justify-center py-12 text-muted-foreground">
+                <p>Click "Generate New Token" to create tokens</p>
               </div>
-            </div>
-            <div className="text-sm text-muted-foreground">
-              <p>Length: {token.length} characters</p>
-              <p>Entropy: ~{Math.round(token.length * Math.log2((includeUppercase ? 26 : 0) + (includeLowercase ? 26 : 0) + (includeNumbers ? 10 : 0) + (includeSymbols ? 20 : 0) + customChars.length))} bits</p>
-            </div>
+            ) : (
+              <div className="space-y-3">
+                {tokens.map((token, index) => (
+                  <div key={index} className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Label className="text-xs text-muted-foreground w-12">
+                        #{index + 1}
+                      </Label>
+                      <div className="flex gap-2 flex-1">
+                        <Input
+                          value={token}
+                          readOnly
+                          className="font-mono text-sm"
+                        />
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => copyToClipboard(token)}
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <div className="text-sm text-muted-foreground pt-2 border-t">
+                  <p>Length: {length} characters per token</p>
+                  <p>Entropy: ~{Math.round(length * Math.log2((includeUppercase ? 26 : 0) + (includeLowercase ? 26 : 0) + (includeNumbers ? 10 : 0) + (includeSymbols ? 20 : 0) + customChars.length))} bits per token</p>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
