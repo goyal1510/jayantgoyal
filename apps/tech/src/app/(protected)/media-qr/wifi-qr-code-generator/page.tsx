@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Download } from "lucide-react"
+import { Download, Wifi, RefreshCw } from "lucide-react"
 import { toast } from "sonner"
 
 export default function WiFiQRCodeGeneratorPage() {
@@ -16,6 +16,7 @@ export default function WiFiQRCodeGeneratorPage() {
   const [security, setSecurity] = React.useState("WPA")
   const [hidden, setHidden] = React.useState(false)
   const [qrUrl, setQrUrl] = React.useState("")
+  const [isDetecting, setIsDetecting] = React.useState(false)
 
   React.useEffect(() => {
     if (!ssid.trim()) {
@@ -38,6 +39,65 @@ export default function WiFiQRCodeGeneratorPage() {
     toast.success("WiFi QR code downloaded")
   }
 
+  const detectCurrentWiFi = async () => {
+    setIsDetecting(true)
+    
+    try {
+      // Try to detect SSID using experimental APIs (limited browser support)
+      if ('getNetworkInformation' in navigator) {
+        try {
+          const networkInfo = await (navigator as any).getNetworkInformation()
+          if (networkInfo?.ssid) {
+            setSSID(networkInfo.ssid)
+            toast.success("WiFi SSID detected successfully")
+            setIsDetecting(false)
+            return
+          }
+        } catch (e) {
+          // API not available
+        }
+      }
+
+      // Try Chrome/Edge experimental API on Android
+      if ('wifi' in navigator) {
+        try {
+          const wifiInfo = await (navigator as any).wifi.getCurrentWifiInfo()
+          if (wifiInfo?.ssid) {
+            setSSID(wifiInfo.ssid)
+            toast.success("WiFi SSID detected successfully")
+            setIsDetecting(false)
+            return
+          }
+        } catch (e) {
+          // API not available
+        }
+      }
+
+      // Check network connection type
+      const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection
+      
+      if (connection) {
+        const networkType = connection.effectiveType || connection.type || "unknown"
+        const isWifi = connection.type === 'wifi' || connection.effectiveType?.includes('wifi')
+        
+        if (isWifi) {
+          // WiFi detected but SSID not accessible
+          toast.info("WiFi connection detected. Please enter the network name (SSID) manually.")
+        } else {
+          toast.info("Unable to detect WiFi network. Please enter the network details manually.")
+        }
+      } else {
+        // No connection info available
+        toast.info("Please enter your WiFi network name (SSID) manually.")
+      }
+      
+    } catch (error) {
+      toast.info("Please enter your WiFi network details manually.")
+    } finally {
+      setIsDetecting(false)
+    }
+  }
+
   if (!tool) {
     return <div>Tool not found</div>
   }
@@ -51,13 +111,37 @@ export default function WiFiQRCodeGeneratorPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="ssid">SSID (Network Name)</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="ssid">SSID (Network Name)</Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={detectCurrentWiFi}
+                disabled={isDetecting}
+              >
+                {isDetecting ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                    Detecting...
+                  </>
+                ) : (
+                  <>
+                    <Wifi className="h-4 w-4 mr-2" />
+                    Detect Current WiFi
+                  </>
+                )}
+              </Button>
+            </div>
             <Input
               id="ssid"
               value={ssid}
               onChange={(e) => setSSID(e.target.value)}
               placeholder="MyWiFiNetwork"
             />
+            <p className="text-xs text-muted-foreground">
+              WiFi detection may not work on all browsers. Passwords must be entered manually for security.
+            </p>
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
