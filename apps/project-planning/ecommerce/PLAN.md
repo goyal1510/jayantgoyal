@@ -1,1 +1,1 @@
-Ecommerce - Jaynt
+Ecommerce - Jaynt Goyal
