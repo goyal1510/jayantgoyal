@@ -3,15 +3,168 @@ import { PersonalInfo, DEFAULT_PERSONAL_INFO, PreviousCompany, Education, SAMPLE
 
 type Tab = "basic" | "address" | "experience" | "education" | "skills" | "languages" | "certifications" | "projects" | "references" | "links" | "additional";
 
+// Copy to clipboard helper function
+async function copyToClipboard(text: string) {
+  try {
+    await navigator.clipboard.writeText(text);
+    const notification = document.createElement("div");
+    notification.textContent = "Copied!";
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #4CAF50;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 4px;
+      z-index: 10000;
+      font-size: 12px;
+      pointer-events: none;
+    `;
+    document.body.appendChild(notification);
+    setTimeout(() => notification.remove(), 1000);
+  } catch (err) {
+    console.error("Failed to copy:", err);
+  }
+}
+
+// Helper component for nested fields (in Previous Jobs, Education sections)
+const NestedFieldWithCopy = ({
+  label,
+  value,
+  onChange,
+  placeholder,
+  type = "text",
+  style = {},
+}: {
+  label: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+  placeholder?: string;
+  type?: string;
+  style?: React.CSSProperties;
+}) => (
+  <div style={{ marginBottom: "8px" }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+      <label style={{ fontSize: "11px", fontWeight: "500", color: "#a0a0a0" }}>{label}</label>
+      {value && (
+        <button
+          onClick={() => copyToClipboard(value)}
+          style={{
+            padding: "2px 6px",
+            backgroundColor: "#333333",
+            border: "1px solid #404040",
+            borderRadius: "3px",
+            cursor: "pointer",
+            fontSize: "10px",
+            color: "#a0a0a0",
+          }}
+          title="Copy"
+        >
+          📋
+        </button>
+      )}
+    </div>
+    {type === "textarea" ? (
+      <textarea
+        value={value}
+        onChange={onChange as (e: React.ChangeEvent<HTMLTextAreaElement>) => void}
+        placeholder={placeholder}
+        style={{ width: "100%", padding: "8px", border: "1px solid #404040", borderRadius: "4px", fontSize: "12px", fontFamily: "inherit", resize: "vertical", backgroundColor: "#2d2d2d", color: "#e0e0e0", ...style }}
+      />
+    ) : (
+      <input
+        type={type}
+        value={value}
+        onChange={onChange as (e: React.ChangeEvent<HTMLInputElement>) => void}
+        placeholder={placeholder}
+        style={{ width: "100%", padding: "8px", border: "1px solid #404040", borderRadius: "4px", fontSize: "12px", backgroundColor: "#2d2d2d", color: "#e0e0e0", ...style }}
+      />
+    )}
+  </div>
+);
+
+// Reusable field component with label and copy button
+const FieldWithCopy = ({ 
+  label, 
+  value, 
+  onChange, 
+  placeholder, 
+  type = "text",
+  style = {},
+  options
+}: {
+  label: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+  placeholder?: string;
+  type?: string;
+  style?: React.CSSProperties;
+  options?: { value: string; label: string }[];
+}) => (
+  <div style={{ marginBottom: "12px" }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+      <label style={{ fontSize: "12px", fontWeight: "500", color: "#c0c0c0" }}>{label}</label>
+      {value && (
+        <button
+          onClick={() => copyToClipboard(value)}
+          style={{
+            padding: "4px 8px",
+            backgroundColor: "#333333",
+            border: "1px solid #404040",
+            borderRadius: "4px",
+            cursor: "pointer",
+            fontSize: "11px",
+            color: "#a0a0a0",
+            display: "flex",
+            alignItems: "center",
+            gap: "4px",
+          }}
+          title="Copy to clipboard"
+        >
+          📋 Copy
+        </button>
+      )}
+    </div>
+    {type === "textarea" ? (
+      <textarea
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        style={{ width: "100%", padding: "9px 12px", border: "1px solid #404040", borderRadius: "6px", fontSize: "13px", fontFamily: "inherit", resize: "vertical", backgroundColor: "#2d2d2d", color: "#e0e0e0", ...style }}
+      />
+    ) : type === "select" && options ? (
+      <select
+        value={value}
+        onChange={onChange}
+        style={{ width: "100%", padding: "9px 12px", border: "1px solid #404040", borderRadius: "6px", fontSize: "13px", backgroundColor: "#2d2d2d", color: "#e0e0e0", ...style }}
+      >
+        {options.map((opt) => (
+          <option key={opt.value} value={opt.value}>{opt.label}</option>
+        ))}
+      </select>
+    ) : (
+      <input
+        type={type}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        style={{ width: "100%", padding: "9px 12px", border: "1px solid #404040", borderRadius: "6px", fontSize: "13px", backgroundColor: "#2d2d2d", color: "#e0e0e0", ...style }}
+      />
+    )}
+  </div>
+);
+
 export default function App() {
   const [personalInfo, setPersonalInfo] = useState<PersonalInfo>(DEFAULT_PERSONAL_INFO);
   const [saved, setSaved] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>("basic");
   const [showFormatModal, setShowFormatModal] = useState(false);
+  const [autoPrefill, setAutoPrefill] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    chrome.storage.local.get(["personalInfo"], (result) => {
+    chrome.storage.local.get(["personalInfo", "autoPrefill"], (result) => {
       if (result.personalInfo) {
         // Merge with DEFAULT_PERSONAL_INFO to ensure all fields are initialized
         setPersonalInfo({
@@ -29,6 +182,9 @@ export default function App() {
           preferredWorkType: result.personalInfo.preferredWorkType || [],
         });
       }
+      if (result.autoPrefill !== undefined) {
+        setAutoPrefill(result.autoPrefill);
+      }
     });
   }, []);
 
@@ -45,6 +201,23 @@ export default function App() {
         chrome.tabs.sendMessage(tabs[0].id, {
           type: "AUTOFILL",
           data: personalInfo,
+        });
+      }
+    });
+  };
+
+  const handleToggleAutoPrefill = () => {
+    const newValue = !autoPrefill;
+    setAutoPrefill(newValue);
+    chrome.storage.local.set({ autoPrefill: newValue }, () => {
+      // If enabling, trigger prefill on current tab
+      if (newValue) {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          if (tabs[0]?.id) {
+            chrome.tabs.sendMessage(tabs[0].id, {
+              type: "TRIGGER_PREFILL",
+            });
+          }
         });
       }
     });
@@ -192,158 +365,6 @@ export default function App() {
     copyToClipboard(exampleJson);
   };
 
-  const copyToClipboard = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      // Show temporary feedback
-      const notification = document.createElement("div");
-      notification.textContent = "Copied!";
-      notification.style.cssText = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: #4CAF50;
-        color: white;
-        padding: 8px 16px;
-        border-radius: 4px;
-        z-index: 10000;
-        font-size: 12px;
-        pointer-events: none;
-      `;
-      document.body.appendChild(notification);
-      setTimeout(() => notification.remove(), 1000);
-    } catch (err) {
-      console.error("Failed to copy:", err);
-    }
-  };
-
-  // Helper component for nested fields (in Previous Jobs, Education sections)
-  const NestedFieldWithCopy = ({
-    label,
-    value,
-    onChange,
-    placeholder,
-    type = "text",
-    style = {},
-  }: {
-    label: string;
-    value: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
-    placeholder?: string;
-    type?: string;
-    style?: React.CSSProperties;
-  }) => (
-    <div style={{ marginBottom: "8px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
-        <label style={{ fontSize: "11px", fontWeight: "500", color: "#a0a0a0" }}>{label}</label>
-        {value && (
-          <button
-            onClick={() => copyToClipboard(value)}
-            style={{
-              padding: "2px 6px",
-              backgroundColor: "#333333",
-              border: "1px solid #404040",
-              borderRadius: "3px",
-              cursor: "pointer",
-              fontSize: "10px",
-              color: "#a0a0a0",
-            }}
-            title="Copy"
-          >
-            📋
-          </button>
-        )}
-      </div>
-      {type === "textarea" ? (
-        <textarea
-          value={value}
-          onChange={onChange as (e: React.ChangeEvent<HTMLTextAreaElement>) => void}
-          placeholder={placeholder}
-          style={{ width: "100%", padding: "8px", border: "1px solid #404040", borderRadius: "4px", fontSize: "12px", fontFamily: "inherit", resize: "vertical", backgroundColor: "#2d2d2d", color: "#e0e0e0", ...style }}
-        />
-      ) : (
-        <input
-          type={type}
-          value={value}
-          onChange={onChange as (e: React.ChangeEvent<HTMLInputElement>) => void}
-          placeholder={placeholder}
-          style={{ width: "100%", padding: "8px", border: "1px solid #404040", borderRadius: "4px", fontSize: "12px", backgroundColor: "#2d2d2d", color: "#e0e0e0", ...style }}
-        />
-      )}
-    </div>
-  );
-
-  // Reusable field component with label and copy button
-  const FieldWithCopy = ({ 
-    label, 
-    value, 
-    onChange, 
-    placeholder, 
-    type = "text",
-    style = {},
-    options
-  }: {
-    label: string;
-    value: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
-    placeholder?: string;
-    type?: string;
-    style?: React.CSSProperties;
-    options?: { value: string; label: string }[];
-  }) => (
-    <div style={{ marginBottom: "12px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-        <label style={{ fontSize: "12px", fontWeight: "500", color: "#c0c0c0" }}>{label}</label>
-        {value && (
-          <button
-            onClick={() => copyToClipboard(value)}
-            style={{
-              padding: "4px 8px",
-              backgroundColor: "#333333",
-              border: "1px solid #404040",
-              borderRadius: "4px",
-              cursor: "pointer",
-              fontSize: "11px",
-              color: "#a0a0a0",
-              display: "flex",
-              alignItems: "center",
-              gap: "4px",
-            }}
-            title="Copy to clipboard"
-          >
-            📋 Copy
-          </button>
-        )}
-      </div>
-      {type === "textarea" ? (
-        <textarea
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
-          style={{ width: "100%", padding: "9px 12px", border: "1px solid #404040", borderRadius: "6px", fontSize: "13px", fontFamily: "inherit", resize: "vertical", backgroundColor: "#2d2d2d", color: "#e0e0e0", ...style }}
-        />
-      ) : type === "select" && options ? (
-        <select
-          value={value}
-          onChange={onChange}
-          style={{ width: "100%", padding: "9px 12px", border: "1px solid #404040", borderRadius: "6px", fontSize: "13px", backgroundColor: "#2d2d2d", color: "#e0e0e0", ...style }}
-        >
-          {options.map((opt) => (
-            <option key={opt.value} value={opt.value}>{opt.label}</option>
-          ))}
-        </select>
-      ) : (
-        <input
-          type={type}
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
-          style={{ width: "100%", padding: "9px 12px", border: "1px solid #404040", borderRadius: "6px", fontSize: "13px", backgroundColor: "#2d2d2d", color: "#e0e0e0", ...style }}
-        />
-      )}
-    </div>
-  );
 
   const addLanguage = () => {
     setPersonalInfo({
@@ -1721,42 +1742,84 @@ export default function App() {
         backgroundColor: "#252525",
         flexShrink: 0,
         display: "flex",
+        flexDirection: "column",
         gap: "10px"
       }}>
-        <button
-          onClick={handleSave}
-          style={{
-            flex: 1,
-            padding: "10px 16px",
-            backgroundColor: saved ? "#4CAF50" : "#2196F3",
-            color: "white",
-            border: "none",
-            borderRadius: "6px",
+        {/* Auto-prefill Toggle */}
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "8px 12px",
+          backgroundColor: "#2d2d2d",
+          borderRadius: "6px",
+          border: "1px solid #404040"
+        }}>
+          <label style={{
+            color: "#e0e0e0",
+            fontSize: "12px",
+            fontWeight: "500",
             cursor: "pointer",
-            fontWeight: "600",
-            fontSize: "13px",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-          }}
-        >
-          {saved ? "✓ Saved!" : "Save Information"}
-        </button>
-        <button
-          onClick={handleAutofill}
-          style={{
-            flex: 1,
-            padding: "10px 16px",
-            backgroundColor: "#4CAF50",
-            color: "white",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontWeight: "600",
-            fontSize: "13px",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-          }}
-        >
-          Autofill Form
-        </button>
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            flex: 1
+          }}>
+            <input
+              type="checkbox"
+              checked={autoPrefill}
+              onChange={handleToggleAutoPrefill}
+              style={{
+                width: "16px",
+                height: "16px",
+                cursor: "pointer",
+                accentColor: "#2196F3"
+              }}
+            />
+            <span>Auto-prefill forms on page load</span>
+          </label>
+        </div>
+
+        {/* Action Buttons */}
+        <div style={{
+          display: "flex",
+          gap: "10px"
+        }}>
+          <button
+            onClick={handleSave}
+            style={{
+              flex: 1,
+              padding: "10px 16px",
+              backgroundColor: saved ? "#4CAF50" : "#2196F3",
+              color: "white",
+              border: "none",
+              borderRadius: "6px",
+              cursor: "pointer",
+              fontWeight: "600",
+              fontSize: "13px",
+              boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+            }}
+          >
+            {saved ? "✓ Saved!" : "Save Information"}
+          </button>
+          <button
+            onClick={handleAutofill}
+            style={{
+              flex: 1,
+              padding: "10px 16px",
+              backgroundColor: "#4CAF50",
+              color: "white",
+              border: "none",
+              borderRadius: "6px",
+              cursor: "pointer",
+              fontWeight: "600",
+              fontSize: "13px",
+              boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+            }}
+          >
+            Autofill Form
+          </button>
+        </div>
       </div>
 
       {/* Format Modal */}
