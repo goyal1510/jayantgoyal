@@ -32,14 +32,14 @@ Building a full-stack file management system using Next.js (App Router) and Supa
 ## Week 1: Project Setup & Foundation
 
 ### Day 1: Project Initialization
-- [ ] Initialize Next.js project with TypeScript
-- [ ] Set up project structure (app directory, components, lib, types)
-- [ ] Configure Tailwind CSS
-- [ ] Set up ESLint and Prettier
-- [ ] Initialize Git repository
-- [ ] Create Supabase project
-- [ ] Set up environment variables (.env.local)
-- [ ] Install dependencies: `@supabase/supabase-js`, `@supabase/ssr`
+- [x] Initialize Next.js project with TypeScript
+- [x] Set up project structure (app directory, components, lib, types)
+- [x] Configure Tailwind CSS
+- [x] Set up ESLint and Prettier
+- [x] Initialize Git repository
+- [x] Create Supabase project
+- [ ] Set up environment variables (.env.local) - Add credentials from Supabase dashboard
+- [x] Install dependencies: `@supabase/supabase-js`, `@supabase/ssr`
 
 ### Day 2: Database Setup
 - [ ] Run database schema from `DATABASE-STRUCTURE-PLAN.md`
@@ -254,23 +254,6 @@ Building a full-stack file management system using Next.js (App Router) and Supa
 - [ ] Custom file type icons
 - [ ] File preview improvements
 - [ ] Mobile app (React Native)
-
----
-
-## Technical Stack
-
-- **Framework**: Next.js 14+ (App Router)
-- **Language**: TypeScript
-- **Database**: Supabase (PostgreSQL)
-- **Storage**: Supabase Storage
-- **Authentication**: Supabase Auth
-- **Styling**: Tailwind CSS
-- **UI Components**: shadcn/ui (optional)
-- **Icons**: Lucide React / Heroicons
-- **State Management**: React Context / Zustand (if needed)
-- **File Upload**: Native File API + Supabase Storage
-- **Deployment**: Vercel
-
 ---
 
 ## Key API Routes to Create
