@@ -16,6 +16,8 @@
 - [x] Create Supabase project ✅ (User completed)
 - [x] Set up environment variables (.env.local.example)
 - [x] Install dependencies: `@supabase/supabase-js`, `@supabase/ssr`
+- [x] Set up Vercel deployment (Day 20 Task 1) ✅
+- [x] Configure environment variables for production (Day 20 Task 2) ✅
 
 ---
 
@@ -67,6 +69,19 @@
   - Tailwind CSS and related packages
   - UI libraries (lucide-react, sonner, etc.)
 - All dependencies installed successfully
+
+### Deployment Setup (Day 20 Tasks 1 & 2)
+- ✅ **Vercel Deployment**: Set up and configured Vercel deployment
+  - Project connected to Vercel
+  - Build configuration verified
+  - Deployment pipeline configured
+  - **Live URL**: https://fmanager.jayantgoyal.com
+- ✅ **Production Environment Variables**: Configured environment variables in Vercel
+  - `NEXT_PUBLIC_SUPABASE_URL` configured
+  - `NEXT_PUBLIC_SUPABASE_ANON_KEY` configured
+  - All required environment variables set in Vercel dashboard
+  - Production build tested and verified
+- Application is now live and accessible at fmanager.jayantgoyal.com
 
 ---
 
@@ -156,10 +171,11 @@ apps/file-manager/
 
 ## 📊 Progress Summary
 
-**Tasks Completed**: 8 / 8 (Supabase project created ✅)  
-**Time Spent**: ~1 hour  
+**Tasks Completed**: 10 / 10 (Including Day 20 deployment tasks ✅)  
+**Time Spent**: ~1.5 hours  
 **Blockers**: None  
-**Overall Status**: ✅ On track - Ready for Day 2!
+**Overall Status**: ✅ On track - Project initialized and deployed!  
+**Live URL**: https://fmanager.jayantgoyal.com
 
 ---
 
@@ -180,3 +196,15 @@ What to focus on tomorrow:
 - Supabase storage bucket creation
 - Testing database functions
 - Generating TypeScript types from database
+
+---
+
+## 🚀 Deployment Notes
+
+**Deployment Completed**: Day 1 (ahead of schedule - Day 20 tasks)
+- **Platform**: Vercel
+- **Domain**: fmanager.jayantgoyal.com
+- **Status**: ✅ Live and accessible
+- **Environment Variables**: Configured in Vercel dashboard
+- **Build**: Successful production build
+- **Next Steps**: Continue with Day 2 database setup tasks

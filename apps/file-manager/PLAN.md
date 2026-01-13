@@ -38,7 +38,7 @@ Building a full-stack file management system using Next.js (App Router) and Supa
 - [x] Set up ESLint and Prettier
 - [x] Initialize Git repository
 - [x] Create Supabase project
-- [ ] Set up environment variables (.env.local) - Add credentials from Supabase dashboard
+- [x] Set up environment variables (.env.local) - Add credentials from Supabase dashboard
 - [x] Install dependencies: `@supabase/supabase-js`, `@supabase/ssr`
 
 ### Day 2: Database Setup
@@ -223,8 +223,8 @@ Building a full-stack file management system using Next.js (App Router) and Supa
 - [ ] Optimize bundle size
 
 ### Day 20: Deployment & Final Polish
-- [ ] Set up Vercel/Netlify deployment
-- [ ] Configure environment variables
+- [x] Set up Vercel/Netlify deployment ✅ (Completed on Day 1 - fmanager.jayantgoyal.com)
+- [x] Configure environment variables ✅ (Completed on Day 1)
 - [ ] Set up CI/CD pipeline
 - [ ] Test production build
 - [ ] Fix production issues
