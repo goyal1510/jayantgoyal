@@ -49,16 +49,24 @@ Building a full-stack file management system using Next.js (App Router) and Supa
 - [ ] Test database functions (create_directory_path, list_directory) - **Moved to Day 3 (after auth setup)**
 - [ ] Test RLS policies - **Moved to Day 3 (after auth setup)**
 
-### Day 3: Authentication Setup
-- [ ] Set up Supabase Auth helpers for Next.js
-- [ ] Create login page
-- [ ] Create signup page
-- [ ] Create logout functionality
-- [ ] Implement protected routes middleware
-- [ ] Create user profile component
-- [ ] Test authentication flow
-- [ ] Test database functions (create_directory_path, list_directory) - **From Day 2**
-- [ ] Test RLS policies - **From Day 2**
+### Day 3: Authentication Setup & Sidebar
+- [x] Set up Supabase Auth helpers for Next.js
+- [x] Create login page
+- [x] Create signup page
+- [x] Create logout functionality
+- [x] Implement protected routes middleware (proxy.ts)
+- [x] Create user profile component (NavUser)
+- [x] Implement sidebar navigation
+- [x] Create sidebar UI components (sidebar, skeleton, separator, sheet, collapsible, tooltip, avatar, breadcrumb, dropdown-menu)
+- [x] Create app sidebar component
+- [x] Create navigation components (NavMain, TeamSwitcher, NavUser)
+- [x] Update layout to use sidebar (protected route group)
+- [x] Add theme provider (dark/light/system mode)
+- [x] Add theme toggle component
+- [x] Create account API routes (/api/account/profile, /api/account/delete)
+- [x] Test authentication flow ✅
+- [ ] Test database functions (create_directory_path, list_directory) - **Will test during Day 6+ implementation**
+- [ ] Test RLS policies - **Will test during Day 6+ implementation**
 
 ### Day 4: Layout & Navigation
 - [ ] Create main layout component
