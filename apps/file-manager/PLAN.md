@@ -42,12 +42,12 @@ Building a full-stack file management system using Next.js (App Router) and Supa
 - [x] Install dependencies: `@supabase/supabase-js`, `@supabase/ssr`
 
 ### Day 2: Database Setup
-- [ ] Run database schema from `DATABASE-STRUCTURE-PLAN.md`
-- [ ] Create `private-files` storage bucket in Supabase
-- [ ] Test database functions (create_directory_path, list_directory)
-- [ ] Set up Supabase client utilities
-- [ ] Create TypeScript types from database schema
-- [ ] Test RLS policies
+- [x] Run database schema from `DATABASE-STRUCTURE-PLAN.md`
+- [x] Create `private-files` storage bucket in Supabase
+- [x] Set up Supabase client utilities
+- [x] Create TypeScript types from database schema
+- [ ] Test database functions (create_directory_path, list_directory) - **Moved to Day 3 (after auth setup)**
+- [ ] Test RLS policies - **Moved to Day 3 (after auth setup)**
 
 ### Day 3: Authentication Setup
 - [ ] Set up Supabase Auth helpers for Next.js
@@ -57,6 +57,8 @@ Building a full-stack file management system using Next.js (App Router) and Supa
 - [ ] Implement protected routes middleware
 - [ ] Create user profile component
 - [ ] Test authentication flow
+- [ ] Test database functions (create_directory_path, list_directory) - **From Day 2**
+- [ ] Test RLS policies - **From Day 2**
 
 ### Day 4: Layout & Navigation
 - [ ] Create main layout component
