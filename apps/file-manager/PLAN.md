@@ -69,22 +69,22 @@ Building a full-stack file management system using Next.js (App Router) and Supa
 - [ ] Test RLS policies - **Will test during Day 6+ implementation**
 
 ### Day 4: Layout & Navigation
-- [ ] Create main layout component
-- [ ] Design and implement sidebar navigation
-- [ ] Create header with user menu
-- [ ] Implement breadcrumb navigation
-- [ ] Add loading states and error boundaries
-- [ ] Set up routing structure
+- [x] Create main layout component
+- [x] Design and implement sidebar navigation
+- [x] Create header with user menu
+- [x] Implement breadcrumb navigation
+- [x] Add loading states and error boundaries
+- [x] Set up routing structure
 
 ### Day 5: UI Components Library
-- [ ] Create Button component
-- [ ] Create Input component
-- [ ] Create Modal/Dialog component
-- [ ] Create File/Folder icon components
-- [ ] Create Loading spinner component
-- [ ] Create Toast/Notification component
-- [ ] Create Context Menu component
-- [ ] Set up shadcn/ui (optional)
+- [x] Create Button component
+- [x] Create Input component
+- [x] Create Modal/Dialog component
+- [x] Create File/Folder icon components
+- [x] Create Loading spinner component
+- [x] Create Toast/Notification component
+- [x] Create Context Menu component
+- [x] Set up shadcn/ui (optional)
 
 ---
 
