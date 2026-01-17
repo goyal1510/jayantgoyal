@@ -2,47 +2,46 @@
 
 import * as React from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-// Day 5 imports - commented out for now
-// import { Button } from "@/components/ui/button"
-// import {
-//   Dialog,
-//   DialogContent,
-//   DialogDescription,
-//   DialogFooter,
-//   DialogHeader,
-//   DialogTitle,
-//   DialogTrigger,
-// } from "@/components/ui/dialog"
-// import {
-//   ContextMenu,
-//   ContextMenuContent,
-//   ContextMenuItem,
-//   ContextMenuSeparator,
-//   ContextMenuSub,
-//   ContextMenuSubContent,
-//   ContextMenuSubTrigger,
-//   ContextMenuTrigger,
-// } from "@/components/ui/context-menu"
-// import { FileIcon, FolderIcon, FileFolderIcon, getFileType } from "@/components/file-icons"
-// import { Spinner, SpinnerWithText } from "@/components/ui/spinner"
-// import { Folder, File, Package, Zap } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu"
+import { FileIcon, FolderIcon, FileFolderIcon, getFileType } from "@/components/file-icons"
+import { Spinner, SpinnerWithText } from "@/components/ui/spinner"
+import { Folder, File, Package, Zap } from "lucide-react"
 
 export default function HomePage() {
-  // Day 5 state - commented out for now
-  // const [dialogOpen, setDialogOpen] = React.useState(false)
 
-  // Day 5 sample files - commented out for now
-  // const sampleFiles = [
-  //   { name: "document.pdf", type: "document" as const },
-  //   { name: "photo.jpg", type: "image" as const },
-  //   { name: "video.mp4", type: "video" as const },
-  //   { name: "song.mp3", type: "audio" as const },
-  //   { name: "spreadsheet.xlsx", type: "spreadsheet" as const },
-  //   { name: "code.tsx", type: "code" as const },
-  //   { name: "archive.zip", type: "archive" as const },
-  //   { name: "readme.txt", type: "text" as const },
-  //   { name: "unknown.xyz", type: "other" as const },
-  // ]
+  const [dialogOpen, setDialogOpen] = React.useState(false)
+
+
+  const sampleFiles = [
+    { name: "document.pdf", type: "document" as const },
+    { name: "photo.jpg", type: "image" as const },
+    { name: "video.mp4", type: "video" as const },
+    { name: "song.mp3", type: "audio" as const },
+    { name: "spreadsheet.xlsx", type: "spreadsheet" as const },
+    { name: "code.tsx", type: "code" as const },
+    { name: "archive.zip", type: "archive" as const },
+    { name: "readme.txt", type: "text" as const },
+    { name: "unknown.xyz", type: "other" as const },
+  ]
 
   return (
     <div className="space-y-8">
@@ -53,57 +52,9 @@ export default function HomePage() {
         </p>
       </div>
 
-      {/* Day 4 Components Showcase */}
+      {/* Day 5 Component Showcase - Commented out for now */}
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
-          <CardHeader>
-            <CardTitle>Layout & Navigation</CardTitle>
-            <CardDescription>
-              Protected routes with sidebar navigation and breadcrumbs
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              The application now has a complete layout system with:
-            </p>
-            <ul className="mt-4 space-y-2 text-sm text-muted-foreground list-disc list-inside">
-              <li>Protected route structure</li>
-              <li>Collapsible sidebar navigation</li>
-              <li>Breadcrumb navigation</li>
-              <li>Theme toggle (dark/light/system)</li>
-              <li>User profile menu</li>
-              <li>Error boundaries</li>
-              <li>Loading states</li>
-            </ul>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Authentication</CardTitle>
-            <CardDescription>
-              Complete authentication system
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              User authentication features:
-            </p>
-            <ul className="mt-4 space-y-2 text-sm text-muted-foreground list-disc list-inside">
-              <li>Login and signup pages</li>
-              <li>Guest login support</li>
-              <li>Protected routes middleware</li>
-              <li>User profile management</li>
-              <li>Account deletion</li>
-            </ul>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Day 5 Component Showcase - Commented out for now */}
-      {/* <div className="grid gap-6 md:grid-cols-2">
-        {/* File Icons Showcase */}
-        {/* <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <File className="h-5 w-5" />
@@ -138,10 +89,10 @@ export default function HomePage() {
               </div>
             </div>
           </CardContent>
-        </Card> */}
+        </Card>
 
         {/* Dialog Component Showcase */}
-        {/* <Card>
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Package className="h-5 w-5" />
@@ -184,10 +135,10 @@ export default function HomePage() {
               Click the button above to see the dialog in action
             </p>
           </CardContent>
-        </Card> */}
+        </Card>
 
         {/* Context Menu Showcase */}
-        {/* <Card>
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Zap className="h-5 w-5" />
@@ -238,10 +189,10 @@ export default function HomePage() {
               </ContextMenuContent>
             </ContextMenu>
           </CardContent>
-        </Card> */}
+        </Card>
 
         {/* Spinner Showcase */}
-        {/* <Card>
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Spinner size="sm" />
@@ -272,8 +223,8 @@ export default function HomePage() {
               <SpinnerWithText text="Uploading..." size="lg" />
             </div>
           </CardContent>
-        </Card> */}
-      {/* </div> */}
+        </Card>
+      </div>
 
       {/* Progress Status */}
       <Card>
@@ -302,18 +253,14 @@ export default function HomePage() {
               <span className="text-sm text-muted-foreground">✅ Complete</span>
             </div>
             {/* Day 5 - Commented out for now */}
-            {/* <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Day 5: UI Components Library</span>
               <span className="text-sm text-muted-foreground">✅ Complete</span>
-            </div> */}
-            <div className="flex items-center justify-between pt-2 border-t">
-              <span className="text-sm font-medium">Day 5: UI Components Library</span>
-              <span className="text-sm text-muted-foreground">⏳ Next</span>
             </div>
-            {/* <div className="flex items-center justify-between pt-2 border-t">
+            <div className="flex items-center justify-between pt-2 border-t">
               <span className="text-sm font-medium">Day 6: File Listing & Navigation</span>
               <span className="text-sm text-muted-foreground">⏳ Next</span>
-            </div> */}
+            </div>
           </div>
         </CardContent>
       </Card>
