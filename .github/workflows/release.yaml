@@ -26,6 +26,7 @@ jobs:
       portfolio: ${{ steps.changes.outputs.portfolio }}
       tech: ${{ steps.changes.outputs.tech }}
       weather: ${{ steps.changes.outputs.weather }}
+      file-manager: ${{ steps.changes.outputs.file-manager }}
       pr_title: ${{ steps.changes.outputs.pr_title }}
       pr_body: ${{ steps.changes.outputs.pr_body }}
       pr_number: ${{ steps.changes.outputs.pr_number }}
@@ -99,6 +100,12 @@ jobs:
             echo "weather=true" >> $GITHUB_OUTPUT
           else
             echo "weather=false" >> $GITHUB_OUTPUT
+          fi
+
+          if echo "$CHANGED_FILES" | grep -q "^apps/file-manager/"; then
+            echo "file-manager=true" >> $GITHUB_OUTPUT
+          else
+            echo "file-manager=false" >> $GITHUB_OUTPUT
           fi
 
           # Store PR/commit info for release notes (properly escape multiline content)
@@ -514,3 +521,59 @@ jobs:
         run: |
           echo "Release weather-v${{ steps.version.outputs.version }} already exists, skipping..."
 
+release-file-manager:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.file-manager == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get version from package.json
+        id: version
+        run: |
+          VERSION=$(node -p "require('./apps/file-manager/package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "File Manager version: $VERSION"
+
+      - name: Check if release exists
+        id: check_release
+        run: |
+          if gh release view "file-manager-v${{ steps.version.outputs.version }}" > /dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        if: steps.check_release.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_BODY: ${{ needs.detect-changes.outputs.pr_body }}
+          PR_NUMBER: ${{ needs.detect-changes.outputs.pr_number }}
+          PR_TITLE: ${{ needs.detect-changes.outputs.pr_title }}
+          COMMIT_SHA: ${{ needs.detect-changes.outputs.commit_sha }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          {
+            echo "## Changes"
+            echo ""
+            printf '%s\n' "$PR_BODY"
+            if [ -n "$PR_NUMBER" ]; then
+              echo ""
+              echo "---"
+              echo "PR: #${PR_NUMBER}"
+            fi
+          } > /tmp/release-notes.md
+
+          gh release create "file-manager-v${VERSION}" \
+            --title "[File Manager] ${PR_TITLE}" \
+            --target "${COMMIT_SHA}" \
+            --notes-file /tmp/release-notes.md
+
+      - name: Skip release (already exists)
+        if: steps.check_release.outputs.exists == 'true'
+        run: |
+          echo "Release file-manager-v${{ steps.version.outputs.version }} already exists, skipping..."
