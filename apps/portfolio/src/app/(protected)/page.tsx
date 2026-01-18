@@ -3,7 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { useTheme } from "next-themes";
 import {
   Award,
   Calendar,
@@ -422,48 +423,83 @@ function ProjectsSection({
       <Separator className="my-8" />
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {projects.map((project, index) => (
-          <motion.div
+          <ProjectCard
             key={project.name}
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: index * 0.05 }}
-            viewport={{ once: true }}
-          >
-            <Card
-              className="group h-full cursor-pointer transition-all hover:-translate-y-1 hover:shadow-lg"
-              onClick={() => onSelectProject(project)}
-            >
-              <div className="relative h-48 overflow-hidden rounded-t-lg">
-                <Image
-                  src={project.image}
-                  alt={project.name}
-                  fill
-                  className="object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-              </div>
-              <CardHeader>
-                <CardTitle className="text-lg leading-tight">
-                  {project.name}
-                </CardTitle>
-                <CardDescription>{project.shortDescription}</CardDescription>
-              </CardHeader>
-              <CardContent className="flex flex-wrap gap-2">
-                {project.tags.slice(0, 3).map((tag) => (
-                  <Badge key={tag} variant="secondary">
-                    {tag}
-                  </Badge>
-                ))}
-                {project.tags.length > 3 ? (
-                  <Badge variant="secondary">
-                    +{project.tags.length - 3}
-                  </Badge>
-                ) : null}
-              </CardContent>
-            </Card>
-          </motion.div>
+            project={project}
+            index={index}
+            onSelectProject={onSelectProject}
+          />
         ))}
       </div>
     </section>
+  );
+}
+
+function ProjectCard({
+  project,
+  index,
+  onSelectProject,
+}: {
+  project: Project;
+  index: number;
+  onSelectProject: (project: Project) => void;
+}) {
+  const [mounted, setMounted] = useState(false);
+  const { theme, resolvedTheme } = useTheme();
+  
+  // Prevent hydration mismatch by waiting for client-side mount
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  
+  // Default to light mode during SSR to prevent hydration mismatch
+  const isDark = mounted && (resolvedTheme === 'dark' || theme === 'dark');
+  
+  // Get theme-aware image
+  const projectAny = project as any;
+  const projectImage = isDark 
+    ? (projectAny.imageDark || projectAny.imageLight)
+    : (projectAny.imageLight || projectAny.imageDark);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: index * 0.05 }}
+      viewport={{ once: true }}
+    >
+      <Card
+        className="group h-full cursor-pointer transition-all hover:-translate-y-1 hover:shadow-lg"
+        onClick={() => onSelectProject(project)}
+      >
+        <div className="relative h-48 overflow-hidden rounded-t-lg">
+          <Image
+            src={projectImage}
+            alt={project.name}
+            fill
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+        </div>
+        <CardHeader>
+          <CardTitle className="text-lg leading-tight">
+            {project.name}
+          </CardTitle>
+          <CardDescription>{project.shortDescription}</CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-wrap gap-2">
+          {project.tags.slice(0, 3).map((tag) => (
+            <Badge key={tag} variant="secondary">
+              {tag}
+            </Badge>
+          ))}
+          {project.tags.length > 3 ? (
+            <Badge variant="secondary">
+              +{project.tags.length - 3}
+            </Badge>
+          ) : null}
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }
 
@@ -474,8 +510,24 @@ function ProjectModal({
   project: Project;
   onClose: () => void;
 }) {
+  const [mounted, setMounted] = useState(false);
+  const { theme, resolvedTheme } = useTheme();
+  
+  // Prevent hydration mismatch by waiting for client-side mount
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  
+  // Default to light mode during SSR to prevent hydration mismatch
+  const isDark = mounted && (resolvedTheme === 'dark' || theme === 'dark');
   const hasGithubLink = Boolean(project.githubLink);
   const hasLiveLink = Boolean(project.liveLink);
+  
+  // Get theme-aware image
+  const projectAny = project as any;
+  const projectImage = isDark 
+    ? (projectAny.imageDark || projectAny.imageLight)
+    : (projectAny.imageLight || projectAny.imageDark);
 
   return (
     <motion.div
@@ -502,7 +554,7 @@ function ProjectModal({
         </button>
         <div className="relative h-72 w-full">
           <Image
-            src={project.image}
+            src={projectImage}
             alt={project.name}
             fill
             className="object-cover"

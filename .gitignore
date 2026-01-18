@@ -37,3 +37,6 @@ dist/
 
 apps/jdksk/*
 apps/trinetra-doc/*
+
+# Large video files
+apps/portfolio/public/assets/ProjectVideos/
