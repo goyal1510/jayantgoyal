@@ -521,7 +521,7 @@ jobs:
         run: |
           echo "Release weather-v${{ steps.version.outputs.version }} already exists, skipping..."
 
-release-file-manager:
+  release-file-manager:
     needs: detect-changes
     if: needs.detect-changes.outputs.file-manager == 'true'
     runs-on: ubuntu-latest
