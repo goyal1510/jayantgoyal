@@ -34,10 +34,12 @@ export async function createDirectoryPath(
   userId: string,
   directoryPath: string
 ): Promise<string | null> {
-  const { data, error } = await supabase.rpc("fmanager.create_directory_path", {
-    p_user_id: userId,
-    p_directory_path: directoryPath,
-  } as CreateDirectoryPathParams);
+  const { data, error } = await supabase
+    .schema("fmanager")
+    .rpc("create_directory_path", {
+      p_user_id: userId,
+      p_directory_path: directoryPath,
+    } as CreateDirectoryPathParams);
 
   if (error) {
     console.error("Error creating directory path:", error);
@@ -59,10 +61,12 @@ export async function listDirectory(
   userId: string,
   directoryPath: string = "/"
 ): Promise<DirectoryListingItem[] | null> {
-  const { data, error } = await supabase.rpc("fmanager.list_directory", {
-    p_user_id: userId,
-    p_directory_path: directoryPath,
-  } as ListDirectoryParams);
+  const { data, error } = await supabase
+    .schema("fmanager")
+    .rpc("list_directory", {
+      p_user_id: userId,
+      p_directory_path: directoryPath,
+    } as ListDirectoryParams);
 
   if (error) {
     console.error("Error listing directory:", error);
@@ -84,10 +88,12 @@ export async function getDirectoryTree(
   userId: string,
   parentPath: string = "/"
 ): Promise<DirectoryTreeItem[] | null> {
-  const { data, error } = await supabase.rpc("fmanager.get_directory_tree", {
-    p_user_id: userId,
-    p_parent_path: parentPath,
-  } as GetDirectoryTreeParams);
+  const { data, error } = await supabase
+    .schema("fmanager")
+    .rpc("get_directory_tree", {
+      p_user_id: userId,
+      p_parent_path: parentPath,
+    } as GetDirectoryTreeParams);
 
   if (error) {
     console.error("Error getting directory tree:", error);
@@ -113,10 +119,12 @@ export async function getFileByPath(
   userId: string,
   filePath: string
 ): Promise<FileRecord | null> {
-  const { data, error } = await supabase.rpc("fmanager.get_file_by_path", {
-    p_user_id: userId,
-    p_file_path: filePath,
-  } as GetFileByPathParams);
+  const { data, error } = await supabase
+    .schema("fmanager")
+    .rpc("get_file_by_path", {
+      p_user_id: userId,
+      p_file_path: filePath,
+    } as GetFileByPathParams);
 
   if (error) {
     console.error("Error getting file by path:", error);
@@ -140,11 +148,13 @@ export async function generateStoragePath(
   filePath: string,
   fileName: string
 ): Promise<string | null> {
-  const { data, error } = await supabase.rpc("fmanager.generate_storage_path", {
-    p_user_id: userId,
-    p_file_path: filePath,
-    p_file_name: fileName,
-  } as GenerateStoragePathParams);
+  const { data, error } = await supabase
+    .schema("fmanager")
+    .rpc("generate_storage_path", {
+      p_user_id: userId,
+      p_file_path: filePath,
+      p_file_name: fileName,
+    } as GenerateStoragePathParams);
 
   if (error) {
     console.error("Error generating storage path:", error);
@@ -203,11 +213,13 @@ export async function moveFile(
   newDirectoryPath: string,
   userId: string
 ): Promise<boolean> {
-  const { data, error } = await supabase.rpc("fmanager.move_file", {
-    p_file_id: fileId,
-    p_new_directory_path: newDirectoryPath,
-    p_user_id: userId,
-  } as MoveFileParams);
+  const { data, error } = await supabase
+    .schema("fmanager")
+    .rpc("move_file", {
+      p_file_id: fileId,
+      p_new_directory_path: newDirectoryPath,
+      p_user_id: userId,
+    } as MoveFileParams);
 
   if (error) {
     console.error("Error moving file:", error);
@@ -231,11 +243,13 @@ export async function copyFile(
   targetDirectoryPath: string,
   userId: string
 ): Promise<string | null> {
-  const { data, error } = await supabase.rpc("fmanager.copy_file", {
-    p_file_id: fileId,
-    p_target_directory_path: targetDirectoryPath,
-    p_user_id: userId,
-  } as CopyFileParams);
+  const { data, error } = await supabase
+    .schema("fmanager")
+    .rpc("copy_file", {
+      p_file_id: fileId,
+      p_target_directory_path: targetDirectoryPath,
+      p_user_id: userId,
+    } as CopyFileParams);
 
   if (error) {
     console.error("Error copying file:", error);
