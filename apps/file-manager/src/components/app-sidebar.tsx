@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { usePathname } from "next/navigation";
-import { Folder, Home } from "lucide-react";
+import { Folder, Home, FileText } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
@@ -26,6 +26,12 @@ const navItems = [
     url: "/",
     icon: Home,
     isActive: true,
+  },
+  {
+    title: "Release Notes",
+    url: "/changelog",
+    icon: FileText,
+    isActive: false,
   },
 ];
 

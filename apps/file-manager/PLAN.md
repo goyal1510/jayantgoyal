@@ -91,13 +91,13 @@ Building a full-stack file management system using Next.js (App Router) and Supa
 ## Week 2: Core File Operations
 
 ### Day 6: File Listing & Directory Navigation
-- [ ] Create API route for listing directory contents
-- [ ] Implement `list_directory` function call
-- [ ] Create FileList component (grid/list view)
-- [ ] Implement directory navigation
-- [ ] Add file/folder icons based on type
-- [ ] Implement sorting (name, date, size, type)
-- [ ] Add loading states
+- [x] Create API route for listing directory contents
+- [x] Implement `list_directory` function call
+- [x] Create FileList component (grid/list view)
+- [x] Implement directory navigation
+- [x] Add file/folder icons based on type
+- [x] Implement sorting (name, date, size, type)
+- [x] Add loading states
 
 ### Day 7: Directory Management
 - [ ] Create "New Folder" functionality
