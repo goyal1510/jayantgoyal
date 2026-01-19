@@ -11,7 +11,7 @@
 CREATE SCHEMA IF NOT EXISTS fmanager;
 
 -- Grant usage to authenticated users
-GRANT USAGE ON SCHEMA fmanager TO authenticated;
+GRANT USAGE ON SCHEMA fmanager TO anon, authenticated, service_role;
 GRANT ALL ON SCHEMA fmanager TO authenticated;
 
 -- ============================================
@@ -24,10 +24,10 @@ CREATE TABLE fmanager.files (
   
   -- Storage reference
   bucket_id TEXT NOT NULL DEFAULT 'private-files',
-  storage_path TEXT NOT NULL, -- Full storage path with UUID
+  storage_path TEXT, -- Full storage path with UUID (NULL for directories)
   
   -- File information
-  original_filename TEXT NOT NULL,
+  original_filename TEXT, -- Original filename (NULL for directories)
   display_name TEXT, -- Optional display name different from original
   mime_type TEXT NOT NULL,
   size_bytes BIGINT NOT NULL DEFAULT 0,
@@ -80,6 +80,10 @@ CREATE INDEX idx_files_path_prefix ON fmanager.files(user_id, file_path text_pat
 
 -- For listing files in a directory quickly
 CREATE INDEX idx_files_user_parent_type ON fmanager.files(user_id, parent_id, file_type) WHERE NOT is_deleted;
+
+-- Grant table permissions (RLS will still enforce row-level security)
+GRANT SELECT, INSERT, UPDATE, DELETE ON fmanager.files TO authenticated;
+GRANT SELECT ON fmanager.file_type_categories TO authenticated;
 
 -- ============================================
 -- 3. File Type Categories Table
@@ -205,6 +209,9 @@ BEGIN
   -- Ensure root directory exists
   INSERT INTO fmanager.files (
     user_id,
+    bucket_id,
+    storage_path,
+    original_filename,
     file_path,
     file_name,
     display_name,
@@ -214,6 +221,9 @@ BEGIN
     parent_id
   ) VALUES (
     p_user_id,
+    'private-files',
+    NULL, -- Directories don't have storage paths
+    NULL, -- Directories don't have original filenames
     '/',
     '',
     'Root',
@@ -225,14 +235,20 @@ BEGIN
   WHERE NOT is_deleted DO NOTHING;
   
   -- Get root ID
-  SELECT id INTO parent_id 
-  FROM fmanager.files 
-  WHERE user_id = p_user_id 
-    AND file_path = '/' 
-    AND NOT is_deleted;
+  SELECT f.id INTO parent_id 
+  FROM fmanager.files f
+  WHERE f.user_id = p_user_id 
+    AND f.file_path = '/' 
+    AND NOT f.is_deleted;
   
-  -- Create each directory in the path
-  FOR i IN 1..array_length(path_parts, 1) LOOP
+  -- If path is root, just return root ID
+  IF p_directory_path = '/' OR p_directory_path = '' THEN
+    RETURN parent_id;
+  END IF;
+  
+  -- Create each directory in the path (only if path_parts is not empty)
+  IF array_length(path_parts, 1) IS NOT NULL THEN
+    FOR i IN 1..array_length(path_parts, 1) LOOP
     part := path_parts[i];
     current_path := current_path || part || '/';
     display_name := part;
@@ -240,6 +256,9 @@ BEGIN
     -- Try to insert directory
     INSERT INTO fmanager.files (
       user_id,
+      bucket_id,
+      storage_path,
+      original_filename,
       file_path,
       file_name,
       display_name,
@@ -249,6 +268,9 @@ BEGIN
       parent_id
     ) VALUES (
       p_user_id,
+      'private-files',
+      NULL, -- Directories don't have storage paths
+      NULL, -- Directories don't have original filenames
       current_path,
       part,
       display_name,
@@ -264,15 +286,16 @@ BEGIN
     
     -- Get the ID if insertion succeeded
     IF dir_id IS NULL THEN
-      SELECT id INTO dir_id 
-      FROM fmanager.files 
-      WHERE user_id = p_user_id 
-        AND file_path = current_path 
-        AND NOT is_deleted;
+      SELECT f.id INTO dir_id 
+      FROM fmanager.files f
+      WHERE f.user_id = p_user_id 
+        AND f.file_path = current_path 
+        AND NOT f.is_deleted;
     END IF;
     
-    parent_id := dir_id;
-  END LOOP;
+      parent_id := dir_id;
+    END LOOP;
+  END IF;
   
   RETURN parent_id;
 END;
@@ -315,13 +338,13 @@ RETURNS TABLE (
 DECLARE
   dir_id UUID;
 BEGIN
-  -- Get directory ID
-  SELECT id INTO dir_id
-  FROM fmanager.files
-  WHERE user_id = p_user_id
-    AND file_path = p_directory_path
-    AND is_directory = true
-    AND NOT is_deleted;
+  -- Get directory ID - use table alias to avoid ambiguity with RETURNS TABLE column
+  SELECT f.id INTO dir_id
+  FROM fmanager.files f
+  WHERE f.user_id = p_user_id
+    AND f.file_path = p_directory_path
+    AND f.is_directory = true
+    AND NOT f.is_deleted;
     
   IF dir_id IS NULL THEN
     RAISE EXCEPTION 'Directory not found';
@@ -647,3 +670,14 @@ CREATE POLICY "Anyone can view file types"
 ON fmanager.file_type_categories FOR SELECT
 TO authenticated
 USING (true);
+
+-- Grant execute permissions on all functions
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA fmanager TO anon, authenticated, service_role;
+
+-- Set default privileges for future functions
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA fmanager
+  GRANT EXECUTE ON FUNCTIONS TO anon, authenticated, service_role;
+
+-- Set default privileges for future tables
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA fmanager
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO authenticated;
