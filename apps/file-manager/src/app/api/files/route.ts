@@ -29,7 +29,16 @@ export async function GET(request: NextRequest) {
 
     // Get query parameters
     const searchParams = request.nextUrl.searchParams;
-    const directoryPath = searchParams.get("path") || "/";
+    // URLSearchParams.get() already decodes the value, so we get the decoded path
+    let directoryPath = searchParams.get("path") || "/";
+    
+    // Normalize the path: ensure it ends with / for directories
+    if (directoryPath !== "/" && !directoryPath.endsWith("/")) {
+      directoryPath = directoryPath + "/";
+    }
+    
+    console.log("[API] Listing directory:", directoryPath, "for user:", user.id)
+
     const sortField = searchParams.get("sort") || "name";
     const sortOrder = searchParams.get("order") || "asc";
 
@@ -52,29 +61,53 @@ export async function GET(request: NextRequest) {
 
     // List directory contents
     let files = await listDirectory(supabase, user.id, directoryPath);
+    console.log("[API] Found", files?.length || 0, "files in directory:", directoryPath)
 
-    // If directory doesn't exist (especially root), create it first
+    // Only auto-create root directory if it doesn't exist
+    // For nested directories, return an error if they don't exist
     if (files === null) {
-      // Try to create the directory path (this will create all parent directories if needed)
-      const dirId = await createDirectoryPath(supabase, user.id, directoryPath);
-      
-      if (dirId === null) {
-        return NextResponse.json(
-          { error: "Failed to create or access directory" },
-          { status: 500 }
-        );
-      }
+      // Only auto-create root directory
+      if (directoryPath === "/" || directoryPath === "") {
+        const dirId = await createDirectoryPath(supabase, user.id, "/");
+        
+        if (dirId === null) {
+          return NextResponse.json(
+            { error: "Failed to create or access root directory" },
+            { status: 500 }
+          );
+        }
 
-      // Try listing again after creating the directory
-      files = await listDirectory(supabase, user.id, directoryPath);
-      
-      if (files === null) {
+        // Try listing again after creating the root directory
+        files = await listDirectory(supabase, user.id, "/");
+        
+        if (files === null) {
+          return NextResponse.json(
+            { error: "Failed to list root directory after creation" },
+            { status: 500 }
+          );
+        }
+        
+        // Return empty array if root directory was just created
+        files = files || [];
+      } else {
+        // For nested directories that don't exist, return an error
         return NextResponse.json(
-          { error: "Failed to list directory" },
-          { status: 500 }
+          { error: "Directory not found" },
+          { status: 404 }
         );
       }
     }
+
+    // Filter out any files/folders that have the same path as the current directory
+    // This prevents showing a folder inside itself
+    // The database function already filters by parent_id, but this is a safety check
+    files = files.filter(file => {
+      // Normalize paths for comparison (ensure trailing slash)
+      const filePath = file.file_path.endsWith("/") ? file.file_path : file.file_path + "/"
+      const dirPath = directoryPath.endsWith("/") ? directoryPath : directoryPath + "/"
+      // File path should NOT equal directory path (can't show folder inside itself)
+      return filePath !== dirPath
+    })
 
     // Sort files
     const sortedFiles = [...files].sort((a, b) => {

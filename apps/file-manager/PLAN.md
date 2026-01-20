@@ -100,13 +100,13 @@ Building a full-stack file management system using Next.js (App Router) and Supa
 - [x] Add loading states
 
 ### Day 7: Directory Management
-- [ ] Create "New Folder" functionality
-- [ ] Implement `create_directory_path` API call
-- [ ] Add folder creation modal/form
-- [ ] Implement folder rename
-- [ ] Add folder deletion (soft delete)
-- [ ] Update UI after directory operations
-- [ ] Handle errors and edge cases
+- [x] Create "New Folder" functionality
+- [x] Implement `create_directory_path` API call
+- [x] Add folder creation modal/form
+- [x] Implement folder rename
+- [x] Add folder deletion (soft delete)
+- [x] Update UI after directory operations
+- [x] Handle errors and edge cases
 
 ### Day 8: File Upload
 - [ ] Create file upload component (drag & drop)

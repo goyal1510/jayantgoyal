@@ -1,18 +1,15 @@
 "use client"
 
-import { FileList } from "@/components/file-list"
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
 
 export default function HomePage() {
-  return (
-    <div className="space-y-6">
-      {/* <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Files</h1>
-        <p className="text-muted-foreground">
-          Manage your files and folders
-        </p>
-      </div> */}
+  const router = useRouter()
+  
+  useEffect(() => {
+    // Redirect root to /files
+    router.replace("/files")
+  }, [router])
 
-      <FileList initialPath="/" />
-    </div>
-  )
+  return null
 }

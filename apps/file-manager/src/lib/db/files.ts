@@ -261,6 +261,7 @@ export async function copyFile(
 
 /**
  * Soft delete a file (mark as deleted)
+ * Uses RPC function to bypass RLS issues with UPDATE policy
  * @param supabase - Supabase client instance
  * @param fileId - File ID
  * @param userId - User ID
@@ -271,6 +272,19 @@ export async function deleteFile(
   fileId: string,
   userId: string
 ): Promise<boolean> {
+  // Try using RPC function first (if it exists)
+  const { data: rpcData, error: rpcError } = await supabase
+    .schema("fmanager")
+    .rpc("soft_delete_file", {
+      p_file_id: fileId,
+      p_user_id: userId,
+    });
+
+  if (!rpcError && rpcData === true) {
+    return true;
+  }
+
+  // Fallback to direct UPDATE (will work after RLS policy is fixed)
   const { data, error } = await supabase
     .schema("fmanager")
     .from("files")

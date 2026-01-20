@@ -22,9 +22,9 @@ import { toast } from "sonner";
 
 const navItems = [
   {
-    title: "Home",
-    url: "/",
-    icon: Home,
+    title: "Files",
+    url: "/files",
+    icon: Folder,
     isActive: true,
   },
   {
@@ -53,7 +53,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   const [user, setUser] = React.useState<typeof fallbackUser | null>(null);
   const [isUserLoading, setIsUserLoading] = React.useState(true);
-  const activeUrl = !pathname || pathname === "/" ? "/" : pathname;
+  const activeUrl = !pathname || pathname === "/" || pathname.startsWith("/files") ? "/files" : pathname;
 
   React.useEffect(() => {
     let isMounted = true;
