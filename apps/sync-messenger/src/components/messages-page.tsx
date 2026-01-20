@@ -35,11 +35,11 @@ export function MessagesPage() {
           throw new Error("Failed to fetch messages");
         }
         const { messages: fetchedMessages } = await response.json();
-        // Reverse to show latest first
-        setMessages((fetchedMessages || []).reverse());
+        // API already returns newest first, so use as-is
+        setMessages(fetchedMessages || []);
       } catch (error) {
         console.error("Error fetching messages:", error);
-        // Fallback to direct Supabase call
+        // Fallback to direct Supabase call (also newest first)
         const { data, error: supabaseError } = await supabase
           .schema("messenger")
           .from("messages")
@@ -74,6 +74,7 @@ export function MessagesPage() {
           filter: `user_id=eq.${userId}`,
         },
         (payload) => {
+          console.log("[realtime] messages change", payload);
           if (payload.eventType === "INSERT") {
             setMessages((prev) => [payload.new, ...prev]);
           } else if (payload.eventType === "UPDATE") {

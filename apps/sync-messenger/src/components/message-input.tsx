@@ -110,32 +110,32 @@ export function MessageInput({ onSend, disabled = false }: MessageInputProps) {
           </Select>
         )}
       </div>
-      <div className="flex gap-2">
-        <Textarea
-          ref={textareaRef}
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={
-            messageType === "code"
-              ? "Paste your code here (indentation will be preserved)..."
-              : "Type your message here..."
-          }
-          className="min-h-[150px] resize-none font-mono"
-          disabled={isSending || disabled}
-        />
+      <Textarea
+        ref={textareaRef}
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        onKeyDown={handleKeyDown}
+        placeholder={
+          messageType === "code"
+            ? "Paste your code here (indentation will be preserved)..."
+            : "Type your message here..."
+        }
+        className="min-h-[150px] resize-none font-mono"
+        disabled={isSending || disabled}
+      />
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-xs text-muted-foreground">
+          Press Cmd/Ctrl + Enter to send
+        </p>
         <Button
           onClick={handleSend}
           disabled={!content.trim() || isSending || disabled}
-          size="icon"
-          className="h-[150px] shrink-0"
+          className="flex items-center gap-2"
         >
           <Send className="h-4 w-4" />
+          Send
         </Button>
       </div>
-      <p className="text-xs text-muted-foreground">
-        Press Cmd/Ctrl + Enter to send
-      </p>
     </div>
   );
 }

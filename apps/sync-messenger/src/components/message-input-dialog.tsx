@@ -23,13 +23,14 @@ export function MessageInputDialog({ onSend, trigger }: MessageInputDialogProps)
   const [isSending, setIsSending] = React.useState(false);
 
   const handleSend = React.useCallback(
-    async (content: string, messageType: "text" | "code", language?: string) => {
+    async (content: string, messageType: "text" | "code", language?: string): Promise<boolean> => {
       setIsSending(true);
       const success = await onSend(content, messageType, language);
       if (success) {
         setOpen(false);
       }
       setIsSending(false);
+      return success;
     },
     [onSend]
   );
