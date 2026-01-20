@@ -22,7 +22,7 @@ export async function PATCH(
 
     const { id } = await params;
     const body = await request.json();
-    const { content, message_type, language } = body;
+    const { content, message_type, language, is_read } = body;
 
     // Verify the message belongs to the user
     const { data: existingMessage, error: fetchError } = await supabase
@@ -58,7 +58,13 @@ export async function PATCH(
       updateData.message_type = message_type;
     }
     if (language !== undefined) {
-      updateData.language = message_type === "code" ? language : null;
+      updateData.language =
+        (message_type ?? existingMessage.message_type) === "code"
+          ? language
+          : null;
+    }
+    if (is_read !== undefined) {
+      updateData.is_read = !!is_read;
     }
 
     const { data: message, error } = await supabase

@@ -18,6 +18,7 @@ export interface Database {
           language: string | null
           created_at: string
           updated_at: string
+          is_read: boolean
         }
         Insert: {
           id?: string
@@ -27,6 +28,7 @@ export interface Database {
           language?: string | null
           created_at?: string
           updated_at?: string
+          is_read?: boolean
         }
         Update: {
           id?: string
@@ -36,6 +38,7 @@ export interface Database {
           language?: string | null
           created_at?: string
           updated_at?: string
+          is_read?: boolean
         }
       }
     }
