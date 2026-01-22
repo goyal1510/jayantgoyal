@@ -123,43 +123,79 @@ function ConflictDialog({
   )
 }
 
-// Upload a single file
+// Upload a single file using direct upload to Supabase Storage
 async function uploadSingleFile(
   file: File,
   directoryPath: string,
   overwrite: boolean = false,
   rename: boolean = false
 ): Promise<{ success: boolean; error?: string; conflict?: ConflictInfo }> {
-  const formData = new FormData()
-  formData.append("file", file)
-  formData.append("directoryPath", directoryPath)
-  if (overwrite) formData.append("overwrite", "true")
-  if (rename) formData.append("rename", "true")
-
   try {
-    const response = await fetch("/api/files/upload", {
+    // Step 1: Get signed upload URL from our API
+    const signedUrlResponse = await fetch("/api/files/upload/signed-url", {
       method: "POST",
-      body: formData,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        fileName: file.name,
+        fileSize: file.size,
+        mimeType: file.type,
+        directoryPath,
+        overwrite,
+        rename,
+      }),
     })
 
-    const data = await response.json()
+    const signedUrlData = await signedUrlResponse.json()
 
-    if (response.ok && data.success) {
-      return { success: true }
-    }
-
-    // Check if it's a conflict error
-    if (response.status === 409 && data.code === "FILE_EXISTS") {
-      return {
-        success: false,
-        conflict: {
-          file,
-          existingFile: data.existingFile,
-        },
+    if (!signedUrlResponse.ok) {
+      // Check if it's a conflict error
+      if (signedUrlResponse.status === 409 && signedUrlData.code === "FILE_EXISTS") {
+        return {
+          success: false,
+          conflict: {
+            file,
+            existingFile: signedUrlData.existingFile,
+          },
+        }
       }
+      return { success: false, error: signedUrlData.error || "Failed to get upload URL" }
     }
 
-    return { success: false, error: data.error || "Upload failed" }
+    const { uploadUrl, uploadData } = signedUrlData
+
+    // Step 2: Upload file directly to Supabase Storage using the signed URL
+    const uploadResponse = await fetch(uploadUrl, {
+      method: "PUT",
+      headers: {
+        "Content-Type": file.type || "application/octet-stream",
+      },
+      body: file,
+    })
+
+    if (!uploadResponse.ok) {
+      const errorText = await uploadResponse.text()
+      console.error("Direct upload failed:", errorText)
+      return { success: false, error: "Failed to upload file to storage" }
+    }
+
+    // Step 3: Complete the upload by creating the file record
+    const completeResponse = await fetch("/api/files/upload/complete", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(uploadData),
+    })
+
+    const completeData = await completeResponse.json()
+
+    if (!completeResponse.ok || !completeData.success) {
+      return { success: false, error: completeData.error || "Failed to complete upload" }
+    }
+
+    return { success: true }
   } catch (err) {
     return { success: false, error: err instanceof Error ? err.message : "Upload failed" }
   }
