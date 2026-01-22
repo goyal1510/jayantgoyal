@@ -105,16 +105,17 @@ export function CreateFolderDialog({
               )}
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="flex-col-reverse sm:flex-row gap-2">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={loading}
+              className="w-full sm:w-auto"
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={loading || !folderName.trim()}>
+            <Button type="submit" disabled={loading || !folderName.trim()} className="w-full sm:w-auto">
               {loading ? "Creating..." : "Create"}
             </Button>
           </DialogFooter>

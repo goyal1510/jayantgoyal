@@ -3,6 +3,105 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { updateFileMetadata, deleteFile, getFileByPath } from "@/lib/db/files";
 
 /**
+ * GET /api/files/[id]
+ * Get file details and signed URL for viewing
+ */
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const supabase = await createSupabaseServerClient();
+
+    // Get authenticated user
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    const { id: fileId } = await params;
+
+    // Get file details
+    const { data: file, error: fileError } = await supabase
+      .schema("fmanager")
+      .from("files")
+      .select("*")
+      .eq("id", fileId)
+      .eq("user_id", user.id)
+      .eq("is_deleted", false)
+      .single();
+
+    if (fileError || !file) {
+      return NextResponse.json(
+        { error: "File not found" },
+        { status: 404 }
+      );
+    }
+
+    // If it's a directory, return just the file info
+    if (file.is_directory) {
+      return NextResponse.json({
+        success: true,
+        file: {
+          id: file.id,
+          name: file.file_name,
+          display_name: file.display_name,
+          path: file.file_path,
+          is_directory: true,
+          child_count: file.child_count,
+          created_at: file.created_at,
+          updated_at: file.updated_at,
+        },
+      });
+    }
+
+    // Generate signed URL for file viewing (valid for 1 hour)
+    const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+      .from("private-files")
+      .createSignedUrl(file.storage_path, 3600); // 1 hour expiry
+
+    if (signedUrlError) {
+      console.error("Error creating signed URL:", signedUrlError);
+      return NextResponse.json(
+        { error: "Failed to generate file URL" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      file: {
+        id: file.id,
+        name: file.file_name,
+        display_name: file.display_name,
+        original_filename: file.original_filename,
+        path: file.file_path,
+        mime_type: file.mime_type,
+        size_bytes: file.size_bytes,
+        file_type: file.file_type,
+        is_directory: false,
+        created_at: file.created_at,
+        updated_at: file.updated_at,
+        url: signedUrlData.signedUrl,
+      },
+    });
+  } catch (error) {
+    console.error("Error getting file:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+/**
  * PATCH /api/files/[id]
  * Update file/folder metadata (rename)
  * Body: { name: string }

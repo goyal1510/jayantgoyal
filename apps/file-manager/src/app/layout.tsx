@@ -2,8 +2,8 @@ import "@repo/ui/styles.css";
 import "./globals.css";
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
-import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
+import { ThemedToaster } from "@/components/themed-toaster";
 
 const geist = Geist({ subsets: ["latin"], preload: false });
 
@@ -61,7 +61,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
-          <Toaster />
+          <ThemedToaster />
         </ThemeProvider>
       </body>
     </html>
