@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, CheckCircle2, Code, Database, Layout, Package, Settings } from "lucide-react"
+import { Calendar, CheckCircle2, Code, Database, FolderPlus, Layout, Package, Settings, Upload } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface ChangelogEntry {
@@ -16,6 +16,40 @@ interface ChangelogEntry {
 }
 
 const changelog: ChangelogEntry[] = [
+  {
+    date: "2026-01-21",
+    version: "Day 8",
+    title: "File Upload & View",
+    type: "feature",
+    items: [
+      "Created drag & drop file upload with progress tracking",
+      "Implemented conflict resolution for duplicate files (replace/skip/rename)",
+      "Built file viewer modal with support for images, PDFs, videos, and audio",
+      "Added prev/next navigation and keyboard shortcuts in file viewer",
+      "Persisted grid/list view preference to localStorage",
+      "Added mobile-first responsive design with collapsible breadcrumbs",
+      "Combined Upload and New Folder into single dropdown button",
+      "Implemented tabular list view for desktop with column headers",
+      "Added themed toast notifications matching dark/light mode"
+    ],
+    icon: Upload
+  },
+  {
+    date: "2026-01-20",
+    version: "Day 7",
+    title: "Directory Management",
+    type: "feature",
+    items: [
+      "Created API routes for folder creation, rename, and delete",
+      "Implemented create folder dialog with path validation",
+      "Built rename dialog supporting both files and folders",
+      "Added delete confirmation dialog with soft delete",
+      "Integrated context menu for quick file/folder actions",
+      "Implemented recursive path updates for folder renames",
+      "Added auto-refresh after all directory operations"
+    ],
+    icon: FolderPlus
+  },
   {
     date: "2026-01-19",
     version: "Day 6",
