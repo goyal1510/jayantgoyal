@@ -502,7 +502,7 @@ export function FileList({ initialPath = "/" }: FileListProps) {
             <Button
               variant={viewMode === "list" ? "default" : "ghost"}
               size="sm"
-              className="rounded-l-none"
+              className="rounded-r-none"
               onClick={() => setViewMode("list")}
             >
               <List className="h-4 w-4" />
@@ -510,7 +510,7 @@ export function FileList({ initialPath = "/" }: FileListProps) {
             <Button
               variant={viewMode === "grid" ? "default" : "ghost"}
               size="sm"
-              className="rounded-r-none"
+              className="rounded-l-none"
               onClick={() => setViewMode("grid")}
             >
               <Grid3x3 className="h-4 w-4" />
