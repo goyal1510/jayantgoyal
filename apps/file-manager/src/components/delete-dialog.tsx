@@ -93,12 +93,13 @@ export function DeleteDialog({
         {error && (
           <div className="text-sm text-destructive">{error}</div>
         )}
-        <DialogFooter>
+        <DialogFooter className="flex-col-reverse sm:flex-row gap-2">
           <Button
             type="button"
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={loading}
+            className="w-full sm:w-auto"
           >
             Cancel
           </Button>
@@ -107,6 +108,7 @@ export function DeleteDialog({
             variant="destructive"
             onClick={handleDelete}
             disabled={loading}
+            className="w-full sm:w-auto"
           >
             <Trash2 className="h-4 w-4 mr-2" />
             {loading ? "Deleting..." : "Delete"}

@@ -10,6 +10,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
@@ -28,12 +29,14 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Card } from "@/components/ui/card"
-import { Grid3x3, List, ArrowUpDown, ArrowUp, ArrowDown, FolderPlus, Pencil, Trash2 } from "lucide-react"
+import { Grid3x3, List, ArrowUpDown, ArrowUp, ArrowDown, FolderPlus, Upload, Pencil, Trash2, Plus, Ellipsis, MoreVertical, Eye } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { DirectoryListingItem } from "@/lib/types"
 import { CreateFolderDialog } from "@/components/create-folder-dialog"
 import { RenameDialog } from "@/components/rename-dialog"
 import { DeleteDialog } from "@/components/delete-dialog"
+import { UploadDialog } from "@/components/upload-dialog"
+import { FileViewer } from "@/components/file-viewer"
 
 type SortField = "name" | "date" | "size" | "type"
 type SortOrder = "asc" | "desc"
@@ -65,14 +68,30 @@ export function FileList({ initialPath = "/" }: FileListProps) {
   const [lastValidPath, setLastValidPath] = React.useState(currentPath)
   const [sortField, setSortField] = React.useState<SortField>("name")
   const [sortOrder, setSortOrder] = React.useState<SortOrder>("asc")
-  const [viewMode, setViewMode] = React.useState<ViewMode>("grid")
+  const [viewMode, setViewMode] = React.useState<ViewMode>(() => {
+    // Initialize from localStorage if available
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("fileManagerViewMode")
+      if (saved === "grid" || saved === "list") {
+        return saved
+      }
+    }
+    return "grid"
+  })
   const [loading, setLoading] = React.useState(true)
   const [isInitialLoad, setIsInitialLoad] = React.useState(true)
+
+  // Persist view mode to localStorage
+  React.useEffect(() => {
+    localStorage.setItem("fileManagerViewMode", viewMode)
+  }, [viewMode])
   
   // Dialog states
   const [createFolderOpen, setCreateFolderOpen] = React.useState(false)
+  const [uploadDialogOpen, setUploadDialogOpen] = React.useState(false)
   const [renameDialogOpen, setRenameDialogOpen] = React.useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false)
+  const [fileViewerOpen, setFileViewerOpen] = React.useState(false)
   const [selectedFile, setSelectedFile] = React.useState<DirectoryListingItem | null>(null)
   
   // Track minimum loading time to prevent flickering
@@ -251,14 +270,16 @@ export function FileList({ initialPath = "/" }: FileListProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPath, sortField, sortOrder]) // Don't include fetchFiles to avoid recreating effect
 
-  // Handle directory navigation
-  const handleDirectoryClick = (file: DirectoryListingItem) => {
+  // Handle file/directory click
+  const handleItemClick = (file: DirectoryListingItem) => {
     if (file.is_directory) {
-      // Use the file_path directly - it should already be normalized from the database
-      // Ensure the path ends with / for directories
+      // Navigate into the folder
       const folderPath = file.file_path.endsWith("/") ? file.file_path : `${file.file_path}/`
-      console.log("[FileList] Navigating to folder:", folderPath, "from file:", file)
       navigateToPath(folderPath)
+    } else {
+      // Open file viewer for files
+      setSelectedFile(file)
+      setFileViewerOpen(true)
     }
   }
 
@@ -340,52 +361,87 @@ export function FileList({ initialPath = "/" }: FileListProps) {
   return (
     <div className="space-y-4">
       {/* Toolbar - Always visible */}
-      <div className="flex items-center justify-between">
-        {/* Breadcrumb Navigation */}
-        <Breadcrumb>
+      <div className="flex items-center justify-between gap-2">
+        {/* Breadcrumb Navigation - Collapsible */}
+        <Breadcrumb className="min-w-0 flex-1">
           <BreadcrumbList>
-            {getBreadcrumbSegments(currentPath).map((segment, index, array) => {
-              const isLast = index === array.length - 1
+            {(() => {
+              const segments = getBreadcrumbSegments(currentPath)
+              const currentSegment = segments[segments.length - 1]
+              const parentSegments = segments.slice(0, -1)
+
+              // If we have parent segments, show collapsed view with dropdown
+              if (parentSegments.length > 0) {
+                return (
+                  <>
+                    <BreadcrumbItem>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-auto p-1 gap-1">
+                            <Ellipsis className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start">
+                          {parentSegments.map((segment) => (
+                            <DropdownMenuItem
+                              key={segment.path}
+                              onClick={() => handleBreadcrumbClick(segment.path)}
+                              className="cursor-pointer"
+                            >
+                              {segment.name}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage className="truncate max-w-[200px]">
+                        {currentSegment?.name}
+                      </BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </>
+                )
+              }
+
+              // Root level - just show Home
               return (
-                <React.Fragment key={segment.path}>
-                  <BreadcrumbItem>
-                    {isLast ? (
-                      <BreadcrumbPage>{segment.name}</BreadcrumbPage>
-                    ) : (
-                      <BreadcrumbLink
-                        onClick={() => handleBreadcrumbClick(segment.path)}
-                        className="cursor-pointer"
-                      >
-                        {segment.name}
-                      </BreadcrumbLink>
-                    )}
-                  </BreadcrumbItem>
-                  {!isLast && <BreadcrumbSeparator />}
-                </React.Fragment>
+                <BreadcrumbItem>
+                  <BreadcrumbPage>{currentSegment?.name}</BreadcrumbPage>
+                </BreadcrumbItem>
               )
-            })}
+            })()}
           </BreadcrumbList>
         </Breadcrumb>
 
         {/* View Controls */}
         <div className="flex items-center gap-2">
-          {/* New Folder Button */}
-          <Button
-            variant="default"
-            size="sm"
-            onClick={() => setCreateFolderOpen(true)}
-            className="gap-2"
-          >
-            <FolderPlus className="h-4 w-4" />
-            New Folder
-          </Button>
+          {/* New Button - Combined Upload & New Folder */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="default" size="sm" className="gap-1">
+                <Plus className="h-4 w-4" />
+                <span className="hidden xs:inline">New</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setUploadDialogOpen(true)} className="cursor-pointer">
+                <Upload className="h-4 w-4 mr-2" />
+                Upload File
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setCreateFolderOpen(true)} className="cursor-pointer">
+                <FolderPlus className="h-4 w-4 mr-2" />
+                New Folder
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* Sort Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-2">
+              <Button variant="outline" size="sm" className="gap-1">
                 <ArrowUpDown className="h-4 w-4" />
-                Sort: {sortField}
+                <span className="hidden sm:inline">Sort: {sortField}</span>
                 {getSortIcon()}
               </Button>
             </DropdownMenuTrigger>
@@ -441,8 +497,8 @@ export function FileList({ initialPath = "/" }: FileListProps) {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* View Mode Toggle */}
-          <div className="flex items-center border rounded-md">
+          {/* View Mode Toggle - Hidden on mobile, grid is default */}
+          <div className="hidden sm:flex items-center border rounded-md">
             <Button
               variant={viewMode === "grid" ? "default" : "ghost"}
               size="sm"
@@ -499,129 +555,230 @@ export function FileList({ initialPath = "/" }: FileListProps) {
               <SpinnerWithText text="Loading..." size="md" />
             </div>
           )}
-          <div
-            className={cn(
-              viewMode === "grid"
-                ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"
-                : "space-y-1"
-            )}
-          >
-            {files.map((file) => {
-            const displayName = file.display_name || file.file_name
-            const isDirectory = file.is_directory
-
-            if (viewMode === "grid") {
-              return (
-                <ContextMenu key={file.id}>
-                  <ContextMenuTrigger asChild>
-                    <Card
-                      className={cn(
-                        "p-4 cursor-pointer transition-colors hover:bg-accent",
-                        isDirectory && "hover:bg-accent/80"
-                      )}
-                      onClick={() => handleDirectoryClick(file)}
-                    >
-                      <div className="flex flex-col items-center gap-2">
-                        <FileFolderIcon
-                          isFolder={isDirectory}
-                          name={file.file_name}
-                          size={48}
-                        />
-                        <div className="text-center w-full">
-                          <p className="text-sm font-medium truncate" title={displayName}>
-                            {displayName}
-                          </p>
-                          {!isDirectory && (
-                            <p className="text-xs text-muted-foreground">
-                              {formatFileSize(file.size_bytes || 0)}
-                            </p>
-                          )}
-                          {isDirectory && file.child_count > 0 && (
-                            <p className="text-xs text-muted-foreground">
-                              {file.child_count} item{file.child_count !== 1 ? "s" : ""}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </Card>
-                  </ContextMenuTrigger>
-                  <ContextMenuContent onClick={(e) => handleContextMenuClick(e, file)}>
-                    <ContextMenuItem onClick={() => handleRename(file)}>
-                      <Pencil className="h-4 w-4 mr-2" />
-                      Rename
-                    </ContextMenuItem>
-                    <ContextMenuSeparator />
-                    <ContextMenuItem
-                      onClick={() => handleDelete(file)}
-                      variant="destructive"
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Delete
-                    </ContextMenuItem>
-                  </ContextMenuContent>
-                </ContextMenu>
-              )
-            } else {
-              return (
-                <ContextMenu key={file.id}>
-                  <ContextMenuTrigger asChild>
-                    <Card
-                      className={cn(
-                        "p-3 cursor-pointer transition-colors hover:bg-accent",
-                        isDirectory && "hover:bg-accent/80"
-                      )}
-                      onClick={() => handleDirectoryClick(file)}
-                    >
-                      <div className="flex items-center gap-3">
-                        <FileFolderIcon
-                          isFolder={isDirectory}
-                          name={file.file_name}
-                          size={24}
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate" title={displayName}>
-                            {displayName}
-                          </p>
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <>
+            {/* Grid View - Always shown on mobile, shown on desktop when viewMode is grid */}
+            <div
+              className={cn(
+                "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4",
+                viewMode === "list" ? "sm:hidden" : "" // Hide on desktop when list view is selected
+              )}
+            >
+              {files.map((file) => {
+                const displayName = file.display_name || file.file_name
+                const isDirectory = file.is_directory
+                return (
+                  <ContextMenu key={file.id}>
+                    <ContextMenuTrigger asChild>
+                      <Card
+                        className={cn(
+                          "p-4 cursor-pointer transition-colors hover:bg-accent relative group",
+                          isDirectory && "hover:bg-accent/80"
+                        )}
+                        onClick={() => handleItemClick(file)}
+                      >
+                        {/* Three-dot menu button */}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="absolute top-1 right-1 h-7 w-7 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
                             {!isDirectory && (
                               <>
-                                <span>{formatFileSize(file.size_bytes || 0)}</span>
-                                <span>•</span>
+                                <DropdownMenuItem onClick={() => handleItemClick(file)}>
+                                  <Eye className="h-4 w-4 mr-2" />
+                                  View
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
                               </>
                             )}
-                            <span>{formatDate(file.updated_at)}</span>
+                            <DropdownMenuItem onClick={() => handleRename(file)}>
+                              <Pencil className="h-4 w-4 mr-2" />
+                              Rename
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={() => handleDelete(file)}
+                              className="text-destructive focus:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                        <div className="flex flex-col items-center gap-2">
+                          <FileFolderIcon
+                            isFolder={isDirectory}
+                            name={file.file_name}
+                            size={48}
+                          />
+                          <div className="text-center w-full">
+                            <p className="text-sm font-medium truncate" title={displayName}>
+                              {displayName}
+                            </p>
+                            {!isDirectory && (
+                              <p className="text-xs text-muted-foreground">
+                                {formatFileSize(file.size_bytes || 0)}
+                              </p>
+                            )}
                             {isDirectory && file.child_count > 0 && (
-                              <>
-                                <span>•</span>
-                                <span>
-                                  {file.child_count} item{file.child_count !== 1 ? "s" : ""}
-                                </span>
-                              </>
+                              <p className="text-xs text-muted-foreground">
+                                {file.child_count} item{file.child_count !== 1 ? "s" : ""}
+                              </p>
                             )}
                           </div>
                         </div>
-                      </div>
-                    </Card>
-                  </ContextMenuTrigger>
-                  <ContextMenuContent onClick={(e) => handleContextMenuClick(e, file)}>
-                    <ContextMenuItem onClick={() => handleRename(file)}>
-                      <Pencil className="h-4 w-4 mr-2" />
-                      Rename
-                    </ContextMenuItem>
-                    <ContextMenuSeparator />
-                    <ContextMenuItem
-                      onClick={() => handleDelete(file)}
-                      variant="destructive"
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Delete
-                    </ContextMenuItem>
-                  </ContextMenuContent>
-                </ContextMenu>
-              )
-            }
-          })}
-          </div>
+                      </Card>
+                    </ContextMenuTrigger>
+                    <ContextMenuContent onClick={(e) => handleContextMenuClick(e, file)}>
+                      {!isDirectory && (
+                        <>
+                          <ContextMenuItem onClick={() => handleItemClick(file)}>
+                            <Eye className="h-4 w-4 mr-2" />
+                            View
+                          </ContextMenuItem>
+                          <ContextMenuSeparator />
+                        </>
+                      )}
+                      <ContextMenuItem onClick={() => handleRename(file)}>
+                        <Pencil className="h-4 w-4 mr-2" />
+                        Rename
+                      </ContextMenuItem>
+                      <ContextMenuSeparator />
+                      <ContextMenuItem
+                        onClick={() => handleDelete(file)}
+                        variant="destructive"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete
+                      </ContextMenuItem>
+                    </ContextMenuContent>
+                  </ContextMenu>
+                )
+              })}
+            </div>
+
+            {/* List/Table View - Only shown on desktop (sm+) when viewMode is list */}
+            {viewMode === "list" && (
+              <div className="hidden sm:block border rounded-lg overflow-hidden">
+                {/* Table Header */}
+                <div className="grid grid-cols-[1fr_100px_120px_140px_40px] gap-4 px-4 py-2 bg-muted/50 border-b text-xs font-medium text-muted-foreground">
+                  <div>Name</div>
+                  <div className="text-right">Size</div>
+                  <div>Type</div>
+                  <div>Modified</div>
+                  <div></div>
+                </div>
+                {/* Table Body */}
+                <div className="divide-y">
+                  {files.map((file) => {
+                    const displayName = file.display_name || file.file_name
+                    const isDirectory = file.is_directory
+                    const fileType = isDirectory
+                      ? `Folder${file.child_count > 0 ? ` (${file.child_count})` : ""}`
+                      : file.file_type || "File"
+                    return (
+                      <ContextMenu key={file.id}>
+                        <ContextMenuTrigger asChild>
+                          <div
+                            className="grid grid-cols-[1fr_100px_120px_140px_40px] gap-4 px-4 py-2 cursor-pointer transition-colors hover:bg-accent items-center group"
+                            onClick={() => handleItemClick(file)}
+                          >
+                            <div className="flex items-center gap-3 min-w-0">
+                              <FileFolderIcon
+                                isFolder={isDirectory}
+                                name={file.file_name}
+                                size={20}
+                              />
+                              <span className="text-sm truncate" title={displayName}>
+                                {displayName}
+                              </span>
+                            </div>
+                            <div className="text-sm text-muted-foreground text-right">
+                              {isDirectory ? "—" : formatFileSize(file.size_bytes || 0)}
+                            </div>
+                            <div className="text-sm text-muted-foreground capitalize truncate">
+                              {fileType}
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                              {formatDate(file.updated_at)}
+                            </div>
+                            {/* Three-dot menu */}
+                            <div className="flex justify-end">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-7 w-7 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    <MoreVertical className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  {!isDirectory && (
+                                    <>
+                                      <DropdownMenuItem onClick={() => handleItemClick(file)}>
+                                        <Eye className="h-4 w-4 mr-2" />
+                                        View
+                                      </DropdownMenuItem>
+                                      <DropdownMenuSeparator />
+                                    </>
+                                  )}
+                                  <DropdownMenuItem onClick={() => handleRename(file)}>
+                                    <Pencil className="h-4 w-4 mr-2" />
+                                    Rename
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem
+                                    onClick={() => handleDelete(file)}
+                                    className="text-destructive focus:text-destructive"
+                                  >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Delete
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
+                          </div>
+                        </ContextMenuTrigger>
+                        <ContextMenuContent onClick={(e) => handleContextMenuClick(e, file)}>
+                          {!isDirectory && (
+                            <>
+                              <ContextMenuItem onClick={() => handleItemClick(file)}>
+                                <Eye className="h-4 w-4 mr-2" />
+                                View
+                              </ContextMenuItem>
+                              <ContextMenuSeparator />
+                            </>
+                          )}
+                          <ContextMenuItem onClick={() => handleRename(file)}>
+                            <Pencil className="h-4 w-4 mr-2" />
+                            Rename
+                          </ContextMenuItem>
+                          <ContextMenuSeparator />
+                          <ContextMenuItem
+                            onClick={() => handleDelete(file)}
+                            variant="destructive"
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete
+                          </ContextMenuItem>
+                        </ContextMenuContent>
+                      </ContextMenu>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+          </>
         </div>
       )}
 
@@ -630,6 +787,12 @@ export function FileList({ initialPath = "/" }: FileListProps) {
         open={createFolderOpen}
         onOpenChange={setCreateFolderOpen}
         parentPath={currentPath}
+        onSuccess={handleRefresh}
+      />
+      <UploadDialog
+        open={uploadDialogOpen}
+        onOpenChange={setUploadDialogOpen}
+        directoryPath={currentPath}
         onSuccess={handleRefresh}
       />
       <RenameDialog
@@ -643,6 +806,13 @@ export function FileList({ initialPath = "/" }: FileListProps) {
         onOpenChange={setDeleteDialogOpen}
         file={selectedFile}
         onSuccess={handleRefresh}
+      />
+      <FileViewer
+        open={fileViewerOpen}
+        onOpenChange={setFileViewerOpen}
+        file={selectedFile}
+        files={files}
+        onFileChange={setSelectedFile}
       />
     </div>
   )

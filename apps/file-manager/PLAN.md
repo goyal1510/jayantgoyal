@@ -108,15 +108,23 @@ Building a full-stack file management system using Next.js (App Router) and Supa
 - [x] Update UI after directory operations
 - [x] Handle errors and edge cases
 
-### Day 8: File Upload
-- [ ] Create file upload component (drag & drop)
-- [ ] Implement file upload to Supabase Storage
-- [ ] Create API route for file metadata insertion
-- [ ] Add progress indicator
-- [ ] Handle multiple file uploads
-- [ ] Validate file types and sizes
-- [ ] Show upload success/error notifications
-- [ ] Refresh file list after upload
+### Day 8: File Upload & View
+- [x] Create file upload component (drag & drop)
+- [x] Implement file upload to Supabase Storage
+- [x] Create API route for file metadata insertion
+- [x] Add progress indicator
+- [x] Handle multiple file uploads
+- [x] Validate file types and sizes
+- [x] Show upload success/error notifications
+- [x] Refresh file list after upload
+- [x] Add conflict resolution for duplicate files
+- [x] Create file viewer modal
+- [x] Add file navigation in viewer
+- [x] Persist view mode preference
+- [x] Mobile responsive UI improvements
+- [x] Collapsible breadcrumbs with dropdown navigation
+- [x] Combined "+ New" button for Upload/New Folder
+- [x] Tabular list view for desktop
 
 ### Day 9: File Download & Preview
 - [ ] Implement file download functionality

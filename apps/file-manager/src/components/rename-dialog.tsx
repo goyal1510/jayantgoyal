@@ -126,16 +126,17 @@ export function RenameDialog({
               )}
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="flex-col-reverse sm:flex-row gap-2">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={loading}
+              className="w-full sm:w-auto"
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={loading || !name.trim()}>
+            <Button type="submit" disabled={loading || !name.trim()} className="w-full sm:w-auto">
               {loading ? "Renaming..." : "Rename"}
             </Button>
           </DialogFooter>
