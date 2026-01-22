@@ -6,7 +6,7 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { vs } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { useTheme } from "next-themes";
-import { ChevronDown, ChevronUp, Code2, MessageSquare } from "lucide-react";
+import { ChevronDown, ChevronUp, Code2, MessageSquare, Copy, Check } from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
@@ -25,6 +25,7 @@ export function MessageItem({ message }: MessageItemProps) {
   const { theme } = useTheme();
   const [isOpen, setIsOpen] = React.useState(false);
   const [isUpdating, setIsUpdating] = React.useState(false);
+  const [isCopied, setIsCopied] = React.useState(false);
   const isDark =
     theme === "dark" ||
     (theme === "system" &&
@@ -41,24 +42,14 @@ export function MessageItem({ message }: MessageItemProps) {
     }).format(date);
   };
 
-  // Preview: first 80 characters for text, first 2 lines for code
+  // Preview: first line only
   const getPreview = () => {
-    if (message.message_type === "code") {
-      const lines = message.content.split("\n");
-      const previewLines = lines.slice(0, 2);
-      return previewLines.join("\n") + (lines.length > 2 ? "\n..." : "");
-    }
-    return message.content.length > 80
-      ? message.content.substring(0, 80) + "..."
-      : message.content;
+    const content = message.content || "";
+    const firstLine = content.split("\n")[0] || "";
+    return firstLine;
   };
 
   const preview = getPreview();
-  const hasMoreContent =
-    message.message_type === "code"
-      ? message.content.split("\n").length > 2 ||
-        message.content.length > 150
-      : message.content.length > 80;
 
   const handleToggleRead = async (
     e: React.ChangeEvent<HTMLInputElement>
@@ -82,6 +73,17 @@ export function MessageItem({ message }: MessageItemProps) {
       console.error("Failed to update is_read:", error);
     } finally {
       setIsUpdating(false);
+    }
+  };
+
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await navigator.clipboard.writeText(message.content || "");
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch (error) {
+      console.error("Failed to copy:", error);
     }
   };
 
@@ -131,11 +133,11 @@ export function MessageItem({ message }: MessageItemProps) {
                       )}
                     >
                       {message.message_type === "code" ? (
-                        <pre className="whitespace-pre-wrap break-words font-mono text-xs text-muted-foreground bg-muted/50 rounded p-2 border">
+                        <pre className="whitespace-pre-wrap break-words text-muted-foreground line-clamp-1">
                           {preview}
                         </pre>
                       ) : (
-                        <p className="whitespace-pre-wrap break-words text-muted-foreground line-clamp-2">
+                        <p className="whitespace-pre-wrap break-words text-muted-foreground line-clamp-1">
                           {preview}
                         </p>
                       )}
@@ -143,11 +145,17 @@ export function MessageItem({ message }: MessageItemProps) {
                   )}
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  {hasMoreContent && (
-                    <span className="text-xs text-muted-foreground">
-                      {isOpen ? "Less" : "More"}
-                    </span>
-                  )}
+                  <button
+                    onClick={handleCopy}
+                    className="p-1 rounded hover:bg-muted transition-colors"
+                    title="Copy message"
+                  >
+                    {isCopied ? (
+                      <Check className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <Copy className="h-4 w-4 text-muted-foreground" />
+                    )}
+                  </button>
                   {isOpen ? (
                     <ChevronUp className="h-4 w-4 text-muted-foreground" />
                   ) : (

@@ -385,19 +385,19 @@ export default function UsersPage() {
   };
 
   const handleDeleteSelected = async () => {
-    const selectedIds = Object.keys(rowSelection);
-    if (selectedIds.length === 0) return;
+    const selectedRows = table.getSelectedRowModel().rows;
+    if (selectedRows.length === 0) return;
 
-    if (!confirm(`Are you sure you want to delete ${selectedIds.length} user(s)?`)) {
+    if (!confirm(`Are you sure you want to delete ${selectedRows.length} user(s)?`)) {
       return;
     }
 
     try {
-      const deletePromises = selectedIds.map((userId) =>
+      const deletePromises = selectedRows.map((row) =>
         fetch("/api/users", {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId }),
+          body: JSON.stringify({ userId: row.original.id }),
         })
       );
 
@@ -415,7 +415,7 @@ export default function UsersPage() {
       if (failedDeletes.length > 0) {
         toast.error(`Failed to delete ${failedDeletes.length} user(s)`);
       } else {
-        toast.success(`Successfully deleted ${selectedIds.length} user(s)`);
+        toast.success(`Successfully deleted ${selectedRows.length} user(s)`);
         setRowSelection({});
         await fetchUsers();
       }

@@ -80,7 +80,7 @@ export function MessagesPage() {
           } else if (payload.eventType === "UPDATE") {
             setMessages((prev) =>
               prev.map((msg) =>
-                msg.id === payload.new.id ? payload.new : msg
+                msg.id === payload.new.id ? { ...msg, ...payload.new } : msg
               )
             );
           } else if (payload.eventType === "DELETE") {
