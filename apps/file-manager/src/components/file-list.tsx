@@ -76,7 +76,7 @@ export function FileList({ initialPath = "/" }: FileListProps) {
         return saved
       }
     }
-    return "grid"
+    return "list"
   })
   const [loading, setLoading] = React.useState(true)
   const [isInitialLoad, setIsInitialLoad] = React.useState(true)
@@ -500,20 +500,20 @@ export function FileList({ initialPath = "/" }: FileListProps) {
           {/* View Mode Toggle - Hidden on mobile, grid is default */}
           <div className="hidden sm:flex items-center border rounded-md">
             <Button
-              variant={viewMode === "grid" ? "default" : "ghost"}
-              size="sm"
-              className="rounded-r-none"
-              onClick={() => setViewMode("grid")}
-            >
-              <Grid3x3 className="h-4 w-4" />
-            </Button>
-            <Button
               variant={viewMode === "list" ? "default" : "ghost"}
               size="sm"
               className="rounded-l-none"
               onClick={() => setViewMode("list")}
             >
               <List className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={viewMode === "grid" ? "default" : "ghost"}
+              size="sm"
+              className="rounded-r-none"
+              onClick={() => setViewMode("grid")}
+            >
+              <Grid3x3 className="h-4 w-4" />
             </Button>
           </div>
         </div>
