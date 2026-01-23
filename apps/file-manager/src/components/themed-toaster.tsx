@@ -9,7 +9,6 @@ export function ThemedToaster() {
   return (
     <Toaster
       theme={resolvedTheme === "dark" ? "dark" : "light"}
-      richColors
     />
   )
 }

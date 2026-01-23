@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, CheckCircle2, Code, Database, FolderPlus, Layout, Package, Settings, Upload } from "lucide-react"
+import { Calendar, CheckCircle2, Code, Database, Download, FolderPlus, Layout, Package, Settings, Upload } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface ChangelogEntry {
@@ -17,7 +17,23 @@ interface ChangelogEntry {
 
 const changelog: ChangelogEntry[] = [
   {
-    date: "2026-01-21",
+    date: "2026-01-23",
+    version: "Day 9",
+    title: "File Download & Preview",
+    type: "feature",
+    items: [
+      "Added download button to file viewer header",
+      "Added download option to file context menus (grid and list views)",
+      "Downloads use display name for user-friendly file naming",
+      "Created FileThumbnail component for lazy-loaded image previews",
+      "Image thumbnails in grid view with IntersectionObserver",
+      "Thumbnail caching to prevent unnecessary API calls",
+      "Blob-based download for proper file naming"
+    ],
+    icon: Download
+  },
+  {
+    date: "2026-01-22",
     version: "Day 8",
     title: "File Upload & View",
     type: "feature",

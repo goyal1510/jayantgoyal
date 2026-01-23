@@ -127,13 +127,14 @@ Building a full-stack file management system using Next.js (App Router) and Supa
 - [x] Tabular list view for desktop
 
 ### Day 9: File Download & Preview
-- [ ] Implement file download functionality
-- [ ] Create signed URL generation for downloads
-- [ ] Add file preview for images and PDFs
-- [ ] Create preview modal/component
-- [ ] Handle different file types (images, PDFs, videos)
-- [ ] Add download button in file actions
-- [ ] Test with various file types
+- [x] Implement file download functionality
+- [x] Create signed URL generation for downloads
+- [x] Add file preview for images and PDFs
+- [x] Create preview modal/component (FileViewer from Day 8)
+- [x] Handle different file types (images, PDFs, videos, audio, text)
+- [x] Add download button in file actions (FileViewer + context menus)
+- [x] Add thumbnail previews in grid view for images
+- [x] Test with various file types
 
 ### Day 10: File Operations (Rename, Move, Copy)
 - [ ] Implement file rename functionality

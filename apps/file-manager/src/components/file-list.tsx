@@ -4,6 +4,7 @@ import * as React from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { toast } from "sonner"
 import { FileFolderIcon } from "@/components/file-icons"
+import { FileThumbnail } from "@/components/file-thumbnail"
 import { Button } from "@/components/ui/button"
 import { SpinnerWithText } from "@/components/ui/spinner"
 import {
@@ -29,7 +30,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Card } from "@/components/ui/card"
-import { Grid3x3, List, ArrowUpDown, ArrowUp, ArrowDown, FolderPlus, Upload, Pencil, Trash2, Plus, Ellipsis, MoreVertical, Eye } from "lucide-react"
+import { Grid3x3, List, ArrowUpDown, ArrowUp, ArrowDown, FolderPlus, Upload, Pencil, Trash2, Plus, Ellipsis, MoreVertical, Eye, Download } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { DirectoryListingItem } from "@/lib/types"
 import { CreateFolderDialog } from "@/components/create-folder-dialog"
@@ -353,6 +354,41 @@ export function FileList({ initialPath = "/" }: FileListProps) {
     setDeleteDialogOpen(true)
   }
 
+  // Handle file download
+  const handleDownload = async (file: DirectoryListingItem) => {
+    if (file.is_directory) return
+
+    try {
+      // Fetch file details to get the signed URL (requires authentication)
+      const response = await fetch(`/api/files/${file.id}`)
+      const data = await response.json()
+
+      if (!response.ok || !data.success) {
+        toast.error(data.error || "Failed to get download link")
+        return
+      }
+
+      // Fetch the file as a blob using the signed URL
+      const fileResponse = await fetch(data.file.url)
+      const blob = await fileResponse.blob()
+
+      // Create a download link
+      const downloadUrl = window.URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = downloadUrl
+      link.download = data.file.display_name || data.file.original_filename || file.file_name
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(downloadUrl)
+
+      toast.success("Download started")
+    } catch (err) {
+      console.error("Download failed:", err)
+      toast.error("Failed to download file")
+    }
+  }
+
   // Prevent navigation when clicking context menu
   const handleContextMenuClick = (e: React.MouseEvent, file: DirectoryListingItem) => {
     e.stopPropagation()
@@ -595,6 +631,10 @@ export function FileList({ initialPath = "/" }: FileListProps) {
                                   <Eye className="h-4 w-4 mr-2" />
                                   View
                                 </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleDownload(file)}>
+                                  <Download className="h-4 w-4 mr-2" />
+                                  Download
+                                </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                               </>
                             )}
@@ -613,9 +653,8 @@ export function FileList({ initialPath = "/" }: FileListProps) {
                           </DropdownMenuContent>
                         </DropdownMenu>
                         <div className="flex flex-col items-center gap-2">
-                          <FileFolderIcon
-                            isFolder={isDirectory}
-                            name={file.file_name}
+                          <FileThumbnail
+                            file={file}
                             size={48}
                           />
                           <div className="text-center w-full">
@@ -642,6 +681,10 @@ export function FileList({ initialPath = "/" }: FileListProps) {
                           <ContextMenuItem onClick={() => handleItemClick(file)}>
                             <Eye className="h-4 w-4 mr-2" />
                             View
+                          </ContextMenuItem>
+                          <ContextMenuItem onClick={() => handleDownload(file)}>
+                            <Download className="h-4 w-4 mr-2" />
+                            Download
                           </ContextMenuItem>
                           <ContextMenuSeparator />
                         </>
@@ -729,6 +772,10 @@ export function FileList({ initialPath = "/" }: FileListProps) {
                                         <Eye className="h-4 w-4 mr-2" />
                                         View
                                       </DropdownMenuItem>
+                                      <DropdownMenuItem onClick={() => handleDownload(file)}>
+                                        <Download className="h-4 w-4 mr-2" />
+                                        Download
+                                      </DropdownMenuItem>
                                       <DropdownMenuSeparator />
                                     </>
                                   )}
@@ -755,6 +802,10 @@ export function FileList({ initialPath = "/" }: FileListProps) {
                               <ContextMenuItem onClick={() => handleItemClick(file)}>
                                 <Eye className="h-4 w-4 mr-2" />
                                 View
+                              </ContextMenuItem>
+                              <ContextMenuItem onClick={() => handleDownload(file)}>
+                                <Download className="h-4 w-4 mr-2" />
+                                Download
                               </ContextMenuItem>
                               <ContextMenuSeparator />
                             </>

@@ -65,7 +65,7 @@ export async function GET(
     // Generate signed URL for file viewing (valid for 1 hour)
     const { data: signedUrlData, error: signedUrlError } = await supabase.storage
       .from("private-files")
-      .createSignedUrl(file.storage_path, 3600); // 1 hour expiry
+      .createSignedUrl(file.storage_path, 60); // 60 seconds expiry - short-lived for security
 
     if (signedUrlError) {
       console.error("Error creating signed URL:", signedUrlError);

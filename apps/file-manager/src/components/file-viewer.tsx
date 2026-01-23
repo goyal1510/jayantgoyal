@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { SpinnerWithText } from "@/components/ui/spinner"
-import { FileIcon, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react"
+import { FileIcon, AlertCircle, ChevronLeft, ChevronRight, Download } from "lucide-react"
 import type { DirectoryListingItem } from "@/lib/types"
 
 interface FileViewerProps {
@@ -158,6 +158,29 @@ export function FileViewer({ file, files, open, onOpenChange, onFileChange }: Fi
     }
   }, [hasNext, viewableFiles, currentIndex, onFileChange])
 
+  // Download handler
+  const handleDownload = React.useCallback(async () => {
+    if (!fileDetails) return
+
+    try {
+      // Fetch the file as a blob
+      const response = await fetch(fileDetails.url)
+      const blob = await response.blob()
+
+      // Create a download link
+      const downloadUrl = window.URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = downloadUrl
+      link.download = fileDetails.display_name || fileDetails.original_filename || fileDetails.name
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(downloadUrl)
+    } catch (err) {
+      console.error("Download failed:", err)
+    }
+  }, [fileDetails])
+
   // Keyboard navigation
   React.useEffect(() => {
     if (!open) return
@@ -184,9 +207,28 @@ export function FileViewer({ file, files, open, onOpenChange, onFileChange }: Fi
 
       fetch(`/api/files/${file.id}`)
         .then(res => res.json())
-        .then(data => {
+        .then(async (data) => {
           if (data.success && data.file) {
-            setFileDetails(data.file)
+            // For images, convert to blob URL so the signed URL can't be copied
+            // Blob URLs are only valid in the current tab and can't be shared
+            const mimeType = data.file.mime_type || ""
+            if (mimeType.startsWith("image/")) {
+              try {
+                const imageResponse = await fetch(data.file.url)
+                const blob = await imageResponse.blob()
+                const blobUrl = URL.createObjectURL(blob)
+                setFileDetails({
+                  ...data.file,
+                  url: blobUrl,
+                  _blobUrl: true // Mark as blob URL for cleanup
+                })
+              } catch {
+                // Fallback to signed URL if blob conversion fails
+                setFileDetails(data.file)
+              }
+            } else {
+              setFileDetails(data.file)
+            }
           } else {
             setError(data.error || "Failed to load file")
           }
@@ -205,13 +247,17 @@ export function FileViewer({ file, files, open, onOpenChange, onFileChange }: Fi
   React.useEffect(() => {
     if (!open) {
       const timer = setTimeout(() => {
+        // Revoke blob URL to free memory
+        if (fileDetails?.url && (fileDetails as unknown as { _blobUrl?: boolean })._blobUrl) {
+          URL.revokeObjectURL(fileDetails.url)
+        }
         setFileDetails(null)
         setError(null)
         setLoading(true)
       }, 200)
       return () => clearTimeout(timer)
     }
-  }, [open])
+  }, [open, fileDetails])
 
   if (!file) return null
 
@@ -223,11 +269,23 @@ export function FileViewer({ file, files, open, onOpenChange, onFileChange }: Fi
         <DialogHeader className="flex-shrink-0">
           <div className="flex items-center justify-between pr-8">
             <DialogTitle className="truncate flex-1 text-sm sm:text-base">{displayName}</DialogTitle>
-            {viewableFiles.length > 1 && (
-              <span className="text-xs sm:text-sm text-muted-foreground ml-2">
-                {currentIndex + 1} / {viewableFiles.length}
-              </span>
-            )}
+            <div className="flex items-center gap-2 ml-2">
+              {viewableFiles.length > 1 && (
+                <span className="text-xs sm:text-sm text-muted-foreground">
+                  {currentIndex + 1} / {viewableFiles.length}
+                </span>
+              )}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleDownload}
+                disabled={loading || !fileDetails}
+                className="gap-1"
+              >
+                <Download className="h-4 w-4" />
+                <span className="hidden sm:inline">Download</span>
+              </Button>
+            </div>
           </div>
         </DialogHeader>
 
