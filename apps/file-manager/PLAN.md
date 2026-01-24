@@ -137,14 +137,14 @@ Building a full-stack file management system using Next.js (App Router) and Supa
 - [x] Test with various file types
 
 ### Day 10: File Operations (Rename, Move, Copy)
-- [ ] Implement file rename functionality
-- [ ] Create move file dialog (directory picker)
-- [ ] Implement `move_file` function call
-- [ ] Create copy file functionality
-- [ ] Implement `copy_file` function call
-- [ ] Add context menu for file operations
-- [ ] Update UI after operations
-- [ ] Handle conflicts and errors
+- [x] Implement file rename functionality
+- [x] Create move file dialog (directory picker)
+- [x] Implement `move_file` function call
+- [x] Create copy file functionality
+- [x] Implement `copy_file` function call
+- [x] Add context menu for file operations
+- [x] Update UI after operations
+- [x] Handle conflicts and errors
 
 ---
 

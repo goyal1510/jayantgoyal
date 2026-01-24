@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, CheckCircle2, Code, Database, Download, FolderPlus, Layout, Package, Settings, Upload } from "lucide-react"
+import { Calendar, CheckCircle2, Code, Database, Download, FolderInput, FolderPlus, Layout, Package, Settings, Upload } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface ChangelogEntry {
@@ -16,6 +16,24 @@ interface ChangelogEntry {
 }
 
 const changelog: ChangelogEntry[] = [
+  {
+    date: "2026-01-24",
+    version: "Day 10",
+    title: "File Operations (Rename, Move, Copy)",
+    type: "feature",
+    items: [
+      "Created Move API with conflict detection and resolution",
+      "Created Copy API with storage file duplication",
+      "Built directory picker component with tree navigation",
+      "Implemented Move and Copy dialogs with conflict resolution",
+      "Added Replace, Cancel, and Keep Both options for conflicts",
+      "Fixed RLS policy issues by using hard delete for Replace",
+      "Updated parent_id correctly when moving files",
+      "Handled copy to root directory edge case",
+      "Fixed event propagation in context menu handlers"
+    ],
+    icon: FolderInput
+  },
   {
     date: "2026-01-23",
     version: "Day 9",
