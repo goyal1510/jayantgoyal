@@ -30,7 +30,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Card } from "@/components/ui/card"
-import { Grid3x3, List, ArrowUpDown, ArrowUp, ArrowDown, FolderPlus, Upload, Pencil, Trash2, Plus, Ellipsis, MoreVertical, Eye, Download } from "lucide-react"
+import { Grid3x3, List, ArrowUpDown, ArrowUp, ArrowDown, FolderPlus, Upload, Pencil, Trash2, Plus, Ellipsis, MoreVertical, Eye, Download, FolderInput, Copy } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { DirectoryListingItem } from "@/lib/types"
 import { CreateFolderDialog } from "@/components/create-folder-dialog"
@@ -38,6 +38,8 @@ import { RenameDialog } from "@/components/rename-dialog"
 import { DeleteDialog } from "@/components/delete-dialog"
 import { UploadDialog } from "@/components/upload-dialog"
 import { FileViewer } from "@/components/file-viewer"
+import { MoveDialog } from "@/components/move-dialog"
+import { CopyDialog } from "@/components/copy-dialog"
 
 type SortField = "name" | "date" | "size" | "type"
 type SortOrder = "asc" | "desc"
@@ -92,6 +94,8 @@ export function FileList({ initialPath = "/" }: FileListProps) {
   const [uploadDialogOpen, setUploadDialogOpen] = React.useState(false)
   const [renameDialogOpen, setRenameDialogOpen] = React.useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false)
+  const [moveDialogOpen, setMoveDialogOpen] = React.useState(false)
+  const [copyDialogOpen, setCopyDialogOpen] = React.useState(false)
   const [fileViewerOpen, setFileViewerOpen] = React.useState(false)
   const [selectedFile, setSelectedFile] = React.useState<DirectoryListingItem | null>(null)
   
@@ -344,18 +348,33 @@ export function FileList({ initialPath = "/" }: FileListProps) {
   }, [currentPath, fetchFiles])
 
   // Handle context menu actions
-  const handleRename = (file: DirectoryListingItem) => {
+  const handleRename = (e: React.MouseEvent, file: DirectoryListingItem) => {
+    e.stopPropagation()
     setSelectedFile(file)
     setRenameDialogOpen(true)
   }
 
-  const handleDelete = (file: DirectoryListingItem) => {
+  const handleDelete = (e: React.MouseEvent, file: DirectoryListingItem) => {
+    e.stopPropagation()
     setSelectedFile(file)
     setDeleteDialogOpen(true)
   }
 
+  const handleMove = (e: React.MouseEvent, file: DirectoryListingItem) => {
+    e.stopPropagation()
+    setSelectedFile(file)
+    setMoveDialogOpen(true)
+  }
+
+  const handleCopy = (e: React.MouseEvent, file: DirectoryListingItem) => {
+    e.stopPropagation()
+    setSelectedFile(file)
+    setCopyDialogOpen(true)
+  }
+
   // Handle file download
-  const handleDownload = async (file: DirectoryListingItem) => {
+  const handleDownload = async (e: React.MouseEvent, file: DirectoryListingItem) => {
+    e.stopPropagation()
     if (file.is_directory) return
 
     try {
@@ -631,20 +650,30 @@ export function FileList({ initialPath = "/" }: FileListProps) {
                                   <Eye className="h-4 w-4 mr-2" />
                                   View
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleDownload(file)}>
+                                <DropdownMenuItem onClick={(e) => handleDownload(e, file)}>
                                   <Download className="h-4 w-4 mr-2" />
                                   Download
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                               </>
                             )}
-                            <DropdownMenuItem onClick={() => handleRename(file)}>
+                            <DropdownMenuItem onClick={(e) => handleRename(e, file)}>
                               <Pencil className="h-4 w-4 mr-2" />
                               Rename
                             </DropdownMenuItem>
+                            <DropdownMenuItem onClick={(e) => handleMove(e, file)}>
+                              <FolderInput className="h-4 w-4 mr-2" />
+                              Move to...
+                            </DropdownMenuItem>
+                            {!isDirectory && (
+                              <DropdownMenuItem onClick={(e) => handleCopy(e, file)}>
+                                <Copy className="h-4 w-4 mr-2" />
+                                Copy to...
+                              </DropdownMenuItem>
+                            )}
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
-                              onClick={() => handleDelete(file)}
+                              onClick={(e) => handleDelete(e, file)}
                               className="text-destructive focus:text-destructive"
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
@@ -682,20 +711,30 @@ export function FileList({ initialPath = "/" }: FileListProps) {
                             <Eye className="h-4 w-4 mr-2" />
                             View
                           </ContextMenuItem>
-                          <ContextMenuItem onClick={() => handleDownload(file)}>
+                          <ContextMenuItem onClick={(e) => handleDownload(e, file)}>
                             <Download className="h-4 w-4 mr-2" />
                             Download
                           </ContextMenuItem>
                           <ContextMenuSeparator />
                         </>
                       )}
-                      <ContextMenuItem onClick={() => handleRename(file)}>
+                      <ContextMenuItem onClick={(e) => handleRename(e, file)}>
                         <Pencil className="h-4 w-4 mr-2" />
                         Rename
                       </ContextMenuItem>
+                      <ContextMenuItem onClick={(e) => handleMove(e, file)}>
+                        <FolderInput className="h-4 w-4 mr-2" />
+                        Move to...
+                      </ContextMenuItem>
+                      {!isDirectory && (
+                        <ContextMenuItem onClick={(e) => handleCopy(e, file)}>
+                          <Copy className="h-4 w-4 mr-2" />
+                          Copy to...
+                        </ContextMenuItem>
+                      )}
                       <ContextMenuSeparator />
                       <ContextMenuItem
-                        onClick={() => handleDelete(file)}
+                        onClick={(e) => handleDelete(e, file)}
                         variant="destructive"
                       >
                         <Trash2 className="h-4 w-4 mr-2" />
@@ -772,20 +811,30 @@ export function FileList({ initialPath = "/" }: FileListProps) {
                                         <Eye className="h-4 w-4 mr-2" />
                                         View
                                       </DropdownMenuItem>
-                                      <DropdownMenuItem onClick={() => handleDownload(file)}>
+                                      <DropdownMenuItem onClick={(e) => handleDownload(e, file)}>
                                         <Download className="h-4 w-4 mr-2" />
                                         Download
                                       </DropdownMenuItem>
                                       <DropdownMenuSeparator />
                                     </>
                                   )}
-                                  <DropdownMenuItem onClick={() => handleRename(file)}>
+                                  <DropdownMenuItem onClick={(e) => handleRename(e, file)}>
                                     <Pencil className="h-4 w-4 mr-2" />
                                     Rename
                                   </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={(e) => handleMove(e, file)}>
+                                    <FolderInput className="h-4 w-4 mr-2" />
+                                    Move to...
+                                  </DropdownMenuItem>
+                                  {!isDirectory && (
+                                    <DropdownMenuItem onClick={(e) => handleCopy(e, file)}>
+                                      <Copy className="h-4 w-4 mr-2" />
+                                      Copy to...
+                                    </DropdownMenuItem>
+                                  )}
                                   <DropdownMenuSeparator />
                                   <DropdownMenuItem
-                                    onClick={() => handleDelete(file)}
+                                    onClick={(e) => handleDelete(e, file)}
                                     className="text-destructive focus:text-destructive"
                                   >
                                     <Trash2 className="h-4 w-4 mr-2" />
@@ -803,20 +852,30 @@ export function FileList({ initialPath = "/" }: FileListProps) {
                                 <Eye className="h-4 w-4 mr-2" />
                                 View
                               </ContextMenuItem>
-                              <ContextMenuItem onClick={() => handleDownload(file)}>
+                              <ContextMenuItem onClick={(e) => handleDownload(e, file)}>
                                 <Download className="h-4 w-4 mr-2" />
                                 Download
                               </ContextMenuItem>
                               <ContextMenuSeparator />
                             </>
                           )}
-                          <ContextMenuItem onClick={() => handleRename(file)}>
+                          <ContextMenuItem onClick={(e) => handleRename(e, file)}>
                             <Pencil className="h-4 w-4 mr-2" />
                             Rename
                           </ContextMenuItem>
+                          <ContextMenuItem onClick={(e) => handleMove(e, file)}>
+                            <FolderInput className="h-4 w-4 mr-2" />
+                            Move to...
+                          </ContextMenuItem>
+                          {!isDirectory && (
+                            <ContextMenuItem onClick={(e) => handleCopy(e, file)}>
+                              <Copy className="h-4 w-4 mr-2" />
+                              Copy to...
+                            </ContextMenuItem>
+                          )}
                           <ContextMenuSeparator />
                           <ContextMenuItem
-                            onClick={() => handleDelete(file)}
+                            onClick={(e) => handleDelete(e, file)}
                             variant="destructive"
                           >
                             <Trash2 className="h-4 w-4 mr-2" />
@@ -855,6 +914,18 @@ export function FileList({ initialPath = "/" }: FileListProps) {
       <DeleteDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
+        file={selectedFile}
+        onSuccess={handleRefresh}
+      />
+      <MoveDialog
+        open={moveDialogOpen}
+        onOpenChange={setMoveDialogOpen}
+        file={selectedFile}
+        onSuccess={handleRefresh}
+      />
+      <CopyDialog
+        open={copyDialogOpen}
+        onOpenChange={setCopyDialogOpen}
         file={selectedFile}
         onSuccess={handleRefresh}
       />
