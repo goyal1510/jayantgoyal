@@ -172,17 +172,25 @@ export async function POST(request: NextRequest) {
     const existingFile = await getFileByPath(supabase, user.id, filePath);
     if (existingFile) {
       if (overwrite) {
-        // Delete the existing file from storage and database
+        // Delete the existing file from storage
         if (existingFile.storage_path) {
           await supabase.storage.from("private-files").remove([existingFile.storage_path]);
         }
-        // Soft delete the existing record
-        await supabase
+        // Hard delete the existing record (RLS UPDATE policy has issues with soft delete)
+        const { error: deleteError } = await supabase
           .schema("fmanager")
           .from("files")
-          .update({ is_deleted: true, deleted_at: new Date().toISOString() })
+          .delete()
           .eq("id", existingFile.id)
           .eq("user_id", user.id);
+
+        if (deleteError) {
+          console.error("Error deleting existing file:", deleteError);
+          return NextResponse.json(
+            { error: "Failed to replace existing file: " + deleteError.message },
+            { status: 500 }
+          );
+        }
       } else if (rename) {
         // Generate a unique filename with number suffix
         sanitizedFileName = await generateUniqueFileName(supabase, user.id, normalizedDirPath, sanitizedFileName);
