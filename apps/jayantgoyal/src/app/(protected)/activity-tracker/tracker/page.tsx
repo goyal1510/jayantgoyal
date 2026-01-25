@@ -17,9 +17,9 @@ export default function TrackerPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Activity Tracker</h1>
+    <div className="flex flex-col gap-4 sm:gap-6">
+      <div className="flex items-center justify-between gap-2">
+        <h1 className="text-lg font-bold tracking-tight sm:text-2xl md:text-3xl">Tracker</h1>
         <MonthNavigator
           currentMonth={currentMonth}
           onPreviousMonth={handlePreviousMonth}

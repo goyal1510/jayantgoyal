@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation"
 import Link from "next/link"
+import { Home } from "lucide-react"
 
 import {
   Breadcrumb,
@@ -116,9 +117,17 @@ export function DynamicBreadcrumb() {
   })()
 
   return (
-    <Breadcrumb>
-      <BreadcrumbList>
-        <BreadcrumbItem>
+    <Breadcrumb className="min-w-0 flex-1">
+      <BreadcrumbList className="flex-nowrap overflow-hidden">
+        <BreadcrumbItem className="shrink-0">
+          <BreadcrumbLink asChild>
+            <Link href="/portfolio#home" aria-label="Home">
+              <Home className="size-4" />
+            </Link>
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator className="shrink-0" />
+        <BreadcrumbItem className="shrink-0">
           {pageName ? (
             <BreadcrumbLink asChild>
               <Link href={appHref}>{appName}</Link>
@@ -129,9 +138,11 @@ export function DynamicBreadcrumb() {
         </BreadcrumbItem>
         {pageName && (
           <>
-            <BreadcrumbSeparator className="md:block" />
-            <BreadcrumbItem>
-              <BreadcrumbPage>{pageName}</BreadcrumbPage>
+            <BreadcrumbSeparator className="shrink-0" />
+            <BreadcrumbItem className="min-w-0 flex-1">
+              <BreadcrumbPage className="block truncate">
+                {pageName}
+              </BreadcrumbPage>
             </BreadcrumbItem>
           </>
         )}

@@ -21,6 +21,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  useSidebar,
 } from "@/components/ui/sidebar"
 
 // Color palette for tool icons
@@ -69,7 +70,15 @@ export function NavApps({
 }: NavAppsProps) {
   const pathname = usePathname()
   const router = useRouter()
+  const { isMobile, setOpenMobile } = useSidebar()
   const isOnPortfolio = pathname === "/portfolio" || pathname.startsWith("/portfolio#")
+
+  // Close mobile sidebar on navigation
+  const closeMobileSidebar = () => {
+    if (isMobile) {
+      setOpenMobile(false)
+    }
+  }
 
   // Determine active tool category for tech tools
   const activeCategoryId = toolCategories.find((category) =>
@@ -130,7 +139,7 @@ export function NavApps({
                                           asChild
                                           isActive={isToolActive}
                                         >
-                                          <Link href={tool.path}>
+                                          <Link href={tool.path} onClick={closeMobileSidebar}>
                                             <tool.icon className={cn("size-4", getToolColor(tool.id))} />
                                             <span>{tool.title}</span>
                                           </Link>
@@ -161,7 +170,7 @@ export function NavApps({
                   tooltip={app.name}
                   isActive={isActiveApp}
                 >
-                  <Link href={href}>
+                  <Link href={href} onClick={closeMobileSidebar}>
                     <app.icon className={cn(app.color)} />
                     <span>{app.name}</span>
                   </Link>
@@ -203,6 +212,7 @@ export function NavApps({
                                 href={`/portfolio#${navItem.id}`}
                                 onClick={(e) => {
                                   e.preventDefault()
+                                  closeMobileSidebar()
                                   if (isOnPortfolio) {
                                     // Already on portfolio, just scroll
                                     const el = document.getElementById(navItem.id)
@@ -231,7 +241,7 @@ export function NavApps({
                             asChild
                             isActive={isActiveNav}
                           >
-                            <Link href={href}>
+                            <Link href={href} onClick={closeMobileSidebar}>
                               <navItem.icon className={cn("size-4", navItem.color)} />
                               <span>{navItem.label}</span>
                             </Link>

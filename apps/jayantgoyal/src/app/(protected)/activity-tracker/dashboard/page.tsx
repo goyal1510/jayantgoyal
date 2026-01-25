@@ -69,10 +69,10 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <div className="flex items-center gap-4">
+    <div className="flex flex-col gap-4 sm:gap-6">
+      <div className="flex items-center justify-between gap-2">
+        <h1 className="text-lg font-bold tracking-tight sm:text-2xl md:text-3xl">Dashboard</h1>
+        <div className="flex items-center gap-2 sm:gap-4">
           <MonthNavigator
             currentMonth={currentMonth}
             onPreviousMonth={handlePreviousMonth}
@@ -80,9 +80,9 @@ export default function DashboardPage() {
           />
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Activity
+              <Button size="sm" className="gap-1">
+                <Plus className="h-4 w-4" />
+                <span className="hidden sm:inline">Add Activity</span>
               </Button>
             </DialogTrigger>
             <DialogContent>

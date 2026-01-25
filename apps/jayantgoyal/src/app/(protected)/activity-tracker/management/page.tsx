@@ -171,10 +171,10 @@ export default function ManagementPage() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-6">
-        <h1 className="text-3xl font-bold tracking-tight">Activity Management</h1>
+      <div className="flex flex-col gap-4 sm:gap-6">
+        <h1 className="text-lg font-bold tracking-tight sm:text-2xl md:text-3xl">Management</h1>
         <Card>
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <Skeleton className="h-10 w-full mb-4" />
             <Skeleton className="h-12 w-full" />
           </CardContent>
@@ -184,10 +184,10 @@ export default function ManagementPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <h1 className="text-3xl font-bold tracking-tight">Activity Management</h1>
+    <div className="flex flex-col gap-4 sm:gap-6">
+      <h1 className="text-lg font-bold tracking-tight sm:text-2xl md:text-3xl">Management</h1>
       <Card>
-        <CardContent className="p-6">
+        <CardContent className="p-4 sm:p-6">
           {activities.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12">
               <p className="text-muted-foreground text-center">
@@ -195,53 +195,57 @@ export default function ManagementPage() {
               </p>
             </div>
           ) : (
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[200px]">Activity Name</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {activities.map((activity) => (
-                    <TableRow key={activity.id}>
-                      <TableCell className="font-medium">{activity.name}</TableCell>
-                      <TableCell>
-                        <span
-                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                            activity.is_active
-                              ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                              : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400"
-                          }`}
-                        >
-                          {activity.is_active ? "Active" : "Inactive"}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-4">
-                          <Switch
-                            checked={activity.is_active}
-                            onCheckedChange={() =>
-                              handleToggleActive(activity.id, activity.is_active)
-                            }
-                            disabled={updatingActivities.has(activity.id)}
-                          />
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleOpenEditDialog(activity)}
-                            className="h-8 w-8"
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+            <div className="-mx-4 overflow-x-auto sm:mx-0">
+              <div className="inline-block min-w-full align-middle">
+                <div className="rounded-md border sm:rounded-lg">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="min-w-[120px] sm:w-[200px]">Activity</TableHead>
+                        <TableHead className="min-w-[80px]">Status</TableHead>
+                        <TableHead className="min-w-[100px] text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {activities.map((activity) => (
+                        <TableRow key={activity.id}>
+                          <TableCell className="font-medium text-sm">{activity.name}</TableCell>
+                          <TableCell>
+                            <span
+                              className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
+                                activity.is_active
+                                  ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                                  : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400"
+                              }`}
+                            >
+                              {activity.is_active ? "Active" : "Inactive"}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end gap-2 sm:gap-4">
+                              <Switch
+                                checked={activity.is_active}
+                                onCheckedChange={() =>
+                                  handleToggleActive(activity.id, activity.is_active)
+                                }
+                                disabled={updatingActivities.has(activity.id)}
+                              />
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleOpenEditDialog(activity)}
+                                className="h-8 w-8"
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
             </div>
           )}
         </CardContent>

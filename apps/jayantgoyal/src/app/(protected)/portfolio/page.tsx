@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useMemo, useState, useEffect } from "react";
 import { useTheme } from "next-themes";
@@ -17,6 +18,7 @@ import {
   MapPin,
   Phone,
   Sparkles,
+  X,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -510,18 +512,31 @@ function ProjectModal({
   project: Project;
   onClose: () => void;
 }) {
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const { theme, resolvedTheme } = useTheme();
-  
+
   // Prevent hydration mismatch by waiting for client-side mount
   useEffect(() => {
     setMounted(true);
   }, []);
-  
+
   // Default to light mode during SSR to prevent hydration mismatch
   const isDark = mounted && (resolvedTheme === 'dark' || theme === 'dark');
   const hasGithubLink = Boolean(project.githubLink);
   const hasLiveLink = Boolean(project.liveLink);
+
+  // Check if the live link is internal (jg.jayantgoyal.com)
+  const isInternalLink = hasLiveLink && project.liveLink.includes('jg.jayantgoyal.com');
+
+  const handleLiveClick = () => {
+    if (isInternalLink) {
+      // Extract path from the URL and navigate internally
+      const url = new URL(project.liveLink);
+      onClose();
+      router.push(url.pathname);
+    }
+  };
   
   // Get theme-aware image
   const projectAny = project as any;
@@ -534,82 +549,89 @@ function ProjectModal({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-2 sm:p-4"
       onClick={onClose}
     >
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="relative w-full max-w-4xl overflow-hidden rounded-lg bg-background shadow-xl"
+        className="relative flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-lg bg-background shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <button
-          type="button"
-          className="absolute right-3 top-3 rounded-full border bg-muted p-1 text-muted-foreground transition hover:bg-muted/80"
-          onClick={onClose}
-          aria-label="Close project"
-        >
-          ×
-        </button>
-        <div className="relative h-72 w-full">
-          <Image
-            src={projectImage}
-            alt={project.name}
-            fill
-            className="object-cover"
-          />
+        {/* Sticky header with close button */}
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-background px-4 py-3">
+          <h2 className="truncate text-lg font-semibold sm:text-xl">{project.name}</h2>
+          <button
+            type="button"
+            className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground transition hover:bg-muted/80"
+            onClick={onClose}
+            aria-label="Close project"
+          >
+            <X className="size-5" />
+          </button>
         </div>
-        <div className="space-y-6 p-6">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div>
-              <h2 className="text-2xl font-semibold">{project.name}</h2>
-              <p className="text-sm text-muted-foreground">
-                {project.shortDescription}
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {hasGithubLink ? (
-                <Button variant="outline" size="sm" asChild>
-                  <Link
-                    href={project.githubLink}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <Github className="size-4" />
-                    Code
-                  </Link>
-                </Button>
-              ) : null}
-              {hasLiveLink ? (
-                <Button size="sm" asChild>
-                  <Link
-                    href={project.liveLink}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <ExternalLink className="size-4" />
-                    Live Demo
-                  </Link>
-                </Button>
-              ) : null}
-            </div>
+
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="relative h-48 w-full sm:h-64 md:h-72">
+            <Image
+              src={projectImage}
+              alt={project.name}
+              fill
+              className="object-cover"
+            />
           </div>
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-lg font-semibold">Description</h3>
-              <p className="text-sm leading-relaxed text-muted-foreground">
-                {project.fullDescription}
-              </p>
+          <div className="space-y-4 p-4 sm:space-y-6 sm:p-6">
+            <div className="flex flex-wrap gap-2">
+                {hasGithubLink ? (
+                  <Button variant="outline" size="sm" asChild>
+                    <Link
+                      href={project.githubLink}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <Github className="size-4" />
+                      Code
+                    </Link>
+                  </Button>
+                ) : null}
+                {hasLiveLink ? (
+                  isInternalLink ? (
+                    <Button size="sm" onClick={handleLiveClick}>
+                      <ExternalLink className="size-4" />
+                      Live Demo
+                    </Button>
+                  ) : (
+                    <Button size="sm" asChild>
+                      <Link
+                        href={project.liveLink}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <ExternalLink className="size-4" />
+                        Live Demo
+                      </Link>
+                    </Button>
+                  )
+                ) : null}
             </div>
-            <div>
-              <h3 className="text-lg font-semibold">Technologies Used</h3>
-              <div className="flex flex-wrap gap-2">
-                {project.tags.map((tag) => (
-                  <Badge key={tag} variant="secondary">
-                    {tag}
-                  </Badge>
-                ))}
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-base font-semibold sm:text-lg">Description</h3>
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  {project.fullDescription}
+                </p>
+              </div>
+              <div>
+                <h3 className="text-base font-semibold sm:text-lg">Technologies Used</h3>
+                <div className="flex flex-wrap gap-2">
+                  {project.tags.map((tag) => (
+                    <Badge key={tag} variant="secondary">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
