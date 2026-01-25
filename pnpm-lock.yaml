@@ -598,6 +598,9 @@ importers:
 
   apps/jg-hub:
     dependencies:
+      '@faker-js/faker':
+        specifier: ^10.2.0
+        version: 10.2.0
       '@radix-ui/react-avatar':
         specifier: ^1.1.11
         version: 1.1.11(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
@@ -634,6 +637,9 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.84.0
         version: 2.84.0
+      '@tanstack/react-table':
+        specifier: ^8.21.3
+        version: 8.21.3(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1

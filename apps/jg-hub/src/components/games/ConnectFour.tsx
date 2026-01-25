@@ -21,7 +21,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
-import { playToastSound } from "@/lib/sound"
+import { playToastSound } from "@/lib/games/sound"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 

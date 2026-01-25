@@ -17,7 +17,8 @@ export default async function proxy(request: NextRequest) {
 
   // Public paths that don't require authentication
   const publicPaths = [
-    "/",              // Portfolio is public
+    "/",              // Root redirect (public)
+    "/portfolio",     // Portfolio is public
     "/login",
     "/signup",
     "/api/guest-login",
@@ -26,9 +27,9 @@ export default async function proxy(request: NextRequest) {
   ];
 
   const isPublic = publicPaths.some((path) => {
-    if (path === "/") {
-      // Only exact match for root
-      return pathname === "/";
+    if (path === "/" || path === "/portfolio") {
+      // Exact match for root and portfolio
+      return pathname === path;
     }
     return pathname.startsWith(path);
   });
@@ -76,7 +77,7 @@ export default async function proxy(request: NextRequest) {
     if (redirectUrl && redirectUrl.startsWith("/")) {
       return NextResponse.redirect(new URL(redirectUrl, request.url));
     }
-    return NextResponse.redirect(new URL("/", request.url));
+    return NextResponse.redirect(new URL("/portfolio", request.url));
   }
 
   return response;

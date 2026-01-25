@@ -2,7 +2,7 @@ import Link from "next/link"
 import type { ElementType } from "react"
 import { ArrowRight, Grid3X3, HandHeart, Scissors, Layers, Brain } from "lucide-react"
 
-import { GAME_META } from "@/lib/games"
+import { GAME_META } from "@/lib/games/config"
 import { cn } from "@/lib/utils"
 
 const CARD_THEMES: Record<

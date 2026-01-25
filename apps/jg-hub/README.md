@@ -22,7 +22,9 @@ JG Hub consolidates multiple standalone apps from the monorepo into one cohesive
 src/
 ├── app/
 │   ├── (protected)/           # Auth-guarded routes
-│   │   ├── page.tsx           # Portfolio (root page)
+│   │   ├── page.tsx           # Root redirect to /portfolio
+│   │   ├── portfolio/         # Portfolio page
+│   │   │   └── page.tsx
 │   │   ├── games/             # Game Hub routes
 │   │   │   ├── page.tsx       # Games dashboard
 │   │   │   ├── tic-tac-toe/
@@ -35,19 +37,46 @@ src/
 │   ├── signup/                # Public signup page
 │   └── api/                   # API routes
 ├── components/
-│   ├── app-sidebar.tsx        # Main sidebar with apps navigation
-│   ├── nav-apps.tsx           # Expandable app groups
-│   ├── nav-user.tsx           # User profile dropdown
-│   ├── dynamic-breadcrumb.tsx # Route-aware breadcrumb
+│   ├── auth/                  # Authentication components
+│   │   ├── login-form.tsx
+│   │   └── signup-form.tsx
+│   ├── sidebar/               # Sidebar & navigation components
+│   │   ├── app-sidebar.tsx
+│   │   ├── dynamic-breadcrumb.tsx
+│   │   ├── nav-apps.tsx
+│   │   ├── nav-user.tsx
+│   │   └── team-switcher.tsx
+│   ├── theme/                 # Theme components
+│   │   ├── theme-provider.tsx
+│   │   └── theme-toogle.tsx
+│   ├── portfolio/             # Portfolio-specific components
+│   │   ├── contact-form.tsx
+│   │   └── github-calendar.tsx
 │   ├── games/                 # Game components
-│   └── ui/                    # Shared UI components
+│   │   ├── TicTacToe.tsx
+│   │   ├── RockPaperScissors.tsx
+│   │   ├── ConnectFour.tsx
+│   │   ├── DareX.tsx
+│   │   └── MemoryMatch.tsx
+│   └── ui/                    # Shared UI primitives
 └── lib/
-    ├── hub-config.ts          # Central app configuration
-    ├── games.ts               # Game metadata
-    └── supabase/              # Auth clients
+    ├── config/
+    │   └── hub-config.ts      # Central app configuration
+    ├── games/
+    │   ├── config.ts          # Game metadata
+    │   └── sound.ts           # Audio utilities
+    ├── portfolio/
+    │   ├── data.ts            # Portfolio data mapping
+    │   ├── server.ts          # Server-side helpers
+    │   ├── use-portfolio-data.tsx
+    │   └── profiles/          # Portfolio profile data
+    ├── supabase/              # Auth clients
+    │   ├── client.ts
+    │   └── server.ts
+    └── utils.ts
 ```
 
-### Hub Configuration (`lib/hub-config.ts`)
+### Hub Configuration (`lib/config/hub-config.ts`)
 
 Central configuration defining all apps, their navigation items, icons, and public/private status:
 
@@ -66,7 +95,7 @@ type AppConfig = {
 
 | App | Status | Route | Description |
 |-----|--------|-------|-------------|
-| Portfolio | Implemented | `/` | Personal portfolio with scroll sections |
+| Portfolio | Implemented | `/portfolio` | Personal portfolio with scroll sections |
 | Game Hub | Implemented | `/games/*` | 5 browser games |
 | Tech Tools | Planned | `/tools/*` | 99+ utilities |
 | File Manager | Planned | `/files/*` | File management |
@@ -369,209 +398,22 @@ All games include:
 - Audio feedback
 - Dark mode support
 
-## Next Steps / Planned Improvements
+## Future Improvements
 
-### 1. Reorganize Component Structure
+### 1. Consider Adding a Landing Page
 
-Current flat structure needs to be organized into logical subdirectories:
-
-**Current:**
-```
-src/components/
-├── app-sidebar.tsx
-├── contact-form.tsx
-├── dynamic-breadcrumb.tsx
-├── github-calendar.tsx
-├── login-form.tsx
-├── nav-apps.tsx
-├── nav-main.tsx
-├── nav-projects.tsx
-├── nav-user.tsx
-├── signup-form.tsx
-├── team-switcher.tsx
-├── theme-provider.tsx
-├── theme-toogle.tsx
-├── games/
-└── ui/
-```
-
-**Target:**
-```
-src/components/
-├── auth/                    # Authentication components
-│   ├── login-form.tsx
-│   └── signup-form.tsx
-├── sidebar/                 # Sidebar & navigation components
-│   ├── app-sidebar.tsx
-│   ├── dynamic-breadcrumb.tsx
-│   ├── nav-apps.tsx
-│   ├── nav-main.tsx
-│   ├── nav-projects.tsx
-│   ├── nav-user.tsx
-│   └── team-switcher.tsx
-├── theme/                   # Theme components
-│   ├── theme-provider.tsx
-│   └── theme-toggle.tsx
-├── portfolio/               # Portfolio-specific components
-│   ├── contact-form.tsx
-│   ├── github-calendar.tsx
-│   ├── hero-section.tsx
-│   ├── about-section.tsx
-│   ├── skills-section.tsx
-│   ├── experience-section.tsx
-│   ├── projects-section.tsx
-│   ├── certificates-section.tsx
-│   └── contact-section.tsx
-├── games/                   # Game components (already organized)
-│   ├── TicTacToe.tsx
-│   ├── RockPaperScissors.tsx
-│   ├── ConnectFour.tsx
-│   ├── DareX.tsx
-│   └── MemoryMatch.tsx
-└── ui/                      # Shared UI primitives (already organized)
-```
-
-### 2. Restructure Routes - Portfolio as Explicit Route
-
-Current: Portfolio is at `/` (root)
-Target: Portfolio at `/portfolio`, root redirects to it
-
-**Current:**
-```
-src/app/(protected)/
-├── page.tsx              # Portfolio (root)
-├── games/
-└── layout.tsx
-```
-
-**Target:**
-```
-src/app/
-├── page.tsx              # Redirect to /portfolio
-├── (protected)/
-│   ├── portfolio/
-│   │   └── page.tsx      # Portfolio page
-│   ├── games/
-│   └── layout.tsx
-```
-
-**Root page.tsx (redirect):**
-```typescript
-import { redirect } from "next/navigation"
-
-export default function RootPage() {
-  redirect("/portfolio")
-}
-```
-
-**Benefits:**
-- Cleaner URL structure (`/portfolio`, `/games`, `/tools`)
-- Consistent pattern across all apps
-- Easier to add a landing/home page later if needed
-
-### 3. Reorganize Lib Structure
-
-**Current:**
-```
-src/lib/
-├── games.ts
-├── hub-config.ts
-├── portfolio-data.ts
-├── portfolio-profiles/
-├── portfolio-server.ts
-├── sound.ts
-├── supabase/
-├── use-portfolio-data.tsx
-└── utils.ts
-```
-
-**Target:**
-```
-src/lib/
-├── config/
-│   └── hub-config.ts        # Central app configuration
-├── portfolio/
-│   ├── data.ts              # Portfolio data mapping
-│   ├── server.ts            # Server-side helpers
-│   ├── use-portfolio-data.tsx
-│   └── profiles/
-│       └── jayant.ts
-├── games/
-│   ├── config.ts            # Game metadata
-│   └── sound.ts             # Audio utilities
-├── supabase/
-│   ├── client.ts
-│   └── server.ts
-└── utils.ts
-```
-
-### 4. Update proxy.ts for New Routes
-
-When portfolio moves to `/portfolio`:
-
-```typescript
-const publicPaths = [
-  "/",                // Root redirect (still public)
-  "/portfolio",       # Portfolio page (public)
-  "/login",
-  "/signup",
-  "/api/guest-login",
-  "/api/contact",
-]
-```
-
-### 5. Update Hub Config for New Routes
-
-```typescript
-const PORTFOLIO_NAV: NavItem[] = [
-  { id: "home", label: "Home", icon: Home, color: "...", url: "/portfolio#home" },
-  { id: "about", label: "About", icon: User, color: "...", url: "/portfolio#about" },
-  // ... etc
-]
-```
-
-### 6. Update Navigation Components
-
-- `nav-apps.tsx`: Update portfolio detection from `pathname === "/"` to `pathname.startsWith("/portfolio")`
-- `app-sidebar.tsx`: Update active app detection
-- `dynamic-breadcrumb.tsx`: Update portfolio route handling
-
-### 7. Consider Adding a Landing Page (Future)
-
-Once portfolio is at `/portfolio`, the root `/` could become:
+The root `/` currently redirects to `/portfolio`. It could become:
 - A landing page with links to all apps
 - A dashboard showing activity across apps
-- Keep as redirect (current plan)
+- Keep as redirect (current behavior)
 
-### 8. Cleanup Unused Files
+### 2. Migrate More Apps
 
-After reorganization, remove:
-- [ ] `nav-main.tsx` (if replaced by nav-apps)
-- [ ] `nav-projects.tsx` (if not used)
-- [ ] Any duplicate/unused components
-
-### Implementation Order
-
-1. **Phase 1: Component Reorganization**
-   - Create subdirectories
-   - Move files
-   - Update all import paths
-   - Test everything works
-
-2. **Phase 2: Route Restructuring**
-   - Create `/portfolio` route
-   - Move portfolio page content
-   - Add root redirect
-   - Update proxy.ts
-   - Update hub-config.ts
-   - Update navigation components
-
-3. **Phase 3: Lib Reorganization**
-   - Create subdirectories
-   - Move files
-   - Update import paths
-
-4. **Phase 4: Cleanup**
-   - Remove unused files
-   - Update README
-   - Final testing
+The following apps are planned for integration:
+- Tech Tools (99+ utilities)
+- File Manager
+- Activity Tracker
+- Currency Calculator
+- Sync Messenger
+- Weather (public)
+- Custom Calculator (public)

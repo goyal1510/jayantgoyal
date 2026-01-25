@@ -1,16 +1,16 @@
 import type { ReactNode } from "react";
 
-import { AppSidebar } from "@/components/app-sidebar";
-import { DynamicBreadcrumb } from "@/components/dynamic-breadcrumb";
+import { AppSidebar } from "@/components/sidebar/app-sidebar";
+import { DynamicBreadcrumb } from "@/components/sidebar/dynamic-breadcrumb";
 import { Separator } from "@/components/ui/separator";
-import ThemeToogle from "@/components/theme-toogle";
+import ThemeToogle from "@/components/theme/theme-toogle";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { getPortfolioDataFromHeaders } from "@/lib/portfolio-server";
-import { PortfolioDataProvider } from "@/lib/use-portfolio-data";
+import { getPortfolioDataFromHeaders } from "@/lib/portfolio/server";
+import { PortfolioDataProvider } from "@/lib/portfolio/use-portfolio-data";
 
 export default async function ProtectedLayout({
   children,
@@ -32,7 +32,7 @@ export default async function ProtectedLayout({
             </div>
             <ThemeToogle />
           </header>
-          <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
+          <div className="flex flex-1 flex-col gap-4 p-4">{children}</div>
         </SidebarInset>
       </SidebarProvider>
     </PortfolioDataProvider>
