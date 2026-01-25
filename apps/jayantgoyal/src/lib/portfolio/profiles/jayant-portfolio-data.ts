@@ -216,7 +216,7 @@ const PROJECTS = [
     tags: ["Next.js", "Supabase", "CSS", "CRUD Operations"],
     githubLink:
       "https://github.com/goyal1510/jayantgoyal/tree/main/apps/jayantgoyal",
-    liveLink: "https://jg.jayantgoyal.com/calculator/new",
+    liveLink: "https://www.jayantgoyal.com/calculator/new",
   },
   {
     name: "Custom Drag & Drop Calculator",
@@ -228,7 +228,7 @@ const PROJECTS = [
     tags: ["Next.js", "Tailwind CSS", "Drag & Drop"],
     githubLink:
       "https://github.com/goyal1510/jayantgoyal/tree/main/apps/jayantgoyal",
-    liveLink: "https://jg.jayantgoyal.com/custom-calculator",
+    liveLink: "https://www.jayantgoyal.com/custom-calculator",
   },
   {
     name: "E-commerce Application",
@@ -254,7 +254,7 @@ const PROJECTS = [
     tags: ["Next.js", "TypeScript", "Supabase", "Interactive Games", "AI Opponents"],
     githubLink:
       "https://github.com/goyal1510/jayantgoyal/tree/main/apps/jayantgoyal",
-    liveLink: "https://jg.jayantgoyal.com/games",
+    liveLink: "https://www.jayantgoyal.com/games",
   },
   {
     name: "Weather App",
@@ -266,7 +266,7 @@ const PROJECTS = [
     imageDark: "/assets/ProjectImages/Dark/weather.png",
     tags: ["Next.js","TypeScript", "OpenWeather API", "Tailwind CSS", "Geolocation"],
     githubLink: "https://github.com/goyal1510/jayantgoyal/tree/main/apps/jayantgoyal",
-    liveLink: "https://jg.jayantgoyal.com/weather",
+    liveLink: "https://www.jayantgoyal.com/weather",
   },
   {
     name: "Activity Tracker",
@@ -279,7 +279,7 @@ const PROJECTS = [
     tags: ["Next.js", "TypeScript", "Supabase", "Dashboard", "Analytics"],
     githubLink:
       "https://github.com/goyal1510/jayantgoyal/tree/main/apps/jayantgoyal",
-    liveLink: "https://jg.jayantgoyal.com/activity-tracker/dashboard",
+    liveLink: "https://www.jayantgoyal.com/activity-tracker/dashboard",
   },
   {
     name: "Tech Tools",
@@ -292,7 +292,7 @@ const PROJECTS = [
     tags: ["Next.js", "TypeScript", "React", "Developer Tools", "Utilities"],
     githubLink:
       "https://github.com/goyal1510/jayantgoyal/tree/main/apps/jayantgoyal",
-    liveLink: "https://jg.jayantgoyal.com/tools",
+    liveLink: "https://www.jayantgoyal.com/tools",
   },
   {
     name: "File Manager",
@@ -305,7 +305,7 @@ const PROJECTS = [
     tags: ["Next.js", "TypeScript", "Supabase", "File Storage", "Database"],
     githubLink:
       "https://github.com/goyal1510/jayantgoyal/tree/main/apps/jayantgoyal",
-    liveLink: "https://jg.jayantgoyal.com/files",
+    liveLink: "https://www.jayantgoyal.com/files",
   },
   {
     name: "Sync Messenger",
@@ -318,7 +318,7 @@ const PROJECTS = [
     tags: ["Next.js", "TypeScript", "Supabase", "Real-time", "Messaging"],
     githubLink:
       "https://github.com/goyal1510/jayantgoyal/tree/main/apps/jayantgoyal",
-    liveLink: "https://jg.jayantgoyal.com/messenger",
+    liveLink: "https://www.jayantgoyal.com/messenger",
   },
 ] as const
 
