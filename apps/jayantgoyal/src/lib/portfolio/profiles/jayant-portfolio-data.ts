@@ -211,8 +211,8 @@ const PROJECTS = [
       "Developed a personal calculator to total cash denomination, store multiple calculations per date, and add optional notes.",
     fullDescription:
       "Developed a personal calculator to total cash denomination, store multiple calculations per date, and add optional notes. Integrated Supabase for backend storage with full CRUD functionality. Built with React and custom external CSS for a clean, responsive UI and smooth user interactions. Features include bundle counting, historical tracking, and data persistence.",
-    imageLight: "/assets/ProjectImages/Light/ccal.png",
-    imageDark: "/assets/ProjectImages/Dark/ccal.png",
+    imageLight: "/assets/ProjectImages/Light/calculator.png",
+    imageDark: "/assets/ProjectImages/Dark/calculator.png",
     tags: ["Next.js", "Supabase", "CSS", "CRUD Operations"],
     githubLink:
       "https://github.com/goyal1510/jayantgoyal/tree/main/apps/jayantgoyal",
@@ -223,8 +223,8 @@ const PROJECTS = [
     shortDescription: "Built a drag-and-drop calculator using React and Zustand.",
     fullDescription:
       "Built a drag-and-drop calculator using React and Zustand. Added dark mode, backspace, clear all, and duplicate prevention. Styled with Tailwind CSS and optimized with Vite. Features a calculator builder with drag-and-drop functionality.",
-    imageLight: "/assets/ProjectImages/Light/customcal.png",
-    imageDark: "/assets/ProjectImages/Dark/customcal.png",
+    imageLight: "/assets/ProjectImages/Light/custom-calculator.png",
+    imageDark: "/assets/ProjectImages/Dark/custom-calculator.png",
     tags: ["Next.js", "Tailwind CSS", "Drag & Drop"],
     githubLink:
       "https://github.com/goyal1510/jayantgoyal/tree/main/apps/jayantgoyal",
@@ -249,8 +249,8 @@ const PROJECTS = [
       "Developed a Game Hub featuring five interactive games: Rock Paper Scissors, Tic Tac Toe, Connect Four, Memory Match, and Dare X.",
     fullDescription:
       "Developed a Game Hub featuring five interactive games: Rock Paper Scissors, Tic Tac Toe, Connect Four, Memory Match, and Dare X. Built with Next.js 16, TypeScript, and Supabase for authentication. Features include animated coin drops in Connect Four, winning line highlighting, AI opponents with strategic gameplay, multiple difficulty levels in Memory Match, and comprehensive game state management. Includes both Player vs Player and Player vs Computer modes for most games.",
-    imageLight: "/assets/ProjectImages/Light/ghub.png",
-    imageDark: "/assets/ProjectImages/Dark/ghub.png",
+    imageLight: "/assets/ProjectImages/Light/games.png",
+    imageDark: "/assets/ProjectImages/Dark/games.png",
     tags: ["Next.js", "TypeScript", "Supabase", "Interactive Games", "AI Opponents"],
     githubLink:
       "https://github.com/goyal1510/jayantgoyal/tree/main/apps/jayantgoyal",
@@ -274,8 +274,8 @@ const PROJECTS = [
       "Supabase-authenticated activity tracking tool for monitoring daily activities with performance KPIs and dashboard analytics.",
     fullDescription:
       "Built a comprehensive activity tracking application using Next.js, TypeScript, and Supabase. Features include custom activity creation, daily checkbox-based tracking, month navigation, and a dashboard with real-time KPIs and performance metrics. Activities persist across months, allowing users to track their progress over time. Includes completion rates, progress bars, and user-specific data with full authentication support.",
-    imageLight: "/assets/ProjectImages/Light/atrack.png",
-    imageDark: "/assets/ProjectImages/Dark/atrack.png",
+    imageLight: "/assets/ProjectImages/Light/activity-tracker.png",
+    imageDark: "/assets/ProjectImages/Dark/activity-tracker.png",
     tags: ["Next.js", "TypeScript", "Supabase", "Dashboard", "Analytics"],
     githubLink:
       "https://github.com/goyal1510/jayantgoyal/tree/main/apps/jayantgoyal",
@@ -287,8 +287,8 @@ const PROJECTS = [
       "A comprehensive collection of 99+ developer tools and utilities including generators, converters, parsers, validators, and formatters.",
     fullDescription:
       "Developed a comprehensive developer tools platform with 99+ utilities organized into 10 categories. Features include generators (UUID, ULID, tokens, RSA keys), hash & encryption tools, converters (date-time, base64, color, JSON/YAML/TOML/XML), text tools, parsers & validators, formatters, code & dev tools, network tools, media & QR generators, and calculators. Built with Next.js 16, React 19, TypeScript, and Tailwind CSS v4. Includes modern UI with dark mode, responsive design, collapsible sidebar navigation, and real-time updates.",
-    imageLight: "/assets/ProjectImages/Light/tech.png",
-    imageDark: "/assets/ProjectImages/Dark/tech.png",
+    imageLight: "/assets/ProjectImages/Light/tools.png",
+    imageDark: "/assets/ProjectImages/Dark/tools.png",
     tags: ["Next.js", "TypeScript", "React", "Developer Tools", "Utilities"],
     githubLink:
       "https://github.com/goyal1510/jayantgoyal/tree/main/apps/jayantgoyal",
@@ -300,8 +300,8 @@ const PROJECTS = [
       "Full-stack file management system with private storage, directory support, file operations, and user authentication.",
     fullDescription:
       "Built a complete file management system using Next.js and Supabase with hierarchical directory support. Features include user authentication, private file storage, file upload/download/preview, directory management (create, navigate, move, copy), file operations (rename, delete, restore), search and filtering capabilities. Implemented with a custom database schema using the fmanager schema, storage bucket management, Row-Level Security (RLS) policies, and a modern responsive UI. Supports file type categorization, versioning, and soft delete functionality.",
-    imageLight: "/assets/ProjectImages/Light/tech.png",
-    imageDark: "/assets/ProjectImages/Dark/tech.png",
+    imageLight: "/assets/ProjectImages/Light/files.png",
+    imageDark: "/assets/ProjectImages/Dark/files.png",
     tags: ["Next.js", "TypeScript", "Supabase", "File Storage", "Database"],
     githubLink:
       "https://github.com/goyal1510/jayantgoyal/tree/main/apps/jayantgoyal",
@@ -313,8 +313,8 @@ const PROJECTS = [
       "Real-time messaging application with Supabase authentication and instant message synchronization.",
     fullDescription:
       "Built a real-time messaging application using Next.js, TypeScript, and Supabase. Features include user authentication, real-time message updates using Supabase subscriptions, message history, and a clean responsive UI. Messages sync instantly across devices with full CRUD operations for managing conversations.",
-    imageLight: "/assets/ProjectImages/Light/tech.png",
-    imageDark: "/assets/ProjectImages/Dark/tech.png",
+    imageLight: "/assets/ProjectImages/Light/messenger.png",
+    imageDark: "/assets/ProjectImages/Dark/messenger.png",
     tags: ["Next.js", "TypeScript", "Supabase", "Real-time", "Messaging"],
     githubLink:
       "https://github.com/goyal1510/jayantgoyal/tree/main/apps/jayantgoyal",
