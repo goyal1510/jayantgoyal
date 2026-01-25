@@ -215,8 +215,8 @@ const PROJECTS = [
     imageDark: "/assets/ProjectImages/Dark/ccal.png",
     tags: ["Next.js", "Supabase", "CSS", "CRUD Operations"],
     githubLink:
-      "https://github.com/goyal1510/jayantgoyal/tree/main/apps/currency-calculator",
-    liveLink: "https://ccal.jayantgoyal.com",
+      "https://github.com/goyal1510/jayantgoyal/tree/main/apps/jayantgoyal",
+    liveLink: "https://jg.jayantgoyal.com/calculator/new",
   },
   {
     name: "Custom Drag & Drop Calculator",
@@ -227,8 +227,8 @@ const PROJECTS = [
     imageDark: "/assets/ProjectImages/Dark/customcal.png",
     tags: ["Next.js", "Tailwind CSS", "Drag & Drop"],
     githubLink:
-      "https://github.com/goyal1510/jayantgoyal/tree/main/apps/custom-drag-drop-calculator",
-    liveLink: "https://customcal.jayantgoyal.com",
+      "https://github.com/goyal1510/jayantgoyal/tree/main/apps/jayantgoyal",
+    liveLink: "https://jg.jayantgoyal.com/custom-calculator",
   },
   {
     name: "E-commerce Application",
@@ -253,8 +253,8 @@ const PROJECTS = [
     imageDark: "/assets/ProjectImages/Dark/ghub.png",
     tags: ["Next.js", "TypeScript", "Supabase", "Interactive Games", "AI Opponents"],
     githubLink:
-      "https://github.com/goyal1510/jayantgoyal/tree/main/apps/game-hub",
-    liveLink: "https://ghub.jayantgoyal.com",
+      "https://github.com/goyal1510/jayantgoyal/tree/main/apps/jayantgoyal",
+    liveLink: "https://jg.jayantgoyal.com/games",
   },
   {
     name: "Weather App",
@@ -265,8 +265,8 @@ const PROJECTS = [
     imageLight: "/assets/ProjectImages/Light/weather.png",
     imageDark: "/assets/ProjectImages/Dark/weather.png",
     tags: ["Next.js","TypeScript", "OpenWeather API", "Tailwind CSS", "Geolocation"],
-    githubLink: "https://github.com/goyal1510/jayantgoyal/tree/main/apps/weather",
-    liveLink: "https://weather.jayantgoyal.com",
+    githubLink: "https://github.com/goyal1510/jayantgoyal/tree/main/apps/jayantgoyal",
+    liveLink: "https://jg.jayantgoyal.com/weather",
   },
   {
     name: "Activity Tracker",
@@ -278,8 +278,8 @@ const PROJECTS = [
     imageDark: "/assets/ProjectImages/Dark/atrack.png",
     tags: ["Next.js", "TypeScript", "Supabase", "Dashboard", "Analytics"],
     githubLink:
-      "https://github.com/goyal1510/jayantgoyal/tree/main/apps/activity-tracker",
-    liveLink: "https://atrack.jayantgoyal.com",
+      "https://github.com/goyal1510/jayantgoyal/tree/main/apps/jayantgoyal",
+    liveLink: "https://jg.jayantgoyal.com/activity-tracker/dashboard",
   },
   {
     name: "Tech Tools",
@@ -291,22 +291,35 @@ const PROJECTS = [
     imageDark: "/assets/ProjectImages/Dark/tech.png",
     tags: ["Next.js", "TypeScript", "React", "Developer Tools", "Utilities"],
     githubLink:
-      "https://github.com/goyal1510/jayantgoyal/tree/main/apps/tech",
-    liveLink: "https://tech.jayantgoyal.com",
+      "https://github.com/goyal1510/jayantgoyal/tree/main/apps/jayantgoyal",
+    liveLink: "https://jg.jayantgoyal.com/tools",
   },
-  // {
-  //   name: "File Manager",
-  //   shortDescription:
-  //     "Full-stack file management system with private storage, directory support, file operations, and user authentication.",
-  //   fullDescription:
-  //     "Built a complete file management system using Next.js and Supabase with hierarchical directory support. Features include user authentication, private file storage, file upload/download/preview, directory management (create, navigate, move, copy), file operations (rename, delete, restore), search and filtering capabilities. Implemented with a custom database schema using the fmanager schema, storage bucket management, Row-Level Security (RLS) policies, and a modern responsive UI. Supports file type categorization, versioning, and soft delete functionality.",
-  //   imageLight: "/assets/ProjectImages/Light/fmanager.png",
-  //   imageDark: "/assets/ProjectImages/Dark/fmanager.png",
-  //   tags: ["Next.js", "TypeScript", "Supabase", "File Storage", "Database"],
-  //   githubLink:
-  //     "https://github.com/goyal1510/jayantgoyal/tree/main/apps/file-manager",
-  //   liveLink: "https://fmanager.jayantgoyal.com",
-  // },
+  {
+    name: "File Manager",
+    shortDescription:
+      "Full-stack file management system with private storage, directory support, file operations, and user authentication.",
+    fullDescription:
+      "Built a complete file management system using Next.js and Supabase with hierarchical directory support. Features include user authentication, private file storage, file upload/download/preview, directory management (create, navigate, move, copy), file operations (rename, delete, restore), search and filtering capabilities. Implemented with a custom database schema using the fmanager schema, storage bucket management, Row-Level Security (RLS) policies, and a modern responsive UI. Supports file type categorization, versioning, and soft delete functionality.",
+    imageLight: "/assets/ProjectImages/Light/tech.png",
+    imageDark: "/assets/ProjectImages/Dark/tech.png",
+    tags: ["Next.js", "TypeScript", "Supabase", "File Storage", "Database"],
+    githubLink:
+      "https://github.com/goyal1510/jayantgoyal/tree/main/apps/jayantgoyal",
+    liveLink: "https://jg.jayantgoyal.com/files",
+  },
+  {
+    name: "Sync Messenger",
+    shortDescription:
+      "Real-time messaging application with Supabase authentication and instant message synchronization.",
+    fullDescription:
+      "Built a real-time messaging application using Next.js, TypeScript, and Supabase. Features include user authentication, real-time message updates using Supabase subscriptions, message history, and a clean responsive UI. Messages sync instantly across devices with full CRUD operations for managing conversations.",
+    imageLight: "/assets/ProjectImages/Light/tech.png",
+    imageDark: "/assets/ProjectImages/Dark/tech.png",
+    tags: ["Next.js", "TypeScript", "Supabase", "Real-time", "Messaging"],
+    githubLink:
+      "https://github.com/goyal1510/jayantgoyal/tree/main/apps/jayantgoyal",
+    liveLink: "https://jg.jayantgoyal.com/messenger",
+  },
 ] as const
 
 const CERTIFICATES = [
