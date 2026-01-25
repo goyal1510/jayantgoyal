@@ -526,8 +526,11 @@ function ProjectModal({
   const hasGithubLink = Boolean(project.githubLink);
   const hasLiveLink = Boolean(project.liveLink);
 
-  // Check if the live link is internal (jg.jayantgoyal.com)
-  const isInternalLink = hasLiveLink && project.liveLink.includes('jg.jayantgoyal.com');
+  // Check if the live link is internal (jayantgoyal.com or www.jayantgoyal.com) - these open in same tab
+  // External links like ecommerce.jayantgoyal.com open in new tab
+  const isInternalLink = hasLiveLink &&
+    (project.liveLink.includes('www.jayantgoyal.com') ||
+     project.liveLink.match(/https?:\/\/jayantgoyal\.com/));
 
   const handleLiveClick = () => {
     if (isInternalLink) {
