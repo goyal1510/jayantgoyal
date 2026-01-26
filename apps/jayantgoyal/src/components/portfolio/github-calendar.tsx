@@ -39,11 +39,12 @@ export function GithubCalendarComponent({ username, githubUrl }: GithubCalendarP
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState<YearOption>('last');
 
-  // Generate year options: last 5 years + "Last Year" option
+  // Generate year options: 2025 to current year + "Last Year" option
   const yearOptions = useMemo(() => {
+    const startYear = 2025;
     const years: YearOption[] = ['last'];
-    for (let i = 0; i < 5; i++) {
-      years.push(currentYear - i);
+    for (let year = currentYear; year >= startYear; year--) {
+      years.push(year);
     }
     return years;
   }, [currentYear]);

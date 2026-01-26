@@ -23,6 +23,7 @@ import {
   History,
   MessageSquare,
   Cloud,
+  ShoppingCart,
   type LucideIcon,
 } from "lucide-react"
 
@@ -41,6 +42,7 @@ export type AppConfig = {
   color: string
   isPublic: boolean
   navItems: NavItem[]
+  externalUrl?: string
 }
 
 // Portfolio navigation items (scroll-based sections)
@@ -164,6 +166,15 @@ export const HUB_APPS: AppConfig[] = [
     color: "text-violet-500 dark:text-violet-400",
     isPublic: true,
     navItems: [],
+  },
+  {
+    id: "ecommerce",
+    name: "E-commerce",
+    icon: ShoppingCart,
+    color: "text-pink-500 dark:text-pink-400",
+    isPublic: true,
+    navItems: [],
+    externalUrl: "https://ecommerce.jayantgoyal.com/",
   },
 ]
 

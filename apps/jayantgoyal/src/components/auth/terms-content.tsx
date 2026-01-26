@@ -20,7 +20,7 @@ export function TermsContent() {
             Terms and Conditions (&quot;Terms&quot;).
           </p>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            This platform is operated by <strong className="text-foreground">Jayant Goyal</strong> as an individual developer
+            This platform is operated by <strong className="text-foreground">Jayant</strong> as an individual developer
             showcasing web development skills, experimental features, and technical capabilities.
           </p>
         </div>

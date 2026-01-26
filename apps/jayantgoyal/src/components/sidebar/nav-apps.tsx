@@ -160,6 +160,29 @@ export function NavApps({
             )
           }
 
+          // External link app - opens in new tab
+          if (app.externalUrl) {
+            return (
+              <SidebarMenuItem key={app.id}>
+                <SidebarMenuButton
+                  asChild
+                  tooltip={app.name}
+                  isActive={isActiveApp}
+                >
+                  <a
+                    href={app.externalUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={closeMobileSidebar}
+                  >
+                    <app.icon className={cn(app.color)} />
+                    <span>{app.name}</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )
+          }
+
           // Single page app - no sub-navigation
           if (!hasSubNav) {
             const href = `/${app.id}`
