@@ -1,4 +1,5 @@
 import { TermsContent, TERMS_LAST_UPDATED } from "@/components/auth/terms-content"
+import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { FileText } from "lucide-react"
 import type { Metadata } from "next"
@@ -33,8 +34,8 @@ export default function TermsConditionsPage() {
         </ScrollArea>
 
         {/* Footer */}
-        <div className="mt-8 text-sm text-muted-foreground">
-          <p>
+        <div className="mt-8 flex items-center justify-between gap-4">
+          <p className="text-sm text-muted-foreground">
             If you have any questions about these terms, please{" "}
             <a
               href="/portfolio#contact"
@@ -44,6 +45,9 @@ export default function TermsConditionsPage() {
             </a>
             .
           </p>
+          <Button asChild>
+            <a href="https://jayantgoyal.com">Continue to Site</a>
+          </Button>
         </div>
       </div>
     </div>
