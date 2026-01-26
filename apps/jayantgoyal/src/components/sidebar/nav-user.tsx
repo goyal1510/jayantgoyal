@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import { ChevronsUpDown, LogOut, Settings, Trash2, Lock, User } from "lucide-react"
+import { ChevronsUpDown, LogOut, Settings, Trash2, Lock, User, UserPlus } from "lucide-react"
 
 import {
   Avatar,
@@ -253,11 +253,20 @@ export function NavUser({
                   </DropdownMenuItem>
                 </SheetTrigger>
               ) : (
-                <DropdownMenuItem disabled className="gap-2">
-                  <Settings className="size-4" />
-                  Settings
-                  <Lock className="size-4" />
-                </DropdownMenuItem>
+                <>
+                  <DropdownMenuItem disabled className="gap-2">
+                    <Settings className="size-4" />
+                    Settings
+                    <Lock className="size-4" />
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onSelect={() => router.push("/signup")}
+                    className="gap-2"
+                  >
+                    <UserPlus className="size-4" />
+                    Create your account
+                  </DropdownMenuItem>
+                </>
               )}
               <DropdownMenuSeparator />
               <DropdownMenuItem

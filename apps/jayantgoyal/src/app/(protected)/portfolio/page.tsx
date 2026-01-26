@@ -41,7 +41,7 @@ type Project = PortfolioData["PROJECTS"][number];
 type Certificate = PortfolioData["CERTIFICATES"][number];
 
 const sectionId = (id: SectionId) => id;
-const sectionScrollMargin = "scroll-mt-28";
+const sectionScrollMargin = "scroll-mt-20";
 
 export default function Page() {
   const { data } = usePortfolioData();
@@ -103,19 +103,14 @@ function HeroSection({
   return (
     <section
       id={sectionId("home")}
-      className={cn("relative overflow-hidden", sectionScrollMargin)}
+      className={cn("px-4 sm:px-6 lg:px-8", sectionScrollMargin)}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-secondary/10" />
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -top-32 -right-32 h-64 w-64 rounded-full bg-primary/15 blur-3xl" />
-        <div className="absolute -bottom-32 -left-32 h-64 w-64 rounded-full bg-secondary/20 blur-3xl" />
-      </div>
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: "easeOut" }}
         viewport={{ once: true, amount: 0.4 }}
-        className="relative mx-auto flex max-w-5xl flex-col items-center gap-6 px-4 py-16 text-center sm:px-6 lg:px-8"
+        className="mx-auto flex max-w-5xl flex-col items-center gap-6 py-16 text-center"
       >
         <motion.span
           initial={{ opacity: 0, y: 10 }}
@@ -183,10 +178,7 @@ function AboutSection({
   return (
     <section
       id={sectionId("about")}
-      className={cn(
-        "rounded-2xl bg-muted/40 px-4 py-12 sm:px-6 lg:px-8",
-        sectionScrollMargin
-      )}
+      className={cn("px-4 sm:px-6 lg:px-8", sectionScrollMargin)}
     >
       <SectionHeader
         title="About Me"
@@ -413,10 +405,7 @@ function ProjectsSection({
   return (
     <section
       id={sectionId("projects")}
-      className={cn(
-        "rounded-2xl bg-muted/30 px-4 py-12 sm:px-6 lg:px-8",
-        sectionScrollMargin
-      )}
+      className={cn("px-4 sm:px-6 lg:px-8", sectionScrollMargin)}
     >
       <SectionHeader
         title="My Projects"
@@ -787,7 +776,7 @@ function GithubActivitySection({
         description="Consistent daily coding and open source contributions"
       />
       <Separator className="my-8" />
-      <div className="mx-auto max-w-4xl">
+      <div className="mx-auto">
         <GithubCalendarComponent username={githubUsername} githubUrl={githubUrl} />
       </div>
     </section>
@@ -802,10 +791,7 @@ function ContactSection({
   return (
     <section
       id={sectionId("contact")}
-      className={cn(
-        "rounded-2xl bg-muted/30 px-4 py-12 sm:px-6 lg:px-8",
-        sectionScrollMargin
-      )}
+      className={cn("px-4 sm:px-6 lg:px-8", sectionScrollMargin)}
     >
       <SectionHeader
         title="Get In Touch"

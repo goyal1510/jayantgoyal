@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getPortfolioDataFromHeaders } from "@/lib/portfolio/server";
 import { PortfolioDataProvider } from "@/lib/portfolio/use-portfolio-data";
+import { TermsAcceptanceCheck } from "@/components/auth/terms-acceptance-check";
 
 export default async function ProtectedLayout({
   children,
@@ -21,6 +22,7 @@ export default async function ProtectedLayout({
 
   return (
     <PortfolioDataProvider profile={profile} host={host}>
+      <TermsAcceptanceCheck />
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset>

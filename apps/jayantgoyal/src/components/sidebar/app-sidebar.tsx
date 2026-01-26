@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutGrid, LogIn, User } from "lucide-react"
+import { FileText, LayoutGrid, LogIn, User } from "lucide-react"
 
 import { NavApps } from "@/components/sidebar/nav-apps"
 import { NavUser } from "@/components/sidebar/nav-user"
@@ -23,6 +23,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { HUB_APPS } from "@/lib/config/hub-config"
 import { createSupabaseBrowserClient } from "@/lib/supabase/client"
+import { TermsDialog } from "@/components/auth/terms-dialog"
 
 const fallbackUser = {
   name: "Guest",
@@ -204,6 +205,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
     // Function to determine which section is currently active
     const updateActiveSection = () => {
+      // Check if we've scrolled to the bottom of the page
+      const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 50
+
+      // If at the bottom, highlight the last section (contact)
+      if (isAtBottom && portfolioSectionIds.length > 0) {
+        setPortfolioActiveSection(portfolioSectionIds[portfolioSectionIds.length - 1] || "home")
+        return
+      }
+
       // Get the scroll position with an offset (consider section active when its top reaches 20% from viewport top)
       const scrollPosition = window.scrollY + window.innerHeight * 0.2
 
@@ -282,6 +292,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         />
       </SidebarContent>
       <SidebarFooter>
+        {user && (
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <TermsDialog>
+                <SidebarMenuButton className="w-full">
+                  <FileText className="size-4" />
+                  <span>Terms & Conditions</span>
+                </SidebarMenuButton>
+              </TermsDialog>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        )}
+        <SidebarSeparator className={user ? "" : "hidden"} />
         {isUserLoading ? (
           <SidebarMenu>
             <SidebarMenuItem>
