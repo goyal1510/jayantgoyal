@@ -25,6 +25,7 @@ export default async function proxy(request: NextRequest) {
     "/terms-conditions",  // Terms & Conditions is public
     "/login",
     "/signup",
+    "/auth/callback", // Auth callback for email verification token exchange
     "/api/guest-login",
     "/api/contact",   // Contact form API
     "/api/account/terms-status", // Terms status check (returns safe defaults for unauthenticated)
@@ -67,9 +68,9 @@ export default async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const isAuthed = Boolean(user);
-  const guestEmail = process.env.GUEST_EMAIL_LOGIN;
-  const isGuest = guestEmail && user?.email === guestEmail;
-  const termsAccepted = isGuest || user?.user_metadata?.terms_accepted === true;
+  // Use Supabase's built-in anonymous user detection
+  const isAnonymous = user?.is_anonymous === true;
+  const termsAccepted = isAnonymous || user?.user_metadata?.terms_accepted === true;
 
   response.headers.set("x-auth-status", isAuthed ? "authed" : "anon");
   response.headers.set("x-terms-accepted", termsAccepted ? "true" : "false");
@@ -98,8 +99,15 @@ export default async function proxy(request: NextRequest) {
   }
 
   if (isAuthed && (pathname.startsWith("/login") || pathname.startsWith("/signup"))) {
-    // Allow guest users to access signup page to create a real account
-    if (isGuest && pathname.startsWith("/signup")) {
+    // Allow anonymous users to access signup page to convert to permanent account
+    if (isAnonymous && pathname.startsWith("/signup")) {
+      return response;
+    }
+
+    // Allow users who just verified their email to access signup page to set password
+    // This happens when anonymous user verifies email - they're no longer anonymous but need to set password
+    const isVerified = request.nextUrl.searchParams.get("verified") === "true";
+    if (isVerified && pathname.startsWith("/signup")) {
       return response;
     }
 

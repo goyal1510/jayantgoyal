@@ -16,17 +16,8 @@ export async function GET() {
     );
   }
 
-  const guestEmail = process.env.GUEST_EMAIL_LOGIN?.toLowerCase();
-  const guestEmailsToMatch = [guestEmail]
-    .filter(Boolean)
-    .map((value) => (value ?? "").toLowerCase());
-
   const metadata = (user.user_metadata ?? {}) as Record<string, unknown>;
   const getString = (value: unknown) => (typeof value === "string" ? value : "");
-  const normalize = (value: string | null | undefined) =>
-    (value ?? "").trim().toLowerCase();
-  const metadataEmail =
-    getString(metadata.email) || getString(metadata.preferred_email);
   const firstName = getString(metadata.first_name);
   const lastName = getString(metadata.last_name);
   const combinedName = `${firstName} ${lastName}`.trim();
@@ -35,22 +26,26 @@ export async function GET() {
     combinedName ||
     getString(metadata.name) ||
     getString(metadata.user_name) ||
-    (user.email ? user.email.split("@")[0] : "");
+    (user.email ? user.email.split("@")[0] : "Guest");
 
-  const metadataIsGuestValue =
-    metadata.is_guest ?? metadata.isGuest ?? metadata.guest;
-  const metadataIsGuest =
-    metadataIsGuestValue === true ||
-    metadataIsGuestValue === "true" ||
-    metadataIsGuestValue === 1 ||
-    metadataIsGuestValue === "1";
+  // Use Supabase's built-in anonymous user detection
+  const isGuest = user.is_anonymous === true;
 
-  const isGuest =
-    guestEmailsToMatch.some(
-      (guest) =>
-        !!guest &&
-        (normalize(user.email) === guest || normalize(metadataEmail) === guest)
-    ) || metadataIsGuest;
+  // Check if user has verified email (for anonymous → permanent conversion flow)
+  const hasVerifiedEmail = Boolean(user.email_confirmed_at || user.confirmed_at);
+
+  // User needs to set password if they:
+  // - Were anonymous (is_anonymous could be true or false after email link)
+  // - Have a verified email
+  // - Don't have identities with a password (checking if they came from anonymous)
+  const identities = user.identities || [];
+  const hasPasswordIdentity = identities.some(
+    (identity) => identity.provider === "email" && identity.identity_data?.email
+  );
+
+  // If user has verified email but originally was anonymous (no password identity created via signUp)
+  // they need to set a password. Anonymous users who link email don't have password until they set it.
+  const needsPassword = hasVerifiedEmail && !isGuest && identities.length === 0;
 
   return NextResponse.json({
     user: {
@@ -58,6 +53,8 @@ export async function GET() {
       email: user.email,
       name,
       isGuest,
+      hasVerifiedEmail,
+      needsPassword,
     },
   });
 }

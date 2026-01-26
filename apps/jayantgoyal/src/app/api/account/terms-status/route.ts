@@ -4,7 +4,6 @@ import { createServerClient } from "@supabase/ssr";
 export async function GET(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  const guestEmail = process.env.GUEST_EMAIL_LOGIN;
 
   if (!supabaseUrl || !supabaseAnonKey) {
     return NextResponse.json(
@@ -36,9 +35,9 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  // Guest users don't need to accept terms
-  const isGuest = guestEmail && user.email === guestEmail;
-  if (isGuest) {
+  // Anonymous users don't need to accept terms
+  const isAnonymous = user.is_anonymous === true;
+  if (isAnonymous) {
     return NextResponse.json({
       needsAcceptance: false,
       isAuthenticated: true,

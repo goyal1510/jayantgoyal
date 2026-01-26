@@ -6,7 +6,6 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 export async function DELETE() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const guestEmail = process.env.GUEST_EMAIL_LOGIN?.toLowerCase();
 
   if (!supabaseUrl || !serviceRoleKey) {
     return NextResponse.json(
@@ -28,18 +27,10 @@ export async function DELETE() {
     );
   }
 
-  const userEmail = user.email?.toLowerCase();
-  const userMetadataEmail =
-    typeof user.user_metadata?.email === "string"
-      ? user.user_metadata.email.toLowerCase()
-      : null;
-  const isGuestUser =
-    !!guestEmail &&
-    (userEmail === guestEmail || userMetadataEmail === guestEmail);
-
-  if (isGuestUser) {
+  // Anonymous users cannot delete their accounts (they can just sign out)
+  if (user.is_anonymous === true) {
     return NextResponse.json(
-      { error: "Guest accounts cannot be deleted." },
+      { error: "Anonymous accounts cannot be deleted. Please sign out instead." },
       { status: 403 }
     );
   }

@@ -2,16 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
 export async function POST(request: NextRequest) {
-  const guestEmail = process.env.GUEST_EMAIL_LOGIN;
-  const guestPassword = process.env.GUEST_PASSWORD_LOGIN;
-
-  if (!guestEmail || !guestPassword) {
-    return NextResponse.json(
-      { error: "Guest credentials are not configured." },
-      { status: 500 }
-    );
-  }
-
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -37,10 +27,8 @@ export async function POST(request: NextRequest) {
     },
   });
 
-  const { error } = await supabase.auth.signInWithPassword({
-    email: guestEmail,
-    password: guestPassword,
-  });
+  // Use Supabase anonymous sign-in - each guest gets a unique isolated session
+  const { error } = await supabase.auth.signInAnonymously();
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 401 });

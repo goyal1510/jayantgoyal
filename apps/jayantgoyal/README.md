@@ -109,12 +109,19 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 
 # Optional
-GUEST_EMAIL_LOGIN=guest@example.com
-GUEST_PASSWORD_LOGIN=guest_password
 RESEND_API_KEY=your_resend_api_key
 RESEND_FROM_EMAIL=noreply@example.com
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
+
+### Guest Login Setup
+
+Guest login uses Supabase Anonymous Sign-In. To enable:
+
+1. Go to **Supabase Dashboard** → **Authentication** → **Providers**
+2. Enable **Anonymous Sign-ins**
+
+Each guest gets a unique isolated session. When they sign up, their anonymous account converts to a permanent account (preserving data).
 
 ## Project Structure
 

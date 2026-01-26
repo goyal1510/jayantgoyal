@@ -96,7 +96,7 @@ export function TermsContent() {
                 <h3 className="font-medium text-purple-600 dark:text-purple-400">Data Retention</h3>
               </div>
               <ul className="text-sm text-muted-foreground space-y-1">
-                <li>• Guest account data: <strong className="text-foreground">Cleared every 7 days</strong></li>
+                <li>• Guest (anonymous) data: <strong className="text-foreground">Session-based, may be cleared periodically</strong></li>
                 <li>• User account data: Retained while account is active</li>
                 <li>• Inactive accounts (&gt;180 days): May be purged</li>
                 <li>• Backups: No guaranteed backup retention</li>
@@ -109,7 +109,7 @@ export function TermsContent() {
                 <h3 className="font-medium text-purple-600 dark:text-purple-400">Privacy Expectations</h3>
               </div>
               <ul className="text-sm text-muted-foreground space-y-1">
-                <li>• Guest data: <strong className="text-foreground">No privacy expectation</strong></li>
+                <li>• Guest data: <strong className="text-foreground">Isolated but limited privacy</strong></li>
                 <li>• User data: Basic security measures applied</li>
                 <li>• No GDPR/CCPA compliance guaranteed</li>
                 <li>• Analytics data collected for improvement</li>
@@ -166,39 +166,44 @@ export function TermsContent() {
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <Users className="size-4 text-indigo-500" />
-                  <span className="text-sm font-medium">Shared Environment</span>
+                  <span className="text-sm font-medium">Anonymous Session</span>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  All guest users share the same data space. Other guests can see, modify, or delete your data.
+                  Each guest gets a unique anonymous session. Your data is isolated from other guests.
                 </p>
               </div>
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <Clock className="size-4 text-indigo-500" />
-                  <span className="text-sm font-medium">Auto-Cleanup</span>
+                  <span className="text-sm font-medium">Session-Based</span>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Guest data is automatically cleared every 7 days without notice.
+                  Guest data is tied to your browser session. Clearing cookies or using a different device will lose access.
                 </p>
               </div>
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <EyeOff className="size-4 text-indigo-500" />
-                  <span className="text-sm font-medium">No Privacy</span>
+                  <span className="text-sm font-medium">Limited Privacy</span>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Absolutely no expectation of privacy for any data stored in guest accounts.
+                  Basic security measures apply, but no guarantees. Convert to a full account for better security.
                 </p>
               </div>
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <Trash2 className="size-4 text-indigo-500" />
-                  <span className="text-sm font-medium">No Backup</span>
+                  <span className="text-sm font-medium">No Recovery</span>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  No backups are maintained for guest data. Deletion is permanent.
+                  Lost session = lost data. No backups or recovery options for anonymous accounts.
                 </p>
               </div>
+            </div>
+            <div className="mt-4 pt-3 border-t border-indigo-500/20">
+              <p className="text-xs text-indigo-600 dark:text-indigo-400">
+                <strong>Tip:</strong> You can convert your guest account to a permanent account anytime by signing up. Your data will be preserved!
+              </p>
             </div>
           </div>
         </div>
