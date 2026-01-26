@@ -5,6 +5,7 @@ import * as React from "react"
 import { useSearchParams } from "next/navigation"
 import { useFormStatus } from "react-dom"
 import Link from "next/link"
+import { Eye, EyeOff, Home } from "lucide-react"
 
 import { loginWithPassword } from "@/app/login/actions"
 import { Button } from "@/components/ui/button"
@@ -45,6 +46,7 @@ export function LoginForm({
     initialState
   )
   const [isGuestPending, startGuestTransition] = React.useTransition()
+  const [showPassword, setShowPassword] = React.useState(false)
 
   const handleGuestLogin = React.useCallback(() => {
     startGuestTransition(() => {
@@ -54,6 +56,13 @@ export function LoginForm({
             method: "POST",
             credentials: "include",
           })
+
+          const contentType = response.headers.get("content-type")
+          if (!contentType || !contentType.includes("application/json")) {
+            toast.error("Server error. Please try again.")
+            return
+          }
+
           const data = await response.json()
 
           if (!response.ok || !data?.success) {
@@ -88,9 +97,9 @@ export function LoginForm({
             <input type="hidden" name="redirect" value={redirectUrl} />
             <div className="flex flex-col items-center text-center">
               <h1 className="text-2xl font-bold">Welcome Back</h1>
-              <p className="text-balance text-muted-foreground">
+              {/* <p className="text-balance text-muted-foreground">
                 Login to your account
-              </p>
+              </p> */}
             </div>
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
@@ -107,17 +116,27 @@ export function LoginForm({
               <div className="flex items-center">
                 <Label htmlFor="password">Password</Label>
               </div>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="Enter Your Password"
-                autoComplete="current-password"
-                required
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter Your Password"
+                  autoComplete="current-password"
+                  required
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                </button>
+              </div>
             </div>
             <div className="grid gap-3">
-              <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
+              <div className="flex flex-row gap-2">
                 <Button
                   type="button"
                   variant="outline"
@@ -126,7 +145,7 @@ export function LoginForm({
                   aria-disabled={isGuestPending}
                   disabled={isGuestPending}
                 >
-                  {isGuestPending ? "Logging in as guest..." : "Continue as guest"}
+                  {isGuestPending ? "Logging in..." : "Login as guest"}
                 </Button>
                 <SubmitButton className="flex-1" />
               </div>
@@ -137,6 +156,12 @@ export function LoginForm({
                 Sign up
               </Link>
             </div>
+            <Button variant="ghost" asChild className="w-full">
+              <Link href="/portfolio">
+                <Home className="size-4" />
+                Back to Home
+              </Link>
+            </Button>
           </form>
         </CardContent>
       </Card>

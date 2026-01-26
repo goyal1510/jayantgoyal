@@ -26,6 +26,8 @@ export default async function proxy(request: NextRequest) {
     "/signup",
     "/api/guest-login",
     "/api/contact",   // Contact form API
+    "/api/account/terms-status", // Terms status check (returns safe defaults for unauthenticated)
+    "/api/account/accept-terms", // Terms acceptance
     "/favicon_io/site.webmanifest",
   ];
 
@@ -64,8 +66,28 @@ export default async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const isAuthed = Boolean(user);
+  const guestEmail = process.env.GUEST_EMAIL_LOGIN;
+  const isGuest = guestEmail && user?.email === guestEmail;
+  const termsAccepted = isGuest || user?.user_metadata?.terms_accepted === true;
 
   response.headers.set("x-auth-status", isAuthed ? "authed" : "anon");
+  response.headers.set("x-terms-accepted", termsAccepted ? "true" : "false");
+
+  // Block protected API routes if terms not accepted (except terms-related APIs)
+  if (isAuthed && !termsAccepted && pathname.startsWith("/api/")) {
+    const allowedApis = [
+      "/api/account/terms-status",
+      "/api/account/accept-terms",
+      "/api/account/profile",
+    ];
+    const isAllowedApi = allowedApis.some((api) => pathname.startsWith(api));
+    if (!isAllowedApi) {
+      return NextResponse.json(
+        { error: "You must accept the Terms and Conditions to use this feature." },
+        { status: 403 }
+      );
+    }
+  }
 
   if (!isAuthed && !isPublic) {
     // Redirect to login with return URL
@@ -75,6 +97,11 @@ export default async function proxy(request: NextRequest) {
   }
 
   if (isAuthed && (pathname.startsWith("/login") || pathname.startsWith("/signup"))) {
+    // Allow guest users to access signup page to create a real account
+    if (isGuest && pathname.startsWith("/signup")) {
+      return response;
+    }
+
     // Check if there's a redirect URL
     const redirectUrl = request.nextUrl.searchParams.get("redirect");
     if (redirectUrl && redirectUrl.startsWith("/")) {
