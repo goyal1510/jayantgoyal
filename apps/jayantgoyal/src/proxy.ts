@@ -22,6 +22,7 @@ export default async function proxy(request: NextRequest) {
     "/tools",         // Tech Tools is public
     "/weather",       // Weather is public
     "/custom-calculator", // Custom Calculator is public
+    "/terms-conditions",  // Terms & Conditions is public
     "/login",
     "/signup",
     "/api/guest-login",
@@ -32,7 +33,7 @@ export default async function proxy(request: NextRequest) {
   ];
 
   const isPublic = publicPaths.some((path) => {
-    if (path === "/" || path === "/portfolio" || path === "/weather" || path === "/custom-calculator") {
+    if (path === "/" || path === "/portfolio" || path === "/weather" || path === "/custom-calculator" || path === "/terms-conditions") {
       // Exact match for these routes
       return pathname === path;
     }

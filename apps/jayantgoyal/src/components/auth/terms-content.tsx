@@ -1,6 +1,6 @@
 "use client"
 
-import { Shield, AlertTriangle, Clock, BookOpen, Mail, Code, Database, Globe, Users, EyeOff, Trash2, Cpu } from "lucide-react"
+import { Shield, AlertTriangle, Clock, BookOpen, Mail, Code, Database, Globe, Users, EyeOff, Trash2, Cpu, RefreshCw } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 
 export function TermsContent() {
@@ -310,7 +310,10 @@ export function TermsContent() {
 
       {/* Changes to Terms */}
       <section className="space-y-4">
-        <h2 className="text-xl font-semibold">11. Changes to Terms</h2>
+        <div className="flex items-center gap-3">
+          <RefreshCw className="size-6 text-cyan-500" />
+          <h2 className="text-xl font-semibold">11. Changes to Terms</h2>
+        </div>
         <div className="pl-9 space-y-3">
           <p className="text-sm text-muted-foreground leading-relaxed">
             We reserve the right to modify these Terms at any time. When we make changes,
@@ -375,4 +378,4 @@ export function TermsContent() {
   )
 }
 
-export const TERMS_LAST_UPDATED = "January 2025"
+export const TERMS_LAST_UPDATED = "26 January 2026"
