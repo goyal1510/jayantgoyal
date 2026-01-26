@@ -1,6 +1,12 @@
+import type { Metadata } from "next"
 import Link from "next/link"
 import { allTools } from "@/lib/tools/tools"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+
+export const metadata: Metadata = {
+  title: "Developer Tools | Jayant Goyal",
+  description: "99+ utilities for developers and power users including generators, converters, formatters, and more.",
+}
 
 export default function ToolsPage() {
   return (

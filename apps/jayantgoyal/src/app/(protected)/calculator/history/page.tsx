@@ -1,7 +1,11 @@
-"use client"
+import type { Metadata } from "next"
+import CalculatorHistoryClient from "./client"
 
-import { CalculationsHistory } from "@/components/calculator/calculations-history"
+export const metadata: Metadata = {
+  title: "Calculator History | Jayant Goyal",
+  description: "View your calculation history.",
+}
 
 export default function Page() {
-  return <CalculationsHistory />
+  return <CalculatorHistoryClient />
 }

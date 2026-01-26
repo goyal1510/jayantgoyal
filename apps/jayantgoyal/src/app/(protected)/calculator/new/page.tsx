@@ -1,7 +1,11 @@
-"use client"
+import type { Metadata } from "next"
+import NewCalculatorClient from "./client"
 
-import { CurrencyCalculatorForm } from "@/components/calculator/currency-calculator-form"
+export const metadata: Metadata = {
+  title: "New Calculator | Jayant Goyal",
+  description: "Create a new calculator.",
+}
 
 export default function Page() {
-  return <CurrencyCalculatorForm />
+  return <NewCalculatorClient />
 }

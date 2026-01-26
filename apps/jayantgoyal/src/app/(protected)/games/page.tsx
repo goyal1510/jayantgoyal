@@ -1,9 +1,16 @@
+import type { Metadata } from "next"
 import Link from "next/link"
 import type { ElementType } from "react"
 import { ArrowRight, Grid3X3, HandHeart, Scissors, Layers, Brain } from "lucide-react"
 
 import { GAME_META } from "@/lib/games/config"
 import { cn } from "@/lib/utils"
+
+export const metadata: Metadata = {
+  title: "Games | Jayant Goyal",
+  description:
+    "Play fun games including Tic Tac Toe, Rock Paper Scissors, Connect Four, and more.",
+}
 
 const CARD_THEMES: Record<
   keyof typeof GAME_META,

@@ -1,4 +1,11 @@
+import type { Metadata } from "next"
+import { GAME_META } from "@/lib/games/config"
 import { TicTacToe } from "@/components/games/TicTacToe"
+
+export const metadata: Metadata = {
+  title: `${GAME_META["tic-tac-toe"].name} | Jayant Goyal`,
+  description: GAME_META["tic-tac-toe"].description,
+}
 
 export default function TicTacToePage() {
   return (
