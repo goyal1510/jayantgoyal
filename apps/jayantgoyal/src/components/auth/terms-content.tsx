@@ -356,12 +356,12 @@ export function TermsContent() {
 
       {/* Final Acknowledgement */}
       <section className="space-y-4">
-        <h2 className="text-xl font-semibold text-center">Final Acknowledgement</h2>
-        <div className="text-center space-y-2">
+        <h2 className="text-xl font-semibold">Final Acknowledgement</h2>
+        <div className="space-y-2">
           <p className="text-sm text-muted-foreground">
             By clicking &quot;Accept & Continue&quot;, you acknowledge that:
           </p>
-          <div className="max-w-2xl mx-auto">
+          <div className="">
             <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1 text-left inline-block">
               <li>You have read and understood these Terms and Conditions</li>
               <li>You will not store sensitive or critical data on this platform</li>
