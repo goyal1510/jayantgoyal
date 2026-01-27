@@ -117,7 +117,7 @@ export function DynamicBreadcrumb() {
   })()
 
   return (
-    <Breadcrumb className="min-w-0 flex-1">
+    <Breadcrumb className="min-w-0 flex-1 max-w-full">
       <BreadcrumbList className="flex-nowrap overflow-hidden">
         <BreadcrumbItem className="shrink-0">
           <BreadcrumbLink asChild>
@@ -127,13 +127,13 @@ export function DynamicBreadcrumb() {
           </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator className="shrink-0" />
-        <BreadcrumbItem className="shrink-0">
+        <BreadcrumbItem className="shrink-0 max-w-[200px]">
           {pageName ? (
             <BreadcrumbLink asChild>
-              <Link href={appHref}>{appName}</Link>
+              <Link href={appHref} className="truncate block">{appName}</Link>
             </BreadcrumbLink>
           ) : (
-            <BreadcrumbPage>{appName}</BreadcrumbPage>
+            <BreadcrumbPage className="truncate block">{appName}</BreadcrumbPage>
           )}
         </BreadcrumbItem>
         {pageName && (
