@@ -1,13 +1,16 @@
 import "@repo/ui/styles.css";
 import "./globals.css";
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
-import { CustomCursor } from "@/components/ui/custom-cursor";
 import { getPortfolioDataFromHeaders } from "@/lib/portfolio/server";
 
-const geist = Geist({ subsets: ["latin"], preload: false });
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
 
 export async function generateMetadata(): Promise<Metadata> {
   const { data } = await getPortfolioDataFromHeaders();
@@ -58,7 +61,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={geist.className}>
+      <body className={inter.className}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -67,7 +70,6 @@ export default function RootLayout({
         >
           {children}
           <Toaster />
-          <CustomCursor />
         </ThemeProvider>
       </body>
     </html>

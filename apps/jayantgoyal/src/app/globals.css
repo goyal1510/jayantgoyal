@@ -105,13 +105,6 @@
     scroll-behavior: smooth;
   }
 
-  /* Hide default cursor for custom cursor */
-  @media (pointer: fine) {
-    * {
-      cursor: none !important;
-    }
-  }
-
   /* Hide scrollbar but keep functionality */
   .scrollbar-hide {
     -ms-overflow-style: none !important;

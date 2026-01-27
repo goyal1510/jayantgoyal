@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { useMemo, useState, useEffect } from "react";
 import { useTheme } from "next-themes";
@@ -20,6 +21,11 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
+
+const PDFViewerModal = dynamic(
+  () => import("@/components/portfolio/pdf-viewer").then((mod) => mod.PDFViewerModal),
+  { ssr: false }
+);
 
 import { Button } from "@/components/ui/button";
 import LogoSlider from "@/components/ui/logo-slider";
@@ -504,6 +510,24 @@ function ProjectModal({
     setMounted(true);
   }, []);
 
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, []);
+
+  // Close modal on Escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [onClose]);
+
   // Default to light mode during SSR to prevent hydration mismatch
   const isDark = mounted && (resolvedTheme === 'dark' || theme === 'dark');
   const hasGithubLink = Boolean(project.githubLink);
@@ -702,52 +726,30 @@ function CertificatesSection({
         ))}
       </div>
       {openCertificate ? (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
-          onClick={() => setOpenCertificate(null)}
-        >
-          <div
-            className="w-full max-w-4xl overflow-hidden rounded-lg bg-background shadow-xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between border-b px-4 py-3">
-              <div>
-                <h3 className="text-lg font-semibold">{openCertificate.name}</h3>
-                <p className="text-xs text-muted-foreground">
-                  {openCertificate.issuer}
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button size="sm" asChild variant="outline">
-                  <Link
-                    href={openCertificate.path}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <ExternalLink className="size-4" />
-                    Open
-                  </Link>
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => setOpenCertificate(null)}
-                >
-                  Close
-                </Button>
-              </div>
-            </div>
-            <div className="h-[70vh]">
-              <iframe
-                src={openCertificate.path}
-                title={openCertificate.name}
-                className="h-full w-full"
-      />
-            </div>
-          </div>
-        </div>
+        <CertificateModal
+          certificate={openCertificate}
+          onClose={() => setOpenCertificate(null)}
+        />
       ) : null}
     </section>
+  );
+}
+
+function CertificateModal({
+  certificate,
+  onClose,
+}: {
+  certificate: Certificate;
+  onClose: () => void;
+}) {
+  return (
+    <PDFViewerModal
+      name={certificate.name}
+      issuer={certificate.issuer}
+      description={certificate.description}
+      path={certificate.path}
+      onClose={onClose}
+    />
   );
 }
 
