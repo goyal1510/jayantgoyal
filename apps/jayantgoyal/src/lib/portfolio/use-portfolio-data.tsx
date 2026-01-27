@@ -1,51 +1,52 @@
 'use client'
 
 import type { ReactNode } from "react"
-import { createContext, useContext, useEffect, useMemo, useState } from "react"
+import { createContext, useContext, useEffect, useState } from "react"
 
-import type { PortfolioData, PortfolioProfileKey } from "@/lib/portfolio/data"
-import {
-  getPortfolioData,
-  normalizeHost,
-  resolvePortfolioProfile,
-} from "@/lib/portfolio/data"
+import type { PortfolioProfileKey } from "@/lib/portfolio/data"
+import { normalizeHost, resolvePortfolioProfile } from "@/lib/portfolio/data"
+import type { SerializablePortfolioData } from "@/lib/portfolio/serializable"
+import { transformLegacyToSerializable } from "@/lib/portfolio/serializable"
+import { jayantPortfolioData } from "@/lib/portfolio/profiles/jayant-portfolio-data"
 
 type PortfolioContextValue = {
-  data: PortfolioData
+  data: SerializablePortfolioData
   profile: PortfolioProfileKey
   host?: string
 }
 
 const PortfolioDataContext = createContext<PortfolioContextValue | null>(null)
 
+/**
+ * Provider component for portfolio data
+ * Data is passed from server component (fetched from database)
+ */
 export function PortfolioDataProvider({
+  data,
   profile,
   host,
   children,
 }: {
+  data: SerializablePortfolioData
   profile: PortfolioProfileKey
   host?: string
   children: ReactNode
 }) {
   const normalizedHost = normalizeHost(host)
-  const resolvedProfile = useMemo(
-    () => resolvePortfolioProfile(normalizedHost || profile),
-    [normalizedHost, profile]
-  )
-  const resolvedData = useMemo(
-    () => getPortfolioData(normalizedHost || resolvedProfile),
-    [normalizedHost, resolvedProfile]
-  )
 
   return (
     <PortfolioDataContext.Provider
-      value={{ data: resolvedData, profile: resolvedProfile, host: normalizedHost }}
+      value={{ data, profile, host: normalizedHost }}
     >
       {children}
     </PortfolioDataContext.Provider>
   )
 }
 
+/**
+ * Hook to access portfolio data in client components
+ * Returns serializable data (icons are string keys)
+ */
 export function usePortfolioData(initialHost?: string) {
   const context = useContext(PortfolioDataContext)
   const [host, setHost] = useState<string | undefined>(
@@ -59,7 +60,9 @@ export function usePortfolioData(initialHost?: string) {
   }, [host])
 
   const resolvedHost = host ?? context?.host
-  const data = context?.data ?? getPortfolioData(resolvedHost)
+
+  // Use context data if available (from server), otherwise fall back to transformed legacy
+  const data = context?.data ?? transformLegacyToSerializable(jayantPortfolioData)
   const profile = context?.profile ?? resolvePortfolioProfile(resolvedHost)
 
   return {

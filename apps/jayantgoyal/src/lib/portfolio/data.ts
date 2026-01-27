@@ -1,4 +1,3 @@
-
 import { jayantPortfolioData } from "@/lib/portfolio/profiles/jayant-portfolio-data"
 
 const PORTFOLIO_PROFILES = {
@@ -6,7 +5,12 @@ const PORTFOLIO_PROFILES = {
 } as const
 
 export type PortfolioProfileKey = keyof typeof PORTFOLIO_PROFILES
-export type PortfolioData = (typeof PORTFOLIO_PROFILES)[PortfolioProfileKey]
+
+/**
+ * Legacy portfolio data type (from hardcoded profiles)
+ * This matches the structure of jayant-portfolio-data.ts
+ */
+export type LegacyPortfolioData = (typeof PORTFOLIO_PROFILES)[PortfolioProfileKey]
 
 const HOSTNAME_MAP: Record<string, PortfolioProfileKey> = {
   "portfolio.jayantgoyal.com": "jayant",
@@ -50,7 +54,11 @@ export function resolvePortfolioProfile(host?: string | null): PortfolioProfileK
   return DEFAULT_PORTFOLIO_PROFILE
 }
 
-export function getPortfolioData(host?: string | null): PortfolioData {
+/**
+ * Get legacy (hardcoded) portfolio data
+ * Used as fallback when database is unavailable
+ */
+export function getLegacyPortfolioData(host?: string | null): LegacyPortfolioData {
   return PORTFOLIO_PROFILES[resolvePortfolioProfile(host)]
 }
 

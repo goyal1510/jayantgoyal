@@ -18,10 +18,10 @@ export default async function ProtectedLayout({
 }: {
   children: ReactNode;
 }) {
-  const { profile, host } = await getPortfolioDataFromHeaders();
+  const { data, profile, host } = await getPortfolioDataFromHeaders();
 
   return (
-    <PortfolioDataProvider profile={profile} host={host}>
+    <PortfolioDataProvider data={data} profile={profile} host={host}>
       <TermsAcceptanceCheck />
       <SidebarProvider>
         <AppSidebar />

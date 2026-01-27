@@ -10,6 +10,7 @@ import { useTheme } from "next-themes";
 import {
   Award,
   Calendar,
+  Code2,
   Download,
   ExternalLink,
   Github,
@@ -39,15 +40,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import type { PortfolioData } from "@/lib/portfolio/data";
 import { usePortfolioData } from "@/lib/portfolio/use-portfolio-data";
+import { getIconComponent } from "@/lib/portfolio/icons";
+import type { SerializablePortfolioData } from "@/lib/portfolio/serializable";
 import { cn } from "@/lib/utils";
 import { GithubCalendarComponent } from "@/components/portfolio/github-calendar";
 import { ContactForm } from "@/components/portfolio/contact-form";
 
-type SectionId = PortfolioData["NAV_ITEMS"][number]["id"];
-type Project = PortfolioData["PROJECTS"][number];
-type Certificate = PortfolioData["CERTIFICATES"][number];
+type SectionId = SerializablePortfolioData["NAV_ITEMS"][number]["id"];
+type Project = SerializablePortfolioData["PROJECTS"][number];
+type Certificate = SerializablePortfolioData["CERTIFICATES"][number];
 
 const sectionId = (id: SectionId) => id;
 const sectionScrollMargin = "scroll-mt-20";
@@ -106,8 +108,8 @@ function HeroSection({
   hero,
   contact,
 }: {
-  hero: PortfolioData["HERO"];
-  contact: PortfolioData["CONTACT"];
+  hero: SerializablePortfolioData["HERO"];
+  contact: SerializablePortfolioData["CONTACT"];
 }) {
   return (
     <section
@@ -174,8 +176,8 @@ function AboutSection({
   about,
   education,
 }: {
-  about: PortfolioData["ABOUT"];
-  education: PortfolioData["EDUCATION"];
+  about: SerializablePortfolioData["ABOUT"];
+  education: SerializablePortfolioData["EDUCATION"];
 }) {
   return (
     <section
@@ -253,8 +255,8 @@ function SkillsSection({
   skillSets,
   techIcons,
 }: {
-  skillSets: PortfolioData["SKILL_SETS"];
-  techIcons: PortfolioData["TECH_ICONS"];
+  skillSets: SerializablePortfolioData["SKILL_SETS"];
+  techIcons: SerializablePortfolioData["TECH_ICONS"];
 }) {
   return (
     <section
@@ -268,17 +270,20 @@ function SkillsSection({
 
       <div className="mt-10 overflow-hidden rounded-2xl bg-muted/30 py-6 max-w-5xl mx-auto">
         <LogoSlider
-          logos={techIcons.map((tech) => (
-            <div
-              key={tech.name}
-              className="flex items-center justify-center gap-3 px-4 py-2"
-            >
-              <tech.icon className={cn("size-8", tech.color)} />
-              <span className="text-lg font-medium text-foreground whitespace-nowrap">
-                {tech.name}
-              </span>
-            </div>
-          ))}
+          logos={techIcons.map((tech) => {
+            const TechIcon = getIconComponent(tech.icon_key) ?? Code2;
+            return (
+              <div
+                key={tech.name}
+                className="flex items-center justify-center gap-3 px-4 py-2"
+              >
+                <TechIcon className={cn("size-8", tech.color)} />
+                <span className="text-lg font-medium text-foreground whitespace-nowrap">
+                  {tech.name}
+                </span>
+              </div>
+            );
+          })}
           speed={30}
           direction="left"
           pauseOnHover={true}
@@ -289,44 +294,47 @@ function SkillsSection({
       <Separator className="my-10" />
 
       <div className="grid gap-6 md:grid-cols-2">
-        {skillSets.map((set, setIndex) => (
-          <motion.div
-            key={set.title}
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: setIndex * 0.05 }}
-            viewport={{ once: true }}
-          >
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <set.icon className={cn("size-5", set.color ?? "text-primary")} />
-                  {set.title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {set.items.map((item, itemIndex) => (
-                  <motion.div
-                    key={item.name}
-                    initial={{ opacity: 0, x: -12 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: itemIndex * 0.05 }}
-                    viewport={{ once: true }}
-                    className="space-y-2"
-                  >
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="font-medium">{item.name}</span>
-                      <span className="text-muted-foreground">
-                        {item.level}%
-                      </span>
-                    </div>
-                    <Progress value={item.level} />
-                  </motion.div>
-                ))}
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
+        {skillSets.map((set, setIndex) => {
+          const SetIcon = getIconComponent(set.icon_key) ?? Code2;
+          return (
+            <motion.div
+              key={set.title}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: setIndex * 0.05 }}
+              viewport={{ once: true }}
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <SetIcon className={cn("size-5", set.color ?? "text-primary")} />
+                    {set.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {set.items.map((item, itemIndex) => (
+                    <motion.div
+                      key={item.name}
+                      initial={{ opacity: 0, x: -12 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.4, delay: itemIndex * 0.05 }}
+                      viewport={{ once: true }}
+                      className="space-y-2"
+                    >
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="font-medium">{item.name}</span>
+                        <span className="text-muted-foreground">
+                          {item.level}%
+                        </span>
+                      </div>
+                      <Progress value={item.level} />
+                    </motion.div>
+                  ))}
+                </CardContent>
+              </Card>
+            </motion.div>
+          );
+        })}
       </div>
     </section>
   );
@@ -335,7 +343,7 @@ function SkillsSection({
 function ExperienceSection({
   experience,
 }: {
-  experience: PortfolioData["EXPERIENCE"];
+  experience: SerializablePortfolioData["EXPERIENCE"];
 }) {
   return (
     <section
@@ -399,7 +407,7 @@ function ProjectsSection({
   projects,
   onSelectProject,
 }: {
-  projects: PortfolioData["PROJECTS"];
+  projects: SerializablePortfolioData["PROJECTS"];
   onSelectProject: (project: Project) => void;
 }) {
   return (
@@ -478,7 +486,7 @@ function ProjectCard({
           <CardDescription>{project.shortDescription}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
-          {project.tags.slice(0, 3).map((tag) => (
+          {project.tags.slice(0, 3).map((tag: string) => (
             <Badge key={tag} variant="secondary">
               {tag}
             </Badge>
@@ -636,7 +644,7 @@ function ProjectModal({
               <div>
                 <h3 className="text-base font-semibold sm:text-lg">Technologies Used</h3>
                 <div className="flex flex-wrap gap-2">
-                  {project.tags.map((tag) => (
+                  {project.tags.map((tag: string) => (
                     <Badge key={tag} variant="secondary">
                       {tag}
                     </Badge>
@@ -659,7 +667,7 @@ function CertificatesSection({
 }: {
   categories: string[];
   selectedCategory: string;
-  certificates: PortfolioData["CERTIFICATES"];
+  certificates: SerializablePortfolioData["CERTIFICATES"];
   onSelectCategory: (category: string) => void;
 }) {
   const [openCertificate, setOpenCertificate] = useState<Certificate | null>(
@@ -756,7 +764,7 @@ function CertificateModal({
 function GithubActivitySection({
   contact,
 }: {
-  contact: PortfolioData["CONTACT"];
+  contact: SerializablePortfolioData["CONTACT"];
 }) {
   const githubSocial = contact.socials.find((social) => social.label === "GitHub");
   const githubUrl = githubSocial?.href;
@@ -782,7 +790,7 @@ function GithubActivitySection({
 function ContactSection({
   contact,
 }: {
-  contact: PortfolioData["CONTACT"];
+  contact: SerializablePortfolioData["CONTACT"];
 }) {
   return (
     <section
@@ -823,20 +831,23 @@ function ContactSection({
                 href={`https://maps.google.com/?q=${encodeURIComponent(contact.location)}`}
       />
               <div className="grid grid-cols-1 gap-3 pt-2 sm:grid-cols-3">
-                {contact.socials.map((social) => (
-                  <Button
-                    key={social.label}
-                    asChild
-                    variant="outline"
-                    size="sm"
-                    className="flex h-16 w-full flex-col items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-center"
-                  >
-                    <Link href={social.href} target="_blank" rel="noreferrer">
-                      <social.icon className={cn("size-5", social.color)} />
-                      <span className="text-xs font-medium">{social.label}</span>
-                    </Link>
-                  </Button>
-                ))}
+                {contact.socials.map((social) => {
+                  const SocialIcon = getIconComponent(social.icon_key) ?? Code2;
+                  return (
+                    <Button
+                      key={social.label}
+                      asChild
+                      variant="outline"
+                      size="sm"
+                      className="flex h-16 w-full flex-col items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-center"
+                    >
+                      <Link href={social.href} target="_blank" rel="noreferrer">
+                        <SocialIcon className={cn("size-5", social.color)} />
+                        <span className="text-xs font-medium">{social.label}</span>
+                      </Link>
+                    </Button>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
