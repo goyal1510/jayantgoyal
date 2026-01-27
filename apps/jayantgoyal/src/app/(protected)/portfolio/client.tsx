@@ -24,6 +24,7 @@ import {
 import { Button } from "@/components/ui/button";
 import LogoSlider from "@/components/ui/logo-slider";
 import FlipText from "@/components/ui/flip-text";
+import Typewriter from "@/components/ui/typewriter";
 import {
   Card,
   CardContent,
@@ -132,18 +133,18 @@ function HeroSection({
           className="space-y-3"
         >
           <h1 className="text-4xl font-bold text-foreground sm:text-5xl lg:text-6xl">
-            Hi, I&apos;m <FlipText className="text-primary inline-block" duration={3}>{hero.name}</FlipText>
+            Hi, I&apos;m <FlipText className="text-cyan-500 inline-block" duration={3}>{hero.name}</FlipText>
           </h1>
           <p className="text-2xl text-muted-foreground">{hero.role}</p>
         </motion.div>
         <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
           viewport={{ once: true }}
           className="max-w-2xl text-lg text-muted-foreground"
         >
-          {hero.tagline}
+          <Typewriter text={hero.tagline} speed={30} delay={500} cursor={true} />
         </motion.p>
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -748,7 +749,7 @@ function CertificatesSection({
                 src={openCertificate.path}
                 title={openCertificate.name}
                 className="h-full w-full"
-              />
+      />
             </div>
           </div>
         </div>
@@ -813,19 +814,19 @@ function ContactSection({
                 label="Email"
                 value={contact.email}
                 href={`mailto:${contact.email}`}
-              />
+      />
               <ContactItem
                 icon={Phone}
                 label="Phone"
                 value={contact.phone}
                 href={`tel:${contact.phone}`}
-              />
+      />
               <ContactItem
                 icon={MapPin}
                 label="Location"
                 value={contact.location}
                 href={`https://maps.google.com/?q=${encodeURIComponent(contact.location)}`}
-              />
+      />
               <div className="grid grid-cols-1 gap-3 pt-2 sm:grid-cols-3">
                 {contact.socials.map((social) => (
                   <Button

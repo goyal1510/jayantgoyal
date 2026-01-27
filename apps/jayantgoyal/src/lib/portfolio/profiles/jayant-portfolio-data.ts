@@ -26,7 +26,7 @@ const HERO = {
   name: "Jayant",
   role: "Full Stack Developer",
   tagline:
-    "I create beautiful, functional, and user-centered digital experiences. Passionate about clean code, modern technologies, and solving complex problems.",
+    "Building clean, functional web experiences with modern technologies.",
   blurb:
     "I love pairing fast iteration with thoughtful craft—shipping early, measuring, and polishing with every release.",
   location: "Hyderabad, India",

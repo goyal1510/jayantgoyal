@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { CustomCursor } from "@/components/ui/custom-cursor";
 import { getPortfolioDataFromHeaders } from "@/lib/portfolio/server";
 
 const geist = Geist({ subsets: ["latin"], preload: false });
@@ -66,6 +67,7 @@ export default function RootLayout({
         >
           {children}
           <Toaster />
+          <CustomCursor />
         </ThemeProvider>
       </body>
     </html>
