@@ -132,20 +132,13 @@ function HeroSection({
           viewport={{ once: true }}
           className="space-y-3"
         >
-          <h1 className="text-4xl font-bold text-foreground sm:text-5xl lg:text-6xl">
-            Hi, I&apos;m <FlipText className="text-cyan-500 inline-block" duration={3}>{hero.name}</FlipText>
+          <h1 className="text-4xl font-bold text-foreground sm:text-5xl lg:text-6xl uppercase tracking-wide">
+            HI, I&apos;M <FlipText className="text-cyan-500 inline-block" duration={3}>{hero.name.toUpperCase()}</FlipText>
           </h1>
-          <p className="text-2xl text-muted-foreground">{hero.role}</p>
+          <p className="text-2xl text-muted-foreground uppercase tracking-wider">
+            <Typewriter text={hero.role.toUpperCase()} speed={80} delay={500} cursor={true} />
+          </p>
         </motion.div>
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.3, delay: 0.2 }}
-          viewport={{ once: true }}
-          className="max-w-2xl text-lg text-muted-foreground"
-        >
-          <Typewriter text={hero.tagline} speed={30} delay={500} cursor={true} />
-        </motion.p>
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -877,9 +870,15 @@ function SectionHeader({
       viewport={{ once: true, amount: 0.3 }}
       className="text-center"
     >
-      <h2 className="text-3xl font-bold text-foreground sm:text-4xl">
-        {title}
-      </h2>
+      <div className="flex items-center justify-center gap-4">
+        <span className="size-2 rounded-full bg-foreground" />
+        <span className="h-px w-16 bg-foreground/30 sm:w-24" />
+        <h2 className="text-3xl font-bold text-foreground sm:text-4xl whitespace-nowrap">
+          {title}
+        </h2>
+        <span className="h-px w-16 bg-foreground/30 sm:w-24" />
+        <span className="size-2 rounded-full bg-foreground" />
+      </div>
       {description ? (
         <p className="mt-3 text-lg text-muted-foreground">{description}</p>
       ) : null}
