@@ -5,7 +5,6 @@ import {
   resolvePortfolioProfile,
 } from "@/lib/portfolio/data"
 import { getTransformedPortfolioData } from "@/lib/portfolio/database"
-import type { TransformedPortfolioData } from "@/lib/portfolio/database.types"
 import { transformLegacyToSerializable, type SerializablePortfolioData } from "@/lib/portfolio/serializable"
 import { jayantPortfolioData } from "@/lib/portfolio/profiles/jayant-portfolio-data"
 
@@ -19,7 +18,7 @@ const USE_DATABASE = true
  * Get portfolio data from database with fallback to hardcoded data
  * Returns serializable data (no React components - icons are string keys)
  */
-async function getPortfolioDataWithFallback(host?: string | null): Promise<SerializablePortfolioData> {
+async function getPortfolioDataWithFallback(): Promise<SerializablePortfolioData> {
   if (!USE_DATABASE) {
     return transformLegacyToSerializable(jayantPortfolioData)
   }
@@ -50,7 +49,7 @@ export async function getPortfolioDataFromHeaders() {
   const host = (await headers()).get("host")
   const normalizedHost = normalizeHost(host)
 
-  const data = await getPortfolioDataWithFallback(host)
+  const data = await getPortfolioDataWithFallback()
 
   return {
     data,
