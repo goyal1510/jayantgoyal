@@ -22,6 +22,8 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import LogoSlider from "@/components/ui/logo-slider";
+import FlipText from "@/components/ui/flip-text";
 import {
   Card,
   CardContent,
@@ -116,11 +118,11 @@ function HeroSection({
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-        viewport={{ once: true }}
-        className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary"
-      >
-        <Sparkles className="size-4" />
-        Welcome to my portfolio
+          viewport={{ once: true }}
+          className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary"
+        >
+          <Sparkles className="size-4" />
+          Welcome to my portfolio
         </motion.span>
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -130,7 +132,7 @@ function HeroSection({
           className="space-y-3"
         >
           <h1 className="text-4xl font-bold text-foreground sm:text-5xl lg:text-6xl">
-            Hi, I&apos;m <span className="text-primary">{hero.name}</span>
+            Hi, I&apos;m <FlipText className="text-primary inline-block" duration={3}>{hero.name}</FlipText>
           </h1>
           <p className="text-2xl text-muted-foreground">{hero.role}</p>
         </motion.div>
@@ -264,27 +266,25 @@ function SkillsSection({
         description="The tools and stacks I reach for to ship reliable, user-friendly products."
       />
 
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        viewport={{ once: true, amount: 0.2 }}
-        className="mt-10 flex flex-wrap justify-center gap-6 rounded-2xl bg-muted/30 p-6"
-      >
-        {techIcons.map((tech, index) => (
-          <motion.div
-            key={tech.name}
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4, delay: index * 0.05 }}
-            viewport={{ once: true }}
-            className="flex flex-col items-center gap-2 rounded-lg bg-background px-4 py-3 text-center shadow-sm"
-          >
-            <tech.icon className={cn("size-6", tech.color)} />
-            <span className="text-sm text-muted-foreground">{tech.name}</span>
-          </motion.div>
-        ))}
-      </motion.div>
+      <div className="mt-10 overflow-hidden rounded-2xl bg-muted/30 py-6 max-w-5xl mx-auto">
+        <LogoSlider
+          logos={techIcons.map((tech) => (
+            <div
+              key={tech.name}
+              className="flex items-center justify-center gap-3 px-4 py-2"
+            >
+              <tech.icon className={cn("size-8", tech.color)} />
+              <span className="text-lg font-medium text-foreground whitespace-nowrap">
+                {tech.name}
+              </span>
+            </div>
+          ))}
+          speed={30}
+          direction="left"
+          pauseOnHover={true}
+          blurLayers={4}
+        />
+      </div>
 
       <Separator className="my-10" />
 
@@ -519,7 +519,7 @@ function ProjectModal({
   // External links like ecommerce.jayantgoyal.com open in new tab
   const isInternalLink = hasLiveLink &&
     (project.liveLink.includes('www.jayantgoyal.com') ||
-     project.liveLink.match(/https?:\/\/jayantgoyal\.com/));
+      project.liveLink.match(/https?:\/\/jayantgoyal\.com/));
 
   const handleLiveClick = () => {
     if (isInternalLink) {
@@ -576,37 +576,37 @@ function ProjectModal({
           </div>
           <div className="space-y-4 p-4 sm:space-y-6 sm:p-6">
             <div className="flex flex-wrap gap-2">
-                {hasGithubLink ? (
-                  <Button variant="outline" size="sm" asChild>
+              {hasGithubLink ? (
+                <Button variant="outline" size="sm" asChild>
+                  <Link
+                    href={project.githubLink}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <Github className="size-4" />
+                    Code
+                  </Link>
+                </Button>
+              ) : null}
+              {hasLiveLink ? (
+                isInternalLink ? (
+                  <Button size="sm" onClick={handleLiveClick}>
+                    <ExternalLink className="size-4" />
+                    Live Demo
+                  </Button>
+                ) : (
+                  <Button size="sm" asChild>
                     <Link
-                      href={project.githubLink}
+                      href={project.liveLink}
                       target="_blank"
                       rel="noreferrer"
                     >
-                      <Github className="size-4" />
-                      Code
-                    </Link>
-                  </Button>
-                ) : null}
-                {hasLiveLink ? (
-                  isInternalLink ? (
-                    <Button size="sm" onClick={handleLiveClick}>
                       <ExternalLink className="size-4" />
                       Live Demo
-                    </Button>
-                  ) : (
-                    <Button size="sm" asChild>
-                      <Link
-                        href={project.liveLink}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        <ExternalLink className="size-4" />
-                        Live Demo
-                      </Link>
-                    </Button>
-                  )
-                ) : null}
+                    </Link>
+                  </Button>
+                )
+              ) : null}
             </div>
             <div className="space-y-4">
               <div>
