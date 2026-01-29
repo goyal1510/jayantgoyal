@@ -1,4 +1,4 @@
-# Jayant Goyal - Personal Hub
+# Jayant Goyal - Personal Hub 
 
 A modern, full-stack monorepo featuring a unified web application built with Next.js 16, TypeScript, React 19, and Supabase. This repository showcases expertise in monorepo architecture, shared component libraries, and scalable application development.
 
