@@ -205,8 +205,8 @@ jayantgoyal/
 
 ## Live
 
-[jayantgoyal.com](https://jayantgoyal.com)
-[admin.jayantgoyal.com](https://admin.jayantgoyal.com)
+**Website:** [jayantgoyal.com](https://jayantgoyal.com)  
+**Admin Panel:** [admin.jayantgoyal.com](https://admin.jayantgoyal.com)
 
 
 ## Author
