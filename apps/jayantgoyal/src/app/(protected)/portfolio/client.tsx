@@ -140,8 +140,9 @@ function HeroSection({
           viewport={{ once: true }}
           className="space-y-3"
         >
-          <h1 className="text-4xl font-bold text-foreground sm:text-5xl lg:text-6xl uppercase tracking-wide">
-            HI, I&apos;M <FlipText className="text-cyan-500 inline-block" duration={3}>{hero.name.toUpperCase()}</FlipText>
+          <h1 className="flex items-center justify-center gap-[0.3em] flex-wrap text-4xl font-bold text-foreground sm:text-5xl lg:text-6xl uppercase tracking-wide leading-[1.2]">
+            <span>HI, I&apos;M</span>
+            <FlipText className="text-cyan-500" duration={3}>{hero.name.toUpperCase()}</FlipText>
           </h1>
           <p className="text-2xl text-muted-foreground uppercase tracking-wider">
             <Typewriter text={hero.role.toUpperCase()} speed={80} delay={500} cursor={true} />
