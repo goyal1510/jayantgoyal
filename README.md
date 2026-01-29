@@ -12,14 +12,16 @@ A modern, full-stack monorepo featuring a unified web application built with Nex
 
 This is a **Turborepo monorepo** managed with **pnpm workspaces**, containing:
 
-- **1 Unified Application** - Full-stack Next.js app with multiple integrated features
+- **2 Applications** - Main hub app and an admin panel
 - **4 Shared Packages** - Reusable UI components and configurations
 - **TypeScript** throughout for type safety
 - **Shared Design System** via `@repo/ui`
 
-## Application Features
+## Applications
 
-The main application (`apps/jayantgoyal`) is a unified hub combining:
+### Main App (`apps/jayantgoyal`)
+
+The main application is a unified hub combining:
 
 ### Portfolio
 Personal portfolio showcasing projects, skills, experience, education, and certificates with smooth animations and responsive design.
@@ -55,6 +57,10 @@ Full-stack file management with hierarchical directories, file operations, and s
 
 ### Sync Messenger
 Real-time messaging with Supabase subscriptions and instant synchronization.
+
+### Admin Panel (`apps/admin`)
+
+Administrative interface for managing portfolio data and application content.
 
 ## Shared Packages
 
@@ -123,6 +129,7 @@ Strict TypeScript configurations for apps and libraries.
    RESEND_API_KEY=your_resend_api_key
    RESEND_FROM_EMAIL=noreply@example.com
    NEXT_PUBLIC_SITE_URL=http://localhost:3000
+   NEXT_PUBLIC_OPENWEATHER_API_KEY=your_openweather_api_key
    ```
 
 ## Development
@@ -172,7 +179,14 @@ pnpm format
 ```
 jayantgoyal/
 ├── apps/
-│   └── jayantgoyal/           # Unified web application
+│   ├── jayantgoyal/           # Main web application (port 3000)
+│   │   ├── src/
+│   │   │   ├── app/           # Next.js App Router pages
+│   │   │   ├── components/    # React components
+│   │   │   ├── lib/           # Utilities and configurations
+│   │   │   └── hooks/         # Custom React hooks
+│   │   └── public/            # Static assets
+│   └── admin/                 # Admin panel
 │       ├── src/
 │       │   ├── app/           # Next.js App Router pages
 │       │   ├── components/    # React components
@@ -192,6 +206,8 @@ jayantgoyal/
 ## Live
 
 [jayantgoyal.com](https://jayantgoyal.com)
+[admin.jayantgoyal.com](https://admin.jayantgoyal.com)
+
 
 ## Author
 
