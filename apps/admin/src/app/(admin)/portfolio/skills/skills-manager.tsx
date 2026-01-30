@@ -272,7 +272,7 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
         }))
       );
       toast.success(skill.is_visible ? "Skill hidden" : "Skill visible");
-    } catch (error) {
+    } catch {
       toast.error("Failed to update visibility");
     }
   };

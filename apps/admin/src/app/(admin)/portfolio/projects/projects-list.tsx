@@ -155,7 +155,7 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
         )
       );
       toast.success(item.is_visible ? "Hidden from portfolio" : "Now visible");
-    } catch (error) {
+    } catch {
       toast.error("Failed to update visibility");
     }
   };

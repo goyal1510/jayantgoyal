@@ -42,6 +42,7 @@ export function createSupabaseAdminClient() {
     throw new Error("Missing Supabase admin environment variables.");
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { createClient } = require("@supabase/supabase-js");
   return createClient(supabaseUrl, supabaseServiceKey, {
     auth: {

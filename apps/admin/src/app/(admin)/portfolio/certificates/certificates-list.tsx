@@ -38,7 +38,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
+
 import type { Certificate } from "@/lib/types";
 
 interface CertificatesListProps {
@@ -145,7 +145,7 @@ export function CertificatesList({ initialData }: CertificatesListProps) {
         )
       );
       toast.success(item.is_visible ? "Hidden from portfolio" : "Now visible");
-    } catch (error) {
+    } catch {
       toast.error("Failed to update visibility");
     }
   };

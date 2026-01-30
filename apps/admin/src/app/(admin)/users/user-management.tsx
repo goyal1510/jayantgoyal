@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+
 import { toast } from "sonner";
 import {
   Shield,
@@ -54,7 +54,6 @@ const roleIcons: Record<UserRole, typeof User> = {
 };
 
 export function UserManagement({ currentUserId }: UserManagementProps) {
-  const router = useRouter();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [availableUsers, setAvailableUsers] = useState<AvailableUser[]>([]);
   const [loading, setLoading] = useState(true);

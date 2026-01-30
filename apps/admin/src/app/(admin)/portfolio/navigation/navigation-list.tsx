@@ -140,7 +140,7 @@ export function NavigationList({ initialData }: NavigationListProps) {
         )
       );
       toast.success(item.is_visible ? "Hidden from nav" : "Now visible");
-    } catch (error) {
+    } catch {
       toast.error("Failed to update visibility");
     }
   };
