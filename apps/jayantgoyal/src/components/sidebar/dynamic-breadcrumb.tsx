@@ -90,6 +90,11 @@ export function DynamicBreadcrumb() {
       return { appName: "Weather", appHref: "/weather", pageName: null }
     }
 
+    // GitHub Stats route
+    if (pathname === "/github-stats") {
+      return { appName: "GitHub Stats", appHref: "/github-stats", pageName: null }
+    }
+
     // Custom Calculator route
     if (pathname === "/custom-calculator") {
       return { appName: "Custom Calculator", appHref: "/custom-calculator", pageName: null }

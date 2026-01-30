@@ -23,6 +23,7 @@ export default async function proxy(request: NextRequest) {
     "/weather",       // Weather is public
     "/custom-calculator", // Custom Calculator is public
     "/terms-conditions",  // Terms & Conditions is public
+    "/github-stats",
     "/login",
     "/signup",
     "/auth/callback", // Auth callback for email verification token exchange

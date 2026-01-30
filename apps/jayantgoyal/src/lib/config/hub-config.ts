@@ -24,6 +24,7 @@ import {
   MessageSquare,
   Cloud,
   ShoppingCart,
+  Github,
   type LucideIcon,
 } from "lucide-react"
 
@@ -156,6 +157,14 @@ export const HUB_APPS: AppConfig[] = [
     name: "Weather",
     icon: Cloud,
     color: "text-sky-500 dark:text-sky-400",
+    isPublic: true,
+    navItems: [],
+  },
+  {
+    id: "github-stats",
+    name: "GitHub Stats",
+    icon: Github,
+    color: "text-gray-700 dark:text-gray-300",
     isPublic: true,
     navItems: [],
   },

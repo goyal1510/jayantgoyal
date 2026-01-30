@@ -42,6 +42,7 @@
     "react-dom": "^19.2.1",
     "react-github-calendar": "^5.0.4",
     "react-syntax-highlighter": "^15.6.6",
+    "recharts": "^3.7.0",
     "resend": "^6.6.0",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",

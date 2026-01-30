@@ -160,6 +160,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       }
     }
 
+    // Check for github-stats route
+    if (pathname === "/github-stats") {
+      return {
+        activeAppId: "github-stats",
+        activeNavId: undefined,
+      }
+    }
+
     // Check for custom calculator route
     if (pathname === "/custom-calculator") {
       return {
