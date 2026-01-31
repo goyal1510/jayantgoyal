@@ -10,11 +10,11 @@ import {
   BarChart3,
 } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
+import { Button } from "@repo/ui/button";
+import { Input } from "@repo/ui/input";
+import { Label } from "@repo/ui/label";
+import { Badge } from "@repo/ui/badge";
+import { Switch } from "@repo/ui/switch";
 import {
   Dialog,
   DialogContent,
@@ -22,8 +22,8 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Card, CardContent } from "@/components/ui/card";
+} from "@repo/ui/dialog";
+import { Card, CardContent } from "@repo/ui/card";
 import type { ShortUrl } from "@/lib/types";
 import { createUrl, updateUrl, deleteUrl } from "@/lib/urls-api";
 

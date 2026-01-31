@@ -1,7 +1,7 @@
 "use client"
 
 import { Shield, AlertTriangle, Clock, BookOpen, Mail, Code, Database, Globe, Users, EyeOff, Trash2, Cpu, RefreshCw } from "lucide-react"
-import { Separator } from "@/components/ui/separator"
+import { Separator } from "@repo/ui/separator"
 
 export function TermsContent() {
   return (

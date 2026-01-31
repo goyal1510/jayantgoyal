@@ -4,14 +4,14 @@ import { useState, useMemo } from "react"
 import dynamic from "next/dynamic"
 import { motion } from "framer-motion"
 import { Github, ChevronDown, Check } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card"
+import { Button } from "@repo/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@repo/ui/dropdown-menu"
 
 const GitHubCalendar = dynamic(
   () => import("react-github-calendar").then((mod) => ({ default: mod.GitHubCalendar })),

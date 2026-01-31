@@ -1,9 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
+import { Button } from "@repo/ui/button"
+import { Label } from "@repo/ui/label"
 import { Copy, RefreshCw, Download } from "lucide-react"
 import { toast } from "sonner"
 
@@ -37,7 +37,7 @@ async function generateRSAKeyPair(modulusLength: number = 2048): Promise<{ priva
       privateKey: `-----BEGIN PRIVATE KEY-----\n${privateKeyBase64}\n-----END PRIVATE KEY-----`,
       publicKey: `-----BEGIN PUBLIC KEY-----\n${publicKeyBase64}\n-----END PUBLIC KEY-----`,
     }
-  } catch (error) {
+  } catch {
     throw new Error("Failed to generate RSA key pair")
   }
 }
@@ -55,7 +55,7 @@ export default function RSAKeyGeneratorClient() {
       setPrivateKey(keys.privateKey)
       setPublicKey(keys.publicKey)
       toast.success("RSA key pair generated successfully")
-    } catch (error) {
+    } catch {
       toast.error("Failed to generate RSA key pair")
     } finally {
       setIsGenerating(false)
@@ -190,7 +190,7 @@ export default function RSAKeyGeneratorClient() {
               Store your private key securely (use a password manager or secure storage)
             </p>
             <p>
-              The private key is shown here for convenience - ensure you're in a secure environment
+              The private key is shown here for convenience - ensure you&apos;re in a secure environment
             </p>
           </CardContent>
         </Card>

@@ -10,20 +10,20 @@ import {
   UserCheck,
 } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Button } from "@repo/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card"
+import { Input } from "@repo/ui/input"
+import { Label } from "@repo/ui/label"
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet"
-import { Separator } from "@/components/ui/separator"
+} from "@repo/ui/sheet"
+
 import { playToastSound } from "@/lib/games/sound"
-import { cn } from "@/lib/utils"
+import { cn } from "@repo/ui/lib/utils"
 
 type Mode = "local_pvp" | "vs_computer"
 type Cell = "X" | "O" | ""

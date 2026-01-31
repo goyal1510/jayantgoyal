@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { allTools } from "@/lib/tools/tools"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
 
 export const metadata: Metadata = {
   title: "Developer Tools | Jayant Goyal",

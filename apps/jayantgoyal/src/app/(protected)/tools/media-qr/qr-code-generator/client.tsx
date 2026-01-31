@@ -1,9 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
+import { Button } from "@repo/ui/button"
+import { Input } from "@repo/ui/input"
 import { Download } from "lucide-react"
 import { toast } from "sonner"
 
@@ -57,6 +57,7 @@ export default function QRCodeGeneratorClient() {
             </div>
           </CardHeader>
           <CardContent className="flex justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={qrUrl} alt="QR Code" className="border rounded" />
           </CardContent>
         </Card>

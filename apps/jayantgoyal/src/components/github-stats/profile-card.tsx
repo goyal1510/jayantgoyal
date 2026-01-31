@@ -3,7 +3,7 @@
 import Image from "next/image"
 import { MapPin, Building2, Link as LinkIcon, Users, BookOpen } from "lucide-react"
 import { motion } from "framer-motion"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent } from "@repo/ui/card"
 import type { GitHubUser } from "@/lib/github-stats/types"
 
 interface ProfileCardProps {

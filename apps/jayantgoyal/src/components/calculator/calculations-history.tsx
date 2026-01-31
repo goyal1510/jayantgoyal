@@ -5,15 +5,15 @@ import { Calendar, ChevronLeft, ChevronRight, Clock, History, Search, Trash2 } f
 
 import { deleteCalculation, getCalculations } from "@/lib/calculator/client-calculations"
 import type { CalculationWithDenominations } from "@/lib/calculator/database"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { Button } from "@repo/ui/button"
+import { Card, CardContent } from "@repo/ui/card"
+import { Input } from "@repo/ui/input"
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet"
+} from "@repo/ui/sheet"
 
 type AmountFilter = "all" | "positive" | "negative"
 type LoadOptions = {

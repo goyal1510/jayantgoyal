@@ -8,11 +8,11 @@ import Link from "next/link"
 import { Eye, EyeOff, Home } from "lucide-react"
 
 import { loginWithPassword } from "@/app/login/actions"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { cn } from "@/lib/utils"
+import { Button } from "@repo/ui/button"
+import { Card, CardContent } from "@repo/ui/card"
+import { Input } from "@repo/ui/input"
+import { Label } from "@repo/ui/label"
+import { cn } from "@repo/ui/lib/utils"
 import { toast } from "sonner"
 
 const initialState = {

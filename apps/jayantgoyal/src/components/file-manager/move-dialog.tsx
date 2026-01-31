@@ -8,8 +8,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
+} from "@repo/ui/dialog"
+import { Button } from "@repo/ui/button"
 import { FolderInput, AlertCircle, Replace, SkipForward, Copy } from "lucide-react"
 import { DirectoryPicker } from "@/components/file-manager/directory-picker"
 import type { DirectoryListingItem } from "@/lib/file-manager/types"

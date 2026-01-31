@@ -1,10 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
+import { Button } from "@repo/ui/button"
+import { Input } from "@repo/ui/input"
+import { Label } from "@repo/ui/label"
 import { Copy } from "lucide-react"
 import { toast } from "sonner"
 
@@ -21,17 +21,17 @@ function convertBase(value: string, fromBase: number, toBase: number): string {
   }
 }
 
+const bases = [
+  { value: 2, label: "Binary (2)" },
+  { value: 8, label: "Octal (8)" },
+  { value: 10, label: "Decimal (10)" },
+  { value: 16, label: "Hexadecimal (16)" },
+]
+
 export default function IntegerBaseConverterClient() {
   const [input, setInput] = React.useState("")
   const [fromBase, setFromBase] = React.useState(10)
   const [results, setResults] = React.useState<Record<number, string>>({})
-
-  const bases = [
-    { value: 2, label: "Binary (2)" },
-    { value: 8, label: "Octal (8)" },
-    { value: 10, label: "Decimal (10)" },
-    { value: 16, label: "Hexadecimal (16)" },
-  ]
 
   React.useEffect(() => {
     if (!input.trim()) {

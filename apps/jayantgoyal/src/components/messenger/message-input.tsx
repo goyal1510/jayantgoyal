@@ -1,9 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@repo/ui/button";
+import { Textarea } from "@repo/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@repo/ui/select";
 import { Code2, MessageSquare, Send } from "lucide-react";
 
 interface MessageInputProps {

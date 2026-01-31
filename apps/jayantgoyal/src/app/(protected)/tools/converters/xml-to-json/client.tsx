@@ -1,8 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
+import { Button } from "@repo/ui/button"
 import { Copy } from "lucide-react"
 import { toast } from "sonner"
 
@@ -17,7 +17,7 @@ function xmlToJson(xml: string): string {
       throw new Error("Invalid XML")
     }
 
-    function nodeToJson(node: Node): any {
+    function nodeToJson(node: Node): unknown {
       if (node.nodeType === Node.TEXT_NODE) {
         const text = node.textContent?.trim()
         return text || null
@@ -25,18 +25,19 @@ function xmlToJson(xml: string): string {
 
       if (node.nodeType === Node.ELEMENT_NODE) {
         const element = node as Element
-        const result: Record<string, any> = {}
+        const result: Record<string, unknown> = {}
 
         // Attributes
         if (element.attributes.length > 0) {
-          result["@attributes"] = {}
+          const attrs: Record<string, string> = {}
           Array.from(element.attributes).forEach((attr) => {
-            result["@attributes"][attr.name] = attr.value
+            attrs[attr.name] = attr.value
           })
+          result["@attributes"] = attrs
         }
 
         // Children
-        const children: Record<string, any[]> = {}
+        const children: Record<string, unknown[]> = {}
         Array.from(element.childNodes).forEach((child) => {
           if (child.nodeType === Node.ELEMENT_NODE) {
             const childElement = child as Element
@@ -63,7 +64,7 @@ function xmlToJson(xml: string): string {
 
     const json = nodeToJson(xmlDoc.documentElement)
     return JSON.stringify(json, null, 2)
-  } catch (error) {
+  } catch {
     throw new Error("Failed to parse XML")
   }
 }

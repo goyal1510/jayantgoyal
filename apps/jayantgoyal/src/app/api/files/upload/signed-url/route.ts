@@ -56,6 +56,7 @@ const MIME_TYPE_MAP: Record<string, FileTypeCategory> = {
  * Sanitize filename to remove invalid characters
  */
 function sanitizeFileName(fileName: string): string {
+  // eslint-disable-next-line no-control-regex
   return fileName.trim().replace(/[<>:"/\\|?*\x00-\x1f]/g, "");
 }
 

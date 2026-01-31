@@ -6,11 +6,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff, Link2 } from "lucide-react";
 import { toast } from "sonner";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { Button } from "@repo/ui/button";
+import { Input } from "@repo/ui/input";
+import { Label } from "@repo/ui/label";
+import { Card, CardContent } from "@repo/ui/card";
+import { cn } from "@repo/ui/lib/utils";
 
 function LoginForm() {
   const router = useRouter();

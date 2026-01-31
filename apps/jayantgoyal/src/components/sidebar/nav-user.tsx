@@ -7,8 +7,8 @@ import { ChevronsUpDown, LogOut, Settings, Trash2, Lock, User, UserPlus } from "
 import {
   Avatar,
   AvatarFallback,
-} from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
+} from "@repo/ui/avatar"
+import { Button } from "@repo/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,15 +16,15 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@repo/ui/dropdown-menu"
+import { Input } from "@repo/ui/input"
+import { Label } from "@repo/ui/label"
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar"
+} from "@repo/ui/sidebar"
 import {
   Sheet,
   SheetContent,
@@ -33,7 +33,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet"
+} from "@repo/ui/sheet"
 import { createSupabaseBrowserClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
 

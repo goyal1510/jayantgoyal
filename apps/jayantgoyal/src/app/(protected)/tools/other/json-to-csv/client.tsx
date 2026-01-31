@@ -1,13 +1,12 @@
 "use client"
 
 import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
+import { Button } from "@repo/ui/button"
 import { Copy } from "lucide-react"
 import { toast } from "sonner"
 
-function jsonToCSV(json: any[]): string {
+function jsonToCSV(json: Record<string, unknown>[]): string {
   if (json.length === 0) return ""
 
   const headers = Object.keys(json[0]!)

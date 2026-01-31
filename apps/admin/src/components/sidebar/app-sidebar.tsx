@@ -33,8 +33,8 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarGroupContent,
-} from "@/components/ui/sidebar"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+} from "@repo/ui/sidebar"
+import { Avatar, AvatarFallback } from "@repo/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,7 +42,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@repo/ui/dropdown-menu"
 import { createSupabaseBrowserClient } from "@/lib/supabase/client"
 import type { AuthUser } from "@/lib/types"
 

@@ -8,13 +8,13 @@ import { useSearchParams, useRouter } from "next/navigation"
 import { useFormStatus } from "react-dom"
 
 import { signupWithEmail, setPassword } from "@/app/signup/actions"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Button } from "@repo/ui/button"
+import { Card, CardContent } from "@repo/ui/card"
+import { Input } from "@repo/ui/input"
+import { Label } from "@repo/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { TermsDialog } from "@/components/auth/terms-dialog"
-import { cn } from "@/lib/utils"
+import { cn } from "@repo/ui/lib/utils"
 import { toast } from "sonner"
 
 const initialState = {

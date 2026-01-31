@@ -1,10 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
+import { Button } from "@repo/ui/button"
+import { Input } from "@repo/ui/input"
+import { Label } from "@repo/ui/label"
 import { Play } from "lucide-react"
 
 export default function BenchmarkBuilderClient() {
@@ -29,7 +29,7 @@ export default function BenchmarkBuilderClient() {
       const average = totalTime / iterations
 
       setResults({ time: totalTime, average })
-    } catch (error) {
+    } catch {
       setResults({ time: 0, average: 0 })
     } finally {
       setRunning(false)

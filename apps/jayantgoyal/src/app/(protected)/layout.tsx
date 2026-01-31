@@ -2,13 +2,13 @@ import type { ReactNode } from "react";
 
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { DynamicBreadcrumb } from "@/components/sidebar/dynamic-breadcrumb";
-import { Separator } from "@/components/ui/separator";
+import { Separator } from "@repo/ui/separator";
 import ThemeToogle from "@/components/theme/theme-toogle";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebar";
+} from "@repo/ui/sidebar";
 import { getPortfolioDataFromHeaders } from "@/lib/portfolio/server";
 import { PortfolioDataProvider } from "@/lib/portfolio/use-portfolio-data";
 import { TermsAcceptanceCheck } from "@/components/auth/terms-acceptance-check";

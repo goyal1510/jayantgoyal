@@ -1,9 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
+import { Button } from "@repo/ui/button"
+import { Input } from "@repo/ui/input"
 import { Copy } from "lucide-react"
 import { toast } from "sonner"
 
@@ -53,7 +53,7 @@ export default function NumeronymGeneratorClient() {
               placeholder="e.g., internationalization"
             />
             <p className="text-xs text-muted-foreground mt-2">
-              Example: "internationalization" becomes "i18n"
+              Example: &quot;internationalization&quot; becomes &quot;i18n&quot;
             </p>
           </CardContent>
         </Card>

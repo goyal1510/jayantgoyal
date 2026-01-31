@@ -1,8 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
+import { Button } from "@repo/ui/button"
 import { Copy, RefreshCw } from "lucide-react"
 import { toast } from "sonner"
 
@@ -46,7 +46,7 @@ function generateIPv6ULA(): string {
 
 export default function IPv6ULAGeneratorClient() {
   const [addresses, setAddresses] = React.useState<string[]>([])
-  const [count, setCount] = React.useState(1)
+  const [count] = React.useState(1)
 
   const generateAddresses = React.useCallback(() => {
     const newAddresses: string[] = []

@@ -1,10 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
+import { Button } from "@repo/ui/button"
+import { Input } from "@repo/ui/input"
+import { Label } from "@repo/ui/label"
 import { Copy } from "lucide-react"
 import { toast } from "sonner"
 
@@ -13,18 +13,22 @@ async function hashText(text: string, algorithm: string): Promise<string> {
   const data = encoder.encode(text)
 
   switch (algorithm) {
-    case "SHA-256":
+    case "SHA-256": {
       const hash256 = await crypto.subtle.digest("SHA-256", data)
       return Array.from(new Uint8Array(hash256)).map(b => b.toString(16).padStart(2, "0")).join("")
-    case "SHA-384":
+    }
+    case "SHA-384": {
       const hash384 = await crypto.subtle.digest("SHA-384", data)
       return Array.from(new Uint8Array(hash384)).map(b => b.toString(16).padStart(2, "0")).join("")
-    case "SHA-512":
+    }
+    case "SHA-512": {
       const hash512 = await crypto.subtle.digest("SHA-512", data)
       return Array.from(new Uint8Array(hash512)).map(b => b.toString(16).padStart(2, "0")).join("")
-    case "SHA-1":
+    }
+    case "SHA-1": {
       const hash1 = await crypto.subtle.digest("SHA-1", data)
       return Array.from(new Uint8Array(hash1)).map(b => b.toString(16).padStart(2, "0")).join("")
+    }
     default:
       throw new Error("Unsupported algorithm")
   }
@@ -72,7 +76,7 @@ export default function HashTextClient() {
         result = await hashText(input, algorithm)
       }
       setHashed(result)
-    } catch (error) {
+    } catch {
       toast.error("Failed to hash text")
       setHashed("")
     } finally {

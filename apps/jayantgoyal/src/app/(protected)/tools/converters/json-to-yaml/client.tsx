@@ -1,17 +1,17 @@
 "use client"
 
 import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
+import { Button } from "@repo/ui/button"
 import { Copy } from "lucide-react"
 import { toast } from "sonner"
 
-function jsonToYaml(obj: any, indent: number = 0): string {
+function jsonToYaml(obj: unknown, indent: number = 0): string {
   let yaml = ""
   const spaces = "  ".repeat(indent)
 
   if (Array.isArray(obj)) {
-    obj.forEach((item, index) => {
+    obj.forEach((item) => {
       if (typeof item === "object" && item !== null) {
         yaml += `${spaces}- ` + jsonToYaml(item, indent + 1).trim() + "\n"
       } else {
@@ -19,7 +19,7 @@ function jsonToYaml(obj: any, indent: number = 0): string {
       }
     })
   } else if (typeof obj === "object" && obj !== null) {
-    Object.entries(obj).forEach(([key, value]) => {
+    Object.entries(obj as Record<string, unknown>).forEach(([key, value]) => {
       if (typeof value === "object" && value !== null && !Array.isArray(value)) {
         yaml += `${spaces}${key}:\n${jsonToYaml(value, indent + 1)}`
       } else if (Array.isArray(value)) {
@@ -33,7 +33,7 @@ function jsonToYaml(obj: any, indent: number = 0): string {
   return yaml
 }
 
-function stringifyValue(value: any): string {
+function stringifyValue(value: unknown): string {
   if (value === null) return "null"
   if (typeof value === "string") return `"${value.replace(/"/g, '\\"')}"`
   return String(value)

@@ -1,13 +1,13 @@
 'use client';
 
-import { cn } from "@/lib/utils";
+import { cn } from "@repo/ui/lib/utils";
 
 interface DisplayProps {
   value: string;
   className?: string;
 }
 
-const Display: React.FC<DisplayProps> = ({ value, className }) => {
+function Display({ value, className }: DisplayProps) {
   return (
     <div className={cn(
       "flex min-h-[80px] items-center justify-end rounded-lg border border-white/10 bg-gradient-to-r from-slate-900/80 to-slate-800/70 p-4 text-2xl font-mono shadow-inner shadow-black/30 transition-all duration-200",
@@ -19,6 +19,6 @@ const Display: React.FC<DisplayProps> = ({ value, className }) => {
       </span>
     </div>
   );
-};
+}
 
 export default Display;

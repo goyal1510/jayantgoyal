@@ -5,8 +5,8 @@ import { useState } from "react"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@repo/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card"
 import { playToastSound } from "@/lib/games/sound"
 
 type Choice = "rock" | "paper" | "scissors"

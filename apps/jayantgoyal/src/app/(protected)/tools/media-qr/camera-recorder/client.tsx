@@ -1,8 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
+import { Button } from "@repo/ui/button"
 import { Camera, Video, Download } from "lucide-react"
 import { toast } from "sonner"
 
@@ -10,7 +10,7 @@ export default function CameraRecorderClient() {
   const [stream, setStream] = React.useState<MediaStream | null>(null)
   const [recording, setRecording] = React.useState(false)
   const [mediaRecorder, setMediaRecorder] = React.useState<MediaRecorder | null>(null)
-  const [recordedChunks, setRecordedChunks] = React.useState<Blob[]>([])
+  const [, setRecordedChunks] = React.useState<Blob[]>([])
   const [photoUrl, setPhotoUrl] = React.useState<string | null>(null)
   const [videoUrl, setVideoUrl] = React.useState<string | null>(null)
   const [videoReady, setVideoReady] = React.useState(false)
@@ -301,6 +301,7 @@ export default function CameraRecorderClient() {
                 <CardTitle>Captured Photo</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={photoUrl} alt="Captured" className="w-full max-w-md rounded border mx-auto" />
                 <Button
                   variant="outline"

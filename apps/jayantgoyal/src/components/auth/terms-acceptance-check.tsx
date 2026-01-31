@@ -4,14 +4,14 @@ import * as React from "react"
 import { useRouter } from "next/navigation"
 import { Shield } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@repo/ui/button"
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog"
+} from "@repo/ui/dialog"
 import { TermsContent, TERMS_LAST_UPDATED } from "@/components/auth/terms-content"
 import { createSupabaseBrowserClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
@@ -100,7 +100,7 @@ export function TermsAcceptanceCheck() {
       await supabase.auth.signOut()
       toast.info("You must accept the Terms and Conditions to use this platform.")
       router.push("/login")
-    } catch (error) {
+    } catch {
       toast.error("Failed to sign out")
     } finally {
       setIsLoading(false)

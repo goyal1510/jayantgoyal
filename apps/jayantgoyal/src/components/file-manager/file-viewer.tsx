@@ -6,8 +6,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
+} from "@repo/ui/dialog"
+import { Button } from "@repo/ui/button"
 import { SpinnerWithText } from "@/components/ui/spinner"
 import { FileIcon, AlertCircle, ChevronLeft, ChevronRight, Download } from "lucide-react"
 import type { DirectoryListingItem } from "@/lib/file-manager/types"
@@ -43,6 +43,7 @@ function FilePreview({ file, url }: { file: FileDetails; url: string }) {
   if (mimeType.startsWith("image/")) {
     return (
       <div className="flex items-center justify-center w-full h-[60vh] sm:h-[80vh] bg-muted/30 rounded-lg overflow-hidden">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={url}
           alt={file.display_name || file.name}

@@ -2,9 +2,9 @@
 
 import { useDrag } from "react-dnd";
 import { useCalculatorStore } from "@/lib/custom-calculator/useCalculatorStore";
-import { Button } from "@/components/ui/button";
+import { Button } from "@repo/ui/button";
 import { CalculatorComponent } from "@/lib/custom-calculator/types";
-import { cn } from "@/lib/utils";
+import { cn } from "@repo/ui/lib/utils";
 
 interface CalculatorButtonProps {
   label: string;
@@ -13,12 +13,12 @@ interface CalculatorButtonProps {
   className?: string;
 }
 
-const CalculatorButton: React.FC<CalculatorButtonProps> = ({ 
-  label, 
+function CalculatorButton({
+  label,
   variant = 'default',
   size = 'default',
-  className 
-}) => {
+  className
+}: CalculatorButtonProps) {
   const { components, addComponent } = useCalculatorStore();
 
   const [{ isDragging }, drag] = useDrag(() => ({
@@ -65,6 +65,6 @@ const CalculatorButton: React.FC<CalculatorButtonProps> = ({
       {label}
     </Button>
   );
-};
+}
 
 export default CalculatorButton;

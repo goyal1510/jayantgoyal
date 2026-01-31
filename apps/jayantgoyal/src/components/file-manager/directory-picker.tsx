@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { ChevronRight, Folder, FolderOpen, Home } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn } from "@repo/ui/lib/utils"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Spinner } from "@/components/ui/spinner"
 import type { DirectoryTreeItem } from "@/lib/file-manager/types"
@@ -36,13 +36,8 @@ export function DirectoryPicker({
   const [expandedPaths, setExpandedPaths] = React.useState<Set<string>>(new Set(["/"]));
   const [loadingPaths, setLoadingPaths] = React.useState<Set<string>>(new Set())
 
-  // Fetch root directories on mount
-  React.useEffect(() => {
-    fetchDirectories("/")
-  }, [])
-
   // Fetch directories for a given path
-  const fetchDirectories = async (parentPath: string) => {
+  const fetchDirectories = React.useCallback(async (parentPath: string) => {
     try {
       if (parentPath === "/") {
         setLoading(true)
@@ -96,7 +91,13 @@ export function DirectoryPicker({
         })
       }
     }
-  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Fetch root directories on mount
+  React.useEffect(() => {
+    fetchDirectories("/")
+  }, [fetchDirectories])
 
   // Recursively update children for a directory
   const updateDirectoryChildren = (

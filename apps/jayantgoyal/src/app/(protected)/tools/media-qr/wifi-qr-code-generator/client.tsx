@@ -1,10 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
+import { Button } from "@repo/ui/button"
+import { Input } from "@repo/ui/input"
+import { Label } from "@repo/ui/label"
 import { Download, Wifi, RefreshCw } from "lucide-react"
 import { toast } from "sonner"
 
@@ -44,6 +44,7 @@ export default function WiFiQRCodeGeneratorClient() {
       // Try to detect SSID using experimental APIs (limited browser support)
       if ('getNetworkInformation' in navigator) {
         try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const networkInfo = await (navigator as any).getNetworkInformation()
           if (networkInfo?.ssid) {
             setSSID(networkInfo.ssid)
@@ -51,7 +52,7 @@ export default function WiFiQRCodeGeneratorClient() {
             setIsDetecting(false)
             return
           }
-        } catch (e) {
+        } catch {
           // API not available
         }
       }
@@ -59,6 +60,7 @@ export default function WiFiQRCodeGeneratorClient() {
       // Try Chrome/Edge experimental API on Android
       if ('wifi' in navigator) {
         try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const wifiInfo = await (navigator as any).wifi.getCurrentWifiInfo()
           if (wifiInfo?.ssid) {
             setSSID(wifiInfo.ssid)
@@ -66,16 +68,16 @@ export default function WiFiQRCodeGeneratorClient() {
             setIsDetecting(false)
             return
           }
-        } catch (e) {
+        } catch {
           // API not available
         }
       }
 
       // Check network connection type
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection
 
       if (connection) {
-        const networkType = connection.effectiveType || connection.type || "unknown"
         const isWifi = connection.type === 'wifi' || connection.effectiveType?.includes('wifi')
 
         if (isWifi) {
@@ -89,7 +91,7 @@ export default function WiFiQRCodeGeneratorClient() {
         toast.info("Please enter your WiFi network name (SSID) manually.")
       }
 
-    } catch (error) {
+    } catch {
       toast.info("Please enter your WiFi network details manually.")
     } finally {
       setIsDetecting(false)
@@ -187,6 +189,7 @@ export default function WiFiQRCodeGeneratorClient() {
             </div>
           </CardHeader>
           <CardContent className="flex justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={qrUrl} alt="WiFi QR Code" className="border rounded" />
           </CardContent>
         </Card>

@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation"
 import { toast } from "sonner"
 import { FileFolderIcon } from "@/components/file-manager/file-icons"
 import { FileThumbnail } from "@/components/file-manager/file-thumbnail"
-import { Button } from "@/components/ui/button"
+import { Button } from "@repo/ui/button"
 import { SpinnerWithText } from "@/components/ui/spinner"
 import {
   DropdownMenu,
@@ -13,7 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@repo/ui/dropdown-menu"
 import {
   ContextMenu,
   ContextMenuContent,
@@ -24,14 +24,14 @@ import {
 import {
   Breadcrumb,
   BreadcrumbItem,
-  BreadcrumbLink,
+
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Card } from "@/components/ui/card"
+} from "@repo/ui/breadcrumb"
+import { Card } from "@repo/ui/card"
 import { Grid3x3, List, ArrowUpDown, ArrowUp, ArrowDown, FolderPlus, Upload, Pencil, Trash2, Plus, Ellipsis, MoreVertical, Eye, Download, FolderInput, Copy } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn } from "@repo/ui/lib/utils"
 import type { DirectoryListingItem } from "@/lib/file-manager/types"
 import { CreateFolderDialog } from "@/components/file-manager/create-folder-dialog"
 import { RenameDialog } from "@/components/file-manager/rename-dialog"
@@ -49,6 +49,7 @@ interface FileListProps {
   initialPath?: string
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function FileList({ initialPath = "/" }: FileListProps) {
   const router = useRouter()
   const pathname = usePathname()
@@ -82,7 +83,7 @@ export function FileList({ initialPath = "/" }: FileListProps) {
     return "list"
   })
   const [loading, setLoading] = React.useState(true)
-  const [isInitialLoad, setIsInitialLoad] = React.useState(true)
+  const [, setIsInitialLoad] = React.useState(true)
 
   // Persist view mode to localStorage
   React.useEffect(() => {
@@ -409,6 +410,7 @@ export function FileList({ initialPath = "/" }: FileListProps) {
   }
 
   // Prevent navigation when clicking context menu
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleContextMenuClick = (e: React.MouseEvent, file: DirectoryListingItem) => {
     e.stopPropagation()
   }

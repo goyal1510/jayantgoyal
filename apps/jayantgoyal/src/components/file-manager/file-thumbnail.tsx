@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { FileFolderIcon } from "@/components/file-manager/file-icons"
-import { cn } from "@/lib/utils"
+import { cn } from "@repo/ui/lib/utils"
 import type { DirectoryListingItem } from "@/lib/file-manager/types"
 
 interface FileThumbnailProps {
@@ -22,6 +22,32 @@ export function FileThumbnail({ file, size = 48, className }: FileThumbnailProps
 
   const isImage = file.file_type === "image" || file.mime_type?.startsWith("image/")
   const canShowThumbnail = isImage && !file.is_directory
+
+  const fetchThumbnail = React.useCallback(async () => {
+    setLoading(true)
+    try {
+      const response = await fetch(`/api/files/${file.id}`)
+      const data = await response.json()
+
+      if (data.success && data.file?.url) {
+        // Convert to blob URL so the signed URL can't be copied
+        // Blob URLs are only valid in the current tab and can't be shared
+        const imageResponse = await fetch(data.file.url)
+        const blob = await imageResponse.blob()
+        const blobUrl = URL.createObjectURL(blob)
+
+        thumbnailCache.set(file.id, blobUrl)
+        setThumbnailUrl(blobUrl)
+      } else {
+        setError(true)
+      }
+    } catch (err) {
+      console.error("Failed to fetch thumbnail:", err)
+      setError(true)
+    } finally {
+      setLoading(false)
+    }
+  }, [file.id])
 
   // Fetch thumbnail URL when component mounts and is visible
   React.useEffect(() => {
@@ -52,33 +78,7 @@ export function FileThumbnail({ file, size = 48, className }: FileThumbnailProps
     }
 
     return () => observer.disconnect()
-  }, [file.id, canShowThumbnail, thumbnailUrl, loading, error])
-
-  const fetchThumbnail = async () => {
-    setLoading(true)
-    try {
-      const response = await fetch(`/api/files/${file.id}`)
-      const data = await response.json()
-
-      if (data.success && data.file?.url) {
-        // Convert to blob URL so the signed URL can't be copied
-        // Blob URLs are only valid in the current tab and can't be shared
-        const imageResponse = await fetch(data.file.url)
-        const blob = await imageResponse.blob()
-        const blobUrl = URL.createObjectURL(blob)
-
-        thumbnailCache.set(file.id, blobUrl)
-        setThumbnailUrl(blobUrl)
-      } else {
-        setError(true)
-      }
-    } catch (err) {
-      console.error("Failed to fetch thumbnail:", err)
-      setError(true)
-    } finally {
-      setLoading(false)
-    }
-  }
+  }, [file.id, canShowThumbnail, thumbnailUrl, loading, error, fetchThumbnail])
 
   // Show icon for directories, non-images, or on error
   if (file.is_directory || !canShowThumbnail || error) {
@@ -101,6 +101,7 @@ export function FileThumbnail({ file, size = 48, className }: FileThumbnailProps
       style={{ width: size * 1.5, height: size * 1.5 }}
     >
       {thumbnailUrl ? (
+        /* eslint-disable-next-line @next/next/no-img-element */
         <img
           src={thumbnailUrl}
           alt={file.display_name || file.file_name}

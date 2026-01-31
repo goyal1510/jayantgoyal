@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion"
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card"
 import type { GitHubRepo } from "@/lib/github-stats/types"
 
 interface TopReposBarChartProps {

@@ -49,7 +49,7 @@ export async function submitContactForm(
     // Initialize Resend client only when needed (at runtime, not build time)
     const resend = getResendClient();
     
-    const { data, error } = await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: fromEmail, // Use verified domain or Resend's test domain
       to: [recipientEmail], // Fixed recipient email: goyal151002@gmail.com
       replyTo: `${String(name)} <${String(email)}>`, // User's email for replies (shows their name)

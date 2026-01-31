@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { ChevronRight } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn } from "@repo/ui/lib/utils"
 import type { AppConfig } from "@/lib/config/hub-config"
 import { toolCategories } from "@/lib/tools/tools"
 
@@ -11,7 +11,7 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible"
+} from "@repo/ui/collapsible"
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -22,7 +22,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   useSidebar,
-} from "@/components/ui/sidebar"
+} from "@repo/ui/sidebar"
 
 // Color palette for tool icons
 const TOOL_COLORS = [

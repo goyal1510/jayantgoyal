@@ -37,6 +37,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Sanitize folder name (remove invalid characters)
+    // eslint-disable-next-line no-control-regex
     const sanitizedName = name.trim().replace(/[<>:"/\\|?*\x00-\x1f]/g, "");
     if (!sanitizedName) {
       return NextResponse.json(

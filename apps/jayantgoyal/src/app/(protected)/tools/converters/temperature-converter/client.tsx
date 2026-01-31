@@ -1,9 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
+import { Input } from "@repo/ui/input"
+import { Label } from "@repo/ui/label"
 import { Copy } from "lucide-react"
 import { toast } from "sonner"
 
@@ -63,21 +63,21 @@ function convertTemperature(value: number, from: string, to: string): number {
   }
 }
 
+const units = [
+  "Celsius",
+  "Fahrenheit",
+  "Kelvin",
+  "Rankine",
+  "Delisle",
+  "Newton",
+  "Reaumur",
+  "Romer",
+]
+
 export default function TemperatureConverterClient() {
   const [input, setInput] = React.useState("")
   const [fromUnit, setFromUnit] = React.useState("Celsius")
   const [results, setResults] = React.useState<Record<string, string>>({})
-
-  const units = [
-    "Celsius",
-    "Fahrenheit",
-    "Kelvin",
-    "Rankine",
-    "Delisle",
-    "Newton",
-    "Reaumur",
-    "Romer",
-  ]
 
   React.useEffect(() => {
     if (!input.trim()) {

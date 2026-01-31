@@ -1,6 +1,3 @@
-export default {
-  plugins: {
-    "@tailwindcss/postcss": {},
-    autoprefixer: {},
-  },
-};
+import { postcssConfig } from "@repo/tailwind-config/postcss";
+
+export default postcssConfig;

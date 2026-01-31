@@ -1,10 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { Copy, ArrowUpDown } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card"
+import { Button } from "@repo/ui/button"
+import { Copy } from "lucide-react"
 import { toast } from "sonner"
 
 const htmlEntities: Record<string, string> = {

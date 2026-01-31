@@ -1,8 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
+import { Button } from "@repo/ui/button"
 import { Copy } from "lucide-react"
 import { toast } from "sonner"
 
@@ -11,10 +11,8 @@ function yamlToJson(yaml: string): string {
   try {
     // This is a simplified converter - for production use a proper YAML parser
     const lines = yaml.split("\n")
-    const result: Record<string, any> = {}
-    const stack: Array<Record<string, any>> = [result]
-    let currentIndent = 0
-
+    const result: Record<string, unknown> = {}
+    const stack: Array<Record<string, unknown>> = [result]
     lines.forEach((line) => {
       const trimmed = line.trim()
       if (!trimmed || trimmed.startsWith("#")) return
@@ -32,7 +30,6 @@ function yamlToJson(yaml: string): string {
         // Skip invalid entries
       } else if (trimmed.startsWith("- ")) {
         // Array item
-        const value = trimmed.slice(2).trim()
         if (!Array.isArray(current)) {
           // Convert to array
           const keys = Object.keys(current)
@@ -52,11 +49,11 @@ function yamlToJson(yaml: string): string {
           if (value === "" || value === "{}" || value === "[]") {
             current[key] = value === "[]" ? [] : {}
             if (typeof current[key] === "object" && current[key] !== null && !Array.isArray(current[key])) {
-              stack.push(current[key] as Record<string, any>)
+              stack.push(current[key] as Record<string, unknown>)
             }
           } else {
             // Try to parse value
-            let parsedValue: any = value
+            let parsedValue: unknown = value
             if (value.startsWith('"') && value.endsWith('"')) {
               parsedValue = value.slice(1, -1)
             } else if (value === "true") {
@@ -75,7 +72,7 @@ function yamlToJson(yaml: string): string {
     })
 
     return JSON.stringify(result, null, 2)
-  } catch (error) {
+  } catch {
     throw new Error("Failed to parse YAML")
   }
 }

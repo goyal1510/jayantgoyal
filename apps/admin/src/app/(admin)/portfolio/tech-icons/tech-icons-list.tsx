@@ -17,14 +17,14 @@ import {
   updatePortfolioData,
   deletePortfolioData,
 } from "@/lib/portfolio-api";
-import { Button } from "@/components/ui/button";
+import { Button } from "@repo/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@repo/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -32,10 +32,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+} from "@repo/ui/dialog";
+import { Input } from "@repo/ui/input";
+import { Label } from "@repo/ui/label";
+import { Switch } from "@repo/ui/switch";
 import type { TechIcon } from "@/lib/types";
 
 interface TechIconsListProps {

@@ -8,12 +8,12 @@ interface DragDropProviderProps {
   children: ReactNode;
 }
 
-const DragDropProvider: React.FC<DragDropProviderProps> = ({ children }) => {
+function DragDropProvider({ children }: DragDropProviderProps) {
   return (
     <DndProvider backend={HTML5Backend}>
       {children}
     </DndProvider>
   );
-};
+}
 
 export default DragDropProvider;

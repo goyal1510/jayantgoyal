@@ -18,9 +18,9 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-} from "@/components/ui/sidebar"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+} from "@repo/ui/sidebar"
+import { Skeleton } from "@repo/ui/skeleton"
+import { Avatar, AvatarFallback } from "@repo/ui/avatar"
 import { HUB_APPS } from "@/lib/config/hub-config"
 import { createSupabaseBrowserClient } from "@/lib/supabase/client"
 import { TermsDialog } from "@/components/auth/terms-dialog"

@@ -1,10 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
+import { Button } from "@repo/ui/button"
+import { Input } from "@repo/ui/input"
+import { Label } from "@repo/ui/label"
 import { Copy, Download } from "lucide-react"
 import { toast } from "sonner"
 
@@ -36,7 +36,7 @@ export default function Base64FileConverterClient() {
         setIsProcessing(false)
       }
       reader.readAsDataURL(selectedFile)
-    } catch (error) {
+    } catch {
       toast.error("Failed to process file")
       setIsProcessing(false)
     }
@@ -68,7 +68,7 @@ export default function Base64FileConverterClient() {
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
       toast.success("File downloaded")
-    } catch (error) {
+    } catch {
       toast.error("Failed to download file")
     }
   }

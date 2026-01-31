@@ -5,15 +5,14 @@ import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { Github, ChevronDown, Check } from 'lucide-react';
 import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@repo/ui/card';
+import { Button } from '@repo/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { cn } from '@/lib/utils';
+} from '@repo/ui/dropdown-menu';
 
 // Dynamically import GitHubCalendar with SSR disabled for Next.js compatibility
 const GitHubCalendar = dynamic(
