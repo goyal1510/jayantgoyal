@@ -4,13 +4,9 @@ import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Button } from "@repo/ui/button";
 import { submitContactForm } from "@/app/(protected)/contact/actions";
 import { Loader2 } from "lucide-react";
-
-type ContactFormProps = {
-  // No props needed - recipient email is fixed in the server action
-};
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -28,7 +24,7 @@ function SubmitButton() {
   );
 }
 
-export function ContactForm(_props: ContactFormProps) {
+export function ContactForm() {
   const [state, formAction] = useActionState(submitContactForm, {});
   const formRef = useRef<HTMLFormElement>(null);
 

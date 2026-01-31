@@ -1,9 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
+import { Button } from "@repo/ui/button"
+import { Input } from "@repo/ui/input"
 import { Copy } from "lucide-react"
 import { toast } from "sonner"
 
@@ -28,7 +28,7 @@ function parseJWT(token: string) {
         signature: parts[2],
       },
     }
-  } catch (error) {
+  } catch {
     throw new Error("Failed to parse JWT")
   }
 }

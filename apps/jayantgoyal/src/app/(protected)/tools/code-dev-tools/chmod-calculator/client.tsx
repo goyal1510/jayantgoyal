@@ -1,9 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
+import { Input } from "@repo/ui/input"
+import { Label } from "@repo/ui/label"
 import { Copy } from "lucide-react"
 import { toast } from "sonner"
 
@@ -71,7 +71,7 @@ export default function ChmodCalculatorClient() {
 
   React.useEffect(() => {
     updateFromCheckboxes()
-  }, [read, write, execute])
+  }, [read, write, execute, updateFromCheckboxes])
 
   const result = calculateChmod(owner, group, others)
 

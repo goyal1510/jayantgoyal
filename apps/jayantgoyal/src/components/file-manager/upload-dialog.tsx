@@ -7,11 +7,11 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
+} from "@repo/ui/dialog"
+import { Button } from "@repo/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Upload, X, FileIcon, AlertCircle, Replace, Copy, SkipForward } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn } from "@repo/ui/lib/utils"
 import { toast } from "sonner"
 
 // Maximum file size: 25MB

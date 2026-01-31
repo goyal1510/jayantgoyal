@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 // GET /api/messages - Fetch all messages for the authenticated user
-export async function GET(_request: NextRequest) {
+export async function GET() {
   try {
     const supabase = await createSupabaseServerClient();
     const {

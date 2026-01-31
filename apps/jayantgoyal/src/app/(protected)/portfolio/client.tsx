@@ -28,7 +28,7 @@ const PDFViewerModal = dynamic(
   { ssr: false }
 );
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@repo/ui/button";
 import LogoSlider from "@/components/ui/logo-slider";
 import FlipText from "@/components/ui/flip-text";
 import Typewriter from "@/components/ui/typewriter";
@@ -38,12 +38,12 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+} from "@repo/ui/card";
+import { Separator } from "@repo/ui/separator";
 import { usePortfolioData } from "@/lib/portfolio/use-portfolio-data";
 import { getIconComponent } from "@/lib/portfolio/icons";
 import type { SerializablePortfolioData } from "@/lib/portfolio/serializable";
-import { cn } from "@/lib/utils";
+import { cn } from "@repo/ui/lib/utils";
 import { GithubCalendarComponent } from "@/components/portfolio/github-calendar";
 import { ContactForm } from "@/components/portfolio/contact-form";
 
@@ -78,7 +78,7 @@ export default function PortfolioClient() {
 
   return (
     <div className="space-y-16">
-      <HeroSection hero={HERO} contact={CONTACT} />
+      <HeroSection hero={HERO} />
       <AboutSection about={ABOUT} education={EDUCATION} />
       <SkillsSection skillSets={SKILL_SETS} techIcons={TECH_ICONS} />
       <GithubActivitySection contact={CONTACT} />
@@ -106,10 +106,8 @@ export default function PortfolioClient() {
 
 function HeroSection({
   hero,
-  contact,
 }: {
   hero: SerializablePortfolioData["HERO"];
-  contact: SerializablePortfolioData["CONTACT"];
 }) {
   return (
     <section
@@ -456,10 +454,9 @@ function ProjectCard({
   const isDark = mounted && (resolvedTheme === 'dark' || theme === 'dark');
 
   // Get theme-aware image
-  const projectAny = project as any;
   const projectImage = isDark
-    ? (projectAny.imageDark || projectAny.imageLight)
-    : (projectAny.imageLight || projectAny.imageDark);
+    ? (project.imageDark || project.imageLight)
+    : (project.imageLight || project.imageDark);
 
   return (
     <motion.div
@@ -558,10 +555,9 @@ function ProjectModal({
   };
 
   // Get theme-aware image
-  const projectAny = project as any;
   const projectImage = isDark
-    ? (projectAny.imageDark || projectAny.imageLight)
-    : (projectAny.imageLight || projectAny.imageDark);
+    ? (project.imageDark || project.imageLight)
+    : (project.imageLight || project.imageDark);
 
   return (
     <motion.div
@@ -769,7 +765,7 @@ function GithubActivitySection({
 }) {
   const githubSocial = contact.socials.find((social) => social.label === "GitHub");
   const githubUrl = githubSocial?.href;
-  const githubUsername = githubUrl?.match(/github\.com\/([^\/]+)/)?.[1] || "goyal1510";
+  const githubUsername = githubUrl?.match(/github\.com\/([^/]+)/)?.[1] || "goyal1510";
 
   return (
     <section

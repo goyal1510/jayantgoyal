@@ -1,10 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
+import { Label } from "@repo/ui/label"
+import { Button } from "@repo/ui/button"
+import { Input } from "@repo/ui/input"
 import { Copy, RefreshCw } from "lucide-react"
 import { toast } from "sonner"
 
@@ -70,7 +70,7 @@ export default function BcryptClient() {
     try {
       const result = await hashBcrypt(password, rounds)
       setHash(result)
-    } catch (error) {
+    } catch {
       toast.error("Failed to hash password")
       setHash("")
     } finally {
@@ -97,7 +97,7 @@ export default function BcryptClient() {
       } else {
         toast.error("Passwords do not match")
       }
-    } catch (error) {
+    } catch {
       toast.error("Failed to compare passwords")
       setIsMatch(null)
     } finally {

@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Shield } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@repo/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -11,7 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
-} from "@/components/ui/dialog"
+} from "@repo/ui/dialog"
 import { TermsContent, TERMS_LAST_UPDATED } from "@/components/auth/terms-content"
 
 interface TermsDialogProps {

@@ -1,10 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
+import { Button } from "@repo/ui/button"
+import { Input } from "@repo/ui/input"
+import { Label } from "@repo/ui/label"
 import { Copy, RefreshCw } from "lucide-react"
 import { toast } from "sonner"
 
@@ -15,11 +15,6 @@ function formatDate(date: Date, format: string): string {
   const hours = String(date.getHours()).padStart(2, "0")
   const minutes = String(date.getMinutes()).padStart(2, "0")
   const seconds = String(date.getSeconds()).padStart(2, "0")
-  const ms = String(date.getMilliseconds()).padStart(3, "0")
-  const timezone = -date.getTimezoneOffset() / 60
-  const tzSign = timezone >= 0 ? "+" : "-"
-  const tzHours = String(Math.abs(timezone)).padStart(2, "0")
-
   switch (format) {
     case "ISO 8601":
       return date.toISOString()
@@ -86,7 +81,7 @@ export default function DateTimeConverterClient() {
 
       const result = formatDate(date, outputFormat)
       setOutput(result)
-    } catch (error) {
+    } catch {
       setOutput("Conversion failed")
     }
   }, [input, inputFormat, outputFormat])

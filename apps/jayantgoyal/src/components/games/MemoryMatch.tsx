@@ -10,19 +10,19 @@ import {
   Trophy,
 } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Button } from "@repo/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card"
+import { Input } from "@repo/ui/input"
+import { Label } from "@repo/ui/label"
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet"
+} from "@repo/ui/sheet"
 import { playToastSound } from "@/lib/games/sound"
-import { cn } from "@/lib/utils"
+import { cn } from "@repo/ui/lib/utils"
 
 type Mode = "local_pvp" | "vs_computer"
 
@@ -212,7 +212,7 @@ export function MemoryMatch() {
     let secondCardId: number | null = null
 
     // Try to match known pairs
-    for (const [value, ids] of knownCards.entries()) {
+    for (const [, ids] of knownCards.entries()) {
       if (ids.length >= 2) {
         firstCardId = ids[0]!
         secondCardId = ids[1]!
@@ -288,7 +288,6 @@ export function MemoryMatch() {
     setIsLoading(false)
   }
 
-  const totalPairs = GRID_SIZES[gridSize]!.pairs
   const gameOver = cards.length > 0 && cards.every((c) => c.matched)
   const winner = gameOver
     ? scores.player1 > scores.player2

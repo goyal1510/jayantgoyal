@@ -1,16 +1,16 @@
 "use client"
 
 import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
+import { Button } from "@repo/ui/button"
 import { Copy } from "lucide-react"
 import { toast } from "sonner"
 
 function tomlToJson(toml: string): string {
   try {
-    const result: Record<string, any> = {}
+    const result: Record<string, unknown> = {}
     const lines = toml.split("\n")
-    let currentSection: Record<string, any> = result
+    let currentSection: Record<string, unknown> = result
 
     lines.forEach((line) => {
       const trimmed = line.trim()
@@ -25,9 +25,9 @@ function tomlToJson(toml: string): string {
             currentSection[part] = {}
           }
           if (index === sectionPath.length - 1) {
-            currentSection = currentSection[part] as Record<string, any>
+            currentSection = currentSection[part] as Record<string, unknown>
           } else {
-            currentSection = currentSection[part] as Record<string, any>
+            currentSection = currentSection[part] as Record<string, unknown>
           }
         })
         return
@@ -48,7 +48,7 @@ function tomlToJson(toml: string): string {
   }
 }
 
-function parseTomlValue(value: string): any {
+function parseTomlValue(value: string): unknown {
   const trimmed = value.trim()
 
   if (trimmed.startsWith('"') && trimmed.endsWith('"')) {

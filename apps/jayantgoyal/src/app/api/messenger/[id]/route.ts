@@ -46,7 +46,7 @@ export async function PATCH(
       );
     }
 
-    const updateData: any = {};
+    const updateData: Record<string, unknown> = {};
     if (content !== undefined) updateData.content = content.trim();
     if (message_type !== undefined) {
       if (message_type !== "text" && message_type !== "code") {
@@ -96,7 +96,7 @@ export async function PATCH(
 
 // DELETE /api/messages/[id] - Delete a message
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {

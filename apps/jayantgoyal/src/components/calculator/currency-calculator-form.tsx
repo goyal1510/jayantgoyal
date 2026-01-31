@@ -6,10 +6,10 @@ import { useRouter } from "next/navigation"
 
 import { createCalculation } from "@/lib/calculator/client-calculations"
 import { CURRENCY_DENOMINATIONS } from "@/lib/calculator/database"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
+import { Button } from "@repo/ui/button"
+import { Card, CardContent } from "@repo/ui/card"
+import { Input } from "@repo/ui/input"
+import { Separator } from "@repo/ui/separator"
 
 interface DenominationInput {
   denomination: number
@@ -163,6 +163,7 @@ export function CurrencyCalculatorForm() {
                   msOverflowStyle: "none",
                 }}
               >
+                {/* eslint-disable-next-line react/no-unknown-property */}
                 <style jsx>{`
                   div::-webkit-scrollbar {
                     display: none;

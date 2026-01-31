@@ -2,7 +2,7 @@
 
 import { Star, GitFork, BookOpen, Code2, TrendingUp, Calendar } from "lucide-react"
 import { motion } from "framer-motion"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent } from "@repo/ui/card"
 import type { GitHubStats } from "@/lib/github-stats/types"
 
 interface StatsCardsProps {

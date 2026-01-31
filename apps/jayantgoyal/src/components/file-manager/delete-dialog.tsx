@@ -8,8 +8,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
+} from "@repo/ui/dialog"
+import { Button } from "@repo/ui/button"
 import { Trash2, AlertTriangle } from "lucide-react"
 import type { DirectoryListingItem } from "@/lib/file-manager/types"
 

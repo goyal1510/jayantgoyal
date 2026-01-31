@@ -1,17 +1,17 @@
 "use client"
 
 import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
+import { Button } from "@repo/ui/button"
 import { Copy } from "lucide-react"
 import { toast } from "sonner"
 
 function tomlToYaml(toml: string): string {
   // Convert TOML to JSON first, then JSON to YAML
   try {
-    const result: Record<string, any> = {}
+    const result: Record<string, unknown> = {}
     const lines = toml.split("\n")
-    let currentSection: Record<string, any> = result
+    let currentSection: Record<string, unknown> = result
 
     lines.forEach((line) => {
       const trimmed = line.trim()
@@ -25,9 +25,9 @@ function tomlToYaml(toml: string): string {
             currentSection[part] = {}
           }
           if (index === sectionPath.length - 1) {
-            currentSection = currentSection[part] as Record<string, any>
+            currentSection = currentSection[part] as Record<string, unknown>
           } else {
-            currentSection = currentSection[part] as Record<string, any>
+            currentSection = currentSection[part] as Record<string, unknown>
           }
         })
         return
@@ -47,7 +47,7 @@ function tomlToYaml(toml: string): string {
   }
 }
 
-function parseTomlValue(value: string): any {
+function parseTomlValue(value: string): unknown {
   const trimmed = value.trim()
   if (trimmed.startsWith('"') && trimmed.endsWith('"')) {
     return trimmed.slice(1, -1).replace(/\\"/g, '"')
@@ -64,7 +64,7 @@ function parseTomlValue(value: string): any {
   return trimmed
 }
 
-function jsonToYaml(obj: any, indent: number = 0): string {
+function jsonToYaml(obj: unknown, indent: number = 0): string {
   let yaml = ""
   const spaces = "  ".repeat(indent)
 
@@ -77,7 +77,7 @@ function jsonToYaml(obj: any, indent: number = 0): string {
       }
     })
   } else if (typeof obj === "object" && obj !== null) {
-    Object.entries(obj).forEach(([key, value]) => {
+    Object.entries(obj as Record<string, unknown>).forEach(([key, value]) => {
       if (typeof value === "object" && value !== null && !Array.isArray(value)) {
         yaml += `${spaces}${key}:\n${jsonToYaml(value, indent + 1)}`
       } else if (Array.isArray(value)) {
@@ -91,7 +91,7 @@ function jsonToYaml(obj: any, indent: number = 0): string {
   return yaml
 }
 
-function stringifyValue(value: any): string {
+function stringifyValue(value: unknown): string {
   if (value === null) return "null"
   if (typeof value === "string") return `"${value.replace(/"/g, '\\"')}"`
   return String(value)

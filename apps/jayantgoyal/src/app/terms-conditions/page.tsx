@@ -1,5 +1,5 @@
 import { TermsContent, TERMS_LAST_UPDATED } from "@/components/auth/terms-content"
-import { Button } from "@/components/ui/button"
+import { Button } from "@repo/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { FileText } from "lucide-react"
 import type { Metadata } from "next"

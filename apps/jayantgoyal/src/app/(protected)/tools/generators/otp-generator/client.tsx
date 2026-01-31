@@ -1,10 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
+import { Button } from "@repo/ui/button"
+import { Input } from "@repo/ui/input"
+import { Label } from "@repo/ui/label"
 import { Copy, RefreshCw, CheckCircle2, XCircle } from "lucide-react"
 import { toast } from "sonner"
 
@@ -41,7 +41,7 @@ export default function OTPGeneratorClient() {
     generateOTP(newSecret)
   }
 
-  const generateOTP = (secretKey?: string) => {
+  const generateOTP = React.useCallback((secretKey?: string) => {
     const key = secretKey || secret
     if (!key) {
       toast.error("Please enter or generate a secret")
@@ -49,7 +49,7 @@ export default function OTPGeneratorClient() {
     }
     const code = generateTOTP(key, timeStep, digits)
     setOtp(code)
-  }
+  }, [secret, timeStep, digits])
 
   React.useEffect(() => {
     if (secret) {
@@ -57,7 +57,7 @@ export default function OTPGeneratorClient() {
       const interval = setInterval(() => generateOTP(), timeStep * 1000)
       return () => clearInterval(interval)
     }
-  }, [secret, timeStep, digits])
+  }, [secret, timeStep, digits, generateOTP])
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(otp)

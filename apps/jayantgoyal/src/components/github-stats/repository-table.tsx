@@ -3,9 +3,9 @@
 import { useState, useMemo } from "react"
 import { ArrowUpDown, Star, GitFork, ExternalLink } from "lucide-react"
 import { motion } from "framer-motion"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card"
+import { Button } from "@repo/ui/button"
+import { Badge } from "@repo/ui/badge"
 import {
   Table,
   TableBody,

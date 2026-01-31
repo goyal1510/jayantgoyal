@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion"
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card"
 import type { LanguageDistribution } from "@/lib/github-stats/types"
 
 interface LanguagePieChartProps {

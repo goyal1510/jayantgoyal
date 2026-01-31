@@ -1,9 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Card, CardContent } from "@repo/ui/card"
+import { Button } from "@repo/ui/button"
+import { Skeleton } from "@repo/ui/skeleton"
 import {
   Table,
   TableBody,
@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Switch } from "@/components/ui/switch"
+import { Switch } from "@repo/ui/switch"
 import {
   Dialog,
   DialogContent,
@@ -20,9 +20,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@repo/ui/dialog"
+import { Input } from "@repo/ui/input"
+import { Label } from "@repo/ui/label"
 import { Activity } from "@/lib/activity-tracker/database"
 import { toast } from "sonner"
 import { Pencil } from "lucide-react"

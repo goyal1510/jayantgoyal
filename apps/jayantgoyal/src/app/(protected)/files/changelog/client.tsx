@@ -1,10 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
+import { Badge } from "@repo/ui/badge"
 import { Calendar, CheckCircle2, Code, Database, Download, FolderInput, FolderPlus, Layout, Package, Settings, Upload } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn } from "@repo/ui/lib/utils"
 
 interface ChangelogEntry {
   date: string
@@ -267,7 +267,7 @@ export default function ChangelogPageClient() {
         <CardContent className="pt-6">
           <p className="text-sm text-muted-foreground text-center">
             This changelog is automatically updated as development progresses.
-            Each day's work is documented here for easy reference.
+            Each day&apos;s work is documented here for easy reference.
           </p>
         </CardContent>
       </Card>

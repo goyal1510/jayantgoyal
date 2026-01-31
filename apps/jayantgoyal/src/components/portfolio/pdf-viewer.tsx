@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Download,
   ExternalLink,
@@ -8,7 +8,7 @@ import {
   X,
 } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button } from "@repo/ui/button";
 
 interface PDFViewerModalProps {
   name: string;
@@ -52,6 +52,16 @@ export function PDFViewerModal({ name, issuer, description, path, onClose }: PDF
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const objectRef = useRef<HTMLObjectElement>(null);
+
+  useEffect(() => {
+    const el = objectRef.current;
+    if (!el) return;
+    const handler = () => setEmbedFailed(true);
+    el.addEventListener('error', handler);
+    return () => el.removeEventListener('error', handler);
   }, []);
 
   const showMobileView = isMobile || embedFailed;
@@ -131,11 +141,11 @@ export function PDFViewerModal({ name, issuer, description, path, onClose }: PDF
           ) : (
             // Desktop embed view
             <object
+              ref={objectRef}
               data={pdfPath}
               type="application/pdf"
               className="h-full w-full"
               style={{ minHeight: "70vh" }}
-              onError={() => setEmbedFailed(true)}
             >
               {/* Fallback if object tag fails */}
               <div className="flex h-full flex-col items-center justify-center gap-4 p-8" style={{ minHeight: "60vh" }}>

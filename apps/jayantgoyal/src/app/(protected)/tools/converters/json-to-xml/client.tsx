@@ -1,13 +1,13 @@
 "use client"
 
 import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
+import { Button } from "@repo/ui/button"
+import { Label } from "@repo/ui/label"
 import { Copy } from "lucide-react"
 import { toast } from "sonner"
 
-function jsonToXml(obj: any, rootTag: string = "root"): string {
+function jsonToXml(obj: unknown, rootTag: string = "root"): string {
   function escapeXml(str: string): string {
     return str
       .replace(/&/g, "&amp;")
@@ -17,7 +17,7 @@ function jsonToXml(obj: any, rootTag: string = "root"): string {
       .replace(/'/g, "&apos;")
   }
 
-  function valueToXml(value: any, tag: string, indent: number = 0): string {
+  function valueToXml(value: unknown, tag: string, indent: number = 0): string {
     const spaces = "  ".repeat(indent)
 
     if (value === null || value === undefined) {
@@ -26,12 +26,12 @@ function jsonToXml(obj: any, rootTag: string = "root"): string {
 
     if (typeof value === "object") {
       if (Array.isArray(value)) {
-        return value.map((item, index) =>
+        return value.map((item) =>
           valueToXml(item, tag, indent)
         ).join("")
       } else {
         let xml = `${spaces}<${tag}>\n`
-        Object.entries(value).forEach(([key, val]) => {
+        Object.entries(value as Record<string, unknown>).forEach(([key, val]) => {
           xml += valueToXml(val, key, indent + 1)
         })
         xml += `${spaces}</${tag}>\n`

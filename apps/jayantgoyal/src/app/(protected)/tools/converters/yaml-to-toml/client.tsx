@@ -1,8 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
+import { Button } from "@repo/ui/button"
 import { Copy } from "lucide-react"
 import { toast } from "sonner"
 
@@ -11,7 +11,7 @@ function yamlToToml(yaml: string): string {
   // First convert YAML to JSON, then JSON to TOML
   try {
     const lines = yaml.split("\n")
-    const result: Record<string, any> = {}
+    const result: Record<string, unknown> = {}
 
     lines.forEach((line) => {
       const trimmed = line.trim()
@@ -22,7 +22,7 @@ function yamlToToml(yaml: string): string {
         const key = trimmed.slice(0, colonIndex).trim()
         const value = trimmed.slice(colonIndex + 1).trim()
 
-        let parsedValue: any = value
+        let parsedValue: unknown = value
         if (value.startsWith('"') && value.endsWith('"')) {
           parsedValue = value.slice(1, -1)
         } else if (value === "true") {
@@ -46,7 +46,7 @@ function yamlToToml(yaml: string): string {
   }
 }
 
-function jsonToToml(obj: any, prefix: string = ""): string {
+function jsonToToml(obj: Record<string, unknown>, prefix: string = ""): string {
   let toml = ""
 
   Object.entries(obj).forEach(([key, value]) => {
@@ -54,7 +54,7 @@ function jsonToToml(obj: any, prefix: string = ""): string {
 
     if (typeof value === "object" && value !== null && !Array.isArray(value)) {
       toml += `[${fullKey}]\n`
-      toml += jsonToToml(value, fullKey)
+      toml += jsonToToml(value as Record<string, unknown>, fullKey)
     } else {
       const tomlValue = valueToToml(value)
       toml += `${key} = ${tomlValue}\n`
@@ -64,7 +64,7 @@ function jsonToToml(obj: any, prefix: string = ""): string {
   return toml
 }
 
-function valueToToml(value: any): string {
+function valueToToml(value: unknown): string {
   if (value === null) return "null"
   if (typeof value === "string") return `"${value.replace(/"/g, '\\"')}"`
   if (typeof value === "boolean") return value ? "true" : "false"

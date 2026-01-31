@@ -14,7 +14,7 @@ import {
   Folder,
   FolderOpen,
 } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn } from "@repo/ui/lib/utils"
 
 export type FileTypeCategory =
   | "image"

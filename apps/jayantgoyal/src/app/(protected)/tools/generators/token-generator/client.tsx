@@ -1,10 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
+import { Button } from "@repo/ui/button"
+import { Input } from "@repo/ui/input"
+import { Label } from "@repo/ui/label"
 import { Copy, RefreshCw, CopyCheck } from "lucide-react"
 import { toast } from "sonner"
 
@@ -51,7 +51,7 @@ export default function TokenGeneratorClient() {
     }
 
     setTokens(generatedTokens)
-  }, [length, includeUppercase, includeLowercase, includeNumbers, includeSymbols, customChars, tokenCount, generateSingleToken])
+  }, [includeUppercase, includeLowercase, includeNumbers, includeSymbols, customChars, tokenCount, generateSingleToken])
 
   React.useEffect(() => {
     generateToken()
@@ -200,7 +200,7 @@ export default function TokenGeneratorClient() {
           <CardContent className="space-y-4">
             {tokens.length === 0 ? (
               <div className="flex items-center justify-center py-12 text-muted-foreground">
-                <p>Click "Generate New Token" to create tokens</p>
+                <p>Click &quot;Generate New Token&quot; to create tokens</p>
               </div>
             ) : (
               <div className="space-y-3">

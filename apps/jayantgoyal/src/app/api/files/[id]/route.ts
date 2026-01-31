@@ -7,7 +7,7 @@ import { updateFileMetadata, deleteFile, getFileByPath } from "@/lib/file-manage
  * Get file details and signed URL for viewing
  */
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -141,6 +141,7 @@ export async function PATCH(
     }
 
     // Sanitize name (remove invalid characters)
+    // eslint-disable-next-line no-control-regex
     const sanitizedName = name.trim().replace(/[<>:"/\\|?*\x00-\x1f]/g, "");
     if (!sanitizedName) {
       return NextResponse.json(
@@ -290,7 +291,7 @@ export async function PATCH(
  * Soft delete a file/folder
  */
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {

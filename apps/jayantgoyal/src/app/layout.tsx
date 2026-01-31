@@ -1,9 +1,8 @@
-import "@repo/ui/styles.css";
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/theme/theme-provider";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "@repo/ui/sonner";
 import { getPortfolioDataFromHeaders } from "@/lib/portfolio/server";
 
 const inter = Inter({
@@ -13,7 +12,7 @@ const inter = Inter({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { data } = await getPortfolioDataFromHeaders();
+  await getPortfolioDataFromHeaders();
 
   return {
     title: `Jayant Goyal`,

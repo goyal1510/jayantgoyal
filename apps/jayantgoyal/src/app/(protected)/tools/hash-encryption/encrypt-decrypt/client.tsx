@@ -1,10 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
+import { Button } from "@repo/ui/button"
+import { Input } from "@repo/ui/input"
+import { Label } from "@repo/ui/label"
 import { Copy, Lock, Unlock } from "lucide-react"
 import { toast } from "sonner"
 
@@ -91,7 +91,7 @@ async function decryptText(encryptedBase64: string, password: string, algorithm:
     )
 
     return decoder.decode(decrypted)
-  } catch (error) {
+  } catch {
     throw new Error("Decryption failed - incorrect password or corrupted data")
   }
 }

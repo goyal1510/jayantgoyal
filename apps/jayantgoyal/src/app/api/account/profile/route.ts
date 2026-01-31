@@ -39,10 +39,6 @@ export async function GET() {
   // - Have a verified email
   // - Don't have identities with a password (checking if they came from anonymous)
   const identities = user.identities || [];
-  const hasPasswordIdentity = identities.some(
-    (identity) => identity.provider === "email" && identity.identity_data?.email
-  );
-
   // If user has verified email but originally was anonymous (no password identity created via signUp)
   // they need to set a password. Anonymous users who link email don't have password until they set it.
   const needsPassword = hasVerifiedEmail && !isGuest && identities.length === 0;

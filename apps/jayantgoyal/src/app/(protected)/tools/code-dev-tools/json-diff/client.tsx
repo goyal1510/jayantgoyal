@@ -1,9 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
 
-function jsonDiff(obj1: any, obj2: any, path: string = ""): string[] {
+function jsonDiff(obj1: Record<string, unknown>, obj2: Record<string, unknown>, path: string = ""): string[] {
   const diffs: string[] = []
 
   const keys1 = Object.keys(obj1 || {})
@@ -20,7 +20,7 @@ function jsonDiff(obj1: any, obj2: any, path: string = ""): string[] {
     } else if (!(key in obj2)) {
       diffs.push(`- ${currentPath}: ${JSON.stringify(val1)}`)
     } else if (typeof val1 === "object" && typeof val2 === "object" && val1 !== null && val2 !== null && !Array.isArray(val1) && !Array.isArray(val2)) {
-      diffs.push(...jsonDiff(val1, val2, currentPath))
+      diffs.push(...jsonDiff(val1 as Record<string, unknown>, val2 as Record<string, unknown>, currentPath))
     } else if (JSON.stringify(val1) !== JSON.stringify(val2)) {
       diffs.push(`~ ${currentPath}: ${JSON.stringify(val1)} → ${JSON.stringify(val2)}`)
     }

@@ -11,7 +11,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
+} from "@repo/ui/breadcrumb"
 import { getAppById, HUB_APPS } from "@/lib/config/hub-config"
 import { toolCategories, getToolByPath } from "@/lib/tools/tools"
 
