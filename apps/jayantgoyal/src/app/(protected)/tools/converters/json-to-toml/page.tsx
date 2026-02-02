@@ -5,7 +5,7 @@ import JSONToTOMLClient from "./client"
 const tool = getToolByPath("/tools/converters/json-to-toml")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant Goyal`,
+  title: `${tool?.title} | Jayant`,
   description: tool?.description,
 }
 

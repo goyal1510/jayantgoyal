@@ -5,7 +5,7 @@ import StringObfuscatorClient from "./client"
 const tool = getToolByPath("/tools/text-tools/string-obfuscator")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant Goyal`,
+  title: `${tool?.title} | Jayant`,
   description: tool?.description,
 }
 

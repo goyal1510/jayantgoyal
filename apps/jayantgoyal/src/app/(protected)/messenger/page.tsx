@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import { MessagesPage } from "@/components/messenger/messages-page"
 
 export const metadata: Metadata = {
-  title: "Messenger | Jayant Goyal",
+  title: "Messenger | Jayant",
   description: "Send and receive messages securely.",
 }
 

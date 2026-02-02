@@ -5,7 +5,7 @@ import IPv4SubnetCalculatorClient from "./client"
 const tool = getToolByPath("/tools/network-tools/ipv4-subnet-calculator")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant Goyal`,
+  title: `${tool?.title} | Jayant`,
   description: tool?.description,
 }
 

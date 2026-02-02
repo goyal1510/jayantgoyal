@@ -15,9 +15,9 @@ export async function generateMetadata(): Promise<Metadata> {
   await getPortfolioDataFromHeaders();
 
   return {
-    title: `Jayant Goyal`,
+    title: `Jayant`,
     description:
-      "A unified hub combining portfolio, games, tools, and utilities by Jayant Goyal.",
+      "A unified hub combining portfolio, games, tools, and utilities by Jayant.",
     icons: {
       icon: [
         { url: "/assets/Jayant_favicon_io/favicon.ico" },

@@ -5,7 +5,7 @@ import YAMLToTOMLClient from "./client"
 const tool = getToolByPath("/tools/converters/yaml-to-toml")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant Goyal`,
+  title: `${tool?.title} | Jayant`,
   description: tool?.description,
 }
 

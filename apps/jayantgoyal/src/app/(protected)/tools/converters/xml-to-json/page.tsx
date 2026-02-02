@@ -5,7 +5,7 @@ import XMLToJSONClient from "./client"
 const tool = getToolByPath("/tools/converters/xml-to-json")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant Goyal`,
+  title: `${tool?.title} | Jayant`,
   description: tool?.description,
 }
 

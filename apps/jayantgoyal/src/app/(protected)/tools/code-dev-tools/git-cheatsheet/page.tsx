@@ -5,7 +5,7 @@ import GitCheatsheetClient from "./client"
 const tool = getToolByPath("/tools/code-dev-tools/git-cheatsheet")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant Goyal`,
+  title: `${tool?.title} | Jayant`,
   description: tool?.description,
 }
 

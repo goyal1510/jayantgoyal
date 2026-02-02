@@ -5,7 +5,7 @@ import ChmodCalculatorClient from "./client"
 const tool = getToolByPath("/tools/code-dev-tools/chmod-calculator")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant Goyal`,
+  title: `${tool?.title} | Jayant`,
   description: tool?.description,
 }
 

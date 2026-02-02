@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import WeatherDashboard from "@/components/weather/weather-dashboard"
 
 export const metadata: Metadata = {
-  title: "Weather | Jayant Goyal",
+  title: "Weather | Jayant",
   description: "Check the current weather conditions.",
 }
 

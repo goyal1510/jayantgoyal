@@ -5,7 +5,7 @@ import SQLPrettifyClient from "./client"
 const tool = getToolByPath("/tools/formatters/sql-prettify")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant Goyal`,
+  title: `${tool?.title} | Jayant`,
   description: tool?.description,
 }
 

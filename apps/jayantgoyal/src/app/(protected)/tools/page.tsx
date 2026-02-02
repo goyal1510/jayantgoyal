@@ -4,7 +4,7 @@ import { allTools } from "@/lib/tools/tools"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
 
 export const metadata: Metadata = {
-  title: "Developer Tools | Jayant Goyal",
+  title: "Developer Tools | Jayant",
   description: "99+ utilities for developers and power users including generators, converters, formatters, and more.",
 }
 

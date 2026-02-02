@@ -5,7 +5,7 @@ import MACAddressLookupClient from "./client"
 const tool = getToolByPath("/tools/network-tools/mac-address-lookup")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant Goyal`,
+  title: `${tool?.title} | Jayant`,
   description: tool?.description,
 }
 

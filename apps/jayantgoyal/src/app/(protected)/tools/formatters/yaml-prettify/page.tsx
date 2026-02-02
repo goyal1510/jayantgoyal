@@ -5,7 +5,7 @@ import YAMLPrettifyClient from "./client"
 const tool = getToolByPath("/tools/formatters/yaml-prettify")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant Goyal`,
+  title: `${tool?.title} | Jayant`,
   description: tool?.description,
 }
 

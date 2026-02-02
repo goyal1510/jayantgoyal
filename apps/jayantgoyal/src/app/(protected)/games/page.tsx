@@ -7,7 +7,7 @@ import { GAME_META } from "@/lib/games/config"
 import { cn } from "@repo/ui/lib/utils"
 
 export const metadata: Metadata = {
-  title: "Games | Jayant Goyal",
+  title: "Games | Jayant",
   description:
     "Play fun games including Tic Tac Toe, Rock Paper Scissors, Connect Four, and more.",
 }

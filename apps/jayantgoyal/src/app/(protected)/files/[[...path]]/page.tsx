@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import FilesPageClient from "./client"
 
 export const metadata: Metadata = {
-  title: "Files | Jayant Goyal",
+  title: "Files | Jayant",
   description: "Browse and manage your files.",
 }
 

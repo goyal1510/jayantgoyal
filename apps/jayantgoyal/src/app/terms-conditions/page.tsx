@@ -5,7 +5,7 @@ import { FileText } from "lucide-react"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Terms & Conditions | Jayant Goyal",
+  title: "Terms & Conditions | Jayant",
   description: "Terms and Conditions for jayantgoyal.com - Read our terms of service, data policies, and usage guidelines.",
 }
 

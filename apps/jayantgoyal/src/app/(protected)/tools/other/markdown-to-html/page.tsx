@@ -5,7 +5,7 @@ import MarkdownToHTMLClient from "./client"
 const tool = getToolByPath("/tools/other/markdown-to-html")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant Goyal`,
+  title: `${tool?.title} | Jayant`,
   description: tool?.description,
 }
 

@@ -5,7 +5,7 @@ import PasswordStrengthClient from "./client"
 const tool = getToolByPath("/tools/hash-encryption/password-strength")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant Goyal`,
+  title: `${tool?.title} | Jayant`,
   description: tool?.description,
 }
 

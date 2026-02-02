@@ -5,7 +5,7 @@ import IPv6ULAGeneratorClient from "./client"
 const tool = getToolByPath("/tools/generators/ipv6-ula-generator")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant Goyal`,
+  title: `${tool?.title} | Jayant`,
   description: tool?.description,
 }
 

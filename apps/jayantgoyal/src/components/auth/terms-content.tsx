@@ -300,7 +300,7 @@ export function TermsContent() {
         </div>
         <div className="pl-9 space-y-3">
           <p className="text-sm text-muted-foreground leading-relaxed">
-            All platform code, design, content, and branding are the property of Jayant Goyal
+            All platform code, design, content, and branding are the property of Jayant
             unless otherwise stated. You may not copy, modify, distribute, or create derivative
             works without explicit permission.
           </p>

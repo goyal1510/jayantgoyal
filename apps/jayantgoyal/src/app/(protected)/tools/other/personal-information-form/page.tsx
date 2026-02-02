@@ -5,7 +5,7 @@ import PersonalInformationFormClient from "./client"
 const tool = getToolByPath("/tools/other/personal-information-form")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant Goyal`,
+  title: `${tool?.title} | Jayant`,
   description: tool?.description,
 }
 

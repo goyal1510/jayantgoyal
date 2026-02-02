@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { SignupForm } from "@/components/auth/signup-form";
 
 export const metadata: Metadata = {
-  title: "Sign Up | Jayant Goyal",
+  title: "Sign Up | Jayant",
   description: "Create a new account.",
 }
 

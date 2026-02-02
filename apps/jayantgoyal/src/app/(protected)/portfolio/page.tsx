@@ -2,8 +2,8 @@ import type { Metadata } from "next"
 import PortfolioClient from "./client"
 
 export const metadata: Metadata = {
-  title: "Portfolio | Jayant Goyal",
-  description: "Welcome to Jayant Goyal's portfolio showcasing projects and skills.",
+  title: "Portfolio | Jayant",
+  description: "Welcome to Jayant's portfolio showcasing projects and skills.",
 }
 
 export default function Page() {

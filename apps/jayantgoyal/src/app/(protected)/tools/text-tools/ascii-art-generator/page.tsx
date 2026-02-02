@@ -5,7 +5,7 @@ import ASCIIArtGeneratorClient from "./client"
 const tool = getToolByPath("/tools/text-tools/ascii-art-generator")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant Goyal`,
+  title: `${tool?.title} | Jayant`,
   description: tool?.description,
 }
 

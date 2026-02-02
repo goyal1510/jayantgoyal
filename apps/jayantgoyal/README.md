@@ -1,4 +1,4 @@
-# Jayant Goyal - Personal Hub
+# Jayant - Personal Hub
 
 A unified full-stack web application combining portfolio, games, tools, and productivity features built with Next.js 16, TypeScript, React 19, and Supabase.
 
