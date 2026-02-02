@@ -111,14 +111,12 @@ export function GithubCalendarComponent({ username, githubUrl }: GithubCalendarP
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="w-full overflow-x-auto overflow-y-hidden pb-2 scrollbar-hide"
+          className="w-full overflow-x-auto overflow-y-hidden pb-2"
           style={{
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
             WebkitOverflowScrolling: 'touch',
           }}
         >
-          <div className="flex justify-center scrollbar-hide" style={{ minWidth: 'max-content' }}>
+          <div className="flex justify-center" style={{ minWidth: 'max-content' }}>
             <GitHubCalendar
               username={username}
               year={selectedYear}
