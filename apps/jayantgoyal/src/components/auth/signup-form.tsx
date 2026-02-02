@@ -251,7 +251,7 @@ export function SignupForm({
                 We&apos;ve sent a verification link to your email. Click the link to verify, then come back here to set your password.
               </p>
               <Button variant="outline" asChild className="mt-4">
-                <Link href="/portfolio">
+                <Link href="/">
                   <Home className="size-4 mr-2" />
                   Back to Home
                 </Link>
@@ -284,10 +284,10 @@ export function SignupForm({
                     id="password"
                     name="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Create a password (min 6 characters)"
+                    placeholder="Create a password (min 8 characters)"
                     autoComplete="new-password"
                     required
-                    minLength={6}
+                    minLength={8}
                     className="pr-10"
                   />
                   <button
@@ -303,7 +303,7 @@ export function SignupForm({
                 <SubmitButton isAnonymous={false} isSettingPassword />
               </div>
               <Button variant="ghost" asChild className="w-full">
-                <Link href="/portfolio">
+                <Link href="/">
                   <Home className="size-4" />
                   Back to Home
                 </Link>
@@ -403,7 +403,7 @@ export function SignupForm({
               </div>
             )}
             <Button variant="ghost" asChild className="w-full">
-              <Link href="/portfolio">
+              <Link href="/">
                 <Home className="size-4" />
                 Back to Home
               </Link>

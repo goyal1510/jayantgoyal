@@ -35,6 +35,7 @@ import {
   SheetTrigger,
 } from "@repo/ui/sheet"
 import { createSupabaseBrowserClient } from "@/lib/supabase/client"
+import { MfaSettingsSection } from "@/components/auth/mfa-settings-section"
 import { toast } from "sonner"
 
 export function NavUser({
@@ -209,17 +210,10 @@ export function NavUser({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <SidebarMenuButton
-                size="lg"
                 className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
               >
-                <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarFallback className="rounded-lg bg-muted text-muted-foreground">
-                    <User className="size-4" />
-                  </AvatarFallback>
-                </Avatar>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">{nameForUi}</span>
-                </div>
+                <User className="size-4" />
+                <span className="truncate font-semibold">{nameForUi}</span>
                 <ChevronsUpDown className="ml-auto size-4" />
               </SidebarMenuButton>
             </DropdownMenuTrigger>
@@ -338,6 +332,9 @@ export function NavUser({
                     autoComplete="new-password"
                 />
               </div>
+            </div>
+            <div className="px-6">
+              <MfaSettingsSection />
             </div>
             <SheetFooter className="p-6 pt-2 flex-row flex-wrap items-center gap-3">
               <Button

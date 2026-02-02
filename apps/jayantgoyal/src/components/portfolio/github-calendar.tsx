@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import dynamic from 'next/dynamic';
+import { useTheme } from 'next-themes';
 import { motion } from 'framer-motion';
 import { Github, ChevronDown, Check } from 'lucide-react';
 import Link from 'next/link';
@@ -36,6 +37,7 @@ type YearOption = number | 'last';
 
 export function GithubCalendarComponent({ username, githubUrl }: GithubCalendarProps) {
   const currentYear = new Date().getFullYear();
+  const { resolvedTheme } = useTheme();
   const [selectedYear, setSelectedYear] = useState<YearOption>('last');
 
   // Generate year options: 2025 to current year + "Last Year" option
@@ -120,6 +122,7 @@ export function GithubCalendarComponent({ username, githubUrl }: GithubCalendarP
             <GitHubCalendar
               username={username}
               year={selectedYear}
+              colorScheme={resolvedTheme === 'dark' ? 'dark' : 'light'}
               blockSize={14}
               blockMargin={4}
               fontSize={14}

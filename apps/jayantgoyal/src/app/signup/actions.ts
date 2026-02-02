@@ -85,7 +85,7 @@ export async function signupWithEmail(
     password: String(password),
     options: {
       // Redirect through auth callback to exchange token for session
-      emailRedirectTo: `${origin}/auth/callback?next=/portfolio`,
+      emailRedirectTo: `${origin}/auth/callback?next=/`,
       data: {
         terms_accepted: true,
         terms_accepted_at: new Date().toISOString(),
@@ -116,8 +116,8 @@ export async function setPassword(
     return { error: "Password is required." };
   }
 
-  if (String(password).length < 6) {
-    return { error: "Password must be at least 6 characters." };
+  if (String(password).length < 8) {
+    return { error: "Password must be at least 8 characters." };
   }
 
   const supabase = await createSupabaseServerClient();

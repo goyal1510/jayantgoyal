@@ -25,6 +25,8 @@ export default async function proxy(request: NextRequest) {
     "/github-stats",
     "/login",
     "/signup",
+    "/forgot-password",
+    "/reset-password",
     "/auth/callback", // Auth callback for email verification token exchange
     "/api/guest-login",
     "/api/contact",   // Contact form API

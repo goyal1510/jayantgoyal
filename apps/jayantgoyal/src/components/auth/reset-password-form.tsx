@@ -1,0 +1,300 @@
+"use client"
+
+import * as React from "react"
+import Link from "next/link"
+import { Eye, EyeOff, Home, AlertCircle, ShieldCheck, Loader2 } from "lucide-react"
+
+import { createSupabaseBrowserClient } from "@/lib/supabase/client"
+import { Button } from "@repo/ui/button"
+import { Card, CardContent } from "@repo/ui/card"
+import { Input } from "@repo/ui/input"
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@repo/ui/input-otp"
+import { Label } from "@repo/ui/label"
+import { cn } from "@repo/ui/lib/utils"
+import { toast } from "sonner"
+
+type SessionState = "loading" | "none" | "aal1_mfa_required" | "ready"
+
+export function ResetPasswordForm({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
+  const [showPassword, setShowPassword] = React.useState(false)
+  const [password, setPassword] = React.useState("")
+  const [confirmPassword, setConfirmPassword] = React.useState("")
+  const [isPending, setIsPending] = React.useState(false)
+  const [sessionState, setSessionState] = React.useState<SessionState>("loading")
+
+  // MFA state
+  const [mfaCode, setMfaCode] = React.useState("")
+  const [isMfaVerifying, setIsMfaVerifying] = React.useState(false)
+
+  React.useEffect(() => {
+    const checkSession = async () => {
+      const supabase = createSupabaseBrowserClient()
+      const { data: { session } } = await supabase.auth.getSession()
+
+      if (!session) {
+        setSessionState("none")
+        return
+      }
+
+      // Check if MFA verification is needed
+      const { data: aalData } =
+        await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+
+      if (aalData && aalData.currentLevel === "aal1" && aalData.nextLevel === "aal2") {
+        setSessionState("aal1_mfa_required")
+      } else {
+        setSessionState("ready")
+      }
+    }
+    checkSession()
+  }, [])
+
+  const handleMfaVerify = React.useCallback(async () => {
+    if (mfaCode.length !== 6) return
+
+    setIsMfaVerifying(true)
+    try {
+      const supabase = createSupabaseBrowserClient()
+
+      const { data: factorsData, error: factorsError } =
+        await supabase.auth.mfa.listFactors()
+      if (factorsError) throw factorsError
+
+      const totp = factorsData.totp[0]
+      if (!totp) throw new Error("No TOTP factor found.")
+
+      const { data: challengeData, error: challengeError } =
+        await supabase.auth.mfa.challenge({ factorId: totp.id })
+      if (challengeError) throw challengeError
+
+      const { error: verifyError } = await supabase.auth.mfa.verify({
+        factorId: totp.id,
+        challengeId: challengeData.id,
+        code: mfaCode,
+      })
+      if (verifyError) throw verifyError
+
+      setSessionState("ready")
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Verification failed."
+      toast.error(message)
+      setMfaCode("")
+    } finally {
+      setIsMfaVerifying(false)
+    }
+  }, [mfaCode])
+
+  const handleSubmit = React.useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault()
+
+      if (password.length < 8) {
+        toast.error("Password must be at least 8 characters.")
+        return
+      }
+
+      if (password !== confirmPassword) {
+        toast.error("Passwords do not match.")
+        return
+      }
+
+      setIsPending(true)
+
+      void (async () => {
+        try {
+          const supabase = createSupabaseBrowserClient()
+          const { error } = await supabase.auth.updateUser({ password })
+
+          if (error) {
+            toast.error(error.message)
+            return
+          }
+
+          toast.success("Password updated successfully!")
+          window.location.href = "/"
+        } catch (err) {
+          const message =
+            err instanceof Error ? err.message : "Unable to update password."
+          toast.error(message)
+        } finally {
+          setIsPending(false)
+        }
+      })()
+    },
+    [password, confirmPassword]
+  )
+
+  // Loading state while checking session
+  if (sessionState === "loading") {
+    return (
+      <div className={cn("flex flex-col gap-6", className)} {...props}>
+        <Card className="overflow-hidden">
+          <CardContent className="p-6 md:p-8">
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-pulse text-muted-foreground">Loading...</div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  // No session — invalid or expired link
+  if (sessionState === "none") {
+    return (
+      <div className={cn("flex flex-col gap-6", className)} {...props}>
+        <Card className="overflow-hidden">
+          <CardContent className="p-6 md:p-8">
+            <div className="flex flex-col items-center text-center gap-4">
+              <AlertCircle className="size-12 text-destructive" />
+              <h1 className="text-2xl font-bold">Invalid or Expired Link</h1>
+              <p className="text-muted-foreground">
+                This password reset link is invalid or has expired. Please request a new one.
+              </p>
+              <div className="flex flex-col gap-2 w-full mt-4">
+                <Button asChild>
+                  <Link href="/forgot-password">Request New Link</Link>
+                </Button>
+                <Button variant="ghost" asChild>
+                  <Link href="/">
+                    <Home className="size-4" />
+                    Back to Home
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  // MFA verification required before allowing password reset
+  if (sessionState === "aal1_mfa_required") {
+    return (
+      <div className={cn("flex flex-col gap-6", className)} {...props}>
+        <Card className="overflow-hidden">
+          <CardContent className="p-6 md:p-8">
+            <div className="flex flex-col items-center gap-6">
+              <div className="flex flex-col items-center gap-2 text-center">
+                <ShieldCheck className="text-muted-foreground size-10" />
+                <h1 className="text-2xl font-bold">Two-Factor Authentication</h1>
+                <p className="text-muted-foreground text-sm">
+                  Enter the 6-digit code from your authenticator app to continue resetting your password.
+                </p>
+              </div>
+
+              <InputOTP
+                maxLength={6}
+                value={mfaCode}
+                onChange={setMfaCode}
+                onComplete={handleMfaVerify}
+                disabled={isMfaVerifying}
+              >
+                <InputOTPGroup>
+                  <InputOTPSlot index={0} />
+                  <InputOTPSlot index={1} />
+                  <InputOTPSlot index={2} />
+                  <InputOTPSlot index={3} />
+                  <InputOTPSlot index={4} />
+                  <InputOTPSlot index={5} />
+                </InputOTPGroup>
+              </InputOTP>
+
+              <Button
+                className="w-full"
+                onClick={handleMfaVerify}
+                disabled={isMfaVerifying || mfaCode.length !== 6}
+              >
+                {isMfaVerifying ? (
+                  <>
+                    <Loader2 className="size-4 animate-spin" />
+                    Verifying...
+                  </>
+                ) : (
+                  "Verify"
+                )}
+              </Button>
+              <Button variant="ghost" asChild className="w-full">
+                <Link href="/">
+                  <Home className="size-4" />
+                  Back to Home
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  return (
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
+      <Card className="overflow-hidden">
+        <CardContent className="p-6 md:p-8">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+            <div className="flex flex-col items-center text-center">
+              <h1 className="text-2xl font-bold">Reset Password</h1>
+              <p className="text-muted-foreground text-sm mt-1">
+                Enter your new password below.
+              </p>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="password">New Password</Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter new password (min 8 characters)"
+                  autoComplete="new-password"
+                  required
+                  minLength={8}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                </button>
+              </div>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="confirm-password">Confirm Password</Label>
+              <Input
+                id="confirm-password"
+                type="password"
+                placeholder="Confirm new password"
+                autoComplete="new-password"
+                required
+                minLength={8}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+            </div>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isPending}
+            >
+              {isPending ? "Updating..." : "Update Password"}
+            </Button>
+            <Button variant="ghost" asChild className="w-full">
+              <Link href="/">
+                <Home className="size-4" />
+                Back to Home
+              </Link>
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}

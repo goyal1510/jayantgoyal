@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react"
 import dynamic from "next/dynamic"
+import { useTheme } from "next-themes"
 import { motion } from "framer-motion"
 import { Github, ChevronDown, Check } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card"
@@ -33,6 +34,7 @@ interface ContributionCalendarProps {
 
 export function ContributionCalendar({ username }: ContributionCalendarProps) {
   const currentYear = new Date().getFullYear()
+  const { resolvedTheme } = useTheme()
   const [selectedYear, setSelectedYear] = useState<YearOption>("last")
 
   const yearOptions = useMemo(() => {
@@ -92,6 +94,7 @@ export function ContributionCalendar({ username }: ContributionCalendarProps) {
               <GitHubCalendar
                 username={username}
                 year={selectedYear}
+                colorScheme={resolvedTheme === "dark" ? "dark" : "light"}
                 blockSize={14}
                 blockMargin={4}
                 fontSize={14}

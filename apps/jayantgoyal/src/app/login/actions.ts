@@ -7,6 +7,8 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 type LoginFormState = {
   error?: string;
+  mfaRequired?: boolean;
+  redirectUrl?: string;
 };
 
 export async function loginWithPassword(
@@ -31,11 +33,24 @@ export async function loginWithPassword(
     return { error: error.message };
   }
 
-  revalidatePath("/", "layout");
+  // Check if user has MFA enrolled and needs to verify
+  const { data: aalData, error: aalError } =
+    await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
 
-  // Redirect to the original page or home
-  const targetUrl = redirectUrl && String(redirectUrl).startsWith("/")
-    ? String(redirectUrl)
-    : "/";
+  const targetUrl =
+    redirectUrl && String(redirectUrl).startsWith("/")
+      ? String(redirectUrl)
+      : "/";
+
+  if (
+    !aalError &&
+    aalData &&
+    aalData.currentLevel === "aal1" &&
+    aalData.nextLevel === "aal2"
+  ) {
+    return { mfaRequired: true, redirectUrl: targetUrl };
+  }
+
+  revalidatePath("/", "layout");
   redirect(targetUrl);
 }

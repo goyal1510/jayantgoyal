@@ -14,13 +14,12 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
-  SidebarSeparator,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@repo/ui/sidebar"
+import { Separator } from "@repo/ui/separator"
 import { Skeleton } from "@repo/ui/skeleton"
-import { Avatar, AvatarFallback } from "@repo/ui/avatar"
 import { HUB_APPS } from "@/lib/config/hub-config"
 import { createSupabaseBrowserClient } from "@/lib/supabase/client"
 import { TermsDialog } from "@/components/auth/terms-dialog"
@@ -299,33 +298,27 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           activeNavId={finalActiveNavId}
         />
       </SidebarContent>
+      <Separator />
       <SidebarFooter>
-        {user && (
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <TermsDialog>
-                <SidebarMenuButton className="w-full">
-                  <FileText className="size-4" />
-                  <span>Terms & Conditions</span>
-                </SidebarMenuButton>
-              </TermsDialog>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        )}
-        <SidebarSeparator className={user ? "" : "hidden"} />
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <TermsDialog>
+              <SidebarMenuButton className="w-full">
+                <FileText className="size-4" />
+                <span>Terms & Conditions</span>
+              </SidebarMenuButton>
+            </TermsDialog>
+          </SidebarMenuItem>
+        </SidebarMenu>
         {isUserLoading ? (
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton
-                size="lg"
-                className="gap-2"
                 aria-disabled
                 data-loading="true"
               >
-                <Skeleton className="h-8 w-8 rounded-lg" />
-                <div className="grid flex-1 gap-1 text-left text-sm leading-tight">
-                  <Skeleton className="h-4 w-24" />
-                </div>
+                <Skeleton className="size-4 rounded" />
+                <Skeleton className="h-4 w-24" />
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
@@ -334,20 +327,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         ) : (
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton
-                asChild
-                size="lg"
-                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-              >
+              <SidebarMenuButton asChild>
                 <Link href="/login">
-                  <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarFallback className="rounded-lg bg-muted text-muted-foreground">
-                      <User className="size-4" />
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">Login</span>
-                  </div>
+                  <User className="size-4" />
+                  <span>Login</span>
                   <LogIn className="ml-auto size-4" />
                 </Link>
               </SidebarMenuButton>
