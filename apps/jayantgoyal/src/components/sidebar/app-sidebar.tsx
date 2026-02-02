@@ -327,11 +327,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         ) : (
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild>
+              <SidebarMenuButton asChild className="group/login">
                 <Link href="/login">
                   <User className="size-4" />
                   <span>Login</span>
-                  <LogIn className="ml-auto size-4" />
+                  <LogIn className="ml-auto size-4 text-green-600 transition-transform duration-200 group-hover/login:translate-x-0.5 dark:text-green-500" />
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

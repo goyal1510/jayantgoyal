@@ -269,9 +269,10 @@ export function NavUser({
                   handleSignOut()
                 }}
                 disabled={isSigningOut || isDeleting || isSaving}
+                className="group/logout"
               >
-                <LogOut />
-                {isSigningOut ? "Signing out..." : "Log out"}
+                <LogOut className="transition-transform duration-200 group-hover/logout:translate-x-0.5" />
+                <span className="text-destructive">{isSigningOut ? "Signing out..." : "Log out"}</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
