@@ -49,9 +49,9 @@ Workspace deps use `"workspace:*"` in package.json.
 ### Routing (Main App)
 
 - **`(protected)/`** — Layout group with sidebar + breadcrumb header. All routes under here require auth.
-  - `/portfolio`, `/games/*`, `/tools/*`, `/activity-tracker`, `/calculator`, `/custom-calculator`, `/weather`, `/files`, `/messenger`, `/contact`
+  - `/` (portfolio), `/games/*`, `/tools/*`, `/activity-tracker`, `/calculator`, `/custom-calculator`, `/weather`, `/files`, `/messenger`, `/contact`
 - **Public routes** — `/login`, `/signup`, `/auth/callback`, `/terms-conditions`
-- **`/`** — Redirects to `/portfolio`
+- **`/`** — Portfolio landing page (served directly, no redirect)
 
 ### Auth (Supabase)
 

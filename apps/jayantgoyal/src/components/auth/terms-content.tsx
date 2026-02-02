@@ -350,7 +350,7 @@ export function TermsContent() {
               Email: <a href="mailto:goyal151002@gmail.com" target="_blank" rel="noreferrer" className="text-primary underline underline-offset-4 hover:text-primary/80 font-medium">goyal151002@gmail.com</a>
             </p>
             <p className="text-sm text-muted-foreground mt-1">
-              Portfolio: <a href="https://jayantgoyal.com/portfolio#contact" target="_blank" rel="noreferrer" className="text-primary underline underline-offset-4 hover:text-primary/80 font-medium">jayantgoyal.com</a>
+              Portfolio: <a href="https://jayantgoyal.com/#contact" target="_blank" rel="noreferrer" className="text-primary underline underline-offset-4 hover:text-primary/80 font-medium">jayantgoyal.com</a>
             </p>
             <p className="text-xs text-muted-foreground mt-3">
               <strong className="text-foreground">Note:</strong> As this is a personal portfolio project, response times may vary.

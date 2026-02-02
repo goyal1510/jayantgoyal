@@ -1,11 +1,11 @@
 import type { Metadata } from "next"
-import { redirect } from "next/navigation";
+import PortfolioClient from "./client"
 
 export const metadata: Metadata = {
-  title: "Home | Jayant",
-  description: "Welcome to Jayant's personal website.",
+  title: "Jayant",
+  description: "Welcome to Jayant's portfolio showcasing projects and skills.",
 }
 
-export default function RootPage() {
-  redirect("/portfolio");
+export default function Page() {
+  return <PortfolioClient />
 }

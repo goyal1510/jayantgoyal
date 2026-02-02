@@ -177,7 +177,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     }
 
     // Default to portfolio for /portfolio path (or root redirect)
-    if (pathname === "/portfolio" || pathname === "/" || pathname === "") {
+    if (pathname === "/" || pathname === "") {
       return { activeAppId: "portfolio", activeNavId: "home" }
     }
 

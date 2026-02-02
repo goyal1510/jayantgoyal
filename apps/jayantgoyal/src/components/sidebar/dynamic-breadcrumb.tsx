@@ -101,8 +101,8 @@ export function DynamicBreadcrumb() {
     }
 
     // Portfolio - just show "Portfolio" without section tracking
-    if (pathname === "/portfolio" || pathname === "/" || pathname === "") {
-      return { appName: "Portfolio", appHref: "/portfolio", pageName: null }
+    if (pathname === "/" || pathname === "") {
+      return { appName: "Portfolio", appHref: "/", pageName: null }
     }
 
     // Check other apps
@@ -118,7 +118,7 @@ export function DynamicBreadcrumb() {
       }
     }
 
-    return { appName: "Portfolio", appHref: "/portfolio", pageName: null }
+    return { appName: "Portfolio", appHref: "/", pageName: null }
   })()
 
   return (
@@ -126,7 +126,7 @@ export function DynamicBreadcrumb() {
       <BreadcrumbList className="flex-nowrap overflow-hidden">
         <BreadcrumbItem className="shrink-0">
           <BreadcrumbLink asChild>
-            <Link href="/portfolio#home" aria-label="Home">
+            <Link href="/#home" aria-label="Home">
               <Home className="size-4" />
             </Link>
           </BreadcrumbLink>

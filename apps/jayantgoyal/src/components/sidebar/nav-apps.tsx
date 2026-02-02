@@ -71,7 +71,7 @@ export function NavApps({
   const pathname = usePathname()
   const router = useRouter()
   const { isMobile, setOpenMobile } = useSidebar()
-  const isOnPortfolio = pathname === "/portfolio" || pathname.startsWith("/portfolio#")
+  const isOnPortfolio = pathname === "/" || pathname.startsWith("/#")
 
   // Close mobile sidebar on navigation
   const closeMobileSidebar = () => {
@@ -232,7 +232,7 @@ export function NavApps({
                               isActive={isActiveNav}
                             >
                               <a
-                                href={`/portfolio#${navItem.id}`}
+                                href={`/#${navItem.id}`}
                                 onClick={(e) => {
                                   e.preventDefault()
                                   closeMobileSidebar()
@@ -244,7 +244,7 @@ export function NavApps({
                                     }
                                   } else {
                                     // Navigate to portfolio with hash
-                                    router.push(`/portfolio#${navItem.id}`)
+                                    router.push(`/#${navItem.id}`)
                                   }
                                 }}
                               >

@@ -30,7 +30,7 @@ export default function NotFound() {
         {/* Actions */}
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Button asChild variant="default">
-            <Link href="/portfolio">
+            <Link href="/">
               <Home className="mr-2 size-4" />
               Go Home
             </Link>
