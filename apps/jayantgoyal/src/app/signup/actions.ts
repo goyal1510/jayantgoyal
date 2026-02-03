@@ -1,6 +1,6 @@
 "use server";
 
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -52,9 +52,16 @@ export async function signupWithEmail(
     // Anonymous user converting to permanent account
     // Step 1: Link email (sends verification email)
     // Password will be set after email verification
-    // Redirect through auth callback to exchange token for session
-    // URL-encode the next parameter to handle nested query params
-    const nextUrl = encodeURIComponent("/signup?verified=true");
+    // Store the post-auth redirect destination in a cookie.
+    // Query params in emailRedirectTo cause Supabase to reject the URL and fall back to the Site URL.
+    const cookieStore = await cookies();
+    cookieStore.set("auth_redirect", "/signup?verified=true", {
+      path: "/",
+      httpOnly: true,
+      secure: origin.startsWith("https"),
+      sameSite: "lax",
+      maxAge: 3600,
+    });
     const { error } = await supabase.auth.updateUser({
       email: String(email),
       data: {
@@ -62,7 +69,7 @@ export async function signupWithEmail(
         terms_accepted_at: new Date().toISOString(),
       },
     }, {
-      emailRedirectTo: `${origin}/auth/callback?next=${nextUrl}`,
+      emailRedirectTo: `${origin}/auth/callback`,
     });
 
     if (error) {
@@ -80,12 +87,21 @@ export async function signupWithEmail(
     return { error: "Password is required." };
   }
 
+  // Store the post-auth redirect destination in a cookie.
+  // Query params in emailRedirectTo cause Supabase to reject the URL and fall back to the Site URL.
+  const cookieStore = await cookies();
+  cookieStore.set("auth_redirect", "/", {
+    path: "/",
+    httpOnly: true,
+    secure: origin.startsWith("https"),
+    sameSite: "lax",
+    maxAge: 3600,
+  });
   const { error } = await supabase.auth.signUp({
     email: String(email),
     password: String(password),
     options: {
-      // Redirect through auth callback to exchange token for session
-      emailRedirectTo: `${origin}/auth/callback?next=/`,
+      emailRedirectTo: `${origin}/auth/callback`,
       data: {
         terms_accepted: true,
         terms_accepted_at: new Date().toISOString(),

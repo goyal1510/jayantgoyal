@@ -1,6 +1,6 @@
 "use server"
 
-import { headers } from "next/headers"
+import { cookies, headers } from "next/headers"
 
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 
@@ -26,8 +26,19 @@ export async function forgotPassword(
 
   const supabase = await createSupabaseServerClient()
 
+  // Store the post-auth redirect destination in a cookie.
+  // Query params in redirectTo cause Supabase to reject the URL and fall back to the Site URL.
+  const cookieStore = await cookies()
+  cookieStore.set("auth_redirect", "/reset-password", {
+    path: "/",
+    httpOnly: true,
+    secure: origin.startsWith("https"),
+    sameSite: "lax",
+    maxAge: 3600,
+  })
+
   const { error } = await supabase.auth.resetPasswordForEmail(String(email), {
-    redirectTo: `${origin}/auth/callback?next=/reset-password`,
+    redirectTo: `${origin}/auth/callback`,
   })
 
   if (error) {

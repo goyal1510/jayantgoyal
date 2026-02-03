@@ -10,7 +10,11 @@ export async function GET(request: NextRequest) {
   const code = requestUrl.searchParams.get("code");
   const token_hash = requestUrl.searchParams.get("token_hash");
   const type = requestUrl.searchParams.get("type");
-  const next = requestUrl.searchParams.get("next") ?? "/";
+
+  // Redirect destination: prefer the auth_redirect cookie (set by server actions
+  // to avoid query params in Supabase redirect URLs), fall back to the next query param.
+  const authRedirect = request.cookies.get("auth_redirect")?.value;
+  const next = authRedirect || requestUrl.searchParams.get("next") || "/";
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -22,6 +26,11 @@ export async function GET(request: NextRequest) {
   // Prepare response for cookie setting
   const redirectUrl = new URL(next, request.url);
   const response = NextResponse.redirect(redirectUrl);
+
+  // Clear the auth_redirect cookie now that we've consumed it
+  if (authRedirect) {
+    response.cookies.set("auth_redirect", "", { path: "/", maxAge: 0 });
+  }
 
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
