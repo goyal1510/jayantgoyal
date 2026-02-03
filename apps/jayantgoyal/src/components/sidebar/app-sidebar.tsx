@@ -38,10 +38,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [user, setUser] = React.useState<typeof fallbackUser | null>(null)
   const [isUserLoading, setIsUserLoading] = React.useState(true)
 
-  // Load user profile
-  const loadUser = React.useCallback(async () => {
+  // Load user profile. `silent` skips the loading skeleton so NavUser
+  // stays mounted and its local state (settings sheet, MFA dialog) is preserved.
+  const loadUser = React.useCallback(async (silent = false) => {
     try {
-      setIsUserLoading(true)
+      if (!silent) setIsUserLoading(true)
       const response = await fetch("/api/account/profile", {
         cache: "no-store",
       })
@@ -84,8 +85,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       if (event === "SIGNED_OUT") {
         setUser(null)
         setIsUserLoading(false)
-      } else if (event === "SIGNED_IN") {
-        void loadUser()
+      } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+        void loadUser(true) // silent reload — don't unmount NavUser
       }
     })
 

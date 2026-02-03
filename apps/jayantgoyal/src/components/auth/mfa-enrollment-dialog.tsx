@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Loader2 } from "lucide-react"
+import { Check, Copy, Loader2 } from "lucide-react"
 
 import { Button } from "@repo/ui/button"
 import {
@@ -33,6 +33,7 @@ export function MfaEnrollmentDialog({
   const [code, setCode] = React.useState("")
   const [isLoading, setIsLoading] = React.useState(false)
   const [isVerifying, setIsVerifying] = React.useState(false)
+  const [copied, setCopied] = React.useState(false)
 
   const reset = React.useCallback(() => {
     setStep("qr")
@@ -55,6 +56,19 @@ export function MfaEnrollmentDialog({
     void (async () => {
       try {
         const supabase = createSupabaseBrowserClient()
+
+        // Clean up any stale unverified factors before enrolling a new one.
+        // These accumulate when the dialog is dismissed without completing verification.
+        const { data: existing } = await supabase.auth.mfa.listFactors()
+        if (existing && !cancelled) {
+          for (const factor of existing.all) {
+            if (factor.factor_type === "totp" && factor.status === "unverified") {
+              await supabase.auth.mfa.unenroll({ factorId: factor.id })
+            }
+          }
+        }
+        if (cancelled) return
+
         const { data, error } = await supabase.auth.mfa.enroll({
           factorType: "totp",
         })
@@ -130,7 +144,12 @@ export function MfaEnrollmentDialog({
         void handleCancel()
       }
     }}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent
+        className="sm:max-w-md"
+        onInteractOutside={(e) => e.preventDefault()}
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onFocusOutside={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle>
             {step === "qr" ? "Set up authenticator" : "Verify code"}
@@ -149,23 +168,39 @@ export function MfaEnrollmentDialog({
         ) : step === "qr" ? (
           <div className="flex flex-col items-center gap-4">
             {qrCode && (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img
-                src={qrCode}
-                alt="TOTP QR Code"
-                className="rounded-lg border"
-                width={200}
-                height={200}
-              />
+              <div className="rounded-lg border bg-white p-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={qrCode}
+                  alt="TOTP QR Code"
+                  width={200}
+                  height={200}
+                />
+              </div>
             )}
             {secret && (
               <div className="w-full space-y-1">
                 <p className="text-muted-foreground text-xs">
                   Or enter this secret manually:
                 </p>
-                <code className="bg-muted block break-all rounded px-3 py-2 text-xs font-mono">
-                  {secret}
-                </code>
+                <button
+                  type="button"
+                  className="bg-muted hover:bg-muted/80 relative flex w-full items-center justify-between gap-2 rounded px-3 py-2 text-left transition-colors"
+                  onClick={() => {
+                    void navigator.clipboard.writeText(secret).then(() => {
+                      setCopied(true)
+                      toast.success("Secret copied to clipboard.")
+                      setTimeout(() => setCopied(false), 2000)
+                    })
+                  }}
+                >
+                  <code className="break-all text-xs font-mono">{secret}</code>
+                  {copied ? (
+                    <Check className="text-green-500 size-3.5 shrink-0" />
+                  ) : (
+                    <Copy className="text-muted-foreground size-3.5 shrink-0" />
+                  )}
+                </button>
               </div>
             )}
             <Button className="w-full" onClick={() => setStep("verify")}>
