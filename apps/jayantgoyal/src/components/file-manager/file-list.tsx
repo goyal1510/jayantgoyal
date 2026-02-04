@@ -403,8 +403,7 @@ export function FileList({ initialPath = "/" }: FileListProps) {
       window.URL.revokeObjectURL(downloadUrl)
 
       toast.success("Download started")
-    } catch (err) {
-      console.error("Download failed:", err)
+    } catch {
       toast.error("Failed to download file")
     }
   }
