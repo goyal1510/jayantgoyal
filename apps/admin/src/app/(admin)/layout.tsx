@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
+import { DynamicBreadcrumb } from "@/components/sidebar/dynamic-breadcrumb";
 import { Separator } from "@repo/ui/separator";
-import { Breadcrumb } from "@repo/ui/breadcrumb";
 import ThemeToggle from "@/components/theme/theme-toggle";
 import {
   SidebarInset,
@@ -51,7 +51,9 @@ export default async function AdminLayout({
           <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
             <SidebarTrigger className="-ml-1 shrink-0" />
             <Separator orientation="vertical" className="mr-2 h-4 shrink-0" />
-            <Breadcrumb />
+            <div className="min-w-0 flex-1 overflow-hidden">
+              <DynamicBreadcrumb />
+            </div>
           </div>
           <div className="shrink-0">
             <ThemeToggle />
