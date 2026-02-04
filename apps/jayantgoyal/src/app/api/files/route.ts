@@ -37,8 +37,6 @@ export async function GET(request: NextRequest) {
       directoryPath = directoryPath + "/";
     }
 
-    console.log("[API] Listing directory:", directoryPath, "for user:", user.id)
-
     const sortField = searchParams.get("sort") || "name";
     const sortOrder = searchParams.get("order") || "asc";
 
@@ -61,7 +59,6 @@ export async function GET(request: NextRequest) {
 
     // List directory contents
     let files = await listDirectory(supabase, user.id, directoryPath);
-    console.log("[API] Found", files?.length || 0, "files in directory:", directoryPath)
 
     // Only auto-create root directory if it doesn't exist
     // For nested directories, return an error if they don't exist
