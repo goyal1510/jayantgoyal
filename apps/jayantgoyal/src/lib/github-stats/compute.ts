@@ -1,4 +1,4 @@
-import type { GitHubRepo, GitHubStats, LanguageDistribution } from "./types"
+import type { GitHubRepo, GitHubStats, GitHubLOCStats, LanguageDistribution, LanguageLOCBreakdown } from "./types"
 
 // GitHub-style language colors
 const LANGUAGE_COLORS: Record<string, string> = {
@@ -37,8 +37,65 @@ const LANGUAGE_COLORS: Record<string, string> = {
   Makefile: "#427819",
 }
 
-function getLanguageColor(language: string): string {
+export function getLanguageColor(language: string): string {
   return LANGUAGE_COLORS[language] ?? "#8b8b8b"
+}
+
+const BYTES_PER_LINE = 40
+
+export function bytesToLines(bytes: number): number {
+  return Math.round(bytes / BYTES_PER_LINE)
+}
+
+export function computeLOCStats(
+  languagesByRepo: Record<string, number>[],
+  totalRepos: number,
+  createdAt: string
+): GitHubLOCStats {
+  const aggregated = new Map<string, number>()
+
+  for (const repoLangs of languagesByRepo) {
+    for (const [lang, bytes] of Object.entries(repoLangs)) {
+      aggregated.set(lang, (aggregated.get(lang) ?? 0) + bytes)
+    }
+  }
+
+  let totalBytes = 0
+  let topLanguage: string | null = null
+  let topBytes = 0
+
+  for (const [lang, bytes] of aggregated) {
+    totalBytes += bytes
+    if (bytes > topBytes) {
+      topBytes = bytes
+      topLanguage = lang
+    }
+  }
+
+  const totalLinesOfCode = bytesToLines(totalBytes)
+
+  const languageBreakdown: LanguageLOCBreakdown[] = Array.from(aggregated.entries())
+    .map(([name, bytes]) => ({
+      name,
+      lines: bytesToLines(bytes),
+      percentage: totalBytes > 0 ? (bytes / totalBytes) * 100 : 0,
+      color: getLanguageColor(name),
+    }))
+    .sort((a, b) => b.lines - a.lines)
+
+  const yearsOfCoding = Math.max(
+    1,
+    Math.floor((Date.now() - new Date(createdAt).getTime()) / (1000 * 60 * 60 * 24 * 365))
+  )
+
+  return {
+    totalLinesOfCode,
+    totalRepos,
+    totalLanguages: aggregated.size,
+    topLanguage,
+    yearsOfCoding,
+    languageBreakdown,
+  }
 }
 
 export function computeStats(repos: GitHubRepo[], createdAt: string): GitHubStats {

@@ -8,6 +8,7 @@ interface CacheEntry<T> {
 const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
 const userCache = new Map<string, CacheEntry<GitHubUser>>()
 const reposCache = new Map<string, CacheEntry<GitHubRepo[]>>()
+const languagesCache = new Map<string, CacheEntry<Record<string, number>>>()
 
 function getCached<T>(cache: Map<string, CacheEntry<T>>, key: string): T | null {
   const entry = cache.get(key)
@@ -23,12 +24,23 @@ function setCache<T>(cache: Map<string, CacheEntry<T>>, key: string, data: T) {
   cache.set(key, { data, timestamp: Date.now() })
 }
 
+function getGitHubHeaders(): HeadersInit {
+  const headers: HeadersInit = { Accept: "application/vnd.github.v3+json" }
+  const token = process.env.GITHUB_TOKEN
+  if (token) {
+    headers.Authorization = `Bearer ${token}`
+  }
+  return headers
+}
+
 export async function fetchGitHubUser(username: string): Promise<GitHubUser> {
   const key = username.toLowerCase()
   const cached = getCached(userCache, key)
   if (cached) return cached
 
-  const res = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}`)
+  const res = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}`, {
+    headers: getGitHubHeaders(),
+  })
   if (!res.ok) {
     if (res.status === 404) throw new Error(`User "${username}" not found`)
     if (res.status === 403) throw new Error("GitHub API rate limit exceeded. Try again later.")
@@ -51,7 +63,8 @@ export async function fetchGitHubRepos(username: string): Promise<GitHubRepo[]> 
 
   while (true) {
     const res = await fetch(
-      `https://api.github.com/users/${encodeURIComponent(username)}/repos?per_page=${perPage}&page=${page}&sort=updated`
+      `https://api.github.com/users/${encodeURIComponent(username)}/repos?per_page=${perPage}&page=${page}&sort=updated`,
+      { headers: getGitHubHeaders() }
     )
     if (!res.ok) {
       if (res.status === 403) throw new Error("GitHub API rate limit exceeded. Try again later.")
@@ -67,4 +80,23 @@ export async function fetchGitHubRepos(username: string): Promise<GitHubRepo[]> 
 
   setCache(reposCache, key, allRepos)
   return allRepos
+}
+
+export async function fetchRepoLanguages(owner: string, repo: string): Promise<Record<string, number>> {
+  const key = `${owner.toLowerCase()}/${repo.toLowerCase()}`
+  const cached = getCached(languagesCache, key)
+  if (cached) return cached
+
+  const res = await fetch(
+    `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/languages`,
+    { headers: getGitHubHeaders() }
+  )
+  if (!res.ok) {
+    if (res.status === 403) throw new Error("GitHub API rate limit exceeded. Try again later.")
+    return {}
+  }
+
+  const data: Record<string, number> = await res.json()
+  setCache(languagesCache, key, data)
+  return data
 }
