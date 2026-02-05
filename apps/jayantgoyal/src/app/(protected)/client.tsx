@@ -46,6 +46,7 @@ import type { SerializablePortfolioData } from "@/lib/portfolio/serializable";
 import { cn } from "@repo/ui/lib/utils";
 import { GithubCalendarComponent } from "@/components/portfolio/github-calendar";
 import { ContactForm } from "@/components/portfolio/contact-form";
+import { CodeStatsSection } from "@/components/portfolio/code-stats-section";
 
 type SectionId = SerializablePortfolioData["NAV_ITEMS"][number]["id"];
 type Project = SerializablePortfolioData["PROJECTS"][number];
@@ -76,12 +77,17 @@ export default function PortfolioClient() {
     return Array.from(set);
   }, [CERTIFICATES]);
 
+  const githubSocial = CONTACT.socials.find((social) => social.label === "GitHub");
+  const githubUrl = githubSocial?.href;
+  const githubUsername = githubUrl?.match(/github\.com\/([^/]+)/)?.[1] || "goyal1510";
+
   return (
     <div className="space-y-16">
       <HeroSection hero={HERO} />
       <AboutSection about={ABOUT} education={EDUCATION} />
       <SkillsSection skillSets={SKILL_SETS} techIcons={TECH_ICONS} />
-      <GithubActivitySection contact={CONTACT} />
+      <CodeStatsSection githubUsername={githubUsername} />
+      <GithubActivitySection githubUsername={githubUsername} githubUrl={githubUrl} />
       <ExperienceSection experience={EXPERIENCE} />
       <ProjectsSection
         projects={PROJECTS}
@@ -759,14 +765,12 @@ function CertificateModal({
 }
 
 function GithubActivitySection({
-  contact,
+  githubUsername,
+  githubUrl,
 }: {
-  contact: SerializablePortfolioData["CONTACT"];
+  githubUsername: string;
+  githubUrl: string | undefined;
 }) {
-  const githubSocial = contact.socials.find((social) => social.label === "GitHub");
-  const githubUrl = githubSocial?.href;
-  const githubUsername = githubUrl?.match(/github\.com\/([^/]+)/)?.[1] || "goyal1510";
-
   return (
     <section
       id="github-activity"
