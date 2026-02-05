@@ -30,6 +30,7 @@ export default async function proxy(request: NextRequest) {
     "/auth/callback", // Auth callback for email verification token exchange
     "/api/guest-login",
     "/api/contact",   // Contact form API
+    "/api/github-loc", // GitHub LOC stats (public)
     "/api/account/terms-status", // Terms status check (returns safe defaults for unauthenticated)
     "/api/account/accept-terms", // Terms acceptance
     "/favicon_io/site.webmanifest",
