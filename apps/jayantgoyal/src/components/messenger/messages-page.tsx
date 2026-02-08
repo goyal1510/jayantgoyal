@@ -9,7 +9,8 @@ import type { Database } from "@/lib/messenger/database.types";
 type Message = Database["messenger"]["Tables"]["messages"]["Row"];
 
 export function MessagesPage() {
-  const supabase = createSupabaseBrowserClient();
+  // Memoize the client so it's only created once, preventing subscription recreation
+  const supabase = React.useMemo(() => createSupabaseBrowserClient(), []);
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [userId, setUserId] = React.useState<string | null>(null);
@@ -65,32 +66,53 @@ export function MessagesPage() {
     if (!userId) return;
 
     const channel = supabase
-      .channel("messages-changes")
+      .channel(`messages-${userId}`)
       .on(
         "postgres_changes",
         {
-          event: "*",
+          event: "INSERT",
           schema: "messenger",
           table: "messages",
           filter: `user_id=eq.${userId}`,
         },
         (payload) => {
-          console.log("[realtime] messages change", payload);
-          if (payload.eventType === "INSERT") {
-            setMessages((prev) => [payload.new as Message, ...prev]);
-          } else if (payload.eventType === "UPDATE") {
-            const newMessage = payload.new as Message;
-            setMessages((prev) =>
-              prev.map((msg) =>
-                msg.id === newMessage.id ? { ...msg, ...newMessage } : msg
-              )
-            );
-          } else if (payload.eventType === "DELETE") {
-            const oldMessage = payload.old as { id: string };
-            setMessages((prev) =>
-              prev.filter((msg) => msg.id !== oldMessage.id)
-            );
-          }
+          const newMessage = payload.new as Message;
+          setMessages((prev) => {
+            if (prev.some((m) => m.id === newMessage.id)) {
+              return prev;
+            }
+            return [newMessage, ...prev];
+          });
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "messenger",
+          table: "messages",
+          filter: `user_id=eq.${userId}`,
+        },
+        (payload) => {
+          const updatedMessage = payload.new as Message;
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === updatedMessage.id ? { ...msg, ...updatedMessage } : msg
+            )
+          );
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "DELETE",
+          schema: "messenger",
+          table: "messages",
+          filter: `user_id=eq.${userId}`,
+        },
+        (payload) => {
+          const oldMessage = payload.old as { id: string };
+          setMessages((prev) => prev.filter((msg) => msg.id !== oldMessage.id));
         }
       )
       .subscribe();
@@ -120,7 +142,18 @@ export function MessagesPage() {
           throw new Error(error.error || "Failed to send message");
         }
 
-        // The real-time subscription will automatically add the new message
+        // Add the new message to state immediately
+        const { message } = await response.json();
+        if (message) {
+          setMessages((prev) => {
+            // Avoid duplicates if realtime already added it
+            if (prev.some((m) => m.id === message.id)) {
+              return prev;
+            }
+            return [message, ...prev];
+          });
+        }
+
         return true;
       } catch (error) {
         console.error("Error sending message:", error);
