@@ -139,7 +139,7 @@ export function NavApps({
                                           asChild
                                           isActive={isToolActive}
                                         >
-                                          <Link href={tool.path} onClick={closeMobileSidebar}>
+                                          <Link href={tool.path} prefetch={false} onClick={closeMobileSidebar}>
                                             <tool.icon className={cn("size-4", getToolColor(tool.id))} />
                                             <span>{tool.title}</span>
                                           </Link>
@@ -193,7 +193,7 @@ export function NavApps({
                   tooltip={app.name}
                   isActive={isActiveApp}
                 >
-                  <Link href={href} onClick={closeMobileSidebar}>
+                  <Link href={href} prefetch={false} onClick={closeMobileSidebar}>
                     <app.icon className={cn(app.color)} />
                     <span>{app.name}</span>
                   </Link>
@@ -264,7 +264,7 @@ export function NavApps({
                             asChild
                             isActive={isActiveNav}
                           >
-                            <Link href={href} onClick={closeMobileSidebar}>
+                            <Link href={href} prefetch={false} onClick={closeMobileSidebar}>
                               <navItem.icon className={cn("size-4", navItem.color)} />
                               <span>{navItem.label}</span>
                             </Link>
