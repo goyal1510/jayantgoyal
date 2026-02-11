@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import { ChevronsUpDown, LogOut, Settings, Trash2, Lock, User, UserPlus } from "lucide-react"
+import { ChevronsUpDown, LogOut, Settings, Trash2, Lock, User, UserPlus, Eye, EyeOff, Info } from "lucide-react"
 
 import {
   Avatar,
@@ -34,8 +34,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@repo/ui/sheet"
+import { Separator } from "@repo/ui/separator"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@repo/ui/tooltip"
 import { createSupabaseBrowserClient } from "@/lib/supabase/client"
 import { MfaSettingsSection } from "@/components/auth/mfa-settings-section"
+import { MfaVerifyDialog } from "@/components/auth/mfa-verify-dialog"
 import { toast } from "sonner"
 
 export function NavUser({
@@ -58,6 +61,11 @@ export function NavUser({
   const [isDeleting, setIsDeleting] = React.useState(false)
   const [newPassword, setNewPassword] = React.useState("")
   const [confirmPassword, setConfirmPassword] = React.useState("")
+  const [showNewPassword, setShowNewPassword] = React.useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false)
+  const [isMfaEnabled, setIsMfaEnabled] = React.useState(false)
+  const [mfaVerifyOpen, setMfaVerifyOpen] = React.useState(false)
+  const [pendingAction, setPendingAction] = React.useState<"save" | "delete" | null>(null)
   const canOpenSettings = !user.isGuest
 
   const nameForUi = displayName || user.name
@@ -91,24 +99,46 @@ export function NavUser({
     setDisplayName(normalizedName)
   }, [user.email, user.name])
 
-  const handleSave = React.useCallback(() => {
-    if (user.isGuest) {
-      toast.error("Guest accounts cannot update profile details.")
-      return
+  // Reset all fields when the sheet opens (to current user data) or closes
+  React.useEffect(() => {
+    if (isSettingsOpen) {
+      const normalizedName = (displayName || user.name)?.trim() ?? ""
+      const [first = "", ...rest] = normalizedName.split(" ").filter(Boolean)
+      setFirstName(first)
+      setLastName(rest.join(" "))
     }
+    setNewPassword("")
+    setConfirmPassword("")
+    setShowNewPassword(false)
+    setShowConfirmPassword(false)
+  }, [isSettingsOpen]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  const executeSave = React.useCallback(() => {
     const trimmedFirst = firstName.trim()
     const trimmedLast = lastName.trim()
     const hasPasswordChange = newPassword.length > 0
 
-    if (hasPasswordChange && newPassword.length < 8) {
-      toast.error("Password must be at least 8 characters.")
-      return
-    }
-
-    if (hasPasswordChange && newPassword !== confirmPassword) {
-      toast.error("Passwords do not match.")
-      return
+    if (hasPasswordChange) {
+      if (newPassword.length < 8) {
+        toast.error("Password must be at least 8 characters.")
+        return
+      }
+      if (!/[A-Z]/.test(newPassword)) {
+        toast.error("Password must contain at least one uppercase letter.")
+        return
+      }
+      if (!/[0-9]/.test(newPassword)) {
+        toast.error("Password must contain at least one number.")
+        return
+      }
+      if (!/[^A-Za-z0-9]/.test(newPassword)) {
+        toast.error("Password must contain at least one special character.")
+        return
+      }
+      if (newPassword !== confirmPassword) {
+        toast.error("Passwords do not match.")
+        return
+      }
     }
 
     setIsSaving(true)
@@ -158,16 +188,10 @@ export function NavUser({
     firstName,
     lastName,
     newPassword,
-    user.isGuest,
     user.name,
   ])
 
-  const handleDeleteAccount = React.useCallback(() => {
-    if (user.isGuest) {
-      toast.error("Guest accounts cannot be deleted.")
-      return
-    }
-
+  const executeDelete = React.useCallback(() => {
     setIsDeleting(true)
 
     void (async () => {
@@ -198,7 +222,43 @@ export function NavUser({
         setIsDeleting(false)
       }
     })()
-  }, [router, user.isGuest])
+  }, [router])
+
+  const handleSave = React.useCallback(() => {
+    if (user.isGuest) {
+      toast.error("Guest accounts cannot update profile details.")
+      return
+    }
+    const hasPasswordChange = newPassword.length > 0
+    if (isMfaEnabled && hasPasswordChange) {
+      setPendingAction("save")
+      setMfaVerifyOpen(true)
+      return
+    }
+    executeSave()
+  }, [user.isGuest, newPassword, isMfaEnabled, executeSave])
+
+  const handleDeleteAccount = React.useCallback(() => {
+    if (user.isGuest) {
+      toast.error("Guest accounts cannot be deleted.")
+      return
+    }
+    if (isMfaEnabled) {
+      setPendingAction("delete")
+      setMfaVerifyOpen(true)
+      return
+    }
+    executeDelete()
+  }, [user.isGuest, isMfaEnabled, executeDelete])
+
+  const handleMfaVerified = React.useCallback(() => {
+    if (pendingAction === "save") {
+      executeSave()
+    } else if (pendingAction === "delete") {
+      executeDelete()
+    }
+    setPendingAction(null)
+  }, [pendingAction, executeSave, executeDelete])
 
   return (
     <SidebarMenu>
@@ -279,7 +339,7 @@ export function NavUser({
 
           {canOpenSettings ? (
             <SheetContent
-              side={isMobile ? "bottom" : "right"}
+              side="right"
               className="sm:max-w-md"
             >
               <SheetHeader className="p-6 pb-2">
@@ -288,76 +348,133 @@ export function NavUser({
                   Update your profile details.
                 </SheetDescription>
               </SheetHeader>
+
+              {/* Profile Section */}
               <div className="space-y-4 px-6">
-                <div className="grid gap-2">
-                  <Label htmlFor="first-name">First name</Label>
-                  <Input
-                    id="first-name"
-                    name="firstName"
-                    value={firstName}
-                    onChange={(event) => setFirstName(event.target.value)}
-                    placeholder="Enter first name"
-                  />
+                <h3 className="text-sm font-medium">Profile</h3>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div className="grid gap-2">
+                    <Label htmlFor="first-name">First name</Label>
+                    <Input
+                      id="first-name"
+                      name="firstName"
+                      value={firstName}
+                      onChange={(event) => setFirstName(event.target.value)}
+                      placeholder="Enter first name"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="last-name">Last name</Label>
+                    <Input
+                      id="last-name"
+                      name="lastName"
+                      value={lastName}
+                      onChange={(event) => setLastName(event.target.value)}
+                      placeholder="Enter last name"
+                    />
+                  </div>
                 </div>
+              </div>
+
+              <Separator className="mx-6 w-auto" />
+
+              {/* Security Section */}
+              <div className="space-y-4 px-6">
+                <h3 className="text-sm font-medium">Security</h3>
                 <div className="grid gap-2">
-                  <Label htmlFor="last-name">Last name</Label>
-                  <Input
-                    id="last-name"
-                    name="lastName"
-                    value={lastName}
-                    onChange={(event) => setLastName(event.target.value)}
-                    placeholder="Enter last name"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="new-password">New password</Label>
-                  <Input
-                    id="new-password"
-                    name="newPassword"
-                    type="password"
-                    value={newPassword}
-                    onChange={(event) => setNewPassword(event.target.value)}
-                    placeholder="Enter new password"
-                    autoComplete="new-password"
-                  />
+                  <div className="flex items-center gap-1.5">
+                    <Label htmlFor="new-password">New password</Label>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="text-muted-foreground size-3.5 cursor-pointer" />
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="max-w-56 text-xs">
+                        <ul className="space-y-0.5">
+                          <li>At least 8 characters</li>
+                          <li>One uppercase letter</li>
+                          <li>One number</li>
+                          <li>One special character</li>
+                        </ul>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                  <div className="relative">
+                    <Input
+                      id="new-password"
+                      name="newPassword"
+                      type={showNewPassword ? "text" : "password"}
+                      value={newPassword}
+                      onChange={(event) => setNewPassword(event.target.value)}
+                      placeholder="Enter new password"
+                      autoComplete="new-password"
+                      className={`pr-16 ${newPassword.length > 0 ? (newPassword.length >= 8 && /[A-Z]/.test(newPassword) && /[0-9]/.test(newPassword) && /[^A-Za-z0-9]/.test(newPassword) ? "border-green-500 focus-visible:ring-green-500" : "border-destructive focus-visible:ring-destructive") : ""}`}
+                    />
+                    <button
+                      type="button"
+                      tabIndex={-1}
+                      className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer transition-colors"
+                      onClick={() => setShowNewPassword((v) => !v)}
+                    >
+                      {showNewPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                    </button>
+                  </div>
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="confirm-password">Confirm new password</Label>
-                  <Input
-                    id="confirm-password"
-                    name="confirmPassword"
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(event) => setConfirmPassword(event.target.value)}
-                    placeholder="Confirm new password"
-                    autoComplete="new-password"
-                />
+                  <div className="relative">
+                    <Input
+                      id="confirm-password"
+                      name="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={confirmPassword}
+                      onChange={(event) => setConfirmPassword(event.target.value)}
+                      placeholder="Confirm new password"
+                      autoComplete="new-password"
+                      className={`pr-16 ${confirmPassword.length > 0 ? (newPassword === confirmPassword ? "border-green-500 focus-visible:ring-green-500" : "border-destructive focus-visible:ring-destructive") : ""}`}
+                    />
+                    <button
+                      type="button"
+                      tabIndex={-1}
+                      className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer transition-colors"
+                      onClick={() => setShowConfirmPassword((v) => !v)}
+                    >
+                      {showConfirmPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                    </button>
+                  </div>
+                </div>
+                <MfaSettingsSection onStatusChange={setIsMfaEnabled} />
               </div>
-            </div>
-            <div className="px-6">
-              <MfaSettingsSection />
-            </div>
-            <SheetFooter className="p-6 pt-2 flex-row flex-wrap items-center gap-3">
-              <Button
-                type="button"
-                className="flex-1 min-w-[140px]"
-                onClick={handleSave}
-                disabled={isSaving || isDeleting}
-              >
-                {isSaving ? "Saving..." : "Save changes"}
-              </Button>
-              <Button
-                type="button"
-                variant="destructive"
-                className="flex-1 min-w-[140px] justify-between"
-                onClick={handleDeleteAccount}
-                disabled={isSaving || isDeleting}
-              >
-                <span>{isDeleting ? "Deleting..." : "Delete account"}</span>
-                <Trash2 className="size-4" />
-              </Button>
-            </SheetFooter>
-          </SheetContent>
+
+              <SheetFooter className="p-6 pt-2 flex-row flex-wrap items-center gap-3">
+                <Button
+                  type="button"
+                  className="flex-1 min-w-[140px]"
+                  onClick={handleSave}
+                  disabled={isSaving || isDeleting}
+                >
+                  {isSaving ? "Saving..." : "Save changes"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  className="flex-1 min-w-[140px] justify-between"
+                  onClick={handleDeleteAccount}
+                  disabled={isSaving || isDeleting}
+                >
+                  <span>{isDeleting ? "Deleting..." : "Delete account"}</span>
+                  <Trash2 className="size-4" />
+                </Button>
+              </SheetFooter>
+
+              <MfaVerifyDialog
+                open={mfaVerifyOpen}
+                onOpenChange={(open) => {
+                  setMfaVerifyOpen(open)
+                  if (!open) setPendingAction(null)
+                }}
+                onVerified={handleMfaVerified}
+              />
+            </SheetContent>
         ) : null}
         </Sheet>
       </SidebarMenuItem>
