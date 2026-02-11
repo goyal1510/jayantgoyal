@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { cookies } from "next/headers";
 
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { DynamicBreadcrumb } from "@/components/sidebar/dynamic-breadcrumb";
@@ -21,10 +22,14 @@ export default async function ProtectedLayout({
 }) {
   const { data, profile, host } = await getPortfolioDataFromHeaders();
 
+  const cookieStore = await cookies();
+  const defaultOpen = cookieStore.get("sidebar_state")?.value !== "false";
+  const defaultWidth = Number(cookieStore.get("sidebar_width")?.value) || undefined;
+
   return (
     <PortfolioDataProvider data={data} profile={profile} host={host}>
       <TermsAcceptanceCheck />
-      <SidebarProvider>
+      <SidebarProvider defaultOpen={defaultOpen} defaultWidth={defaultWidth}>
         <AppSidebar />
         <SidebarInset>
           <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center gap-2 border-b bg-background/95 px-4 transition-[width,height] ease-linear backdrop-blur supports-[backdrop-filter]:bg-background/80 group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 max-w-full">
