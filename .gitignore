@@ -29,6 +29,9 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
+# supabase
+supabase/.temp/
+
 # turbo
 .turbo
 
