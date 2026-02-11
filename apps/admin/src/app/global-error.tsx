@@ -33,7 +33,7 @@ export default function GlobalError({
             <div className="flex justify-center">
               <button
                 onClick={() => reset()}
-                className="inline-flex items-center rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800"
+                className="inline-flex cursor-pointer items-center rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800"
               >
                 <RotateCcw className="mr-2 size-4" />
                 Try Again

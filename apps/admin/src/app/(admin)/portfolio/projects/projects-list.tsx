@@ -396,7 +396,7 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
                         <button
                           type="button"
                           onClick={() => removeTag(tag)}
-                          className="ml-1 hover:text-destructive"
+                          className="ml-1 cursor-pointer hover:text-destructive"
                         >
                           <X className="h-3 w-3" />
                         </button>
