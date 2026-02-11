@@ -66,7 +66,7 @@ Auth flows: email/password, magic link, PKCE OAuth, guest login (`POST /api/gues
 Next.js 16 uses `src/proxy.ts` instead of the old `middleware.ts`. Both apps have a `src/proxy.ts` that runs on every request (except static assets) and handles auth guards, redirects, and header injection.
 
 - **Main app** (`apps/jayantgoyal/src/proxy.ts`) — Checks Supabase auth, enforces public/protected route split, redirects unauthenticated users to `/login`, blocks protected API routes if terms not accepted, and sets `x-auth-status` / `x-terms-accepted` headers.
-- **Admin app** (`apps/admin/src/proxy.ts`) — Checks Supabase auth, verifies the user has an `admin` or `super_admin` role via the `portfolio.profile` table, redirects unauthorized users to `/unauthorized`, and sets `x-auth-status` / `x-user-role` headers.
+- **Admin app** (`apps/admin/src/proxy.ts`) — Checks Supabase auth, verifies the user has an `admin` or `super_admin` role via the `jg_account.profiles` table, redirects unauthorized users to `/unauthorized`, and sets `x-auth-status` / `x-user-role` headers.
 
 When modifying route protection, public paths, or auth logic, edit `src/proxy.ts` (not `middleware.ts`).
 
@@ -88,6 +88,23 @@ Zustand stores with `persist` middleware for localStorage. Manual hydration (`sk
 ### API Routes
 
 Located at `src/app/api/`. Pattern: validate input, use Supabase server client, return JSON. Key routes: `/contact` (Resend email), `/guest-login`, `/calculator/*`, `/activity-tracker/*`, `/messenger/*`, `/files/*`, `/account/*`.
+
+### Database (Supabase Postgres)
+
+All user profile data (name, role, terms acceptance) lives in **`jg_account.profiles`**. Both apps query this table — never read profile data from `auth.users.user_metadata`.
+
+**DB schemas**: `jg_account`, `portfolio`, `activity_tracker`, `currency_calculator`, `fmanager`, `messenger`, `public`
+
+**File layout under `supabase/`**:
+- **`supabase/schema/<schema>/schema.sql`** — Fresh `supabase db dump --schema <name>` output. This is the **ground truth** for current DB state. Read these to understand tables, RLS policies, triggers, functions.
+- **`supabase/migrations/`** — Timestamped migration files (`YYYYMMDD_NNN_description.sql`). These record what changed and when. Never re-run migrations that have already been applied.
+
+**To refresh schema dumps** after DB changes:
+```bash
+supabase db dump --schema <schema_name> > supabase/schema/<schema_name>/schema.sql
+```
+
+**When making DB changes**: write a new migration file in `supabase/migrations/`, apply it in the SQL editor, then re-dump the affected schema(s).
 
 ## Environment Variables
 
