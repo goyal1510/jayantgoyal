@@ -1,16 +1,20 @@
 "use client"
 
 import * as React from "react"
-import { ShieldCheck, Loader2 } from "lucide-react"
+import { Loader2 } from "lucide-react"
 
-import { Button } from "@repo/ui/button"
 import { Label } from "@repo/ui/label"
+import { Switch } from "@repo/ui/switch"
 import { createSupabaseBrowserClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
 
 import { MfaEnrollmentDialog } from "./mfa-enrollment-dialog"
 
-export function MfaSettingsSection() {
+export function MfaSettingsSection({
+  onStatusChange,
+}: {
+  onStatusChange?: (enabled: boolean) => void
+}) {
   const [isEnabled, setIsEnabled] = React.useState(false)
   const [isLoading, setIsLoading] = React.useState(true)
   const [isDisabling, setIsDisabling] = React.useState(false)
@@ -25,13 +29,15 @@ export function MfaSettingsSection() {
       const verifiedTotp = data.totp.filter(
         (f) => f.status === "verified"
       )
-      setIsEnabled(verifiedTotp.length > 0)
+      const enabled = verifiedTotp.length > 0
+      setIsEnabled(enabled)
+      onStatusChange?.(enabled)
     } catch {
       // Silently fail — section just shows "off" state
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [onStatusChange])
 
   React.useEffect(() => {
     void fetchStatus()
@@ -49,6 +55,7 @@ export function MfaSettingsSection() {
       }
 
       setIsEnabled(false)
+      onStatusChange?.(false)
       toast.success("MFA disabled.")
     } catch (err) {
       const message =
@@ -57,7 +64,18 @@ export function MfaSettingsSection() {
     } finally {
       setIsDisabling(false)
     }
-  }, [])
+  }, [onStatusChange])
+
+  const handleToggle = React.useCallback(
+    (checked: boolean) => {
+      if (checked) {
+        setEnrollOpen(true)
+      } else {
+        void handleDisable()
+      }
+    },
+    [handleDisable]
+  )
 
   if (isLoading) {
     return (
@@ -72,36 +90,14 @@ export function MfaSettingsSection() {
 
   return (
     <>
-      <div className="space-y-2">
-        <Label className="flex items-center gap-2">
-          <ShieldCheck className="size-4" />
-          Two-factor authentication
-          {isEnabled && (
-            <span className="bg-green-500/10 text-green-600 dark:text-green-400 ml-auto rounded-full px-2.5 py-0.5 text-xs font-medium">
-              Active
-            </span>
-          )}
-        </Label>
-        {isEnabled ? (
-          <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleDisable}
-              disabled={isDisabling}
-            >
-              {isDisabling ? "Disabling..." : "Disable MFA"}
-            </Button>
-          </div>
-        ) : (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setEnrollOpen(true)}
-          >
-            Enable MFA
-          </Button>
-        )}
+      <div className="flex items-center justify-between gap-4">
+        <Label htmlFor="mfa-toggle">Multi-Factor Authentication</Label>
+        <Switch
+          id="mfa-toggle"
+          checked={isEnabled}
+          onCheckedChange={handleToggle}
+          disabled={isDisabling}
+        />
       </div>
 
       <MfaEnrollmentDialog
@@ -109,6 +105,7 @@ export function MfaSettingsSection() {
         onOpenChange={setEnrollOpen}
         onSuccess={() => {
           setIsEnabled(true)
+          onStatusChange?.(true)
         }}
       />
     </>

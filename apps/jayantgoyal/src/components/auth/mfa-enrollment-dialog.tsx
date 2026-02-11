@@ -26,7 +26,6 @@ export function MfaEnrollmentDialog({
   onOpenChange,
   onSuccess,
 }: MfaEnrollmentDialogProps) {
-  const [step, setStep] = React.useState<"qr" | "verify">("qr")
   const [qrCode, setQrCode] = React.useState("")
   const [secret, setSecret] = React.useState("")
   const [factorId, setFactorId] = React.useState("")
@@ -36,7 +35,6 @@ export function MfaEnrollmentDialog({
   const [copied, setCopied] = React.useState(false)
 
   const reset = React.useCallback(() => {
-    setStep("qr")
     setQrCode("")
     setSecret("")
     setFactorId("")
@@ -95,7 +93,8 @@ export function MfaEnrollmentDialog({
   }, [open, onOpenChange, reset])
 
   const handleCancel = React.useCallback(async () => {
-    // Clean up unverified factor
+    onOpenChange(false)
+    // Clean up unverified factor in background
     if (factorId) {
       try {
         const supabase = createSupabaseBrowserClient()
@@ -104,7 +103,6 @@ export function MfaEnrollmentDialog({
         // Best effort cleanup
       }
     }
-    onOpenChange(false)
   }, [factorId, onOpenChange])
 
   const handleVerify = React.useCallback(async () => {
@@ -151,13 +149,9 @@ export function MfaEnrollmentDialog({
         onFocusOutside={(e) => e.preventDefault()}
       >
         <DialogHeader>
-          <DialogTitle>
-            {step === "qr" ? "Set up authenticator" : "Verify code"}
-          </DialogTitle>
+          <DialogTitle>Set up authenticator</DialogTitle>
           <DialogDescription>
-            {step === "qr"
-              ? "Scan this QR code with your authenticator app."
-              : "Enter the 6-digit code from your authenticator app to confirm."}
+            Scan this QR code with your authenticator app, then enter the 6-digit code to confirm.
           </DialogDescription>
         </DialogHeader>
 
@@ -165,7 +159,7 @@ export function MfaEnrollmentDialog({
           <div className="flex items-center justify-center py-8">
             <Loader2 className="text-muted-foreground size-8 animate-spin" />
           </div>
-        ) : step === "qr" ? (
+        ) : (
           <div className="flex flex-col items-center gap-4">
             {qrCode && (
               <div className="rounded-lg border bg-white p-3">
@@ -185,7 +179,7 @@ export function MfaEnrollmentDialog({
                 </p>
                 <button
                   type="button"
-                  className="bg-muted hover:bg-muted/80 relative flex w-full items-center justify-between gap-2 rounded px-3 py-2 text-left transition-colors"
+                  className="bg-muted hover:bg-muted/80 relative flex w-full cursor-pointer items-center justify-between gap-2 rounded px-3 py-2 text-left transition-colors"
                   onClick={() => {
                     void navigator.clipboard.writeText(secret).then(() => {
                       setCopied(true)
@@ -203,12 +197,6 @@ export function MfaEnrollmentDialog({
                 </button>
               </div>
             )}
-            <Button className="w-full" onClick={() => setStep("verify")}>
-              Continue
-            </Button>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center gap-4">
             <InputOTP
               maxLength={6}
               value={code}
