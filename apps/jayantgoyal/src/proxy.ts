@@ -9,11 +9,18 @@ export const config = {
 };
 
 export default async function proxy(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+
+  // Skip proxy for static asset files (matcher regex may not catch all cases)
+  if (/\.(?:svg|png|jpg|jpeg|gif|webp|webmanifest|pdf|ico)$/i.test(pathname)) {
+    return NextResponse.next();
+  }
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   const response = NextResponse.next({ request: { headers: request.headers } });
-  const pathname = request.nextUrl.pathname;
+
 
   // Public paths that don't require authentication
   const publicPaths = [
