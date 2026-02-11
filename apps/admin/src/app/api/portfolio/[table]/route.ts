@@ -28,8 +28,8 @@ async function checkAdminAccess() {
   }
 
   const { data: profile } = await supabase
-    .schema("portfolio")
-    .from("profile")
+    .schema("jg_account")
+    .from("profiles")
     .select("role")
     .eq("user_id", user.id)
     .single();

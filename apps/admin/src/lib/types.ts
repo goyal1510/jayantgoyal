@@ -6,9 +6,15 @@ export type UserRole = "user" | "admin" | "super_admin";
 
 export interface Profile {
   id: number;
-  created_at: string;
   user_id: string;
+  first_name: string;
+  last_name: string;
+  avatar_url: string | null;
   role: UserRole;
+  terms_accepted: boolean;
+  terms_accepted_at: string | null;
+  created_at: string;
+  updated_at: string;
   email?: string; // Joined from auth.users
 }
 
