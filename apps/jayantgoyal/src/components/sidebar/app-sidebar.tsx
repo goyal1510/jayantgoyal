@@ -96,7 +96,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         setUser(null)
         setIsUserLoading(false)
       } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
-        void loadUser(true) // silent reload — don't unmount NavUser
+        // Small delay so auth cookies are fully propagated before querying
+        // jg_account.profiles (the DB query needs a valid RLS session).
+        cachedUser = undefined
+        setTimeout(() => void loadUser(true), 300)
         // Clean up any dangling unverified MFA factors from incomplete enrollments
         if (event === "SIGNED_IN") {
           void fetch("/api/account/mfa-cleanup", { method: "POST" })

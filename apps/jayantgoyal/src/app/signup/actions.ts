@@ -64,13 +64,21 @@ export async function signupWithEmail(
     });
     const { error } = await supabase.auth.updateUser({
       email: String(email),
-      data: {
-        terms_accepted: true,
-        terms_accepted_at: new Date().toISOString(),
-      },
     }, {
       emailRedirectTo: `${origin}/auth/callback`,
     });
+
+    if (!error) {
+      // Mark terms as accepted in jg_account.profiles
+      await supabase
+        .schema("jg_account")
+        .from("profiles")
+        .update({
+          terms_accepted: true,
+          terms_accepted_at: new Date().toISOString(),
+        })
+        .eq("user_id", currentUser!.id);
+    }
 
     if (error) {
       return { error: error.message };
@@ -97,17 +105,26 @@ export async function signupWithEmail(
     sameSite: "lax",
     maxAge: 3600,
   });
-  const { error } = await supabase.auth.signUp({
+  const { error, data: signUpData } = await supabase.auth.signUp({
     email: String(email),
     password: String(password),
     options: {
       emailRedirectTo: `${origin}/auth/callback`,
-      data: {
-        terms_accepted: true,
-        terms_accepted_at: new Date().toISOString(),
-      },
     },
   });
+
+  // If signup succeeded and we have a user, mark terms accepted in their profile.
+  // The profile is auto-created by the DB trigger on auth.users insert.
+  if (!error && signUpData?.user) {
+    await supabase
+      .schema("jg_account")
+      .from("profiles")
+      .update({
+        terms_accepted: true,
+        terms_accepted_at: new Date().toISOString(),
+      })
+      .eq("user_id", signUpData.user.id);
+  }
 
   if (error) {
     return { error: error.message };

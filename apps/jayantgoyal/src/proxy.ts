@@ -81,7 +81,18 @@ export default async function proxy(request: NextRequest) {
   const isAuthed = Boolean(user);
   // Use Supabase's built-in anonymous user detection
   const isAnonymous = user?.is_anonymous === true;
-  const termsAccepted = isAnonymous || user?.user_metadata?.terms_accepted === true;
+
+  // Read terms_accepted from jg_account.profiles (anonymous users skip terms)
+  let termsAccepted = isAnonymous;
+  if (isAuthed && !isAnonymous) {
+    const { data: profile } = await supabase
+      .schema("jg_account")
+      .from("profiles")
+      .select("terms_accepted")
+      .eq("user_id", user!.id)
+      .single();
+    termsAccepted = profile?.terms_accepted === true;
+  }
 
   response.headers.set("x-auth-status", isAuthed ? "authed" : "anon");
   response.headers.set("x-terms-accepted", termsAccepted ? "true" : "false");
