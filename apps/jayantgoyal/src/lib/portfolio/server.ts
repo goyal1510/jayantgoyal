@@ -1,3 +1,4 @@
+import { cache } from "react"
 import { headers } from "next/headers"
 
 import {
@@ -17,8 +18,9 @@ const USE_DATABASE = true
 /**
  * Get portfolio data from database with fallback to hardcoded data
  * Returns serializable data (no React components - icons are string keys)
+ * Wrapped in React cache() for request-level deduplication
  */
-async function getPortfolioDataWithFallback(): Promise<SerializablePortfolioData> {
+const getPortfolioDataWithFallback = cache(async (): Promise<SerializablePortfolioData> => {
   if (!USE_DATABASE) {
     return transformLegacyToSerializable(jayantPortfolioData)
   }
@@ -39,7 +41,7 @@ async function getPortfolioDataWithFallback(): Promise<SerializablePortfolioData
     console.error("Error fetching portfolio data from database:", error)
     return transformLegacyToSerializable(jayantPortfolioData)
   }
-}
+})
 
 /**
  * Get portfolio data using request headers

@@ -30,13 +30,16 @@ const fallbackUser = {
   isGuest: false,
 }
 
+// Module-level cache to avoid re-fetching on every navigation
+let cachedUser: typeof fallbackUser | null | undefined = undefined
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
   const allApps = React.useMemo(() => HUB_APPS, [])
 
-  // User state
-  const [user, setUser] = React.useState<typeof fallbackUser | null>(null)
-  const [isUserLoading, setIsUserLoading] = React.useState(true)
+  // User state — initialize from module cache to avoid flicker on navigation
+  const [user, setUser] = React.useState<typeof fallbackUser | null>(cachedUser ?? null)
+  const [isUserLoading, setIsUserLoading] = React.useState(cachedUser === undefined)
 
   // Load user profile. `silent` skips the loading skeleton so NavUser
   // stays mounted and its local state (settings sheet, MFA dialog) is preserved.
@@ -63,12 +66,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         return
       }
 
-      setUser({
+      const userData = {
         name: resolvedName,
         email: resolvedEmail,
         isGuest: Boolean(payload.user.isGuest),
-      })
+      }
+      cachedUser = userData
+      setUser(userData)
     } catch {
+      cachedUser = null
       setUser(null)
     } finally {
       setIsUserLoading(false)
@@ -77,12 +83,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   // Initial load and auth state listener
   React.useEffect(() => {
-    void loadUser()
+    // Skip initial fetch if we already have cached data
+    if (cachedUser === undefined) {
+      void loadUser()
+    }
 
     // Listen for auth state changes (login/logout)
     const supabase = createSupabaseBrowserClient()
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_OUT") {
+        cachedUser = undefined
         setUser(null)
         setIsUserLoading(false)
       } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {

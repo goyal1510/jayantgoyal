@@ -79,7 +79,7 @@ export function MfaVerifyStep({ redirectUrl }: { redirectUrl: string }) {
 
       <Button
         className="w-full"
-        onClick={handleVerify}
+        onClick={() => handleVerify()}
         disabled={isPending || code.length !== 6}
       >
         {isPending ? (

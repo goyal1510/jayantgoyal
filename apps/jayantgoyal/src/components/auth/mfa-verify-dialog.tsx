@@ -99,7 +99,7 @@ export function MfaVerifyDialog({
           </InputOTP>
           <Button
             className="w-full"
-            onClick={handleVerify}
+            onClick={() => handleVerify()}
             disabled={isPending || code.length !== 6}
           >
             {isPending ? (

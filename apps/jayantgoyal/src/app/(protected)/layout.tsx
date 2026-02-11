@@ -12,6 +12,7 @@ import {
 import { getPortfolioDataFromHeaders } from "@/lib/portfolio/server";
 import { PortfolioDataProvider } from "@/lib/portfolio/use-portfolio-data";
 import { TermsAcceptanceCheck } from "@/components/auth/terms-acceptance-check";
+import { LazyMotionProvider } from "@/components/providers/lazy-motion-provider";
 
 export default async function ProtectedLayout({
   children,
@@ -38,7 +39,9 @@ export default async function ProtectedLayout({
               <ThemeToogle />
             </div>
           </header>
-          <div className="flex flex-1 flex-col gap-4 p-4 min-w-0">{children}</div>
+          <LazyMotionProvider>
+            <div className="flex flex-1 flex-col gap-4 p-4 min-w-0">{children}</div>
+          </LazyMotionProvider>
         </SidebarInset>
       </SidebarProvider>
     </PortfolioDataProvider>

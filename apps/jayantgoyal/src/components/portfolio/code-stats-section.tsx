@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { Code2, BookOpen, Languages, Trophy, Calendar } from "lucide-react";
 import { Card, CardContent } from "@repo/ui/card";
 import { Separator } from "@repo/ui/separator";
@@ -58,7 +58,7 @@ export function CodeStatsSection({ githubUsername }: CodeStatsSectionProps) {
 
 function SectionHeader({ title, description }: { title: string; description?: string }) {
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -77,7 +77,7 @@ function SectionHeader({ title, description }: { title: string; description?: st
       {description ? (
         <p className="mt-3 text-lg text-muted-foreground">{description}</p>
       ) : null}
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -137,7 +137,7 @@ function StatsContent({ stats }: { stats: GitHubLOCStats }) {
     <div className="space-y-8">
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
         {cards.map((card, i) => (
-          <motion.div
+          <m.div
             key={card.label}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -161,7 +161,7 @@ function StatsContent({ stats }: { stats: GitHubLOCStats }) {
                 <p className="text-xs text-muted-foreground">{card.label}</p>
               </CardContent>
             </Card>
-          </motion.div>
+          </m.div>
         ))}
       </div>
       <LanguageBar breakdown={stats.languageBreakdown} />
@@ -174,7 +174,7 @@ function LanguageBar({ breakdown }: { breakdown: LanguageLOCBreakdown[] }) {
   const otherPercentage = breakdown.slice(6).reduce((sum, l) => sum + l.percentage, 0);
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.3 }}
@@ -183,7 +183,7 @@ function LanguageBar({ breakdown }: { breakdown: LanguageLOCBreakdown[] }) {
     >
       <div className="flex h-4 w-full overflow-hidden rounded-full">
         {top.map((lang) => (
-          <motion.div
+          <m.div
             key={lang.name}
             className="h-full"
             style={{ backgroundColor: lang.color }}
@@ -195,7 +195,7 @@ function LanguageBar({ breakdown }: { breakdown: LanguageLOCBreakdown[] }) {
           />
         ))}
         {otherPercentage > 0 ? (
-          <motion.div
+          <m.div
             className="h-full"
             style={{ backgroundColor: "#8b8b8b" }}
             initial={{ width: 0 }}
@@ -225,6 +225,6 @@ function LanguageBar({ breakdown }: { breakdown: LanguageLOCBreakdown[] }) {
           </div>
         ) : null}
       </div>
-    </motion.div>
+    </m.div>
   );
 }

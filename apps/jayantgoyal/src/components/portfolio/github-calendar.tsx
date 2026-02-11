@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { useTheme } from 'next-themes';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Github, ChevronDown, Check } from 'lucide-react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@repo/ui/card';
@@ -108,7 +108,7 @@ export function GithubCalendarComponent({ username, githubUrl }: GithubCalendarP
         </div>
       </CardHeader>
       <CardContent>
-        <motion.div
+        <m.div
           key={selectedYear}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -130,7 +130,7 @@ export function GithubCalendarComponent({ username, githubUrl }: GithubCalendarP
               weekStart={1}
             />
           </div>
-        </motion.div>
+        </m.div>
         <p className="mt-4 text-center text-sm text-muted-foreground">
           Active GitHub contributor with consistent daily commits across production-grade projects
         </p>

@@ -1,7 +1,7 @@
 "use client"
 
 import { Star, GitFork, BookOpen, Code2, TrendingUp, Calendar } from "lucide-react"
-import { motion } from "framer-motion"
+import { m } from "framer-motion"
 import { Card, CardContent } from "@repo/ui/card"
 import type { GitHubStats } from "@/lib/github-stats/types"
 
@@ -52,7 +52,7 @@ export function StatsCards({ stats }: StatsCardsProps) {
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
       {cards.map((card, i) => (
-        <motion.div
+        <m.div
           key={card.label}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -65,7 +65,7 @@ export function StatsCards({ stats }: StatsCardsProps) {
               <p className="text-xs text-muted-foreground">{card.label}</p>
             </CardContent>
           </Card>
-        </motion.div>
+        </m.div>
       ))}
     </div>
   )

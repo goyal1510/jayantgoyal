@@ -34,6 +34,7 @@ export default async function proxy(request: NextRequest) {
     "/api/account/terms-status", // Terms status check (returns safe defaults for unauthenticated)
     "/api/account/accept-terms", // Terms acceptance
     "/favicon_io/site.webmanifest",
+    "/assets/",           // Static assets (favicons, images, etc.)
   ];
 
   const isPublic = publicPaths.some((path) => {

@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import { MapPin, Building2, Link as LinkIcon, Users, BookOpen } from "lucide-react"
-import { motion } from "framer-motion"
+import { m } from "framer-motion"
 import { Card, CardContent } from "@repo/ui/card"
 import type { GitHubUser } from "@/lib/github-stats/types"
 
@@ -12,7 +12,7 @@ interface ProfileCardProps {
 
 export function ProfileCard({ user }: ProfileCardProps) {
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+    <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
       <Card>
         <CardContent className="flex flex-col items-center gap-6 p-6 sm:flex-row sm:items-start">
           <Image
@@ -76,6 +76,6 @@ export function ProfileCard({ user }: ProfileCardProps) {
           </div>
         </CardContent>
       </Card>
-    </motion.div>
+    </m.div>
   )
 }

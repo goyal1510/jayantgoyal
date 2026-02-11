@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { cn } from "@repo/ui/lib/utils";
 
 interface TypewriterProps {
@@ -83,7 +83,7 @@ export function Typewriter({
     <span className={cn("inline", className)}>
       {displayedText}
       {cursor && (
-        <motion.span
+        <m.span
           animate={{ opacity: [1, 0] }}
           transition={{
             duration: 0.8,

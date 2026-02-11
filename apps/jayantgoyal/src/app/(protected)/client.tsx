@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { useMemo, useState, useEffect } from "react";
 import { useTheme } from "next-themes";
 import {
@@ -120,14 +120,14 @@ function HeroSection({
       id={sectionId("home")}
       className={cn("px-4 sm:px-6 lg:px-8", sectionScrollMargin)}
     >
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: "easeOut" }}
         viewport={{ once: true, amount: 0.4 }}
         className="mx-auto flex max-w-5xl flex-col items-center gap-6 py-16 text-center"
       >
-        <motion.span
+        <m.span
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -136,8 +136,8 @@ function HeroSection({
         >
           <Sparkles className="size-4" />
           Welcome to my portfolio
-        </motion.span>
-        <motion.div
+        </m.span>
+        <m.div
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
@@ -151,8 +151,8 @@ function HeroSection({
           <p className="text-2xl text-muted-foreground uppercase tracking-wider">
             <Typewriter text={hero.role.toUpperCase()} speed={80} delay={500} cursor={true} />
           </p>
-        </motion.div>
-        <motion.div
+        </m.div>
+        <m.div
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
@@ -171,8 +171,8 @@ function HeroSection({
               <Download className="ml-2 size-4 transition-transform group-hover:translate-y-0.5" />
             </a>
           </Button>
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
     </section>
   );
 }
@@ -302,7 +302,7 @@ function SkillsSection({
         {skillSets.map((set, setIndex) => {
           const SetIcon = getIconComponent(set.icon_key) ?? Code2;
           return (
-            <motion.div
+            <m.div
               key={set.title}
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -318,7 +318,7 @@ function SkillsSection({
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {set.items.map((item, itemIndex) => (
-                    <motion.div
+                    <m.div
                       key={item.name}
                       initial={{ opacity: 0, x: -12 }}
                       whileInView={{ opacity: 1, x: 0 }}
@@ -333,11 +333,11 @@ function SkillsSection({
                         </span>
                       </div>
                       <Progress value={item.level} />
-                    </motion.div>
+                    </m.div>
                   ))}
                 </CardContent>
               </Card>
-            </motion.div>
+            </m.div>
           );
         })}
       </div>
@@ -362,7 +362,7 @@ function ExperienceSection({
       <Separator className="my-8" />
       <div className="space-y-6">
         {experience.map((exp, index) => (
-          <motion.div
+          <m.div
             key={`${exp.company}-${exp.role}`}
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -401,7 +401,7 @@ function ExperienceSection({
                 </ul>
               </CardContent>
             </Card>
-          </motion.div>
+          </m.div>
         ))}
       </div>
     </section>
@@ -465,7 +465,7 @@ function ProjectCard({
     : (project.imageLight || project.imageDark);
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: index * 0.05 }}
@@ -502,7 +502,7 @@ function ProjectCard({
           ) : null}
         </CardContent>
       </Card>
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -566,14 +566,14 @@ function ProjectModal({
     : (project.imageLight || project.imageDark);
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-2 sm:p-4"
       onClick={onClose}
     >
-      <motion.div
+      <m.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
@@ -657,8 +657,8 @@ function ProjectModal({
             </div>
           </div>
         </div>
-      </motion.div>
-    </motion.div>
+      </m.div>
+    </m.div>
   );
 }
 
@@ -706,7 +706,7 @@ function CertificatesSection({
       <Separator className="my-8" />
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {filteredCertificates.map((cert, index) => (
-          <motion.div
+          <m.div
             key={cert.name}
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -733,7 +733,7 @@ function CertificatesSection({
                 </Button>
               </CardContent>
             </Card>
-          </motion.div>
+          </m.div>
         ))}
       </div>
       {openCertificate ? (
@@ -877,7 +877,7 @@ function SectionHeader({
   description?: string;
 }) {
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -896,7 +896,7 @@ function SectionHeader({
       {description ? (
         <p className="mt-3 text-lg text-muted-foreground">{description}</p>
       ) : null}
-    </motion.div>
+    </m.div>
   );
 }
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { m } from "framer-motion"
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card"
 import type { GitHubRepo } from "@/lib/github-stats/types"
@@ -30,7 +30,7 @@ export function TopReposBarChart({ repos }: TopReposBarChartProps) {
   }))
 
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }} className="h-full">
+    <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }} className="h-full">
       <Card className="h-full">
         <CardHeader>
           <CardTitle>Top Repos by Stars</CardTitle>
@@ -61,6 +61,6 @@ export function TopReposBarChart({ repos }: TopReposBarChartProps) {
           </ResponsiveContainer>
         </CardContent>
       </Card>
-    </motion.div>
+    </m.div>
   )
 }

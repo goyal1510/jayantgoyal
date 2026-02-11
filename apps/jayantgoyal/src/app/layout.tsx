@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Toaster } from "@repo/ui/sonner";
-import { getPortfolioDataFromHeaders } from "@/lib/portfolio/server";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -11,10 +10,7 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-export async function generateMetadata(): Promise<Metadata> {
-  await getPortfolioDataFromHeaders();
-
-  return {
+export const metadata: Metadata = {
     title: `Jayant`,
     description:
       "A unified hub combining portfolio, games, tools, and utilities by Jayant.",
@@ -51,7 +47,6 @@ export async function generateMetadata(): Promise<Metadata> {
       ],
     },
   };
-}
 
 export default function RootLayout({
   children,

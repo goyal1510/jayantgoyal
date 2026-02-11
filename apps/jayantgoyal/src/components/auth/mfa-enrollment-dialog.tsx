@@ -202,7 +202,7 @@ export function MfaEnrollmentDialog({
             </InputOTP>
             <Button
               className="w-full"
-              onClick={handleVerify}
+              onClick={() => handleVerify()}
               disabled={isVerifying || code.length !== 6}
             >
               {isVerifying ? (

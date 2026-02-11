@@ -1,8 +1,9 @@
 "use client"
 
 import { useState, useCallback, useEffect, useMemo } from "react"
+import dynamic from "next/dynamic"
 import { Search, X } from "lucide-react"
-import { motion } from "framer-motion"
+import { m } from "framer-motion"
 import { Input } from "@repo/ui/input"
 import { Button } from "@repo/ui/button"
 import { Skeleton } from "@repo/ui/skeleton"
@@ -13,9 +14,35 @@ import type { GitHubUser, GitHubRepo } from "@/lib/github-stats/types"
 import { ProfileCard } from "./profile-card"
 import { StatsCards } from "./stats-cards"
 import { ContributionCalendar } from "./contribution-calendar"
-import { LanguagePieChart } from "./language-pie-chart"
-import { TopReposBarChart } from "./top-repos-bar-chart"
 import { RepositoryTable } from "./repository-table"
+
+const LanguagePieChart = dynamic(
+  () => import("./language-pie-chart").then((mod) => ({ default: mod.LanguagePieChart })),
+  {
+    ssr: false,
+    loading: () => (
+      <Card className="h-full">
+        <CardContent className="flex items-center justify-center py-24">
+          <Skeleton className="h-[300px] w-full rounded-lg" />
+        </CardContent>
+      </Card>
+    ),
+  }
+)
+
+const TopReposBarChart = dynamic(
+  () => import("./top-repos-bar-chart").then((mod) => ({ default: mod.TopReposBarChart })),
+  {
+    ssr: false,
+    loading: () => (
+      <Card className="h-full">
+        <CardContent className="flex items-center justify-center py-24">
+          <Skeleton className="h-[300px] w-full rounded-lg" />
+        </CardContent>
+      </Card>
+    ),
+  }
+)
 
 const DEFAULT_USERNAME = "goyal1510"
 
@@ -155,7 +182,7 @@ export default function GitHubStatsDashboard() {
 
       {/* Results */}
       {!loading && user && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
@@ -173,7 +200,7 @@ export default function GitHubStatsDashboard() {
           </div>
 
           <RepositoryTable repos={repos} />
-        </motion.div>
+        </m.div>
       )}
     </div>
   )

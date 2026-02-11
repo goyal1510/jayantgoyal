@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react"
 import { ArrowUpDown, Star, GitFork, ExternalLink } from "lucide-react"
-import { motion } from "framer-motion"
+import { m } from "framer-motion"
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card"
 import { Button } from "@repo/ui/button"
 import { Badge } from "@repo/ui/badge"
@@ -73,7 +73,7 @@ export function RepositoryTable({ repos }: RepositoryTableProps) {
   )
 
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.25 }}>
+    <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.25 }}>
       <Card>
         <CardHeader>
           <CardTitle>All Repositories ({repos.length})</CardTitle>
@@ -135,6 +135,6 @@ export function RepositoryTable({ repos }: RepositoryTableProps) {
           </Table>
         </CardContent>
       </Card>
-    </motion.div>
+    </m.div>
   )
 }

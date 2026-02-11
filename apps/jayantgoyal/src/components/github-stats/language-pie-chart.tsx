@@ -1,6 +1,6 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { m } from "framer-motion"
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card"
 import type { LanguageDistribution } from "@/lib/github-stats/types"
@@ -24,7 +24,7 @@ export function LanguagePieChart({ data }: LanguagePieChartProps) {
   }
 
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.15 }} className="h-full">
+    <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.15 }} className="h-full">
       <Card className="h-full">
         <CardHeader>
           <CardTitle>Language Distribution</CardTitle>
@@ -64,6 +64,6 @@ export function LanguagePieChart({ data }: LanguagePieChartProps) {
           </ResponsiveContainer>
         </CardContent>
       </Card>
-    </motion.div>
+    </m.div>
   )
 }

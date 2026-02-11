@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react"
 import dynamic from "next/dynamic"
 import { useTheme } from "next-themes"
-import { motion } from "framer-motion"
+import { m } from "framer-motion"
 import { Github, ChevronDown, Check } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card"
 import { Button } from "@repo/ui/button"
@@ -51,7 +51,7 @@ export function ContributionCalendar({ username }: ContributionCalendarProps) {
   }
 
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}>
+    <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}>
       <Card>
         <CardHeader>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -82,7 +82,7 @@ export function ContributionCalendar({ username }: ContributionCalendarProps) {
           </div>
         </CardHeader>
         <CardContent>
-          <motion.div
+          <m.div
             key={`${username}-${selectedYear}`}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -102,9 +102,9 @@ export function ContributionCalendar({ username }: ContributionCalendarProps) {
                 weekStart={1}
               />
             </div>
-          </motion.div>
+          </m.div>
         </CardContent>
       </Card>
-    </motion.div>
+    </m.div>
   )
 }
