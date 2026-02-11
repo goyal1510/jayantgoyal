@@ -9,6 +9,7 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
 
 import { MfaEnrollmentDialog } from "./mfa-enrollment-dialog"
+import { MfaVerifyDialog } from "./mfa-verify-dialog"
 
 export function MfaSettingsSection({
   onStatusChange,
@@ -19,6 +20,7 @@ export function MfaSettingsSection({
   const [isLoading, setIsLoading] = React.useState(true)
   const [isDisabling, setIsDisabling] = React.useState(false)
   const [enrollOpen, setEnrollOpen] = React.useState(false)
+  const [verifyOpen, setVerifyOpen] = React.useState(false)
 
   const fetchStatus = React.useCallback(async () => {
     try {
@@ -71,10 +73,10 @@ export function MfaSettingsSection({
       if (checked) {
         setEnrollOpen(true)
       } else {
-        void handleDisable()
+        setVerifyOpen(true)
       }
     },
-    [handleDisable]
+    []
   )
 
   if (isLoading) {
@@ -106,6 +108,14 @@ export function MfaSettingsSection({
         onSuccess={() => {
           setIsEnabled(true)
           onStatusChange?.(true)
+        }}
+      />
+
+      <MfaVerifyDialog
+        open={verifyOpen}
+        onOpenChange={setVerifyOpen}
+        onVerified={() => {
+          void handleDisable()
         }}
       />
     </>
