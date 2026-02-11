@@ -61,6 +61,15 @@ Two client factories:
 
 Auth flows: email/password, magic link, PKCE OAuth, guest login (`POST /api/guest-login`). Auth callback at `/auth/callback` handles both `code` (PKCE) and `token_hash` (magic link) exchanges.
 
+### Middleware (Proxy)
+
+Next.js 16 uses `src/proxy.ts` instead of the old `middleware.ts`. Both apps have a `src/proxy.ts` that runs on every request (except static assets) and handles auth guards, redirects, and header injection.
+
+- **Main app** (`apps/jayantgoyal/src/proxy.ts`) — Checks Supabase auth, enforces public/protected route split, redirects unauthenticated users to `/login`, blocks protected API routes if terms not accepted, and sets `x-auth-status` / `x-terms-accepted` headers.
+- **Admin app** (`apps/admin/src/proxy.ts`) — Checks Supabase auth, verifies the user has an `admin` or `super_admin` role via the `portfolio.profile` table, redirects unauthorized users to `/unauthorized`, and sets `x-auth-status` / `x-user-role` headers.
+
+When modifying route protection, public paths, or auth logic, edit `src/proxy.ts` (not `middleware.ts`).
+
 ### Page Pattern
 
 Server component page exports metadata, renders a client component:
