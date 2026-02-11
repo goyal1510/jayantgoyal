@@ -12,8 +12,9 @@ export function MfaVerifyStep({ redirectUrl }: { redirectUrl: string }) {
   const [code, setCode] = React.useState("")
   const [isPending, setIsPending] = React.useState(false)
 
-  const handleVerify = React.useCallback(async () => {
-    if (code.length !== 6) return
+  const handleVerify = React.useCallback(async (verifyCode?: string) => {
+    const codeToUse = verifyCode ?? code
+    if (codeToUse.length !== 6) return
 
     setIsPending(true)
     try {
@@ -23,8 +24,8 @@ export function MfaVerifyStep({ redirectUrl }: { redirectUrl: string }) {
         await supabase.auth.mfa.listFactors()
       if (factorsError) throw factorsError
 
-      const totp = factorsData.totp[0]
-      if (!totp) throw new Error("No TOTP factor found.")
+      const totp = factorsData.totp.find((f) => f.status === "verified")
+      if (!totp) throw new Error("No verified TOTP factor found.")
 
       const { data: challengeData, error: challengeError } =
         await supabase.auth.mfa.challenge({ factorId: totp.id })
@@ -33,7 +34,7 @@ export function MfaVerifyStep({ redirectUrl }: { redirectUrl: string }) {
       const { error: verifyError } = await supabase.auth.mfa.verify({
         factorId: totp.id,
         challengeId: challengeData.id,
-        code,
+        code: codeToUse,
       })
       if (verifyError) throw verifyError
 
@@ -63,7 +64,7 @@ export function MfaVerifyStep({ redirectUrl }: { redirectUrl: string }) {
         maxLength={6}
         value={code}
         onChange={setCode}
-        onComplete={handleVerify}
+        onComplete={(value) => handleVerify(value)}
         disabled={isPending}
       >
         <InputOTPGroup>

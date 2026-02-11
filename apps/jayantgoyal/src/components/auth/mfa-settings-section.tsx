@@ -24,6 +24,9 @@ export function MfaSettingsSection({
 
   const fetchStatus = React.useCallback(async () => {
     try {
+      // Always clean up any dangling unverified factors via admin API
+      await fetch("/api/account/mfa-cleanup", { method: "POST" })
+
       const supabase = createSupabaseBrowserClient()
       const { data, error } = await supabase.auth.mfa.listFactors()
       if (error) throw error

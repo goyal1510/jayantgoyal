@@ -56,15 +56,8 @@ export function MfaEnrollmentDialog({
         const supabase = createSupabaseBrowserClient()
 
         // Clean up any stale unverified factors before enrolling a new one.
-        // These accumulate when the dialog is dismissed without completing verification.
-        const { data: existing } = await supabase.auth.mfa.listFactors()
-        if (existing && !cancelled) {
-          for (const factor of existing.all) {
-            if (factor.factor_type === "totp" && factor.status === "unverified") {
-              await supabase.auth.mfa.unenroll({ factorId: factor.id })
-            }
-          }
-        }
+        // Uses admin API since client-side unenroll requires AAL2.
+        await fetch("/api/account/mfa-cleanup", { method: "POST" })
         if (cancelled) return
 
         const { data, error } = await supabase.auth.mfa.enroll({
@@ -94,19 +87,13 @@ export function MfaEnrollmentDialog({
 
   const handleCancel = React.useCallback(async () => {
     onOpenChange(false)
-    // Clean up unverified factor in background
-    if (factorId) {
-      try {
-        const supabase = createSupabaseBrowserClient()
-        await supabase.auth.mfa.unenroll({ factorId })
-      } catch {
-        // Best effort cleanup
-      }
-    }
-  }, [factorId, onOpenChange])
+    // Clean up unverified factor in background via admin API
+    await fetch("/api/account/mfa-cleanup", { method: "POST" }).catch(() => {})
+  }, [onOpenChange])
 
-  const handleVerify = React.useCallback(async () => {
-    if (code.length !== 6 || !factorId) return
+  const handleVerify = React.useCallback(async (verifyCode?: string) => {
+    const codeToUse = verifyCode ?? code
+    if (codeToUse.length !== 6 || !factorId) return
 
     setIsVerifying(true)
     try {
@@ -119,7 +106,7 @@ export function MfaEnrollmentDialog({
       const { error: verifyError } = await supabase.auth.mfa.verify({
         factorId,
         challengeId: challengeData.id,
-        code,
+        code: codeToUse,
       })
       if (verifyError) throw verifyError
 
@@ -201,7 +188,7 @@ export function MfaEnrollmentDialog({
               maxLength={6}
               value={code}
               onChange={setCode}
-              onComplete={handleVerify}
+              onComplete={(value) => handleVerify(value)}
               disabled={isVerifying}
             >
               <InputOTPGroup>

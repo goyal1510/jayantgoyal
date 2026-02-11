@@ -84,6 +84,7 @@ export default async function proxy(request: NextRequest) {
       "/api/account/terms-status",
       "/api/account/accept-terms",
       "/api/account/profile",
+      "/api/account/mfa-cleanup",
     ];
     const isAllowedApi = allowedApis.some((api) => pathname.startsWith(api));
     if (!isAllowedApi) {

@@ -33,8 +33,9 @@ export function MfaVerifyDialog({
     if (open) setCode("")
   }, [open])
 
-  const handleVerify = React.useCallback(async () => {
-    if (code.length !== 6) return
+  const handleVerify = React.useCallback(async (verifyCode?: string) => {
+    const codeToUse = verifyCode ?? code
+    if (codeToUse.length !== 6) return
 
     setIsPending(true)
     try {
@@ -54,7 +55,7 @@ export function MfaVerifyDialog({
       const { error: verifyError } = await supabase.auth.mfa.verify({
         factorId: totp.id,
         challengeId: challengeData.id,
-        code,
+        code: codeToUse,
       })
       if (verifyError) throw verifyError
 
@@ -84,7 +85,7 @@ export function MfaVerifyDialog({
             maxLength={6}
             value={code}
             onChange={setCode}
-            onComplete={handleVerify}
+            onComplete={(value) => handleVerify(value)}
             disabled={isPending}
           >
             <InputOTPGroup>

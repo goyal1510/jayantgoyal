@@ -87,6 +87,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         setIsUserLoading(false)
       } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
         void loadUser(true) // silent reload — don't unmount NavUser
+        // Clean up any dangling unverified MFA factors from incomplete enrollments
+        if (event === "SIGNED_IN") {
+          void fetch("/api/account/mfa-cleanup", { method: "POST" })
+        }
       }
     })
 
