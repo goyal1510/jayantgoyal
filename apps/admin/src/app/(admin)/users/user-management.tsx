@@ -104,8 +104,8 @@ export function UserManagement({ currentUserId }: UserManagementProps) {
       const supabase = createSupabaseBrowserClient();
 
       const { error } = await supabase
-        .schema("portfolio")
-        .from("profile")
+        .schema("jg_account")
+        .from("profiles")
         .update({ role: newRole })
         .eq("id", profileId);
 
@@ -139,8 +139,8 @@ export function UserManagement({ currentUserId }: UserManagementProps) {
       const supabase = createSupabaseBrowserClient();
 
       const { error } = await supabase
-        .schema("portfolio")
-        .from("profile")
+        .schema("jg_account")
+        .from("profiles")
         .update({ role: "user" })
         .eq("id", profileId);
 

@@ -4,9 +4,11 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 interface ProfileRow {
   id: number;
-  created_at: string;
   user_id: string;
+  first_name: string;
+  last_name: string;
   role: string;
+  created_at: string;
 }
 
 // GET - Fetch all profiles with user emails
@@ -24,8 +26,8 @@ export async function GET() {
     }
 
     const { data: profile } = await supabase
-      .schema("portfolio")
-      .from("profile")
+      .schema("jg_account")
+      .from("profiles")
       .select("role")
       .eq("user_id", user.id)
       .single();
@@ -51,8 +53,8 @@ export async function GET() {
 
     // Fetch all profiles
     const { data: profiles, error: profilesError } = await adminClient
-      .schema("portfolio")
-      .from("profile")
+      .schema("jg_account")
+      .from("profiles")
       .select("*")
       .order("created_at", { ascending: false });
 
@@ -119,8 +121,8 @@ export async function POST(request: Request) {
     }
 
     const { data: profile } = await supabase
-      .schema("portfolio")
-      .from("profile")
+      .schema("jg_account")
+      .from("profiles")
       .select("role")
       .eq("user_id", user.id)
       .single();
@@ -175,8 +177,8 @@ export async function POST(request: Request) {
 
     // Check if profile already exists
     const { data: existingProfile } = await adminClient
-      .schema("portfolio")
-      .from("profile")
+      .schema("jg_account")
+      .from("profiles")
       .select("id, role")
       .eq("user_id", targetUser.id)
       .single();
@@ -201,8 +203,8 @@ export async function POST(request: Request) {
 
     // Create new profile
     const { error: insertError } = await adminClient
-      .schema("portfolio")
-      .from("profile")
+      .schema("jg_account")
+      .from("profiles")
       .insert({ user_id: targetUser.id, role });
 
     if (insertError) {
