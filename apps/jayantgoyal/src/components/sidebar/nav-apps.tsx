@@ -123,7 +123,7 @@ export function NavApps({
                           >
                             <SidebarMenuSubItem>
                               <CollapsibleTrigger asChild>
-                                <SidebarMenuSubButton className="cursor-pointer" isActive={isCategoryActive}>
+                                <SidebarMenuSubButton isActive={isCategoryActive}>
                                   <category.icon className={cn("size-4", category.color)} />
                                   <span>{category.title}</span>
                                   <ChevronRight className="ml-auto size-3 transition-transform duration-200 group-data-[state=open]/category:rotate-90" />

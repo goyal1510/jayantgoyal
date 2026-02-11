@@ -181,7 +181,7 @@ export function DirectoryPicker({
           <button
             type="button"
             className={cn(
-              "h-5 w-5 p-0 shrink-0 rounded hover:bg-accent/50 flex items-center justify-center",
+              "h-5 w-5 p-0 shrink-0 cursor-pointer rounded hover:bg-accent/50 flex items-center justify-center",
               isSelected && "hover:bg-primary-foreground/20",
               disabled && "pointer-events-none opacity-50"
             )}

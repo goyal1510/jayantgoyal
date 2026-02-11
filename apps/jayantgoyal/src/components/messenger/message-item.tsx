@@ -147,7 +147,7 @@ export function MessageItem({ message }: MessageItemProps) {
                 <div className="flex items-center gap-2 shrink-0">
                   <button
                     onClick={handleCopy}
-                    className="p-1 rounded hover:bg-muted transition-colors"
+                    className="cursor-pointer p-1 rounded hover:bg-muted transition-colors"
                     title="Copy message"
                   >
                     {isCopied ? (

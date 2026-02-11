@@ -386,7 +386,7 @@ export function WeatherDashboard() {
                 <button
                   onClick={() => void handleSearch()}
                   disabled={loading}
-                  className="mt-2 flex h-10 w-full items-center justify-center rounded-md bg-blue-500 px-2 text-white transition hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="mt-2 flex h-10 w-full cursor-pointer items-center justify-center rounded-md bg-blue-500 px-2 text-white transition hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {loading ? (
                     "Loading..."
@@ -405,7 +405,7 @@ export function WeatherDashboard() {
                 <button
                   onClick={handleCurrentLocation}
                   disabled={loading}
-                  className="flex w-full items-center justify-center rounded-md bg-gray-600 px-4 py-2 text-white transition hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="flex w-full cursor-pointer items-center justify-center rounded-md bg-gray-600 px-4 py-2 text-white transition hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <MapPin className="mr-2 h-4 w-4" />
                   Current Location
@@ -415,7 +415,7 @@ export function WeatherDashboard() {
                   <div className="relative">
                     <button
                       onClick={() => setShowDropdown((open) => !open)}
-                      className="mt-1 flex w-full items-center justify-between rounded-md bg-gray-600 px-4 py-2 text-white transition hover:bg-gray-700"
+                      className="mt-1 flex w-full cursor-pointer items-center justify-between rounded-md bg-gray-600 px-4 py-2 text-white transition hover:bg-gray-700"
                     >
                       <span>Recent Searches</span>
                       {showDropdown ? (
@@ -431,7 +431,7 @@ export function WeatherDashboard() {
                             <li key={city}>
                               <button
                                 onClick={() => void handleRecentCityClick(city)}
-                                className="w-full px-4 py-2 text-left transition hover:bg-gray-600"
+                                className="w-full cursor-pointer px-4 py-2 text-left transition hover:bg-gray-600"
                               >
                                 {city}
                               </button>

@@ -54,7 +54,7 @@ const ComponentLibrary: React.FC = () => {
             <div key={section.group} className="rounded-lg border border-white/10 bg-muted/20">
               <button
                 onClick={() => toggleSection(section.group)}
-                className="flex w-full items-center justify-between rounded-lg p-3 text-left transition-colors duration-200 hover:bg-muted/50"
+                className="flex w-full cursor-pointer items-center justify-between rounded-lg p-3 text-left transition-colors duration-200 hover:bg-muted/50"
               >
                 <h4 className="text-sm font-medium text-foreground">
                   {section.group}

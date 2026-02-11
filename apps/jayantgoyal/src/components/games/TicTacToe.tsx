@@ -214,7 +214,7 @@ export function TicTacToe() {
                   onClick={() => handleBoxClick(index)}
                   disabled={!!value || !!winner || isDraw || isLoading}
                   className={cn(
-                    "aspect-square rounded-lg border bg-background text-3xl font-semibold transition hover:bg-muted",
+                    "aspect-square cursor-pointer rounded-lg border bg-background text-3xl font-semibold transition hover:bg-muted",
                     "disabled:cursor-not-allowed disabled:opacity-70 flex items-center justify-center"
                   )}
                 >

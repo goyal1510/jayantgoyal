@@ -369,7 +369,7 @@ export function MemoryMatch() {
                       gameOver
                     }
                     className={cn(
-                      "aspect-square w-16 h-16 sm:w-20 sm:h-20 rounded-lg border-2 transition-all",
+                      "aspect-square w-16 h-16 sm:w-20 sm:h-20 cursor-pointer rounded-lg border-2 transition-all",
                       "disabled:cursor-not-allowed",
                       card.matched
                         ? "bg-green-200 dark:bg-green-900/30 border-green-400"

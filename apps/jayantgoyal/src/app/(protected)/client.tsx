@@ -585,7 +585,7 @@ function ProjectModal({
           <h2 className="truncate text-lg font-semibold sm:text-xl">{project.name}</h2>
           <button
             type="button"
-            className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground transition hover:bg-muted/80"
+            className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full bg-muted text-muted-foreground transition hover:bg-muted/80"
             onClick={onClose}
             aria-label="Close project"
           >
