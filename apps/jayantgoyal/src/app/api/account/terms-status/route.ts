@@ -1,27 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
+import { NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return NextResponse.json(
-      { error: "Server configuration error." },
-      { status: 500 }
-    );
-  }
-
-  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-    cookies: {
-      getAll() {
-        return request.cookies.getAll();
-      },
-      setAll() {
-        // Not needed for reading
-      },
-    },
-  });
+export async function GET() {
+  const supabase = await createSupabaseServerClient();
 
   const {
     data: { user },
@@ -45,8 +27,15 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  // Check if terms are accepted
-  const termsAccepted = user.user_metadata?.terms_accepted === true;
+  // Check if terms are accepted from jg_account.profiles
+  const { data: profile } = await supabase
+    .schema("jg_account")
+    .from("profiles")
+    .select("terms_accepted")
+    .eq("user_id", user.id)
+    .single();
+
+  const termsAccepted = profile?.terms_accepted === true;
 
   return NextResponse.json({
     needsAcceptance: !termsAccepted,

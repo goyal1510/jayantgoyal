@@ -146,29 +146,38 @@ export function NavUser({
     void (async () => {
       try {
         const supabase = createSupabaseBrowserClient()
-        const payload: Parameters<typeof supabase.auth.updateUser>[0] = {
-          data: {
-            first_name: trimmedFirst,
-            last_name: trimmedLast,
-            full_name: `${trimmedFirst} ${trimmedLast}`.trim(),
-          },
-        }
 
-        if (hasPasswordChange) {
-          payload.password = newPassword
-        }
-
-        const { error, data } = await supabase.auth.updateUser(payload)
-
-        if (error) {
-          toast.error(error.message)
+        // Update name in jg_account.profiles
+        const { data: { user: currentUser } } = await supabase.auth.getUser()
+        if (!currentUser) {
+          toast.error("Not authenticated.")
           return
         }
 
+        const { error: profileError } = await supabase
+          .schema("jg_account")
+          .from("profiles")
+          .update({ first_name: trimmedFirst, last_name: trimmedLast })
+          .eq("user_id", currentUser.id)
+
+        if (profileError) {
+          toast.error(profileError.message)
+          return
+        }
+
+        // Update password via auth if changed
+        if (hasPasswordChange) {
+          const { error: authError } = await supabase.auth.updateUser({
+            password: newPassword,
+          })
+          if (authError) {
+            toast.error(authError.message)
+            return
+          }
+        }
+
         const updatedName =
-          `${trimmedFirst} ${trimmedLast}`.trim() ||
-          data?.user?.user_metadata?.full_name ||
-          user.name
+          `${trimmedFirst} ${trimmedLast}`.trim() || user.name
 
         setDisplayName(updatedName)
         setIsSettingsOpen(false)
