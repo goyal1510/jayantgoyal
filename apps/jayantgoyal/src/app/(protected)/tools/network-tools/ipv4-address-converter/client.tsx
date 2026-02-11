@@ -63,7 +63,7 @@ export default function IPv4AddressConverterClient() {
                 <Input value={converted.dottedDecimal} readOnly className="font-mono" />
                 <button
                   onClick={() => copyToClipboard(converted.dottedDecimal)}
-                  className="px-3 border rounded-md hover:bg-accent"
+                  className="cursor-pointer px-3 border rounded-md hover:bg-accent"
                 >
                   <Copy className="h-4 w-4" />
                 </button>
@@ -75,7 +75,7 @@ export default function IPv4AddressConverterClient() {
                 <Input value={converted.decimal.toString()} readOnly className="font-mono" />
                 <button
                   onClick={() => copyToClipboard(converted.decimal.toString())}
-                  className="px-3 border rounded-md hover:bg-accent"
+                  className="cursor-pointer px-3 border rounded-md hover:bg-accent"
                 >
                   <Copy className="h-4 w-4" />
                 </button>
@@ -87,7 +87,7 @@ export default function IPv4AddressConverterClient() {
                 <Input value={converted.binary} readOnly className="font-mono" />
                 <button
                   onClick={() => copyToClipboard(converted.binary)}
-                  className="px-3 border rounded-md hover:bg-accent"
+                  className="cursor-pointer px-3 border rounded-md hover:bg-accent"
                 >
                   <Copy className="h-4 w-4" />
                 </button>
@@ -99,7 +99,7 @@ export default function IPv4AddressConverterClient() {
                 <Input value={converted.hex} readOnly className="font-mono" />
                 <button
                   onClick={() => copyToClipboard(converted.hex)}
-                  className="px-3 border rounded-md hover:bg-accent"
+                  className="cursor-pointer px-3 border rounded-md hover:bg-accent"
                 >
                   <Copy className="h-4 w-4" />
                 </button>

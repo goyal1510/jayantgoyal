@@ -131,7 +131,7 @@ export default function PasswordStrengthClient() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="px-3 border rounded-md hover:bg-accent"
+                  className="cursor-pointer px-3 border rounded-md hover:bg-accent"
                 >
                   <Eye className="h-4 w-4" />
                 </button>

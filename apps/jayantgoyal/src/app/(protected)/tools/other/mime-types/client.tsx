@@ -55,13 +55,13 @@ export default function MIMETypesClient() {
             <div className="flex gap-2">
               <button
                 onClick={() => setMode("mime")}
-                className={`px-3 py-1 rounded text-sm ${mode === "mime" ? "bg-primary text-primary-foreground" : "bg-muted"}`}
+                className={`cursor-pointer px-3 py-1 rounded text-sm ${mode === "mime" ? "bg-primary text-primary-foreground" : "bg-muted"}`}
               >
                 MIME - Extensions
               </button>
               <button
                 onClick={() => setMode("ext")}
-                className={`px-3 py-1 rounded text-sm ${mode === "ext" ? "bg-primary text-primary-foreground" : "bg-muted"}`}
+                className={`cursor-pointer px-3 py-1 rounded text-sm ${mode === "ext" ? "bg-primary text-primary-foreground" : "bg-muted"}`}
               >
                 Extension - MIME
               </button>

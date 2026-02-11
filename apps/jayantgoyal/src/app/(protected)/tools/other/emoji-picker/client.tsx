@@ -49,7 +49,7 @@ export default function EmojiPickerClient() {
               <button
                 key={index}
                 onClick={() => copyToClipboard(emoji)}
-                className="text-2xl p-2 rounded hover:bg-accent transition-colors"
+                className="cursor-pointer text-2xl p-2 rounded hover:bg-accent transition-colors"
               >
                 {emoji}
               </button>

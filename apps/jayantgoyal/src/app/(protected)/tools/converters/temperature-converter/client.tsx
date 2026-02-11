@@ -163,7 +163,7 @@ export default function TemperatureConverterClient() {
                 <button
                   onClick={() => copyToClipboard(results[unit] || "")}
                   disabled={!results[unit]}
-                  className="px-3 border rounded-md hover:bg-accent disabled:opacity-50"
+                  className="cursor-pointer px-3 border rounded-md hover:bg-accent disabled:opacity-50"
                 >
                   <Copy className="h-4 w-4" />
                 </button>

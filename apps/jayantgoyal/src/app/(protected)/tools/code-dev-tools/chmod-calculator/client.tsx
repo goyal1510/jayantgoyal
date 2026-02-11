@@ -236,7 +236,7 @@ export default function ChmodCalculatorClient() {
                 <Input value={result.octal} readOnly className="font-mono text-2xl text-center font-bold" />
                 <button
                   onClick={() => copyToClipboard(result.octal)}
-                  className="px-3 border rounded-md hover:bg-accent"
+                  className="cursor-pointer px-3 border rounded-md hover:bg-accent"
                 >
                   <Copy className="h-4 w-4" />
                 </button>
@@ -249,7 +249,7 @@ export default function ChmodCalculatorClient() {
                 <Input value={result.binary} readOnly className="font-mono" />
                 <button
                   onClick={() => copyToClipboard(result.binary)}
-                  className="px-3 border rounded-md hover:bg-accent"
+                  className="cursor-pointer px-3 border rounded-md hover:bg-accent"
                 >
                   <Copy className="h-4 w-4" />
                 </button>
@@ -262,7 +262,7 @@ export default function ChmodCalculatorClient() {
                 <Input value={result.symbolic} readOnly className="font-mono" />
                 <button
                   onClick={() => copyToClipboard(result.symbolic)}
-                  className="px-3 border rounded-md hover:bg-accent"
+                  className="cursor-pointer px-3 border rounded-md hover:bg-accent"
                 >
                   <Copy className="h-4 w-4" />
                 </button>
@@ -275,7 +275,7 @@ export default function ChmodCalculatorClient() {
                 <Input value={`chmod ${result.octal} file`} readOnly className="font-mono" />
                 <button
                   onClick={() => copyToClipboard(`chmod ${result.octal} file`)}
-                  className="px-3 border rounded-md hover:bg-accent"
+                  className="cursor-pointer px-3 border rounded-md hover:bg-accent"
                 >
                   <Copy className="h-4 w-4" />
                 </button>
