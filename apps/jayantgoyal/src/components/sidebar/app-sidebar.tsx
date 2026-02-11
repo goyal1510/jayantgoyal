@@ -43,7 +43,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   // Load user profile. `silent` skips the loading skeleton so NavUser
   // stays mounted and its local state (settings sheet, MFA dialog) is preserved.
-  const loadUser = React.useCallback(async (silent = false) => {
+  const loadUser = React.useCallback(async (silent = false, retries = 2) => {
     try {
       if (!silent) setIsUserLoading(true)
       const response = await fetch("/api/account/profile", {
@@ -74,8 +74,28 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       cachedUser = userData
       setUser(userData)
     } catch {
-      cachedUser = null
-      setUser(null)
+      // Retry before giving up
+      if (retries > 0) {
+        await new Promise((r) => setTimeout(r, 500))
+        return loadUser(true, retries - 1)
+      }
+      // Final fallback: if there's an active session, show email-based user
+      // instead of "Login" button
+      const supabase = createSupabaseBrowserClient()
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session?.user) {
+        const email = session.user.email || ""
+        const userData = {
+          name: email.split("@")[0] || "User",
+          email,
+          isGuest: session.user.is_anonymous === true,
+        }
+        cachedUser = userData
+        setUser(userData)
+      } else {
+        cachedUser = null
+        setUser(null)
+      }
     } finally {
       setIsUserLoading(false)
     }
@@ -88,19 +108,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       void loadUser()
     }
 
-    // Listen for auth state changes (login/logout)
+    // Listen for auth state changes (login/logout/session restore)
     const supabase = createSupabaseBrowserClient()
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_OUT") {
         cachedUser = undefined
         setUser(null)
         setIsUserLoading(false)
+      } else if (event === "INITIAL_SESSION") {
+        // Fires on page load when restoring session from cookies.
+        // Only fetch if we don't have cached data (avoids double-fetch).
+        if (session && !cachedUser) {
+          void loadUser()
+        }
       } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
-        // Small delay so auth cookies are fully propagated before querying
-        // jg_account.profiles (the DB query needs a valid RLS session).
         cachedUser = undefined
-        setTimeout(() => void loadUser(true), 300)
-        // Clean up any dangling unverified MFA factors from incomplete enrollments
+        void loadUser()
         if (event === "SIGNED_IN") {
           void fetch("/api/account/mfa-cleanup", { method: "POST" })
         }
