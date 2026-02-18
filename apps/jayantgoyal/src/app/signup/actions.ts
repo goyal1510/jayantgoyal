@@ -28,6 +28,8 @@ export async function signupWithEmail(
   const email = formData.get("email");
   const password = formData.get("password");
   const termsAccepted = formData.get("termsAccepted");
+  const firstName = String(formData.get("firstName") ?? "").trim();
+  const lastName = String(formData.get("lastName") ?? "").trim();
 
   if (!email) {
     return { error: "Email is required." };
@@ -113,13 +115,15 @@ export async function signupWithEmail(
     },
   });
 
-  // If signup succeeded and we have a user, mark terms accepted in their profile.
+  // If signup succeeded and we have a user, save name and terms in their profile.
   // The profile is auto-created by the DB trigger on auth.users insert.
   if (!error && signUpData?.user) {
     await supabase
       .schema("jg_account")
       .from("profiles")
       .update({
+        first_name: firstName,
+        last_name: lastName,
         terms_accepted: true,
         terms_accepted_at: new Date().toISOString(),
       })
@@ -144,6 +148,12 @@ export async function setPassword(
   formData: FormData
 ): Promise<SetPasswordFormState> {
   const password = formData.get("password");
+  const firstName = String(formData.get("firstName") ?? "").trim();
+  const lastName = String(formData.get("lastName") ?? "").trim();
+
+  if (!firstName || !lastName) {
+    return { error: "First name and last name are required." };
+  }
 
   if (!password) {
     return { error: "Password is required." };
@@ -176,7 +186,19 @@ export async function setPassword(
     return { error: error.message };
   }
 
+  // Save name and ensure terms are accepted in the profile
+  await supabase
+    .schema("jg_account")
+    .from("profiles")
+    .update({
+      first_name: firstName,
+      last_name: lastName,
+      terms_accepted: true,
+      terms_accepted_at: new Date().toISOString(),
+    })
+    .eq("user_id", user.id);
+
   return {
-    success: "Password set successfully! Your account is now complete.",
+    success: "Account complete! Redirecting...",
   };
 }

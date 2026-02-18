@@ -37,20 +37,12 @@ BEGIN
   -- Fires for every auth.users insert, including anonymous (guest) logins.
   -- Anonymous profiles get safe defaults; ON DELETE CASCADE cleans them up
   -- when Supabase purges stale anonymous sessions.
-  INSERT INTO jg_account.profiles (user_id, first_name, last_name, terms_accepted, terms_accepted_at)
+  INSERT INTO jg_account.profiles (user_id, first_name, last_name, terms_accepted)
   VALUES (
     NEW.id,
-    COALESCE(NEW.raw_user_meta_data ->> 'first_name', ''),
-    COALESCE(NEW.raw_user_meta_data ->> 'last_name', ''),
-    COALESCE((NEW.raw_user_meta_data ->> 'terms_accepted')::boolean, FALSE),
-    CASE
-      WHEN (NEW.raw_user_meta_data ->> 'terms_accepted')::boolean = TRUE
-      THEN COALESCE(
-        (NEW.raw_user_meta_data ->> 'terms_accepted_at')::timestamptz,
-        now()
-      )
-      ELSE NULL
-    END
+    '',
+    '',
+    FALSE
   );
   RETURN NEW;
 EXCEPTION WHEN OTHERS THEN

@@ -272,10 +272,34 @@ export function SignupForm({
             <form action={passwordFormAction} className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <CheckCircle2 className="size-8 text-green-500 mb-2" />
-                <h1 className="text-2xl font-bold">Email Verified!</h1>
+                <h1 className="text-2xl font-bold">Complete Your Account</h1>
                 <p className="text-muted-foreground mt-1">
-                  Now set a password to complete your account.
+                  Add your name and set a password to finish.
                 </p>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="firstName">First Name</Label>
+                  <Input
+                    id="firstName"
+                    name="firstName"
+                    type="text"
+                    placeholder="First name"
+                    autoComplete="given-name"
+                    required
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <Input
+                    id="lastName"
+                    name="lastName"
+                    type="text"
+                    placeholder="Last name"
+                    autoComplete="family-name"
+                    required
+                  />
+                </div>
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="password">Password</Label>
@@ -330,6 +354,30 @@ export function SignupForm({
                   Convert your guest session to a permanent account
                 </p>
               )}
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="firstName">First Name</Label>
+                <Input
+                  id="firstName"
+                  name="firstName"
+                  type="text"
+                  placeholder="First name"
+                  autoComplete="given-name"
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="lastName">Last Name</Label>
+                <Input
+                  id="lastName"
+                  name="lastName"
+                  type="text"
+                  placeholder="Last name"
+                  autoComplete="family-name"
+                  required
+                />
+              </div>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
