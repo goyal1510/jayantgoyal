@@ -61,7 +61,7 @@ export function UserManagement({ currentUserId }: UserManagementProps) {
 
   // Add user form state
   const [selectedUserId, setSelectedUserId] = useState("");
-  const [newRole, setNewRole] = useState<"admin" | "super_admin">("admin");
+  const [newRole, setNewRole] = useState<UserRole>("admin");
   const [addingUser, setAddingUser] = useState(false);
 
   const fetchUsers = useCallback(async () => {
@@ -251,13 +251,14 @@ export function UserManagement({ currentUserId }: UserManagementProps) {
                 <Label htmlFor="role">Role</Label>
                 <Select
                   value={newRole}
-                  onValueChange={(v) => setNewRole(v as "admin" | "super_admin")}
+                  onValueChange={(v) => setNewRole(v as UserRole)}
                   disabled={addingUser}
                 >
                   <SelectTrigger id="role">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="user">User</SelectItem>
                     <SelectItem value="admin">Admin</SelectItem>
                     <SelectItem value="super_admin">Super Admin</SelectItem>
                   </SelectContent>
