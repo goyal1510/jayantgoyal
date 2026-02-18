@@ -46,8 +46,8 @@ function LoginForm() {
 
       // Check user role
       const { data: profile, error: profileError } = await supabase
-        .schema("portfolio")
-        .from("profile")
+        .schema("jg_account")
+        .from("profiles")
         .select("role")
         .eq("user_id", data.user.id)
         .single();

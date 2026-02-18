@@ -141,7 +141,7 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!["admin", "super_admin"].includes(role)) {
+    if (!["user", "admin", "super_admin"].includes(role)) {
       return NextResponse.json(
         { error: "Invalid role" },
         { status: 400 }
@@ -186,8 +186,8 @@ export async function POST(request: Request) {
     if (existingProfile) {
       // Update existing profile
       const { error: updateError } = await adminClient
-        .schema("portfolio")
-        .from("profile")
+        .schema("jg_account")
+        .from("profiles")
         .update({ role })
         .eq("id", (existingProfile as { id: number; role: string }).id);
 
