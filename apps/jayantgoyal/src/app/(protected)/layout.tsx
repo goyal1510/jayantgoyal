@@ -20,14 +20,14 @@ export default async function ProtectedLayout({
 }: {
   children: ReactNode;
 }) {
-  const { data, profile, host } = await getPortfolioDataFromHeaders();
+  const { data, profile, host, source } = await getPortfolioDataFromHeaders();
 
   const cookieStore = await cookies();
   const defaultOpen = cookieStore.get("sidebar_state")?.value !== "false";
   const defaultWidth = Number(cookieStore.get("sidebar_width")?.value) || undefined;
 
   return (
-    <PortfolioDataProvider data={data} profile={profile} host={host}>
+    <PortfolioDataProvider data={data} profile={profile} host={host} source={source}>
       <TermsAcceptanceCheck />
       <SidebarProvider defaultOpen={defaultOpen} defaultWidth={defaultWidth}>
         <AppSidebar />

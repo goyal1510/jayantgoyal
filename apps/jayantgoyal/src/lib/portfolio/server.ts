@@ -20,9 +20,9 @@ const USE_DATABASE = true
  * Returns serializable data (no React components - icons are string keys)
  * Wrapped in React cache() for request-level deduplication
  */
-const getPortfolioDataWithFallback = cache(async (): Promise<SerializablePortfolioData> => {
+const getPortfolioDataWithFallback = cache(async (): Promise<{ data: SerializablePortfolioData; source: "database" | "hardcoded" }> => {
   if (!USE_DATABASE) {
-    return transformLegacyToSerializable(jayantPortfolioData)
+    return { data: transformLegacyToSerializable(jayantPortfolioData), source: "hardcoded" }
   }
 
   try {
@@ -31,15 +31,15 @@ const getPortfolioDataWithFallback = cache(async (): Promise<SerializablePortfol
     // Check if we got valid data (hero name exists)
     if (dbData.HERO.name) {
       // Database data is already serializable (uses icon_key strings)
-      return dbData as SerializablePortfolioData
+      return { data: dbData as SerializablePortfolioData, source: "database" }
     }
 
     // Fall back to legacy data if database returned empty
     console.warn("Database returned empty data, falling back to hardcoded data")
-    return transformLegacyToSerializable(jayantPortfolioData)
+    return { data: transformLegacyToSerializable(jayantPortfolioData), source: "hardcoded" }
   } catch (error) {
     console.error("Error fetching portfolio data from database:", error)
-    return transformLegacyToSerializable(jayantPortfolioData)
+    return { data: transformLegacyToSerializable(jayantPortfolioData), source: "hardcoded" }
   }
 })
 
@@ -51,10 +51,11 @@ export async function getPortfolioDataFromHeaders() {
   const host = (await headers()).get("host")
   const normalizedHost = normalizeHost(host)
 
-  const data = await getPortfolioDataWithFallback()
+  const { data, source } = await getPortfolioDataWithFallback()
 
   return {
     data,
+    source,
     profile: resolvePortfolioProfile(host),
     host: normalizedHost || undefined,
   }
@@ -65,10 +66,11 @@ export async function getPortfolioDataFromHeaders() {
  * Fetches from database with fallback to hardcoded data
  */
 export async function getPortfolioDataStatic() {
-  const data = await getPortfolioDataWithFallback()
+  const { data, source } = await getPortfolioDataWithFallback()
 
   return {
     data,
+    source,
     profile: resolvePortfolioProfile(),
   }
 }

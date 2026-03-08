@@ -11,8 +11,10 @@ import {
   Award,
   Calendar,
   Code2,
+  Database,
   Download,
   ExternalLink,
+  FileCode2,
   Github,
   GraduationCap,
   Link2,
@@ -40,7 +42,7 @@ import {
   CardTitle,
 } from "@repo/ui/card";
 import { Separator } from "@repo/ui/separator";
-import { usePortfolioData } from "@/lib/portfolio/use-portfolio-data";
+import { usePortfolioData, type PortfolioDataSource } from "@/lib/portfolio/use-portfolio-data";
 import { getIconComponent } from "@/lib/portfolio/icons";
 import type { SerializablePortfolioData } from "@/lib/portfolio/serializable";
 import { cn } from "@repo/ui/lib/utils";
@@ -56,7 +58,7 @@ const sectionId = (id: SectionId) => id;
 const sectionScrollMargin = "scroll-mt-20";
 
 export default function PortfolioClient() {
-  const { data } = usePortfolioData();
+  const { data, source } = usePortfolioData();
   const {
     HERO,
     ABOUT,
@@ -83,7 +85,7 @@ export default function PortfolioClient() {
 
   return (
     <div className="space-y-16">
-      <HeroSection hero={HERO} />
+      <HeroSection hero={HERO} source={source} />
       <AboutSection about={ABOUT} education={EDUCATION} />
       <SkillsSection skillSets={SKILL_SETS} techIcons={TECH_ICONS} />
       <CodeStatsSection githubUsername={githubUsername} />
@@ -112,8 +114,10 @@ export default function PortfolioClient() {
 
 function HeroSection({
   hero,
+  source,
 }: {
   hero: SerializablePortfolioData["HERO"];
+  source: PortfolioDataSource;
 }) {
   return (
     <section
@@ -127,16 +131,22 @@ function HeroSection({
         viewport={{ once: true, amount: 0.4 }}
         className="mx-auto flex max-w-5xl flex-col items-center gap-6 py-16 text-center"
       >
-        <m.span
+        <m.div
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           viewport={{ once: true }}
-          className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary"
+          className="flex flex-wrap items-center justify-center gap-2"
         >
-          <Sparkles className="size-4" />
-          Welcome to my portfolio
-        </m.span>
+          <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
+            <Sparkles className="size-4" />
+            Welcome to my portfolio
+          </span>
+          <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
+            {source === "database" ? <Database className="size-4" /> : <FileCode2 className="size-4" />}
+            {source === "database" ? "Database" : "Hardcoded"}
+          </span>
+        </m.div>
         <m.div
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
