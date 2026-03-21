@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Card, CardContent } from "@repo/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Skeleton } from "@repo/ui/skeleton"
+import { PageSpinner } from "@/components/ui/page-spinner"
 import {
   Table,
   TableBody,
@@ -157,19 +157,7 @@ export function ActivityTracker({ currentMonth }: ActivityTrackerProps) {
   }
 
   if (isLoading) {
-    return (
-      <div className="space-y-4">
-        <Card>
-          <CardContent className="p-6">
-            <div className="space-y-2">
-              {[1, 2, 3, 4].map((i) => (
-                <Skeleton key={i} className="h-12 w-full" />
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    )
+    return <PageSpinner />
   }
 
   return (

@@ -6,7 +6,8 @@ import { toast } from "sonner"
 import { FileFolderIcon } from "@/components/file-manager/file-icons"
 import { FileThumbnail } from "@/components/file-manager/file-thumbnail"
 import { Button } from "@repo/ui/button"
-import { SpinnerWithText } from "@/components/ui/spinner"
+import { Spinner } from "@/components/ui/spinner"
+import { PageSpinner } from "@/components/ui/page-spinner"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -577,21 +578,7 @@ export function FileList({ initialPath = "/" }: FileListProps) {
 
       {/* File List Content */}
       {loading && files.length === 0 ? (
-        // Show spinner only when loading and no files to show
-        // Match the grid layout size to prevent size jumps
-        <div
-          className={cn(
-            viewMode === "grid"
-              ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"
-              : "space-y-1"
-          )}
-        >
-          <Card className="p-12 col-span-full">
-            <div className="flex items-center justify-center min-h-[300px]">
-              <SpinnerWithText text="Loading files..." size="lg" />
-            </div>
-          </Card>
-        </div>
+        <PageSpinner />
       ) : files.length === 0 ? (
         // Show empty state when not loading and no files
         <Card className="p-12">
@@ -608,7 +595,7 @@ export function FileList({ initialPath = "/" }: FileListProps) {
           {loading && files.length > 0 && (
             // Show subtle loading indicator overlay when loading but files are visible
             <div className="absolute inset-0 bg-background/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
-              <SpinnerWithText text="Loading..." size="md" />
+              <Spinner size="md" />
             </div>
           )}
           <>

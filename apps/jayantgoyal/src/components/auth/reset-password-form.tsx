@@ -12,6 +12,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@repo/ui/input-otp"
 import { Label } from "@repo/ui/label"
 import { cn } from "@repo/ui/lib/utils"
 import { toast } from "sonner"
+import { Spinner } from "@/components/ui/spinner"
 
 type SessionState = "loading" | "none" | "aal1_mfa_required" | "ready"
 
@@ -135,7 +136,7 @@ export function ResetPasswordForm({
         <Card className="overflow-hidden">
           <CardContent className="p-6 md:p-8">
             <div className="flex items-center justify-center py-8">
-              <div className="animate-pulse text-muted-foreground">Loading...</div>
+              <Spinner size="lg" />
             </div>
           </CardContent>
         </Card>

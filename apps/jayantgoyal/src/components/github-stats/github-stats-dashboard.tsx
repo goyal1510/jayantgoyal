@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useEffect, useMemo } from "react"
+import { useState, useCallback, useEffect, useMemo, useRef } from "react"
 import dynamic from "next/dynamic"
 import { Search, X } from "lucide-react"
 import { m } from "framer-motion"
@@ -8,6 +8,7 @@ import { Input } from "@repo/ui/input"
 import { Button } from "@repo/ui/button"
 import { Skeleton } from "@repo/ui/skeleton"
 import { Card, CardContent } from "@repo/ui/card"
+import { PageSpinner } from "@/components/ui/page-spinner"
 import { fetchGitHubUser, fetchGitHubRepos } from "@/lib/github-stats/api"
 import { computeStats, computeLanguageDistribution, getTopReposByStars } from "@/lib/github-stats/compute"
 import type { GitHubUser, GitHubRepo } from "@/lib/github-stats/types"
@@ -52,6 +53,7 @@ export default function GitHubStatsDashboard() {
   const [error, setError] = useState<string | null>(null)
   const [user, setUser] = useState<GitHubUser | null>(null)
   const [repos, setRepos] = useState<GitHubRepo[]>([])
+  const hasLoaded = useRef(false)
 
   const handleSearch = useCallback(
     async (username?: string) => {
@@ -78,6 +80,7 @@ export default function GitHubStatsDashboard() {
         setRepos([])
       } finally {
         setLoading(false)
+        hasLoaded.current = true
       }
     },
     [input]
@@ -153,7 +156,8 @@ export default function GitHubStatsDashboard() {
       )}
 
       {/* Loading */}
-      {loading && (
+      {loading && !hasLoaded.current && <PageSpinner />}
+      {loading && hasLoaded.current && (
         <div className="space-y-6">
           <Card>
             <CardContent className="flex gap-6 p-6">
