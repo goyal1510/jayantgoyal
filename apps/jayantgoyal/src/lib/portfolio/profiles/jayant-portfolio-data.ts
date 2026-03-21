@@ -23,7 +23,7 @@ const NAV_ITEMS = [
 ] as const
 
 const HERO = {
-  name: "Jayant",
+  name: "Jayant G",
   role: "Full Stack Developer",
   tagline:
     "Building clean, functional web experiences with modern technologies.",

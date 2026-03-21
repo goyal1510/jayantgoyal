@@ -11,18 +11,19 @@ import { jayantPortfolioData } from "@/lib/portfolio/profiles/jayant-portfolio-d
 
 /**
  * Whether to use the database for portfolio data
- * Set to true once the database is seeded and ready
+ * Controlled by PORTFOLIO_DATA_SOURCE env var ("database" | "system")
+ * Defaults to "system" when not set
  */
-const USE_DATABASE = true
+const USE_DATABASE = process.env.PORTFOLIO_DATA_SOURCE === "database"
 
 /**
  * Get portfolio data from database with fallback to hardcoded data
  * Returns serializable data (no React components - icons are string keys)
  * Wrapped in React cache() for request-level deduplication
  */
-const getPortfolioDataWithFallback = cache(async (): Promise<{ data: SerializablePortfolioData; source: "database" | "hardcoded" }> => {
+const getPortfolioDataWithFallback = cache(async (): Promise<{ data: SerializablePortfolioData; source: "database" | "system" }> => {
   if (!USE_DATABASE) {
-    return { data: transformLegacyToSerializable(jayantPortfolioData), source: "hardcoded" }
+    return { data: transformLegacyToSerializable(jayantPortfolioData), source: "system" }
   }
 
   try {
@@ -36,10 +37,10 @@ const getPortfolioDataWithFallback = cache(async (): Promise<{ data: Serializabl
 
     // Fall back to legacy data if database returned empty
     console.warn("Database returned empty data, falling back to hardcoded data")
-    return { data: transformLegacyToSerializable(jayantPortfolioData), source: "hardcoded" }
+    return { data: transformLegacyToSerializable(jayantPortfolioData), source: "system" }
   } catch (error) {
     console.error("Error fetching portfolio data from database:", error)
-    return { data: transformLegacyToSerializable(jayantPortfolioData), source: "hardcoded" }
+    return { data: transformLegacyToSerializable(jayantPortfolioData), source: "system" }
   }
 })
 

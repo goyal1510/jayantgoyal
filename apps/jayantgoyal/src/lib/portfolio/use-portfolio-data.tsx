@@ -9,7 +9,7 @@ import type { SerializablePortfolioData } from "@/lib/portfolio/serializable"
 import { transformLegacyToSerializable } from "@/lib/portfolio/serializable"
 import { jayantPortfolioData } from "@/lib/portfolio/profiles/jayant-portfolio-data"
 
-export type PortfolioDataSource = "database" | "hardcoded"
+export type PortfolioDataSource = "database" | "system"
 
 type PortfolioContextValue = {
   data: SerializablePortfolioData
@@ -69,7 +69,7 @@ export function usePortfolioData(initialHost?: string) {
   // Use context data if available (from server), otherwise fall back to transformed legacy
   const data = context?.data ?? transformLegacyToSerializable(jayantPortfolioData)
   const profile = context?.profile ?? resolvePortfolioProfile(resolvedHost)
-  const source: PortfolioDataSource = context?.source ?? "hardcoded"
+  const source: PortfolioDataSource = context?.source ?? "system"
 
   return {
     data,

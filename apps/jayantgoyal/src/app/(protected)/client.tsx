@@ -144,7 +144,7 @@ function HeroSection({
           </span>
           <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
             {source === "database" ? <Database className="size-4" /> : <FileCode2 className="size-4" />}
-            {source === "database" ? "Database" : "Hardcoded"}
+            {source === "database" ? "Database" : "System"}
           </span>
         </m.div>
         <m.div
