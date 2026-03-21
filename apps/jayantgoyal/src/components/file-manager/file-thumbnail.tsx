@@ -3,6 +3,7 @@
 import * as React from "react"
 import { FileFolderIcon } from "@/components/file-manager/file-icons"
 import { cn } from "@repo/ui/lib/utils"
+import { Spinner } from "@/components/ui/spinner"
 import type { DirectoryListingItem } from "@/lib/file-manager/types"
 
 interface FileThumbnailProps {
@@ -118,7 +119,7 @@ export function FileThumbnail({ file, size = 48, className }: FileThumbnailProps
       )}
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center bg-background/50">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <Spinner size="sm" />
         </div>
       )}
     </div>

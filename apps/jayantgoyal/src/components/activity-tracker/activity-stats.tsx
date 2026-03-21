@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Card, CardContent } from "@repo/ui/card"
-import { Skeleton } from "@repo/ui/skeleton"
+import { PageSpinner } from "@/components/ui/page-spinner"
 import {
   Table,
   TableBody,
@@ -70,14 +70,7 @@ export function ActivityStats({ currentMonth }: ActivityStatsProps) {
   }, [currentMonth])
 
   if (isLoading) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <Skeleton className="h-10 w-full mb-4" />
-          <Skeleton className="h-12 w-full" />
-        </CardContent>
-      </Card>
-    )
+    return <PageSpinner />
   }
 
   if (stats.length === 0) {

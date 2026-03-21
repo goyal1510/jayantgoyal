@@ -4,6 +4,7 @@ import * as React from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { MessageList } from "@/components/messenger/message-list";
 import { MessageInputDialog } from "@/components/messenger/message-input-dialog";
+import { PageSpinner } from "@/components/ui/page-spinner";
 import type { Database } from "@/lib/messenger/database.types";
 
 type Message = Database["messenger"]["Tables"]["messages"]["Row"];
@@ -167,9 +168,7 @@ export function MessagesPage() {
     <div className="relative flex flex-1 flex-col overflow-hidden">
       <div className="flex-1 overflow-y-auto p-4">
         {loading ? (
-          <div className="flex items-center justify-center py-8">
-            <p className="text-muted-foreground">Loading messages...</p>
-          </div>
+          <PageSpinner />
         ) : messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-4 py-12">
             <p className="text-muted-foreground">

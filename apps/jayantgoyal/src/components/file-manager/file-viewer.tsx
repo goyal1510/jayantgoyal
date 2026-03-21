@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@repo/ui/dialog"
 import { Button } from "@repo/ui/button"
-import { SpinnerWithText } from "@/components/ui/spinner"
+import { Spinner } from "@/components/ui/spinner"
 import { FileIcon, AlertCircle, ChevronLeft, ChevronRight, Download } from "lucide-react"
 import type { DirectoryListingItem } from "@/lib/file-manager/types"
 
@@ -322,7 +322,7 @@ export function FileViewer({ file, files, open, onOpenChange, onFileChange }: Fi
           <div className="h-full overflow-auto px-8 sm:px-12">
             {loading ? (
               <div className="flex items-center justify-center h-[60vh] sm:h-[80vh]">
-                <SpinnerWithText text="Loading file..." size="lg" />
+                <Spinner size="lg" />
               </div>
             ) : error ? (
               <div className="flex flex-col items-center justify-center gap-4 h-[60vh] sm:h-[80vh] bg-destructive/10 rounded-lg px-4">
@@ -334,7 +334,7 @@ export function FileViewer({ file, files, open, onOpenChange, onFileChange }: Fi
               <FilePreview file={fileDetails} url={fileDetails.url} />
             ) : (
               <div className="flex items-center justify-center h-[60vh] sm:h-[80vh]">
-                <SpinnerWithText text="Loading file..." size="lg" />
+                <Spinner size="lg" />
               </div>
             )}
           </div>

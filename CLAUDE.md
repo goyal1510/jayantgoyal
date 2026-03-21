@@ -81,6 +81,15 @@ page.tsx (server) → client.tsx ('use client')
 
 Multi-tenant by hostname — different hosts can show different portfolio profiles. Data fetched server-side via `getPortfolioDataFromHeaders()`, falls back to hardcoded data if DB is unavailable. Distributed to client via React Context (`PortfolioDataProvider` / `usePortfolioData()`). Icons stored as string keys in the database, resolved at runtime.
 
+### Loading System (Main App)
+
+Unified loading across all protected pages using a shared `<PageSpinner />` component (`src/components/ui/page-spinner.tsx`).
+
+- **`(protected)/loading.tsx`** — Next.js Suspense boundary, renders `<PageSpinner />` during server-side navigation transitions.
+- **`RouteChangeProvider`** (`src/components/providers/route-change-provider.tsx`) — Client component wrapping children in the protected layout. Detects internal link clicks, shows a spinner immediately during client-side navigation. Uses `useLayoutEffect` for pathname detection to prevent double-spinner flash.
+- **Page components** — Use `<PageSpinner />` for initial client-side data fetch loading states. Pages that have a heading should keep the heading visible above the spinner.
+- **Do NOT use** `next/image` `<Image>` for external URLs — Next.js 16 removed the `url` parameter from the image optimization proxy. Use plain `<img>` tags instead.
+
 ### State Management
 
 Zustand stores with `persist` middleware for localStorage. Manual hydration (`skipHydration: true`) to avoid SSR mismatch.

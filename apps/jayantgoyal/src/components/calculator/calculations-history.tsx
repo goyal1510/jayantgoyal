@@ -8,6 +8,7 @@ import type { CalculationWithDenominations } from "@/lib/calculator/database"
 import { Button } from "@repo/ui/button"
 import { Card, CardContent } from "@repo/ui/card"
 import { Input } from "@repo/ui/input"
+import { PageSpinner } from "@/components/ui/page-spinner"
 import {
   Sheet,
   SheetContent,
@@ -322,27 +323,7 @@ export function CalculationsHistory() {
   )
 
   if (loading && !hasLoaded) {
-    return (
-      <div className="w-full space-y-4 p-3 sm:p-4">
-        <Card className="border-primary/20">
-          <CardContent className="space-y-4 p-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-2">
-                <div className="h-3 w-28 animate-pulse rounded-full bg-muted" />
-                <div className="h-4 w-48 animate-pulse rounded-full bg-muted" />
-              </div>
-              <div className="h-10 w-24 animate-pulse rounded-lg bg-muted" />
-            </div>
-            <div className="grid gap-3 sm:grid-cols-3">
-              {[1, 2, 3].map((item) => (
-                <div key={item} className="h-20 animate-pulse rounded-xl bg-muted" />
-              ))}
-            </div>
-            <div className="h-64 animate-pulse rounded-xl bg-muted" />
-          </CardContent>
-        </Card>
-      </div>
-    )
+    return <PageSpinner />
   }
 
   return (

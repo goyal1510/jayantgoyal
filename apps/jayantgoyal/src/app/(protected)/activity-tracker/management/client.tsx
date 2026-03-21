@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Card, CardContent } from "@repo/ui/card"
 import { Button } from "@repo/ui/button"
-import { Skeleton } from "@repo/ui/skeleton"
+import { PageSpinner } from "@/components/ui/page-spinner"
 import {
   Table,
   TableBody,
@@ -173,12 +173,7 @@ export default function ManagementClient() {
     return (
       <div className="flex flex-col gap-4 sm:gap-6">
         <h1 className="text-lg font-bold tracking-tight sm:text-2xl md:text-3xl">Management</h1>
-        <Card>
-          <CardContent className="p-4 sm:p-6">
-            <Skeleton className="h-10 w-full mb-4" />
-            <Skeleton className="h-12 w-full" />
-          </CardContent>
-        </Card>
+        <PageSpinner />
       </div>
     )
   }
