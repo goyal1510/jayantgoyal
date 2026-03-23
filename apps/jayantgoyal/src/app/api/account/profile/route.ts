@@ -20,7 +20,7 @@ export async function GET() {
   const { data: profile, error: profileError } = await supabase
     .schema("jg_account")
     .from("profiles")
-    .select("first_name, last_name")
+    .select("first_name, last_name, role")
     .eq("user_id", user.id)
     .single();
 
@@ -31,6 +31,7 @@ export async function GET() {
   const firstName = profile?.first_name ?? "";
   const lastName = profile?.last_name ?? "";
   const combinedName = `${firstName} ${lastName}`.trim();
+  const role = profile?.role ?? "user";
 
   // Fallback chain for display name
   const metadata = (user.user_metadata ?? {}) as Record<string, unknown>;
@@ -65,6 +66,7 @@ export async function GET() {
       isGuest,
       hasVerifiedEmail,
       needsPassword,
+      role,
     },
   });
 }
