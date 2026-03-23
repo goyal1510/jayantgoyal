@@ -10,6 +10,8 @@ import {
   SidebarTrigger,
 } from "@repo/ui/sidebar";
 import type { UserRole } from "@/lib/types";
+import { LazyMotionProvider } from "@/components/providers/lazy-motion-provider";
+import { RouteChangeProvider } from "@/components/providers/route-change-provider";
 
 export default async function AdminLayout({
   children,
@@ -59,7 +61,11 @@ export default async function AdminLayout({
             <ThemeToggle />
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 min-w-0">{children}</div>
+        <LazyMotionProvider>
+          <div className="flex flex-1 flex-col gap-4 p-4 min-w-0">
+            <RouteChangeProvider>{children}</RouteChangeProvider>
+          </div>
+        </LazyMotionProvider>
       </SidebarInset>
     </SidebarProvider>
   );

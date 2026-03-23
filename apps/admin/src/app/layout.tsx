@@ -1,10 +1,14 @@
+import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { Toaster } from "@repo/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
-import "./globals.css";
+import { Toaster } from "@repo/ui/sonner";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
 
 export const metadata: Metadata = {
   title: "Admin Panel",
