@@ -1,7 +1,6 @@
 "use client"
 
-import { usePathname } from "next/navigation"
-import Link from "next/link"
+import { usePathname, useRouter } from "next/navigation"
 import { Home } from "lucide-react"
 
 import {
@@ -17,6 +16,7 @@ import { toolCategories, getToolByPath } from "@/lib/tools/tools"
 
 export function DynamicBreadcrumb() {
   const pathname = usePathname()
+  const router = useRouter()
 
   // Determine app and page based on pathname
   const { appName, appHref, pageName } = (() => {
@@ -126,9 +126,15 @@ export function DynamicBreadcrumb() {
       <BreadcrumbList className="flex-nowrap overflow-hidden">
         <BreadcrumbItem className="shrink-0">
           <BreadcrumbLink asChild>
-            <Link href="/#home" aria-label="Home">
+            <button
+              onClick={() => {
+                router.push("/#home")
+              }}
+              aria-label="Home"
+              className="flex items-center justify-center"
+            >
               <Home className="size-4" />
-            </Link>
+            </button>
           </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator className="shrink-0" />

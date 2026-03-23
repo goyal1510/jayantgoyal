@@ -236,16 +236,9 @@ export function NavApps({
                                 onClick={(e) => {
                                   e.preventDefault()
                                   closeMobileSidebar()
-                                  if (isOnPortfolio) {
-                                    // Already on portfolio, just scroll
-                                    const el = document.getElementById(navItem.id)
-                                    if (el) {
-                                      el.scrollIntoView({ behavior: "smooth" })
-                                    }
-                                  } else {
-                                    // Navigate to portfolio with hash
-                                    router.push(`/#${navItem.id}`)
-                                  }
+                                  // Always navigate to portfolio with hash
+                                  // The portfolio page will handle scrolling to the section
+                                  router.push(`/#${navItem.id}`)
                                 }}
                               >
                                 <navItem.icon className={cn("size-4", navItem.color)} />

@@ -58,6 +58,7 @@ const sectionId = (id: SectionId) => id;
 const sectionScrollMargin = "scroll-mt-20";
 
 export default function PortfolioClient() {
+  const router = useRouter();
   const { data, source } = usePortfolioData();
   const {
     HERO,
@@ -82,6 +83,21 @@ export default function PortfolioClient() {
   const githubSocial = CONTACT.socials.find((social) => social.label === "GitHub");
   const githubUrl = githubSocial?.href;
   const githubUsername = githubUrl?.match(/github\.com\/([^/]+)/)?.[1] || "goyal1510";
+
+  // Handle hash navigation on mount and route changes
+  useEffect(() => {
+    const hash = window.location.hash.slice(1);
+    if (hash) {
+      // Small delay to ensure the page is fully rendered
+      const timeout = setTimeout(() => {
+        const element = document.getElementById(hash);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 100);
+      return () => clearTimeout(timeout);
+    }
+  }, [data]);
 
   return (
     <div className="space-y-16">
@@ -169,11 +185,12 @@ function HeroSection({
           viewport={{ once: true }}
           className="flex flex-wrap items-center justify-center gap-4"
         >
-          <Button asChild size="lg" className="group h-11">
-            <Link href={`#${sectionId("contact")}`}>
-              Get in touch
-              <Mail className="ml-2 size-4 transition-transform group-hover:translate-y-0.5" />
-            </Link>
+          <Button size="lg" className="group h-11" onClick={() => {
+            const contactSection = document.getElementById(sectionId("contact"));
+            contactSection?.scrollIntoView({ behavior: "smooth" });
+          }}>
+            Get in touch
+            <Mail className="ml-2 size-4 transition-transform group-hover:translate-y-0.5" />
           </Button>
           <Button asChild size="lg" variant="outline" className="group h-11">
             <a href="/assets/Jayant_Resume.pdf" download="Jayant_Resume.pdf">
