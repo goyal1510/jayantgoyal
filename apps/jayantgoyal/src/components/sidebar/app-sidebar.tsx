@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { FileText, LayoutGrid, LogIn, Shield, User } from "lucide-react"
+import { FileText, LayoutGrid, LogIn, User } from "lucide-react"
 
 import { NavApps } from "@/components/sidebar/nav-apps"
 import { NavUser } from "@/components/sidebar/nav-user"
@@ -31,14 +31,14 @@ const fallbackUser = {
 }
 
 // Module-level cache to avoid re-fetching on every navigation
-let cachedUser: typeof fallbackUser & { role?: string } | null | undefined = undefined
+let cachedUser: typeof fallbackUser | null | undefined = undefined
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
   const allApps = React.useMemo(() => HUB_APPS, [])
 
   // User state — initialize from module cache to avoid flicker on navigation
-  const [user, setUser] = React.useState<typeof fallbackUser & { role?: string } | null>(cachedUser ?? null)
+  const [user, setUser] = React.useState<typeof fallbackUser | null>(cachedUser ?? null)
   const [isUserLoading, setIsUserLoading] = React.useState(cachedUser === undefined)
 
   // Load user profile. `silent` skips the loading skeleton so NavUser
@@ -55,7 +55,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       }
 
       const payload = (await response.json()) as
-        | { user?: { name?: string; email?: string; isGuest?: boolean; role?: string } }
+        | { user?: { name?: string; email?: string; isGuest?: boolean } }
         | undefined
 
       const resolvedName = payload?.user?.name?.trim() || fallbackUser.name
@@ -70,7 +70,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         name: resolvedName,
         email: resolvedEmail,
         isGuest: Boolean(payload.user.isGuest),
-        role: payload.user.role ?? "user",
       }
       cachedUser = userData
       setUser(userData)
@@ -342,19 +341,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <Separator />
       <SidebarFooter>
-        {/* Admin Panel Link (only for admin/super_admin) */}
-        {user?.role && ["admin", "super_admin"].includes(user.role) && (
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild className="group/admin">
-                <Link href="/portfolio">
-                  <Shield className="size-4 text-purple-500 transition-colors group-hover/admin:text-purple-600 dark:text-purple-400 dark:group-hover/admin:text-purple-300" />
-                  <span className="font-medium">Admin Panel</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        )}
         <SidebarMenu>
           <SidebarMenuItem>
             <TermsDialog>
