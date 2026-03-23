@@ -92,7 +92,7 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
       </SidebarContent>
       <SidebarSeparator />
       <SidebarFooter>
-        <NavUser user={{ email: user.email }} />
+        <NavUser user={{ email: user.email, name: user.name, isGuest: user.isGuest ?? false }} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

@@ -31,7 +31,7 @@ export default async function AdminLayout({
   const { data: profile } = await supabase
     .schema("jg_account")
     .from("profiles")
-    .select("role")
+    .select("role, first_name, last_name")
     .eq("user_id", user.id)
     .single();
 
@@ -39,10 +39,14 @@ export default async function AdminLayout({
     redirect("/unauthorized");
   }
 
+  const fullName = `${profile.first_name || ""} ${profile.last_name || ""}`.trim() || user.email?.split("@")[0] || "User";
+
   const authUser = {
     id: user.id,
     email: user.email ?? "",
+    name: fullName,
     role: profile.role as UserRole,
+    isGuest: false,
   };
 
   return (
