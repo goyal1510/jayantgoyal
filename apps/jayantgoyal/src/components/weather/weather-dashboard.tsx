@@ -361,7 +361,7 @@ export function WeatherDashboard() {
   )
 
   return (
-    <div className="flex-1 rounded-lg bg-gradient-to-b from-sky-50 to-blue-100 dark:from-slate-900/40 dark:to-slate-950/70">
+    <div className="flex-1 rounded-lg">
       <div className="container mx-auto px-4 py-6 text-gray-900 dark:text-white">
         {error ? (
           <div className="mx-auto mb-6 max-w-3xl rounded-md border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-400/60 dark:bg-red-500/20 dark:text-red-50">
@@ -370,7 +370,7 @@ export function WeatherDashboard() {
         ) : null}
 
         <div className="flex flex-col gap-4 md:flex-row">
-          <div className="flex w-full flex-col gap-4 rounded-md border border-gray-200 bg-white/80 p-6 backdrop-blur dark:border-white/10 dark:bg-gray-800/70 md:w-1/4">
+          <div className="flex w-full flex-col gap-4 rounded-md border border-gray-200 bg-white/60 p-6 backdrop-blur-md dark:border-white/10 dark:bg-gray-800/50 md:w-1/4">
             <div className="flex flex-col gap-2">
               <span className="text-lg font-semibold">Enter the city:</span>
               <input
@@ -443,7 +443,7 @@ export function WeatherDashboard() {
             </div>
           </div>
 
-          <div className="flex w-full flex-col rounded-md border border-gray-200 bg-white/80 p-4 backdrop-blur dark:border-white/10 dark:bg-gray-800/70 md:w-3/4">
+          <div className="flex w-full flex-col rounded-md border border-gray-200 bg-white/60 p-4 backdrop-blur-md dark:border-white/10 dark:bg-gray-800/50 md:w-3/4">
             {currentWeather ? (
               <div
                 className={`${getWeatherBgColor(

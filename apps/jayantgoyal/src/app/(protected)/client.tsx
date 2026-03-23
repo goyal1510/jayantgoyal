@@ -49,7 +49,6 @@ import { cn } from "@repo/ui/lib/utils";
 import { GithubCalendarComponent } from "@/components/portfolio/github-calendar";
 import { ContactForm } from "@/components/portfolio/contact-form";
 import { CodeStatsSection } from "@/components/portfolio/code-stats-section";
-
 type SectionId = SerializablePortfolioData["NAV_ITEMS"][number]["id"];
 type Project = SerializablePortfolioData["PROJECTS"][number];
 type Certificate = SerializablePortfolioData["CERTIFICATES"][number];
@@ -58,7 +57,6 @@ const sectionId = (id: SectionId) => id;
 const sectionScrollMargin = "scroll-mt-20";
 
 export default function PortfolioClient() {
-  const router = useRouter();
   const { data, source } = usePortfolioData();
   const {
     HERO,
@@ -100,31 +98,33 @@ export default function PortfolioClient() {
   }, [data]);
 
   return (
-    <div className="space-y-16">
-      <HeroSection hero={HERO} source={source} />
-      <AboutSection about={ABOUT} education={EDUCATION} />
-      <SkillsSection skillSets={SKILL_SETS} techIcons={TECH_ICONS} />
-      <CodeStatsSection githubUsername={githubUsername} />
-      <GithubActivitySection githubUsername={githubUsername} githubUrl={githubUrl} />
-      <ExperienceSection experience={EXPERIENCE} />
-      <ProjectsSection
-        projects={PROJECTS}
-        onSelectProject={setSelectedProject}
-      />
-      <CertificatesSection
-        categories={categories}
-        selectedCategory={selectedCategory}
-        certificates={CERTIFICATES}
-        onSelectCategory={setSelectedCategory}
-      />
-      <ContactSection contact={CONTACT} />
-      {selectedProject ? (
-        <ProjectModal
-          project={selectedProject}
-          onClose={() => setSelectedProject(null)}
+    <>
+      <div className="relative z-10 space-y-16">
+        <HeroSection hero={HERO} source={source} />
+        <AboutSection about={ABOUT} education={EDUCATION} />
+        <SkillsSection skillSets={SKILL_SETS} techIcons={TECH_ICONS} />
+        <CodeStatsSection githubUsername={githubUsername} />
+        <GithubActivitySection githubUsername={githubUsername} githubUrl={githubUrl} />
+        <ExperienceSection experience={EXPERIENCE} />
+        <ProjectsSection
+          projects={PROJECTS}
+          onSelectProject={setSelectedProject}
         />
-      ) : null}
-    </div>
+        <CertificatesSection
+          categories={categories}
+          selectedCategory={selectedCategory}
+          certificates={CERTIFICATES}
+          onSelectCategory={setSelectedCategory}
+        />
+        <ContactSection contact={CONTACT} />
+        {selectedProject ? (
+          <ProjectModal
+            project={selectedProject}
+            onClose={() => setSelectedProject(null)}
+          />
+        ) : null}
+      </div>
+    </>
   );
 }
 

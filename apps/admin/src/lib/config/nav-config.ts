@@ -10,6 +10,8 @@ import {
   Navigation,
   MonitorSmartphone,
   Palette,
+  Rocket,
+  KeyRound,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
@@ -34,4 +36,9 @@ export const portfolioNavItems: NavItem[] = [
 
 export const adminNavItems: NavItem[] = [
   { label: "User Management", href: "/users", icon: Users },
+]
+
+export const deploymentNavItems: NavItem[] = [
+  { label: "Deployments", href: "/deployments", icon: Rocket },
+  { label: "Env Variables", href: "/deployments/env", icon: KeyRound },
 ]

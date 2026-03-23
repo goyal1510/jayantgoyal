@@ -191,3 +191,70 @@ export interface NavItem {
   created_at: string;
   updated_at: string;
 }
+
+/**
+ * Vercel Types
+ */
+
+export type VercelDeploymentState =
+  | "BUILDING"
+  | "ERROR"
+  | "INITIALIZING"
+  | "QUEUED"
+  | "READY"
+  | "CANCELED";
+
+export type VercelTarget = "production" | "preview" | null;
+
+export interface VercelDeployment {
+  uid: string;
+  name: string;
+  url: string;
+  created: number;
+  state: VercelDeploymentState;
+  target: VercelTarget;
+  meta?: {
+    githubCommitSha?: string;
+    githubCommitMessage?: string;
+    githubCommitRef?: string;
+    githubCommitAuthorName?: string;
+  };
+  creator?: {
+    uid: string;
+    username: string;
+  };
+  inspectorUrl?: string;
+  ready?: number;
+  buildingAt?: number;
+}
+
+export interface VercelDeploymentDetail extends VercelDeployment {
+  readyState: VercelDeploymentState;
+  aliasAssigned?: number;
+  aliasError?: { code: string; message: string } | null;
+  regions: string[];
+  routes?: unknown[];
+  plan: string;
+  projectId: string;
+}
+
+export interface VercelBuildLogEntry {
+  type: "stdout" | "stderr" | "command" | "delimiter";
+  created: number;
+  payload: string;
+}
+
+export type VercelEnvTarget = "production" | "preview" | "development";
+
+export interface VercelEnvVar {
+  id: string;
+  key: string;
+  value: string;
+  type: "system" | "encrypted" | "plain" | "secret" | "sensitive";
+  target: VercelEnvTarget[];
+  configurationId?: string | null;
+  createdAt?: number;
+  updatedAt?: number;
+}
+
+export type VercelProjectKey = "jg" | "admin";

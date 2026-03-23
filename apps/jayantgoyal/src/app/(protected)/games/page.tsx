@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import type { ElementType } from "react"
+import type { ComponentType } from "react"
 import { ArrowRight, Grid3X3, HandHeart, Scissors, Layers, Brain } from "lucide-react"
 
 import { GAME_META } from "@/lib/games/config"
@@ -16,7 +16,7 @@ const CARD_THEMES: Record<
   keyof typeof GAME_META,
   {
     gradient: string
-    icon: ElementType
+    icon: ComponentType<{ className?: string }>
     accent: string
     accentText: string
     border: string

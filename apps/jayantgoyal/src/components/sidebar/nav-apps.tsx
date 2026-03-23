@@ -71,7 +71,6 @@ export function NavApps({
   const pathname = usePathname()
   const router = useRouter()
   const { isMobile, setOpenMobile } = useSidebar()
-  const isOnPortfolio = pathname === "/" || pathname.startsWith("/#")
 
   // Close mobile sidebar on navigation
   const closeMobileSidebar = () => {

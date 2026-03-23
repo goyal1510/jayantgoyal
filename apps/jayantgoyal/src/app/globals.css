@@ -159,6 +159,41 @@
   animation-play-state: paused;
 }
 
+/* 3D Background - make SidebarInset semi-transparent when active */
+body[data-three-bg="active"] [data-slot="sidebar-inset"] {
+  background: hsl(var(--background) / 0.82);
+}
+
+.dark body[data-three-bg="active"] [data-slot="sidebar-inset"] {
+  background: hsl(var(--background) / 0.6);
+}
+
+/* 3D Background - make Sidebar semi-transparent when active */
+body[data-three-bg="active"] [data-slot="sidebar-inner"] {
+  background: hsl(0 0% 98% / 0.25);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.dark body[data-three-bg="active"] [data-slot="sidebar-inner"] {
+  background: hsl(240 5.9% 10% / 0.2);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+/* Frosted-glass cards when 3D background is active */
+body[data-three-bg="active"] [data-slot="card"] {
+  background: hsl(var(--card) / 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.dark body[data-three-bg="active"] [data-slot="card"] {
+  background: hsl(var(--card) / 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
 /* FlipText Component Animations */
 .flip-char {
   color: inherit;

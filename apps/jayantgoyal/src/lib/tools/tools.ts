@@ -58,14 +58,14 @@ export interface Tool {
   id: string
   title: string
   description: string
-  icon: React.ElementType
+  icon: React.ComponentType<{ className?: string }>
   path: string
 }
 
 export interface ToolCategory {
   id: string
   title: string
-  icon: React.ElementType
+  icon: React.ComponentType<{ className?: string }>
   color: string
   tools: Tool[]
 }

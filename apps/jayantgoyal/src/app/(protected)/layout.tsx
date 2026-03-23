@@ -15,6 +15,8 @@ import { PortfolioDataProvider } from "@/lib/portfolio/use-portfolio-data";
 import { TermsAcceptanceCheck } from "@/components/auth/terms-acceptance-check";
 import { LazyMotionProvider } from "@/components/providers/lazy-motion-provider";
 import { RouteChangeProvider } from "@/components/providers/route-change-provider";
+import { ThreeBgWrapper } from "@/components/three/three-bg-wrapper";
+import { ThreeBgToggle } from "@/components/three/three-bg-toggle";
 
 export default async function ProtectedLayout({
   children,
@@ -31,6 +33,7 @@ export default async function ProtectedLayout({
     <PortfolioDataProvider data={data} profile={profile} host={host} source={source}>
       <TermsAcceptanceCheck />
       <SidebarProvider defaultOpen={defaultOpen} defaultWidth={defaultWidth}>
+        <ThreeBgWrapper />
         <AppSidebar />
         <SidebarInset>
           <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center gap-2 border-b bg-background/95 px-4 transition-[width,height] ease-linear backdrop-blur supports-[backdrop-filter]:bg-background/80 group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 max-w-full">
@@ -41,7 +44,8 @@ export default async function ProtectedLayout({
                 <DynamicBreadcrumb />
               </div>
             </div>
-            <div className="shrink-0">
+            <div className="flex shrink-0 items-center gap-2">
+              <ThreeBgToggle />
               <ThemeToogle />
             </div>
           </header>

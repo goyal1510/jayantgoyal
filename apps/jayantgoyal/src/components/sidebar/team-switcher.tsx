@@ -11,7 +11,7 @@ import {
 
 interface Brand {
   name: string
-  logo: React.ElementType
+  logo: React.ComponentType<{ className?: string }>
 }
 
 export function TeamSwitcher({ brand }: { brand: Brand }) {

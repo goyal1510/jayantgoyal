@@ -12,7 +12,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@repo/ui/breadcrumb"
-import { portfolioNavItems, adminNavItems } from "@/lib/config/nav-config"
+import { portfolioNavItems, adminNavItems, deploymentNavItems } from "@/lib/config/nav-config"
 
 export function DynamicBreadcrumb() {
   const pathname = usePathname()
@@ -24,6 +24,23 @@ export function DynamicBreadcrumb() {
       return {
         groupName: "Portfolio",
         groupHref: "/portfolio/hero",
+        pageName: navItem?.label ?? null,
+      }
+    }
+
+    // Deployment routes
+    if (pathname.startsWith("/deployments")) {
+      const navItem = deploymentNavItems.find((item) => item.href === pathname)
+      if (pathname.match(/^\/deployments\/[^/]+$/) && pathname !== "/deployments/env") {
+        return {
+          groupName: "Deployments",
+          groupHref: "/deployments",
+          pageName: "Deployment Detail",
+        }
+      }
+      return {
+        groupName: "Deployments",
+        groupHref: "/deployments",
         pageName: navItem?.label ?? null,
       }
     }
