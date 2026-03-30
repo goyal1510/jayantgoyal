@@ -300,19 +300,6 @@ Unified loading with `<PageSpinner />` component:
 
 **Schemas:** `jg_account`, `portfolio`, `activity_tracker`, `currency_calculator`, `fmanager`, `messenger`, `public`
 
-**Key tables:**
-- `jg_account.profiles` - User profiles (name, role, terms acceptance)
-- `portfolio.hero`, `portfolio.about`, `portfolio.skills`, etc. - Portfolio content
-
-**Schema management:**
-- Source of truth: `supabase/schema/<schema>/schema.sql`
-- Migrations: `supabase/migrations/YYYYMMDD_NNN_description.sql`
-
-**Refresh schema dump:**
-```bash
-supabase db dump --schema <schema_name> > supabase/schema/<schema_name>/schema.sql
-```
-
 ## Development Conventions
 
 ### Code Style
@@ -380,13 +367,6 @@ No test framework configured. Quality assurance via:
 2. Export in `packages/ui/src/index.ts` (or use wildcard)
 3. Import in apps as `@repo/ui/component`
 4. Run `pnpm build` to verify
-
-### Database Changes
-
-1. Write migration in `supabase/migrations/`
-2. Apply in Supabase SQL editor
-3. Re-dump schema: `supabase db dump --schema <name>`
-4. Update TypeScript types if needed
 
 ### Deploy
 
