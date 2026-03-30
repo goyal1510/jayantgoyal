@@ -171,28 +171,23 @@ body[data-three-bg="active"] [data-slot="sidebar-inset"] {
 /* 3D Background - make Sidebar semi-transparent when active */
 body[data-three-bg="active"] [data-slot="sidebar-inner"] {
   background: hsl(0 0% 98% / 0.25) !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
 }
 
 .dark body[data-three-bg="active"] [data-slot="sidebar-inner"] {
   background: hsl(240 5.9% 10% / 0.2) !important;
-  backdrop-filter: blur(6px) !important;
-  -webkit-backdrop-filter: blur(6px) !important;
 }
 
 /* Frosted-glass cards when 3D background is active */
 body[data-three-bg="active"] [data-slot="card"] {
   background: hsl(var(--card) / 0.88) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
 }
 
 .dark body[data-three-bg="active"] [data-slot="card"] {
   background: hsl(var(--card) / 0.75) !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
 }
+
+/* Note: backdrop-filter is injected at runtime via ThreeBgWrapper
+   to prevent the production CSS bundler from stripping it */
 
 /* FlipText Component Animations */
 .flip-char {
