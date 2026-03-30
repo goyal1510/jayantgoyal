@@ -41,6 +41,8 @@ export function LoginForm({
 }: React.ComponentProps<"div">) {
   const searchParams = useSearchParams()
   const redirectUrl = searchParams.get("redirect") ?? "/"
+  const errorParam = searchParams.get("error")
+  const messageParam = searchParams.get("message")
 
   const [state, formAction] = React.useActionState(
     loginWithPassword,
@@ -95,6 +97,23 @@ export function LoginForm({
       toast.error(state.error)
     }
   }, [state?.error])
+
+  // Show toasts for query param feedback (e.g. from password reset flow)
+  React.useEffect(() => {
+    if (errorParam) {
+      toast.error(decodeURIComponent(errorParam))
+    }
+    if (messageParam === "password_changed") {
+      toast.success("Password updated successfully! Please log in with your new password.")
+    }
+    // Clear query params after displaying to avoid re-showing on refresh
+    if (errorParam || messageParam) {
+      const url = new URL(window.location.href)
+      url.searchParams.delete("error")
+      url.searchParams.delete("message")
+      window.history.replaceState({}, "", url.pathname + url.search)
+    }
+  }, [errorParam, messageParam])
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { Eye, EyeOff, Home, AlertCircle, ShieldCheck, Loader2 } from "lucide-react"
+import { Eye, EyeOff, LogIn, AlertCircle, ShieldCheck, Loader2, Timer } from "lucide-react"
 
 import { createSupabaseBrowserClient } from "@/lib/supabase/client"
 import { Button } from "@repo/ui/button"
@@ -10,11 +10,16 @@ import { Card, CardContent } from "@repo/ui/card"
 import { Input } from "@repo/ui/input"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@repo/ui/input-otp"
 import { Label } from "@repo/ui/label"
+import { Switch } from "@repo/ui/switch"
 import { cn } from "@repo/ui/lib/utils"
 import { toast } from "sonner"
 import { Spinner } from "@/components/ui/spinner"
 
 type SessionState = "loading" | "none" | "aal1_mfa_required" | "ready"
+
+function clearRecoveryCookie() {
+  document.cookie = "recovery_mode=; path=/; max-age=0"
+}
 
 export function ResetPasswordForm({
   className,
@@ -25,6 +30,9 @@ export function ResetPasswordForm({
   const [confirmPassword, setConfirmPassword] = React.useState("")
   const [isPending, setIsPending] = React.useState(false)
   const [sessionState, setSessionState] = React.useState<SessionState>("loading")
+  const [signOutAll, setSignOutAll] = React.useState(true)
+
+  const [timeLeft, setTimeLeft] = React.useState(120) // 2 minutes
 
   // MFA state
   const [mfaCode, setMfaCode] = React.useState("")
@@ -32,10 +40,24 @@ export function ResetPasswordForm({
 
   React.useEffect(() => {
     const checkSession = async () => {
+      // Redirect on refresh: if the page was already visited, sign out
+      const hasVisited = sessionStorage.getItem("reset_password_visited")
+      if (hasVisited) {
+        sessionStorage.removeItem("reset_password_visited")
+        const supabase = createSupabaseBrowserClient()
+        await supabase.auth.signOut()
+        clearRecoveryCookie()
+        window.location.href = "/login"
+        return
+      }
+      sessionStorage.setItem("reset_password_visited", "true")
+
       const supabase = createSupabaseBrowserClient()
       const { data: { session } } = await supabase.auth.getSession()
 
       if (!session) {
+        // Clear stale recovery cookie if session is gone
+        clearRecoveryCookie()
         setSessionState("none")
         return
       }
@@ -52,6 +74,32 @@ export function ResetPasswordForm({
     }
     checkSession()
   }, [])
+
+  const cleanupAndRedirectToLogin = React.useCallback(async () => {
+    sessionStorage.removeItem("reset_password_visited")
+    const supabase = createSupabaseBrowserClient()
+    await supabase.auth.signOut()
+    clearRecoveryCookie()
+    window.location.href = "/login"
+  }, [])
+
+  // 2-minute countdown timer — auto-redirect to login when expired
+  React.useEffect(() => {
+    if (sessionState !== "ready" && sessionState !== "aal1_mfa_required") return
+
+    const interval = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval)
+          void cleanupAndRedirectToLogin()
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [sessionState, cleanupAndRedirectToLogin])
 
   const handleMfaVerify = React.useCallback(async () => {
     if (mfaCode.length !== 6) return
@@ -115,8 +163,11 @@ export function ResetPasswordForm({
             return
           }
 
-          toast.success("Password updated successfully!")
-          window.location.href = "/"
+          // Sign out after password change
+          sessionStorage.removeItem("reset_password_visited")
+          await supabase.auth.signOut({ scope: signOutAll ? "global" : "local" })
+          clearRecoveryCookie()
+          window.location.href = "/login?message=password_changed"
         } catch (err) {
           const message =
             err instanceof Error ? err.message : "Unable to update password."
@@ -126,7 +177,7 @@ export function ResetPasswordForm({
         }
       })()
     },
-    [password, confirmPassword]
+    [password, confirmPassword, signOutAll]
   )
 
   // Loading state while checking session
@@ -161,9 +212,9 @@ export function ResetPasswordForm({
                   <Link href="/forgot-password">Request New Link</Link>
                 </Button>
                 <Button variant="ghost" asChild>
-                  <Link href="/">
-                    <Home className="size-4" />
-                    Back to Home
+                  <Link href="/login">
+                    <LogIn className="size-4" />
+                    Back to Login
                   </Link>
                 </Button>
               </div>
@@ -187,6 +238,13 @@ export function ResetPasswordForm({
                 <p className="text-muted-foreground text-sm">
                   Enter the 6-digit code from your authenticator app to continue resetting your password.
                 </p>
+                <div className={cn(
+                  "flex items-center gap-1.5 text-xs mt-1 font-medium",
+                  timeLeft <= 30 ? "text-destructive" : "text-muted-foreground"
+                )}>
+                  <Timer className="size-3.5" />
+                  Session expires in {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, "0")}
+                </div>
               </div>
 
               <InputOTP
@@ -220,11 +278,13 @@ export function ResetPasswordForm({
                   "Verify"
                 )}
               </Button>
-              <Button variant="ghost" asChild className="w-full">
-                <Link href="/">
-                  <Home className="size-4" />
-                  Back to Home
-                </Link>
+              <Button
+                variant="ghost"
+                className="w-full"
+                onClick={cleanupAndRedirectToLogin}
+              >
+                <LogIn className="size-4" />
+                Back to Login
               </Button>
             </div>
           </CardContent>
@@ -243,6 +303,13 @@ export function ResetPasswordForm({
               <p className="text-muted-foreground text-sm mt-1">
                 Enter your new password below.
               </p>
+              <div className={cn(
+                "flex items-center gap-1.5 text-xs mt-2 font-medium",
+                timeLeft <= 30 ? "text-destructive" : "text-muted-foreground"
+              )}>
+                <Timer className="size-3.5" />
+                Session expires in {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, "0")}
+              </div>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="password">New Password</Label>
@@ -280,6 +347,16 @@ export function ResetPasswordForm({
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
             </div>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="sign-out-all" className="text-sm cursor-pointer">
+                Sign out from all other devices
+              </Label>
+              <Switch
+                id="sign-out-all"
+                checked={signOutAll}
+                onCheckedChange={setSignOutAll}
+              />
+            </div>
             <Button
               type="submit"
               className="w-full"
@@ -287,11 +364,14 @@ export function ResetPasswordForm({
             >
               {isPending ? "Updating..." : "Update Password"}
             </Button>
-            <Button variant="ghost" asChild className="w-full">
-              <Link href="/">
-                <Home className="size-4" />
-                Back to Home
-              </Link>
+            <Button
+              variant="ghost"
+              className="w-full"
+              type="button"
+              onClick={cleanupAndRedirectToLogin}
+            >
+              <LogIn className="size-4" />
+              Back to Login
             </Button>
           </form>
         </CardContent>

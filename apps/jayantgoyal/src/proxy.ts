@@ -97,6 +97,17 @@ export default async function proxy(request: NextRequest) {
   response.headers.set("x-auth-status", isAuthed ? "authed" : "anon");
   response.headers.set("x-terms-accepted", termsAccepted ? "true" : "false");
 
+  // Recovery mode: lock navigation to reset-password while cookie exists
+  const isRecoveryMode = request.cookies.get("recovery_mode")?.value === "true";
+  if (isAuthed && isRecoveryMode) {
+    const recoveryAllowed = ["/reset-password", "/login", "/forgot-password", "/auth/callback"];
+    const isRecoveryAllowed =
+      recoveryAllowed.some((p) => pathname.startsWith(p)) || pathname.startsWith("/api/");
+    if (!isRecoveryAllowed) {
+      return NextResponse.redirect(new URL("/reset-password", request.url));
+    }
+  }
+
   // Block protected API routes if terms not accepted (except terms-related APIs)
   if (isAuthed && !termsAccepted && pathname.startsWith("/api/")) {
     const allowedApis = [
@@ -121,7 +132,7 @@ export default async function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  if (isAuthed && (pathname.startsWith("/login") || pathname.startsWith("/signup"))) {
+  if (isAuthed && !isRecoveryMode && (pathname.startsWith("/login") || pathname.startsWith("/signup"))) {
     // Allow anonymous users to access signup page to convert to permanent account
     if (isAnonymous && pathname.startsWith("/signup")) {
       return response;

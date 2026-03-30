@@ -57,14 +57,34 @@ export async function GET(request: NextRequest) {
 
   // Handle token_hash flow (magic link / email verification)
   if (token_hash && type) {
+    const isRecovery = type === "recovery";
     const { error } = await supabase.auth.verifyOtp({
       token_hash,
       type: type as "email" | "email_change" | "signup" | "recovery" | "invite",
     });
     if (error) {
       console.error("Auth callback error (token_hash):", error.message);
-      return NextResponse.redirect(new URL(`/login?error=${encodeURIComponent(error.message)}`, request.url));
+      const friendlyMessage = isRecovery
+        ? "This password reset link is invalid or has expired. Please request a new one."
+        : error.message;
+      return NextResponse.redirect(new URL(`/login?error=${encodeURIComponent(friendlyMessage)}`, request.url));
     }
+
+    // For recovery flow, set a cookie to lock navigation to /reset-password
+    if (isRecovery) {
+      const recoveryResponse = NextResponse.redirect(new URL("/reset-password", request.url));
+      // Copy over Supabase auth cookies from the original response
+      response.cookies.getAll().forEach(({ name, value, ...options }) => {
+        recoveryResponse.cookies.set(name, value, options);
+      });
+      recoveryResponse.cookies.set("recovery_mode", "true", {
+        path: "/",
+        maxAge: 3600, // 1 hour
+        sameSite: "lax",
+      });
+      return recoveryResponse;
+    }
+
     return response;
   }
 

@@ -5,7 +5,6 @@ import { Canvas } from '@react-three/fiber';
 import { useTheme } from 'next-themes';
 import { useIsMobile } from '@repo/ui/hooks/use-mobile';
 import { ParticleField } from './particle-field';
-import { FloatingGeometries } from './floating-geometries';
 import { FloatingDoodles } from './floating-doodles';
 
 export default function Scene() {
@@ -22,7 +21,6 @@ export default function Scene() {
   const isDark = resolvedTheme === 'dark';
   const color = isDark ? '#a5b4fc' : '#1e293b'; // indigo-300 / slate-800
   const particleCount = isMobile ? 800 : 2000;
-  const shapeCount = isMobile ? 3 : 6;
   const doodleCount = isMobile ? 5 : 10;
 
   return (
@@ -43,7 +41,6 @@ export default function Scene() {
         camera={{ position: [0, 0, 12], fov: 60 }}
       >
         <ParticleField count={particleCount} color={color} isDark={isDark} />
-        <FloatingGeometries count={shapeCount} color={color} isDark={isDark} />
         <FloatingDoodles count={doodleCount} color={color} isDark={isDark} />
       </Canvas>
     </div>

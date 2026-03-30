@@ -161,37 +161,37 @@
 
 /* 3D Background - make SidebarInset semi-transparent when active */
 body[data-three-bg="active"] [data-slot="sidebar-inset"] {
-  background: hsl(var(--background) / 0.82);
+  background: hsl(var(--background) / 0.82) !important;
 }
 
 .dark body[data-three-bg="active"] [data-slot="sidebar-inset"] {
-  background: hsl(var(--background) / 0.6);
+  background: hsl(var(--background) / 0.6) !important;
 }
 
 /* 3D Background - make Sidebar semi-transparent when active */
 body[data-three-bg="active"] [data-slot="sidebar-inner"] {
-  background: hsl(0 0% 98% / 0.25);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: hsl(0 0% 98% / 0.25) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
 }
 
 .dark body[data-three-bg="active"] [data-slot="sidebar-inner"] {
-  background: hsl(240 5.9% 10% / 0.2);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: hsl(240 5.9% 10% / 0.2) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
 }
 
 /* Frosted-glass cards when 3D background is active */
 body[data-three-bg="active"] [data-slot="card"] {
-  background: hsl(var(--card) / 0.88);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: hsl(var(--card) / 0.88) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
 }
 
 .dark body[data-three-bg="active"] [data-slot="card"] {
-  background: hsl(var(--card) / 0.75);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: hsl(var(--card) / 0.75) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
 }
 
 /* FlipText Component Animations */
