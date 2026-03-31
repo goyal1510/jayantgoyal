@@ -184,7 +184,7 @@ export function NavApps({
 
           // Single page app - no sub-navigation
           if (!hasSubNav) {
-            const href = `/${app.id}`
+            const href = app.url ?? `/${app.id}`
             return (
               <SidebarMenuItem key={app.id}>
                 <SidebarMenuButton

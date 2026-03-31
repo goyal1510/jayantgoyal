@@ -15,7 +15,6 @@ import {
   Wrench,
   Calculator,
   FolderOpen,
-  FileText,
   LayoutDashboard,
   Target,
   Settings,
@@ -43,6 +42,7 @@ export type AppConfig = {
   color: string
   isPublic: boolean
   navItems: NavItem[]
+  url?: string
   externalUrl?: string
 }
 
@@ -70,11 +70,6 @@ const GAME_HUB_NAV: NavItem[] = [
 // Tech Tools - uses nested navigation from lib/tools/tools.ts
 // This is just a placeholder, actual navigation is rendered from toolCategories
 
-// File Manager navigation items
-const FILE_MANAGER_NAV: NavItem[] = [
-  { id: "files", label: "Files", icon: FolderOpen, color: "text-blue-500 dark:text-blue-400", url: "/files" },
-  { id: "changelog", label: "Release Notes", icon: FileText, color: "text-gray-500 dark:text-gray-400", url: "/files/changelog" },
-]
 
 // Activity Tracker navigation items
 const ACTIVITY_TRACKER_NAV: NavItem[] = [
@@ -89,21 +84,11 @@ const CURRENCY_CALC_NAV: NavItem[] = [
   { id: "history", label: "History", icon: History, color: "text-blue-500 dark:text-blue-400", url: "/calculator/history" },
 ]
 
-// Sync Messenger navigation items
-const SYNC_MESSENGER_NAV: NavItem[] = [
-  { id: "messenger", label: "Messenger", icon: MessageSquare, color: "text-blue-500 dark:text-blue-400", url: "/messenger" },
-]
 
 // All apps configuration
+// Ordered: private apps first (dropdowns → direct links), then public apps (dropdowns → direct links)
 export const HUB_APPS: AppConfig[] = [
-  {
-    id: "portfolio",
-    name: "Portfolio",
-    icon: User,
-    color: "text-emerald-500 dark:text-emerald-400",
-    isPublic: true,
-    navItems: PORTFOLIO_NAV,
-  },
+  // --- Private apps (dropdowns first) ---
   {
     id: "game-hub",
     name: "Game Hub",
@@ -113,20 +98,12 @@ export const HUB_APPS: AppConfig[] = [
     navItems: GAME_HUB_NAV,
   },
   {
-    id: "file-manager",
-    name: "File Manager",
-    icon: FolderOpen,
-    color: "text-blue-500 dark:text-blue-400",
+    id: "activity-tracker",
+    name: "Activity Tracker",
+    icon: Target,
+    color: "text-green-500 dark:text-green-400",
     isPublic: false,
-    navItems: FILE_MANAGER_NAV,
-  },
-  {
-    id: "sync-messenger",
-    name: "Sync Messenger",
-    icon: MessageSquare,
-    color: "text-blue-500 dark:text-blue-400",
-    isPublic: false,
-    navItems: SYNC_MESSENGER_NAV,
+    navItems: ACTIVITY_TRACKER_NAV,
   },
   {
     id: "currency-calculator",
@@ -137,12 +114,31 @@ export const HUB_APPS: AppConfig[] = [
     navItems: CURRENCY_CALC_NAV,
   },
   {
-    id: "activity-tracker",
-    name: "Activity Tracker",
-    icon: Target,
-    color: "text-green-500 dark:text-green-400",
+    id: "file-manager",
+    name: "File Manager",
+    icon: FolderOpen,
+    color: "text-blue-500 dark:text-blue-400",
     isPublic: false,
-    navItems: ACTIVITY_TRACKER_NAV,
+    navItems: [],
+    url: "/files",
+  },
+  {
+    id: "messenger",
+    name: "Messenger",
+    icon: MessageSquare,
+    color: "text-blue-500 dark:text-blue-400",
+    isPublic: false,
+    navItems: [],
+    url: "/messenger",
+  },
+  // --- Public apps (dropdowns first) ---
+  {
+    id: "portfolio",
+    name: "Portfolio",
+    icon: User,
+    color: "text-emerald-500 dark:text-emerald-400",
+    isPublic: true,
+    navItems: PORTFOLIO_NAV,
   },
   {
     id: "tech-tools",
@@ -161,18 +157,18 @@ export const HUB_APPS: AppConfig[] = [
     navItems: [],
   },
   {
-    id: "github-stats",
-    name: "GitHub Stats",
-    icon: Github,
-    color: "text-gray-700 dark:text-gray-300",
-    isPublic: true,
-    navItems: [],
-  },
-  {
     id: "custom-calculator",
     name: "Custom Calculator",
     icon: Calculator,
     color: "text-violet-500 dark:text-violet-400",
+    isPublic: true,
+    navItems: [],
+  },
+  {
+    id: "github-stats",
+    name: "GitHub Stats",
+    icon: Github,
+    color: "text-gray-700 dark:text-gray-300",
     isPublic: true,
     navItems: [],
   },

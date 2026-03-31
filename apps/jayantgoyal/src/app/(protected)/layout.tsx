@@ -17,6 +17,7 @@ import { LazyMotionProvider } from "@/components/providers/lazy-motion-provider"
 import { RouteChangeProvider } from "@/components/providers/route-change-provider";
 import { ThreeBgWrapper } from "@/components/three/three-bg-wrapper";
 import { ThreeBgToggle } from "@/components/three/three-bg-toggle";
+import { CommandPalette } from "@/components/sidebar/command-palette";
 
 export default async function ProtectedLayout({
   children,
@@ -45,6 +46,7 @@ export default async function ProtectedLayout({
               </div>
             </div>
             <div className="flex shrink-0 items-center gap-2">
+              <CommandPalette />
               <ThreeBgToggle />
               <ThemeToogle />
             </div>

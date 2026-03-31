@@ -82,8 +82,7 @@ export function DynamicBreadcrumb() {
 
     // File Manager routes
     if (pathname === "/files" || pathname.startsWith("/files/")) {
-      const pageName = pathname === "/files/changelog" ? "Release Notes" : null
-      return { appName: "File Manager", appHref: "/files", pageName }
+      return { appName: "File Manager", appHref: "/files", pageName: null }
     }
 
     // Weather route

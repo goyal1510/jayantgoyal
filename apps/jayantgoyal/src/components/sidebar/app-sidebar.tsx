@@ -36,6 +36,9 @@ let cachedUser: typeof fallbackUser | null | undefined = undefined
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
   const allApps = React.useMemo(() => HUB_APPS, [])
+  const privateApps = React.useMemo(() => HUB_APPS.filter((app) => !app.isPublic && !app.externalUrl), [])
+  const publicApps = React.useMemo(() => HUB_APPS.filter((app) => app.isPublic && !app.externalUrl), [])
+  const externalApps = React.useMemo(() => HUB_APPS.filter((app) => app.externalUrl), [])
 
   // User state — initialize from module cache to avoid flicker on navigation
   const [user, setUser] = React.useState<typeof fallbackUser | null>(cachedUser ?? null)
@@ -160,8 +163,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     // Check for messenger routes
     if (pathname === "/messenger" || pathname.startsWith("/messenger/")) {
       return {
-        activeAppId: "sync-messenger",
-        activeNavId: "messenger",
+        activeAppId: "messenger",
+        activeNavId: undefined,
       }
     }
 
@@ -188,7 +191,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     if (pathname === "/files" || pathname.startsWith("/files/")) {
       return {
         activeAppId: "file-manager",
-        activeNavId: pathname === "/files/changelog" ? "changelog" : "files",
+        activeNavId: undefined,
       }
     }
 
@@ -334,9 +337,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavApps
-          apps={allApps}
+          apps={publicApps}
           activeAppId={activeAppId}
           activeNavId={finalActiveNavId}
+          label="Explore"
+        />
+        <NavApps
+          apps={privateApps}
+          activeAppId={activeAppId}
+          activeNavId={finalActiveNavId}
+          label="Apps"
+        />
+        <NavApps
+          apps={externalApps}
+          activeAppId={activeAppId}
+          activeNavId={finalActiveNavId}
+          label="External"
         />
       </SidebarContent>
       <Separator />
