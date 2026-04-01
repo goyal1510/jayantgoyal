@@ -74,7 +74,12 @@ export function LoginForm({
             return
           }
 
-          toast.success("Logged in as guest.")
+          const remaining = data.remaining as number
+          toast.success(
+            remaining > 0
+              ? `Logged in as guest. ${remaining} guest login${remaining === 1 ? "" : "s"} remaining.`
+              : "Logged in as guest. This was your last guest login."
+          )
           // Use window.location for full page navigation to ensure cookies are read
           window.location.href = redirectUrl
         } catch (error) {
