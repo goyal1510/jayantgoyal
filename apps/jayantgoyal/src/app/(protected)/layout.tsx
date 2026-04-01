@@ -18,6 +18,7 @@ import { RouteChangeProvider } from "@/components/providers/route-change-provide
 import { ThreeBgWrapper } from "@/components/three/three-bg-wrapper";
 import { ThreeBgToggle } from "@/components/three/three-bg-toggle";
 import { CommandPalette } from "@/components/sidebar/command-palette";
+import { GuestLoginToast } from "@/components/auth/guest-login-toast";
 
 export default async function ProtectedLayout({
   children,
@@ -33,6 +34,7 @@ export default async function ProtectedLayout({
   return (
     <PortfolioDataProvider data={data} profile={profile} host={host} source={source}>
       <TermsAcceptanceCheck />
+      <GuestLoginToast />
       <SidebarProvider defaultOpen={defaultOpen} defaultWidth={defaultWidth}>
         <ThreeBgWrapper />
         <AppSidebar />

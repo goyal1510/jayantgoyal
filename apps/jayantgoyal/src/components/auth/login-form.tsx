@@ -74,14 +74,11 @@ export function LoginForm({
             return
           }
 
+          // Pass remaining guest logins as query param — toast shown after redirect
           const remaining = data.remaining as number
-          toast.success(
-            remaining > 0
-              ? `Logged in as guest. ${remaining} guest login${remaining === 1 ? "" : "s"} remaining.`
-              : "Logged in as guest. This was your last guest login."
-          )
-          // Use window.location for full page navigation to ensure cookies are read
-          window.location.href = redirectUrl
+          const url = new URL(redirectUrl, window.location.origin)
+          url.searchParams.set("guest_remaining", String(remaining))
+          window.location.href = url.toString()
         } catch (error) {
           // Preserve error shape for potential future handling.
           void error
