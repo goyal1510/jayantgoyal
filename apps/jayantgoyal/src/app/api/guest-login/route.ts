@@ -33,17 +33,18 @@ export async function POST(request: NextRequest) {
       autoRefreshToken: false,
       persistSession: false,
     },
-    db: { schema: "jg_account" },
   });
 
   // Check current login count for this IP
   const { data: existing, error: selectError } = await adminClient
+    .schema("jg_account")
     .from("guest_login_limits")
     .select("login_count")
     .eq("ip_address", ip)
     .maybeSingle();
 
   if (selectError) {
+    console.error("Guest login limit check failed:", selectError);
     return NextResponse.json(
       { error: "Failed to check guest login limit." },
       { status: 500 }
@@ -83,6 +84,7 @@ export async function POST(request: NextRequest) {
 
   // Increment login count after successful auth
   await adminClient
+    .schema("jg_account")
     .from("guest_login_limits")
     .upsert(
       {
