@@ -30,7 +30,7 @@ yarn-error.log*
 .env.production.local
 
 # supabase
-supabase/.temp/
+supabase/*
 
 # turbo
 .turbo
