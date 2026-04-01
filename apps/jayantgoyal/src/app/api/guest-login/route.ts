@@ -16,9 +16,10 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Extract client IP (Vercel sets x-forwarded-for)
-  const forwarded = request.headers.get("x-forwarded-for");
-  const ip = forwarded?.split(",")[0]?.trim();
+  // Extract client IP: cf-connecting-ip (Cloudflare) → x-forwarded-for (Vercel)
+  const ip =
+    request.headers.get("cf-connecting-ip") ||
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
 
   if (!ip) {
     return NextResponse.json(
