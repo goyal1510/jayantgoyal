@@ -227,6 +227,9 @@ importers:
       eslint:
         specifier: ^9.39.1
         version: 9.39.1(jiti@2.6.1)
+      is-odd:
+        specifier: ^3.0.1
+        version: 3.0.1
       postcss:
         specifier: ^8.5.3
         version: 8.5.6
