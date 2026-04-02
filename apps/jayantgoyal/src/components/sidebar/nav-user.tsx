@@ -80,8 +80,7 @@ export function NavUser({
             toast.error(error.message)
             return
           }
-          router.push("/login?message=signed_out")
-          router.refresh()
+          window.location.href = "/login?message=signed_out"
         } catch (err) {
           const message =
             err instanceof Error ? err.message : "Unable to sign out."
