@@ -2,7 +2,6 @@
 
 This directory configures [Claude Code](https://claude.ai/code) for the jayantgoyal monorepo. It defines slash commands, AI agents, auto-invoked skills, rules, and permissions.
 
-
 ## Directory Structure
 
 ```
