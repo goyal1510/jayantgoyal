@@ -32,6 +32,10 @@ yarn-error.log*
 # supabase
 supabase/*
 
+# claude code
+.claude/settings.local.json
+CLAUDE.local.md
+
 # turbo
 .turbo
 
