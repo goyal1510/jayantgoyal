@@ -32,7 +32,7 @@ export default function UnauthorizedPage() {
           <CardDescription>
             You do not have permission to access the admin panel.
             <br />
-            Only administrators can access this area.{" "}
+            Only administrators can access this area.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
