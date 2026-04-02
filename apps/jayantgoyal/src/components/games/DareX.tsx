@@ -39,7 +39,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@repo/ui/sheet"
-import { playToastSound } from "@/lib/games/sound"
 import { cn } from "@repo/ui/lib/utils"
 
 type DareSource = "built-in" | "custom" | "mixed"
@@ -388,8 +387,6 @@ export function DareX() {
     } else {
       toast("Skipped", { description: `${player.name} skipped this dare.` })
     }
-    void playToastSound()
-
     const nextIndex =
       activePlayers.length === 0 ? 0 : (currentPlayerIndex + 1) % activePlayers.length
     setCurrentPlayerIndex(nextIndex)

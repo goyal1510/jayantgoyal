@@ -21,7 +21,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@repo/ui/sheet"
-import { playToastSound } from "@/lib/games/sound"
 import { cn } from "@repo/ui/lib/utils"
 import { toast } from "sonner"
 
@@ -64,11 +63,9 @@ export function ConnectFour() {
 
   const announceOutcome = (outcome: WinnerResult | "draw") => {
     if (outcome === "draw") {
-      void playToastSound()
       return
     }
     if (!outcome) return
-    void playToastSound()
   }
 
   const resetBoard = () => {

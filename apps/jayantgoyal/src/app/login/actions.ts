@@ -62,5 +62,8 @@ export async function loginWithPassword(
   }
 
   revalidatePath("/", "layout");
-  redirect(targetUrl);
+
+  const loginUrl = new URL(targetUrl, "http://n");
+  loginUrl.searchParams.set("login_success", "true");
+  redirect(loginUrl.pathname + loginUrl.search);
 }

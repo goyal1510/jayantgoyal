@@ -21,7 +21,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@repo/ui/sheet"
-import { playToastSound } from "@/lib/games/sound"
 import { cn } from "@repo/ui/lib/utils"
 
 type Mode = "local_pvp" | "vs_computer"
@@ -151,8 +150,6 @@ export function MemoryMatch() {
           ...prev,
           [`player${currentPlayer}` as keyof typeof prev]: prev[`player${currentPlayer}` as keyof typeof prev] + 1,
         }))
-        void playToastSound()
-        
         // Check if game is over
         const allMatched = matchedCards.every((c) => c.matched)
         setFlippedCards([])
@@ -258,8 +255,6 @@ export function MemoryMatch() {
           ...prev,
           player2: prev.player2 + 1,
         }))
-        void playToastSound()
-        
         // Check if game is over
         const allMatched = matched.every((c) => c.matched)
         if (allMatched) {

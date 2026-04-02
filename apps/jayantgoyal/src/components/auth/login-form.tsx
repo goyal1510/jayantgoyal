@@ -108,6 +108,9 @@ export function LoginForm({
     if (messageParam === "password_changed") {
       toast.success("Password updated successfully! Please log in with your new password.")
     }
+    if (messageParam === "signed_out") {
+      toast.success("Signed out successfully.", { id: "signed-out" })
+    }
     // Clear query params after displaying to avoid re-showing on refresh
     if (errorParam || messageParam) {
       const url = new URL(window.location.href)

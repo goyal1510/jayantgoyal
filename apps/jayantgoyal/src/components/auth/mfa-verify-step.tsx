@@ -39,7 +39,9 @@ export function MfaVerifyStep({ redirectUrl }: { redirectUrl: string }) {
       if (verifyError) throw verifyError
 
       // Full navigation so cookies refresh properly
-      window.location.href = redirectUrl
+      const url = new URL(redirectUrl, window.location.origin)
+      url.searchParams.set("login_success", "true")
+      window.location.href = url.toString()
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Verification failed."

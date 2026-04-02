@@ -22,7 +22,6 @@ import {
   SheetTitle,
 } from "@repo/ui/sheet"
 
-import { playToastSound } from "@/lib/games/sound"
 import { cn } from "@repo/ui/lib/utils"
 
 type Mode = "local_pvp" | "vs_computer"
@@ -74,11 +73,9 @@ export function TicTacToe() {
 
   const announceOutcome = (outcome: WinnerResult | "draw") => {
     if (outcome === "draw") {
-      void playToastSound()
       return
     }
     if (!outcome) return
-    void playToastSound()
   }
 
   const resetBoard = () => {

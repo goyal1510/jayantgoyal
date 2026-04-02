@@ -80,7 +80,7 @@ export function NavUser({
             toast.error(error.message)
             return
           }
-          router.push("/")
+          router.push("/login?message=signed_out")
           router.refresh()
         } catch (err) {
           const message =

@@ -7,7 +7,6 @@ import { toast } from "sonner"
 
 import { Button } from "@repo/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card"
-import { playToastSound } from "@/lib/games/sound"
 
 type Choice = "rock" | "paper" | "scissors"
 
@@ -78,7 +77,6 @@ export function RockPaperScissors() {
     if (outcome === "win") toast.success("You win this round!")
     else if (outcome === "loss") toast.error("Computer wins this round.")
     else toast("Draw", { description: "Both picked the same move." })
-    void playToastSound()
     setIsSubmitting(false)
   }
 
