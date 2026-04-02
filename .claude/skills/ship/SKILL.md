@@ -1,5 +1,5 @@
 ---
-name: ship-it
+name: ship
 description: Ship current changes directly to main — stage, commit, push. No feature branches or PRs (solo development workflow).
 argument-hint: [commit message hint]
 user-invocable: true
