@@ -125,6 +125,28 @@ export default async function proxy(request: NextRequest) {
     }
   }
 
+  // Session limit: enforce on ALL pages for logged-in non-anonymous users.
+  // Skip only: the session-limit page itself, API routes, and auth callback.
+  const MAX_SESSIONS = 2;
+  const sessionLimitExempt =
+    pathname.startsWith("/session-limit") ||
+    pathname.startsWith("/api/") ||
+    pathname.startsWith("/auth/callback");
+
+  if (isAuthed && !isAnonymous && !isRecoveryMode && !sessionLimitExempt) {
+    const { data: sessionCount } = await supabase
+      .schema("jg_account")
+      .rpc("count_my_sessions");
+
+    if (typeof sessionCount === "number" && sessionCount > MAX_SESSIONS) {
+      const limitUrl = new URL("/session-limit", request.url);
+      if (pathname !== "/") {
+        limitUrl.searchParams.set("redirect", pathname);
+      }
+      return NextResponse.redirect(limitUrl);
+    }
+  }
+
   if (!isAuthed && !isPublic) {
     // Redirect to login with return URL
     const loginUrl = new URL("/login", request.url);
