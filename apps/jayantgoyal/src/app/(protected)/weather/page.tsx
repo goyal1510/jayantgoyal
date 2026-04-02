@@ -3,7 +3,7 @@ import WeatherDashboard from "@/components/weather/weather-dashboard"
 
 export const metadata: Metadata = {
   title: "Weather | Jayant",
-  description: "Check the current weather conditions.",
+  description: "Check the current weather conditions",
 }
 
 export default function Page() {
