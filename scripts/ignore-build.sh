@@ -9,6 +9,9 @@
 
 APP_DIR="${1:?Usage: ignore-build.sh <app-directory>}"
 
+# Ensure paths resolve from repo root, not Vercel's root directory
+cd "$(git rev-parse --show-toplevel)" || exit 1
+
 echo "Checking for changes in: $APP_DIR, packages/, turbo.json, pnpm-lock.yaml"
 
 git diff HEAD^ HEAD --quiet -- \
