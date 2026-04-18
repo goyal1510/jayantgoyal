@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import type { ComponentType } from "react"
-import { ArrowRight, Grid3X3, HandHeart, Scissors, Layers, Brain } from "lucide-react"
+import { ArrowRight, Grid3X3, HandHeart, Scissors, Layers, Brain, Dices } from "lucide-react"
 
 import { GAME_META } from "@/lib/games/config"
 import { cn } from "@repo/ui/lib/utils"
@@ -64,6 +64,15 @@ const CARD_THEMES: Record<
     accent:
       "bg-pink-100/80 border-pink-200/70 dark:bg-pink-500/10 dark:border-pink-500/30",
     accentText: "text-pink-800 dark:text-pink-50",
+    border: "border-slate-200/60 dark:border-slate-800",
+  },
+  "ludo": {
+    gradient:
+      "from-amber-200/50 via-slate-50 to-white dark:from-amber-500/25 dark:via-slate-900 dark:to-slate-950",
+    icon: Dices,
+    accent:
+      "bg-amber-100/80 border-amber-200/70 dark:bg-amber-500/10 dark:border-amber-500/30",
+    accentText: "text-amber-800 dark:text-amber-50",
     border: "border-slate-200/60 dark:border-slate-800",
   },
 }

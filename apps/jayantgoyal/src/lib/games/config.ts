@@ -1,4 +1,4 @@
-export type GameSlug = "rock-paper-scissors" | "tic-tac-toe" | "dare-x" | "connect-four" | "memory-match"
+export type GameSlug = "rock-paper-scissors" | "tic-tac-toe" | "dare-x" | "connect-four" | "memory-match" | "ludo"
 
 export const GAME_META: Record<
   GameSlug,
@@ -28,5 +28,10 @@ export const GAME_META: Record<
     name: "Memory Match",
     description: "Find matching pairs of cards.",
     modes: ["local_pvp", "vs_computer"],
+  },
+  "ludo": {
+    name: "Ludo",
+    description: "Classic board game with polygon boards for 3–5 players.",
+    modes: ["local_pvp"],
   },
 }
