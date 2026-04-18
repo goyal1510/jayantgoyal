@@ -1,4 +1,4 @@
-export type GameSlug = "rock-paper-scissors" | "tic-tac-toe" | "dare-x" | "connect-four" | "memory-match"
+export type GameSlug = "rock-paper-scissors" | "tic-tac-toe" | "dare-x" | "connect-four" | "memory-match" | "wordle" | "typing-speed"
 
 export const GAME_META: Record<
   GameSlug,
@@ -28,5 +28,15 @@ export const GAME_META: Record<
     name: "Memory Match",
     description: "Find matching pairs of cards.",
     modes: ["local_pvp", "vs_computer"],
+  },
+  "wordle": {
+    name: "Wordle",
+    description: "Guess the 5-letter word in 6 tries.",
+    modes: ["vs_computer"],
+  },
+  "typing-speed": {
+    name: "Typing Speed",
+    description: "Test your typing speed and accuracy.",
+    modes: ["vs_computer"],
   },
 }

@@ -1,9 +1,11 @@
 "use client"
 
 import * as React from "react"
-import { Calendar, ChevronLeft, ChevronRight, Clock, History, Search, Trash2 } from "lucide-react"
+import { Calendar, ChevronLeft, ChevronRight, Clock, Download, History, Search, Trash2 } from "lucide-react"
+import { toast } from "sonner"
 
 import { deleteCalculation, getCalculations } from "@/lib/calculator/client-calculations"
+import { generateCalculationPDF } from "@/lib/calculator/generate-pdf"
 import type { CalculationWithDenominations } from "@/lib/calculator/database"
 import { Button } from "@repo/ui/button"
 import { Card, CardContent } from "@repo/ui/card"
@@ -679,16 +681,30 @@ export function CalculationsHistory() {
                       <ChevronRight className="h-4 w-4" />
                     </Button>
                   </div>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleDelete(currentEntry.id)}
-                    disabled={deletingId === currentEntry.id}
-                    className="gap-1 sm:w-auto"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    {deletingId === currentEntry.id ? "Deleting..." : "Delete"}
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        generateCalculationPDF(currentEntry)
+                        toast.success("PDF downloaded")
+                      }}
+                      className="gap-1"
+                    >
+                      <Download className="h-4 w-4" />
+                      PDF
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDelete(currentEntry.id)}
+                      disabled={deletingId === currentEntry.id}
+                      className="gap-1 sm:w-auto"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      {deletingId === currentEntry.id ? "Deleting..." : "Delete"}
+                    </Button>
+                  </div>
                 </div>
               </>
             )}
