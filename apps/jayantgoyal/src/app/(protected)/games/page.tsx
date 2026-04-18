@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import type { ComponentType } from "react"
-import { ArrowRight, Grid3X3, HandHeart, Scissors, Layers, Brain } from "lucide-react"
+import { ArrowRight, Grid3X3, HandHeart, Scissors, Layers, Brain, Puzzle, Type } from "lucide-react"
 
 import { GAME_META } from "@/lib/games/config"
 import { cn } from "@repo/ui/lib/utils"
@@ -64,6 +64,24 @@ const CARD_THEMES: Record<
     accent:
       "bg-pink-100/80 border-pink-200/70 dark:bg-pink-500/10 dark:border-pink-500/30",
     accentText: "text-pink-800 dark:text-pink-50",
+    border: "border-slate-200/60 dark:border-slate-800",
+  },
+  "wordle": {
+    gradient:
+      "from-emerald-200/50 via-slate-50 to-white dark:from-emerald-500/25 dark:via-slate-900 dark:to-slate-950",
+    icon: Puzzle,
+    accent:
+      "bg-emerald-100/80 border-emerald-200/70 dark:bg-emerald-500/10 dark:border-emerald-500/30",
+    accentText: "text-emerald-800 dark:text-emerald-50",
+    border: "border-slate-200/60 dark:border-slate-800",
+  },
+  "typing-speed": {
+    gradient:
+      "from-cyan-200/50 via-slate-50 to-white dark:from-cyan-500/25 dark:via-slate-900 dark:to-slate-950",
+    icon: Type,
+    accent:
+      "bg-cyan-100/80 border-cyan-200/70 dark:bg-cyan-500/10 dark:border-cyan-500/30",
+    accentText: "text-cyan-800 dark:text-cyan-50",
     border: "border-slate-200/60 dark:border-slate-800",
   },
 }
