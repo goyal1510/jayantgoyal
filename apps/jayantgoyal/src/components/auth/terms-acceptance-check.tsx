@@ -99,7 +99,7 @@ export function TermsAcceptanceCheck() {
       const supabase = createSupabaseBrowserClient()
       await supabase.auth.signOut()
       toast.info("You must accept the Terms and Conditions to use this platform.")
-      router.push("/login")
+      router.push("/welcome")
     } catch {
       toast.error("Failed to sign out")
     } finally {

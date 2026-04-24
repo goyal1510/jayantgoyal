@@ -30,12 +30,10 @@ export default async function proxy(request: NextRequest) {
     "/custom-calculator", // Custom Calculator is public
     "/terms-conditions",  // Terms & Conditions is public
     "/github-stats",
-    "/login",
-    "/signup",
+    "/welcome",
     "/forgot-password",
     "/reset-password",
     "/auth/callback", // Auth callback for email verification token exchange
-    "/api/guest-login",
     "/api/contact",   // Contact form API
     "/api/github-loc", // GitHub LOC stats (public)
     "/api/account/terms-status", // Terms status check (returns safe defaults for unauthenticated)
@@ -58,7 +56,7 @@ export default async function proxy(request: NextRequest) {
       return response;
     }
     // Redirect to login with return URL
-    const loginUrl = new URL("/login", request.url);
+    const loginUrl = new URL("/welcome", request.url);
     loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
   }
@@ -79,12 +77,10 @@ export default async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const isAuthed = Boolean(user);
-  // Use Supabase's built-in anonymous user detection
-  const isAnonymous = user?.is_anonymous === true;
 
-  // Read terms_accepted from jg_account.profiles (anonymous users skip terms)
-  let termsAccepted = isAnonymous;
-  if (isAuthed && !isAnonymous) {
+  // Read terms_accepted from jg_account.profiles
+  let termsAccepted = false;
+  if (isAuthed) {
     const { data: profile } = await supabase
       .schema("jg_account")
       .from("profiles")
@@ -100,7 +96,7 @@ export default async function proxy(request: NextRequest) {
   // Recovery mode: lock navigation to reset-password while cookie exists
   const isRecoveryMode = request.cookies.get("recovery_mode")?.value === "true";
   if (isAuthed && isRecoveryMode) {
-    const recoveryAllowed = ["/reset-password", "/login", "/forgot-password", "/auth/callback"];
+    const recoveryAllowed = ["/reset-password", "/welcome", "/forgot-password", "/auth/callback"];
     const isRecoveryAllowed =
       recoveryAllowed.some((p) => pathname.startsWith(p)) || pathname.startsWith("/api/");
     if (!isRecoveryAllowed) {
@@ -125,48 +121,14 @@ export default async function proxy(request: NextRequest) {
     }
   }
 
-  // Session limit: enforce on ALL pages for logged-in non-anonymous users.
-  // Skip only: the session-limit page itself, API routes, and auth callback.
-  const MAX_SESSIONS = 2;
-  const sessionLimitExempt =
-    pathname.startsWith("/session-limit") ||
-    pathname.startsWith("/api/") ||
-    pathname.startsWith("/auth/callback");
-
-  if (isAuthed && !isAnonymous && !isRecoveryMode && !sessionLimitExempt) {
-    const { data: sessionCount } = await supabase
-      .schema("jg_account")
-      .rpc("count_my_sessions");
-
-    if (typeof sessionCount === "number" && sessionCount > MAX_SESSIONS) {
-      const limitUrl = new URL("/session-limit", request.url);
-      if (pathname !== "/") {
-        limitUrl.searchParams.set("redirect", pathname);
-      }
-      return NextResponse.redirect(limitUrl);
-    }
-  }
-
   if (!isAuthed && !isPublic) {
     // Redirect to login with return URL
-    const loginUrl = new URL("/login", request.url);
+    const loginUrl = new URL("/welcome", request.url);
     loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  if (isAuthed && !isRecoveryMode && (pathname.startsWith("/login") || pathname.startsWith("/signup"))) {
-    // Allow anonymous users to access signup page to convert to permanent account
-    if (isAnonymous && pathname.startsWith("/signup")) {
-      return response;
-    }
-
-    // Allow users who just verified their email to access signup page to set password
-    // This happens when anonymous user verifies email - they're no longer anonymous but need to set password
-    const isVerified = request.nextUrl.searchParams.get("verified") === "true";
-    if (isVerified && pathname.startsWith("/signup")) {
-      return response;
-    }
-
+  if (isAuthed && !isRecoveryMode && pathname.startsWith("/welcome")) {
     // Check if there's a redirect URL
     const redirectUrl = request.nextUrl.searchParams.get("redirect");
     if (redirectUrl && redirectUrl.startsWith("/")) {

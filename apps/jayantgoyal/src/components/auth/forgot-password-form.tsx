@@ -61,7 +61,7 @@ export function ForgotPasswordForm({
               </p>
               <div className="flex flex-col gap-2 w-full mt-4">
                 <Button asChild>
-                  <Link href="/login">Back to Login</Link>
+                  <Link href="/welcome">Back to Login</Link>
                 </Button>
                 <Button variant="ghost" asChild>
                   <Link href="/">
@@ -102,7 +102,7 @@ export function ForgotPasswordForm({
             <SubmitButton />
             <div className="text-center text-sm">
               Remember your password?{" "}
-              <Link href="/login" className="underline underline-offset-4">
+              <Link href="/welcome" className="underline underline-offset-4">
                 Log in
               </Link>
             </div>

@@ -1,6 +1,6 @@
 "use client"
 
-import { Shield, AlertTriangle, Clock, BookOpen, Mail, Code, Database, Globe, Users, EyeOff, Trash2, Cpu, RefreshCw } from "lucide-react"
+import { Shield, AlertTriangle, BookOpen, Mail, Code, Database, Globe, EyeOff, Trash2, Cpu, RefreshCw } from "lucide-react"
 import { Separator } from "@repo/ui/separator"
 
 export function TermsContent() {
@@ -96,7 +96,6 @@ export function TermsContent() {
                 <h3 className="font-medium text-purple-600 dark:text-purple-400">Data Retention</h3>
               </div>
               <ul className="text-sm text-muted-foreground space-y-1">
-                <li>• Guest (anonymous) data: <strong className="text-foreground">Session-based, may be cleared periodically</strong></li>
                 <li>• User account data: Retained while account is active</li>
                 <li>• Inactive accounts (&gt;180 days): May be purged</li>
                 <li>• Backups: No guaranteed backup retention</li>
@@ -109,7 +108,6 @@ export function TermsContent() {
                 <h3 className="font-medium text-purple-600 dark:text-purple-400">Privacy Expectations</h3>
               </div>
               <ul className="text-sm text-muted-foreground space-y-1">
-                <li>• Guest data: <strong className="text-foreground">Isolated but limited privacy</strong></li>
                 <li>• User data: Basic security measures applied</li>
                 <li>• No GDPR/CCPA compliance guaranteed</li>
                 <li>• Analytics data collected for improvement</li>
@@ -153,69 +151,11 @@ export function TermsContent() {
 
       <Separator />
 
-      {/* Guest Account Specific Terms */}
-      <section className="space-y-4">
-        <div className="flex items-center gap-3">
-          <Users className="size-6 text-indigo-500" />
-          <h2 className="text-xl font-semibold">6. Guest Account Specific Terms</h2>
-        </div>
-        <div className="pl-9 space-y-4">
-          <div className="rounded-lg bg-indigo-500/10 border border-indigo-500/20 p-4">
-            <h3 className="font-medium text-indigo-600 dark:text-indigo-400 mb-3">Important Notice for Guest Users</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <Users className="size-4 text-indigo-500" />
-                  <span className="text-sm font-medium">Anonymous Session</span>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Each guest gets a unique anonymous session. Your data is isolated from other guests.
-                </p>
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <Clock className="size-4 text-indigo-500" />
-                  <span className="text-sm font-medium">Session-Based</span>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Guest data is tied to your browser session. Clearing cookies or using a different device will lose access.
-                </p>
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <EyeOff className="size-4 text-indigo-500" />
-                  <span className="text-sm font-medium">Limited Privacy</span>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Basic security measures apply, but no guarantees. Convert to a full account for better security.
-                </p>
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <Trash2 className="size-4 text-indigo-500" />
-                  <span className="text-sm font-medium">No Recovery</span>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Lost session = lost data. No backups or recovery options for anonymous accounts.
-                </p>
-              </div>
-            </div>
-            <div className="mt-4 pt-3 border-t border-indigo-500/20">
-              <p className="text-xs text-indigo-600 dark:text-indigo-400">
-                <strong>Tip:</strong> You can convert your guest account to a permanent account anytime by signing up. Your data will be preserved!
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <Separator />
-
       {/* User Account Terms */}
       <section className="space-y-4">
         <div className="flex items-center gap-3">
           <Shield className="size-6 text-green-500" />
-          <h2 className="text-xl font-semibold">7. User Account Terms</h2>
+          <h2 className="text-xl font-semibold">6. User Account Terms</h2>
         </div>
         <div className="pl-9 space-y-4">
           <div className="rounded-lg bg-green-500/10 border border-green-500/20 p-4">
@@ -250,7 +190,7 @@ export function TermsContent() {
       <section className="space-y-4">
         <div className="flex items-center gap-3">
           <Globe className="size-6 text-orange-500" />
-          <h2 className="text-xl font-semibold">8. Acceptable Use Policy</h2>
+          <h2 className="text-xl font-semibold">7. Acceptable Use Policy</h2>
         </div>
         <div className="pl-9 space-y-3">
           <p className="text-sm text-muted-foreground leading-relaxed">
@@ -274,7 +214,7 @@ export function TermsContent() {
       <section className="space-y-4">
         <div className="flex items-center gap-3">
           <Cpu className="size-6 text-muted-foreground" />
-          <h2 className="text-xl font-semibold">9. Technical Requirements & Limitations</h2>
+          <h2 className="text-xl font-semibold">8. Technical Requirements & Limitations</h2>
         </div>
         <div className="pl-9 space-y-3">
           <div className="rounded-lg bg-muted/50 border border-border p-4">
@@ -296,7 +236,7 @@ export function TermsContent() {
       <section className="space-y-4">
         <div className="flex items-center gap-3">
           <Code className="size-6 text-blue-500" />
-          <h2 className="text-xl font-semibold">10. Intellectual Property</h2>
+          <h2 className="text-xl font-semibold">9. Intellectual Property</h2>
         </div>
         <div className="pl-9 space-y-3">
           <p className="text-sm text-muted-foreground leading-relaxed">
@@ -317,7 +257,7 @@ export function TermsContent() {
       <section className="space-y-4">
         <div className="flex items-center gap-3">
           <RefreshCw className="size-6 text-cyan-500" />
-          <h2 className="text-xl font-semibold">11. Changes to Terms</h2>
+          <h2 className="text-xl font-semibold">10. Changes to Terms</h2>
         </div>
         <div className="pl-9 space-y-3">
           <p className="text-sm text-muted-foreground leading-relaxed">
@@ -339,7 +279,7 @@ export function TermsContent() {
       <section className="space-y-4">
         <div className="flex items-center gap-3">
           <Mail className="size-6 text-primary" />
-          <h2 className="text-xl font-semibold">12. Contact & Support</h2>
+          <h2 className="text-xl font-semibold">11. Contact & Support</h2>
         </div>
         <div className="pl-9 space-y-3">
           <p className="text-sm text-muted-foreground leading-relaxed">

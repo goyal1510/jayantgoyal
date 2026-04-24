@@ -47,7 +47,7 @@ export function ResetPasswordForm({
         const supabase = createSupabaseBrowserClient()
         await supabase.auth.signOut()
         clearRecoveryCookie()
-        window.location.href = "/login"
+        window.location.href = "/welcome"
         return
       }
       sessionStorage.setItem("reset_password_visited", "true")
@@ -80,7 +80,7 @@ export function ResetPasswordForm({
     const supabase = createSupabaseBrowserClient()
     await supabase.auth.signOut()
     clearRecoveryCookie()
-    window.location.href = "/login"
+    window.location.href = "/welcome"
   }, [])
 
   // 2-minute countdown timer — auto-redirect to login when expired
@@ -167,7 +167,7 @@ export function ResetPasswordForm({
           sessionStorage.removeItem("reset_password_visited")
           await supabase.auth.signOut({ scope: signOutAll ? "global" : "local" })
           clearRecoveryCookie()
-          window.location.href = "/login?message=password_changed"
+          window.location.href = "/welcome?message=password_changed"
         } catch (err) {
           const message =
             err instanceof Error ? err.message : "Unable to update password."
@@ -212,7 +212,7 @@ export function ResetPasswordForm({
                   <Link href="/forgot-password">Request New Link</Link>
                 </Button>
                 <Button variant="ghost" asChild>
-                  <Link href="/login">
+                  <Link href="/welcome">
                     <LogIn className="size-4" />
                     Back to Login
                   </Link>

@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    return NextResponse.redirect(new URL("/login?error=config", request.url));
+    return NextResponse.redirect(new URL("/welcome?error=config", request.url));
   }
 
   // Prepare response for cookie setting
@@ -45,13 +45,40 @@ export async function GET(request: NextRequest) {
     },
   });
 
-  // Handle PKCE flow (code-based)
+  // Handle PKCE flow (code-based) — used by Google OAuth and email verification
   if (code) {
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     if (error) {
       console.error("Auth callback error (code):", error.message);
-      return NextResponse.redirect(new URL(`/login?error=${encodeURIComponent(error.message)}`, request.url));
+      return NextResponse.redirect(new URL(`/welcome?error=${encodeURIComponent(error.message)}`, request.url));
     }
+
+    // For OAuth users signing in for the first time, populate profile with name from provider
+    if (data?.user) {
+      const { data: existingProfile } = await supabase
+        .schema("jg_account")
+        .from("profiles")
+        .select("first_name")
+        .eq("user_id", data.user.id)
+        .single();
+
+      // Only update if profile exists but has no name set (created by DB trigger)
+      if (existingProfile && !existingProfile.first_name) {
+        const metadata = (data.user.user_metadata ?? {}) as Record<string, unknown>;
+        const fullName = String(metadata.full_name || metadata.name || "");
+        const [firstName = "", ...rest] = fullName.split(" ");
+        const lastName = rest.join(" ");
+
+        if (firstName) {
+          await supabase
+            .schema("jg_account")
+            .from("profiles")
+            .update({ first_name: firstName, last_name: lastName })
+            .eq("user_id", data.user.id);
+        }
+      }
+    }
+
     return response;
   }
 
@@ -67,7 +94,7 @@ export async function GET(request: NextRequest) {
       const friendlyMessage = isRecovery
         ? "This password reset link is invalid or has expired. Please request a new one."
         : error.message;
-      return NextResponse.redirect(new URL(`/login?error=${encodeURIComponent(friendlyMessage)}`, request.url));
+      return NextResponse.redirect(new URL(`/welcome?error=${encodeURIComponent(friendlyMessage)}`, request.url));
     }
 
     // For recovery flow, set a cookie to lock navigation to /reset-password
@@ -89,5 +116,5 @@ export async function GET(request: NextRequest) {
   }
 
   // No valid token provided
-  return NextResponse.redirect(new URL("/login?error=invalid_token", request.url));
+  return NextResponse.redirect(new URL("/welcome?error=invalid_token", request.url));
 }

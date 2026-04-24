@@ -17,16 +17,6 @@ export async function GET() {
     });
   }
 
-  // Anonymous users don't need to accept terms
-  const isAnonymous = user.is_anonymous === true;
-  if (isAnonymous) {
-    return NextResponse.json({
-      needsAcceptance: false,
-      isAuthenticated: true,
-      isGuest: true,
-    });
-  }
-
   // Check if terms are accepted from jg_account.profiles
   const { data: profile } = await supabase
     .schema("jg_account")
@@ -40,6 +30,5 @@ export async function GET() {
   return NextResponse.json({
     needsAcceptance: !termsAccepted,
     isAuthenticated: true,
-    isGuest: false,
   });
 }

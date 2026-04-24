@@ -40,31 +40,13 @@ export async function GET() {
     getString(metadata.full_name) ||
     getString(metadata.name) ||
     getString(metadata.user_name) ||
-    (user.email ? user.email.split("@")[0] : "Guest");
-
-  // Use Supabase's built-in anonymous user detection
-  const isGuest = user.is_anonymous === true;
-
-  // Check if user has verified email (for anonymous → permanent conversion flow)
-  const hasVerifiedEmail = Boolean(user.email_confirmed_at || user.confirmed_at);
-
-  // User needs to set password if they:
-  // - Were anonymous (is_anonymous could be true or false after email link)
-  // - Have a verified email
-  // - Don't have identities with a password (checking if they came from anonymous)
-  const identities = user.identities || [];
-  // If user has verified email but originally was anonymous (no password identity created via signUp)
-  // they need to set a password. Anonymous users who link email don't have password until they set it.
-  const needsPassword = hasVerifiedEmail && !isGuest && identities.length === 0;
+    (user.email ? user.email.split("@")[0] : "User");
 
   return NextResponse.json({
     user: {
       id: user.id,
       email: user.email,
       name,
-      isGuest,
-      hasVerifiedEmail,
-      needsPassword,
     },
   });
 }

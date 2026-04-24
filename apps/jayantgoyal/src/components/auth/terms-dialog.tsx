@@ -18,18 +18,12 @@ interface TermsDialogProps {
   children: React.ReactNode
   onAccept?: () => void
   onBack?: () => void
-  onGuestLogin?: () => void
-  showGuestOption?: boolean
-  isGuestLoading?: boolean
 }
 
 export function TermsDialog({
   children,
   onAccept,
   onBack,
-  onGuestLogin,
-  showGuestOption = false,
-  isGuestLoading = false,
 }: TermsDialogProps) {
   const [open, setOpen] = React.useState(false)
 
@@ -40,11 +34,6 @@ export function TermsDialog({
 
   const handleContinue = () => {
     onAccept?.()
-    setOpen(false)
-  }
-
-  const handleGuestLogin = () => {
-    onGuestLogin?.()
     setOpen(false)
   }
 
@@ -67,21 +56,11 @@ export function TermsDialog({
         <div className="overflow-y-auto px-6 py-4">
           <TermsContent />
         </div>
-        {(onAccept || onBack || showGuestOption) && (
+        {(onAccept || onBack) && (
           <DialogFooter className="border-t px-6 py-4 flex-row gap-2 bg-muted/30">
             {onBack && (
               <Button variant="outline" onClick={handleBack} className="flex-1">
                 Back
-              </Button>
-            )}
-            {showGuestOption && onGuestLogin && (
-              <Button
-                variant="secondary"
-                onClick={handleGuestLogin}
-                className="flex-1"
-                disabled={isGuestLoading}
-              >
-                {isGuestLoading ? "Logging in..." : "Continue as guest"}
               </Button>
             )}
             {onAccept && (

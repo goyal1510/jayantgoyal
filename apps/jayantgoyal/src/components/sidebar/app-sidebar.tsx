@@ -25,9 +25,8 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/client"
 import { TermsDialog } from "@/components/auth/terms-dialog"
 
 const fallbackUser = {
-  name: "Guest",
-  email: "guest@example.com",
-  isGuest: false,
+  name: "User",
+  email: "user@example.com",
 }
 
 // Module-level cache to avoid re-fetching on every navigation
@@ -58,7 +57,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       }
 
       const payload = (await response.json()) as
-        | { user?: { name?: string; email?: string; isGuest?: boolean } }
+        | { user?: { name?: string; email?: string } }
         | undefined
 
       const resolvedName = payload?.user?.name?.trim() || fallbackUser.name
@@ -72,7 +71,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       const userData = {
         name: resolvedName,
         email: resolvedEmail,
-        isGuest: Boolean(payload.user.isGuest),
       }
       cachedUser = userData
       setUser(userData)
@@ -91,7 +89,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         const userData = {
           name: email.split("@")[0] || "User",
           email,
-          isGuest: session.user.is_anonymous === true,
         }
         cachedUser = userData
         setUser(userData)
@@ -385,7 +382,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton asChild className="group/login">
-                <Link href="/login">
+                <Link href="/welcome">
                   <User className="size-4" />
                   <span>Login</span>
                   <LogIn className="ml-auto size-4 text-green-600 transition-transform duration-200 group-hover/login:translate-x-0.5 dark:text-green-500" />

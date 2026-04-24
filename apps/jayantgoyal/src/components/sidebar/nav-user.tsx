@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import { ChevronsUpDown, LogOut, Settings, Trash2, Lock, User, UserPlus, Eye, EyeOff, Info, Monitor, Smartphone, Globe, Loader2, X } from "lucide-react"
+import { ChevronsUpDown, LogOut, Settings, Trash2, User, Eye, EyeOff, Info } from "lucide-react"
 
 import {
   Avatar,
@@ -34,7 +34,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@repo/ui/sheet"
-import { Badge } from "@repo/ui/badge"
 import { Separator } from "@repo/ui/separator"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@repo/ui/tooltip"
 import { createSupabaseBrowserClient } from "@/lib/supabase/client"
@@ -42,64 +41,12 @@ import { MfaSettingsSection } from "@/components/auth/mfa-settings-section"
 import { MfaVerifyDialog } from "@/components/auth/mfa-verify-dialog"
 import { toast } from "sonner"
 
-interface SessionInfo {
-  id: string
-  createdAt: string
-  updatedAt: string
-  userAgent: string | null
-  ip: string | null
-  isCurrent: boolean
-}
-
-function parseUserAgent(ua: string | null): { label: string; isMobile: boolean } {
-  if (!ua) return { label: "Unknown device", isMobile: false }
-
-  let browser = ""
-  if (ua.includes("Firefox/")) browser = "Firefox"
-  else if (ua.includes("Edg/")) browser = "Edge"
-  else if (ua.includes("OPR/") || ua.includes("Opera/")) browser = "Opera"
-  else if (ua.includes("Chrome/") && ua.includes("Safari/")) browser = "Chrome"
-  else if (ua.includes("Safari/") && !ua.includes("Chrome/")) browser = "Safari"
-
-  let os = ""
-  if (ua.includes("Windows")) os = "Windows"
-  else if (ua.includes("Macintosh") || ua.includes("Mac OS")) os = "macOS"
-  else if (ua.includes("Android")) os = "Android"
-  else if (ua.includes("iPhone") || ua.includes("iPad")) os = "iOS"
-  else if (ua.includes("Linux")) os = "Linux"
-
-  const isMobile = ua.includes("Mobile") || ua.includes("Android") || ua.includes("iPhone")
-
-  const label =
-    browser && os ? `${browser} on ${os}` :
-    browser || os || "Unknown device"
-
-  return { label, isMobile }
-}
-
-function formatIp(ip: string): string {
-  return ip.replace(/\/\d+$/, "")
-}
-
-function formatRelativeTime(dateStr: string): string {
-  const diff = Date.now() - new Date(dateStr).getTime()
-  const minutes = Math.floor(diff / 60000)
-  if (minutes < 1) return "Just now"
-  if (minutes < 60) return `${minutes}m ago`
-  const hours = Math.floor(minutes / 60)
-  if (hours < 24) return `${hours}h ago`
-  const days = Math.floor(hours / 24)
-  if (days < 30) return `${days}d ago`
-  return new Date(dateStr).toLocaleDateString()
-}
-
 export function NavUser({
   user,
 }: {
   user: {
     name: string
     email: string
-    isGuest: boolean
   }
 }) {
   const { isMobile } = useSidebar()
@@ -118,12 +65,6 @@ export function NavUser({
   const [isMfaEnabled, setIsMfaEnabled] = React.useState(false)
   const [mfaVerifyOpen, setMfaVerifyOpen] = React.useState(false)
   const [pendingAction, setPendingAction] = React.useState<"save" | "delete" | null>(null)
-  const [sessions, setSessions] = React.useState<SessionInfo[]>([])
-  const [isLoadingSessions, setIsLoadingSessions] = React.useState(false)
-  const [revokingSessionId, setRevokingSessionId] = React.useState<string | null>(null)
-  const [isRevokingAll, setIsRevokingAll] = React.useState(false)
-  const canOpenSettings = !user.isGuest
-
   const nameForUi = displayName || user.name
 
   const handleSignOut = React.useCallback(() => {
@@ -167,65 +108,6 @@ export function NavUser({
     setShowNewPassword(false)
     setShowConfirmPassword(false)
   }, [isSettingsOpen]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  const fetchSessions = React.useCallback(async () => {
-    setIsLoadingSessions(true)
-    try {
-      const res = await fetch("/api/account/sessions")
-      if (!res.ok) throw new Error("Failed to load sessions.")
-      const data = (await res.json()) as { sessions: SessionInfo[] }
-      setSessions(data.sessions)
-    } catch {
-      setSessions([])
-    } finally {
-      setIsLoadingSessions(false)
-    }
-  }, [])
-
-  React.useEffect(() => {
-    if (isSettingsOpen && canOpenSettings) {
-      void fetchSessions()
-    }
-  }, [isSettingsOpen, canOpenSettings, fetchSessions])
-
-  const handleRevokeSession = React.useCallback(async (sessionId: string) => {
-    setRevokingSessionId(sessionId)
-    try {
-      const res = await fetch("/api/account/sessions", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId }),
-      })
-      if (!res.ok) {
-        const data = (await res.json().catch(() => null)) as { error?: string } | null
-        throw new Error(data?.error ?? "Failed to revoke session.")
-      }
-      setSessions((prev) => prev.filter((s) => s.id !== sessionId))
-      toast.success("Session revoked.")
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to revoke session.")
-    } finally {
-      setRevokingSessionId(null)
-    }
-  }, [])
-
-  const handleRevokeAllOthers = React.useCallback(async () => {
-    setIsRevokingAll(true)
-    try {
-      const res = await fetch("/api/account/sessions", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ scope: "others" }),
-      })
-      if (!res.ok) throw new Error("Failed to revoke sessions.")
-      setSessions((prev) => prev.filter((s) => s.isCurrent))
-      toast.success("All other sessions revoked.")
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to revoke sessions.")
-    } finally {
-      setIsRevokingAll(false)
-    }
-  }, [])
 
   const executeSave = React.useCallback(() => {
     const trimmedFirst = firstName.trim()
@@ -348,10 +230,6 @@ export function NavUser({
   }, [router])
 
   const handleSave = React.useCallback(() => {
-    if (user.isGuest) {
-      toast.error("Guest accounts cannot update profile details.")
-      return
-    }
     const hasPasswordChange = newPassword.length > 0
     if (isMfaEnabled && hasPasswordChange) {
       setPendingAction("save")
@@ -359,20 +237,16 @@ export function NavUser({
       return
     }
     executeSave()
-  }, [user.isGuest, newPassword, isMfaEnabled, executeSave])
+  }, [newPassword, isMfaEnabled, executeSave])
 
   const handleDeleteAccount = React.useCallback(() => {
-    if (user.isGuest) {
-      toast.error("Guest accounts cannot be deleted.")
-      return
-    }
     if (isMfaEnabled) {
       setPendingAction("delete")
       setMfaVerifyOpen(true)
       return
     }
     executeDelete()
-  }, [user.isGuest, isMfaEnabled, executeDelete])
+  }, [isMfaEnabled, executeDelete])
 
   const handleMfaVerified = React.useCallback(() => {
     if (pendingAction === "save") {
@@ -387,8 +261,8 @@ export function NavUser({
     <SidebarMenu>
       <SidebarMenuItem>
         <Sheet
-          open={canOpenSettings ? isSettingsOpen : false}
-          onOpenChange={canOpenSettings ? setIsSettingsOpen : undefined}
+          open={isSettingsOpen}
+          onOpenChange={setIsSettingsOpen}
         >
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -419,32 +293,15 @@ export function NavUser({
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              {canOpenSettings ? (
-                <SheetTrigger asChild>
-                  <DropdownMenuItem
-                    onSelect={(event) => event.preventDefault()}
-                    className="gap-2"
-                  >
-                    <Settings className="size-4" />
-                    Settings
-                  </DropdownMenuItem>
-                </SheetTrigger>
-              ) : (
-                <>
-                  <DropdownMenuItem disabled className="gap-2">
-                    <Settings className="size-4" />
-                    Settings
-                    <Lock className="size-4" />
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onSelect={() => router.push("/signup")}
-                    className="gap-2"
-                  >
-                    <UserPlus className="size-4" />
-                    Create your account
-                  </DropdownMenuItem>
-                </>
-              )}
+              <SheetTrigger asChild>
+                <DropdownMenuItem
+                  onSelect={(event) => event.preventDefault()}
+                  className="gap-2"
+                >
+                  <Settings className="size-4" />
+                  Settings
+                </DropdownMenuItem>
+              </SheetTrigger>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onSelect={(event) => {
@@ -460,8 +317,7 @@ export function NavUser({
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {canOpenSettings ? (
-            <SheetContent
+          <SheetContent
               side="right"
               className="sm:max-w-md"
             >
@@ -568,107 +424,6 @@ export function NavUser({
                 <MfaSettingsSection onStatusChange={setIsMfaEnabled} />
               </div>
 
-              <Separator className="mx-6 w-auto" />
-
-              {/* Sessions Section */}
-              <div className="space-y-4 px-6">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-medium">
-                    Sessions
-                    {!isLoadingSessions && sessions.length > 0 && (
-                      <span className="text-muted-foreground ml-1.5 font-normal">
-                        ({sessions.length})
-                      </span>
-                    )}
-                  </h3>
-                  {sessions.filter((s) => !s.isCurrent).length > 1 && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-destructive hover:text-destructive h-auto px-2 py-1 text-xs"
-                      onClick={() => void handleRevokeAllOthers()}
-                      disabled={isRevokingAll || revokingSessionId !== null}
-                    >
-                      {isRevokingAll ? (
-                        <>
-                          <Loader2 className="mr-1 size-3 animate-spin" />
-                          Revoking...
-                        </>
-                      ) : (
-                        "Revoke all others"
-                      )}
-                    </Button>
-                  )}
-                </div>
-
-                {isLoadingSessions ? (
-                  <div className="flex items-center justify-center py-6">
-                    <Loader2 className="text-muted-foreground size-5 animate-spin" />
-                  </div>
-                ) : sessions.length === 0 ? (
-                  <p className="text-muted-foreground text-sm">No active sessions found.</p>
-                ) : (
-                  <div className="space-y-2">
-                    {sessions.map((session) => {
-                      const { label, isMobile: isMobileDevice } = parseUserAgent(session.userAgent)
-                      const deviceLabel = session.isCurrent ? "This device" : label
-                      const DeviceIcon = isMobileDevice ? Smartphone : Monitor
-                      const isRevoking = revokingSessionId === session.id
-
-                      return (
-                        <div
-                          key={session.id}
-                          className="bg-muted/50 flex items-start gap-3 rounded-lg border p-3"
-                        >
-                          <DeviceIcon className="text-muted-foreground mt-0.5 size-4 shrink-0" />
-                          <div className="min-w-0 flex-1 space-y-0.5">
-                            <div className="flex items-center gap-2">
-                              <span className="truncate text-sm font-medium">
-                                {deviceLabel}
-                              </span>
-                              {session.isCurrent && (
-                                <Badge variant="secondary" className="shrink-0 px-1.5 py-0 text-[10px]">
-                                  Current
-                                </Badge>
-                              )}
-                            </div>
-                            <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
-                              {session.ip && (
-                                <>
-                                  <Globe className="size-3" />
-                                  <span>{formatIp(session.ip)}</span>
-                                  <span>&middot;</span>
-                                </>
-                              )}
-                              <span>Created {formatRelativeTime(session.createdAt)}</span>
-                            </div>
-                          </div>
-                          {!session.isCurrent && (
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <button
-                                  type="button"
-                                  className="text-muted-foreground hover:text-destructive mt-0.5 shrink-0 cursor-pointer transition-colors disabled:opacity-50"
-                                  onClick={() => void handleRevokeSession(session.id)}
-                                  disabled={isRevoking || isRevokingAll}
-                                >
-                                  {isRevoking ? (
-                                    <Loader2 className="size-4 animate-spin" />
-                                  ) : (
-                                    <X className="size-4" />
-                                  )}
-                                </button>
-                              </TooltipTrigger>
-                              <TooltipContent side="left">Revoke session</TooltipContent>
-                            </Tooltip>
-                          )}
-                        </div>
-                      )
-                    })}
-                  </div>
-                )}
-              </div>
-
               <SheetFooter className="p-6 pt-2 flex-row flex-wrap items-center gap-3">
                 <Button
                   type="button"
@@ -698,8 +453,7 @@ export function NavUser({
                 }}
                 onVerified={handleMfaVerified}
               />
-            </SheetContent>
-        ) : null}
+          </SheetContent>
         </Sheet>
       </SidebarMenuItem>
     </SidebarMenu>

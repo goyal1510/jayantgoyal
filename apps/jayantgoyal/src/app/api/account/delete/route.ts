@@ -27,14 +27,6 @@ export async function DELETE() {
     );
   }
 
-  // Anonymous users cannot delete their accounts (they can just sign out)
-  if (user.is_anonymous === true) {
-    return NextResponse.json(
-      { error: "Anonymous accounts cannot be deleted. Please sign out instead." },
-      { status: 403 }
-    );
-  }
-
   const adminClient = createClient(supabaseUrl, serviceRoleKey, {
     auth: {
       autoRefreshToken: false,
