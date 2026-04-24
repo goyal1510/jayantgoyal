@@ -2,20 +2,19 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { Eye, EyeOff, LogIn, AlertCircle, ShieldCheck, Loader2, Timer } from "lucide-react"
+import { Eye, EyeOff, LogIn, AlertCircle, Timer } from "lucide-react"
 
 import { createSupabaseBrowserClient } from "@/lib/supabase/client"
 import { Button } from "@repo/ui/button"
 import { Card, CardContent } from "@repo/ui/card"
 import { Input } from "@repo/ui/input"
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@repo/ui/input-otp"
 import { Label } from "@repo/ui/label"
 import { Switch } from "@repo/ui/switch"
 import { cn } from "@repo/ui/lib/utils"
 import { toast } from "sonner"
 import { Spinner } from "@/components/ui/spinner"
 
-type SessionState = "loading" | "none" | "aal1_mfa_required" | "ready"
+type SessionState = "loading" | "none" | "ready"
 
 function clearRecoveryCookie() {
   document.cookie = "recovery_mode=; path=/; max-age=0"
@@ -33,10 +32,6 @@ export function ResetPasswordForm({
   const [signOutAll, setSignOutAll] = React.useState(true)
 
   const [timeLeft, setTimeLeft] = React.useState(120) // 2 minutes
-
-  // MFA state
-  const [mfaCode, setMfaCode] = React.useState("")
-  const [isMfaVerifying, setIsMfaVerifying] = React.useState(false)
 
   React.useEffect(() => {
     const checkSession = async () => {
@@ -62,15 +57,8 @@ export function ResetPasswordForm({
         return
       }
 
-      // Check if MFA verification is needed
-      const { data: aalData } =
-        await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
-
-      if (aalData && aalData.currentLevel === "aal1" && aalData.nextLevel === "aal2") {
-        setSessionState("aal1_mfa_required")
-      } else {
-        setSessionState("ready")
-      }
+      // MFA is enforced at the proxy level — if we reach here, MFA is already passed
+      setSessionState("ready")
     }
     checkSession()
   }, [])
@@ -85,7 +73,7 @@ export function ResetPasswordForm({
 
   // 2-minute countdown timer — auto-redirect to login when expired
   React.useEffect(() => {
-    if (sessionState !== "ready" && sessionState !== "aal1_mfa_required") return
+    if (sessionState !== "ready") return
 
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
@@ -100,42 +88,6 @@ export function ResetPasswordForm({
 
     return () => clearInterval(interval)
   }, [sessionState, cleanupAndRedirectToLogin])
-
-  const handleMfaVerify = React.useCallback(async () => {
-    if (mfaCode.length !== 6) return
-
-    setIsMfaVerifying(true)
-    try {
-      const supabase = createSupabaseBrowserClient()
-
-      const { data: factorsData, error: factorsError } =
-        await supabase.auth.mfa.listFactors()
-      if (factorsError) throw factorsError
-
-      const totp = factorsData.totp[0]
-      if (!totp) throw new Error("No TOTP factor found.")
-
-      const { data: challengeData, error: challengeError } =
-        await supabase.auth.mfa.challenge({ factorId: totp.id })
-      if (challengeError) throw challengeError
-
-      const { error: verifyError } = await supabase.auth.mfa.verify({
-        factorId: totp.id,
-        challengeId: challengeData.id,
-        code: mfaCode,
-      })
-      if (verifyError) throw verifyError
-
-      setSessionState("ready")
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Verification failed."
-      toast.error(message)
-      setMfaCode("")
-    } finally {
-      setIsMfaVerifying(false)
-    }
-  }, [mfaCode])
 
   const handleSubmit = React.useCallback(
     (e: React.FormEvent) => {
@@ -218,74 +170,6 @@ export function ResetPasswordForm({
                   </Link>
                 </Button>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
-
-  // MFA verification required before allowing password reset
-  if (sessionState === "aal1_mfa_required") {
-    return (
-      <div className={cn("flex flex-col gap-6", className)} {...props}>
-        <Card className="overflow-hidden">
-          <CardContent className="p-6 md:p-8">
-            <div className="flex flex-col items-center gap-6">
-              <div className="flex flex-col items-center gap-2 text-center">
-                <ShieldCheck className="text-muted-foreground size-10" />
-                <h1 className="text-2xl font-bold">Two-Factor Authentication</h1>
-                <p className="text-muted-foreground text-sm">
-                  Enter the 6-digit code from your authenticator app to continue resetting your password.
-                </p>
-                <div className={cn(
-                  "flex items-center gap-1.5 text-xs mt-1 font-medium",
-                  timeLeft <= 30 ? "text-destructive" : "text-muted-foreground"
-                )}>
-                  <Timer className="size-3.5" />
-                  Session expires in {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, "0")}
-                </div>
-              </div>
-
-              <InputOTP
-                maxLength={6}
-                value={mfaCode}
-                onChange={setMfaCode}
-                onComplete={handleMfaVerify}
-                disabled={isMfaVerifying}
-              >
-                <InputOTPGroup>
-                  <InputOTPSlot index={0} />
-                  <InputOTPSlot index={1} />
-                  <InputOTPSlot index={2} />
-                  <InputOTPSlot index={3} />
-                  <InputOTPSlot index={4} />
-                  <InputOTPSlot index={5} />
-                </InputOTPGroup>
-              </InputOTP>
-
-              <Button
-                className="w-full"
-                onClick={handleMfaVerify}
-                disabled={isMfaVerifying || mfaCode.length !== 6}
-              >
-                {isMfaVerifying ? (
-                  <>
-                    <Loader2 className="size-4 animate-spin" />
-                    Verifying...
-                  </>
-                ) : (
-                  "Verify"
-                )}
-              </Button>
-              <Button
-                variant="ghost"
-                className="w-full"
-                onClick={cleanupAndRedirectToLogin}
-              >
-                <LogIn className="size-4" />
-                Back to Login
-              </Button>
             </div>
           </CardContent>
         </Card>

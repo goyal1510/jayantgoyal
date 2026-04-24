@@ -8,7 +8,6 @@ import Link from "next/link"
 import { Eye, EyeOff, Home } from "lucide-react"
 
 import { authenticate } from "@/app/welcome/actions"
-import { MfaVerifyStep } from "@/components/auth/mfa-verify-step"
 import { createSupabaseBrowserClient } from "@/lib/supabase/client"
 import { Button } from "@repo/ui/button"
 import { Card, CardContent } from "@repo/ui/card"
@@ -56,7 +55,6 @@ export function WelcomeForm({
 
   const [state, formAction] = React.useActionState(authenticate, initialState)
   const [showPassword, setShowPassword] = React.useState(false)
-  const [mfaStep, setMfaStep] = React.useState(false)
   const [isGooglePending, setIsGooglePending] = React.useState(false)
 
   const handleGoogleLogin = React.useCallback(() => {
@@ -69,12 +67,6 @@ export function WelcomeForm({
       },
     })
   }, [redirectUrl])
-
-  React.useEffect(() => {
-    if (state?.mfaRequired) {
-      setMfaStep(true)
-    }
-  }, [state?.mfaRequired])
 
   React.useEffect(() => {
     if (state?.error) {
@@ -105,10 +97,7 @@ export function WelcomeForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden">
         <CardContent className="p-6 md:p-8">
-          {mfaStep ? (
-            <MfaVerifyStep redirectUrl={state?.redirectUrl ?? redirectUrl} />
-          ) : (
-            <form action={formAction} className="flex flex-col gap-6">
+          <form action={formAction} className="flex flex-col gap-6">
               <input type="hidden" name="redirect" value={redirectUrl} />
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">Welcome!</h1>
@@ -177,8 +166,7 @@ export function WelcomeForm({
                   Back to Home
                 </Link>
               </Button>
-            </form>
-          )}
+          </form>
         </CardContent>
       </Card>
     </div>

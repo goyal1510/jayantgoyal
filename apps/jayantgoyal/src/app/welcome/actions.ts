@@ -9,12 +9,11 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 type AuthFormState = {
   error?: string;
   success?: string;
-  mfaRequired?: boolean;
-  redirectUrl?: string;
 };
 
 /**
  * Unified auth action — tries sign-in first, falls back to sign-up if user doesn't exist.
+ * MFA is enforced at the proxy level, not here.
  */
 export async function authenticate(
   prevState: AuthFormState,
@@ -37,36 +36,17 @@ export async function authenticate(
   });
 
   if (!loginError) {
-    // Sign-in succeeded — check MFA
-    const { data: aalData, error: aalError } =
-      await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    // Sign-in succeeded — proxy will handle MFA check on next request
+    revalidatePath("/", "layout");
 
     const targetUrl =
       redirectUrl && String(redirectUrl).startsWith("/")
         ? String(redirectUrl)
         : "/";
 
-    if (
-      !aalError &&
-      aalData &&
-      aalData.currentLevel === "aal1" &&
-      aalData.nextLevel === "aal2"
-    ) {
-      const { data: factorsData } = await supabase.auth.mfa.listFactors();
-      const verifiedFactors = factorsData?.totp.filter(
-        (f) => f.status === "verified"
-      );
-
-      if (verifiedFactors && verifiedFactors.length > 0) {
-        return { mfaRequired: true, redirectUrl: targetUrl };
-      }
-    }
-
-    revalidatePath("/", "layout");
-
-    const loginUrl = new URL(targetUrl, "http://n");
-    loginUrl.searchParams.set("login_success", "true");
-    redirect(loginUrl.pathname + loginUrl.search);
+    const url = new URL(targetUrl, "http://n");
+    url.searchParams.set("login_success", "true");
+    redirect(url.pathname + url.search);
   }
 
   // Sign-in failed — try creating an account
@@ -84,13 +64,12 @@ export async function authenticate(
   });
 
   if (!signupError) {
-    // Account created — user needs to verify email
     return {
       success:
         "Account created! Check your email for the verification link.",
     };
   }
 
-  // Both failed — existing user with wrong password (signUp returns "User already registered")
+  // Both failed — existing user with wrong password
   return { error: loginError.message };
 }

@@ -53,6 +53,26 @@ Replace guest/anonymous login with Google OAuth. Users should be able to login/s
 - `src/app/unauthorized/page.tsx` — `/login` → `/welcome`
 - `src/app/(admin)/layout.tsx`, `users/page.tsx`, `deployments/*.tsx` — all redirects `/login` → `/welcome`
 
+### MFA Enforcement at Proxy Level (both apps)
+- `src/proxy.ts` — refactored into middleware chain pattern with sub-proxies:
+  - `src/proxy/types.ts` — ProxyContext and ProxyMiddleware types
+  - `src/proxy/runner.ts` — sequential middleware runner
+  - `src/proxy/mfa.ts` — MFA enforcement (blocks pages + APIs at AAL1)
+  - `src/proxy/recovery.ts` — recovery mode lockdown (pages + APIs)
+  - `src/proxy/terms.ts` — terms acceptance enforcement
+  - `src/proxy/route-guard.ts` — auth redirects
+- `src/proxy.ts` — now a thin orchestrator that builds context and runs the chain:
+  1. Unauthenticated users handled first (redirect to /welcome)
+  2. MFA enforcement blocks pages AND APIs (only essential APIs allowed at AAL1)
+  3. Recovery mode blocks APIs too (only profile/mfa-cleanup allowed)
+  4. Terms enforcement unchanged
+  5. Welcome page redirect last
+- `src/app/mfa-verify/page.tsx` — new dedicated MFA verification page
+- `src/app/welcome/actions.ts` — removed MFA check (proxy handles it now)
+- `src/components/auth/welcome-form.tsx` — removed mfaStep state and MfaVerifyStep usage
+- `src/components/auth/reset-password-form.tsx` — removed client-side MFA check (proxy enforces it before page loads)
+- Admin app: added `mfa-verify-step.tsx` component, `mfa-verify/page.tsx`, proxy AAL check
+
 ### Database Cleanup
 - Saved email function reference to `docs/references/resend-email-from-postgres.md`
 - Dropped `jg_account.guest_login_limits` table

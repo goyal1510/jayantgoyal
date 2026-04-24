@@ -1,6 +1,13 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+import { runMiddleware } from "@/proxy/runner";
+import { mfaMiddleware } from "@/proxy/mfa";
+import { recoveryMiddleware } from "@/proxy/recovery";
+import { termsMiddleware } from "@/proxy/terms";
+import { routeGuardMiddleware } from "@/proxy/route-guard";
+import type { ProxyContext } from "@/proxy/types";
+
 export const config = {
   matcher: [
     "/",
@@ -8,59 +15,58 @@ export const config = {
   ],
 };
 
+/** Public paths that don't require authentication */
+const PUBLIC_PATHS = [
+  "/",
+  "/tools",
+  "/weather",
+  "/custom-calculator",
+  "/terms-conditions",
+  "/github-stats",
+  "/welcome",
+  "/forgot-password",
+  "/reset-password",
+  "/auth/callback",
+  "/api/contact",
+  "/api/github-loc",
+  "/api/account/terms-status",
+  "/api/account/accept-terms",
+  "/favicon_io/site.webmanifest",
+  "/assets/",
+];
+
+/** Paths that require exact match instead of prefix match */
+const EXACT_MATCH_PATHS = new Set(["/", "/weather", "/custom-calculator", "/terms-conditions"]);
+
+function isPublicPath(pathname: string): boolean {
+  return PUBLIC_PATHS.some((path) => {
+    if (EXACT_MATCH_PATHS.has(path)) return pathname === path;
+    return pathname.startsWith(path);
+  });
+}
+
 export default async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  // Skip proxy for static asset files (matcher regex may not catch all cases)
+  // Skip proxy for static asset files
   if (/\.(?:svg|png|jpg|jpeg|gif|webp|webmanifest|pdf|ico)$/i.test(pathname)) {
     return NextResponse.next();
   }
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
   const response = NextResponse.next({ request: { headers: request.headers } });
+  const isPublic = isPublicPath(pathname);
 
-
-  // Public paths that don't require authentication
-  const publicPaths = [
-    "/",              // Portfolio / root (public)
-    "/tools",         // Tech Tools is public
-    "/weather",       // Weather is public
-    "/custom-calculator", // Custom Calculator is public
-    "/terms-conditions",  // Terms & Conditions is public
-    "/github-stats",
-    "/welcome",
-    "/forgot-password",
-    "/reset-password",
-    "/auth/callback", // Auth callback for email verification token exchange
-    "/api/contact",   // Contact form API
-    "/api/github-loc", // GitHub LOC stats (public)
-    "/api/account/terms-status", // Terms status check (returns safe defaults for unauthenticated)
-    "/api/account/accept-terms", // Terms acceptance
-    "/favicon_io/site.webmanifest",
-    "/assets/",           // Static assets (favicons, images, etc.)
-  ];
-
-  const isPublic = publicPaths.some((path) => {
-    if (path === "/" || path === "/weather" || path === "/custom-calculator" || path === "/terms-conditions") {
-      // Exact match for these routes
-      return pathname === path;
-    }
-    return pathname.startsWith(path);
-  });
-
-  // If Supabase config is missing, allow public pages and block protected ones.
+  // If Supabase config is missing, allow public pages and block protected ones
   if (!supabaseUrl || !supabaseAnonKey) {
-    if (isPublic) {
-      return response;
-    }
-    // Redirect to login with return URL
+    if (isPublic) return response;
     const loginUrl = new URL("/welcome", request.url);
     loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
+  // Create Supabase client
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll: () => request.cookies.getAll(),
@@ -72,13 +78,11 @@ export default async function proxy(request: NextRequest) {
     },
   });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  // Resolve auth state
+  const { data: { user } } = await supabase.auth.getUser();
   const isAuthed = Boolean(user);
 
-  // Read terms_accepted from jg_account.profiles
+  // Resolve terms state
   let termsAccepted = false;
   if (isAuthed) {
     const { data: profile } = await supabase
@@ -90,52 +94,26 @@ export default async function proxy(request: NextRequest) {
     termsAccepted = profile?.terms_accepted === true;
   }
 
+  // Set response headers
   response.headers.set("x-auth-status", isAuthed ? "authed" : "anon");
   response.headers.set("x-terms-accepted", termsAccepted ? "true" : "false");
 
-  // Recovery mode: lock navigation to reset-password while cookie exists
-  const isRecoveryMode = request.cookies.get("recovery_mode")?.value === "true";
-  if (isAuthed && isRecoveryMode) {
-    const recoveryAllowed = ["/reset-password", "/welcome", "/forgot-password", "/auth/callback"];
-    const isRecoveryAllowed =
-      recoveryAllowed.some((p) => pathname.startsWith(p)) || pathname.startsWith("/api/");
-    if (!isRecoveryAllowed) {
-      return NextResponse.redirect(new URL("/reset-password", request.url));
-    }
-  }
+  // Build context and run middleware chain
+  const ctx: ProxyContext = {
+    request,
+    response,
+    supabase,
+    user,
+    pathname,
+    isAuthed,
+    termsAccepted,
+    isPublic,
+  };
 
-  // Block protected API routes if terms not accepted (except terms-related APIs)
-  if (isAuthed && !termsAccepted && pathname.startsWith("/api/")) {
-    const allowedApis = [
-      "/api/account/terms-status",
-      "/api/account/accept-terms",
-      "/api/account/profile",
-      "/api/account/mfa-cleanup",
-    ];
-    const isAllowedApi = allowedApis.some((api) => pathname.startsWith(api));
-    if (!isAllowedApi) {
-      return NextResponse.json(
-        { error: "You must accept the Terms and Conditions to use this feature." },
-        { status: 403 }
-      );
-    }
-  }
-
-  if (!isAuthed && !isPublic) {
-    // Redirect to login with return URL
-    const loginUrl = new URL("/welcome", request.url);
-    loginUrl.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(loginUrl);
-  }
-
-  if (isAuthed && !isRecoveryMode && pathname.startsWith("/welcome")) {
-    // Check if there's a redirect URL
-    const redirectUrl = request.nextUrl.searchParams.get("redirect");
-    if (redirectUrl && redirectUrl.startsWith("/")) {
-      return NextResponse.redirect(new URL(redirectUrl, request.url));
-    }
-    return NextResponse.redirect(new URL("/", request.url));
-  }
-
-  return response;
+  return runMiddleware(ctx, [
+    routeGuardMiddleware,   // 1. Redirect unauthenticated to /welcome, authed away from /welcome
+    mfaMiddleware,          // 2. MFA enforcement — block pages + APIs at AAL1
+    recoveryMiddleware,     // 3. Recovery mode — lock to /reset-password + essential APIs
+    termsMiddleware,        // 4. Terms — block APIs if not accepted
+  ]);
 }
