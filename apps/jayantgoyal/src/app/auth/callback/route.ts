@@ -79,6 +79,23 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Check if user has MFA enrolled — redirect to /mfa-verify instead of target URL.
+    // This catches MFA immediately at session creation rather than relying on the proxy
+    // (which can miss it due to AAL timing on freshly created sessions).
+    const { data: factorsData } = await supabase.auth.mfa.listFactors();
+    const hasVerifiedFactor = factorsData?.totp.some((f) => f.status === "verified");
+    if (hasVerifiedFactor) {
+      const mfaUrl = new URL("/mfa-verify", request.url);
+      if (next !== "/") {
+        mfaUrl.searchParams.set("redirect", next);
+      }
+      const mfaResponse = NextResponse.redirect(mfaUrl);
+      response.cookies.getAll().forEach(({ name, value, ...options }) => {
+        mfaResponse.cookies.set(name, value, options);
+      });
+      return mfaResponse;
+    }
+
     return response;
   }
 
@@ -97,16 +114,19 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL(`/welcome?error=${encodeURIComponent(friendlyMessage)}`, request.url));
     }
 
-    // For recovery flow, set a cookie to lock navigation to /reset-password
+    // For recovery flow, set a cookie to lock navigation to /reset-password.
+    // MFA check happens here too — user must verify TOTP before resetting password.
     if (isRecovery) {
-      const recoveryResponse = NextResponse.redirect(new URL("/reset-password", request.url));
-      // Copy over Supabase auth cookies from the original response
+      const { data: recoveryFactors } = await supabase.auth.mfa.listFactors();
+      const recoveryHasMfa = recoveryFactors?.totp.some((f) => f.status === "verified");
+      const recoveryTarget = recoveryHasMfa ? "/mfa-verify?redirect=/reset-password" : "/reset-password";
+      const recoveryResponse = NextResponse.redirect(new URL(recoveryTarget, request.url));
       response.cookies.getAll().forEach(({ name, value, ...options }) => {
         recoveryResponse.cookies.set(name, value, options);
       });
       recoveryResponse.cookies.set("recovery_mode", "true", {
         path: "/",
-        maxAge: 3600, // 1 hour
+        maxAge: 3600,
         sameSite: "lax",
       });
       return recoveryResponse;
