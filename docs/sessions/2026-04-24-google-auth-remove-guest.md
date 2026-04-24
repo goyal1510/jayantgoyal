@@ -53,6 +53,12 @@ Replace guest/anonymous login with Google OAuth. Users should be able to login/s
 - `src/app/unauthorized/page.tsx` — `/login` → `/welcome`
 - `src/app/(admin)/layout.tsx`, `users/page.tsx`, `deployments/*.tsx` — all redirects `/login` → `/welcome`
 
+### Database Cleanup
+- Saved email function reference to `docs/references/resend-email-from-postgres.md`
+- Dropped `jg_account.guest_login_limits` table
+- Dropped `delete_anonymous_users_complete()` function
+- Unscheduled `cleanup-anonymous-users-nightly` cron job
+
 ## Verification
 - `pnpm check-types --filter jg` — passes
 - `pnpm lint --filter jg` — passes (zero warnings)
