@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import { ChevronsUpDown, LogOut, Settings, Trash2, Lock, User, UserPlus, Eye, EyeOff, Info } from "lucide-react"
+import { ChevronsUpDown, LogOut, Settings, Trash2, User, Eye, EyeOff, Info } from "lucide-react"
 
 import {
   Avatar,
@@ -47,7 +47,6 @@ export function NavUser({
   user: {
     name: string
     email: string
-    isGuest: boolean
   }
 }) {
   const { isMobile } = useSidebar()
@@ -66,8 +65,6 @@ export function NavUser({
   const [isMfaEnabled, setIsMfaEnabled] = React.useState(false)
   const [mfaVerifyOpen, setMfaVerifyOpen] = React.useState(false)
   const [pendingAction, setPendingAction] = React.useState<"save" | "delete" | null>(null)
-  const canOpenSettings = !user.isGuest
-
   const nameForUi = displayName || user.name
 
   const handleSignOut = React.useCallback(() => {
@@ -234,10 +231,6 @@ export function NavUser({
   }, [router])
 
   const handleSave = React.useCallback(() => {
-    if (user.isGuest) {
-      toast.error("Guest accounts cannot update profile details.")
-      return
-    }
     const hasPasswordChange = newPassword.length > 0
     if (isMfaEnabled && hasPasswordChange) {
       setPendingAction("save")
@@ -245,20 +238,16 @@ export function NavUser({
       return
     }
     executeSave()
-  }, [user.isGuest, newPassword, isMfaEnabled, executeSave])
+  }, [newPassword, isMfaEnabled, executeSave])
 
   const handleDeleteAccount = React.useCallback(() => {
-    if (user.isGuest) {
-      toast.error("Guest accounts cannot be deleted.")
-      return
-    }
     if (isMfaEnabled) {
       setPendingAction("delete")
       setMfaVerifyOpen(true)
       return
     }
     executeDelete()
-  }, [user.isGuest, isMfaEnabled, executeDelete])
+  }, [isMfaEnabled, executeDelete])
 
   const handleMfaVerified = React.useCallback(() => {
     if (pendingAction === "save") {
@@ -273,8 +262,8 @@ export function NavUser({
     <SidebarMenu>
       <SidebarMenuItem>
         <Sheet
-          open={canOpenSettings ? isSettingsOpen : false}
-          onOpenChange={canOpenSettings ? setIsSettingsOpen : undefined}
+          open={isSettingsOpen}
+          onOpenChange={setIsSettingsOpen}
         >
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -305,32 +294,15 @@ export function NavUser({
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              {canOpenSettings ? (
-                <SheetTrigger asChild>
-                  <DropdownMenuItem
-                    onSelect={(event) => event.preventDefault()}
-                    className="gap-2"
-                  >
-                    <Settings className="size-4" />
-                    Settings
-                  </DropdownMenuItem>
-                </SheetTrigger>
-              ) : (
-                <>
-                  <DropdownMenuItem disabled className="gap-2">
-                    <Settings className="size-4" />
-                    Settings
-                    <Lock className="size-4" />
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onSelect={() => router.push("/signup")}
-                    className="gap-2"
-                  >
-                    <UserPlus className="size-4" />
-                    Create your account
-                  </DropdownMenuItem>
-                </>
-              )}
+              <SheetTrigger asChild>
+                <DropdownMenuItem
+                  onSelect={(event) => event.preventDefault()}
+                  className="gap-2"
+                >
+                  <Settings className="size-4" />
+                  Settings
+                </DropdownMenuItem>
+              </SheetTrigger>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onSelect={(event) => {
@@ -346,8 +318,7 @@ export function NavUser({
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {canOpenSettings ? (
-            <SheetContent
+          <SheetContent
               side="right"
               className="sm:max-w-md"
             >
@@ -483,8 +454,7 @@ export function NavUser({
                 }}
                 onVerified={handleMfaVerified}
               />
-            </SheetContent>
-          ) : null}
+          </SheetContent>
         </Sheet>
       </SidebarMenuItem>
     </SidebarMenu>

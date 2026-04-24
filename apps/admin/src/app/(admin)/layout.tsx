@@ -46,7 +46,6 @@ export default async function AdminLayout({
     email: user.email ?? "",
     name: fullName,
     role: profile.role as UserRole,
-    isGuest: false,
   };
 
   return (

@@ -42,6 +42,12 @@ Replace guest/anonymous login with Google OAuth. Users should be able to login/s
 - Google button uses inline SVG icon (no new dependency)
 - "or" divider between email/password and Google OAuth buttons
 
+### Admin App (`apps/admin`)
+- `src/lib/types.ts` — removed `isGuest` from `AuthUser` interface
+- `src/app/(admin)/layout.tsx` — removed `isGuest: false` from authUser
+- `src/components/sidebar/app-sidebar.tsx` — removed `isGuest` from NavUser prop
+- `src/components/sidebar/nav-user.tsx` — removed `isGuest` from user type, removed `canOpenSettings` guard, removed locked settings + "Create your account" menu items, removed guest checks in save/delete
+
 ## Verification
 - `pnpm check-types --filter jg` — passes
 - `pnpm lint --filter jg` — passes (zero warnings)
