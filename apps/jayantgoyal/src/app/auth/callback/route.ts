@@ -80,9 +80,21 @@ export async function GET(request: NextRequest) {
     }
 
     // Check if user has MFA enrolled — redirect to /mfa-verify instead of target URL.
-    // This catches MFA immediately at session creation rather than relying on the proxy
-    // (which can miss it due to AAL timing on freshly created sessions).
-    const { data: factorsData } = await supabase.auth.mfa.listFactors();
+    // We need a fresh client that reads from RESPONSE cookies (where the new session lives),
+    // since the original client reads from REQUEST cookies (which don't have the session yet).
+    const postAuthSupabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+      cookies: {
+        getAll() {
+          return response.cookies.getAll().map((c) => ({ name: c.name, value: c.value }));
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            response.cookies.set(name, value, options);
+          });
+        },
+      },
+    });
+    const { data: factorsData } = await postAuthSupabase.auth.mfa.listFactors();
     const hasVerifiedFactor = factorsData?.totp.some((f) => f.status === "verified");
     if (hasVerifiedFactor) {
       const mfaUrl = new URL("/mfa-verify", request.url);
@@ -117,7 +129,19 @@ export async function GET(request: NextRequest) {
     // For recovery flow, set a cookie to lock navigation to /reset-password.
     // MFA check happens here too — user must verify TOTP before resetting password.
     if (isRecovery) {
-      const { data: recoveryFactors } = await supabase.auth.mfa.listFactors();
+      const postVerifySupabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+        cookies: {
+          getAll() {
+            return response.cookies.getAll().map((c) => ({ name: c.name, value: c.value }));
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              response.cookies.set(name, value, options);
+            });
+          },
+        },
+      });
+      const { data: recoveryFactors } = await postVerifySupabase.auth.mfa.listFactors();
       const recoveryHasMfa = recoveryFactors?.totp.some((f) => f.status === "verified");
       const recoveryTarget = recoveryHasMfa ? "/mfa-verify?redirect=/reset-password" : "/reset-password";
       const recoveryResponse = NextResponse.redirect(new URL(recoveryTarget, request.url));
