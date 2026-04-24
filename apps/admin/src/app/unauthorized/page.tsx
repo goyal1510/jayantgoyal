@@ -18,7 +18,7 @@ export default function UnauthorizedPage() {
   async function handleLogout() {
     const supabase = createSupabaseBrowserClient();
     await supabase.auth.signOut();
-    router.push("/login");
+    router.push("/welcome");
   }
 
   return (

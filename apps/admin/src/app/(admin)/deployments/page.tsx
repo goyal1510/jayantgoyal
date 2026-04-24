@@ -10,7 +10,7 @@ export default async function DeploymentsPage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login");
+    redirect("/welcome");
   }
 
   const { data: profile } = await supabase

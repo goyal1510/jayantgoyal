@@ -11,7 +11,7 @@ export default async function UsersPage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login");
+    redirect("/welcome");
   }
 
   // Check if user is super_admin

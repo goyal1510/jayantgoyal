@@ -77,7 +77,7 @@ export function NavUser({
             toast.error(error.message)
             return
           }
-          router.push("/login")
+          router.push("/welcome")
           router.refresh()
         } catch (err) {
           const message =
@@ -218,7 +218,7 @@ export function NavUser({
 
         toast.success("Account deleted.")
         setIsSettingsOpen(false)
-        router.push("/login")
+        router.push("/welcome")
         router.refresh()
       } catch (err) {
         const message =

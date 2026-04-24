@@ -24,7 +24,7 @@ export default async function proxy(request: NextRequest) {
 
   // Public paths that don't require authentication
   const publicPaths = [
-    "/login",
+    "/welcome",
     "/unauthorized",
     "/auth/callback",
   ];
@@ -36,7 +36,7 @@ export default async function proxy(request: NextRequest) {
     if (isPublic) {
       return response;
     }
-    const loginUrl = new URL("/login", request.url);
+    const loginUrl = new URL("/welcome", request.url);
     loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
   }
@@ -62,13 +62,13 @@ export default async function proxy(request: NextRequest) {
 
   // If not authenticated and not on public page, redirect to login
   if (!isAuthed && !isPublic) {
-    const loginUrl = new URL("/login", request.url);
+    const loginUrl = new URL("/welcome", request.url);
     loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
   // If authenticated and on login page, redirect to home
-  if (isAuthed && pathname.startsWith("/login")) {
+  if (isAuthed && pathname.startsWith("/welcome")) {
     const redirectUrl = request.nextUrl.searchParams.get("redirect");
     if (redirectUrl && redirectUrl.startsWith("/")) {
       return NextResponse.redirect(new URL(redirectUrl, request.url));

@@ -46,7 +46,12 @@ Replace guest/anonymous login with Google OAuth. Users should be able to login/s
 - `src/lib/types.ts` — removed `isGuest` from `AuthUser` interface
 - `src/app/(admin)/layout.tsx` — removed `isGuest: false` from authUser
 - `src/components/sidebar/app-sidebar.tsx` — removed `isGuest` from NavUser prop
-- `src/components/sidebar/nav-user.tsx` — removed `isGuest` from user type, removed `canOpenSettings` guard, removed locked settings + "Create your account" menu items, removed guest checks in save/delete
+- `src/components/sidebar/nav-user.tsx` — removed `isGuest` from user type, removed `canOpenSettings` guard, removed locked settings + "Create your account" menu items, removed guest checks in save/delete, renamed `/login` to `/welcome`
+- `src/app/login/` → `src/app/welcome/` — renamed route, heading changed to "Welcome!"
+- `src/proxy.ts` — all `/login` refs → `/welcome`
+- `src/app/auth/callback/route.ts` — `/login` → `/welcome`
+- `src/app/unauthorized/page.tsx` — `/login` → `/welcome`
+- `src/app/(admin)/layout.tsx`, `users/page.tsx`, `deployments/*.tsx` — all redirects `/login` → `/welcome`
 
 ## Verification
 - `pnpm check-types --filter jg` — passes

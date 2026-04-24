@@ -85,10 +85,7 @@ function LoginForm() {
                   <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary">
                     <Shield className="h-6 w-6 text-primary-foreground" />
                   </div>
-                  <h1 className="text-2xl font-bold">Admin Panel</h1>
-                  <p className="text-balance text-muted-foreground">
-                    Sign in with your admin credentials
-                  </p>
+                  <h1 className="text-2xl font-bold">Welcome!</h1>
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
@@ -144,7 +141,7 @@ function LoginForm() {
   );
 }
 
-export default function LoginPage() {
+export default function WelcomePage() {
   return (
     <Suspense fallback={null}>
       <LoginForm />
