@@ -19,6 +19,7 @@ import {
   isFutureDate,
 } from "@/lib/activity-tracker/date"
 import { toast } from "sonner"
+import { getCompletionBgColor } from "./completion-color"
 
 interface ActivitiesResponse {
   activities: Activity[]
@@ -48,7 +49,6 @@ export function ActivityTracker({ currentMonth }: ActivityTrackerProps) {
       try {
         setIsLoading(true)
 
-        // Load activities filtered by month
         const activitiesResponse = await fetch(`/api/activity-tracker?month=${month}`, {
           cache: "no-store",
         })
@@ -59,7 +59,6 @@ export function ActivityTracker({ currentMonth }: ActivityTrackerProps) {
 
         const activitiesData = (await activitiesResponse.json()) as ActivitiesResponse
 
-        // Load entries for the entire month
         const entriesResponse = await fetch(`/api/activity-tracker/entries?month=${month}`, {
           cache: "no-store",
         })
@@ -119,7 +118,6 @@ export function ActivityTracker({ currentMonth }: ActivityTrackerProps) {
 
       const { entry } = (await response.json()) as { entry: ActivityEntry }
 
-      // Update local state
       setEntries((prev) => {
         const existingIndex = prev.findIndex(
           (e) => e.activity_id === activityId && e.date === date
@@ -144,7 +142,6 @@ export function ActivityTracker({ currentMonth }: ActivityTrackerProps) {
     }
   }
 
-
   const isEntryCompleted = (activityId: string, date: string): boolean => {
     const entry = entries.find(
       (e) => e.activity_id === activityId && e.date === date && e.completed
@@ -154,6 +151,14 @@ export function ActivityTracker({ currentMonth }: ActivityTrackerProps) {
 
   const isUpdating = (activityId: string, date: string): boolean => {
     return updatingEntries.has(`${activityId}-${date}`)
+  }
+
+  const getDateBgColor = (date: string): string => {
+    if (isFutureDate(date)) return ""
+    const completedCount = activities.filter((a) =>
+      isEntryCompleted(a.id, date)
+    ).length
+    return getCompletionBgColor(completedCount, activities.length)
   }
 
   if (isLoading) {
@@ -184,36 +189,12 @@ export function ActivityTracker({ currentMonth }: ActivityTrackerProps) {
                       const dayNumber = parseInt(date.split("-")[2]!)
                       const isEditable = isDateEditable(date)
 
-                      // Calculate completion percentage for this date (only for past/present dates)
-                      const isFuture = isFutureDate(date)
-                      let bgColor = ""
-
-                      if (!isFuture) {
-                        const completedCount = activities.filter((activity) =>
-                          isEntryCompleted(activity.id, date)
-                        ).length
-                        const totalActivities = activities.length
-                        const completionPercentage =
-                          totalActivities > 0
-                            ? (completedCount / totalActivities) * 100
-                            : 0
-
-                        // Determine background color based on completion percentage
-                        if (completionPercentage < 50) {
-                          bgColor = "bg-red-100 dark:bg-red-950/50"
-                        } else if (completionPercentage >= 50 && completionPercentage <= 80) {
-                          bgColor = "bg-yellow-100 dark:bg-yellow-700/50"
-                        } else if (completionPercentage > 80) {
-                          bgColor = "bg-green-100 dark:bg-green-900/40"
-                        }
-                      }
-
                       return (
                         <TableHead
                           key={date}
                           className={`text-center p-1 w-[32px] ${
                             isEditable ? "bg-muted/50" : ""
-                          } ${bgColor}`}
+                          } ${getDateBgColor(date)}`}
                           title={isEditable ? "Editable" : "Read-only"}
                         >
                           <span className="text-xs font-semibold">{dayNumber}</span>
@@ -223,61 +204,34 @@ export function ActivityTracker({ currentMonth }: ActivityTrackerProps) {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {activities.map((activity) => {
-                    return (
-                      <TableRow key={activity.id}>
-                        <TableCell className="font-medium p-2">
-                          {activity.name}
-                        </TableCell>
-                        {allDaysInMonth.map((date) => {
-                          const isCompleted = isEntryCompleted(activity.id, date)
-                          const isUpdatingEntry = isUpdating(activity.id, date)
-                          const canEdit = isDateEditable(date)
+                  {activities.map((activity) => (
+                    <TableRow key={activity.id}>
+                      <TableCell className="font-medium p-2">
+                        {activity.name}
+                      </TableCell>
+                      {allDaysInMonth.map((date) => {
+                        const isCompleted = isEntryCompleted(activity.id, date)
+                        const isUpdatingEntry = isUpdating(activity.id, date)
+                        const canEdit = isDateEditable(date)
 
-                          // Calculate completion percentage for this date column (only for past/present dates)
-                          const isFuture = isFutureDate(date)
-                          let bgColor = ""
-
-                          if (!isFuture) {
-                            const completedCount = activities.filter((a) =>
-                              isEntryCompleted(a.id, date)
-                            ).length
-                            const totalActivities = activities.length
-                            const completionPercentage =
-                              totalActivities > 0
-                                ? (completedCount / totalActivities) * 100
-                                : 0
-
-                            // Determine background color based on completion percentage
-                            if (completionPercentage < 50) {
-                              bgColor = "bg-red-100 dark:bg-red-950/50"
-                            } else if (completionPercentage >= 50 && completionPercentage <= 80) {
-                              bgColor = "bg-yellow-100 dark:bg-yellow-700/50"
-                            } else {
-                              bgColor = "bg-green-100 dark:bg-green-900/40"
-                            }
-                          }
-
-                          return (
-                            <TableCell
-                              key={date}
-                              className={`text-center p-1 ${bgColor}`}
-                            >
-                              <Checkbox
-                                checked={isCompleted}
-                                disabled={isUpdatingEntry || !canEdit}
-                                onCheckedChange={() =>
-                                  handleToggleEntry(activity.id, date, isCompleted)
-                                }
-                                className="h-4 w-4"
-                              />
-                            </TableCell>
-                          )
-                        })}
-                      </TableRow>
-                    )
-                  })}
-                  {/* Summary Row */}
+                        return (
+                          <TableCell
+                            key={date}
+                            className={`text-center p-1 ${getDateBgColor(date)}`}
+                          >
+                            <Checkbox
+                              checked={isCompleted}
+                              disabled={isUpdatingEntry || !canEdit}
+                              onCheckedChange={() =>
+                                handleToggleEntry(activity.id, date, isCompleted)
+                              }
+                              className="h-4 w-4"
+                            />
+                          </TableCell>
+                        )
+                      })}
+                    </TableRow>
+                  ))}
                   {activities.length > 0 && (
                     <TableRow className="bg-muted/30">
                       <TableCell className="font-medium p-2">
@@ -287,34 +241,14 @@ export function ActivityTracker({ currentMonth }: ActivityTrackerProps) {
                         const completedCount = activities.filter((activity) =>
                           isEntryCompleted(activity.id, date)
                         ).length
-                        const totalActivities = activities.length
-
-                        // Only apply color coding for past/present dates
-                        const isFuture = isFutureDate(date)
-                        let bgColor = ""
-
-                        if (!isFuture) {
-                          const completionPercentage =
-                            totalActivities > 0
-                              ? (completedCount / totalActivities) * 100
-                              : 0
-
-                          if (completionPercentage < 50) {
-                            bgColor = "bg-red-100 dark:bg-red-950/50"
-                          } else if (completionPercentage >= 50 && completionPercentage <= 80) {
-                            bgColor = "bg-yellow-100 dark:bg-yellow-700/50"
-                          } else {
-                            bgColor = "bg-green-100 dark:bg-green-900/40"
-                          }
-                        }
 
                         return (
                           <TableCell
                             key={date}
-                            className={`text-center p-1 ${bgColor}`}
+                            className={`text-center p-1 ${getDateBgColor(date)}`}
                           >
                             <span className="text-xs font-semibold">
-                              {completedCount}/{totalActivities}
+                              {completedCount}/{activities.length}
                             </span>
                           </TableCell>
                         )

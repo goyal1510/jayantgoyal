@@ -13,19 +13,11 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Switch } from "@repo/ui/switch"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@repo/ui/dialog"
-import { Input } from "@repo/ui/input"
-import { Label } from "@repo/ui/label"
 import { Activity } from "@/lib/activity-tracker/database"
 import { toast } from "sonner"
 import { Pencil } from "lucide-react"
+
+import { EditActivityDialog } from "./edit-activity-dialog"
 
 interface ActivitiesResponse {
   activities: Activity[]
@@ -37,9 +29,6 @@ export default function ManagementClient() {
   const [updatingActivities, setUpdatingActivities] = React.useState<Set<string>>(new Set())
   const [editingActivity, setEditingActivity] = React.useState<Activity | null>(null)
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false)
-  const [editName, setEditName] = React.useState("")
-  const [editIsActive, setEditIsActive] = React.useState(true)
-  const [isSaving, setIsSaving] = React.useState(false)
 
   const loadActivities = React.useCallback(async () => {
     try {
@@ -89,7 +78,6 @@ export default function ManagementClient() {
         `Activity ${!currentIsActive ? "activated" : "deactivated"} successfully!`
       )
 
-      // Update local state
       setActivities((prev) =>
         prev.map((activity) =>
           activity.id === activityId
@@ -110,63 +98,15 @@ export default function ManagementClient() {
 
   const handleOpenEditDialog = (activity: Activity) => {
     setEditingActivity(activity)
-    setEditName(activity.name)
-    setEditIsActive(activity.is_active)
     setIsEditDialogOpen(true)
   }
 
-  const handleCloseEditDialog = () => {
-    setIsEditDialogOpen(false)
-    setEditingActivity(null)
-    setEditName("")
-    setEditIsActive(true)
-  }
-
-  const handleSaveEdit = async () => {
-    if (!editingActivity) return
-
-    if (!editName.trim()) {
-      toast.error("Activity name is required.")
-      return
-    }
-
-    try {
-      setIsSaving(true)
-
-      const response = await fetch(`/api/activity-tracker/${editingActivity.id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: editName.trim(),
-          is_active: editIsActive,
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to update activity.")
-      }
-
-      const { activity: updatedActivity } = (await response.json()) as {
-        activity: Activity
-      }
-
-      toast.success("Activity updated successfully!")
-
-      // Update local state
-      setActivities((prev) =>
-        prev.map((activity) =>
-          activity.id === editingActivity.id ? updatedActivity : activity
-        )
+  const handleActivitySaved = (updatedActivity: Activity) => {
+    setActivities((prev) =>
+      prev.map((activity) =>
+        activity.id === updatedActivity.id ? updatedActivity : activity
       )
-
-      handleCloseEditDialog()
-    } catch {
-      toast.error("Unable to update activity.")
-    } finally {
-      setIsSaving(false)
-    }
+    )
   }
 
   if (isLoading) {
@@ -246,61 +186,12 @@ export default function ManagementClient() {
         </CardContent>
       </Card>
 
-      {/* Edit Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Activity</DialogTitle>
-            <DialogDescription>
-              Update the activity name and status. Changes will be reflected immediately.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="edit-activity-name">Activity Name</Label>
-              <Input
-                id="edit-activity-name"
-                placeholder="e.g., Exercise, Reading, Meditation"
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !isSaving) {
-                    handleSaveEdit()
-                  }
-                }}
-              />
-            </div>
-            <div className="flex items-center justify-between space-x-2">
-              <Label htmlFor="edit-activity-status" className="flex-1">
-                Status
-              </Label>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">
-                  {editIsActive ? "Active" : "Inactive"}
-                </span>
-                <Switch
-                  id="edit-activity-status"
-                  checked={editIsActive}
-                  onCheckedChange={setEditIsActive}
-                  disabled={isSaving}
-                />
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={handleCloseEditDialog}
-              disabled={isSaving}
-            >
-              Cancel
-            </Button>
-            <Button onClick={handleSaveEdit} disabled={isSaving}>
-              {isSaving ? "Saving..." : "Save Changes"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <EditActivityDialog
+        activity={editingActivity}
+        isOpen={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        onSaved={handleActivitySaved}
+      />
     </div>
   )
 }

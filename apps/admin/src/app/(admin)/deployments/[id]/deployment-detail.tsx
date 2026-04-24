@@ -5,7 +5,6 @@ import Link from "next/link";
 import { toast } from "sonner";
 import {
   Loader2,
-  RefreshCw,
   ExternalLink,
   ArrowLeft,
   RotateCcw,
@@ -21,14 +20,6 @@ import {
   CardTitle,
 } from "@repo/ui/card";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@repo/ui/dialog";
-import {
   getDeployment,
   getBuildLogs,
   redeployDeployment,
@@ -39,6 +30,8 @@ import type {
   VercelBuildLogEntry,
   VercelDeploymentState,
 } from "@/lib/types";
+import { BuildLogsCard } from "./build-logs-card";
+import { ConfirmActionDialog } from "../confirm-action-dialog";
 
 const stateBadgeVariant: Record<
   VercelDeploymentState,
@@ -97,38 +90,22 @@ export function DeploymentDetail({ deploymentId }: DeploymentDetailProps) {
     fetchLogs();
   }, [fetchDetail, fetchLogs]);
 
-  async function handleRedeploy() {
-    if (!deployment) return;
-    setActionLoading(true);
-    try {
-      // Determine project from the deployment name
-      const project = deployment.name?.includes("admin") ? "admin" as const : "jg" as const;
-      await redeployDeployment(
-        deployment.uid,
-        project,
-        deployment.target || "production"
-      );
-      toast.success("Redeploy triggered");
-      setConfirmAction(null);
-      fetchDetail();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Redeploy failed");
-    } finally {
-      setActionLoading(false);
-    }
-  }
-
-  async function handleRollback() {
-    if (!deployment) return;
+  async function handleAction() {
+    if (!deployment || !confirmAction) return;
     setActionLoading(true);
     try {
       const project = deployment.name?.includes("admin") ? "admin" as const : "jg" as const;
-      await rollbackDeployment(deployment.uid, project);
-      toast.success("Rollback triggered");
+      if (confirmAction === "redeploy") {
+        await redeployDeployment(deployment.uid, project, deployment.target || "production");
+        toast.success("Redeploy triggered");
+      } else {
+        await rollbackDeployment(deployment.uid, project);
+        toast.success("Rollback triggered");
+      }
       setConfirmAction(null);
       fetchDetail();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Rollback failed");
+      toast.error(err instanceof Error ? err.message : `${confirmAction} failed`);
     } finally {
       setActionLoading(false);
     }
@@ -165,7 +142,6 @@ export function DeploymentDetail({ deploymentId }: DeploymentDetailProps) {
         </Link>
       </Button>
 
-      {/* Deployment Info */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
@@ -262,80 +238,15 @@ export function DeploymentDetail({ deploymentId }: DeploymentDetailProps) {
         </CardContent>
       </Card>
 
-      {/* Build Logs */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle>Build Logs</CardTitle>
-            <CardDescription>Output from the build process</CardDescription>
-          </div>
-          <Button variant="outline" size="sm" onClick={fetchLogs} disabled={logsLoading}>
-            <RefreshCw className={`h-4 w-4 mr-2 ${logsLoading ? "animate-spin" : ""}`} />
-            Refresh
-          </Button>
-        </CardHeader>
-        <CardContent>
-          {logsLoading && logs.length === 0 ? (
-            <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-            </div>
-          ) : logs.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No build logs available</p>
-          ) : (
-            <div className="bg-muted/50 rounded-md p-4 max-h-[500px] overflow-y-auto">
-              <pre className="text-xs font-mono whitespace-pre-wrap break-all">
-                {logs.map((log, i) => (
-                  <span
-                    key={i}
-                    className={
-                      log.type === "stderr"
-                        ? "text-red-500"
-                        : log.type === "command"
-                          ? "text-blue-500"
-                          : ""
-                    }
-                  >
-                    {log.payload}
-                    {"\n"}
-                  </span>
-                ))}
-              </pre>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <BuildLogsCard logs={logs} loading={logsLoading} onRefresh={fetchLogs} />
 
-      {/* Confirmation Dialog */}
-      <Dialog
-        open={!!confirmAction}
-        onOpenChange={(open) => !open && setConfirmAction(null)}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {confirmAction === "redeploy" ? "Redeploy" : "Rollback"} Confirmation
-            </DialogTitle>
-            <DialogDescription>
-              {confirmAction === "redeploy"
-                ? `This will create a new deployment based on ${deployment.url}.`
-                : `This will rollback production to ${deployment.url}.`}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setConfirmAction(null)}>
-              Cancel
-            </Button>
-            <Button
-              variant={confirmAction === "rollback" ? "destructive" : "default"}
-              onClick={confirmAction === "redeploy" ? handleRedeploy : handleRollback}
-              disabled={actionLoading}
-            >
-              {actionLoading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-              {confirmAction === "redeploy" ? "Redeploy" : "Rollback"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ConfirmActionDialog
+        action={confirmAction}
+        onClose={() => setConfirmAction(null)}
+        onConfirm={handleAction}
+        loading={actionLoading}
+        deploymentLabel={deployment.url}
+      />
     </div>
   );
 }

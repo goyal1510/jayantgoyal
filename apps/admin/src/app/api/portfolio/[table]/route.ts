@@ -1,60 +1,10 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import {
+  validateTable,
+  authorizeAndGetClient,
+  TABLES_WITH_SORT_ORDER,
+} from "./helpers";
 
-const ALLOWED_TABLES = [
-  "hero",
-  "about",
-  "education",
-  "experience",
-  "skill_categories",
-  "skills",
-  "tech_icons",
-  "projects",
-  "certificates",
-  "contact",
-  "nav_items",
-];
-
-async function checkAdminAccess() {
-  const supabase = await createSupabaseServerClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { authorized: false, error: "Unauthorized", status: 401 };
-  }
-
-  const { data: profile } = await supabase
-    .schema("jg_account")
-    .from("profiles")
-    .select("role")
-    .eq("user_id", user.id)
-    .single();
-
-  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
-    return { authorized: false, error: "Forbidden", status: 403 };
-  }
-
-  return { authorized: true, user };
-}
-
-function getAdminClient() {
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-
-  if (!serviceRoleKey || !supabaseUrl) {
-    return null;
-  }
-
-  return createClient(supabaseUrl, serviceRoleKey, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
-}
-
-// GET - Fetch data from a portfolio table
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ table: string }> }
@@ -62,25 +12,11 @@ export async function GET(
   try {
     const { table } = await params;
 
-    if (!ALLOWED_TABLES.includes(table)) {
-      return NextResponse.json({ error: "Invalid table" }, { status: 400 });
-    }
+    const tableError = validateTable(table);
+    if (tableError) return tableError;
 
-    const authCheck = await checkAdminAccess();
-    if (!authCheck.authorized) {
-      return NextResponse.json(
-        { error: authCheck.error },
-        { status: authCheck.status }
-      );
-    }
-
-    const adminClient = getAdminClient();
-    if (!adminClient) {
-      return NextResponse.json(
-        { error: "Server configuration error" },
-        { status: 500 }
-      );
-    }
+    const auth = await authorizeAndGetClient();
+    if ("error" in auth) return auth.error;
 
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
@@ -89,7 +25,7 @@ export async function GET(
     let error;
 
     if (id) {
-      const result = await adminClient
+      const result = await auth.client
         .schema("portfolio")
         .from(table)
         .select("*")
@@ -97,34 +33,21 @@ export async function GET(
         .single();
       data = result.data;
       error = result.error;
+    } else if (TABLES_WITH_SORT_ORDER.includes(table)) {
+      const result = await auth.client
+        .schema("portfolio")
+        .from(table)
+        .select("*")
+        .order("sort_order", { ascending: true });
+      data = result.data;
+      error = result.error;
     } else {
-      // Order by sort_order if the table has it
-      const tablesWithSortOrder = [
-        "education",
-        "experience",
-        "skill_categories",
-        "skills",
-        "tech_icons",
-        "projects",
-        "certificates",
-        "nav_items",
-      ];
-      if (tablesWithSortOrder.includes(table)) {
-        const result = await adminClient
-          .schema("portfolio")
-          .from(table)
-          .select("*")
-          .order("sort_order", { ascending: true });
-        data = result.data;
-        error = result.error;
-      } else {
-        const result = await adminClient
-          .schema("portfolio")
-          .from(table)
-          .select("*");
-        data = result.data;
-        error = result.error;
-      }
+      const result = await auth.client
+        .schema("portfolio")
+        .from(table)
+        .select("*");
+      data = result.data;
+      error = result.error;
     }
 
     if (error) {
@@ -141,7 +64,6 @@ export async function GET(
   }
 }
 
-// POST - Create new record
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ table: string }> }
@@ -149,29 +71,15 @@ export async function POST(
   try {
     const { table } = await params;
 
-    if (!ALLOWED_TABLES.includes(table)) {
-      return NextResponse.json({ error: "Invalid table" }, { status: 400 });
-    }
+    const tableError = validateTable(table);
+    if (tableError) return tableError;
 
-    const authCheck = await checkAdminAccess();
-    if (!authCheck.authorized) {
-      return NextResponse.json(
-        { error: authCheck.error },
-        { status: authCheck.status }
-      );
-    }
-
-    const adminClient = getAdminClient();
-    if (!adminClient) {
-      return NextResponse.json(
-        { error: "Server configuration error" },
-        { status: 500 }
-      );
-    }
+    const auth = await authorizeAndGetClient();
+    if ("error" in auth) return auth.error;
 
     const body = await request.json();
 
-    const { data, error } = await adminClient
+    const { data, error } = await auth.client
       .schema("portfolio")
       .from(table)
       .insert(body)
@@ -192,7 +100,6 @@ export async function POST(
   }
 }
 
-// PUT - Update existing record
 export async function PUT(
   request: Request,
   { params }: { params: Promise<{ table: string }> }
@@ -200,25 +107,11 @@ export async function PUT(
   try {
     const { table } = await params;
 
-    if (!ALLOWED_TABLES.includes(table)) {
-      return NextResponse.json({ error: "Invalid table" }, { status: 400 });
-    }
+    const tableError = validateTable(table);
+    if (tableError) return tableError;
 
-    const authCheck = await checkAdminAccess();
-    if (!authCheck.authorized) {
-      return NextResponse.json(
-        { error: authCheck.error },
-        { status: authCheck.status }
-      );
-    }
-
-    const adminClient = getAdminClient();
-    if (!adminClient) {
-      return NextResponse.json(
-        { error: "Server configuration error" },
-        { status: 500 }
-      );
-    }
+    const auth = await authorizeAndGetClient();
+    if ("error" in auth) return auth.error;
 
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
@@ -232,7 +125,7 @@ export async function PUT(
 
     const body = await request.json();
 
-    const { data, error } = await adminClient
+    const { data, error } = await auth.client
       .schema("portfolio")
       .from(table)
       .update(body)
@@ -254,7 +147,6 @@ export async function PUT(
   }
 }
 
-// DELETE - Delete record
 export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ table: string }> }
@@ -262,25 +154,11 @@ export async function DELETE(
   try {
     const { table } = await params;
 
-    if (!ALLOWED_TABLES.includes(table)) {
-      return NextResponse.json({ error: "Invalid table" }, { status: 400 });
-    }
+    const tableError = validateTable(table);
+    if (tableError) return tableError;
 
-    const authCheck = await checkAdminAccess();
-    if (!authCheck.authorized) {
-      return NextResponse.json(
-        { error: authCheck.error },
-        { status: authCheck.status }
-      );
-    }
-
-    const adminClient = getAdminClient();
-    if (!adminClient) {
-      return NextResponse.json(
-        { error: "Server configuration error" },
-        { status: 500 }
-      );
-    }
+    const auth = await authorizeAndGetClient();
+    if ("error" in auth) return auth.error;
 
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
@@ -292,7 +170,7 @@ export async function DELETE(
       );
     }
 
-    const { error } = await adminClient
+    const { error } = await auth.client
       .schema("portfolio")
       .from(table)
       .delete()

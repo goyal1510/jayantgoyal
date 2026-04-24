@@ -25,47 +25,26 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@repo/ui/dialog";
-import { Input } from "@repo/ui/input";
-import { Label } from "@repo/ui/label";
-import { Switch } from "@repo/ui/switch";
 import type { NavItem } from "@/lib/types";
+import { NavigationDialog, emptyNavForm, type NavFormData } from "./navigation-dialog";
 
 interface NavigationListProps {
   initialData: NavItem[];
 }
-
-type FormData = Omit<NavItem, "id" | "created_at" | "updated_at">;
-
-const emptyForm: FormData = {
-  section_id: "",
-  label: "",
-  icon_key: "",
-  color: "",
-  sort_order: 0,
-  is_visible: true,
-};
 
 export function NavigationList({ initialData }: NavigationListProps) {
   const router = useRouter();
   const [items, setItems] = useState(initialData);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<NavItem | null>(null);
-  const [formData, setFormData] = useState<FormData>(emptyForm);
+  const [formData, setFormData] = useState<NavFormData>(emptyNavForm);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
 
   const openAddDialog = () => {
     setEditingItem(null);
     setFormData({
-      ...emptyForm,
+      ...emptyNavForm,
       sort_order: items.length > 0 ? Math.max(...items.map((i) => i.sort_order)) + 1 : 0,
     });
     setDialogOpen(true);
@@ -239,128 +218,15 @@ export function NavigationList({ initialData }: NavigationListProps) {
         </CardContent>
       </Card>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {editingItem ? "Edit Nav Item" : "Add Nav Item"}
-            </DialogTitle>
-            <DialogDescription>
-              {editingItem
-                ? "Update the navigation item details."
-                : "Add a new navigation item to your portfolio menu."}
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleSubmit}>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="label">Label</Label>
-                <Input
-                  id="label"
-                  value={formData.label}
-                  onChange={(e) =>
-                    setFormData({ ...formData, label: e.target.value })
-                  }
-                  placeholder="About Me"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="section_id">Section ID</Label>
-                <Input
-                  id="section_id"
-                  value={formData.section_id}
-                  onChange={(e) =>
-                    setFormData({ ...formData, section_id: e.target.value })
-                  }
-                  placeholder="about"
-                  required
-                />
-                <p className="text-xs text-muted-foreground">
-                  The HTML id of the section this links to (e.g., &quot;about&quot;,
-                  &quot;experience&quot;)
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="icon_key">Icon Key</Label>
-                  <Input
-                    id="icon_key"
-                    value={formData.icon_key}
-                    onChange={(e) =>
-                      setFormData({ ...formData, icon_key: e.target.value })
-                    }
-                    placeholder="User"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="color">Color</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="color"
-                      value={formData.color ?? ""}
-                      onChange={(e) =>
-                        setFormData({ ...formData, color: e.target.value })
-                      }
-                      placeholder="#3B82F6"
-                    />
-                    <input
-                      type="color"
-                      value={formData.color || "#666666"}
-                      onChange={(e) =>
-                        setFormData({ ...formData, color: e.target.value })
-                      }
-                      className="h-9 w-12 rounded border cursor-pointer"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="sort_order">Sort Order</Label>
-                <Input
-                  id="sort_order"
-                  type="number"
-                  value={formData.sort_order}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      sort_order: parseInt(e.target.value) || 0,
-                    })
-                  }
-                />
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="is_visible"
-                  checked={formData.is_visible}
-                  onCheckedChange={(checked) =>
-                    setFormData({ ...formData, is_visible: checked })
-                  }
-                />
-                <Label htmlFor="is_visible">Visible in navigation</Label>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setDialogOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={saving}>
-                {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {editingItem ? "Update" : "Add"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <NavigationDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        editing={editingItem}
+        formData={formData}
+        setFormData={setFormData}
+        onSubmit={handleSubmit}
+        saving={saving}
+      />
     </>
   );
 }

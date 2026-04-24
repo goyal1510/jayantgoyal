@@ -9,8 +9,10 @@ import {
 } from "@repo/ui/dialog"
 import { Button } from "@repo/ui/button"
 import { Spinner } from "@/components/ui/spinner"
-import { FileIcon, AlertCircle, ChevronLeft, ChevronRight, Download } from "lucide-react"
+import { AlertCircle, ChevronLeft, ChevronRight, Download } from "lucide-react"
 import type { DirectoryListingItem } from "@/lib/file-manager/types"
+import { FilePreview } from "@/components/file-manager/file-preview"
+import type { FileDetails } from "@/components/file-manager/file-preview"
 
 interface FileViewerProps {
   file: DirectoryListingItem | null
@@ -20,124 +22,21 @@ interface FileViewerProps {
   onFileChange: (file: DirectoryListingItem) => void
 }
 
-interface FileDetails {
-  id: string
-  name: string
-  display_name: string | null
-  original_filename: string
-  path: string
-  mime_type: string
-  size_bytes: number
-  file_type: string
-  is_directory: boolean
-  created_at: string
-  updated_at: string
-  url: string
-}
-
-// Get preview component based on mime type
-function FilePreview({ file, url }: { file: FileDetails; url: string }) {
-  const mimeType = file.mime_type
-
-  // Images
-  if (mimeType.startsWith("image/")) {
-    return (
-      <div className="flex items-center justify-center w-full h-[60vh] sm:h-[80vh] bg-muted/30 rounded-lg overflow-hidden">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={url}
-          alt={file.display_name || file.name}
-          className="max-w-full max-h-full object-contain"
-        />
-      </div>
-    )
-  }
-
-  // PDF
-  if (mimeType === "application/pdf") {
-    return (
-      <iframe
-        src={url}
-        className="w-full h-[60vh] sm:h-[80vh] rounded-lg border"
-        title={file.display_name || file.name}
-      />
-    )
-  }
-
-  // Video
-  if (mimeType.startsWith("video/")) {
-    return (
-      <div className="flex items-center justify-center w-full h-[60vh] sm:h-[80vh] bg-black rounded-lg overflow-hidden">
-        <video
-          src={url}
-          controls
-          className="max-w-full max-h-full"
-          autoPlay={false}
-        >
-          Your browser does not support the video tag.
-        </video>
-      </div>
-    )
-  }
-
-  // Audio
-  if (mimeType.startsWith("audio/")) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-4 sm:gap-6 h-[60vh] sm:h-[80vh] bg-muted/30 rounded-lg px-4">
-        <FileIcon className="h-16 w-16 sm:h-24 sm:w-24 text-muted-foreground" />
-        <p className="text-base sm:text-lg font-medium text-center truncate max-w-full">{file.display_name || file.name}</p>
-        <audio src={url} controls className="w-full max-w-md">
-          Your browser does not support the audio tag.
-        </audio>
-      </div>
-    )
-  }
-
-  // Text/Code files - show in iframe
-  if (
-    mimeType.startsWith("text/") ||
-    mimeType === "application/json" ||
-    mimeType === "application/javascript"
-  ) {
-    return (
-      <iframe
-        src={url}
-        className="w-full h-[60vh] sm:h-[80vh] rounded-lg border bg-white dark:bg-zinc-900"
-        title={file.display_name || file.name}
-      />
-    )
-  }
-
-  // Not previewable
-  return (
-    <div className="flex flex-col items-center justify-center gap-4 h-[60vh] sm:h-[80vh] bg-muted/30 rounded-lg px-4">
-      <AlertCircle className="h-12 w-12 sm:h-16 sm:w-16 text-muted-foreground" />
-      <p className="text-base sm:text-lg font-medium text-center">Preview not available</p>
-      <p className="text-xs sm:text-sm text-muted-foreground text-center">
-        This file type ({mimeType}) cannot be previewed in the browser.
-      </p>
-    </div>
-  )
-}
-
 export function FileViewer({ file, files, open, onOpenChange, onFileChange }: FileViewerProps) {
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
   const [fileDetails, setFileDetails] = React.useState<FileDetails | null>(null)
 
-  // Get only non-directory files for navigation
   const viewableFiles = React.useMemo(() =>
     files.filter(f => !f.is_directory),
     [files]
   )
 
-  // Get current file index
   const currentIndex = React.useMemo(() => {
     if (!file) return -1
     return viewableFiles.findIndex(f => f.id === file.id)
   }, [file, viewableFiles])
 
-  // Navigation handlers
   const hasPrev = currentIndex > 0
   const hasNext = currentIndex < viewableFiles.length - 1
 
@@ -159,16 +58,13 @@ export function FileViewer({ file, files, open, onOpenChange, onFileChange }: Fi
     }
   }, [hasNext, viewableFiles, currentIndex, onFileChange])
 
-  // Download handler
   const handleDownload = React.useCallback(async () => {
     if (!fileDetails) return
 
     try {
-      // Fetch the file as a blob
       const response = await fetch(fileDetails.url)
       const blob = await response.blob()
 
-      // Create a download link
       const downloadUrl = window.URL.createObjectURL(blob)
       const link = document.createElement("a")
       link.href = downloadUrl
@@ -182,7 +78,6 @@ export function FileViewer({ file, files, open, onOpenChange, onFileChange }: Fi
     }
   }, [fileDetails])
 
-  // Keyboard navigation
   React.useEffect(() => {
     if (!open) return
 
@@ -200,7 +95,6 @@ export function FileViewer({ file, files, open, onOpenChange, onFileChange }: Fi
     return () => window.removeEventListener("keydown", handleKeyDown)
   }, [open, goToPrev, goToNext])
 
-  // Fetch file details when file changes
   React.useEffect(() => {
     if (open && file && !file.is_directory) {
       setLoading(true)
@@ -210,8 +104,6 @@ export function FileViewer({ file, files, open, onOpenChange, onFileChange }: Fi
         .then(res => res.json())
         .then(async (data) => {
           if (data.success && data.file) {
-            // For images, convert to blob URL so the signed URL can't be copied
-            // Blob URLs are only valid in the current tab and can't be shared
             const mimeType = data.file.mime_type || ""
             if (mimeType.startsWith("image/")) {
               try {
@@ -221,10 +113,9 @@ export function FileViewer({ file, files, open, onOpenChange, onFileChange }: Fi
                 setFileDetails({
                   ...data.file,
                   url: blobUrl,
-                  _blobUrl: true // Mark as blob URL for cleanup
+                  _blobUrl: true
                 })
               } catch {
-                // Fallback to signed URL if blob conversion fails
                 setFileDetails(data.file)
               }
             } else {
@@ -244,11 +135,9 @@ export function FileViewer({ file, files, open, onOpenChange, onFileChange }: Fi
     }
   }, [open, file])
 
-  // Reset state when dialog closes
   React.useEffect(() => {
     if (!open) {
       const timer = setTimeout(() => {
-        // Revoke blob URL to free memory
         if (fileDetails?.url && (fileDetails as unknown as { _blobUrl?: boolean })._blobUrl) {
           URL.revokeObjectURL(fileDetails.url)
         }
@@ -290,9 +179,7 @@ export function FileViewer({ file, files, open, onOpenChange, onFileChange }: Fi
           </div>
         </DialogHeader>
 
-        {/* Content with navigation */}
         <div className="flex-1 min-h-[60vh] sm:min-h-[80vh] relative">
-          {/* Previous button */}
           {viewableFiles.length > 1 && (
             <Button
               variant="ghost"
@@ -305,7 +192,6 @@ export function FileViewer({ file, files, open, onOpenChange, onFileChange }: Fi
             </Button>
           )}
 
-          {/* Next button */}
           {viewableFiles.length > 1 && (
             <Button
               variant="ghost"
@@ -318,7 +204,6 @@ export function FileViewer({ file, files, open, onOpenChange, onFileChange }: Fi
             </Button>
           )}
 
-          {/* File content */}
           <div className="h-full overflow-auto px-8 sm:px-12">
             {loading ? (
               <div className="flex items-center justify-center h-[60vh] sm:h-[80vh]">

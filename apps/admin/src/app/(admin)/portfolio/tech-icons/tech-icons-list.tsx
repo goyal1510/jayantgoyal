@@ -25,46 +25,26 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@repo/ui/dialog";
-import { Input } from "@repo/ui/input";
-import { Label } from "@repo/ui/label";
-import { Switch } from "@repo/ui/switch";
 import type { TechIcon } from "@/lib/types";
+import { TechIconDialog, emptyTechIconForm, type TechIconFormData } from "./tech-icon-dialog";
 
 interface TechIconsListProps {
   initialData: TechIcon[];
 }
-
-type FormData = Omit<TechIcon, "id" | "created_at" | "updated_at">;
-
-const emptyForm: FormData = {
-  icon_key: "",
-  name: "",
-  color: "",
-  sort_order: 0,
-  is_visible: true,
-};
 
 export function TechIconsList({ initialData }: TechIconsListProps) {
   const router = useRouter();
   const [items, setItems] = useState(initialData);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<TechIcon | null>(null);
-  const [formData, setFormData] = useState<FormData>(emptyForm);
+  const [formData, setFormData] = useState<TechIconFormData>(emptyTechIconForm);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
 
   const openAddDialog = () => {
     setEditingItem(null);
     setFormData({
-      ...emptyForm,
+      ...emptyTechIconForm,
       sort_order: items.length > 0 ? Math.max(...items.map((i) => i.sort_order)) + 1 : 0,
     });
     setDialogOpen(true);
@@ -225,110 +205,15 @@ export function TechIconsList({ initialData }: TechIconsListProps) {
         </CardContent>
       </Card>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {editingItem ? "Edit Tech Icon" : "Add Tech Icon"}
-            </DialogTitle>
-            <DialogDescription>
-              {editingItem
-                ? "Update the tech icon details."
-                : "Add a new technology icon to your portfolio."}
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleSubmit}>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Display Name</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  placeholder="React"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="icon_key">Icon Key</Label>
-                <Input
-                  id="icon_key"
-                  value={formData.icon_key}
-                  onChange={(e) =>
-                    setFormData({ ...formData, icon_key: e.target.value })
-                  }
-                  placeholder="react"
-                  required
-                />
-                <p className="text-xs text-muted-foreground">
-                  The key used to map to an icon component (e.g., &quot;react&quot;,
-                  &quot;typescript&quot;, &quot;nodejs&quot;)
-                </p>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="color">Color</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="color"
-                    value={formData.color ?? ""}
-                    onChange={(e) =>
-                      setFormData({ ...formData, color: e.target.value })
-                    }
-                    placeholder="#61DAFB"
-                  />
-                  <input
-                    type="color"
-                    value={formData.color || "#666666"}
-                    onChange={(e) =>
-                      setFormData({ ...formData, color: e.target.value })
-                    }
-                    className="h-9 w-12 rounded border cursor-pointer"
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="sort_order">Sort Order</Label>
-                <Input
-                  id="sort_order"
-                  type="number"
-                  value={formData.sort_order}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      sort_order: parseInt(e.target.value) || 0,
-                    })
-                  }
-                />
-              </div>
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="is_visible"
-                  checked={formData.is_visible}
-                  onCheckedChange={(checked) =>
-                    setFormData({ ...formData, is_visible: checked })
-                  }
-                />
-                <Label htmlFor="is_visible">Visible on portfolio</Label>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setDialogOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={saving}>
-                {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {editingItem ? "Update" : "Add"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <TechIconDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        editing={editingItem}
+        formData={formData}
+        setFormData={setFormData}
+        onSubmit={handleSubmit}
+        saving={saving}
+      />
     </>
   );
 }

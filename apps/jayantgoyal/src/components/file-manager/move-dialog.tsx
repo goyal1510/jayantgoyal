@@ -10,8 +10,10 @@ import {
   DialogTitle,
 } from "@repo/ui/dialog"
 import { Button } from "@repo/ui/button"
-import { FolderInput, AlertCircle, Replace, SkipForward, Copy } from "lucide-react"
+import { FolderInput } from "lucide-react"
 import { DirectoryPicker } from "@/components/file-manager/directory-picker"
+import { FileConflictDialog } from "@/components/file-manager/file-conflict-dialog"
+import type { FileConflictInfo, FileConflictResolution } from "@/components/file-manager/file-conflict-dialog"
 import type { DirectoryListingItem } from "@/lib/file-manager/types"
 
 interface MoveDialogProps {
@@ -19,100 +21,6 @@ interface MoveDialogProps {
   onOpenChange: (open: boolean) => void
   file: DirectoryListingItem | null
   onSuccess?: () => void
-}
-
-interface ConflictInfo {
-  existingFile: {
-    id: string
-    name: string
-    fileName: string
-    path: string
-    size: number
-    updated_at: string
-    is_directory?: boolean
-  }
-}
-
-type ConflictResolution = "replace" | "skip" | "rename"
-
-// Conflict resolution dialog component
-function ConflictDialog({
-  conflict,
-  fileName,
-  onResolve,
-}: {
-  conflict: ConflictInfo | null
-  fileName: string
-  onResolve: (resolution: ConflictResolution | null) => void
-}) {
-  if (!conflict) return null
-
-  const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return "0 B"
-    const k = 1024
-    const sizes = ["B", "KB", "MB", "GB"]
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`
-  }
-
-  const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleString()
-  }
-
-  return (
-    <Dialog open={!!conflict} onOpenChange={() => onResolve(null)}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <AlertCircle className="h-5 w-5 text-amber-500" />
-            File Already Exists
-          </DialogTitle>
-          <DialogDescription>
-            A {conflict.existingFile.is_directory ? "folder" : "file"} named <span className="font-medium">{fileName}</span> already exists at the destination.
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="space-y-3 py-2">
-          <div className="rounded-md border p-3 space-y-1">
-            <p className="text-sm font-medium">Existing {conflict.existingFile.is_directory ? "folder" : "file"}: <span className="font-normal">{conflict.existingFile.fileName}</span></p>
-            <p className="text-xs text-muted-foreground">
-              Path: {conflict.existingFile.path}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {!conflict.existingFile.is_directory && `Size: ${formatFileSize(conflict.existingFile.size)} • `}
-              Modified: {formatDate(conflict.existingFile.updated_at)}
-            </p>
-          </div>
-        </div>
-
-        <DialogFooter className="flex-col gap-2 sm:flex-col">
-          <Button
-            className="w-full justify-start gap-2"
-            onClick={() => onResolve("replace")}
-          >
-            <Replace className="h-4 w-4" />
-            Replace existing
-          </Button>
-          <Button
-            variant="outline"
-            className="w-full justify-start gap-2"
-            onClick={() => onResolve("skip")}
-          >
-            <SkipForward className="h-4 w-4" />
-            Cancel move
-          </Button>
-          <Button
-            variant="outline"
-            className="w-full justify-start gap-2"
-            onClick={() => onResolve("rename")}
-          >
-            <Copy className="h-4 w-4" />
-            Keep Both (Rename moved file)
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  )
 }
 
 export function MoveDialog({
@@ -124,10 +32,9 @@ export function MoveDialog({
   const [targetPath, setTargetPath] = React.useState("/")
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
-  const [conflict, setConflict] = React.useState<ConflictInfo | null>(null)
-  const [conflictResolver, setConflictResolver] = React.useState<((resolution: ConflictResolution | null) => void) | null>(null)
+  const [conflict, setConflict] = React.useState<FileConflictInfo | null>(null)
+  const [conflictResolver, setConflictResolver] = React.useState<((resolution: FileConflictResolution | null) => void) | null>(null)
 
-  // Reset form when dialog opens/closes
   React.useEffect(() => {
     if (!open) {
       setTargetPath("/")
@@ -137,7 +44,6 @@ export function MoveDialog({
     }
   }, [open])
 
-  // Get the current parent path of the file
   const getCurrentParentPath = (): string => {
     if (!file) return "/"
     const path = file.file_path
@@ -146,15 +52,14 @@ export function MoveDialog({
     return parentPath || "/"
   }
 
-  // Wait for conflict resolution from user
-  const waitForConflictResolution = (conflictInfo: ConflictInfo): Promise<ConflictResolution | null> => {
+  const waitForConflictResolution = (conflictInfo: FileConflictInfo): Promise<FileConflictResolution | null> => {
     return new Promise((resolve) => {
       setConflict(conflictInfo)
       setConflictResolver(() => resolve)
     })
   }
 
-  const handleConflictResolve = (resolution: ConflictResolution | null) => {
+  const handleConflictResolve = (resolution: FileConflictResolution | null) => {
     if (conflictResolver) {
       conflictResolver(resolution)
     }
@@ -166,7 +71,6 @@ export function MoveDialog({
     e.preventDefault()
     if (!file) return
 
-    // Check if moving to the same location
     const currentParent = getCurrentParentPath()
     if (targetPath === currentParent) {
       setError("File is already in this location")
@@ -179,59 +83,39 @@ export function MoveDialog({
     try {
       const response = await fetch(`/api/files/${file.id}/move`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          targetPath,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ targetPath }),
       })
 
       const data = await response.json()
 
       if (!response.ok) {
-        // Check if it's a conflict error
         if (response.status === 409 && data.code === "FILE_EXISTS") {
           const resolution = await waitForConflictResolution({
             existingFile: data.existingFile,
           })
 
           if (resolution === "replace") {
-            // Retry with overwrite flag
             const retryResponse = await fetch(`/api/files/${file.id}/move`, {
               method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                targetPath,
-                overwrite: true,
-              }),
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ targetPath, overwrite: true }),
             })
-
             const retryData = await retryResponse.json()
             if (!retryResponse.ok) {
               throw new Error(retryData.error || "Failed to move")
             }
           } else if (resolution === "rename") {
-            // Retry with rename flag
             const retryResponse = await fetch(`/api/files/${file.id}/move`, {
               method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                targetPath,
-                rename: true,
-              }),
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ targetPath, rename: true }),
             })
-
             const retryData = await retryResponse.json()
             if (!retryResponse.ok) {
               throw new Error(retryData.error || "Failed to move")
             }
           } else {
-            // Skip/Cancel - just close dialog
             setLoading(false)
             return
           }
@@ -240,7 +124,6 @@ export function MoveDialog({
         }
       }
 
-      // Success
       onOpenChange(false)
       if (onSuccess) {
         onSuccess()
@@ -254,7 +137,6 @@ export function MoveDialog({
 
   if (!file) return null
 
-  // For directories, exclude the directory itself and its children
   const excludePath = file.is_directory ? file.file_path : undefined
 
   return (
@@ -311,10 +193,10 @@ export function MoveDialog({
         </DialogContent>
       </Dialog>
 
-      {/* Conflict Resolution Dialog */}
-      <ConflictDialog
+      <FileConflictDialog
         conflict={conflict}
         fileName={file.display_name || file.file_name}
+        action="move"
         onResolve={handleConflictResolve}
       />
     </>

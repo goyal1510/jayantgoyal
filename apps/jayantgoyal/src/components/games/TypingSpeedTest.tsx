@@ -1,6 +1,5 @@
 "use client"
 
-import * as React from "react"
 import {
   Clock,
   History,
@@ -10,191 +9,47 @@ import {
   Trophy,
   Zap,
 } from "lucide-react"
-import { toast } from "sonner"
 
 import { Button } from "@repo/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card"
-import { PageSpinner } from "@/components/ui/page-spinner"
-import { TYPING_TEXTS } from "@/lib/games/typing-texts"
-import type { TypingTestResult, PaginatedTypingResults } from "@/lib/typing-test/database"
 
-type Tab = "test" | "history"
-type Duration = 30 | 60 | 120
-
-function getRandomText(): string {
-  return TYPING_TEXTS[Math.floor(Math.random() * TYPING_TEXTS.length)]!
-}
+import { useTypingSpeedTest, type Duration } from "@/components/games/use-typing-speed-test"
+import { TypingSpeedHistory } from "@/components/games/typing-speed-history"
 
 export function TypingSpeedTest() {
-  const [tab, setTab] = React.useState<Tab>("test")
-
-  // Test state
-  const [text, setText] = React.useState(() => getRandomText())
-  const [typed, setTyped] = React.useState("")
-  const [started, setStarted] = React.useState(false)
-  const [finished, setFinished] = React.useState(false)
-  const [startTime, setStartTime] = React.useState<number>(0)
-  const [elapsed, setElapsed] = React.useState(0)
-  const [duration, setDuration] = React.useState<Duration>(60)
-  const [saving, setSaving] = React.useState(false)
-  const inputRef = React.useRef<HTMLTextAreaElement>(null)
-  const timerRef = React.useRef<ReturnType<typeof setInterval> | null>(null)
-
-  // History state
-  const [results, setResults] = React.useState<TypingTestResult[]>([])
-  const [historyLoading, setHistoryLoading] = React.useState(false)
-  const [historyLoaded, setHistoryLoaded] = React.useState(false)
-  const [historyPage, setHistoryPage] = React.useState(1)
-  const [totalPages, setTotalPages] = React.useState(1)
-
-  // Computed stats
-  const correctChars = React.useMemo(() => {
-    let count = 0
-    for (let i = 0; i < typed.length; i++) {
-      if (typed[i] === text[i]) count++
-    }
-    return count
-  }, [typed, text])
-
-  const currentWPM = React.useMemo(() => {
-    if (elapsed === 0) return 0
-    return Math.round((correctChars / 5) / (elapsed / 60))
-  }, [correctChars, elapsed])
-
-  const accuracy = React.useMemo(() => {
-    if (typed.length === 0) return 100
-    return Math.round((correctChars / typed.length) * 10000) / 100
-  }, [correctChars, typed.length])
-
-  const progress = React.useMemo(() => {
-    return Math.min((typed.length / text.length) * 100, 100)
-  }, [typed.length, text.length])
-
-  const timeLeft = duration - elapsed
-
-  // Timer
-  React.useEffect(() => {
-    if (started && !finished) {
-      timerRef.current = setInterval(() => {
-        const now = Date.now()
-        const newElapsed = Math.floor((now - startTime) / 1000)
-        setElapsed(newElapsed)
-
-        if (newElapsed >= duration) {
-          finishTest()
-        }
-      }, 200)
-    }
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [started, finished, startTime, duration])
-
-  const finishTest = React.useCallback(() => {
-    setFinished(true)
-    if (timerRef.current) clearInterval(timerRef.current)
-  }, [])
-
-  const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    if (finished) return
-    const value = e.target.value
-
-    if (!started && value.length > 0) {
-      setStarted(true)
-      setStartTime(Date.now())
-    }
-
-    setTyped(value)
-
-    if (value.length >= text.length) {
-      finishTest()
-    }
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    // Prevent tab from leaving the textarea
-    if (e.key === "Tab") {
-      e.preventDefault()
-    }
-  }
-
-  const saveResult = async () => {
-    if (saving) return
-    setSaving(true)
-    try {
-      const res = await fetch("/api/typing-test", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          wpm: currentWPM,
-          accuracy,
-          duration_seconds: Math.min(elapsed, duration),
-          total_characters: typed.length,
-          correct_characters: correctChars,
-          text_length: text.length,
-        }),
-      })
-      if (!res.ok) throw new Error("Failed to save")
-      toast.success("Result saved!")
-      setHistoryLoaded(false)
-    } catch {
-      toast.error("Failed to save result")
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  const resetTest = () => {
-    setText(getRandomText())
-    setTyped("")
-    setStarted(false)
-    setFinished(false)
-    setStartTime(0)
-    setElapsed(0)
-    if (timerRef.current) clearInterval(timerRef.current)
-    inputRef.current?.focus()
-  }
-
-  const loadHistory = React.useCallback(async (page: number) => {
-    setHistoryLoading(true)
-    try {
-      const res = await fetch(`/api/typing-test?page=${page}&pageSize=15`)
-      if (!res.ok) throw new Error("Failed to load")
-      const data: PaginatedTypingResults = await res.json()
-      setResults(data.items)
-      setTotalPages(data.totalPages)
-      setHistoryPage(data.page)
-    } catch {
-      toast.error("Failed to load history")
-    } finally {
-      setHistoryLoading(false)
-      setHistoryLoaded(true)
-    }
-  }, [])
-
-  React.useEffect(() => {
-    if (tab === "history" && !historyLoaded) {
-      void loadHistory(1)
-    }
-  }, [tab, historyLoaded, loadHistory])
-
-  // History stats
-  const bestWPM = results.length
-    ? Math.max(...results.map((r) => r.wpm))
-    : 0
-  const avgWPM = results.length
-    ? Math.round(results.reduce((sum, r) => sum + r.wpm, 0) / results.length)
-    : 0
-  const avgAccuracy = results.length
-    ? Math.round(
-        (results.reduce((sum, r) => sum + r.accuracy, 0) / results.length) * 100
-      ) / 100
-    : 0
+  const {
+    tab,
+    setTab,
+    text,
+    typed,
+    started,
+    finished,
+    elapsed,
+    duration,
+    setDuration,
+    saving,
+    inputRef,
+    results,
+    historyLoading,
+    historyLoaded,
+    historyPage,
+    totalPages,
+    currentWPM,
+    accuracy,
+    progress,
+    timeLeft,
+    bestWPM,
+    avgWPM,
+    avgAccuracy,
+    handleInput,
+    handleKeyDown,
+    saveResult,
+    resetTest,
+    loadHistory,
+  } = useTypingSpeedTest()
 
   return (
     <div className="mx-auto max-w-3xl space-y-4">
-      {/* Tabs */}
       <div className="flex items-center gap-2">
         <Button
           variant={tab === "test" ? "default" : "outline"}
@@ -218,7 +73,6 @@ export function TypingSpeedTest() {
 
       {tab === "test" ? (
         <div className="space-y-4">
-          {/* Controls */}
           {!started && (
             <div className="flex items-center gap-3">
               <span className="text-sm text-muted-foreground">Duration:</span>
@@ -239,7 +93,6 @@ export function TypingSpeedTest() {
             </div>
           )}
 
-          {/* Stats bar */}
           <div className="grid grid-cols-4 gap-3">
             <Card>
               <CardContent className="flex items-center gap-2 p-3">
@@ -281,7 +134,6 @@ export function TypingSpeedTest() {
             </Card>
           </div>
 
-          {/* Progress bar */}
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
             <div
               className="h-full rounded-full bg-emerald-500 transition-all duration-300"
@@ -289,7 +141,6 @@ export function TypingSpeedTest() {
             />
           </div>
 
-          {/* Text display */}
           <Card
             className="cursor-text"
             onClick={() => inputRef.current?.focus()}
@@ -314,7 +165,6 @@ export function TypingSpeedTest() {
                   )
                 })}
               </div>
-              {/* Hidden input */}
               <textarea
                 ref={inputRef}
                 value={typed}
@@ -338,7 +188,6 @@ export function TypingSpeedTest() {
             </CardContent>
           </Card>
 
-          {/* Results */}
           {finished && (
             <Card className="border-emerald-200 dark:border-emerald-800">
               <CardHeader className="pb-2">
@@ -375,7 +224,6 @@ export function TypingSpeedTest() {
             </Card>
           )}
 
-          {/* Running controls */}
           {started && !finished && (
             <div className="flex justify-center">
               <Button variant="outline" size="sm" onClick={resetTest} className="gap-1">
@@ -386,112 +234,18 @@ export function TypingSpeedTest() {
           )}
         </div>
       ) : (
-        /* History tab */
         <div className="space-y-4">
-          {historyLoading && !historyLoaded ? (
-            <PageSpinner />
-          ) : results.length === 0 ? (
-            <Card>
-              <CardContent className="py-10 text-center text-muted-foreground">
-                <History className="mx-auto mb-4 h-12 w-12 opacity-60" />
-                <p className="text-base font-medium">No results yet</p>
-                <p className="text-sm">Complete a typing test to see your history here.</p>
-              </CardContent>
-            </Card>
-          ) : (
-            <>
-              {/* Summary stats */}
-              <div className="grid grid-cols-3 gap-3">
-                <Card>
-                  <CardContent className="p-3 text-center">
-                    <div className="text-xs text-muted-foreground">Best WPM</div>
-                    <div className="text-2xl font-bold text-emerald-600">{bestWPM}</div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-3 text-center">
-                    <div className="text-xs text-muted-foreground">Avg WPM</div>
-                    <div className="text-2xl font-bold">{avgWPM}</div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-3 text-center">
-                    <div className="text-xs text-muted-foreground">Avg Accuracy</div>
-                    <div className="text-2xl font-bold">{avgAccuracy}%</div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Results table */}
-              <Card>
-                <CardContent className="p-0">
-                  <div className="overflow-hidden rounded-xl">
-                    <table className="w-full text-sm">
-                      <thead className="bg-muted/70">
-                        <tr className="text-left">
-                          <th className="px-4 py-2.5">Date</th>
-                          <th className="px-4 py-2.5 text-center">WPM</th>
-                          <th className="px-4 py-2.5 text-center">Accuracy</th>
-                          <th className="px-4 py-2.5 text-center">Duration</th>
-                          <th className="px-4 py-2.5 text-center">Chars</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {results.map((r) => (
-                          <tr key={r.id} className="border-b transition hover:bg-muted/40">
-                            <td className="whitespace-nowrap px-4 py-2.5 text-muted-foreground">
-                              {r.created_at
-                                ? new Date(r.created_at).toLocaleDateString("en-IN", {
-                                    day: "2-digit",
-                                    month: "short",
-                                    year: "numeric",
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                  })
-                                : "N/A"}
-                            </td>
-                            <td className="px-4 py-2.5 text-center font-semibold text-emerald-600">
-                              {r.wpm}
-                            </td>
-                            <td className="px-4 py-2.5 text-center">{r.accuracy}%</td>
-                            <td className="px-4 py-2.5 text-center">{r.duration_seconds}s</td>
-                            <td className="px-4 py-2.5 text-center text-muted-foreground">
-                              {r.correct_characters}/{r.total_characters}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={historyPage <= 1 || historyLoading}
-                    onClick={() => loadHistory(historyPage - 1)}
-                  >
-                    Previous
-                  </Button>
-                  <span className="text-sm text-muted-foreground">
-                    Page {historyPage} of {totalPages}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={historyPage >= totalPages || historyLoading}
-                    onClick={() => loadHistory(historyPage + 1)}
-                  >
-                    Next
-                  </Button>
-                </div>
-              )}
-            </>
-          )}
+          <TypingSpeedHistory
+            results={results}
+            historyLoading={historyLoading}
+            historyLoaded={historyLoaded}
+            historyPage={historyPage}
+            totalPages={totalPages}
+            bestWPM={bestWPM}
+            avgWPM={avgWPM}
+            avgAccuracy={avgAccuracy}
+            loadHistory={loadHistory}
+          />
         </div>
       )}
     </div>

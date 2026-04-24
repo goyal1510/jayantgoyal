@@ -79,6 +79,15 @@ Replace guest/anonymous login with Google OAuth. Users should be able to login/s
 - Dropped `delete_anonymous_users_complete()` function
 - Unscheduled `cleanup-anonymous-users-nightly` cron job
 
+### LOC Refactor (target: all files under 300 lines)
+**Sidebar**: nav-user.tsx 461→115, app-sidebar.tsx 398→171 (extracted account-settings-sheet, useActiveApp, useScrollTracking)
+**Portfolio**: client.tsx 1004→84 (extracted 9 section components into components/portfolio/sections/)
+**Games**: DareX 951→266, MemoryMatch 515→274, Wordle 514→267, ConnectFour 510→248, TypingSpeedTest 499→253, TicTacToe 375→218 (extracted hooks + sub-components)
+**File Manager**: file-list 929→165, upload-dialog 511→249, file-viewer 345→230, copy/move dialogs ~320→~207, database.ts 396→17 barrel (split into db-files, db-directories, format-utils)
+**Admin CRUD**: all 11 files refactored under 300 (extracted dialog components, table components, shared confirm dialog, API helpers)
+**Other**: nav-apps 667→134, weather-dashboard 536→211, calculations-history 716→254, floating-doodles 339→73, camera-recorder 350→152, portfolio/database 392→26
+**Remaining over 300**: tools.ts (779, pure data), database.types.ts (434, auto-generated), portfolio-data.ts (400, static content), terms-content.tsx (326, static content), use-dare-x.ts (488, cohesive hook), dare-x-sheets.tsx (439, 3 sheets), account-settings-sheet.tsx (319, single form), use-connect-four.ts (303, game AI) — all data/config or genuinely cohesive units
+
 ## Verification
 - `pnpm check-types --filter jg` — passes
 - `pnpm lint --filter jg` — passes (zero warnings)

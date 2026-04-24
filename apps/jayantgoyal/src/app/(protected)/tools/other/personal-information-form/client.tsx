@@ -21,106 +21,8 @@ import {
 } from "@/components/ui/table"
 import { Download, Trash2, Sparkles } from "lucide-react"
 import { toast } from "sonner"
-import { faker } from "@faker-js/faker"
 
-type PersonalInfo = {
-  id: string
-  firstName: string
-  middleName: string
-  lastName: string
-  phoneNumber: string
-  dateOfBirth: string
-  age: number | null
-  gender: string
-}
-
-function calculateAge(dob: string): number | null {
-  if (!dob) return null
-  const birthDate = new Date(dob)
-  const today = new Date()
-  let age = today.getFullYear() - birthDate.getFullYear()
-  const monthDiff = today.getMonth() - birthDate.getMonth()
-
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-    age--
-  }
-
-  return age >= 0 ? age : null
-}
-
-function convertToCSV(data: PersonalInfo[]): string {
-  if (data.length === 0) return ""
-
-  const headers = ["First Name", "Middle Name", "Last Name", "Phone Number", "Date of Birth", "Age", "Gender"]
-  const rows = data.map(item => [
-    item.firstName || "",
-    item.middleName || "",
-    item.lastName || "",
-    item.phoneNumber || "",
-    item.dateOfBirth || "",
-    item.age !== null ? String(item.age) : "",
-    item.gender || "",
-  ])
-
-  const escapeCSV = (value: string) => {
-    if (value.includes(",") || value.includes('"') || value.includes("\n")) {
-      return `"${value.replace(/"/g, '""')}"`
-    }
-    return value
-  }
-
-  return [
-    headers.map(escapeCSV).join(","),
-    ...rows.map(row => row.map(escapeCSV).join(","))
-  ].join("\n")
-}
-
-// Dummy data generator using Faker.js
-function generateDummyData(count: number): PersonalInfo[] {
-  const dummyData: PersonalInfo[] = []
-
-  for (let i = 0; i < count; i++) {
-    // Randomly determine gender
-    const isMale = Math.random() > 0.5
-    const gender = isMale ? "Male" : "Female"
-
-    // Generate first name with gender-specific option
-    const firstName = faker.person.firstName(isMale ? "male" : "female")
-
-    // Generate middle name (50% chance of having one)
-    const middleName = Math.random() > 0.5 ? faker.person.firstName() : ""
-
-    // Generate last name
-    const lastName = faker.person.lastName()
-
-    // Generate phone number in clean format: XXX-XXX-XXXX
-    // Generate manually to ensure clean format without extensions or parentheses
-    const areaCode = faker.string.numeric(3)
-    const exchange = faker.string.numeric(3)
-    const number = faker.string.numeric(4)
-    const phoneNumber = `${areaCode}-${exchange}-${number}`
-
-    // Generate date of birth (between 18 and 80 years old)
-    const dateOfBirth = faker.date.birthdate({ min: 18, max: 80, mode: 'age' })
-    const dobString = dateOfBirth.toISOString().split('T')[0]!
-
-    // Calculate age
-    const age = calculateAge(dobString)
-
-    dummyData.push({
-      id: crypto.randomUUID(),
-      firstName,
-      middleName,
-      lastName,
-      phoneNumber,
-      dateOfBirth: dobString,
-      age,
-      gender,
-    })
-  }
-
-  return dummyData
-}
+import { type PersonalInfo, convertToCSV, generateDummyData } from "./dummy-data"
 
 export default function PersonalInformationFormClient() {
   const [data, setData] = React.useState<PersonalInfo[]>([])
@@ -128,26 +30,11 @@ export default function PersonalInformationFormClient() {
 
   const columns = React.useMemo<ColumnDef<PersonalInfo>[]>(
     () => [
-      {
-        accessorKey: "firstName",
-        header: "First Name",
-      },
-      {
-        accessorKey: "middleName",
-        header: "Middle Name",
-      },
-      {
-        accessorKey: "lastName",
-        header: "Last Name",
-      },
-      {
-        accessorKey: "phoneNumber",
-        header: "Phone Number",
-      },
-      {
-        accessorKey: "dateOfBirth",
-        header: "Date of Birth",
-      },
+      { accessorKey: "firstName", header: "First Name" },
+      { accessorKey: "middleName", header: "Middle Name" },
+      { accessorKey: "lastName", header: "Last Name" },
+      { accessorKey: "phoneNumber", header: "Phone Number" },
+      { accessorKey: "dateOfBirth", header: "Date of Birth" },
       {
         accessorKey: "age",
         header: "Age",
@@ -156,10 +43,7 @@ export default function PersonalInformationFormClient() {
           return age !== null ? String(age) : "-"
         },
       },
-      {
-        accessorKey: "gender",
-        header: "Gender",
-      },
+      { accessorKey: "gender", header: "Gender" },
       {
         id: "actions",
         header: "Actions",

@@ -3,16 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import {
-  Loader2,
-  Plus,
-  Pencil,
-  Trash2,
-  Eye,
-  EyeOff,
-  ChevronDown,
-  ChevronRight,
-} from "lucide-react";
+import { Plus } from "lucide-react";
 import {
   createPortfolioData,
   updatePortfolioData,
@@ -26,46 +17,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@repo/ui/dialog";
-import { Input } from "@repo/ui/input";
-import { Label } from "@repo/ui/label";
-import { Switch } from "@repo/ui/switch";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@repo/ui/collapsible";
 import type { SkillCategoryWithSkills, SkillCategory, Skill } from "@/lib/types";
+import { CategoryDialog, emptyCategoryForm, type CategoryFormData } from "./category-dialog";
+import { SkillDialog, emptySkillForm, type SkillFormData } from "./skill-dialog";
+import { SkillCategoryCard } from "./skill-category-card";
 
 interface SkillsManagerProps {
   initialData: SkillCategoryWithSkills[];
 }
-
-type CategoryFormData = Omit<SkillCategory, "id" | "created_at" | "updated_at">;
-type SkillFormData = Omit<Skill, "id" | "created_at" | "updated_at">;
-
-const emptyCategoryForm: CategoryFormData = {
-  title: "",
-  icon_key: "",
-  color: "",
-  sort_order: 0,
-  is_visible: true,
-};
-
-const emptySkillForm: SkillFormData = {
-  category_id: "",
-  name: "",
-  level: null,
-  sort_order: 0,
-  is_visible: true,
-};
 
 export function SkillsManager({ initialData }: SkillsManagerProps) {
   const router = useRouter();
@@ -74,13 +33,11 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
     new Set(initialData.map((c) => c.id))
   );
 
-  // Category dialog state
   const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<SkillCategory | null>(null);
   const [categoryForm, setCategoryForm] = useState<CategoryFormData>(emptyCategoryForm);
   const [savingCategory, setSavingCategory] = useState(false);
 
-  // Skill dialog state
   const [skillDialogOpen, setSkillDialogOpen] = useState(false);
   const [editingSkill, setEditingSkill] = useState<Skill | null>(null);
   const [skillForm, setSkillForm] = useState<SkillFormData>(emptySkillForm);
@@ -98,7 +55,6 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
     setExpandedCategories(newExpanded);
   };
 
-  // Category handlers
   const openAddCategoryDialog = () => {
     setEditingCategory(null);
     setCategoryForm({
@@ -178,7 +134,6 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
     }
   };
 
-  // Skill handlers
   const openAddSkillDialog = (categoryId: string) => {
     setEditingSkill(null);
     const category = categories.find((c) => c.id === categoryId);
@@ -301,323 +256,44 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
           ) : (
             <div className="space-y-4">
               {categories.map((category) => (
-                <Collapsible
+                <SkillCategoryCard
                   key={category.id}
-                  open={expandedCategories.has(category.id)}
-                  onOpenChange={() => toggleCategory(category.id)}
-                >
-                  <div className="rounded-lg border">
-                    <div className="flex items-center gap-4 p-4">
-                      <CollapsibleTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          {expandedCategories.has(category.id) ? (
-                            <ChevronDown className="h-4 w-4" />
-                          ) : (
-                            <ChevronRight className="h-4 w-4" />
-                          )}
-                        </Button>
-                      </CollapsibleTrigger>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-semibold">{category.title}</h3>
-                          <span className="text-xs text-muted-foreground">
-                            ({category.skills.length} skills)
-                          </span>
-                          {!category.is_visible && (
-                            <span className="text-xs text-muted-foreground">
-                              (Hidden)
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          Icon: {category.icon_key || "None"}{" "}
-                          {category.color && `• Color: ${category.color}`}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => openAddSkillDialog(category.id)}
-                        >
-                          <Plus className="mr-2 h-4 w-4" />
-                          Add Skill
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => openEditCategoryDialog(category)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDeleteCategory(category.id)}
-                          disabled={deleting === category.id}
-                        >
-                          {deleting === category.id ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <Trash2 className="h-4 w-4" />
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-                    <CollapsibleContent>
-                      <div className="border-t px-4 py-2 space-y-2 bg-muted/50">
-                        {category.skills.length === 0 ? (
-                          <p className="text-sm text-muted-foreground py-4 text-center">
-                            No skills in this category
-                          </p>
-                        ) : (
-                          category.skills.map((skill) => (
-                            <div
-                              key={skill.id}
-                              className="flex items-center gap-4 rounded border bg-background p-3"
-                            >
-                              <div className="flex-1">
-                                <span className="font-medium">{skill.name}</span>
-                                {skill.level !== null && (
-                                  <span className="ml-2 text-sm text-muted-foreground">
-                                    Level: {skill.level}%
-                                  </span>
-                                )}
-                                {!skill.is_visible && (
-                                  <span className="ml-2 text-xs text-muted-foreground">
-                                    (Hidden)
-                                  </span>
-                                )}
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => toggleSkillVisibility(skill)}
-                                >
-                                  {skill.is_visible ? (
-                                    <Eye className="h-4 w-4" />
-                                  ) : (
-                                    <EyeOff className="h-4 w-4" />
-                                  )}
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => openEditSkillDialog(skill)}
-                                >
-                                  <Pencil className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleDeleteSkill(skill.id)}
-                                  disabled={deleting === skill.id}
-                                >
-                                  {deleting === skill.id ? (
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                  ) : (
-                                    <Trash2 className="h-4 w-4" />
-                                  )}
-                                </Button>
-                              </div>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    </CollapsibleContent>
-                  </div>
-                </Collapsible>
+                  category={category}
+                  expanded={expandedCategories.has(category.id)}
+                  onToggle={() => toggleCategory(category.id)}
+                  onEditCategory={openEditCategoryDialog}
+                  onDeleteCategory={handleDeleteCategory}
+                  onAddSkill={openAddSkillDialog}
+                  onEditSkill={openEditSkillDialog}
+                  onDeleteSkill={handleDeleteSkill}
+                  onToggleSkillVisibility={toggleSkillVisibility}
+                  deleting={deleting}
+                />
               ))}
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Category Dialog */}
-      <Dialog open={categoryDialogOpen} onOpenChange={setCategoryDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {editingCategory ? "Edit Category" : "Add Category"}
-            </DialogTitle>
-            <DialogDescription>
-              {editingCategory
-                ? "Update the skill category details."
-                : "Add a new skill category to organize your skills."}
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleCategorySubmit}>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="cat-title">Title</Label>
-                <Input
-                  id="cat-title"
-                  value={categoryForm.title}
-                  onChange={(e) =>
-                    setCategoryForm({ ...categoryForm, title: e.target.value })
-                  }
-                  placeholder="Frontend Development"
-                  required
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="cat-icon">Icon Key</Label>
-                  <Input
-                    id="cat-icon"
-                    value={categoryForm.icon_key}
-                    onChange={(e) =>
-                      setCategoryForm({ ...categoryForm, icon_key: e.target.value })
-                    }
-                    placeholder="Code2"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="cat-color">Color</Label>
-                  <Input
-                    id="cat-color"
-                    value={categoryForm.color ?? ""}
-                    onChange={(e) =>
-                      setCategoryForm({ ...categoryForm, color: e.target.value })
-                    }
-                    placeholder="#3B82F6"
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="cat-sort">Sort Order</Label>
-                <Input
-                  id="cat-sort"
-                  type="number"
-                  value={categoryForm.sort_order}
-                  onChange={(e) =>
-                    setCategoryForm({
-                      ...categoryForm,
-                      sort_order: parseInt(e.target.value) || 0,
-                    })
-                  }
-                />
-              </div>
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="cat-visible"
-                  checked={categoryForm.is_visible}
-                  onCheckedChange={(checked) =>
-                    setCategoryForm({ ...categoryForm, is_visible: checked })
-                  }
-                />
-                <Label htmlFor="cat-visible">Visible on portfolio</Label>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setCategoryDialogOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={savingCategory}>
-                {savingCategory && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                {editingCategory ? "Update" : "Add"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <CategoryDialog
+        open={categoryDialogOpen}
+        onOpenChange={setCategoryDialogOpen}
+        editing={editingCategory}
+        formData={categoryForm}
+        setFormData={setCategoryForm}
+        onSubmit={handleCategorySubmit}
+        saving={savingCategory}
+      />
 
-      {/* Skill Dialog */}
-      <Dialog open={skillDialogOpen} onOpenChange={setSkillDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {editingSkill ? "Edit Skill" : "Add Skill"}
-            </DialogTitle>
-            <DialogDescription>
-              {editingSkill
-                ? "Update the skill details."
-                : "Add a new skill to this category."}
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleSkillSubmit}>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="skill-name">Skill Name</Label>
-                <Input
-                  id="skill-name"
-                  value={skillForm.name}
-                  onChange={(e) =>
-                    setSkillForm({ ...skillForm, name: e.target.value })
-                  }
-                  placeholder="React"
-                  required
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="skill-level">Level (0-100)</Label>
-                  <Input
-                    id="skill-level"
-                    type="number"
-                    min="0"
-                    max="100"
-                    value={skillForm.level ?? ""}
-                    onChange={(e) =>
-                      setSkillForm({
-                        ...skillForm,
-                        level: e.target.value ? parseInt(e.target.value) : null,
-                      })
-                    }
-                    placeholder="85"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="skill-sort">Sort Order</Label>
-                  <Input
-                    id="skill-sort"
-                    type="number"
-                    value={skillForm.sort_order}
-                    onChange={(e) =>
-                      setSkillForm({
-                        ...skillForm,
-                        sort_order: parseInt(e.target.value) || 0,
-                      })
-                    }
-                  />
-                </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="skill-visible"
-                  checked={skillForm.is_visible}
-                  onCheckedChange={(checked) =>
-                    setSkillForm({ ...skillForm, is_visible: checked })
-                  }
-                />
-                <Label htmlFor="skill-visible">Visible on portfolio</Label>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setSkillDialogOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={savingSkill}>
-                {savingSkill && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                {editingSkill ? "Update" : "Add"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <SkillDialog
+        open={skillDialogOpen}
+        onOpenChange={setSkillDialogOpen}
+        editing={editingSkill}
+        formData={skillForm}
+        setFormData={setSkillForm}
+        onSubmit={handleSkillSubmit}
+        saving={savingSkill}
+      />
     </>
   );
 }

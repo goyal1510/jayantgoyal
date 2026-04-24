@@ -10,8 +10,10 @@ import {
   DialogTitle,
 } from "@repo/ui/dialog"
 import { Button } from "@repo/ui/button"
-import { Copy, AlertCircle, Replace, SkipForward } from "lucide-react"
+import { Copy } from "lucide-react"
 import { DirectoryPicker } from "@/components/file-manager/directory-picker"
+import { FileConflictDialog } from "@/components/file-manager/file-conflict-dialog"
+import type { FileConflictInfo, FileConflictResolution } from "@/components/file-manager/file-conflict-dialog"
 import type { DirectoryListingItem } from "@/lib/file-manager/types"
 
 interface CopyDialogProps {
@@ -19,98 +21,6 @@ interface CopyDialogProps {
   onOpenChange: (open: boolean) => void
   file: DirectoryListingItem | null
   onSuccess?: () => void
-}
-
-interface ConflictInfo {
-  existingFile: {
-    id: string
-    name: string
-    fileName: string
-    path: string
-    size: number
-    updated_at: string
-  }
-}
-
-type ConflictResolution = "replace" | "skip" | "rename"
-
-// Conflict resolution dialog component
-function ConflictDialog({
-  conflict,
-  fileName,
-  onResolve,
-}: {
-  conflict: ConflictInfo | null
-  fileName: string
-  onResolve: (resolution: ConflictResolution | null) => void
-}) {
-  if (!conflict) return null
-
-  const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return "0 B"
-    const k = 1024
-    const sizes = ["B", "KB", "MB", "GB"]
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`
-  }
-
-  const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleString()
-  }
-
-  return (
-    <Dialog open={!!conflict} onOpenChange={() => onResolve(null)}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <AlertCircle className="h-5 w-5 text-amber-500" />
-            File Already Exists
-          </DialogTitle>
-          <DialogDescription>
-            A file named <span className="font-medium">{fileName}</span> already exists at the destination.
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="space-y-3 py-2">
-          <div className="rounded-md border p-3 space-y-1">
-            <p className="text-sm font-medium">Existing file: <span className="font-normal">{conflict.existingFile.fileName}</span></p>
-            <p className="text-xs text-muted-foreground">
-              Path: {conflict.existingFile.path}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Size: {formatFileSize(conflict.existingFile.size)} • Modified: {formatDate(conflict.existingFile.updated_at)}
-            </p>
-          </div>
-        </div>
-
-        <DialogFooter className="flex-col gap-2 sm:flex-col">
-          <Button
-            className="w-full justify-start gap-2"
-            onClick={() => onResolve("replace")}
-          >
-            <Replace className="h-4 w-4" />
-            Replace existing
-          </Button>
-          <Button
-            variant="outline"
-            className="w-full justify-start gap-2"
-            onClick={() => onResolve("skip")}
-          >
-            <SkipForward className="h-4 w-4" />
-            Cancel copy
-          </Button>
-          <Button
-            variant="outline"
-            className="w-full justify-start gap-2"
-            onClick={() => onResolve("rename")}
-          >
-            <Copy className="h-4 w-4" />
-            Keep Both (Rename copied file)
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  )
 }
 
 export function CopyDialog({
@@ -122,10 +32,9 @@ export function CopyDialog({
   const [targetPath, setTargetPath] = React.useState("/")
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
-  const [conflict, setConflict] = React.useState<ConflictInfo | null>(null)
-  const [conflictResolver, setConflictResolver] = React.useState<((resolution: ConflictResolution | null) => void) | null>(null)
+  const [conflict, setConflict] = React.useState<FileConflictInfo | null>(null)
+  const [conflictResolver, setConflictResolver] = React.useState<((resolution: FileConflictResolution | null) => void) | null>(null)
 
-  // Reset form when dialog opens/closes
   React.useEffect(() => {
     if (!open) {
       setTargetPath("/")
@@ -135,15 +44,14 @@ export function CopyDialog({
     }
   }, [open])
 
-  // Wait for conflict resolution from user
-  const waitForConflictResolution = (conflictInfo: ConflictInfo): Promise<ConflictResolution | null> => {
+  const waitForConflictResolution = (conflictInfo: FileConflictInfo): Promise<FileConflictResolution | null> => {
     return new Promise((resolve) => {
       setConflict(conflictInfo)
       setConflictResolver(() => resolve)
     })
   }
 
-  const handleConflictResolve = (resolution: ConflictResolution | null) => {
+  const handleConflictResolve = (resolution: FileConflictResolution | null) => {
     if (conflictResolver) {
       conflictResolver(resolution)
     }
@@ -161,59 +69,39 @@ export function CopyDialog({
     try {
       const response = await fetch(`/api/files/${file.id}/copy`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          targetPath,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ targetPath }),
       })
 
       const data = await response.json()
 
       if (!response.ok) {
-        // Check if it's a conflict error
         if (response.status === 409 && data.code === "FILE_EXISTS") {
           const resolution = await waitForConflictResolution({
             existingFile: data.existingFile,
           })
 
           if (resolution === "replace") {
-            // Retry with overwrite flag
             const retryResponse = await fetch(`/api/files/${file.id}/copy`, {
               method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                targetPath,
-                overwrite: true,
-              }),
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ targetPath, overwrite: true }),
             })
-
             const retryData = await retryResponse.json()
             if (!retryResponse.ok) {
               throw new Error(retryData.error || "Failed to copy")
             }
           } else if (resolution === "rename") {
-            // Retry with rename flag
             const retryResponse = await fetch(`/api/files/${file.id}/copy`, {
               method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                targetPath,
-                rename: true,
-              }),
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ targetPath, rename: true }),
             })
-
             const retryData = await retryResponse.json()
             if (!retryResponse.ok) {
               throw new Error(retryData.error || "Failed to copy")
             }
           } else {
-            // Skip/Cancel - just close loading state
             setLoading(false)
             return
           }
@@ -222,7 +110,6 @@ export function CopyDialog({
         }
       }
 
-      // Success
       onOpenChange(false)
       if (onSuccess) {
         onSuccess()
@@ -236,7 +123,6 @@ export function CopyDialog({
 
   if (!file) return null
 
-  // Cannot copy directories
   if (file.is_directory) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
@@ -313,10 +199,10 @@ export function CopyDialog({
         </DialogContent>
       </Dialog>
 
-      {/* Conflict Resolution Dialog */}
-      <ConflictDialog
+      <FileConflictDialog
         conflict={conflict}
         fileName={file.display_name || file.file_name}
+        action="copy"
         onResolve={handleConflictResolve}
       />
     </>

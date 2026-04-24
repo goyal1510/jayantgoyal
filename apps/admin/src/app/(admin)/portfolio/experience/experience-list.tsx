@@ -11,7 +11,6 @@ import {
   GripVertical,
   Eye,
   EyeOff,
-  X,
 } from "lucide-react";
 import {
   createPortfolioData,
@@ -26,50 +25,26 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@repo/ui/dialog";
-import { Input } from "@repo/ui/input";
-import { Label } from "@repo/ui/label";
-import { Textarea } from "@repo/ui/textarea";
-import { Switch } from "@repo/ui/switch";
 import type { Experience } from "@/lib/types";
+import { ExperienceDialog, emptyExperienceForm, type ExperienceFormData } from "./experience-dialog";
 
 interface ExperienceListProps {
   initialData: Experience[];
 }
-
-type FormData = Omit<Experience, "id" | "created_at" | "updated_at">;
-
-const emptyForm: FormData = {
-  company: "",
-  role: "",
-  period: "",
-  location: "",
-  summary: "",
-  bullets: [],
-  sort_order: 0,
-  is_visible: true,
-};
 
 export function ExperienceList({ initialData }: ExperienceListProps) {
   const router = useRouter();
   const [items, setItems] = useState(initialData);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<Experience | null>(null);
-  const [formData, setFormData] = useState<FormData>(emptyForm);
+  const [formData, setFormData] = useState<ExperienceFormData>(emptyExperienceForm);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
 
   const openAddDialog = () => {
     setEditingItem(null);
     setFormData({
-      ...emptyForm,
+      ...emptyExperienceForm,
       sort_order: items.length > 0 ? Math.max(...items.map((i) => i.sort_order)) + 1 : 0,
     });
     setDialogOpen(true);
@@ -155,26 +130,6 @@ export function ExperienceList({ initialData }: ExperienceListProps) {
     } catch {
       toast.error("Failed to update visibility");
     }
-  };
-
-  const addBullet = () => {
-    setFormData({
-      ...formData,
-      bullets: [...formData.bullets, ""],
-    });
-  };
-
-  const removeBullet = (index: number) => {
-    setFormData({
-      ...formData,
-      bullets: formData.bullets.filter((_, i) => i !== index),
-    });
-  };
-
-  const updateBullet = (index: number, value: string) => {
-    const updated = [...formData.bullets];
-    updated[index] = value;
-    setFormData({ ...formData, bullets: updated });
   };
 
   return (
@@ -263,152 +218,15 @@ export function ExperienceList({ initialData }: ExperienceListProps) {
         </CardContent>
       </Card>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
-              {editingItem ? "Edit Experience" : "Add Experience"}
-            </DialogTitle>
-            <DialogDescription>
-              {editingItem
-                ? "Update the experience entry details."
-                : "Add a new experience entry to your portfolio."}
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleSubmit}>
-            <div className="space-y-4 py-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="company">Company</Label>
-                  <Input
-                    id="company"
-                    value={formData.company}
-                    onChange={(e) =>
-                      setFormData({ ...formData, company: e.target.value })
-                    }
-                    placeholder="Acme Inc."
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="role">Role / Position</Label>
-                  <Input
-                    id="role"
-                    value={formData.role}
-                    onChange={(e) =>
-                      setFormData({ ...formData, role: e.target.value })
-                    }
-                    placeholder="Senior Software Engineer"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="period">Period</Label>
-                  <Input
-                    id="period"
-                    value={formData.period}
-                    onChange={(e) =>
-                      setFormData({ ...formData, period: e.target.value })
-                    }
-                    placeholder="Jan 2020 - Present"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="location">Location</Label>
-                  <Input
-                    id="location"
-                    value={formData.location ?? ""}
-                    onChange={(e) =>
-                      setFormData({ ...formData, location: e.target.value })
-                    }
-                    placeholder="San Francisco, CA"
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="summary">Summary</Label>
-                <Textarea
-                  id="summary"
-                  value={formData.summary ?? ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, summary: e.target.value })
-                  }
-                  placeholder="Brief description of your role..."
-                  rows={2}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Key Accomplishments / Responsibilities</Label>
-                {formData.bullets.map((bullet, index) => (
-                  <div key={index} className="flex gap-2 items-start">
-                    <Textarea
-                      value={bullet}
-                      onChange={(e) => updateBullet(index, e.target.value)}
-                      placeholder="Describe an accomplishment..."
-                      rows={2}
-                      className="flex-1"
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeBullet(index)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-                <Button type="button" variant="outline" onClick={addBullet}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Bullet Point
-                </Button>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="sort_order">Sort Order</Label>
-                <Input
-                  id="sort_order"
-                  type="number"
-                  value={formData.sort_order}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      sort_order: parseInt(e.target.value) || 0,
-                    })
-                  }
-                />
-              </div>
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="is_visible"
-                  checked={formData.is_visible}
-                  onCheckedChange={(checked) =>
-                    setFormData({ ...formData, is_visible: checked })
-                  }
-                />
-                <Label htmlFor="is_visible">Visible on portfolio</Label>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setDialogOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={saving}>
-                {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {editingItem ? "Update" : "Add"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <ExperienceDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        editing={editingItem}
+        formData={formData}
+        setFormData={setFormData}
+        onSubmit={handleSubmit}
+        saving={saving}
+      />
     </>
   );
 }
