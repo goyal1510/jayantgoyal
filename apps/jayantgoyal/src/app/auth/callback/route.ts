@@ -2,17 +2,37 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
 /**
- * Auth callback route - handles token exchange from email verification links.
- * Supabase sends users here with a code/token that needs to be exchanged for a session.
+ * Check if a user has verified MFA factors using the Admin API.
+ * This avoids cookie/session issues — uses service role key directly.
  */
+async function userHasMfa(supabaseUrl: string, userId: string): Promise<boolean> {
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!serviceRoleKey) return false;
+
+  try {
+    const res = await fetch(
+      `${supabaseUrl}/auth/v1/admin/users/${userId}/factors`,
+      {
+        headers: {
+          Authorization: `Bearer ${serviceRoleKey}`,
+          apikey: serviceRoleKey,
+        },
+      }
+    );
+    if (!res.ok) return false;
+    const factors = (await res.json()) as { factor_type: string; status: string }[];
+    return factors.some((f) => f.factor_type === "totp" && f.status === "verified");
+  } catch {
+    return false;
+  }
+}
+
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
   const token_hash = requestUrl.searchParams.get("token_hash");
   const type = requestUrl.searchParams.get("type");
 
-  // Redirect destination: prefer the auth_redirect cookie (set by server actions
-  // to avoid query params in Supabase redirect URLs), fall back to the next query param.
   const authRedirect = request.cookies.get("auth_redirect")?.value;
   const next = authRedirect || requestUrl.searchParams.get("next") || "/";
 
@@ -23,11 +43,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL("/welcome?error=config", request.url));
   }
 
-  // Prepare response for cookie setting
   const redirectUrl = new URL(next, request.url);
   const response = NextResponse.redirect(redirectUrl);
 
-  // Clear the auth_redirect cookie now that we've consumed it
   if (authRedirect) {
     response.cookies.set("auth_redirect", "", { path: "/", maxAge: 0 });
   }
@@ -62,7 +80,6 @@ export async function GET(request: NextRequest) {
         .eq("user_id", data.user.id)
         .single();
 
-      // Only update if profile exists but has no name set (created by DB trigger)
       if (existingProfile && !existingProfile.first_name) {
         const metadata = (data.user.user_metadata ?? {}) as Record<string, unknown>;
         const fullName = String(metadata.full_name || metadata.name || "");
@@ -77,35 +94,19 @@ export async function GET(request: NextRequest) {
             .eq("user_id", data.user.id);
         }
       }
-    }
 
-    // Check if user has MFA enrolled — redirect to /mfa-verify instead of target URL.
-    // We need a fresh client that reads from RESPONSE cookies (where the new session lives),
-    // since the original client reads from REQUEST cookies (which don't have the session yet).
-    const postAuthSupabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-      cookies: {
-        getAll() {
-          return response.cookies.getAll().map((c) => ({ name: c.name, value: c.value }));
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options);
-          });
-        },
-      },
-    });
-    const { data: factorsData } = await postAuthSupabase.auth.mfa.listFactors();
-    const hasVerifiedFactor = factorsData?.totp.some((f) => f.status === "verified");
-    if (hasVerifiedFactor) {
-      const mfaUrl = new URL("/mfa-verify", request.url);
-      if (next !== "/") {
-        mfaUrl.searchParams.set("redirect", next);
+      // Check MFA via Admin API (no cookie dependency)
+      if (await userHasMfa(supabaseUrl, data.user.id)) {
+        const mfaUrl = new URL("/mfa-verify", request.url);
+        if (next !== "/") {
+          mfaUrl.searchParams.set("redirect", next);
+        }
+        const mfaResponse = NextResponse.redirect(mfaUrl);
+        response.cookies.getAll().forEach(({ name, value, ...options }) => {
+          mfaResponse.cookies.set(name, value, options);
+        });
+        return mfaResponse;
       }
-      const mfaResponse = NextResponse.redirect(mfaUrl);
-      response.cookies.getAll().forEach(({ name, value, ...options }) => {
-        mfaResponse.cookies.set(name, value, options);
-      });
-      return mfaResponse;
     }
 
     return response;
@@ -126,24 +127,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL(`/welcome?error=${encodeURIComponent(friendlyMessage)}`, request.url));
     }
 
-    // For recovery flow, set a cookie to lock navigation to /reset-password.
-    // MFA check happens here too — user must verify TOTP before resetting password.
+    // For recovery flow, check MFA and set recovery cookie
     if (isRecovery) {
-      const postVerifySupabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-        cookies: {
-          getAll() {
-            return response.cookies.getAll().map((c) => ({ name: c.name, value: c.value }));
-          },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value, options }) => {
-              response.cookies.set(name, value, options);
-            });
-          },
-        },
-      });
-      const { data: recoveryFactors } = await postVerifySupabase.auth.mfa.listFactors();
-      const recoveryHasMfa = recoveryFactors?.totp.some((f) => f.status === "verified");
-      const recoveryTarget = recoveryHasMfa ? "/mfa-verify?redirect=/reset-password" : "/reset-password";
+      const { data: { user } } = await supabase.auth.getUser();
+      const hasMfa = user ? await userHasMfa(supabaseUrl, user.id) : false;
+      const recoveryTarget = hasMfa ? "/mfa-verify?redirect=/reset-password" : "/reset-password";
       const recoveryResponse = NextResponse.redirect(new URL(recoveryTarget, request.url));
       response.cookies.getAll().forEach(({ name, value, ...options }) => {
         recoveryResponse.cookies.set(name, value, options);
@@ -159,6 +147,5 @@ export async function GET(request: NextRequest) {
     return response;
   }
 
-  // No valid token provided
   return NextResponse.redirect(new URL("/welcome?error=invalid_token", request.url));
 }

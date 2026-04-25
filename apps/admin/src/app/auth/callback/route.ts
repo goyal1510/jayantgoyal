@@ -1,6 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
+/**
+ * Check if a user has verified MFA factors using the Admin API.
+ */
+async function userHasMfa(supabaseUrl: string, userId: string): Promise<boolean> {
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!serviceRoleKey) return false;
+
+  try {
+    const res = await fetch(
+      `${supabaseUrl}/auth/v1/admin/users/${userId}/factors`,
+      {
+        headers: {
+          Authorization: `Bearer ${serviceRoleKey}`,
+          apikey: serviceRoleKey,
+        },
+      }
+    );
+    if (!res.ok) return false;
+    const factors = (await res.json()) as { factor_type: string; status: string }[];
+    return factors.some((f) => f.factor_type === "totp" && f.status === "verified");
+  } catch {
+    return false;
+  }
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
@@ -9,11 +34,7 @@ export async function GET(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return NextResponse.redirect(new URL("/welcome?error=config", request.url));
-  }
-
-  if (!code) {
+  if (!supabaseUrl || !supabaseAnonKey || !code) {
     return NextResponse.redirect(new URL("/welcome?error=auth", request.url));
   }
 
@@ -33,29 +54,17 @@ export async function GET(request: NextRequest) {
     },
   });
 
-  const { error } = await supabase.auth.exchangeCodeForSession(code);
+  const { data, error } = await supabase.auth.exchangeCodeForSession(code);
   if (error) {
     return NextResponse.redirect(new URL("/welcome?error=auth", request.url));
   }
 
-  // Check MFA using a client that reads from RESPONSE cookies (where the new session lives)
-  const postAuthSupabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-    cookies: {
-      getAll() {
-        return response.cookies.getAll().map((c) => ({ name: c.name, value: c.value }));
-      },
-      setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value, options }) => {
-          response.cookies.set(name, value, options);
-        });
-      },
-    },
-  });
-
-  const { data: factorsData } = await postAuthSupabase.auth.mfa.listFactors();
-  const hasVerifiedFactor = factorsData?.totp.some((f) => f.status === "verified");
-  if (hasVerifiedFactor) {
-    const mfaUrl = new URL(next !== "/" ? `/mfa-verify?redirect=${encodeURIComponent(next)}` : "/mfa-verify", request.url);
+  // Check MFA via Admin API (no cookie dependency)
+  if (data?.user && await userHasMfa(supabaseUrl, data.user.id)) {
+    const mfaUrl = new URL(
+      next !== "/" ? `/mfa-verify?redirect=${encodeURIComponent(next)}` : "/mfa-verify",
+      request.url
+    );
     const mfaResponse = NextResponse.redirect(mfaUrl);
     response.cookies.getAll().forEach(({ name, value, ...options }) => {
       mfaResponse.cookies.set(name, value, options);
