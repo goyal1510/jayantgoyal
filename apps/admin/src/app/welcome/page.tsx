@@ -65,6 +65,16 @@ function LoginForm() {
         return;
       }
 
+      // Check MFA before redirecting
+      const { data: factorsData } = await supabase.auth.mfa.listFactors();
+      const hasVerifiedFactor = factorsData?.totp.some((f) => f.status === "verified");
+      if (hasVerifiedFactor) {
+        const mfaUrl = redirectUrl !== "/" ? `/mfa-verify?redirect=${encodeURIComponent(redirectUrl)}` : "/mfa-verify";
+        router.push(mfaUrl);
+        router.refresh();
+        return;
+      }
+
       toast.success("Login successful!");
       router.push(redirectUrl);
       router.refresh();

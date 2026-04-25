@@ -13,10 +13,9 @@ type AuthFormState = {
 
 /**
  * Unified auth action — tries sign-in first, falls back to sign-up if user doesn't exist.
- * MFA is enforced at the proxy level, not here.
  */
 export async function authenticate(
-  prevState: AuthFormState,
+  _prevState: AuthFormState,
   formData: FormData
 ): Promise<AuthFormState> {
   const email = formData.get("email");
@@ -36,13 +35,26 @@ export async function authenticate(
   });
 
   if (!loginError) {
-    // Sign-in succeeded — proxy will handle MFA check on next request
-    revalidatePath("/", "layout");
-
     const targetUrl =
       redirectUrl && String(redirectUrl).startsWith("/")
         ? String(redirectUrl)
         : "/";
+
+    // Check if user has MFA enrolled — redirect to /mfa-verify directly.
+    // Proxy redirects don't work reliably for server action soft navigations.
+    const { data: factorsData } = await supabase.auth.mfa.listFactors();
+    const hasVerifiedFactor = factorsData?.totp.some(
+      (f) => f.status === "verified"
+    );
+
+    if (hasVerifiedFactor) {
+      const mfaUrl = targetUrl !== "/"
+        ? `/mfa-verify?redirect=${encodeURIComponent(targetUrl)}`
+        : "/mfa-verify";
+      redirect(mfaUrl);
+    }
+
+    revalidatePath("/", "layout");
 
     const url = new URL(targetUrl, "http://n");
     url.searchParams.set("login_success", "true");
