@@ -1,40 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
-/**
- * Check if a user has verified MFA factors using the Admin API.
- * This avoids cookie/session issues — uses service role key directly.
- */
-async function userHasMfa(supabaseUrl: string, userId: string): Promise<boolean> {
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!serviceRoleKey) {
-    console.error("[MFA check] SUPABASE_SERVICE_ROLE_KEY not set");
-    return false;
-  }
-
-  try {
-    const url = `${supabaseUrl}/auth/v1/admin/users/${userId}/factors`;
-    const res = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${serviceRoleKey}`,
-        apikey: serviceRoleKey,
-      },
-      cache: "no-store",
-    });
-    if (!res.ok) {
-      console.error(`[MFA check] Admin API returned ${res.status}: ${await res.text()}`);
-      return false;
-    }
-    const factors = (await res.json()) as { factor_type: string; status: string }[];
-    const hasMfa = factors.some((f) => f.factor_type === "totp" && f.status === "verified");
-    console.log(`[MFA check] User ${userId}: factors=${factors.length}, hasMfa=${hasMfa}`);
-    return hasMfa;
-  } catch (err) {
-    console.error("[MFA check] Error:", err);
-    return false;
-  }
-}
-
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
@@ -102,22 +68,18 @@ export async function GET(request: NextRequest) {
             .eq("user_id", data.user.id);
         }
       }
-
-      // Check MFA via Admin API (no cookie dependency)
-      if (await userHasMfa(supabaseUrl, data.user.id)) {
-        const mfaUrl = new URL("/mfa-verify", request.url);
-        if (next !== "/") {
-          mfaUrl.searchParams.set("redirect", next);
-        }
-        const mfaResponse = NextResponse.redirect(mfaUrl);
-        response.cookies.getAll().forEach(({ name, value, ...options }) => {
-          mfaResponse.cookies.set(name, value, options);
-        });
-        return mfaResponse;
-      }
     }
 
-    return response;
+    // Always redirect through /mfa-verify after OAuth login.
+    // The page checks if MFA is actually needed — if not, it redirects through immediately.
+    // This avoids unreliable server-side MFA checks in the callback (cookie/session timing).
+    const mfaUrl = new URL("/mfa-verify", request.url);
+    mfaUrl.searchParams.set("redirect", next);
+    const mfaResponse = NextResponse.redirect(mfaUrl);
+    response.cookies.getAll().forEach(({ name, value, ...options }) => {
+      mfaResponse.cookies.set(name, value, options);
+    });
+    return mfaResponse;
   }
 
   // Handle token_hash flow (magic link / email verification)
@@ -135,12 +97,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL(`/welcome?error=${encodeURIComponent(friendlyMessage)}`, request.url));
     }
 
-    // For recovery flow, check MFA and set recovery cookie
     if (isRecovery) {
-      const { data: { user } } = await supabase.auth.getUser();
-      const hasMfa = user ? await userHasMfa(supabaseUrl, user.id) : false;
-      const recoveryTarget = hasMfa ? "/mfa-verify?redirect=/reset-password" : "/reset-password";
-      const recoveryResponse = NextResponse.redirect(new URL(recoveryTarget, request.url));
+      // Recovery always goes through /mfa-verify which will check and pass through if no MFA
+      const recoveryResponse = NextResponse.redirect(new URL("/mfa-verify?redirect=/reset-password", request.url));
       response.cookies.getAll().forEach(({ name, value, ...options }) => {
         recoveryResponse.cookies.set(name, value, options);
       });

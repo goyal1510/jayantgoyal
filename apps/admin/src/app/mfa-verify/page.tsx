@@ -1,13 +1,54 @@
 "use client"
 
 import { Suspense } from "react"
-import { useSearchParams } from "next/navigation"
+import { useSearchParams, useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
 import { MfaVerifyStep } from "@/components/auth/mfa-verify-step"
 import { Card, CardContent } from "@repo/ui/card"
+import { createSupabaseBrowserClient } from "@/lib/supabase/client"
+
+type MfaState = "loading" | "required" | "not-required"
 
 function MfaVerifyContent() {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const redirectUrl = searchParams.get("redirect") ?? "/"
+  const [mfaState, setMfaState] = useState<MfaState>("loading")
+
+  useEffect(() => {
+    const checkMfa = async () => {
+      const supabase = createSupabaseBrowserClient()
+
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        window.location.href = "/welcome"
+        return
+      }
+
+      const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+      if (aal?.currentLevel === "aal1" && aal?.nextLevel === "aal2") {
+        const { data: factors } = await supabase.auth.mfa.listFactors()
+        if (factors?.totp.some((f) => f.status === "verified")) {
+          setMfaState("required")
+          return
+        }
+      }
+
+      // MFA not needed — redirect through
+      router.push(redirectUrl)
+      router.refresh()
+    }
+
+    void checkMfa()
+  }, [redirectUrl, router])
+
+  if (mfaState === "loading") {
+    return (
+      <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
+        <div className="animate-spin size-8 border-2 border-muted-foreground border-t-transparent rounded-full" />
+      </div>
+    )
+  }
 
   return (
     <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
