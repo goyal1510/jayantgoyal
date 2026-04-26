@@ -7,22 +7,30 @@ import { createServerClient } from "@supabase/ssr";
  */
 async function userHasMfa(supabaseUrl: string, userId: string): Promise<boolean> {
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!serviceRoleKey) return false;
+  if (!serviceRoleKey) {
+    console.error("[MFA check] SUPABASE_SERVICE_ROLE_KEY not set");
+    return false;
+  }
 
   try {
-    const res = await fetch(
-      `${supabaseUrl}/auth/v1/admin/users/${userId}/factors`,
-      {
-        headers: {
-          Authorization: `Bearer ${serviceRoleKey}`,
-          apikey: serviceRoleKey,
-        },
-      }
-    );
-    if (!res.ok) return false;
+    const url = `${supabaseUrl}/auth/v1/admin/users/${userId}/factors`;
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${serviceRoleKey}`,
+        apikey: serviceRoleKey,
+      },
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      console.error(`[MFA check] Admin API returned ${res.status}: ${await res.text()}`);
+      return false;
+    }
     const factors = (await res.json()) as { factor_type: string; status: string }[];
-    return factors.some((f) => f.factor_type === "totp" && f.status === "verified");
-  } catch {
+    const hasMfa = factors.some((f) => f.factor_type === "totp" && f.status === "verified");
+    console.log(`[MFA check] User ${userId}: factors=${factors.length}, hasMfa=${hasMfa}`);
+    return hasMfa;
+  } catch (err) {
+    console.error("[MFA check] Error:", err);
     return false;
   }
 }
