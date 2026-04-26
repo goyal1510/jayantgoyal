@@ -111,16 +111,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         void loadUser()
         if (event === "SIGNED_IN") {
           void fetch("/api/account/mfa-cleanup", { method: "POST" })
-          // After OAuth sign-in, check if MFA is required and redirect
-          void (async () => {
-            const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
-            if (aal?.currentLevel === "aal1" && aal?.nextLevel === "aal2") {
-              const { data: factors } = await supabase.auth.mfa.listFactors()
-              if (factors?.totp.some((f) => f.status === "verified")) {
-                window.location.href = "/mfa-verify"
-              }
-            }
-          })()
         }
       }
     })

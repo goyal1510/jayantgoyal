@@ -78,7 +78,9 @@ export default async function proxy(request: NextRequest) {
   // --- Everything below requires authentication ---
 
   // MFA enforcement: if user has TOTP enrolled but is at AAL1, block everything except
-  // the MFA verify page and essential APIs.
+  // the MFA verify page, auth callback, and essential APIs.
+  if (pathname.startsWith("/auth/callback")) return response;
+
   const { data: aalData } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
   const needsMfa =
     aalData?.currentLevel === "aal1" &&

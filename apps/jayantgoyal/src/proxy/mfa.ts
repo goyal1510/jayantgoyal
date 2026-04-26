@@ -17,6 +17,10 @@ const MFA_EXEMPT_APIS = [
 export async function mfaMiddleware(ctx: ProxyContext): Promise<NextResponse | null> {
   if (!ctx.isAuthed) return null;
 
+  // Skip MFA check for auth callback — the route handler needs to
+  // exchange the OAuth code before any MFA redirect can happen
+  if (ctx.pathname.startsWith("/auth/callback")) return null;
+
   const { data: aalData } = await ctx.supabase.auth.mfa.getAuthenticatorAssuranceLevel();
 
   if (aalData?.currentLevel !== "aal1" || aalData?.nextLevel !== "aal2") {
