@@ -10,8 +10,9 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 export async function GET(request: NextRequest) {
   const supabase = await createSupabaseServerClient();
 
-  // Trust proxy-verified user ID (set by proxy after getUser())
+  // Trust proxy-verified headers (set by proxy after getUser())
   let userId = request.headers.get("x-user-id");
+  let userEmail = request.headers.get("x-user-email") ?? undefined;
 
   if (!userId) {
     // Fallback: called directly without proxy (e.g., during development)
@@ -24,6 +25,7 @@ export async function GET(request: NextRequest) {
       });
     }
     userId = user.id;
+    userEmail = user.email;
   }
 
   // Single DB query: profile + terms
@@ -46,7 +48,7 @@ export async function GET(request: NextRequest) {
   const termsAccepted = profile.terms_accepted === true;
 
   const res = NextResponse.json({
-    user: { id: userId, name: name || "User" },
+    user: { id: userId, name: name || "User", email: userEmail },
     isAuthenticated: true,
     needsAcceptance: !termsAccepted,
   });

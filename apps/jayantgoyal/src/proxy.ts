@@ -146,6 +146,7 @@ export default async function proxy(request: NextRequest) {
 
   if (user) {
     requestHeaders.set("x-user-id", user.id);
+    if (user.email) requestHeaders.set("x-user-email", user.email);
   }
 
   const isPublic = matchPath(pathname, AUTH_PUBLIC_PATHS);
