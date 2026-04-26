@@ -2,9 +2,9 @@ import type { MetadataRoute } from "next"
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Jayant Goyal — Full-Stack Developer",
-    short_name: "Jayant Goyal",
-    description: "Full-stack developer portfolio with 99+ dev tools, games, and utilities.",
+    name: "Jayant Goyal — Developer Platform",
+    short_name: "Jayant",
+    description: "A unified platform — portfolio, 99+ developer tools, games, file manager, messenger, and more. Built with Next.js, React, TypeScript, and Supabase.",
     start_url: "/",
     display: "standalone",
     background_color: "#0a0a0a",

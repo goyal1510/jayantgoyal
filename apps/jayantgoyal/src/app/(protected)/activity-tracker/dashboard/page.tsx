@@ -2,8 +2,8 @@ import type { Metadata } from "next"
 import DashboardClient from "./client"
 
 export const metadata: Metadata = {
-  title: "Activity Dashboard | Jayant",
-  description: "View your activity tracker dashboard.",
+  title: "Activity Dashboard",
+  description: "Track and visualize your daily activities with charts and analytics.",
 }
 
 export default function DashboardPage() {

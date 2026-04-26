@@ -3,8 +3,7 @@ import { Suspense } from "react"
 import { ResetPasswordForm } from "@/components/auth/reset-password-form"
 
 export const metadata: Metadata = {
-  title: "Reset Password | Jayant",
-  description: "Set a new password for your account.",
+  title: "Reset Password",
 }
 
 export default function ResetPasswordPage() {

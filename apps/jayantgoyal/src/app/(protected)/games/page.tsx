@@ -7,9 +7,9 @@ import { GAME_META } from "@/lib/games/config"
 import { cn } from "@repo/ui/lib/utils"
 
 export const metadata: Metadata = {
-  title: "Games | Jayant",
+  title: "Games",
   description:
-    "Play fun games including Tic Tac Toe, Rock Paper Scissors, Connect Four, and more.",
+    "Play 7 interactive games — Tic Tac Toe, Connect Four, Memory Match, Wordle, Typing Speed Test, and more.",
 }
 
 const CARD_THEMES: Record<

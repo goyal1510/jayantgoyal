@@ -4,8 +4,8 @@ import { WelcomeForm } from "@/components/auth/welcome-form";
 import { CircularLoader } from "@/components/ui/circular-loader";
 
 export const metadata: Metadata = {
-  title: "Welcome | Jayant",
-  description: "Sign in or create your account.",
+  title: "Welcome",
+  description: "Sign in or create your account on jayantgoyal.com",
 }
 
 export default function WelcomePage() {

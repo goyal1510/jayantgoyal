@@ -3,8 +3,7 @@ import { Suspense } from "react"
 import { ForgotPasswordForm } from "@/components/auth/forgot-password-form"
 
 export const metadata: Metadata = {
-  title: "Forgot Password | Jayant",
-  description: "Reset your account password.",
+  title: "Forgot Password",
 }
 
 export default function ForgotPasswordPage() {

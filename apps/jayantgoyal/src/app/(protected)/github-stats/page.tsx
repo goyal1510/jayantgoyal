@@ -2,8 +2,8 @@ import type { Metadata } from "next"
 import GitHubStatsDashboard from "@/components/github-stats/github-stats-dashboard"
 
 export const metadata: Metadata = {
-  title: "GitHub Stats | Jayant",
-  description: "Explore GitHub profiles with stats, contribution calendar, language distribution, and repository data.",
+  title: "GitHub Stats",
+  description: "Explore GitHub profiles — contribution calendar, repository stats, language breakdown, and activity data.",
 }
 
 export default function Page() {
