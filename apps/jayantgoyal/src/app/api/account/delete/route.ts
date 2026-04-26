@@ -1,19 +1,9 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 export async function DELETE() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !serviceRoleKey) {
-    return NextResponse.json(
-      { error: "Service role key is not configured." },
-      { status: 500 }
-    );
-  }
-
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
@@ -27,12 +17,15 @@ export async function DELETE() {
     );
   }
 
-  const adminClient = createClient(supabaseUrl, serviceRoleKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
+  let adminClient;
+  try {
+    adminClient = createSupabaseAdminClient();
+  } catch {
+    return NextResponse.json(
+      { error: "Service role key is not configured." },
+      { status: 500 }
+    );
+  }
 
   const { error } = await adminClient.auth.admin.deleteUser(user.id);
 

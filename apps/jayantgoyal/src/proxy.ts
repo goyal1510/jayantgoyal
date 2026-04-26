@@ -47,7 +47,6 @@ const PUBLIC_PAGES = [
 const AUTH_PUBLIC_PATHS = [
   "/welcome",
   "/mfa-verify",
-  "/api/account/terms-status",
   "/api/account/accept-terms",
   "/api/account/init",
 ];

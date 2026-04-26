@@ -1,18 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+
 /** Check MFA via Admin API — no cookie dependency */
-async function userHasMfa(supabaseUrl: string, userId: string): Promise<boolean> {
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!serviceRoleKey) return false;
+async function userHasMfa(userId: string): Promise<boolean> {
   try {
-    const res = await fetch(`${supabaseUrl}/auth/v1/admin/users/${userId}/factors`, {
-      headers: { Authorization: `Bearer ${serviceRoleKey}`, apikey: serviceRoleKey },
-      cache: "no-store",
-    });
-    if (!res.ok) return false;
-    const factors = (await res.json()) as { factor_type: string; status: string }[];
-    return factors.some((f) => f.factor_type === "totp" && f.status === "verified");
+    const adminClient = createSupabaseAdminClient();
+    const { data, error } = await adminClient.auth.admin.mfa.listFactors({ userId });
+    if (error || !data) return false;
+    return data.totp.some((f) => f.status === "verified");
   } catch {
     return false;
   }
@@ -89,7 +86,7 @@ export async function GET(request: NextRequest) {
 
       // Check MFA — only redirect to /mfa-verify if user actually has MFA enabled.
       // This avoids an unnecessary redirect (and spinner flash) for users without MFA.
-      if (await userHasMfa(supabaseUrl, data.user.id)) {
+      if (await userHasMfa(data.user.id)) {
         const mfaUrl = new URL("/mfa-verify", request.url);
         mfaUrl.searchParams.set("redirect", next);
         const mfaResponse = NextResponse.redirect(mfaUrl);
@@ -121,7 +118,7 @@ export async function GET(request: NextRequest) {
 
     if (isRecovery) {
       const { data: { user } } = await supabase.auth.getUser();
-      const hasMfa = user ? await userHasMfa(supabaseUrl, user.id) : false;
+      const hasMfa = user ? await userHasMfa(user.id) : false;
       const recoveryTarget = hasMfa ? "/mfa-verify?redirect=/reset-password" : "/reset-password";
       const recoveryResponse = NextResponse.redirect(new URL(recoveryTarget, request.url));
       response.cookies.getAll().forEach(({ name, value, ...options }) => {

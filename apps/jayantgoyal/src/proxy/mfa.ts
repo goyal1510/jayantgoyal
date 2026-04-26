@@ -4,9 +4,7 @@ import type { ProxyContext } from "./types";
 /** APIs that are safe to call without completing MFA */
 const MFA_EXEMPT_APIS = [
   "/api/account/init",
-  "/api/account/terms-status",
   "/api/account/accept-terms",
-  "/api/account/profile",
   "/api/account/mfa-cleanup",
 ];
 
