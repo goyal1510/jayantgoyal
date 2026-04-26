@@ -48,9 +48,9 @@ export function ResetPasswordForm({
       sessionStorage.setItem("reset_password_visited", "true")
 
       const supabase = createSupabaseBrowserClient()
-      const { data: { session } } = await supabase.auth.getSession()
+      const { data: { user: sessionUser } } = await supabase.auth.getUser()
 
-      if (!session) {
+      if (!sessionUser) {
         // Clear stale recovery cookie if session is gone
         clearRecoveryCookie()
         setSessionState("none")

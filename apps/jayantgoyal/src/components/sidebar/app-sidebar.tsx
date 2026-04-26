@@ -80,9 +80,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         return loadUser(true, retries - 1)
       }
       const supabase = createSupabaseBrowserClient()
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session?.user) {
-        const email = session.user.email || ""
+      const { data: { user: fallbackAuthUser } } = await supabase.auth.getUser()
+      if (fallbackAuthUser) {
+        const email = fallbackAuthUser.email || ""
         const userData: SidebarUser = { name: email.split("@")[0] || "User", email }
         cachedUser = userData
         setUser(userData)
