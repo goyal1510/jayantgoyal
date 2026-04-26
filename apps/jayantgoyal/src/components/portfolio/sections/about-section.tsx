@@ -9,7 +9,8 @@ import {
 import { Separator } from "@repo/ui/separator";
 import { cn } from "@repo/ui/lib/utils";
 import type { SerializablePortfolioData } from "@/lib/portfolio/serializable";
-import { sectionId, sectionScrollMargin, SectionHeader } from "@/components/portfolio/shared";
+import { sectionId, sectionScrollMargin } from "@/components/portfolio/constants";
+import { SectionHeader } from "@/components/portfolio/shared";
 
 export function AboutSection({
   about,

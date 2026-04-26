@@ -8,7 +8,7 @@ import { Button } from "@repo/ui/button";
 import { cn } from "@repo/ui/lib/utils";
 import type { PortfolioDataSource } from "@/lib/portfolio/use-portfolio-data";
 import type { SerializablePortfolioData } from "@/lib/portfolio/serializable";
-import { sectionId, sectionScrollMargin } from "@/components/portfolio/shared";
+import { sectionId, sectionScrollMargin } from "@/components/portfolio/constants";
 import { HeroCta } from "@/components/portfolio/sections/hero-cta";
 
 export function HeroSection({

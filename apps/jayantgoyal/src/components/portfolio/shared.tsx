@@ -2,14 +2,10 @@
 
 import { m } from "framer-motion";
 import { cn } from "@repo/ui/lib/utils";
-import type { SerializablePortfolioData } from "@/lib/portfolio/serializable";
 
-export type SectionId = SerializablePortfolioData["NAV_ITEMS"][number]["id"];
-export type Project = SerializablePortfolioData["PROJECTS"][number];
-export type Certificate = SerializablePortfolioData["CERTIFICATES"][number];
-
-export const sectionId = (id: SectionId) => id;
-export const sectionScrollMargin = "scroll-mt-20";
+// Re-export from constants so existing imports from "./shared" keep working
+export { sectionId, sectionScrollMargin } from "./constants";
+export type { SectionId, Project, Certificate } from "./constants";
 
 export function SectionHeader({
   title,
