@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og"
 
 export const runtime = "edge"
-export const alt = "Jayant — Full-Stack Developer Platform"
+export const alt = "jayantgoyal.com — Full-Stack Developer Platform"
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
 
@@ -28,9 +28,9 @@ export default function OgImage() {
 
         {/* Main content */}
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20 }}>
-          {/* Name */}
-          <div style={{ fontSize: 64, fontWeight: 800, color: "white", display: "flex", gap: 14 }}>
-            <span>JAYANT</span>
+          {/* Platform name */}
+          <div style={{ fontSize: 56, fontWeight: 800, color: "white", letterSpacing: "-0.02em" }}>
+            jayantgoyal.com
           </div>
 
           {/* Tagline */}
@@ -90,9 +90,9 @@ export default function OgImage() {
           </div>
         </div>
 
-        {/* URL */}
-        <div style={{ position: "absolute", bottom: 36, fontSize: 18, color: "rgba(255,255,255,0.25)", letterSpacing: "0.05em" }}>
-          jayantgoyal.com
+        {/* Built by */}
+        <div style={{ position: "absolute", bottom: 36, fontSize: 18, color: "rgba(255,255,255,0.3)" }}>
+          Built by Jayant
         </div>
       </div>
     ),
