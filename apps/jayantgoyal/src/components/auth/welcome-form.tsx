@@ -52,6 +52,7 @@ export function WelcomeForm({
   const redirectUrl = searchParams.get("redirect") ?? "/"
   const errorParam = searchParams.get("error")
   const messageParam = searchParams.get("message")
+  const signedOut = searchParams.get("signed_out")
 
   const [state, formAction] = React.useActionState(authenticate, initialState)
   const [showPassword, setShowPassword] = React.useState(false)
@@ -79,19 +80,23 @@ export function WelcomeForm({
 
   // Show toasts for query param feedback
   React.useEffect(() => {
+    if (signedOut) {
+      toast.success("Signed out successfully.")
+    }
     if (errorParam) {
       toast.error(decodeURIComponent(errorParam))
     }
     if (messageParam === "password_changed") {
       toast.success("Password updated successfully! Please sign in with your new password.")
     }
-    if (errorParam || messageParam) {
+    if (errorParam || messageParam || signedOut) {
       const url = new URL(window.location.href)
       url.searchParams.delete("error")
       url.searchParams.delete("message")
+      url.searchParams.delete("signed_out")
       window.history.replaceState({}, "", url.pathname + url.search)
     }
-  }, [errorParam, messageParam])
+  }, [errorParam, messageParam, signedOut])
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>

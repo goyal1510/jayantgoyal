@@ -45,7 +45,7 @@ export function NavUser({
             toast.error(error.message)
             return
           }
-          window.location.href = "/?signed_out=true"
+          window.location.href = "/welcome?signed_out=true"
         } catch (err) {
           toast.error(err instanceof Error ? err.message : "Unable to sign out.")
         }
