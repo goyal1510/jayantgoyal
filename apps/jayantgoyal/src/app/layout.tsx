@@ -36,19 +36,19 @@ export const metadata: Metadata = {
       "Full-stack developer portfolio by Jayant Goyal. Explore projects, 99+ developer tools, interactive games, and utilities built with Next.js, React, TypeScript, and Supabase.",
     images: [
       {
-        url: "https://www.jayantgoyal.com/assets/Jayant_favicon_io/android-chrome-512x512.png",
-        width: 512,
-        height: 512,
+        url: "https://www.jayantgoyal.com/opengraph-image",
+        width: 1200,
+        height: 630,
         alt: "Jayant Goyal — Full-Stack Developer",
       },
     ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "Jayant Goyal — Full-Stack Developer",
     description:
       "Full-stack developer portfolio by Jayant Goyal. Explore projects, 99+ developer tools, interactive games, and utilities built with Next.js, React, TypeScript, and Supabase.",
-    images: ["https://www.jayantgoyal.com/assets/Jayant_favicon_io/android-chrome-512x512.png"],
+    images: ["https://www.jayantgoyal.com/opengraph-image"],
   },
   verification: {
     google: "NPYQ4NJ-F69rJjK2ZcTM_h5Tc_5T1pRqGH0MNgs0oSo",
