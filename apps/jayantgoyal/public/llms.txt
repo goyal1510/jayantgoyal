@@ -1,0 +1,23 @@
+# jayantgoyal.com
+
+> A unified developer platform by Jayant — portfolio, 99+ developer tools, interactive games, and productivity apps.
+
+## Features
+- Portfolio: Projects, skills, experience, certifications
+- Developer Tools: 99+ utilities (UUID generator, JSON formatter, Base64 encoder, hash generators, regex tester, converters, parsers, and more)
+- Games: Tic Tac Toe, Connect Four, Memory Match, Wordle, Typing Speed Test, Rock Paper Scissors, Dare X
+- File Manager: Cloud storage with folders, upload, download
+- Messenger: Real-time messaging
+- Weather: City search with 5-day forecast
+- Activity Tracker: Daily activity tracking with analytics
+- Calculator: Cash denomination calculator
+
+## Tech Stack
+- Next.js 16, React 19, TypeScript
+- Supabase (Auth, Database, Realtime, Storage)
+- Tailwind CSS, Framer Motion
+
+## Links
+- Website: https://www.jayantgoyal.com
+- Tools: https://www.jayantgoyal.com/tools
+- GitHub: https://github.com/goyal1510

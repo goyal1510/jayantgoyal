@@ -26,6 +26,8 @@ const ZERO_COST_PATHS = [
   "/manifest.webmanifest",
   "/opengraph-image",
   "/twitter-image",
+  "/.well-known/",
+  "/llms.txt",
 ];
 
 /** Public pages — viewable without auth. Skip getUser(), use fast cookie check. */

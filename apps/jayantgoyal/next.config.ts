@@ -28,6 +28,7 @@ const nextConfig: NextConfig = {
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(self)" },
           { key: "X-DNS-Prefetch-Control", value: "on" },
+          { key: "Link", value: '</.well-known/api-catalog>; rel="api-catalog", </llms.txt>; rel="ai-content"' },
         ],
       },
       // Cache static assets aggressively
