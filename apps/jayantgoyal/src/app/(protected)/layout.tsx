@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import { cookies } from "next/headers";
-import dynamic from "next/dynamic";
 
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { DynamicBreadcrumb } from "@/components/sidebar/dynamic-breadcrumb";
@@ -16,18 +15,9 @@ import { PortfolioDataProvider } from "@/lib/portfolio/use-portfolio-data";
 import { TermsAcceptanceCheck } from "@/components/auth/terms-acceptance-check";
 import { LazyMotionProvider } from "@/components/providers/lazy-motion-provider";
 import { RouteChangeProvider } from "@/components/providers/route-change-provider";
+import { LazyThreeBgWrapper, LazyCommandPalette } from "@/components/providers/lazy-components";
 import { ThreeBgToggle } from "@/components/three/three-bg-toggle";
 import { AuthToast } from "@/components/auth/auth-toast";
-
-// Lazy-load heavy components that aren't needed for first paint
-const ThreeBgWrapper = dynamic(
-  () => import("@/components/three/three-bg-wrapper").then((m) => ({ default: m.ThreeBgWrapper })),
-  { ssr: false }
-);
-const CommandPalette = dynamic(
-  () => import("@/components/sidebar/command-palette").then((m) => ({ default: m.CommandPalette })),
-  { ssr: false }
-);
 
 export default async function ProtectedLayout({
   children,
@@ -45,7 +35,7 @@ export default async function ProtectedLayout({
       <TermsAcceptanceCheck />
       <AuthToast />
       <SidebarProvider defaultOpen={defaultOpen} defaultWidth={defaultWidth}>
-        <ThreeBgWrapper />
+        <LazyThreeBgWrapper />
         <AppSidebar />
         <SidebarInset>
           <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center gap-2 border-b bg-background/95 px-4 transition-[width,height] ease-linear backdrop-blur supports-[backdrop-filter]:bg-background/80 group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 max-w-full">
@@ -57,7 +47,7 @@ export default async function ProtectedLayout({
               </div>
             </div>
             <div className="flex shrink-0 items-center gap-2">
-              <CommandPalette />
+              <LazyCommandPalette />
               <ThreeBgToggle />
               <ThemeToogle />
             </div>
