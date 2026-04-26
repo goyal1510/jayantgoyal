@@ -26,16 +26,16 @@ function MfaVerifyContent() {
         return
       }
 
-      const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
-      if (aal?.currentLevel === "aal1" && aal?.nextLevel === "aal2") {
-        const { data: factors } = await supabase.auth.mfa.listFactors()
-        if (factors?.totp.some((f) => f.status === "verified")) {
-          setMfaState("required")
-          return
-        }
+      // Check factors directly via API call (always accurate).
+      // Don't use getAuthenticatorAssuranceLevel() — it reads from
+      // the local JWT which may be stale after a fresh OAuth session.
+      const { data: factors } = await supabase.auth.mfa.listFactors()
+      if (factors?.totp.some((f) => f.status === "verified")) {
+        setMfaState("required")
+        return
       }
 
-      // MFA not needed — redirect through to target
+      // No MFA factors — redirect through to target
       const url = new URL(redirectUrl, window.location.origin)
       url.searchParams.set("login_success", "true")
       window.location.href = url.toString()
