@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://www.jayantgoyal.com"),
   title: {
     default: "Jayant Goyal — Full-Stack Developer",
-    template: "%s | Jayant Goyal",
+    template: "%s | Jayant",
   },
   description:
     "Full-stack developer portfolio by Jayant Goyal. Explore projects, 99+ developer tools, games, and utilities built with Next.js, React, TypeScript, and Supabase.",
