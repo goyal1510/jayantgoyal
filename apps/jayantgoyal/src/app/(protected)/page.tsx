@@ -5,10 +5,10 @@ import { AboutSection } from "@/components/portfolio/sections/about-section"
 import { PortfolioInteractive } from "./portfolio-interactive"
 
 export const metadata: Metadata = {
-  title: "Jayant",
+  title: { absolute: "Jayant" },
   description: "A unified platform by Jayant — portfolio, 99+ developer tools, interactive games, file manager, real-time messenger, weather, activity tracker, and more. Built with Next.js, React, TypeScript, and Supabase.",
   openGraph: {
-    title: "Jayant — Full-Stack Developer Platform",
+    title: "jayantgoyal.com — Developer Platform",
     description: "A unified platform by Jayant — portfolio, 99+ developer tools, interactive games, file manager, real-time messenger, weather, activity tracker, and more. Built with Next.js, React, TypeScript, and Supabase.",
     images: [
       {
