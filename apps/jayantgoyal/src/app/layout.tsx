@@ -33,13 +33,13 @@ export const metadata: Metadata = {
     siteName: "Jayant Goyal",
     title: "Jayant Goyal — Full-Stack Developer",
     description:
-      "Full-stack developer portfolio with projects, 99+ dev tools, games, and utilities.",
+      "Full-stack developer portfolio by Jayant Goyal. Explore projects, 99+ developer tools, interactive games, and utilities built with Next.js, React, TypeScript, and Supabase.",
     images: [
       {
-        url: "/assets/Jayant_favicon_io/android-chrome-512x512.png",
+        url: "https://www.jayantgoyal.com/assets/Jayant_favicon_io/android-chrome-512x512.png",
         width: 512,
         height: 512,
-        alt: "Jayant Goyal",
+        alt: "Jayant Goyal — Full-Stack Developer",
       },
     ],
   },
@@ -47,8 +47,8 @@ export const metadata: Metadata = {
     card: "summary",
     title: "Jayant Goyal — Full-Stack Developer",
     description:
-      "Full-stack developer portfolio with projects, 99+ dev tools, games, and utilities.",
-    images: ["/assets/Jayant_favicon_io/android-chrome-512x512.png"],
+      "Full-stack developer portfolio by Jayant Goyal. Explore projects, 99+ developer tools, interactive games, and utilities built with Next.js, React, TypeScript, and Supabase.",
+    images: ["https://www.jayantgoyal.com/assets/Jayant_favicon_io/android-chrome-512x512.png"],
   },
   verification: {
     google: "NPYQ4NJ-F69rJjK2ZcTM_h5Tc_5T1pRqGH0MNgs0oSo",
