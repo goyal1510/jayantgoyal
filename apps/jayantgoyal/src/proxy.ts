@@ -88,6 +88,13 @@ export default async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Markdown for Agents: when Accept: text/markdown, serve llms.txt
+  if (request.headers.get("accept")?.includes("text/markdown")) {
+    const res = NextResponse.rewrite(new URL("/llms.txt", request.url));
+    res.headers.set("Content-Type", "text/markdown; charset=utf-8");
+    return res;
+  }
+
   // Zero-cost paths — instant pass-through
   if (ZERO_COST_PATHS.some((p) => pathname.startsWith(p))) {
     return NextResponse.next();
