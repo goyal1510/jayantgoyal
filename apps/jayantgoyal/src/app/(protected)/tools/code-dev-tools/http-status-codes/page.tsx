@@ -5,7 +5,7 @@ import HTTPStatusCodesClient from "./client"
 const tool = getToolByPath("/tools/code-dev-tools/http-status-codes")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant`,
+  title: `${tool?.title}`,
   description: tool?.description,
 }
 

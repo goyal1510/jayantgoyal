@@ -5,7 +5,7 @@ import BenchmarkBuilderClient from "./client"
 const tool = getToolByPath("/tools/other/benchmark-builder")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant`,
+  title: `${tool?.title}`,
   description: tool?.description,
 }
 

@@ -5,7 +5,7 @@ import CrontabGeneratorClient from "./client"
 const tool = getToolByPath("/tools/code-dev-tools/crontab-generator")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant`,
+  title: `${tool?.title}`,
   description: tool?.description,
 }
 

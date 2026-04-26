@@ -5,7 +5,7 @@ import BasicAuthGeneratorClient from "./client"
 const tool = getToolByPath("/tools/other/basic-auth-generator")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant`,
+  title: `${tool?.title}`,
   description: tool?.description,
 }
 

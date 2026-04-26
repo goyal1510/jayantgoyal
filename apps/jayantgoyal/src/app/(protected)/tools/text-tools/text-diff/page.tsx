@@ -5,7 +5,7 @@ import TextDiffClient from "./client"
 const tool = getToolByPath("/tools/text-tools/text-diff")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant`,
+  title: `${tool?.title}`,
   description: tool?.description,
 }
 

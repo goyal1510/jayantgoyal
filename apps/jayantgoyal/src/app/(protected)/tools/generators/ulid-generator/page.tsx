@@ -5,7 +5,7 @@ import ULIDGeneratorClient from "./client"
 const tool = getToolByPath("/tools/generators/ulid-generator")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant`,
+  title: `${tool?.title}`,
   description: tool?.description,
 }
 

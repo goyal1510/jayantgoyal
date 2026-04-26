@@ -5,7 +5,7 @@ import QRCodeGeneratorClient from "./client"
 const tool = getToolByPath("/tools/media-qr/qr-code-generator")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant`,
+  title: `${tool?.title}`,
   description: tool?.description,
 }
 

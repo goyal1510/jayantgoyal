@@ -5,7 +5,7 @@ import OpenGraphGeneratorClient from "./client"
 const tool = getToolByPath("/tools/other/open-graph-generator")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant`,
+  title: `${tool?.title}`,
   description: tool?.description,
 }
 

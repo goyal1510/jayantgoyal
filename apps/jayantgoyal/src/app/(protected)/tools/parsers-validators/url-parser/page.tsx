@@ -5,7 +5,7 @@ import URLParserClient from "./client"
 const tool = getToolByPath("/tools/parsers-validators/url-parser")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant`,
+  title: `${tool?.title}`,
   description: tool?.description,
 }
 

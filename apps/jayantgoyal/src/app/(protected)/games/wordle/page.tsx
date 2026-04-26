@@ -3,7 +3,7 @@ import { GAME_META } from "@/lib/games/config"
 import { Wordle } from "@/components/games/Wordle"
 
 export const metadata: Metadata = {
-  title: `${GAME_META["wordle"].name} | Jayant`,
+  title: `${GAME_META["wordle"].name}`,
   description: GAME_META["wordle"].description,
 }
 

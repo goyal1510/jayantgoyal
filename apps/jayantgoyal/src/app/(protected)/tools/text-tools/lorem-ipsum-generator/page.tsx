@@ -5,7 +5,7 @@ import LoremIpsumGeneratorClient from "./client"
 const tool = getToolByPath("/tools/text-tools/lorem-ipsum-generator")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant`,
+  title: `${tool?.title}`,
   description: tool?.description,
 }
 

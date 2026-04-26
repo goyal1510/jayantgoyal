@@ -5,7 +5,7 @@ import Base64EncoderDecoderClient from "./client"
 const tool = getToolByPath("/tools/converters/base64-encoder-decoder")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant`,
+  title: `${tool?.title}`,
   description: tool?.description,
 }
 

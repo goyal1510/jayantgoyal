@@ -5,7 +5,7 @@ import SVGPlaceholderGeneratorClient from "./client"
 const tool = getToolByPath("/tools/media-qr/svg-placeholder-generator")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant`,
+  title: `${tool?.title}`,
   description: tool?.description,
 }
 

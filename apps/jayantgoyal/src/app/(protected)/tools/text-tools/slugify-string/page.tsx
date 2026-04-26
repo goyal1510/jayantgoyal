@@ -5,7 +5,7 @@ import SlugifyStringClient from "./client"
 const tool = getToolByPath("/tools/text-tools/slugify-string")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant`,
+  title: `${tool?.title}`,
   description: tool?.description,
 }
 

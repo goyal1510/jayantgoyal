@@ -5,7 +5,7 @@ import TextToASCIIBinaryClient from "./client"
 const tool = getToolByPath("/tools/text-tools/text-to-ascii-binary")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant`,
+  title: `${tool?.title}`,
   description: tool?.description,
 }
 

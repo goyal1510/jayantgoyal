@@ -5,7 +5,7 @@ import YAMLToJSONClient from "./client"
 const tool = getToolByPath("/tools/converters/yaml-to-json")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant`,
+  title: `${tool?.title}`,
   description: tool?.description,
 }
 

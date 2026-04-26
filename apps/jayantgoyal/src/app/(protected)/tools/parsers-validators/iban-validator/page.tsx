@@ -5,7 +5,7 @@ import IBANValidatorClient from "./client"
 const tool = getToolByPath("/tools/parsers-validators/iban-validator")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant`,
+  title: `${tool?.title}`,
   description: tool?.description,
 }
 

@@ -5,7 +5,7 @@ import IPv4AddressConverterClient from "./client"
 const tool = getToolByPath("/tools/network-tools/ipv4-address-converter")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant`,
+  title: `${tool?.title}`,
   description: tool?.description,
 }
 

@@ -5,7 +5,7 @@ import HMACGeneratorClient from "./client"
 const tool = getToolByPath("/tools/hash-encryption/hmac-generator")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant`,
+  title: `${tool?.title}`,
   description: tool?.description,
 }
 

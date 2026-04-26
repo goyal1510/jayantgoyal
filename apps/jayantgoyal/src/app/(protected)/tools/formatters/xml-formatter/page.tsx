@@ -5,7 +5,7 @@ import XMLFormatterClient from "./client"
 const tool = getToolByPath("/tools/formatters/xml-formatter")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant`,
+  title: `${tool?.title}`,
   description: tool?.description,
 }
 

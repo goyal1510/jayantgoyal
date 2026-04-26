@@ -3,7 +3,7 @@ import { GAME_META } from "@/lib/games/config"
 import { MemoryMatch } from "@/components/games/MemoryMatch"
 
 export const metadata: Metadata = {
-  title: `${GAME_META["memory-match"].name} | Jayant`,
+  title: `${GAME_META["memory-match"].name}`,
   description: GAME_META["memory-match"].description,
 }
 

@@ -5,7 +5,7 @@ import JWTParserClient from "./client"
 const tool = getToolByPath("/tools/parsers-validators/jwt-parser")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant`,
+  title: `${tool?.title}`,
   description: tool?.description,
 }
 

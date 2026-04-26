@@ -5,7 +5,7 @@ import PhoneParserClient from "./client"
 const tool = getToolByPath("/tools/parsers-validators/phone-parser")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant`,
+  title: `${tool?.title}`,
   description: tool?.description,
 }
 

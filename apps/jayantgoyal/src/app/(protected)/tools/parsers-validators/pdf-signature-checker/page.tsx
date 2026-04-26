@@ -5,7 +5,7 @@ import PDFSignatureCheckerClient from "./client"
 const tool = getToolByPath("/tools/parsers-validators/pdf-signature-checker")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant`,
+  title: `${tool?.title}`,
   description: tool?.description,
 }
 

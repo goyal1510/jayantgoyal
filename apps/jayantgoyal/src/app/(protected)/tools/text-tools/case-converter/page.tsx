@@ -5,7 +5,7 @@ import CaseConverterClient from "./client"
 const tool = getToolByPath("/tools/text-tools/case-converter")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant`,
+  title: `${tool?.title}`,
   description: tool?.description,
 }
 

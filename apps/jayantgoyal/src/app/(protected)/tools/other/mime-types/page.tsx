@@ -5,7 +5,7 @@ import MIMETypesClient from "./client"
 const tool = getToolByPath("/tools/other/mime-types")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant`,
+  title: `${tool?.title}`,
   description: tool?.description,
 }
 

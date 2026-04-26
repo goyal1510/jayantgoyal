@@ -5,7 +5,7 @@ import EmojiPickerClient from "./client"
 const tool = getToolByPath("/tools/other/emoji-picker")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant`,
+  title: `${tool?.title}`,
   description: tool?.description,
 }
 

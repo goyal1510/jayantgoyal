@@ -3,7 +3,7 @@ import { GAME_META } from "@/lib/games/config"
 import { ConnectFour } from "@/components/games/ConnectFour"
 
 export const metadata: Metadata = {
-  title: `${GAME_META["connect-four"].name} | Jayant`,
+  title: `${GAME_META["connect-four"].name}`,
   description: GAME_META["connect-four"].description,
 }
 

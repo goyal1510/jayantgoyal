@@ -5,7 +5,7 @@ import EmailNormalizerClient from "./client"
 const tool = getToolByPath("/tools/parsers-validators/email-normalizer")
 
 export const metadata: Metadata = {
-  title: `${tool?.title} | Jayant`,
+  title: `${tool?.title}`,
   description: tool?.description,
 }
 

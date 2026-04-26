@@ -3,7 +3,7 @@ import { GAME_META } from "@/lib/games/config"
 import { RockPaperScissors } from "@/components/games/RockPaperScissors"
 
 export const metadata: Metadata = {
-  title: `${GAME_META["rock-paper-scissors"].name} | Jayant`,
+  title: `${GAME_META["rock-paper-scissors"].name}`,
   description: GAME_META["rock-paper-scissors"].description,
 }
 
