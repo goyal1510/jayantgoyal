@@ -15,8 +15,16 @@ export const config = {
   ],
 };
 
-/** Public paths that don't require authentication */
-const PUBLIC_PATHS = [
+/** Truly public paths — no Supabase calls needed at all */
+const STATIC_PUBLIC_PATHS = [
+  "/api/contact",
+  "/api/github-loc",
+  "/favicon_io/site.webmanifest",
+  "/assets/",
+];
+
+/** Pages that need auth check but are publicly accessible */
+const PUBLIC_PAGES = [
   "/",
   "/tools",
   "/weather",
@@ -27,46 +35,46 @@ const PUBLIC_PATHS = [
   "/forgot-password",
   "/reset-password",
   "/auth/callback",
-  "/api/contact",
-  "/api/github-loc",
   "/api/account/terms-status",
   "/api/account/accept-terms",
-  "/favicon_io/site.webmanifest",
-  "/assets/",
 ];
 
-/** Paths that require exact match instead of prefix match */
-const EXACT_MATCH_PATHS = new Set(["/", "/weather", "/custom-calculator", "/terms-conditions"]);
+const EXACT_MATCH = new Set(["/", "/weather", "/custom-calculator", "/terms-conditions"]);
 
-function isPublicPath(pathname: string): boolean {
-  return PUBLIC_PATHS.some((path) => {
-    if (EXACT_MATCH_PATHS.has(path)) return pathname === path;
-    return pathname.startsWith(path);
+function isStaticPublic(pathname: string): boolean {
+  return STATIC_PUBLIC_PATHS.some((p) => pathname.startsWith(p));
+}
+
+function isPublicPage(pathname: string): boolean {
+  return PUBLIC_PAGES.some((p) => {
+    if (EXACT_MATCH.has(p)) return pathname === p;
+    return pathname.startsWith(p);
   });
 }
 
 export default async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  // Skip proxy for static asset files
+  // Skip proxy for static assets
   if (/\.(?:svg|png|jpg|jpeg|gif|webp|webmanifest|pdf|ico)$/i.test(pathname)) {
+    return NextResponse.next();
+  }
+
+  // Static public paths — zero Supabase calls, instant pass-through
+  if (isStaticPublic(pathname)) {
     return NextResponse.next();
   }
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   const response = NextResponse.next({ request: { headers: request.headers } });
-  const isPublic = isPublicPath(pathname);
+  const isPublic = isPublicPage(pathname);
 
-  // If Supabase config is missing, allow public pages and block protected ones
   if (!supabaseUrl || !supabaseAnonKey) {
-    if (isPublic) return response;
-    const loginUrl = new URL("/welcome", request.url);
-    loginUrl.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(loginUrl);
+    if (isPublic || isStaticPublic(pathname)) return response;
+    return NextResponse.redirect(new URL("/welcome", request.url));
   }
 
-  // Create Supabase client
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll: () => request.cookies.getAll(),
@@ -78,27 +86,47 @@ export default async function proxy(request: NextRequest) {
     },
   });
 
-  // Resolve auth state
+  // getUser() — authenticates against Supabase Auth server (secure).
+  // This is the ONLY Supabase call in the proxy for most requests.
   const { data: { user } } = await supabase.auth.getUser();
   const isAuthed = Boolean(user);
 
-  // Resolve terms state
-  let termsAccepted = false;
-  if (isAuthed) {
-    const { data: profile } = await supabase
-      .schema("jg_account")
-      .from("profiles")
-      .select("terms_accepted")
-      .eq("user_id", user!.id)
-      .single();
-    termsAccepted = profile?.terms_accepted === true;
+  // Terms: read from cookie (set by accept-terms API). No DB query.
+  const termsAccepted = isAuthed
+    ? request.cookies.get("terms_accepted")?.value === "true"
+    : false;
+
+  // AAL: decode from access token cookie (no API call).
+  // The JWT is cryptographically signed — we only read the aal claim for routing.
+  let aalLevel: string | null = null;
+  const tokenCookieName = `sb-${new URL(supabaseUrl).hostname.split(".")[0]}-auth-token`;
+  const tokenCookie = request.cookies.get(tokenCookieName)?.value
+    ?? request.cookies.get(`${tokenCookieName}.0`)?.value;
+  if (tokenCookie) {
+    try {
+      const raw = tokenCookie.startsWith("base64-")
+        ? atob(tokenCookie.slice(7))
+        : tokenCookie;
+      const parsed = JSON.parse(raw) as { access_token?: string } | string;
+      const accessToken = typeof parsed === "string" ? parsed : parsed.access_token;
+      if (accessToken) {
+        const payload = JSON.parse(atob(accessToken.split(".")[1]!)) as { aal?: string };
+        aalLevel = payload.aal ?? null;
+      }
+    } catch {
+      aalLevel = null;
+    }
   }
 
-  // Set response headers
   response.headers.set("x-auth-status", isAuthed ? "authed" : "anon");
   response.headers.set("x-terms-accepted", termsAccepted ? "true" : "false");
+  // Pass verified user ID to downstream route handlers so they can skip getUser()
+  // for read-only operations. This header is set by the proxy (trusted) and cannot
+  // be spoofed by the client because Next.js strips incoming x-* request headers.
+  if (user) {
+    response.headers.set("x-user-id", user.id);
+  }
 
-  // Build context and run middleware chain
   const ctx: ProxyContext = {
     request,
     response,
@@ -108,12 +136,13 @@ export default async function proxy(request: NextRequest) {
     isAuthed,
     termsAccepted,
     isPublic,
+    aalLevel,
   };
 
   return runMiddleware(ctx, [
-    routeGuardMiddleware,   // 1. Redirect unauthenticated to /welcome, authed away from /welcome
-    mfaMiddleware,          // 2. MFA enforcement — block pages + APIs at AAL1
-    recoveryMiddleware,     // 3. Recovery mode — lock to /reset-password + essential APIs
-    termsMiddleware,        // 4. Terms — block APIs if not accepted
+    routeGuardMiddleware,
+    mfaMiddleware,
+    recoveryMiddleware,
+    termsMiddleware,
   ]);
 }

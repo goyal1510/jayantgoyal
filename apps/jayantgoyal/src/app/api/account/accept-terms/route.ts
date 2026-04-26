@@ -33,5 +33,14 @@ export async function POST() {
     );
   }
 
-  return NextResponse.json({ success: true });
+  // Set cookie so the proxy can check terms without a DB query on every request
+  const res = NextResponse.json({ success: true });
+  res.cookies.set("terms_accepted", "true", {
+    path: "/",
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    maxAge: 60 * 60 * 24 * 365, // 1 year
+  });
+  return res;
 }

@@ -7,12 +7,11 @@ export interface ProxyContext {
   supabase: SupabaseClient;
   user: User | null;
   pathname: string;
-  /** Whether the user is authenticated */
   isAuthed: boolean;
-  /** Whether the user has accepted terms */
   termsAccepted: boolean;
-  /** Whether the current path is public (no auth required) */
   isPublic: boolean;
+  /** AAL level from the JWT — "aal1" or "aal2". No network call needed. */
+  aalLevel: string | null;
 }
 
 /**

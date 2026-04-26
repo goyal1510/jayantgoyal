@@ -58,9 +58,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const loadUser = React.useCallback(async (silent = false, retries = 2) => {
     try {
       if (!silent) setIsUserLoading(true)
-      const response = await fetch("/api/account/profile", { cache: "no-store" })
+      // Single API call replaces separate profile + terms-status + mfa-cleanup calls
+      const response = await fetch("/api/account/init", { cache: "no-store" })
 
-      if (!response.ok) throw new Error("Failed to load user profile.")
+      if (!response.ok) throw new Error("Failed to load user.")
 
       const payload = (await response.json()) as { user?: { name?: string; email?: string } } | undefined
       if (!payload?.user) {
@@ -79,17 +80,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         await new Promise((r) => setTimeout(r, 500))
         return loadUser(true, retries - 1)
       }
-      const supabase = createSupabaseBrowserClient()
-      const { data: { user: fallbackAuthUser } } = await supabase.auth.getUser()
-      if (fallbackAuthUser) {
-        const email = fallbackAuthUser.email || ""
-        const userData: SidebarUser = { name: email.split("@")[0] || "User", email }
-        cachedUser = userData
-        setUser(userData)
-      } else {
-        cachedUser = null
-        setUser(null)
-      }
+      cachedUser = null
+      setUser(null)
     } finally {
       setIsUserLoading(false)
     }
@@ -99,13 +91,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     if (cachedUser === undefined) void loadUser()
 
     const supabase = createSupabaseBrowserClient()
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_OUT") {
         cachedUser = undefined
         setUser(null)
         setIsUserLoading(false)
       } else if (event === "INITIAL_SESSION") {
-        if (session && !cachedUser) void loadUser()
+        if (!cachedUser) void loadUser()
       } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
         cachedUser = undefined
         void loadUser()

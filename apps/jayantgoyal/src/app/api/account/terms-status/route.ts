@@ -17,7 +17,6 @@ export async function GET() {
     });
   }
 
-  // Check if terms are accepted from jg_account.profiles
   const { data: profile } = await supabase
     .schema("jg_account")
     .from("profiles")
@@ -27,8 +26,21 @@ export async function GET() {
 
   const termsAccepted = profile?.terms_accepted === true;
 
-  return NextResponse.json({
+  // Set/update cookie so the proxy can skip the DB query on future requests
+  const res = NextResponse.json({
     needsAcceptance: !termsAccepted,
     isAuthenticated: true,
   });
+
+  if (termsAccepted) {
+    res.cookies.set("terms_accepted", "true", {
+      path: "/",
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 365,
+    });
+  }
+
+  return res;
 }

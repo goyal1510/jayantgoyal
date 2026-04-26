@@ -25,7 +25,8 @@ export function TermsAcceptanceCheck() {
   React.useEffect(() => {
     const checkTermsAcceptance = async () => {
       try {
-        const response = await fetch("/api/account/terms-status")
+        // Use the combined init endpoint — avoids a separate API call
+        const response = await fetch("/api/account/init")
 
         // Check if response is JSON
         const contentType = response.headers.get("content-type")

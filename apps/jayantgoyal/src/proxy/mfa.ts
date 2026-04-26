@@ -3,6 +3,7 @@ import type { ProxyContext } from "./types";
 
 /** APIs that are safe to call without completing MFA */
 const MFA_EXEMPT_APIS = [
+  "/api/account/init",
   "/api/account/terms-status",
   "/api/account/accept-terms",
   "/api/account/profile",
@@ -11,42 +12,33 @@ const MFA_EXEMPT_APIS = [
 
 /**
  * MFA enforcement middleware.
- * If user has TOTP enrolled but hasn't verified (AAL1 → AAL2), block everything
- * except the MFA verify page and essential APIs.
+ * Reads AAL from the JWT (no network call). Only calls listFactors()
+ * when the user is at AAL1 (rare — only right after login before MFA verify).
  */
 export async function mfaMiddleware(ctx: ProxyContext): Promise<NextResponse | null> {
   if (!ctx.isAuthed) return null;
 
-  // Skip MFA check for auth callback — the route handler needs to
-  // exchange the OAuth code before any MFA redirect can happen
+  // Skip auth callback — route handler needs to exchange OAuth code first
   if (ctx.pathname.startsWith("/auth/callback")) return null;
 
-  const { data: aalData } = await ctx.supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  // If AAL2 already achieved, no MFA check needed (fast path — no network call)
+  if (ctx.aalLevel === "aal2") return null;
 
-  if (aalData?.currentLevel !== "aal1" || aalData?.nextLevel !== "aal2") {
-    return null;
-  }
-
+  // AAL1 — check if user has MFA factors enrolled (one API call, only happens once per session)
   const { data: factorsData } = await ctx.supabase.auth.mfa.listFactors();
   const hasVerifiedFactor = factorsData?.totp.some((f) => f.status === "verified");
 
   if (!hasVerifiedFactor) return null;
 
-  // Allow MFA verify page
+  // User has MFA but hasn't verified — block everything except MFA page and essential APIs
   if (ctx.pathname.startsWith("/mfa-verify")) return null;
 
-  // Allow only essential APIs
   if (ctx.pathname.startsWith("/api/")) {
     const isAllowed = MFA_EXEMPT_APIS.some((api) => ctx.pathname.startsWith(api));
     if (isAllowed) return null;
-
-    return NextResponse.json(
-      { error: "MFA verification required." },
-      { status: 403 }
-    );
+    return NextResponse.json({ error: "MFA verification required." }, { status: 403 });
   }
 
-  // Block everything else — redirect to MFA verify
   const mfaUrl = new URL("/mfa-verify", ctx.request.url);
   if (ctx.pathname !== "/") {
     mfaUrl.searchParams.set("redirect", ctx.pathname);

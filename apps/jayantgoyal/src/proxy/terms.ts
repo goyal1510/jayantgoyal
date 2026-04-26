@@ -3,6 +3,7 @@ import type { ProxyContext } from "./types";
 
 /** APIs allowed without accepting terms */
 const TERMS_EXEMPT_APIS = [
+  "/api/account/init",
   "/api/account/terms-status",
   "/api/account/accept-terms",
   "/api/account/profile",
