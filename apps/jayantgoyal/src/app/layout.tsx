@@ -50,6 +50,9 @@ export const metadata: Metadata = {
       "Full-stack developer portfolio with projects, 99+ dev tools, games, and utilities.",
     images: ["/assets/Jayant_favicon_io/android-chrome-512x512.png"],
   },
+  verification: {
+    google: "NPYQ4NJ-F69rJjK2ZcTM_h5Tc_5T1pRqGH0MNgs0oSo",
+  },
   robots: {
     index: true,
     follow: true,
