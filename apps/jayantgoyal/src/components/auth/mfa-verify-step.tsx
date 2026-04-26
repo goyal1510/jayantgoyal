@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-import { useRouter } from "next/navigation"
 import { ShieldCheck, Loader2 } from "lucide-react"
 
 import { Button } from "@repo/ui/button"
@@ -10,7 +9,6 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
 
 export function MfaVerifyStep({ redirectUrl }: { redirectUrl: string }) {
-  const router = useRouter()
   const [code, setCode] = React.useState("")
   const [isPending, setIsPending] = React.useState(false)
 
@@ -40,14 +38,10 @@ export function MfaVerifyStep({ redirectUrl }: { redirectUrl: string }) {
       })
       if (verifyError) throw verifyError
 
-      toast.success("Logged in successfully.")
-
-      // Soft navigation — no full page load, no spinner flash.
-      // router.refresh() updates server components (sidebar user state)
-      // without triggering loading.tsx.
-      const url = redirectUrl.startsWith("/") ? redirectUrl : "/"
-      router.push(url)
-      router.refresh()
+      // Full navigation so cookies refresh properly
+      const url = new URL(redirectUrl, window.location.origin)
+      url.searchParams.set("login_success", "true")
+      window.location.href = url.toString()
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Verification failed."
@@ -56,7 +50,7 @@ export function MfaVerifyStep({ redirectUrl }: { redirectUrl: string }) {
     } finally {
       setIsPending(false)
     }
-  }, [code, redirectUrl, router])
+  }, [code, redirectUrl])
 
   return (
     <div className="flex flex-col items-center gap-6">
