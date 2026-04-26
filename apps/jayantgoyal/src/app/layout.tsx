@@ -26,6 +26,9 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Jayant", url: "https://www.jayantgoyal.com" }],
   creator: "Jayant",
+  alternates: {
+    canonical: "https://www.jayantgoyal.com",
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
