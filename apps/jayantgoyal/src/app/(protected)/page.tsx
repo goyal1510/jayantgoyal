@@ -10,6 +10,15 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Jayant Goyal — Portfolio",
     description: "Jayant Goyal's portfolio — full-stack developer showcasing projects, skills, work experience, certifications, and open-source contributions.",
+    images: [
+      {
+        url: "https://www.jayantgoyal.com/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "Jayant Goyal — Full-Stack Developer",
+        type: "image/png",
+      },
+    ],
   },
 }
 
