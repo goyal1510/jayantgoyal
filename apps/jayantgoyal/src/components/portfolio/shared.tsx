@@ -1,6 +1,3 @@
-'use client';
-
-import { m } from "framer-motion";
 import { cn } from "@repo/ui/lib/utils";
 
 // Re-export from constants so existing imports from "./shared" keep working
@@ -15,13 +12,7 @@ export function SectionHeader({
   description?: string;
 }) {
   return (
-    <m.div
-      initial={{ opacity: 0, y: 10 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      viewport={{ once: true, amount: 0.3 }}
-      className="text-center"
-    >
+    <div className="text-center animate-in fade-in slide-in-from-bottom-2 duration-500">
       <div className="flex items-center justify-center gap-4">
         <span className="size-2 rounded-full bg-foreground" />
         <span className="h-px w-16 bg-foreground/30 sm:w-24" />
@@ -34,7 +25,7 @@ export function SectionHeader({
       {description ? (
         <p className="mt-3 text-lg text-muted-foreground">{description}</p>
       ) : null}
-    </m.div>
+    </div>
   );
 }
 

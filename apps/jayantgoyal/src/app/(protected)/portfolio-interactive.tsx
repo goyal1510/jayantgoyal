@@ -43,17 +43,29 @@ export function PortfolioInteractive() {
     <>
       <SkillsSection skillSets={SKILL_SETS} techIcons={TECH_ICONS} />
       <Suspense>
-        <CodeStatsSection githubUsername={githubUsername} />
-        <GithubActivitySection githubUsername={githubUsername} githubUrl={githubUrl} />
-        <ExperienceSection experience={EXPERIENCE} />
-        <ProjectsSection projects={PROJECTS} onSelectProject={setSelectedProject} />
-        <CertificatesSection
-          categories={categories}
-          selectedCategory={selectedCategory}
-          certificates={CERTIFICATES}
-          onSelectCategory={setSelectedCategory}
-        />
-        <ContactSection contact={CONTACT} />
+        <div style={{ contentVisibility: "auto", containIntrinsicSize: "0 500px" }}>
+          <CodeStatsSection githubUsername={githubUsername} />
+        </div>
+        <div style={{ contentVisibility: "auto", containIntrinsicSize: "0 400px" }}>
+          <GithubActivitySection githubUsername={githubUsername} githubUrl={githubUrl} />
+        </div>
+        <div style={{ contentVisibility: "auto", containIntrinsicSize: "0 600px" }}>
+          <ExperienceSection experience={EXPERIENCE} />
+        </div>
+        <div style={{ contentVisibility: "auto", containIntrinsicSize: "0 800px" }}>
+          <ProjectsSection projects={PROJECTS} onSelectProject={setSelectedProject} />
+        </div>
+        <div style={{ contentVisibility: "auto", containIntrinsicSize: "0 600px" }}>
+          <CertificatesSection
+            categories={categories}
+            selectedCategory={selectedCategory}
+            certificates={CERTIFICATES}
+            onSelectCategory={setSelectedCategory}
+          />
+        </div>
+        <div style={{ contentVisibility: "auto", containIntrinsicSize: "0 500px" }}>
+          <ContactSection contact={CONTACT} />
+        </div>
       </Suspense>
       {selectedProject ? (
         <Suspense>

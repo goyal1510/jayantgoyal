@@ -1,6 +1,5 @@
 'use client';
 
-import { m } from "framer-motion";
 import { Code2 } from "lucide-react";
 import {
   Card,
@@ -61,12 +60,10 @@ export function SkillsSection({
         {skillSets.map((set, setIndex) => {
           const SetIcon = getIconComponent(set.icon_key) ?? Code2;
           return (
-            <m.div
+            <div
               key={set.title}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: setIndex * 0.05 }}
-              viewport={{ once: true }}
+              className="animate-in fade-in slide-in-from-bottom-4 duration-500"
+              style={{ animationDelay: `${setIndex * 50}ms`, animationFillMode: "both" }}
             >
               <Card>
                 <CardHeader>
@@ -77,13 +74,10 @@ export function SkillsSection({
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {set.items.map((item, itemIndex) => (
-                    <m.div
+                    <div
                       key={item.name}
-                      initial={{ opacity: 0, x: -12 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.4, delay: itemIndex * 0.05 }}
-                      viewport={{ once: true }}
-                      className="space-y-2"
+                      className="space-y-2 animate-in fade-in slide-in-from-left-3 duration-300"
+                      style={{ animationDelay: `${itemIndex * 50}ms`, animationFillMode: "both" }}
                     >
                       <div className="flex items-center justify-between text-sm">
                         <span className="font-medium">{item.name}</span>
@@ -92,11 +86,11 @@ export function SkillsSection({
                         </span>
                       </div>
                       <Progress value={item.level} />
-                    </m.div>
+                    </div>
                   ))}
                 </CardContent>
               </Card>
-            </m.div>
+            </div>
           );
         })}
       </div>
