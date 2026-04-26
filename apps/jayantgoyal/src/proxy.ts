@@ -21,6 +21,9 @@ const STATIC_PUBLIC_PATHS = [
   "/api/github-loc",
   "/favicon_io/site.webmanifest",
   "/assets/",
+  "/sitemap.xml",
+  "/robots.txt",
+  "/manifest.webmanifest",
 ];
 
 /** Pages that need auth check but are publicly accessible */
@@ -67,7 +70,9 @@ export default async function proxy(request: NextRequest) {
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  const response = NextResponse.next({ request: { headers: request.headers } });
+  // Clone request headers so we can add x-user-id for downstream route handlers
+  const requestHeaders = new Headers(request.headers);
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
   const isPublic = isPublicPage(pathname);
 
   if (!supabaseUrl || !supabaseAnonKey) {
@@ -118,13 +123,10 @@ export default async function proxy(request: NextRequest) {
     }
   }
 
-  response.headers.set("x-auth-status", isAuthed ? "authed" : "anon");
-  response.headers.set("x-terms-accepted", termsAccepted ? "true" : "false");
-  // Pass verified user ID to downstream route handlers so they can skip getUser()
-  // for read-only operations. This header is set by the proxy (trusted) and cannot
-  // be spoofed by the client because Next.js strips incoming x-* request headers.
+  // Pass verified user ID to downstream route handlers via request header.
+  // Route handlers read request.headers.get("x-user-id") to skip redundant getUser().
   if (user) {
-    response.headers.set("x-user-id", user.id);
+    requestHeaders.set("x-user-id", user.id);
   }
 
   const ctx: ProxyContext = {
