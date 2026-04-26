@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { cookies } from "next/headers";
+import dynamic from "next/dynamic";
 
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { DynamicBreadcrumb } from "@/components/sidebar/dynamic-breadcrumb";
@@ -15,10 +16,18 @@ import { PortfolioDataProvider } from "@/lib/portfolio/use-portfolio-data";
 import { TermsAcceptanceCheck } from "@/components/auth/terms-acceptance-check";
 import { LazyMotionProvider } from "@/components/providers/lazy-motion-provider";
 import { RouteChangeProvider } from "@/components/providers/route-change-provider";
-import { ThreeBgWrapper } from "@/components/three/three-bg-wrapper";
 import { ThreeBgToggle } from "@/components/three/three-bg-toggle";
-import { CommandPalette } from "@/components/sidebar/command-palette";
 import { AuthToast } from "@/components/auth/auth-toast";
+
+// Lazy-load heavy components that aren't needed for first paint
+const ThreeBgWrapper = dynamic(
+  () => import("@/components/three/three-bg-wrapper").then((m) => ({ default: m.ThreeBgWrapper })),
+  { ssr: false }
+);
+const CommandPalette = dynamic(
+  () => import("@/components/sidebar/command-palette").then((m) => ({ default: m.CommandPalette })),
+  { ssr: false }
+);
 
 export default async function ProtectedLayout({
   children,
