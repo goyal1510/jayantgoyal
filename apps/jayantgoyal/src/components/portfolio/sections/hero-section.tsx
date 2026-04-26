@@ -28,20 +28,9 @@ export function HeroSection({
       id={sectionId("home")}
       className={cn("px-4 sm:px-6 lg:px-8", sectionScrollMargin)}
     >
-      <m.div
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease: "easeOut" }}
-        viewport={{ once: true, amount: 0.4 }}
-        className="mx-auto flex max-w-5xl flex-col items-center gap-6 py-16 text-center"
-      >
-        <m.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={{ once: true }}
-          className="flex flex-wrap items-center justify-center gap-2"
-        >
+      {/* No animation wrapper on the main container — render immediately for fast LCP */}
+      <div className="mx-auto flex max-w-5xl flex-col items-center gap-6 py-16 text-center">
+        <div className="flex flex-wrap items-center justify-center gap-2">
           <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
             <Sparkles className="size-4" />
             Welcome to my portfolio
@@ -50,14 +39,9 @@ export function HeroSection({
             {source === "database" ? <Database className="size-4" /> : <FileCode2 className="size-4" />}
             {source === "database" ? "Database" : "System"}
           </span>
-        </m.div>
-        <m.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          viewport={{ once: true }}
-          className="space-y-3"
-        >
+        </div>
+        {/* LCP element — no opacity:0, no animation delay. Renders instantly. */}
+        <div className="space-y-3">
           <h1 className="flex items-center justify-center gap-[0.3em] flex-wrap text-4xl font-bold text-foreground sm:text-5xl lg:text-6xl uppercase tracking-wide leading-[1.2]">
             <span>HI, I&apos;M</span>
             <FlipText className={source === "database" ? "text-cyan-500" : "text-amber-500"} duration={3}>{hero.name.toUpperCase()}</FlipText>
@@ -65,12 +49,12 @@ export function HeroSection({
           <p className="text-2xl text-muted-foreground uppercase tracking-wider">
             <Typewriter text={hero.role.toUpperCase()} speed={80} delay={500} cursor={true} />
           </p>
-        </m.div>
+        </div>
+        {/* Only animate the CTA buttons — they're below fold on mobile */}
         <m.div
           initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          viewport={{ once: true }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
           className="flex flex-wrap items-center justify-center gap-4"
         >
           <Button size="lg" className="group h-11" onClick={() => {
@@ -87,7 +71,7 @@ export function HeroSection({
             </a>
           </Button>
         </m.div>
-      </m.div>
+      </div>
     </section>
   );
 }

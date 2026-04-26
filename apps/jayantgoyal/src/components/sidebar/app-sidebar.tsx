@@ -3,10 +3,10 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import dynamic from "next/dynamic"
 import { FileText, LayoutGrid, LogIn, User } from "lucide-react"
 
 import { NavApps } from "@/components/sidebar/nav-apps"
-import { NavUser } from "@/components/sidebar/nav-user"
 import { TeamSwitcher } from "@/components/sidebar/team-switcher"
 import {
   Sidebar,
@@ -21,10 +21,12 @@ import {
 import { Separator } from "@repo/ui/separator"
 import { Skeleton } from "@repo/ui/skeleton"
 import { HUB_APPS } from "@/lib/config/hub-config"
-import { createSupabaseBrowserClient } from "@/lib/supabase/client"
-import { TermsDialog } from "@/components/auth/terms-dialog"
 import { useActiveApp } from "@/hooks/use-active-app"
 import { useScrollTracking } from "@/hooks/use-scroll-tracking"
+
+// Lazy-load heavy components — not needed for initial sidebar render
+const NavUser = dynamic(() => import("@/components/sidebar/nav-user").then((m) => ({ default: m.NavUser })), { ssr: false })
+const TermsDialog = dynamic(() => import("@/components/auth/terms-dialog").then((m) => ({ default: m.TermsDialog })), { ssr: false })
 
 type SidebarUser = { name: string; email: string }
 
@@ -58,7 +60,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const loadUser = React.useCallback(async (silent = false, retries = 2) => {
     try {
       if (!silent) setIsUserLoading(true)
-      // Single API call replaces separate profile + terms-status + mfa-cleanup calls
       const response = await fetch("/api/account/init", { cache: "no-store" })
 
       if (!response.ok) throw new Error("Failed to load user.")
@@ -87,27 +88,33 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     }
   }, [])
 
+  // Defer auth listener setup — don't block first paint with Supabase client init
   React.useEffect(() => {
     if (cachedUser === undefined) void loadUser()
 
-    const supabase = createSupabaseBrowserClient()
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_OUT") {
-        cachedUser = undefined
-        setUser(null)
-        setIsUserLoading(false)
-      } else if (event === "INITIAL_SESSION") {
-        if (!cachedUser) void loadUser()
-      } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
-        cachedUser = undefined
-        void loadUser()
-        if (event === "SIGNED_IN") {
-          void fetch("/api/account/mfa-cleanup", { method: "POST" })
+    // Lazy-import Supabase client only when needed (after first paint)
+    let unsubscribe: (() => void) | undefined
+    void import("@/lib/supabase/client").then(({ createSupabaseBrowserClient }) => {
+      const supabase = createSupabaseBrowserClient()
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+        if (event === "SIGNED_OUT") {
+          cachedUser = undefined
+          setUser(null)
+          setIsUserLoading(false)
+        } else if (event === "INITIAL_SESSION") {
+          if (!cachedUser) void loadUser()
+        } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+          cachedUser = undefined
+          void loadUser()
+          if (event === "SIGNED_IN") {
+            void fetch("/api/account/mfa-cleanup", { method: "POST" })
+          }
         }
-      }
+      })
+      unsubscribe = () => subscription.unsubscribe()
     })
 
-    return () => { subscription.unsubscribe() }
+    return () => { unsubscribe?.() }
   }, [loadUser])
 
   return (
