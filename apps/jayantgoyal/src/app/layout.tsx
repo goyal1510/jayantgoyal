@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { ToastSoundProvider } from "@/components/providers/toast-sound-provider";
 import { Toaster } from "@repo/ui/sonner";
+import Script from "next/script";
 import { PersonJsonLd, WebSiteJsonLd, ProfilePageJsonLd, SoftwareAppJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
 
 const inter = Inter({
@@ -90,6 +91,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <Script async src="https://www.googletagmanager.com/gtag/js?id=G-YVBSLSQXFJ" strategy="afterInteractive" />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-YVBSLSQXFJ');`}
+        </Script>
         <link rel="preconnect" href="https://orwfvyditlguqvxvztkw.supabase.co" />
         <link rel="dns-prefetch" href="https://orwfvyditlguqvxvztkw.supabase.co" />
         <PersonJsonLd />
