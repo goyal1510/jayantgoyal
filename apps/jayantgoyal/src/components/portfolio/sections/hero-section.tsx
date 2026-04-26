@@ -10,7 +10,7 @@ import type { PortfolioDataSource } from "@/lib/portfolio/use-portfolio-data";
 import type { SerializablePortfolioData } from "@/lib/portfolio/serializable";
 import { sectionId, sectionScrollMargin } from "@/components/portfolio/constants";
 import { HeroCta } from "@/components/portfolio/sections/hero-cta";
-import FlipText from "@/components/ui/flip-text";
+import { HeroName } from "@/components/portfolio/sections/hero-name";
 
 export function HeroSection({
   hero,
@@ -35,11 +35,13 @@ export function HeroSection({
             {source === "database" ? "Database" : "System"}
           </span>
         </div>
-        {/* LCP element — pure server HTML, no JS dependency */}
         <div className="space-y-3">
           <h1 className="flex items-center justify-center gap-[0.3em] flex-wrap text-4xl font-bold text-foreground sm:text-5xl lg:text-6xl uppercase tracking-wide leading-[1.2]">
             <span>HI, I&apos;M</span>
-            <FlipText className={source === "database" ? "text-cyan-500" : "text-amber-500"} duration={3}>{hero.name.toUpperCase()}</FlipText>
+            <HeroName
+              name={hero.name.toUpperCase()}
+              className={source === "database" ? "text-cyan-500" : "text-amber-500"}
+            />
           </h1>
           <p className="text-2xl text-muted-foreground uppercase tracking-wider">
             {hero.role.toUpperCase()}
