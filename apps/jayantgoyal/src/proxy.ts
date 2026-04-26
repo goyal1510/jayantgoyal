@@ -24,6 +24,8 @@ const ZERO_COST_PATHS = [
   "/sitemap.xml",
   "/robots.txt",
   "/manifest.webmanifest",
+  "/opengraph-image",
+  "/twitter-image",
 ];
 
 /** Public pages — viewable without auth. Skip getUser(), use fast cookie check. */
