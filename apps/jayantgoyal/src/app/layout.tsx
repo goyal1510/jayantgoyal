@@ -15,46 +15,46 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.jayantgoyal.com"),
   title: {
-    default: "Jayant Goyal — Full-Stack Developer",
+    default: "Jayant — Full-Stack Developer",
     template: "%s | Jayant",
   },
   description:
-    "Full-stack developer portfolio by Jayant Goyal. Explore projects, 99+ developer tools, games, and utilities built with Next.js, React, TypeScript, and Supabase.",
+    "Full-stack developer portfolio by Jayant. Explore projects, 99+ developer tools, games, and utilities built with Next.js, React, TypeScript, and Supabase.",
   keywords: [
-    "Jayant Goyal", "full-stack developer", "portfolio", "Next.js",
+    "Jayant", "full-stack developer", "portfolio", "Next.js",
     "React", "TypeScript", "developer tools", "web developer",
   ],
-  authors: [{ name: "Jayant Goyal", url: "https://www.jayantgoyal.com" }],
-  creator: "Jayant Goyal",
+  authors: [{ name: "Jayant", url: "https://www.jayantgoyal.com" }],
+  creator: "Jayant",
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "https://www.jayantgoyal.com",
-    siteName: "Jayant Goyal",
-    title: "Jayant Goyal — Full-Stack Developer",
+    siteName: "Jayant",
+    title: "Jayant — Full-Stack Developer",
     description:
-      "Full-stack developer portfolio by Jayant Goyal. Explore projects, 99+ developer tools, interactive games, and utilities built with Next.js, React, TypeScript, and Supabase.",
+      "Full-stack developer portfolio by Jayant. Explore projects, 99+ developer tools, interactive games, and utilities built with Next.js, React, TypeScript, and Supabase.",
     images: [
       {
         url: "https://www.jayantgoyal.com/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "Jayant Goyal — Full-Stack Developer",
+        alt: "Jayant — Full-Stack Developer",
         type: "image/png",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Jayant Goyal — Full-Stack Developer",
+    title: "Jayant — Full-Stack Developer",
     description:
-      "Full-stack developer portfolio by Jayant Goyal. Explore projects, 99+ developer tools, interactive games, and utilities built with Next.js, React, TypeScript, and Supabase.",
+      "Full-stack developer portfolio by Jayant. Explore projects, 99+ developer tools, interactive games, and utilities built with Next.js, React, TypeScript, and Supabase.",
     images: [
       {
         url: "https://www.jayantgoyal.com/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "Jayant Goyal — Full-Stack Developer",
+        alt: "Jayant — Full-Stack Developer",
       },
     ],
   },

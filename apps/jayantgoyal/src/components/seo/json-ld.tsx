@@ -2,7 +2,7 @@ export function PersonJsonLd() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
-    name: "Jayant Goyal",
+    name: "Jayant",
     url: "https://www.jayantgoyal.com",
     jobTitle: "Full-Stack Developer",
     image: "https://www.jayantgoyal.com/assets/Jayant_favicon_io/android-chrome-512x512.png",
@@ -34,12 +34,12 @@ export function WebSiteJsonLd() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "Jayant Goyal",
+    name: "Jayant",
     url: "https://www.jayantgoyal.com",
     description: "Full-stack developer portfolio with 99+ dev tools, games, and utilities.",
     author: {
       "@type": "Person",
-      name: "Jayant Goyal",
+      name: "Jayant",
     },
   }
 
@@ -57,7 +57,7 @@ export function ProfilePageJsonLd() {
     "@type": "ProfilePage",
     mainEntity: {
       "@type": "Person",
-      name: "Jayant Goyal",
+      name: "Jayant",
       url: "https://www.jayantgoyal.com",
       jobTitle: "Full-Stack Developer",
       image: "https://www.jayantgoyal.com/assets/Jayant_favicon_io/android-chrome-512x512.png",
@@ -87,7 +87,7 @@ export function SoftwareAppJsonLd() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    name: "Jayant Goyal Dev Tools",
+    name: "Jayant Dev Tools",
     url: "https://www.jayantgoyal.com/tools",
     applicationCategory: "DeveloperApplication",
     operatingSystem: "Web",
@@ -99,7 +99,7 @@ export function SoftwareAppJsonLd() {
     },
     author: {
       "@type": "Person",
-      name: "Jayant Goyal",
+      name: "Jayant",
     },
   }
 

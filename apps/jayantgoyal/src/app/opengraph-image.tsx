@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og"
 
 export const runtime = "edge"
-export const alt = "Jayant Goyal — Full-Stack Developer Platform"
+export const alt = "Jayant — Full-Stack Developer Platform"
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
 
@@ -31,7 +31,6 @@ export default function OgImage() {
           {/* Name */}
           <div style={{ fontSize: 64, fontWeight: 800, color: "white", display: "flex", gap: 14 }}>
             <span>JAYANT</span>
-            <span style={{ color: "#06b6d4" }}>GOYAL</span>
           </div>
 
           {/* Tagline */}

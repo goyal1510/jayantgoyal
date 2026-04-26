@@ -6,16 +6,16 @@ import { PortfolioInteractive } from "./portfolio-interactive"
 
 export const metadata: Metadata = {
   title: "Portfolio",
-  description: "Jayant Goyal's portfolio — full-stack developer showcasing projects, skills, experience, and certifications.",
+  description: "Jayant's portfolio — full-stack developer showcasing projects, skills, experience, and certifications.",
   openGraph: {
-    title: "Jayant Goyal — Portfolio",
-    description: "Jayant Goyal's portfolio — full-stack developer showcasing projects, skills, work experience, certifications, and open-source contributions.",
+    title: "Jayant — Portfolio",
+    description: "Jayant's portfolio — full-stack developer showcasing projects, skills, work experience, certifications, and open-source contributions.",
     images: [
       {
         url: "https://www.jayantgoyal.com/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "Jayant Goyal — Full-Stack Developer",
+        alt: "Jayant — Full-Stack Developer",
         type: "image/png",
       },
     ],
