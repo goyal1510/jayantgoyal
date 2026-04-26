@@ -1,51 +1,26 @@
-"use client"
-
-import { Suspense } from "react"
-import { useSearchParams, useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { redirect } from "next/navigation"
+import { createSupabaseServerClient } from "@/lib/supabase/server"
 import { MfaVerifyStep } from "@/components/auth/mfa-verify-step"
 import { Card, CardContent } from "@repo/ui/card"
-import { createSupabaseBrowserClient } from "@/lib/supabase/client"
 
-type MfaState = "loading" | "required" | "not-required"
+interface PageProps {
+  searchParams: Promise<{ redirect?: string }>
+}
 
-function MfaVerifyContent() {
-  const searchParams = useSearchParams()
-  const router = useRouter()
-  const redirectUrl = searchParams.get("redirect") ?? "/"
-  const [mfaState, setMfaState] = useState<MfaState>("loading")
+export default async function MfaVerifyPage({ searchParams }: PageProps) {
+  const { redirect: redirectUrl = "/" } = await searchParams
+  const supabase = await createSupabaseServerClient()
 
-  useEffect(() => {
-    const checkMfa = async () => {
-      const supabase = createSupabaseBrowserClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    redirect("/welcome")
+  }
 
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        window.location.href = "/welcome"
-        return
-      }
+  const { data: factors } = await supabase.auth.mfa.listFactors()
+  const hasVerifiedFactor = factors?.totp.some((f) => f.status === "verified")
 
-      // Check factors directly via API call (always accurate).
-      const { data: factors } = await supabase.auth.mfa.listFactors()
-      if (factors?.totp.some((f) => f.status === "verified")) {
-        setMfaState("required")
-        return
-      }
-
-      // No MFA factors — redirect through
-      router.push(redirectUrl)
-      router.refresh()
-    }
-
-    void checkMfa()
-  }, [redirectUrl, router])
-
-  if (mfaState === "loading") {
-    return (
-      <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
-        <div className="animate-spin size-8 border-2 border-muted-foreground border-t-transparent rounded-full" />
-      </div>
-    )
+  if (!hasVerifiedFactor) {
+    redirect(redirectUrl)
   }
 
   return (
@@ -58,13 +33,5 @@ function MfaVerifyContent() {
         </Card>
       </div>
     </div>
-  )
-}
-
-export default function MfaVerifyPage() {
-  return (
-    <Suspense fallback={null}>
-      <MfaVerifyContent />
-    </Suspense>
   )
 }

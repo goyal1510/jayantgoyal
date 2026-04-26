@@ -1,57 +1,33 @@
-"use client"
-
-import { Suspense } from "react"
-import { useSearchParams, useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { redirect } from "next/navigation"
+import { createSupabaseServerClient } from "@/lib/supabase/server"
 import { MfaVerifyStep } from "@/components/auth/mfa-verify-step"
 import { Card, CardContent } from "@repo/ui/card"
-import { CircularLoader } from "@/components/ui/circular-loader"
-import { createSupabaseBrowserClient } from "@/lib/supabase/client"
 
-type MfaState = "loading" | "required" | "not-required"
+interface PageProps {
+  searchParams: Promise<{ redirect?: string }>
+}
 
-function MfaVerifyContent() {
-  const searchParams = useSearchParams()
-  const router = useRouter()
-  const redirectUrl = searchParams.get("redirect") ?? "/"
-  const [mfaState, setMfaState] = useState<MfaState>("loading")
+export default async function MfaVerifyPage({ searchParams }: PageProps) {
+  const { redirect: redirectUrl = "/" } = await searchParams
+  const supabase = await createSupabaseServerClient()
 
-  useEffect(() => {
-    const checkMfa = async () => {
-      const supabase = createSupabaseBrowserClient()
-
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        window.location.href = "/welcome"
-        return
-      }
-
-      // Check factors directly via API call (always accurate).
-      // Don't use getAuthenticatorAssuranceLevel() — it reads from
-      // the local JWT which may be stale after a fresh OAuth session.
-      const { data: factors } = await supabase.auth.mfa.listFactors()
-      if (factors?.totp.some((f) => f.status === "verified")) {
-        setMfaState("required")
-        return
-      }
-
-      // No MFA factors — redirect through to target
-      const url = new URL(redirectUrl, window.location.origin)
-      url.searchParams.set("login_success", "true")
-      window.location.href = url.toString()
-    }
-
-    void checkMfa()
-  }, [redirectUrl, router])
-
-  if (mfaState === "loading") {
-    return (
-      <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
-        <CircularLoader />
-      </div>
-    )
+  // Check auth — if not signed in, go to welcome
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    redirect("/welcome")
   }
 
+  // Check MFA factors server-side — if no verified TOTP, skip MFA
+  const { data: factors } = await supabase.auth.mfa.listFactors()
+  const hasVerifiedFactor = factors?.totp.some((f) => f.status === "verified")
+
+  if (!hasVerifiedFactor) {
+    const target = new URL(redirectUrl, "http://n")
+    target.searchParams.set("login_success", "true")
+    redirect(target.pathname + target.search)
+  }
+
+  // MFA required — render the TOTP form
   return (
     <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
       <div className="w-full max-w-md">
@@ -62,13 +38,5 @@ function MfaVerifyContent() {
         </Card>
       </div>
     </div>
-  )
-}
-
-export default function MfaVerifyPage() {
-  return (
-    <Suspense fallback={<CircularLoader />}>
-      <MfaVerifyContent />
-    </Suspense>
   )
 }
