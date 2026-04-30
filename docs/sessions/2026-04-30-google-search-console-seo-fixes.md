@@ -61,5 +61,11 @@ Google Search Console coverage report showed:
 - Uses build-time `new Date().toISOString()` for all entries
 - Google actually respects this field (unlike `changeFrequency` and `priority` which are mostly ignored)
 
-### Key lesson
-`NextResponse.next({ request: { headers } })` captures headers at creation time. Mutating the `Headers` object after doesn't work — must create a new `NextResponse.next()` if headers change. Used cookie-based auth check in layout instead of proxy headers for reliability.
+### 9. Fixed client-side navigation bypassing AuthGate
+- **Root cause**: Layout is a server component — only runs on full page load, not client-side navigation. So `isPublicPage` from the server header was stale during SPA navigation.
+- **Fix**: Replaced server-side conditional with `AuthGateWrapper` client component that uses `usePathname()` to check public/private on every navigation. `isAuthenticated` (from cookie) is passed as a prop since it's static for the session.
+- Removed `x-page-public` header dependency from layout (no longer needed).
+
+### Key lessons
+- `NextResponse.next({ request: { headers } })` captures headers at creation time. Mutating the `Headers` object after doesn't work — must create a new `NextResponse.next()` if headers change.
+- Next.js App Router layouts don't re-execute on client-side navigation — conditional rendering based on route must use client components with `usePathname()`.

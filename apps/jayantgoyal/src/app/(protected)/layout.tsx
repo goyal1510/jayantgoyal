@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { DynamicBreadcrumb } from "@/components/sidebar/dynamic-breadcrumb";
@@ -13,7 +13,7 @@ import {
 import { getPortfolioDataFromHeaders } from "@/lib/portfolio/server";
 import { PortfolioDataProvider } from "@/lib/portfolio/use-portfolio-data";
 import { TermsAcceptanceCheck } from "@/components/auth/terms-acceptance-check";
-import { AuthGate } from "@/components/auth/auth-gate";
+import { AuthGateWrapper } from "@/components/auth/auth-gate";
 import { LazyMotionProvider } from "@/components/providers/lazy-motion-provider";
 import { RouteChangeProvider } from "@/components/providers/route-change-provider";
 import { LazyThreeBgWrapper, LazyCommandPalette } from "@/components/providers/lazy-components";
@@ -26,9 +26,6 @@ export default async function ProtectedLayout({
   children: ReactNode;
 }) {
   const { data, profile, host, source } = await getPortfolioDataFromHeaders();
-
-  const headerStore = await headers();
-  const isPublicPage = headerStore.get("x-page-public") === "true";
 
   const cookieStore = await cookies();
 
@@ -67,7 +64,9 @@ export default async function ProtectedLayout({
           <LazyMotionProvider>
             <div className="flex flex-1 flex-col gap-4 p-4 min-w-0">
               <RouteChangeProvider>
-                {isAuthenticated || isPublicPage ? children : <AuthGate />}
+                <AuthGateWrapper isAuthenticated={isAuthenticated}>
+                  {children}
+                </AuthGateWrapper>
               </RouteChangeProvider>
             </div>
           </LazyMotionProvider>
