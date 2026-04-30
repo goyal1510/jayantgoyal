@@ -53,7 +53,11 @@ Google Search Console coverage report showed:
 - **`src/app/api/files/[id]/copy/route.ts`** and **`move/route.ts`**: Added path traversal check — rejects `..` sequences and non-absolute paths
 - **`next.config.ts`**: Added `Strict-Transport-Security` (HSTS, 1 year) and `Content-Security-Policy` headers
 
-### 7. Added `lastModified` to all sitemap entries (`src/app/sitemap.ts`)
+### 7. Fixed CSP blocking external APIs (`next.config.ts`)
+- Added `github-contributions-api.jogruber.de` and `api.openweathermap.org` to `connect-src`
+- Added `api.qrserver.com` to `img-src`
+
+### 8. Added `lastModified` to all sitemap entries (`src/app/sitemap.ts`)
 - Uses build-time `new Date().toISOString()` for all entries
 - Google actually respects this field (unlike `changeFrequency` and `priority` which are mostly ignored)
 
