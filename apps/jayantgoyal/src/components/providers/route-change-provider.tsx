@@ -47,13 +47,14 @@ export function RouteChangeProvider({ children }: { children: ReactNode }) {
     return () => document.removeEventListener("click", onClick, true)
   }, [pathname])
 
-  if (isChanging) {
-    return (
-      <div className="flex min-h-[50vh] flex-1 items-center justify-center">
-        <Spinner size="lg" />
-      </div>
-    )
-  }
-
-  return <>{children}</>
+  return (
+    <>
+      {isChanging && (
+        <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center bg-background/50 backdrop-blur-[2px]">
+          <Spinner size="lg" />
+        </div>
+      )}
+      {children}
+    </>
+  )
 }
