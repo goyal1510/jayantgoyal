@@ -9,7 +9,7 @@ import type { BlogPost } from "@/lib/blog/queries";
 
 export function BlogContent({ post }: { post: BlogPost }) {
   return (
-    <article className="mx-auto max-w-3xl p-4">
+    <article className="mx-auto max-w-4xl">
       <Link
         href="/blog"
         className="mb-6 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"

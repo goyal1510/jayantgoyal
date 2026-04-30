@@ -1,13 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Badge } from "@repo/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@repo/ui/card";
 import { getPublishedBlogPosts } from "@/lib/blog/queries";
 
 export const metadata: Metadata = {
@@ -27,49 +20,41 @@ export default async function BlogPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6 p-4">
-      <h1 className="text-3xl font-bold">Blog</h1>
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        {posts.map((post) => (
-          <Link key={post.id} href={`/blog/${post.slug}`} className="group">
-            <Card className="h-full transition-colors group-hover:border-foreground/20">
-              {post.cover_image && (
-                <img
-                  src={post.cover_image}
-                  alt={post.title}
-                  className="h-48 w-full rounded-t-lg object-cover"
-                />
+    <div className="space-y-1">
+      <div className="rounded-lg border">
+        {posts.map((post, i) => (
+          <Link
+            key={post.id}
+            href={`/blog/${post.slug}`}
+            className={`flex items-center gap-4 px-4 py-3 transition-colors hover:bg-accent ${i !== posts.length - 1 ? "border-b" : ""}`}
+          >
+            <div className="min-w-0 flex-1">
+              <p className="font-medium truncate">{post.title}</p>
+              {post.excerpt && (
+                <p className="text-sm text-muted-foreground truncate mt-0.5">{post.excerpt}</p>
               )}
-              <CardHeader>
-                <CardTitle className="line-clamp-2">{post.title}</CardTitle>
-                {post.published_at && (
-                  <CardDescription>
-                    {new Date(post.published_at).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </CardDescription>
-                )}
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {post.excerpt && (
-                  <p className="text-sm text-muted-foreground line-clamp-3">
-                    {post.excerpt}
-                  </p>
-                )}
-                {post.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
-                    {post.tags.map((tag) => (
-                      <Badge key={tag} variant="secondary" className="text-xs">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            </div>
+            {post.tags.length > 0 && (
+              <div className="hidden sm:flex shrink-0 gap-1">
+                {post.tags.slice(0, 3).map((tag) => (
+                  <Badge key={tag} variant="secondary" className="text-xs">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            )}
+            {post.published_at && (
+              <time
+                dateTime={post.published_at}
+                className="shrink-0 text-xs text-muted-foreground tabular-nums"
+              >
+                {new Date(post.published_at).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })}
+              </time>
+            )}
           </Link>
         ))}
       </div>
