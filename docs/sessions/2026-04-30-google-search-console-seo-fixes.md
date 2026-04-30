@@ -70,6 +70,13 @@ Google Search Console coverage report showed:
 - Changed redirect from `/welcome?signed_out=true` to `currentPath?signed_out=true`
 - User stays on the same page and sees the AuthGate instead of being sent to `/welcome`
 
+### 11. Dynamic breadcrumb JSON-LD per page
+- Removed static "Home → Tools → Games" breadcrumb from root layout (was misleading Google)
+- Created `DynamicBreadcrumbJsonLd` client component (`src/components/seo/dynamic-breadcrumb-jsonld.tsx`)
+- Uses `usePathname()` to generate correct breadcrumb hierarchy per page (e.g., "Home → Tools → Generators → UUID Generator")
+- Added to protected layout — updates on every client-side navigation
+- Removed unused `BreadcrumbJsonLd` import from root layout
+
 ### Key lessons
 - `NextResponse.next({ request: { headers } })` captures headers at creation time. Mutating the `Headers` object after doesn't work — must create a new `NextResponse.next()` if headers change.
 - Next.js App Router layouts don't re-execute on client-side navigation — conditional rendering based on route must use client components with `usePathname()`.

@@ -19,6 +19,7 @@ import { RouteChangeProvider } from "@/components/providers/route-change-provide
 import { LazyThreeBgWrapper, LazyCommandPalette } from "@/components/providers/lazy-components";
 import { ThreeBgToggle } from "@/components/three/three-bg-toggle";
 import { AuthToast } from "@/components/auth/auth-toast";
+import { DynamicBreadcrumbJsonLd } from "@/components/seo/dynamic-breadcrumb-jsonld";
 
 export default async function ProtectedLayout({
   children,
@@ -43,6 +44,7 @@ export default async function ProtectedLayout({
     <PortfolioDataProvider data={data} profile={profile} host={host} source={source}>
       {isAuthenticated && <TermsAcceptanceCheck />}
       <AuthToast />
+      <DynamicBreadcrumbJsonLd />
       <SidebarProvider defaultOpen={defaultOpen} defaultWidth={defaultWidth}>
         <LazyThreeBgWrapper />
         <AppSidebar />

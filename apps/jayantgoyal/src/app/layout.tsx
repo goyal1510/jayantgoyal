@@ -5,7 +5,7 @@ import { ThemeProvider } from "@/components/theme/theme-provider";
 import { ToastSoundProvider } from "@/components/providers/toast-sound-provider";
 import { Toaster } from "@repo/ui/sonner";
 import Script from "next/script";
-import { PersonJsonLd, WebSiteJsonLd, ProfilePageJsonLd, SoftwareAppJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
+import { PersonJsonLd, WebSiteJsonLd, ProfilePageJsonLd, SoftwareAppJsonLd } from "@/components/seo/json-ld";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -101,11 +101,6 @@ export default function RootLayout({
         <WebSiteJsonLd />
         <ProfilePageJsonLd />
         <SoftwareAppJsonLd />
-        <BreadcrumbJsonLd items={[
-          { name: "Home", url: "https://www.jayantgoyal.com" },
-          { name: "Tools", url: "https://www.jayantgoyal.com/tools" },
-          { name: "Games", url: "https://www.jayantgoyal.com/games/tic-tac-toe" },
-        ]} />
       </head>
       <body className={inter.className}>
         <ThemeProvider
