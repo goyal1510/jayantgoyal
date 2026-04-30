@@ -66,6 +66,10 @@ Google Search Console coverage report showed:
 - **Fix**: Replaced server-side conditional with `AuthGateWrapper` client component that uses `usePathname()` to check public/private on every navigation. `isAuthenticated` (from cookie) is passed as a prop since it's static for the session.
 - Removed `x-page-public` header dependency from layout (no longer needed).
 
+### 10. Sign-out stays on current page (`src/components/sidebar/nav-user.tsx`)
+- Changed redirect from `/welcome?signed_out=true` to `currentPath?signed_out=true`
+- User stays on the same page and sees the AuthGate instead of being sent to `/welcome`
+
 ### Key lessons
 - `NextResponse.next({ request: { headers } })` captures headers at creation time. Mutating the `Headers` object after doesn't work — must create a new `NextResponse.next()` if headers change.
 - Next.js App Router layouts don't re-execute on client-side navigation — conditional rendering based on route must use client components with `usePathname()`.
