@@ -159,6 +159,9 @@ export function BlogList({ initialData }: BlogListProps) {
                     <Badge variant="outline" className="text-xs shrink-0">Hidden</Badge>
                   )}
                 </div>
+                {item.excerpt && (
+                  <p className="text-sm text-muted-foreground truncate mt-0.5">{item.excerpt}</p>
+                )}
               </div>
               {item.published_at && (
                 <time className="shrink-0 text-xs text-muted-foreground tabular-nums">
