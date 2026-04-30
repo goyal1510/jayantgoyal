@@ -53,5 +53,9 @@ Google Search Console coverage report showed:
 - **`src/app/api/files/[id]/copy/route.ts`** and **`move/route.ts`**: Added path traversal check — rejects `..` sequences and non-absolute paths
 - **`next.config.ts`**: Added `Strict-Transport-Security` (HSTS, 1 year) and `Content-Security-Policy` headers
 
+### 7. Added `lastModified` to all sitemap entries (`src/app/sitemap.ts`)
+- Uses build-time `new Date().toISOString()` for all entries
+- Google actually respects this field (unlike `changeFrequency` and `priority` which are mostly ignored)
+
 ### Key lesson
 `NextResponse.next({ request: { headers } })` captures headers at creation time. Mutating the `Headers` object after doesn't work — must create a new `NextResponse.next()` if headers change. Used cookie-based auth check in layout instead of proxy headers for reliability.

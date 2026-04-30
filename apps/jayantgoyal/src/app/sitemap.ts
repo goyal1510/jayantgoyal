@@ -2,14 +2,17 @@ import type { MetadataRoute } from "next"
 
 const BASE_URL = "https://www.jayantgoyal.com"
 
+// Last modified date — update when deploying significant changes
+const LAST_MODIFIED = new Date().toISOString()
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const publicPages = [
-    { url: BASE_URL, changeFrequency: "weekly" as const, priority: 1.0 },
-    { url: `${BASE_URL}/tools`, changeFrequency: "monthly" as const, priority: 0.8 },
-    { url: `${BASE_URL}/weather`, changeFrequency: "daily" as const, priority: 0.6 },
-    { url: `${BASE_URL}/custom-calculator`, changeFrequency: "monthly" as const, priority: 0.5 },
-    { url: `${BASE_URL}/terms-conditions`, changeFrequency: "yearly" as const, priority: 0.3 },
-    { url: `${BASE_URL}/github-stats`, changeFrequency: "daily" as const, priority: 0.5 },
+    { url: BASE_URL, lastModified: LAST_MODIFIED, changeFrequency: "weekly" as const, priority: 1.0 },
+    { url: `${BASE_URL}/tools`, lastModified: LAST_MODIFIED, changeFrequency: "monthly" as const, priority: 0.8 },
+    { url: `${BASE_URL}/weather`, lastModified: LAST_MODIFIED, changeFrequency: "daily" as const, priority: 0.6 },
+    { url: `${BASE_URL}/custom-calculator`, lastModified: LAST_MODIFIED, changeFrequency: "monthly" as const, priority: 0.5 },
+    { url: `${BASE_URL}/terms-conditions`, lastModified: LAST_MODIFIED, changeFrequency: "yearly" as const, priority: 0.3 },
+    { url: `${BASE_URL}/github-stats`, lastModified: LAST_MODIFIED, changeFrequency: "daily" as const, priority: 0.5 },
   ]
 
   const tools = [
@@ -53,6 +56,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const toolPages = tools.map((tool) => ({
     url: `${BASE_URL}/tools/${tool}`,
+    lastModified: LAST_MODIFIED,
     changeFrequency: "monthly" as const,
     priority: 0.6,
   }))
@@ -62,6 +66,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "rock-paper-scissors", "dare-x", "wordle", "typing-speed",
   ].map((game) => ({
     url: `${BASE_URL}/games/${game}`,
+    lastModified: LAST_MODIFIED,
     changeFrequency: "monthly" as const,
     priority: 0.5,
   }))
@@ -77,6 +82,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "activity-tracker/management",
   ].map((page) => ({
     url: `${BASE_URL}/${page}`,
+    lastModified: LAST_MODIFIED,
     changeFrequency: "monthly" as const,
     priority: 0.4,
   }))
