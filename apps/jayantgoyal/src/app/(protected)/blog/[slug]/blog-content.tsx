@@ -4,8 +4,6 @@ import type { Components } from "react-markdown";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Badge } from "@repo/ui/badge";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
 import type { BlogPost } from "@/lib/blog/queries";
 
 const markdownComponents: Components = {
@@ -53,15 +51,7 @@ const markdownComponents: Components = {
 
 export function BlogContent({ post }: { post: BlogPost }) {
   return (
-    <article className="mx-auto max-w-4xl">
-      <Link
-        href="/blog"
-        className="mb-6 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="size-4" />
-        Back to Blog
-      </Link>
-
+    <article>
       {post.cover_image && (
         <img
           src={post.cover_image}
