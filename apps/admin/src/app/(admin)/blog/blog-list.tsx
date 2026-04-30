@@ -10,8 +10,6 @@ import {
   Trash2,
   Eye,
   EyeOff,
-  BookOpen,
-  BookDashed,
 } from "lucide-react";
 import {
   createBlogData,
@@ -19,13 +17,6 @@ import {
   deleteBlogData,
 } from "@/lib/blog-api";
 import { Button } from "@repo/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@repo/ui/card";
 import { Badge } from "@repo/ui/badge";
 import type { BlogPost } from "@/lib/types";
 import { BlogDialog, emptyBlogForm, type BlogFormData } from "./blog-dialog";
@@ -75,13 +66,10 @@ export function BlogList({ initialData }: BlogListProps) {
 
     try {
       const payload = { ...formData };
-
-      // Auto-set published_at when publishing for the first time
       if (payload.is_published && !payload.published_at) {
         payload.published_at = new Date().toISOString();
       }
 
-      // Convert empty strings to null for nullable fields
       const sanitized = {
         ...payload,
         excerpt: payload.excerpt || null,
@@ -112,9 +100,7 @@ export function BlogList({ initialData }: BlogListProps) {
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this blog post?")) return;
-
     setDeleting(id);
-
     try {
       const result = await deleteBlogData("blog_posts", id);
       if (result.error) throw new Error(result.error);
@@ -134,167 +120,70 @@ export function BlogList({ initialData }: BlogListProps) {
     try {
       const result = await updateBlogData<BlogPost>("blog_posts", item.id, { is_visible: !item.is_visible });
       if (result.error) throw new Error(result.error);
-      setItems(
-        items.map((i) =>
-          i.id === item.id ? { ...i, is_visible: !i.is_visible } : i
-        )
-      );
-      toast.success(item.is_visible ? "Hidden from blog" : "Now visible");
+      setItems(items.map((i) => i.id === item.id ? { ...i, is_visible: !i.is_visible } : i));
+      toast.success(item.is_visible ? "Hidden" : "Visible");
     } catch {
       toast.error("Failed to update visibility");
     }
   };
 
-  const togglePublish = async (item: BlogPost) => {
-    try {
-      const updates: Partial<BlogPost> = { is_published: !item.is_published };
-
-      // Auto-set published_at when publishing for the first time
-      if (!item.is_published && !item.published_at) {
-        updates.published_at = new Date().toISOString();
-      }
-
-      const result = await updateBlogData<BlogPost>("blog_posts", item.id, updates);
-      if (result.error) throw new Error(result.error);
-      setItems(
-        items.map((i) =>
-          i.id === item.id ? { ...i, ...updates } : i
-        )
-      );
-      toast.success(item.is_published ? "Unpublished" : "Published");
-    } catch {
-      toast.error("Failed to update publish status");
-    }
-  };
-
-  const formatDate = (dateStr: string | null) => {
-    if (!dateStr) return null;
-    return new Date(dateStr).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
   return (
     <>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle>Blog Posts</CardTitle>
-            <CardDescription>
-              Manage your blog posts and articles.
-            </CardDescription>
-          </div>
-          <Button onClick={openAddDialog}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Post
-          </Button>
-        </CardHeader>
-        <CardContent>
-          {items.length === 0 ? (
-            <p className="text-sm text-muted-foreground py-8 text-center">
-              No blog posts yet. Click &quot;Add Post&quot; to get started.
-            </p>
-          ) : (
-            <div className="space-y-4">
-              {items.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-start gap-4 rounded-lg border p-4"
-                >
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-semibold">{item.title}</h3>
-                      {item.is_published ? (
-                        <Badge variant="default" className="text-xs">
-                          Published
-                        </Badge>
-                      ) : (
-                        <Badge variant="secondary" className="text-xs">
-                          Draft
-                        </Badge>
-                      )}
-                      {!item.is_visible && (
-                        <span className="text-xs text-muted-foreground">
-                          (Hidden)
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1 font-mono">
-                      /{item.slug}
-                    </p>
-                    {item.excerpt && (
-                      <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                        {item.excerpt}
-                      </p>
-                    )}
-                    {item.tags && item.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {item.tags.map((tag) => (
-                          <Badge key={tag} variant="secondary" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-                    {item.published_at && (
-                      <p className="text-xs text-muted-foreground mt-2">
-                        Published {formatDate(item.published_at)}
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => toggleVisibility(item)}
-                      title={item.is_visible ? "Hide" : "Show"}
-                    >
-                      {item.is_visible ? (
-                        <Eye className="h-4 w-4" />
-                      ) : (
-                        <EyeOff className="h-4 w-4" />
-                      )}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => togglePublish(item)}
-                      title={item.is_published ? "Unpublish" : "Publish"}
-                    >
-                      {item.is_published ? (
-                        <BookOpen className="h-4 w-4" />
-                      ) : (
-                        <BookDashed className="h-4 w-4" />
-                      )}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => openEditDialog(item)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDelete(item.id)}
-                      disabled={deleting === item.id}
-                    >
-                      {deleting === item.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Trash2 className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
+      <div className="flex items-center justify-end mb-4">
+        <Button onClick={openAddDialog} size="sm">
+          <Plus className="mr-2 h-4 w-4" />
+          Add Post
+        </Button>
+      </div>
+
+      <div className="rounded-lg border">
+        {items.length === 0 ? (
+          <p className="text-sm text-muted-foreground py-8 text-center">
+            No blog posts yet.
+          </p>
+        ) : (
+          items.map((item, i) => (
+            <div
+              key={item.id}
+              className={`flex items-center gap-4 px-4 py-3 ${i !== items.length - 1 ? "border-b" : ""}`}
+            >
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <p className="font-medium truncate">{item.title}</p>
+                  {item.is_published ? (
+                    <Badge variant="default" className="text-xs shrink-0">Published</Badge>
+                  ) : (
+                    <Badge variant="secondary" className="text-xs shrink-0">Draft</Badge>
+                  )}
+                  {!item.is_visible && (
+                    <Badge variant="outline" className="text-xs shrink-0">Hidden</Badge>
+                  )}
                 </div>
-              ))}
+              </div>
+              {item.published_at && (
+                <time className="shrink-0 text-xs text-muted-foreground tabular-nums">
+                  {new Date(item.published_at).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </time>
+              )}
+              <div className="flex shrink-0 items-center gap-1">
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => toggleVisibility(item)}>
+                  {item.is_visible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                </Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEditDialog(item)}>
+                  <Pencil className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDelete(item.id)} disabled={deleting === item.id}>
+                  {deleting === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                </Button>
+              </div>
             </div>
-          )}
-        </CardContent>
-      </Card>
+          ))
+        )}
+      </div>
 
       <BlogDialog
         open={dialogOpen}
