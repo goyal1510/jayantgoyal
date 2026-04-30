@@ -5,7 +5,7 @@ const BASE_URL = "https://www.jayantgoyal.com"
 // Last modified date — update when deploying significant changes
 const LAST_MODIFIED = new Date().toISOString()
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const publicPages = [
     { url: BASE_URL, lastModified: LAST_MODIFIED, changeFrequency: "weekly" as const, priority: 1.0 },
     { url: `${BASE_URL}/tools`, lastModified: LAST_MODIFIED, changeFrequency: "monthly" as const, priority: 0.8 },
@@ -87,5 +87,30 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.4,
   }))
 
-  return [...publicPages, ...toolPages, ...gamePages, ...appPages]
+  const blogPages: MetadataRoute.Sitemap = []
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  if (supabaseUrl && supabaseKey) {
+    const { createClient } = await import("@supabase/supabase-js")
+    const supabase = createClient(supabaseUrl, supabaseKey)
+    const { data: posts } = await supabase
+      .schema("jg_app")
+      .from("blog_posts")
+      .select("slug, updated_at")
+      .eq("is_published", true)
+      .eq("is_visible", true)
+    if (posts) {
+      blogPages.push(
+        { url: `${BASE_URL}/blog`, lastModified: LAST_MODIFIED, changeFrequency: "weekly", priority: 0.8 },
+        ...posts.map((p) => ({
+          url: `${BASE_URL}/blog/${p.slug}`,
+          lastModified: p.updated_at,
+          changeFrequency: "weekly" as const,
+          priority: 0.7,
+        }))
+      )
+    }
+  }
+
+  return [...publicPages, ...toolPages, ...gamePages, ...appPages, ...blogPages]
 }

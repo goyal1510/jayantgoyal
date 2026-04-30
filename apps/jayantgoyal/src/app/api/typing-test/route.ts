@@ -25,8 +25,8 @@ export async function GET(request: NextRequest) {
   const to = from + pageSize - 1
 
   const { data: results, error, count } = await supabase
-    .schema("game_hub")
-    .from("typing_speed_results")
+    .schema("jg_app")
+    .from("game_hub_typing_speed_results")
     .select("*", { count: "exact" })
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
@@ -81,8 +81,8 @@ export async function POST(request: NextRequest) {
   }
 
   const { data: result, error } = await supabase
-    .schema("game_hub")
-    .from("typing_speed_results")
+    .schema("jg_app")
+    .from("game_hub_typing_speed_results")
     .insert({
       user_id: user.id,
       wpm: Math.round(wpm),

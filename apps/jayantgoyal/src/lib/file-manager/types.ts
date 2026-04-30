@@ -1,5 +1,5 @@
 // Type definitions for the File Manager application
-// These types match the database schema in the fmanager schema
+// These types match the database schema in the jg_app schema
 
 // ============================================
 // File Type Categories
@@ -19,7 +19,7 @@ export type FileTypeCategory =
   | "directory";
 
 // ============================================
-// Database Types (matching fmanager.files table)
+// Database Types (matching jg_app.file_manager_files table)
 // ============================================
 
 export interface FileRecord {
@@ -47,7 +47,7 @@ export interface FileRecord {
 }
 
 // ============================================
-// File Type Category (matching fmanager.file_type_categories table)
+// File Type Category (matching jg_app.file_manager_type_categories table)
 // ============================================
 
 export interface FileTypeCategoryRecord {

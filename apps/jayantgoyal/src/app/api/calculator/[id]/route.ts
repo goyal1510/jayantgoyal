@@ -18,8 +18,8 @@ export async function DELETE(
 
     const { id } = await params
     const { error } = await supabase
-      .schema("currency_calculator")
-      .from("calculations")
+      .schema("jg_app")
+      .from("currency_calculator_calculations")
       .delete()
       .eq("id", id)
       .eq("user_id", user.id)

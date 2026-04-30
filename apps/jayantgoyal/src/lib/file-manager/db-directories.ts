@@ -20,7 +20,7 @@ export async function createDirectoryPath(
   directoryPath: string
 ): Promise<string | null> {
   const { data, error } = await supabase
-    .schema("fmanager")
+    .schema("jg_app")
     .rpc("create_directory_path", {
       p_user_id: userId,
       p_directory_path: directoryPath,
@@ -47,7 +47,7 @@ export async function listDirectory(
   directoryPath: string = "/"
 ): Promise<DirectoryListingItem[] | null> {
   const { data, error } = await supabase
-    .schema("fmanager")
+    .schema("jg_app")
     .rpc("list_directory", {
       p_user_id: userId,
       p_directory_path: directoryPath,
@@ -74,7 +74,7 @@ export async function getDirectoryTree(
   parentPath: string = "/"
 ): Promise<DirectoryTreeItem[] | null> {
   const { data, error } = await supabase
-    .schema("fmanager")
+    .schema("jg_app")
     .rpc("get_directory_tree", {
       p_user_id: userId,
       p_parent_path: parentPath,

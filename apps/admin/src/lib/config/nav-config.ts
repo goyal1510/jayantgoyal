@@ -12,6 +12,7 @@ import {
   Palette,
   Rocket,
   KeyRound,
+  FileText,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
@@ -32,6 +33,10 @@ export const portfolioNavItems: NavItem[] = [
   { label: "Certificates", href: "/portfolio/certificates", icon: Award },
   { label: "Contact", href: "/portfolio/contact", icon: Mail },
   { label: "Navigation", href: "/portfolio/navigation", icon: Navigation },
+]
+
+export const blogNavItems: NavItem[] = [
+  { label: "Blog Posts", href: "/blog", icon: FileText },
 ]
 
 export const adminNavItems: NavItem[] = [

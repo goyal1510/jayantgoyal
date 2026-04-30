@@ -28,8 +28,8 @@ export async function handlePatchFile(
   }
 
   const currentFile = await supabase
-    .schema("fmanager")
-    .from("files")
+    .schema("jg_app")
+    .from("file_manager_files")
     .select("*")
     .eq("id", fileId)
     .eq("user_id", userId)
@@ -93,8 +93,8 @@ async function handleRenameDirectory(
 
   const oldPathPrefix = filePath;
   const { data: children, error: childrenError } = await supabase
-    .schema("fmanager")
-    .from("files")
+    .schema("jg_app")
+    .from("file_manager_files")
     .select("id, file_path")
     .eq("user_id", userId)
     .like("file_path", `${oldPathPrefix}%`)
@@ -107,8 +107,8 @@ async function handleRenameDirectory(
     for (const child of children) {
       const newChildPath = child.file_path.replace(oldPathPrefix, newPath);
       await supabase
-        .schema("fmanager")
-        .from("files")
+        .schema("jg_app")
+        .from("file_manager_files")
         .update({
           file_path: newChildPath,
           updated_at: new Date().toISOString(),

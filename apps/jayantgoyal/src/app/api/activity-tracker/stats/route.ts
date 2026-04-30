@@ -25,8 +25,8 @@ export async function GET(request: NextRequest) {
 
     // Get all entries for the month first
     const { data: entries, error: entriesError } = await supabase
-      .schema("activity_tracker")
-      .from("activity_entries")
+      .schema("jg_app")
+      .from("activity_tracker_entries")
       .select("*")
       .eq("user_id", user.id)
       .gte("date", startDate)
@@ -49,8 +49,8 @@ export async function GET(request: NextRequest) {
     // - Show activities that have entries in this month (regardless of is_active), OR
     // - Show only active activities (for months with no entries yet)
     const activitiesQuery = supabase
-      .schema("activity_tracker")
-      .from("activities")
+      .schema("jg_app")
+      .from("activity_tracker_activities")
       .select("*")
       .eq("user_id", user.id)
 

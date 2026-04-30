@@ -21,7 +21,7 @@ export async function getFileByPath(
   filePath: string
 ): Promise<FileRecord | null> {
   const { data, error } = await supabase
-    .schema("fmanager")
+    .schema("jg_app")
     .rpc("get_file_by_path", {
       p_user_id: userId,
       p_file_path: filePath,
@@ -50,7 +50,7 @@ export async function generateStoragePath(
   fileName: string
 ): Promise<string | null> {
   const { data, error } = await supabase
-    .schema("fmanager")
+    .schema("jg_app")
     .rpc("generate_storage_path", {
       p_user_id: userId,
       p_file_path: filePath,
@@ -78,8 +78,8 @@ export async function createFileRecord(
   fileData: CreateFileData
 ): Promise<FileRecord | null> {
   const { data, error } = await supabase
-    .schema("fmanager")
-    .from("files")
+    .schema("jg_app")
+    .from("file_manager_files")
     .insert({
       ...fileData,
       user_id: userId,
@@ -115,7 +115,7 @@ export async function moveFile(
   userId: string
 ): Promise<boolean> {
   const { data, error } = await supabase
-    .schema("fmanager")
+    .schema("jg_app")
     .rpc("move_file", {
       p_file_id: fileId,
       p_new_directory_path: newDirectoryPath,
@@ -145,7 +145,7 @@ export async function copyFile(
   userId: string
 ): Promise<string | null> {
   const { data, error } = await supabase
-    .schema("fmanager")
+    .schema("jg_app")
     .rpc("copy_file", {
       p_file_id: fileId,
       p_target_directory_path: targetDirectoryPath,
@@ -175,7 +175,7 @@ export async function deleteFile(
 ): Promise<boolean> {
   // Try using RPC function first (if it exists)
   const { data: rpcData, error: rpcError } = await supabase
-    .schema("fmanager")
+    .schema("jg_app")
     .rpc("soft_delete_file", {
       p_file_id: fileId,
       p_user_id: userId,
@@ -187,8 +187,8 @@ export async function deleteFile(
 
   // Fallback to direct UPDATE (will work after RLS policy is fixed)
   const { data, error } = await supabase
-    .schema("fmanager")
-    .from("files")
+    .schema("jg_app")
+    .from("file_manager_files")
     .update({
       is_deleted: true,
       deleted_at: new Date().toISOString(),
@@ -219,8 +219,8 @@ export async function restoreFile(
   userId: string
 ): Promise<boolean> {
   const { data, error } = await supabase
-    .schema("fmanager")
-    .from("files")
+    .schema("jg_app")
+    .from("file_manager_files")
     .update({
       is_deleted: false,
       deleted_at: null,
@@ -253,8 +253,8 @@ export async function updateFileMetadata(
   updates: Partial<Pick<FileRecord, "display_name" | "file_name" | "file_path">>
 ): Promise<FileRecord | null> {
   const { data, error } = await supabase
-    .schema("fmanager")
-    .from("files")
+    .schema("jg_app")
+    .from("file_manager_files")
     .update({
       ...updates,
       updated_at: new Date().toISOString(),
@@ -279,8 +279,8 @@ export async function updateFileMetadata(
  */
 export async function getFileTypeCategories(supabase: SupabaseClient) {
   const { data, error } = await supabase
-    .schema("fmanager")
-    .from("file_type_categories")
+    .schema("jg_app")
+    .from("file_manager_type_categories")
     .select("*")
     .order("display_name");
 

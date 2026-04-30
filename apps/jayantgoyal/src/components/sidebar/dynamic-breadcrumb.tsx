@@ -100,6 +100,16 @@ export function DynamicBreadcrumb() {
       return { appName: "Custom Calculator", appHref: "/custom-calculator", pageName: null }
     }
 
+    // Blog routes
+    if (pathname.startsWith("/blog")) {
+      const segments = pathname.split("/").filter(Boolean)
+      if (segments.length > 1 && segments[1]) {
+        const pageName = segments[1].split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")
+        return { appName: "Blog", appHref: "/blog", pageName }
+      }
+      return { appName: "Blog", appHref: "/blog", pageName: null }
+    }
+
     // Portfolio - just show "Portfolio" without section tracking
     if (pathname === "/" || pathname === "") {
       return { appName: "Portfolio", appHref: "/", pageName: null }

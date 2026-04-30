@@ -257,3 +257,23 @@ export interface VercelEnvVar {
 }
 
 export type VercelProjectKey = "jg" | "admin";
+
+/**
+ * Blog Types
+ */
+
+export interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  content: string;
+  cover_image: string | null;
+  tags: string[];
+  is_visible: boolean;
+  is_published: boolean;
+  published_at: string | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}

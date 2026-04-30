@@ -60,6 +60,20 @@ function getBreadcrumbItems(pathname: string): { name: string; url: string }[] {
     return items;
   }
 
+  // Blog routes
+  if (pathname.startsWith("/blog")) {
+    items.push({ name: "Blog", url: `${BASE_URL}/blog` });
+    if (pathname !== "/blog") {
+      const slug = pathname.split("/").pop() ?? "";
+      const name = slug
+        .split("-")
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(" ");
+      items.push({ name, url: `${BASE_URL}${pathname}` });
+    }
+    return items;
+  }
+
   // Simple single-level pages
   const simplePages: Record<string, string> = {
     "/messenger": "Messenger",

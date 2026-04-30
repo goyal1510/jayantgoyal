@@ -47,8 +47,8 @@ export async function PATCH(
 
     // Verify the activity belongs to the user
     const { data: activity, error: fetchError } = await supabase
-      .schema("activity_tracker")
-      .from("activities")
+      .schema("jg_app")
+      .from("activity_tracker_activities")
       .select("id")
       .eq("id", activityId)
       .eq("user_id", user.id)
@@ -63,8 +63,8 @@ export async function PATCH(
 
     // Update activity fields
     const { data: updatedActivity, error: updateError } = await supabase
-      .schema("activity_tracker")
-      .from("activities")
+      .schema("jg_app")
+      .from("activity_tracker_activities")
       .update(updateData)
       .eq("id", activityId)
       .eq("user_id", user.id)

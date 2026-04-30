@@ -18,8 +18,8 @@ export async function GET(request: NextRequest) {
     const includeInactive = url.searchParams.get("include_inactive") === "true"
 
     let query = supabase
-      .schema("activity_tracker")
-      .from("activities")
+      .schema("jg_app")
+      .from("activity_tracker_activities")
       .select("*")
       .eq("user_id", user.id)
 
@@ -37,8 +37,8 @@ export async function GET(request: NextRequest) {
 
         // Get activities that have entries in this month
         const { data: entries } = await supabase
-          .schema("activity_tracker")
-          .from("activity_entries")
+          .schema("jg_app")
+          .from("activity_tracker_entries")
           .select("activity_id")
           .eq("user_id", user.id)
           .gte("date", startDate)
@@ -54,8 +54,8 @@ export async function GET(request: NextRequest) {
         if (activityIdsWithEntries.size > 0) {
           // Fetch all activities first, then filter in memory
           const { data: allActivities } = await supabase
-            .schema("activity_tracker")
-            .from("activities")
+            .schema("jg_app")
+            .from("activity_tracker_activities")
             .select("*")
             .eq("user_id", user.id)
             .order("created_at", { ascending: true })
@@ -120,8 +120,8 @@ export async function POST(request: NextRequest) {
     }
 
     const { data: activity, error: insertError } = await supabase
-      .schema("activity_tracker")
-      .from("activities")
+      .schema("jg_app")
+      .from("activity_tracker_activities")
       .insert({
         name: name.trim(),
         user_id: user.id,

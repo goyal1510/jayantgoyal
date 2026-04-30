@@ -57,8 +57,8 @@ export async function POST(
 
     // Get current file to check if it exists and belongs to user
     const { data: file, error: fileError } = await supabase
-      .schema("fmanager")
-      .from("files")
+      .schema("jg_app")
+      .from("file_manager_files")
       .select("*")
       .eq("id", fileId)
       .eq("user_id", user.id)
@@ -97,8 +97,8 @@ export async function POST(
     let newParentId: string | null = null;
     if (normalizedTargetPath !== "/") {
       const { data: parentDir } = await supabase
-        .schema("fmanager")
-        .from("files")
+        .schema("jg_app")
+        .from("file_manager_files")
         .select("id")
         .eq("user_id", user.id)
         .eq("file_path", normalizedTargetPath)
@@ -116,8 +116,8 @@ export async function POST(
     } else {
       // Moving to root - get root directory ID
       const { data: rootDir } = await supabase
-        .schema("fmanager")
-        .from("files")
+        .schema("jg_app")
+        .from("file_manager_files")
         .select("id")
         .eq("user_id", user.id)
         .eq("file_path", "/")
@@ -133,8 +133,8 @@ export async function POST(
 
     // Check if a file with the same name already exists at the destination
     const { data: existingFile } = await supabase
-      .schema("fmanager")
-      .from("files")
+      .schema("jg_app")
+      .from("file_manager_files")
       .select("id, file_name, file_path, display_name, size_bytes, updated_at, is_directory, storage_path")
       .eq("user_id", user.id)
       .eq("file_path", newFilePath)
@@ -149,8 +149,8 @@ export async function POST(
       if (overwrite) {
         // Hard delete the existing file
         const { error: deleteError } = await supabase
-          .schema("fmanager")
-          .from("files")
+          .schema("jg_app")
+          .from("file_manager_files")
           .delete()
           .eq("id", existingFile.id)
           .eq("user_id", user.id);
@@ -182,8 +182,8 @@ export async function POST(
           finalFilePath = normalizedTargetPath + finalFileName + (file.is_directory ? "/" : "");
 
           const { data: checkFile } = await supabase
-            .schema("fmanager")
-            .from("files")
+            .schema("jg_app")
+            .from("file_manager_files")
             .select("id")
             .eq("user_id", user.id)
             .eq("file_path", finalFilePath)
@@ -216,8 +216,8 @@ export async function POST(
 
     // Move the file (update path and parent)
     const { error: updateError } = await supabase
-      .schema("fmanager")
-      .from("files")
+      .schema("jg_app")
+      .from("file_manager_files")
       .update({
         file_path: finalFilePath,
         file_name: finalFileName,
@@ -263,8 +263,8 @@ async function updateChildPaths(
   newPath: string
 ) {
   const { data: children } = await supabase
-    .schema("fmanager")
-    .from("files")
+    .schema("jg_app")
+    .from("file_manager_files")
     .select("id, file_path")
     .eq("user_id", userId)
     .like("file_path", `${oldPath}%`)
@@ -275,8 +275,8 @@ async function updateChildPaths(
     for (const child of children) {
       const newChildPath = child.file_path.replace(oldPath, newPath);
       await supabase
-        .schema("fmanager")
-        .from("files")
+        .schema("jg_app")
+        .from("file_manager_files")
         .update({
           file_path: newChildPath,
           updated_at: new Date().toISOString(),

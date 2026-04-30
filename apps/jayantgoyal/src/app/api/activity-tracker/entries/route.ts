@@ -19,8 +19,8 @@ export async function GET(request: NextRequest) {
     const datesParam = url.searchParams.get("dates")?.trim()
 
     let query = supabase
-      .schema("activity_tracker")
-      .from("activity_entries")
+      .schema("jg_app")
+      .from("activity_tracker_entries")
       .select("*")
       .eq("user_id", user.id)
 
@@ -132,8 +132,8 @@ export async function POST(request: NextRequest) {
 
     // Check if entry already exists
     const { data: existingEntry } = await supabase
-      .schema("activity_tracker")
-      .from("activity_entries")
+      .schema("jg_app")
+      .from("activity_tracker_entries")
       .select("*")
       .eq("user_id", user.id)
       .eq("activity_id", activity_id)
@@ -143,8 +143,8 @@ export async function POST(request: NextRequest) {
     if (existingEntry) {
       // Update existing entry
       const { data: updatedEntry, error: updateError } = await supabase
-        .schema("activity_tracker")
-        .from("activity_entries")
+        .schema("jg_app")
+        .from("activity_tracker_entries")
         .update({
           completed: Boolean(completed),
         })
@@ -164,8 +164,8 @@ export async function POST(request: NextRequest) {
     } else {
       // Create new entry
       const { data: newEntry, error: insertError } = await supabase
-        .schema("activity_tracker")
-        .from("activity_entries")
+        .schema("jg_app")
+        .from("activity_tracker_entries")
         .insert({
           activity_id,
           date,

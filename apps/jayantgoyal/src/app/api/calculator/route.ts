@@ -33,8 +33,8 @@ export async function GET(request: NextRequest) {
 
     const buildFilteredQuery = (columns: string, withCount = false) => {
       let scoped = supabase
-        .schema("currency_calculator")
-        .from("calculations")
+        .schema("jg_app")
+        .from("currency_calculator_calculations")
         .select(columns, withCount ? { count: "exact" } : undefined)
         .eq("user_id", user.id)
 
@@ -96,8 +96,8 @@ export async function GET(request: NextRequest) {
     const calculationIds = calculationsTyped.map((calc) => calc.id)
     const { data: denominations, error: denomError } = calculationIds.length
       ? await supabase
-          .schema("currency_calculator")
-          .from("denominations")
+          .schema("jg_app")
+          .from("currency_calculator_denominations")
           .select("*")
           .in("calculation_id", calculationIds)
           .order("denomination", { ascending: false })
@@ -219,8 +219,8 @@ export async function POST(request: NextRequest) {
     const { note, ist_timestamp, denominations } = body ?? {}
 
     const { data: calculation, error: calcError } = await supabase
-      .schema("currency_calculator")
-      .from("calculations")
+      .schema("jg_app")
+      .from("currency_calculator_calculations")
       .insert({
         note: note || null,
         ist_timestamp: ist_timestamp || null,
@@ -256,8 +256,8 @@ export async function POST(request: NextRequest) {
         : []
 
     const { data: createdDenominations, error: denomError } = await supabase
-      .schema("currency_calculator")
-      .from("denominations")
+      .schema("jg_app")
+      .from("currency_calculator_denominations")
       .insert(denominationsToInsert)
       .select()
 

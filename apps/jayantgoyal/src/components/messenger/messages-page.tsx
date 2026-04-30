@@ -44,8 +44,8 @@ export function MessagesPage() {
         console.error("Error fetching messages:", error);
         // Fallback to direct Supabase call (also newest first)
         const { data, error: supabaseError } = await supabase
-          .schema("messenger")
-          .from("messages")
+          .schema("jg_app")
+          .from("messenger_messages")
           .select("*")
           .eq("user_id", userId)
           .order("created_at", { ascending: false });
@@ -72,8 +72,8 @@ export function MessagesPage() {
         "postgres_changes",
         {
           event: "INSERT",
-          schema: "messenger",
-          table: "messages",
+          schema: "jg_app",
+          table: "messenger_messages",
           filter: `user_id=eq.${userId}`,
         },
         (payload) => {
@@ -90,8 +90,8 @@ export function MessagesPage() {
         "postgres_changes",
         {
           event: "UPDATE",
-          schema: "messenger",
-          table: "messages",
+          schema: "jg_app",
+          table: "messenger_messages",
           filter: `user_id=eq.${userId}`,
         },
         (payload) => {
@@ -107,8 +107,8 @@ export function MessagesPage() {
         "postgres_changes",
         {
           event: "DELETE",
-          schema: "messenger",
-          table: "messages",
+          schema: "jg_app",
+          table: "messenger_messages",
           filter: `user_id=eq.${userId}`,
         },
         (payload) => {

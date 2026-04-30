@@ -300,7 +300,7 @@ Unified loading with `<PageSpinner />` component:
 
 ### Database Schema
 
-**Schemas:** `jg_account`, `portfolio`, `activity_tracker`, `currency_calculator`, `fmanager`, `messenger`, `public`
+**Schemas:** `jg_account`, `portfolio`, `jg_app` (activity tracker, calculator, file manager, game hub, messenger, blog)
 
 ## Development Conventions
 
@@ -472,7 +472,7 @@ Supabase Auth via `@supabase/ssr`. Supports email/password, magic link, PKCE OAu
 
 ### Database
 
-**Schemas:** `jg_account`, `portfolio`, `activity_tracker`, `currency_calculator`, `fmanager`, `messenger`
+**Schemas:** `jg_account`, `portfolio`, `jg_app` (activity tracker, calculator, file manager, game hub, messenger, blog)
 
 ### Portfolio Data System
 

@@ -18,8 +18,8 @@ export async function GET() {
     }
 
     const { data: messages, error } = await supabase
-      .schema("messenger")
-      .from("messages")
+      .schema("jg_app")
+      .from("messenger_messages")
       .select("*")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
@@ -76,8 +76,8 @@ export async function POST(request: NextRequest) {
     }
 
     const { data: message, error } = await supabase
-      .schema("messenger")
-      .from("messages")
+      .schema("jg_app")
+      .from("messenger_messages")
       .insert({
         user_id: user.id,
         content: content.trim(),

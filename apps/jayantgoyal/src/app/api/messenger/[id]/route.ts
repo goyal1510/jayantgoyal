@@ -26,8 +26,8 @@ export async function PATCH(
 
     // Verify the message belongs to the user
     const { data: existingMessage, error: fetchError } = await supabase
-      .schema("messenger")
-      .from("messages")
+      .schema("jg_app")
+      .from("messenger_messages")
       .select("user_id, message_type")
       .eq("id", id)
       .single();
@@ -68,8 +68,8 @@ export async function PATCH(
     }
 
     const { data: message, error } = await supabase
-      .schema("messenger")
-      .from("messages")
+      .schema("jg_app")
+      .from("messenger_messages")
       .update(updateData)
       .eq("id", id)
       .eq("user_id", user.id)
@@ -117,8 +117,8 @@ export async function DELETE(
 
     // Verify the message belongs to the user
     const { data: existingMessage, error: fetchError } = await supabase
-      .schema("messenger")
-      .from("messages")
+      .schema("jg_app")
+      .from("messenger_messages")
       .select("user_id")
       .eq("id", id)
       .single();
@@ -138,8 +138,8 @@ export async function DELETE(
     }
 
     const { error } = await supabase
-      .schema("messenger")
-      .from("messages")
+      .schema("jg_app")
+      .from("messenger_messages")
       .delete()
       .eq("id", id)
       .eq("user_id", user.id);

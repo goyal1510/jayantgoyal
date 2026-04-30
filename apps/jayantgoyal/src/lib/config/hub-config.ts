@@ -26,6 +26,7 @@ import {
   Github,
   Type,
   Puzzle,
+  FileText,
   type LucideIcon,
 } from "lucide-react"
 
@@ -151,6 +152,15 @@ export const HUB_APPS: AppConfig[] = [
     color: "text-orange-500 dark:text-orange-400",
     isPublic: true,
     navItems: [], // Uses nested navigation from lib/tools/tools.ts
+  },
+  {
+    id: "blog",
+    name: "Blog",
+    icon: FileText,
+    color: "text-orange-500 dark:text-orange-400",
+    isPublic: true,
+    navItems: [],
+    url: "/blog",
   },
   {
     id: "weather",

@@ -57,8 +57,8 @@ export async function POST(
 
     // Get current file to check if it exists and belongs to user
     const { data: file, error: fileError } = await supabase
-      .schema("fmanager")
-      .from("files")
+      .schema("jg_app")
+      .from("file_manager_files")
       .select("*")
       .eq("id", fileId)
       .eq("user_id", user.id)
@@ -85,8 +85,8 @@ export async function POST(
 
     // Check if a file with the same name already exists at the destination
     const { data: existingFile } = await supabase
-      .schema("fmanager")
-      .from("files")
+      .schema("jg_app")
+      .from("file_manager_files")
       .select("id, file_name, file_path, display_name, size_bytes, updated_at, storage_path")
       .eq("user_id", user.id)
       .eq("file_path", newFilePath)
@@ -100,8 +100,8 @@ export async function POST(
       if (overwrite) {
         // Hard delete the existing file
         const { error: deleteError } = await supabase
-          .schema("fmanager")
-          .from("files")
+          .schema("jg_app")
+          .from("file_manager_files")
           .delete()
           .eq("id", existingFile.id)
           .eq("user_id", user.id);
@@ -131,8 +131,8 @@ export async function POST(
           finalFilePath = normalizedTargetPath + finalFileName;
 
           const { data: checkFile } = await supabase
-            .schema("fmanager")
-            .from("files")
+            .schema("jg_app")
+            .from("file_manager_files")
             .select("id")
             .eq("user_id", user.id)
             .eq("file_path", finalFilePath)
@@ -171,8 +171,8 @@ export async function POST(
     let parentId: string | null = null;
     if (normalizedTargetPath !== "/") {
       const { data: parentDir } = await supabase
-        .schema("fmanager")
-        .from("files")
+        .schema("jg_app")
+        .from("file_manager_files")
         .select("id")
         .eq("user_id", user.id)
         .eq("file_path", normalizedTargetPath)
@@ -186,8 +186,8 @@ export async function POST(
     } else {
       // Copying to root - get root directory ID
       const { data: rootDir } = await supabase
-        .schema("fmanager")
-        .from("files")
+        .schema("jg_app")
+        .from("file_manager_files")
         .select("id")
         .eq("user_id", user.id)
         .eq("file_path", "/")
@@ -202,8 +202,8 @@ export async function POST(
 
     // Create the copy record in the database
     const { data: newFile, error: insertError } = await supabase
-      .schema("fmanager")
-      .from("files")
+      .schema("jg_app")
+      .from("file_manager_files")
       .insert({
         user_id: user.id,
         bucket_id: file.bucket_id,
@@ -242,8 +242,8 @@ export async function POST(
           console.error("Error copying file in storage:", copyError);
           // Rollback the database record if storage copy fails
           await supabase
-            .schema("fmanager")
-            .from("files")
+            .schema("jg_app")
+            .from("file_manager_files")
             .delete()
             .eq("id", newFile.id);
 
@@ -256,8 +256,8 @@ export async function POST(
         console.error("Error copying storage file:", storageError);
         // Rollback the database record
         await supabase
-          .schema("fmanager")
-          .from("files")
+          .schema("jg_app")
+          .from("file_manager_files")
           .delete()
           .eq("id", newFile.id);
 

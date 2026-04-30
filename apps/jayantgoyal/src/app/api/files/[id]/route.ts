@@ -25,8 +25,8 @@ export async function GET(
     const { id: fileId } = await params;
 
     const { data: file, error: fileError } = await supabase
-      .schema("fmanager")
-      .from("files")
+      .schema("jg_app")
+      .from("file_manager_files")
       .select("*")
       .eq("id", fileId)
       .eq("user_id", user.id)
@@ -147,8 +147,8 @@ export async function DELETE(
     const { id: fileId } = await params;
 
     const file = await supabase
-      .schema("fmanager")
-      .from("files")
+      .schema("jg_app")
+      .from("file_manager_files")
       .select("*")
       .eq("id", fileId)
       .eq("user_id", user.id)

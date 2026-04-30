@@ -171,8 +171,8 @@ export async function POST(request: NextRequest) {
         }
         // Hard delete the existing record
         const { error: deleteError } = await supabase
-          .schema("fmanager")
-          .from("files")
+          .schema("jg_app")
+          .from("file_manager_files")
           .delete()
           .eq("id", existingFile.id)
           .eq("user_id", user.id);
