@@ -21,7 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "converters/yaml-to-toml", "converters/toml-to-yaml", "converters/base64-encoder-decoder",
     "converters/base64-file-converter", "converters/integer-base-converter",
     "converters/date-time-converter", "converters/temperature-converter",
-    "converters/roman-numeral-converter",
+    "converters/roman-numeral-converter", "converters/color-converter",
     "formatters/json-prettify", "formatters/json-minify", "formatters/xml-formatter",
     "formatters/yaml-prettify", "formatters/sql-prettify",
     "hash-encryption/hash-text", "hash-encryption/hmac-generator", "hash-encryption/bcrypt",
@@ -59,12 +59,27 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const gamePages = [
     "tic-tac-toe", "connect-four", "memory-match",
-    "rock-paper-scissors", "dare-x", "wordle", "typing-speed-test",
+    "rock-paper-scissors", "dare-x", "wordle", "typing-speed",
   ].map((game) => ({
     url: `${BASE_URL}/games/${game}`,
     changeFrequency: "monthly" as const,
     priority: 0.5,
   }))
 
-  return [...publicPages, ...toolPages, ...gamePages]
+  const appPages = [
+    "games",
+    "messenger",
+    "files",
+    "calculator/new",
+    "calculator/history",
+    "activity-tracker/dashboard",
+    "activity-tracker/tracker",
+    "activity-tracker/management",
+  ].map((page) => ({
+    url: `${BASE_URL}/${page}`,
+    changeFrequency: "monthly" as const,
+    priority: 0.4,
+  }))
+
+  return [...publicPages, ...toolPages, ...gamePages, ...appPages]
 }

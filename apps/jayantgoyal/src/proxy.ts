@@ -102,6 +102,10 @@ export default async function proxy(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   const requestHeaders = new Headers(request.headers);
+  // Strip internal headers to prevent client forgery
+  requestHeaders.delete("x-page-public");
+  requestHeaders.delete("x-user-id");
+  requestHeaders.delete("x-user-email");
   const response = NextResponse.next({ request: { headers: requestHeaders } });
 
   if (!supabaseUrl || !supabaseAnonKey) {
@@ -117,6 +121,16 @@ export default async function proxy(request: NextRequest) {
   // Just check if auth cookies exist for sidebar login/logout state.
   // ──────────────────────────────────────────────────────────────
   if (isPublicPage) {
+    requestHeaders.set("x-page-public", "true");
+    return NextResponse.next({ request: { headers: requestHeaders } });
+  }
+
+  // ──────────────────────────────────────────────────────────────
+  // PAGE ROUTES (non-API) — allow unauthenticated access for SEO.
+  // Auth gate is handled at the layout level, not the proxy.
+  // Skip getUser() entirely when no auth cookie exists.
+  // ──────────────────────────────────────────────────────────────
+  if (!pathname.startsWith("/api/") && !getAalFromCookie(request, supabaseUrl)) {
     return response;
   }
 
@@ -137,9 +151,27 @@ export default async function proxy(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   const isAuthed = Boolean(user);
 
-  const termsAccepted = isAuthed
-    ? request.cookies.get("terms_accepted")?.value === "true"
-    : false;
+  // Trust httpOnly cookie as cache; fall back to DB check for API routes
+  const termsCookie = request.cookies.get("terms_accepted")?.value === "true";
+  let termsAccepted = isAuthed ? termsCookie : false;
+  if (isAuthed && !termsAccepted && pathname.startsWith("/api/")) {
+    const { data: profile } = await supabase
+      .schema("jg_account")
+      .from("profiles")
+      .select("terms_accepted")
+      .eq("user_id", user!.id)
+      .single();
+    termsAccepted = profile?.terms_accepted === true;
+    if (termsAccepted) {
+      response.cookies.set("terms_accepted", "true", {
+        path: "/",
+        httpOnly: true,
+        secure: true,
+        sameSite: "lax",
+        maxAge: 60 * 60 * 24 * 365,
+      });
+    }
+  }
 
   const aalLevel = getAalFromCookie(request, supabaseUrl);
 
@@ -148,7 +180,7 @@ export default async function proxy(request: NextRequest) {
     if (user.email) requestHeaders.set("x-user-email", user.email);
   }
 
-  const isPublic = matchPath(pathname, AUTH_PUBLIC_PATHS);
+  const isPublic = !pathname.startsWith("/api/") || matchPath(pathname, AUTH_PUBLIC_PATHS);
 
   const ctx: ProxyContext = {
     request,

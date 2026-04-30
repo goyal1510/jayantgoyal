@@ -22,7 +22,9 @@ export async function GET(request: NextRequest) {
   const type = requestUrl.searchParams.get("type");
 
   const authRedirect = request.cookies.get("auth_redirect")?.value;
-  const next = authRedirect || requestUrl.searchParams.get("next") || "/";
+  const rawNext = authRedirect || requestUrl.searchParams.get("next") || "/";
+  // Prevent open redirect — only allow relative paths
+  const next = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/";
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;

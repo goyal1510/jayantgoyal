@@ -40,6 +40,14 @@ export async function POST(
       );
     }
 
+    // Prevent path traversal attacks
+    if (targetPath.includes("..") || !targetPath.startsWith("/")) {
+      return NextResponse.json(
+        { error: "Invalid target path" },
+        { status: 400 }
+      );
+    }
+
     // Normalize target path (ensure it ends with /)
     const normalizedTargetPath = targetPath === "/"
       ? "/"

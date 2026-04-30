@@ -1,6 +1,34 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+// In-memory rate limiter: max 5 requests per IP per 15 minutes
+const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
+const RATE_LIMIT_MAX = 5;
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return true;
+  }
+
+  if (entry.count >= RATE_LIMIT_MAX) return false;
+  entry.count++;
+  return true;
+}
+
 // Lazy initialization to avoid build-time errors
 function getResendClient() {
   return new Resend(process.env.RESEND_API_KEY);
@@ -8,6 +36,18 @@ function getResendClient() {
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit by IP
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+      || request.headers.get("x-real-ip")
+      || "unknown";
+
+    if (!checkRateLimit(ip)) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { name, email, subject, message } = body;
 
@@ -59,13 +99,13 @@ export async function POST(request: NextRequest) {
             New Contact Form Submission
           </h2>
           <div style="margin-top: 20px;">
-            <p><strong>Name:</strong> ${name}</p>
-            <p><strong>Email:</strong> ${email}</p>
-            <p><strong>Subject:</strong> ${subject}</p>
+            <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+            <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+            <p><strong>Subject:</strong> ${escapeHtml(subject)}</p>
           </div>
           <div style="margin-top: 20px; padding: 15px; background-color: #f5f5f5; border-radius: 5px;">
             <strong>Message:</strong>
-            <p style="margin-top: 10px; white-space: pre-wrap;">${message}</p>
+            <p style="margin-top: 10px; white-space: pre-wrap;">${escapeHtml(message)}</p>
           </div>
         </div>
       `,
