@@ -51,39 +51,41 @@ const markdownComponents: Components = {
 
 export function BlogContent({ post }: { post: BlogPost }) {
   return (
-    <article>
-      {post.cover_image && (
-        <img
-          src={post.cover_image}
-          alt={post.title}
-          className="mb-6 max-h-96 w-full rounded-lg object-cover"
-        />
-      )}
-
-      <h1 className="mb-2 text-3xl font-bold">{post.title}</h1>
-
-      <div className="mb-8 flex items-center gap-3 text-sm text-muted-foreground">
-        {post.published_at && (
-          <time dateTime={post.published_at}>
-            {new Date(post.published_at).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </time>
+    <article className="flex flex-col h-[calc(100vh-8rem)] rounded-lg border">
+      {/* Header — fixed */}
+      <div className="shrink-0 border-b p-6">
+        {post.cover_image && (
+          <img
+            src={post.cover_image}
+            alt={post.title}
+            className="mb-4 max-h-64 w-full rounded-lg object-cover"
+          />
         )}
-        {post.tags.length > 0 && (
-          <div className="flex gap-1">
-            {post.tags.map((tag) => (
-              <Badge key={tag} variant="secondary" className="text-xs">
-                {tag}
-              </Badge>
-            ))}
-          </div>
-        )}
+        <h1 className="mb-2 text-2xl font-bold">{post.title}</h1>
+        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+          {post.published_at && (
+            <time dateTime={post.published_at}>
+              {new Date(post.published_at).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </time>
+          )}
+          {post.tags.length > 0 && (
+            <div className="flex gap-1">
+              {post.tags.map((tag) => (
+                <Badge key={tag} variant="secondary" className="text-xs">
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="border-t pt-8">
+      {/* Content — scrollable */}
+      <div className="flex-1 overflow-y-auto p-6">
         <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
           {post.content}
         </ReactMarkdown>
