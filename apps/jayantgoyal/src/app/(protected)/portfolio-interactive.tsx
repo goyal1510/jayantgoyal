@@ -39,13 +39,9 @@ export function PortfolioInteractive() {
       const el = document.getElementById(hash);
       if (el) {
         clearInterval(interval);
-        // Instant scroll forces contentVisibility:auto sections to render.
-        // Their real sizes differ from placeholders, shifting the target.
-        // Second instant scroll after layout settles lands at the correct spot.
-        el.scrollIntoView({ behavior: "instant" });
-        requestAnimationFrame(() => {
-          el.scrollIntoView({ behavior: "instant" });
-        });
+        // Manual scroll accounting for sticky header (h-16 = 64px + 16px padding)
+        const top = el.getBoundingClientRect().top + window.scrollY - 80;
+        window.scrollTo({ top, behavior: "instant" });
       } else if (++attempts >= 30) {
         clearInterval(interval);
       }
@@ -57,29 +53,17 @@ export function PortfolioInteractive() {
     <>
       <SkillsSection skillSets={SKILL_SETS} techIcons={TECH_ICONS} />
       <Suspense>
-        <div style={{ contentVisibility: "auto", containIntrinsicSize: "0 500px" }}>
-          <CodeStatsSection githubUsername={githubUsername} />
-        </div>
-        <div style={{ contentVisibility: "auto", containIntrinsicSize: "0 400px" }}>
-          <GithubActivitySection githubUsername={githubUsername} githubUrl={githubUrl} />
-        </div>
-        <div style={{ contentVisibility: "auto", containIntrinsicSize: "0 600px" }}>
-          <ExperienceSection experience={EXPERIENCE} />
-        </div>
-        <div style={{ contentVisibility: "auto", containIntrinsicSize: "0 800px" }}>
-          <ProjectsSection projects={PROJECTS} onSelectProject={setSelectedProject} />
-        </div>
-        <div style={{ contentVisibility: "auto", containIntrinsicSize: "0 600px" }}>
-          <CertificatesSection
-            categories={categories}
-            selectedCategory={selectedCategory}
-            certificates={CERTIFICATES}
-            onSelectCategory={setSelectedCategory}
-          />
-        </div>
-        <div style={{ contentVisibility: "auto", containIntrinsicSize: "0 500px" }}>
-          <ContactSection contact={CONTACT} />
-        </div>
+        <CodeStatsSection githubUsername={githubUsername} />
+        <GithubActivitySection githubUsername={githubUsername} githubUrl={githubUrl} />
+        <ExperienceSection experience={EXPERIENCE} />
+        <ProjectsSection projects={PROJECTS} onSelectProject={setSelectedProject} />
+        <CertificatesSection
+          categories={categories}
+          selectedCategory={selectedCategory}
+          certificates={CERTIFICATES}
+          onSelectCategory={setSelectedCategory}
+        />
+        <ContactSection contact={CONTACT} />
       </Suspense>
       {selectedProject ? (
         <Suspense>

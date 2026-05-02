@@ -108,7 +108,8 @@ export function SubNavMenuItem({
                           requestAnimationFrame(() => {
                             const el = document.getElementById(navItem.id)
                             if (el) {
-                              el.scrollIntoView({ behavior: "smooth" })
+                              const top = el.getBoundingClientRect().top + window.scrollY - 80
+                              window.scrollTo({ top, behavior: "smooth" })
                               window.history.replaceState(null, "", `/#${navItem.id}`)
                             } else {
                               router.push(`/#${navItem.id}`)
@@ -161,7 +162,8 @@ export function SubNavMenuItem({
                     handleFlyoutNavigate()
                     const el = document.getElementById(navItem.id)
                     if (el) {
-                      el.scrollIntoView({ behavior: "smooth" })
+                      const top = el.getBoundingClientRect().top + window.scrollY - 80
+                      window.scrollTo({ top, behavior: "smooth" })
                       window.history.replaceState(null, "", `/#${navItem.id}`)
                     } else {
                       router.push(`/#${navItem.id}`)

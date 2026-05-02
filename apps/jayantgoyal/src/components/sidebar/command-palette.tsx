@@ -62,11 +62,11 @@ export function CommandPalette() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="border-input bg-muted/50 text-muted-foreground hover:bg-accent hover:text-accent-foreground inline-flex h-9 w-48 items-center gap-2 rounded-md border px-3 text-sm shadow-xs transition-colors"
+        className="border-input bg-muted/50 text-muted-foreground hover:bg-accent hover:text-accent-foreground inline-flex h-9 items-center gap-2 rounded-md border shadow-xs transition-colors sm:w-48 sm:px-3 px-2"
       >
         <Search className="size-3.5 shrink-0" />
-        <span className="text-foreground/70 flex-1 text-left text-xs font-medium">Find</span>
-        <kbd className="bg-background text-muted-foreground pointer-events-none inline-flex h-6 items-center gap-0.5 rounded border px-2 font-mono text-xs font-medium select-none">
+        <span className="text-foreground/70 hidden sm:block flex-1 text-left text-xs font-medium">Find</span>
+        <kbd className="bg-background text-muted-foreground pointer-events-none hidden sm:inline-flex h-6 items-center gap-0.5 rounded border px-2 font-mono text-xs font-medium select-none">
           <span>&#8984;</span>K
         </kbd>
       </button>
