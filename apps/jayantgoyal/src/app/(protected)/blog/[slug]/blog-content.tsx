@@ -53,7 +53,7 @@ export function BlogContent({ post }: { post: BlogPost }) {
   return (
     <article className="flex flex-col h-[calc(100vh-8rem)] rounded-lg border">
       {/* Header — fixed */}
-      <div className="shrink-0 border-b p-6">
+      <div className="shrink-0 border-b p-4 sm:p-6">
         {post.cover_image && (
           <img
             src={post.cover_image}
@@ -61,19 +61,19 @@ export function BlogContent({ post }: { post: BlogPost }) {
             className="mb-4 max-h-64 w-full rounded-lg object-cover"
           />
         )}
-        <h1 className="mb-2 text-2xl font-bold">{post.title}</h1>
-        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+        <h1 className="mb-2 text-xl sm:text-2xl font-bold">{post.title}</h1>
+        <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
           {post.published_at && (
-            <time dateTime={post.published_at}>
+            <time dateTime={post.published_at} className="shrink-0">
               {new Date(post.published_at).toLocaleDateString("en-US", {
                 year: "numeric",
-                month: "long",
+                month: "short",
                 day: "numeric",
               })}
             </time>
           )}
           {post.tags.length > 0 && (
-            <div className="flex gap-1">
+            <div className="flex flex-wrap gap-1">
               {post.tags.map((tag) => (
                 <Badge key={tag} variant="secondary" className="text-xs">
                   {tag}
@@ -85,7 +85,7 @@ export function BlogContent({ post }: { post: BlogPost }) {
       </div>
 
       {/* Content — scrollable */}
-      <div className="flex-1 overflow-y-auto p-6">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
         <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
           {post.content}
         </ReactMarkdown>
