@@ -25,7 +25,7 @@ Main app (`apps/jayantgoyal`)
 ### Portfolio hash scroll on refresh
 - Sections use `contentVisibility: "auto"` with placeholder sizes — first scroll triggers rendering of skipped sections, shifting layout
 - Root causes: (1) global CSS `scroll-behavior: smooth` caused browser native hash scroll before JS loaded, (2) `contentVisibility: auto` wrappers had placeholder sizes that didn't match real sizes causing layout shifts, (3) `scrollIntoView` didn't properly account for sticky header offset
-- Fix: removed global `scroll-behavior: smooth`, removed `contentVisibility: auto` wrappers (caused too many scroll issues), replaced all `scrollIntoView` with manual `window.scrollTo` using `getBoundingClientRect().top + window.scrollY - 80` for correct header offset
+- Fix: removed global `scroll-behavior: smooth`, removed `contentVisibility: auto` wrappers (caused layout shifts), replaced all `scrollIntoView` with manual `window.scrollTo` using `getBoundingClientRect().top + window.scrollY - 80` for correct header offset. Re-scrolls at 500ms and 1500ms to catch data-fetching sections (CodeStats, GitHubActivity) that change height after render.
 
 ### Command palette mobile
 - Hid "Find" text and "⌘K" badge on mobile (`hidden sm:block`/`hidden sm:inline-flex`), shows search icon only

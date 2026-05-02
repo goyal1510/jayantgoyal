@@ -33,15 +33,23 @@ export function PortfolioInteractive() {
     const hash = window.location.hash.slice(1);
     if (!hash) return;
 
+    const scrollTo = () => {
+      const el = document.getElementById(hash);
+      if (!el) return;
+      const top = el.getBoundingClientRect().top + window.scrollY - 80;
+      window.scrollTo({ top, behavior: "instant" });
+    };
+
     // Wait for the target element to exist (lazy-loaded sections)
     let attempts = 0;
     const interval = setInterval(() => {
-      const el = document.getElementById(hash);
-      if (el) {
+      if (document.getElementById(hash)) {
         clearInterval(interval);
-        // Manual scroll accounting for sticky header (h-16 = 64px + 16px padding)
-        const top = el.getBoundingClientRect().top + window.scrollY - 80;
-        window.scrollTo({ top, behavior: "instant" });
+        scrollTo();
+        // Re-scroll after data-fetching sections (CodeStats, GitHubActivity)
+        // finish loading and change height, pushing lower sections down
+        setTimeout(scrollTo, 500);
+        setTimeout(scrollTo, 1500);
       } else if (++attempts >= 30) {
         clearInterval(interval);
       }
