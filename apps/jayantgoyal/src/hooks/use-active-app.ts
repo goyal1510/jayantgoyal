@@ -24,6 +24,7 @@ const ROUTE_MAP: { prefix: string; appId: string; navResolver?: (pathname: strin
   { prefix: "/weather", appId: "weather" },
   { prefix: "/github-stats", appId: "github-stats" },
   { prefix: "/custom-calculator", appId: "custom-calculator" },
+  { prefix: "/blogs", appId: "blog" },
   { prefix: "/blog", appId: "blog" },
 ]
 

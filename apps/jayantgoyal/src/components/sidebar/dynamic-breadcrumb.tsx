@@ -101,13 +101,13 @@ export function DynamicBreadcrumb() {
     }
 
     // Blog routes
-    if (pathname.startsWith("/blog")) {
-      const segments = pathname.split("/").filter(Boolean)
-      if (segments.length > 1 && segments[1]) {
-        const pageName = segments[1].split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")
-        return { appName: "Blog", appHref: "/blog", pageName }
-      }
-      return { appName: "Blog", appHref: "/blog", pageName: null }
+    if (pathname === "/blogs" || pathname.startsWith("/blogs/")) {
+      return { appName: "Blog", appHref: "/blogs", pageName: null }
+    }
+    if (pathname.startsWith("/blog/")) {
+      const slug = pathname.split("/").pop() ?? ""
+      const pageName = slug.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")
+      return { appName: "Blog", appHref: "/blogs", pageName }
     }
 
     // Portfolio - just show "Portfolio" without section tracking

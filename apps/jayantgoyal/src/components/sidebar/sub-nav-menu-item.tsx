@@ -104,7 +104,16 @@ export function SubNavMenuItem({
                         onClick={(e) => {
                           e.preventDefault()
                           closeMobileSidebar()
-                          router.push(`/#${navItem.id}`)
+                          // Delay scroll to let sidebar close animation finish
+                          requestAnimationFrame(() => {
+                            const el = document.getElementById(navItem.id)
+                            if (el) {
+                              el.scrollIntoView({ behavior: "smooth" })
+                              window.history.replaceState(null, "", `/#${navItem.id}`)
+                            } else {
+                              router.push(`/#${navItem.id}`)
+                            }
+                          })
                         }}
                       >
                         <navItem.icon className={cn("size-4", navItem.color)} />
@@ -150,7 +159,13 @@ export function SubNavMenuItem({
                   onClick={(e) => {
                     e.preventDefault()
                     handleFlyoutNavigate()
-                    router.push(`/#${navItem.id}`)
+                    const el = document.getElementById(navItem.id)
+                    if (el) {
+                      el.scrollIntoView({ behavior: "smooth" })
+                      window.history.replaceState(null, "", `/#${navItem.id}`)
+                    } else {
+                      router.push(`/#${navItem.id}`)
+                    }
                   }}
                 />
               )

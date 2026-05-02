@@ -34,6 +34,7 @@ const ZERO_COST_PATHS = [
 const PUBLIC_PAGES = [
   "/",
   "/tools",
+  "/blogs",
   "/blog",
   "/weather",
   "/custom-calculator",

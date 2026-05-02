@@ -101,7 +101,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .eq("is_visible", true)
     if (posts) {
       blogPages.push(
-        { url: `${BASE_URL}/blog`, lastModified: LAST_MODIFIED, changeFrequency: "weekly", priority: 0.8 },
+        { url: `${BASE_URL}/blogs`, lastModified: LAST_MODIFIED, changeFrequency: "weekly", priority: 0.8 },
         ...posts.map((p) => ({
           url: `${BASE_URL}/blog/${p.slug}`,
           lastModified: p.updated_at,

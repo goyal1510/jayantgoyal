@@ -61,16 +61,18 @@ function getBreadcrumbItems(pathname: string): { name: string; url: string }[] {
   }
 
   // Blog routes
-  if (pathname.startsWith("/blog")) {
-    items.push({ name: "Blog", url: `${BASE_URL}/blog` });
-    if (pathname !== "/blog") {
-      const slug = pathname.split("/").pop() ?? "";
-      const name = slug
-        .split("-")
-        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-        .join(" ");
-      items.push({ name, url: `${BASE_URL}${pathname}` });
-    }
+  if (pathname === "/blogs" || pathname.startsWith("/blogs/")) {
+    items.push({ name: "Blog", url: `${BASE_URL}/blogs` });
+    return items;
+  }
+  if (pathname.startsWith("/blog/")) {
+    items.push({ name: "Blog", url: `${BASE_URL}/blogs` });
+    const slug = pathname.split("/").pop() ?? "";
+    const name = slug
+      .split("-")
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
+    items.push({ name, url: `${BASE_URL}${pathname}` });
     return items;
   }
 

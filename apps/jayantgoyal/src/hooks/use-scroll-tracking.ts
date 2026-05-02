@@ -11,21 +11,25 @@ export function useScrollTracking(sectionIds: string[], enabled: boolean) {
     if (!sectionIds.length || !enabled) return
 
     const updateActiveSection = () => {
-      const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 50
-
-      if (isAtBottom && sectionIds.length > 0) {
-        setActiveSection(sectionIds[sectionIds.length - 1] || "home")
-        return
-      }
-
-      const scrollPosition = window.scrollY + window.innerHeight * 0.2
+      // Use viewport-relative positions (getBoundingClientRect)
+      // Works regardless of offsetParent nesting
+      const threshold = window.innerHeight * 0.3
       let current = sectionIds[0] || "home"
 
       for (const id of sectionIds) {
         const el = document.getElementById(id)
-        if (el && scrollPosition >= el.offsetTop) {
-          current = id
+        if (el) {
+          const rect = el.getBoundingClientRect()
+          if (rect.top <= threshold) {
+            current = id
+          }
         }
+      }
+
+      // If scrolled to bottom, activate last section
+      const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 50
+      if (isAtBottom && sectionIds.length > 0) {
+        current = sectionIds[sectionIds.length - 1] || "home"
       }
 
       setActiveSection(current)

@@ -160,7 +160,7 @@ export const HUB_APPS: AppConfig[] = [
     color: "text-orange-500 dark:text-orange-400",
     isPublic: true,
     navItems: [],
-    url: "/blog",
+    url: "/blogs",
   },
   {
     id: "weather",
