@@ -107,9 +107,6 @@
     @apply bg-background text-foreground;
   }
 
-  html {
-    scroll-behavior: smooth;
-  }
 }
 
 /* LogoSlider - CSS Variables & Animations */

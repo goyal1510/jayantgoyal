@@ -24,7 +24,8 @@ Main app (`apps/jayantgoyal`)
 
 ### Portfolio hash scroll on refresh
 - Sections use `contentVisibility: "auto"` with placeholder sizes — first scroll triggers rendering of skipped sections, shifting layout
-- Fix: scroll 3 times (instant → smooth → smooth, 300ms apart) to converge on correct position after layout reflows
+- Root cause: global `scroll-behavior: smooth` in CSS caused browser to natively smooth-scroll to hash before JS loaded, then sections rendered at different sizes causing a visible jump
+- Fix: removed global `scroll-behavior: smooth`, use two instant `scrollIntoView` calls (first forces sections to render, second lands at correct position). Sidebar nav still uses explicit `behavior: "smooth"` for user clicks.
 
 ### GitHub Stats fix
 - Root cause: `api.ts` called `api.github.com` directly from client — `GITHUB_TOKEN` (server-only env var) was unavailable, causing rate limit (60 req/hr)

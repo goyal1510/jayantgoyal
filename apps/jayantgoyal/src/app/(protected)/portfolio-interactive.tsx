@@ -33,21 +33,23 @@ export function PortfolioInteractive() {
     const hash = window.location.hash.slice(1);
     if (!hash) return;
 
-    // Sections use contentVisibility:"auto" with placeholder sizes.
-    // First scroll triggers rendering of skipped sections, shifting layout.
-    // We scroll multiple times to converge on the correct position.
+    // Wait for the target element to exist (lazy-loaded sections)
     let attempts = 0;
     const interval = setInterval(() => {
       const el = document.getElementById(hash);
       if (el) {
-        el.scrollIntoView({ behavior: attempts === 0 ? "instant" : "smooth" });
-        attempts++;
-        // After 3 scrolls (instant → smooth → smooth), layout should be stable
-        if (attempts >= 3) clearInterval(interval);
+        clearInterval(interval);
+        // Instant scroll forces contentVisibility:auto sections to render.
+        // Their real sizes differ from placeholders, shifting the target.
+        // Second instant scroll after layout settles lands at the correct spot.
+        el.scrollIntoView({ behavior: "instant" });
+        requestAnimationFrame(() => {
+          el.scrollIntoView({ behavior: "instant" });
+        });
       } else if (++attempts >= 30) {
         clearInterval(interval);
       }
-    }, 300);
+    }, 100);
     return () => clearInterval(interval);
   }, []);
 
