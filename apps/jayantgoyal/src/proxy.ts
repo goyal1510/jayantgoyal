@@ -19,6 +19,7 @@ export const config = {
 const ZERO_COST_PATHS = [
   "/api/contact",
   "/api/github-loc",
+  "/api/github-stats",
   "/favicon_io/site.webmanifest",
   "/assets/",
   "/sitemap.xml",

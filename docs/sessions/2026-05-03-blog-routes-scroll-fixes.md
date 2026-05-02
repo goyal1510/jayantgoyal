@@ -26,6 +26,13 @@ Main app (`apps/jayantgoyal`)
 - Sections use `contentVisibility: "auto"` with placeholder sizes — first scroll triggers rendering of skipped sections, shifting layout
 - Fix: scroll 3 times (instant → smooth → smooth, 300ms apart) to converge on correct position after layout reflows
 
+### GitHub Stats fix
+- Root cause: `api.ts` called `api.github.com` directly from client — `GITHUB_TOKEN` (server-only env var) was unavailable, causing rate limit (60 req/hr)
+- Fix: Created `/api/github-stats` server route to proxy GitHub API calls with token authentication
+- Added `api.github.com` to CSP `connect-src` (was blocked by Content-Security-Policy)
+- Added `/api/github-stats` to `ZERO_COST_PATHS` in proxy (no auth needed)
+- Added `GITHUB_TOKEN` to `.env.local`
+
 ### LinkedIn post management
 - `post.mjs`: now auto-logs every post to `.posts.json` (gitignored)
 - New `manage.mjs`: list, delete, and edit (delete + re-post) commands

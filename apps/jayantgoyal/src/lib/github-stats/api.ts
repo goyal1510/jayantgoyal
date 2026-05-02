@@ -24,13 +24,16 @@ function setCache<T>(cache: Map<string, CacheEntry<T>>, key: string, data: T) {
   cache.set(key, { data, timestamp: Date.now() })
 }
 
-function getGitHubHeaders(): HeadersInit {
-  const headers: HeadersInit = { Accept: "application/vnd.github.v3+json" }
-  const token = process.env.GITHUB_TOKEN
-  if (token) {
-    headers.Authorization = `Bearer ${token}`
+async function githubFetch(path: string, params?: Record<string, string>) {
+  const searchParams = new URLSearchParams({ path, ...params })
+  const res = await fetch(`/api/github-stats?${searchParams.toString()}`)
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    if (res.status === 404) throw new Error(`User not found`)
+    if (res.status === 403) throw new Error("GitHub API rate limit exceeded. Try again later.")
+    throw new Error(data.message || `GitHub API error: ${res.statusText}`)
   }
-  return headers
+  return res.json()
 }
 
 export async function fetchGitHubUser(username: string): Promise<GitHubUser> {
@@ -38,16 +41,7 @@ export async function fetchGitHubUser(username: string): Promise<GitHubUser> {
   const cached = getCached(userCache, key)
   if (cached) return cached
 
-  const res = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}`, {
-    headers: getGitHubHeaders(),
-  })
-  if (!res.ok) {
-    if (res.status === 404) throw new Error(`User "${username}" not found`)
-    if (res.status === 403) throw new Error("GitHub API rate limit exceeded. Try again later.")
-    throw new Error(`Failed to fetch user: ${res.statusText}`)
-  }
-
-  const data: GitHubUser = await res.json()
+  const data: GitHubUser = await githubFetch(`/users/${encodeURIComponent(username)}`)
   setCache(userCache, key, data)
   return data
 }
@@ -62,16 +56,10 @@ export async function fetchGitHubRepos(username: string): Promise<GitHubRepo[]> 
   const perPage = 100
 
   while (true) {
-    const res = await fetch(
-      `https://api.github.com/users/${encodeURIComponent(username)}/repos?per_page=${perPage}&page=${page}&sort=updated`,
-      { headers: getGitHubHeaders() }
+    const repos: GitHubRepo[] = await githubFetch(
+      `/users/${encodeURIComponent(username)}/repos`,
+      { per_page: String(perPage), page: String(page), sort: "updated" }
     )
-    if (!res.ok) {
-      if (res.status === 403) throw new Error("GitHub API rate limit exceeded. Try again later.")
-      throw new Error(`Failed to fetch repos: ${res.statusText}`)
-    }
-
-    const repos: GitHubRepo[] = await res.json()
     allRepos.push(...repos)
 
     if (repos.length < perPage) break
@@ -87,16 +75,13 @@ export async function fetchRepoLanguages(owner: string, repo: string): Promise<R
   const cached = getCached(languagesCache, key)
   if (cached) return cached
 
-  const res = await fetch(
-    `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/languages`,
-    { headers: getGitHubHeaders() }
-  )
-  if (!res.ok) {
-    if (res.status === 403) throw new Error("GitHub API rate limit exceeded. Try again later.")
+  try {
+    const data: Record<string, number> = await githubFetch(
+      `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/languages`
+    )
+    setCache(languagesCache, key, data)
+    return data
+  } catch {
     return {}
   }
-
-  const data: Record<string, number> = await res.json()
-  setCache(languagesCache, key, data)
-  return data
 }
