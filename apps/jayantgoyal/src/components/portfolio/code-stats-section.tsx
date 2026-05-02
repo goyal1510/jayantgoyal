@@ -11,14 +11,18 @@ import type { GitHubLOCStats, LanguageLOCBreakdown } from "@/lib/github-stats/ty
 
 interface CodeStatsSectionProps {
   githubUsername: string;
+  initialData?: GitHubLOCStats | null;
 }
 
-export function CodeStatsSection({ githubUsername }: CodeStatsSectionProps) {
-  const [stats, setStats] = useState<GitHubLOCStats | null>(null);
-  const [loading, setLoading] = useState(true);
+export function CodeStatsSection({ githubUsername, initialData }: CodeStatsSectionProps) {
+  const [stats, setStats] = useState<GitHubLOCStats | null>(initialData ?? null);
+  const [loading, setLoading] = useState(!initialData);
   const [error, setError] = useState(false);
 
   useEffect(() => {
+    // Skip fetch if server already provided data
+    if (initialData) return;
+
     let cancelled = false;
 
     async function fetchStats() {
@@ -40,7 +44,7 @@ export function CodeStatsSection({ githubUsername }: CodeStatsSectionProps) {
 
     fetchStats();
     return () => { cancelled = true; };
-  }, [githubUsername]);
+  }, [githubUsername, initialData]);
 
   if (error) return null;
 

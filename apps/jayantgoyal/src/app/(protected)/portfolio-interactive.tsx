@@ -4,6 +4,7 @@ import { useMemo, useState, useEffect, lazy, Suspense } from "react";
 import { usePortfolioData } from "@/lib/portfolio/use-portfolio-data";
 import { SkillsSection } from "@/components/portfolio/sections/skills-section";
 import type { Project } from "@/components/portfolio/shared";
+import type { GitHubLOCStats } from "@/lib/github-stats/types";
 
 const ExperienceSection = lazy(() => import("@/components/portfolio/sections/experience-section").then((m) => ({ default: m.ExperienceSection })));
 const ProjectsSection = lazy(() => import("@/components/portfolio/sections/projects-section").then((m) => ({ default: m.ProjectsSection })));
@@ -13,7 +14,7 @@ const GithubActivitySection = lazy(() => import("@/components/portfolio/sections
 const ContactSection = lazy(() => import("@/components/portfolio/sections/contact-section").then((m) => ({ default: m.ContactSection })));
 const CodeStatsSection = lazy(() => import("@/components/portfolio/code-stats-section").then((m) => ({ default: m.CodeStatsSection })));
 
-export function PortfolioInteractive() {
+export function PortfolioInteractive({ codeStats }: { codeStats: GitHubLOCStats | null }) {
   const { data } = usePortfolioData();
   const { EXPERIENCE, SKILL_SETS, TECH_ICONS, PROJECTS, CERTIFICATES, CONTACT } = data;
 
@@ -33,23 +34,14 @@ export function PortfolioInteractive() {
     const hash = window.location.hash.slice(1);
     if (!hash) return;
 
-    const scrollTo = () => {
-      const el = document.getElementById(hash);
-      if (!el) return;
-      const top = el.getBoundingClientRect().top + window.scrollY - 80;
-      window.scrollTo({ top, behavior: "instant" });
-    };
-
     // Wait for the target element to exist (lazy-loaded sections)
     let attempts = 0;
     const interval = setInterval(() => {
-      if (document.getElementById(hash)) {
+      const el = document.getElementById(hash);
+      if (el) {
         clearInterval(interval);
-        scrollTo();
-        // Re-scroll after data-fetching sections (CodeStats, GitHubActivity)
-        // finish loading and change height, pushing lower sections down
-        setTimeout(scrollTo, 500);
-        setTimeout(scrollTo, 1500);
+        const top = el.getBoundingClientRect().top + window.scrollY - 80;
+        window.scrollTo({ top, behavior: "instant" });
       } else if (++attempts >= 30) {
         clearInterval(interval);
       }
@@ -61,7 +53,7 @@ export function PortfolioInteractive() {
     <>
       <SkillsSection skillSets={SKILL_SETS} techIcons={TECH_ICONS} />
       <Suspense>
-        <CodeStatsSection githubUsername={githubUsername} />
+        <CodeStatsSection githubUsername={githubUsername} initialData={codeStats} />
         <GithubActivitySection githubUsername={githubUsername} githubUrl={githubUrl} />
         <ExperienceSection experience={EXPERIENCE} />
         <ProjectsSection projects={PROJECTS} onSelectProject={setSelectedProject} />

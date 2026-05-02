@@ -107,7 +107,7 @@ export function GithubCalendarComponent({ username, githubUrl }: GithubCalendarP
           </div>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="min-h-[200px]">
         <m.div
           key={selectedYear}
           initial={{ opacity: 0, y: 10 }}
