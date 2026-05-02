@@ -93,7 +93,14 @@ function StatsSkeletons() {
           <div key={i} className="h-28 animate-pulse rounded-xl bg-muted" />
         ))}
       </div>
-      <div className="h-10 animate-pulse rounded-full bg-muted" />
+      <div className="space-y-3">
+        <div className="h-4 animate-pulse rounded-full bg-muted" />
+        <div className="flex flex-wrap justify-center gap-x-4 gap-y-2">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-5 w-24 animate-pulse rounded bg-muted" />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

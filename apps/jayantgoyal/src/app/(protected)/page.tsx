@@ -3,6 +3,8 @@ import { Suspense } from "react"
 import { HeroSection } from "@/components/portfolio/sections/hero-section"
 import { AboutSection } from "@/components/portfolio/sections/about-section"
 import { PortfolioInteractive } from "./portfolio-interactive"
+import { fetchGitHubUser, fetchGitHubRepos, fetchRepoLanguages } from "@/lib/github-stats/api.server"
+import { computeLOCStats } from "@/lib/github-stats/compute"
 import type { GitHubLOCStats } from "@/lib/github-stats/types"
 
 export const metadata: Metadata = {
@@ -29,15 +31,16 @@ export const metadata: Metadata = {
  * Interactive sections (skills animations, projects modal, etc.) load after.
  */
 export default async function Page() {
-  // Fetch GitHub LOC stats on the server so CodeStatsSection renders at full height
-  // immediately — no client-side fetch, no skeleton, no layout shift on hash scroll.
+  // Fetch GitHub LOC stats directly on the server so CodeStatsSection renders at full
+  // height immediately — no client-side fetch, no skeleton, no layout shift on hash scroll.
   let codeStats: GitHubLOCStats | null = null
   try {
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
-    const res = await fetch(`${siteUrl}/api/github-loc?username=goyal1510`, {
-      next: { revalidate: 3600 },
-    })
-    if (res.ok) codeStats = await res.json()
+    const username = "goyal1510"
+    const [user, repos] = await Promise.all([fetchGitHubUser(username), fetchGitHubRepos(username)])
+    const activeRepos = repos.filter((r) => !r.fork && !r.archived)
+    const langResults = await Promise.allSettled(activeRepos.map((r) => fetchRepoLanguages(username, r.name)))
+    const languagesByRepo = langResults.filter((r) => r.status === "fulfilled").map((r) => r.value)
+    codeStats = computeLOCStats(languagesByRepo, activeRepos.length, user.created_at)
   } catch { /* fail silently — section will fetch client-side as fallback */ }
 
   return (

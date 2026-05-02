@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { fetchGitHubUser, fetchGitHubRepos, fetchRepoLanguages } from "@/lib/github-stats/api";
+import { fetchGitHubUser, fetchGitHubRepos, fetchRepoLanguages } from "@/lib/github-stats/api.server";
 import { computeLOCStats } from "@/lib/github-stats/compute";
 import type { GitHubLOCStats } from "@/lib/github-stats/types";
 
