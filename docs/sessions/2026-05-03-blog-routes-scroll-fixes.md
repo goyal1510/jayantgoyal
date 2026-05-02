@@ -1,0 +1,35 @@
+# 2026-05-03 — Blog Route Rename + Scroll Fixes
+
+## Area
+Main app (`apps/jayantgoyal`)
+
+## Changes
+
+### Blog route rename
+- Listing page moved from `/blog` to `/blogs`
+- Individual posts remain at `/blog/[slug]`
+- Updated: proxy, auth-gate, sitemap, breadcrumbs (visual + JSON-LD), hub-config, use-active-app
+
+### Scroll tracking fix
+- `use-scroll-tracking.ts`: replaced `el.offsetTop` with `el.getBoundingClientRect()` — `offsetTop` returned 0 for nested positioned elements
+
+### Portfolio sidebar smooth scroll
+- `sub-nav-menu-item.tsx`: replaced `router.push("/#section")` with `el.scrollIntoView({ behavior: "smooth" })` + `requestAnimationFrame` delay for mobile sidebar close animation
+
+### Cleanup
+- Removed `scripts/IGNORE-BUILD.md` (stale documentation file)
+
+### Breadcrumb "Blog" → "Blogs"
+- Both visual breadcrumb and JSON-LD breadcrumb now say "Blogs" instead of "Blog"
+
+### Portfolio hash scroll on refresh
+- Sections use `contentVisibility: "auto"` with placeholder sizes — first scroll triggers rendering of skipped sections, shifting layout
+- Fix: scroll 3 times (instant → smooth → smooth, 300ms apart) to converge on correct position after layout reflows
+
+### LinkedIn post management
+- `post.mjs`: now auto-logs every post to `.posts.json` (gitignored)
+- New `manage.mjs`: list, delete, and edit (delete + re-post) commands
+- LinkedIn API doesn't support true edits — edit = delete + re-create
+
+## Commits
+- `6ee2911` — blog routes, scroll fixes — pushed to main

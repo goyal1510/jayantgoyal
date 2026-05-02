@@ -102,12 +102,12 @@ export function DynamicBreadcrumb() {
 
     // Blog routes
     if (pathname === "/blogs" || pathname.startsWith("/blogs/")) {
-      return { appName: "Blog", appHref: "/blogs", pageName: null }
+      return { appName: "Blogs", appHref: "/blogs", pageName: null }
     }
     if (pathname.startsWith("/blog/")) {
       const slug = pathname.split("/").pop() ?? ""
       const pageName = slug.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")
-      return { appName: "Blog", appHref: "/blogs", pageName }
+      return { appName: "Blogs", appHref: "/blogs", pageName }
     }
 
     // Portfolio - just show "Portfolio" without section tracking

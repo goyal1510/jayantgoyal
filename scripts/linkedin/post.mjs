@@ -18,6 +18,7 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TOKEN_FILE = path.join(__dirname, ".token.json");
+const POSTS_FILE = path.join(__dirname, ".posts.json");
 
 function loadToken() {
   if (!fs.existsSync(TOKEN_FILE)) {
@@ -93,6 +94,17 @@ async function postToLinkedIn(accessToken, personId, text, articleUrl) {
   return data.id;
 }
 
+function loadPosts() {
+  if (!fs.existsSync(POSTS_FILE)) return [];
+  return JSON.parse(fs.readFileSync(POSTS_FILE, "utf-8"));
+}
+
+function savePost(entry) {
+  const posts = loadPosts();
+  posts.push(entry);
+  fs.writeFileSync(POSTS_FILE, JSON.stringify(posts, null, 2));
+}
+
 async function main() {
   const token = loadToken();
   let { text, url, blogSlug } = parseArgs();
@@ -121,6 +133,10 @@ async function main() {
     console.log(`✓ Posted successfully!`);
     console.log(`  Post ID: ${postId}`);
     console.log(`  View: https://www.linkedin.com/feed/`);
+
+    // Save to post history
+    savePost({ id: postId, text, url: url || null, blogSlug: blogSlug || null, createdAt: new Date().toISOString() });
+    console.log(`  Logged to history (${POSTS_FILE})`);
   } catch (err) {
     console.error(`❌ Failed to post: ${err.message}`);
     process.exit(1);

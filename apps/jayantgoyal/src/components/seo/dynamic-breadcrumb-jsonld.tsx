@@ -62,11 +62,11 @@ function getBreadcrumbItems(pathname: string): { name: string; url: string }[] {
 
   // Blog routes
   if (pathname === "/blogs" || pathname.startsWith("/blogs/")) {
-    items.push({ name: "Blog", url: `${BASE_URL}/blogs` });
+    items.push({ name: "Blogs", url: `${BASE_URL}/blogs` });
     return items;
   }
   if (pathname.startsWith("/blog/")) {
-    items.push({ name: "Blog", url: `${BASE_URL}/blogs` });
+    items.push({ name: "Blogs", url: `${BASE_URL}/blogs` });
     const slug = pathname.split("/").pop() ?? "";
     const name = slug
       .split("-")

@@ -31,12 +31,24 @@ export function PortfolioInteractive() {
 
   useEffect(() => {
     const hash = window.location.hash.slice(1);
-    if (hash) {
-      const timeout = setTimeout(() => {
-        document.getElementById(hash)?.scrollIntoView({ behavior: "smooth" });
-      }, 100);
-      return () => clearTimeout(timeout);
-    }
+    if (!hash) return;
+
+    // Sections use contentVisibility:"auto" with placeholder sizes.
+    // First scroll triggers rendering of skipped sections, shifting layout.
+    // We scroll multiple times to converge on the correct position.
+    let attempts = 0;
+    const interval = setInterval(() => {
+      const el = document.getElementById(hash);
+      if (el) {
+        el.scrollIntoView({ behavior: attempts === 0 ? "instant" : "smooth" });
+        attempts++;
+        // After 3 scrolls (instant → smooth → smooth), layout should be stable
+        if (attempts >= 3) clearInterval(interval);
+      } else if (++attempts >= 30) {
+        clearInterval(interval);
+      }
+    }, 300);
+    return () => clearInterval(interval);
   }, []);
 
   return (
