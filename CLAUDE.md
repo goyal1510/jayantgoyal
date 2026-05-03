@@ -187,7 +187,9 @@ pnpm start --filter admin
 
 ## Environment Variables
 
-Configure in `.env.local` files. Variables declared in `turbo.json` globalEnv:
+Configure in `.env.local` files per app. See `.env.example` in each app for the full list.
+
+### Main App (`apps/jayantgoyal/.env.local`)
 
 ```env
 # Supabase
@@ -195,23 +197,34 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 
-# Email (Resend)
+# Site URL
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+# Email (contact form)
 RESEND_API_KEY=
 RESEND_FROM_EMAIL=
 
-# Guest Login
-GUEST_EMAIL_LOGIN=
-GUEST_PASSWORD_LOGIN=
-
 # External APIs
-NEXT_PUBLIC_OPENWEATHER_API_KEY=
-GITHUB_TOKEN=
+NEXT_PUBLIC_OPENWEATHER_API_KEY=     # Weather app
+GITHUB_TOKEN=                        # GitHub Stats + portfolio Code Stats
 
-# Site Config
-NEXT_PUBLIC_SITE_URL=
+# Portfolio data source
+PORTFOLIO_DATA_SOURCE=database       # or omit for hardcoded
+```
 
-# Portfolio Data Source
-PORTFOLIO_DATA_SOURCE=database  # or "system"
+### Admin App (`apps/admin/.env.local`)
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+NEXT_PUBLIC_SITE_URL=http://localhost:3001
+
+# Vercel (deployment management)
+VERCEL_TOKEN=
+VERCEL_TEAM_ID=
+VERCEL_PROJECT_ID_JG=
+VERCEL_PROJECT_ID_ADMIN=
 ```
 
 ## Architecture Patterns
@@ -360,7 +373,42 @@ No test framework configured. Quality assurance via:
 2. Add API endpoint in `apps/jayantgoyal/src/app/api/`
 3. Create components in `apps/jayantgoyal/src/components/`
 4. Update Supabase schema if needed
-5. Run `pnpm lint` and `pnpm check-types`
+5. **SEO & discoverability (mandatory):**
+   - Export `metadata` (title, description) in every `page.tsx`
+   - Add Open Graph tags (`openGraph: { title, description, images }`)
+   - Update breadcrumb in `dynamic-breadcrumb.tsx` (visual) AND `dynamic-breadcrumb-jsonld.tsx` (structured data)
+   - Add route to `sitemap.ts` with `lastModified`, `changeFrequency`, `priority`
+   - If public: add path to `PUBLIC_PAGES` in `proxy.ts` AND `PUBLIC_PREFIXES` in `auth-gate.tsx`
+   - If public: add zero-cost path for any new API routes in `proxy.ts` (`ZERO_COST_PATHS`)
+6. **Sidebar integration:**
+   - Add app config in `hub-config.ts` (id, name, icon, url, navItems)
+   - Add route prefix to `ROUTE_MAP` in `use-active-app.ts`
+7. Run `pnpm lint` and `pnpm check-types`
+
+### Blog & LinkedIn Workflow
+
+1. **Create blog post** — insert into `jg_app.blog_posts` via Supabase REST API:
+   ```bash
+   curl -X POST "https://orwfvyditlguqvxvztkw.supabase.co/rest/v1/blog_posts" \
+     -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+     -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+     -H "Content-Profile: jg_app" \
+     -H "Content-Type: application/json" \
+     -H "Prefer: return=representation" \
+     -d '{ "title": "...", "slug": "...", "excerpt": "...", "content": "markdown...", "tags": [...], "is_published": true, "is_visible": true, "published_at": "..." }'
+   ```
+2. **Post to LinkedIn:**
+   ```bash
+   node scripts/linkedin/post.mjs "Post text" --url https://www.jayantgoyal.com/blog/<slug>
+   # Or auto-generate from blog:
+   node scripts/linkedin/post.mjs --blog <slug>
+   ```
+3. **Manage LinkedIn posts:**
+   ```bash
+   node scripts/linkedin/manage.mjs list          # View all tracked posts
+   node scripts/linkedin/manage.mjs delete <index> # Delete a post
+   ```
+4. LinkedIn token expires **2026-07-01**. Re-auth: `node scripts/linkedin/auth.mjs`
 
 ### Add Shared Component
 
@@ -498,15 +546,9 @@ Multi-source: `PORTFOLIO_DATA_SOURCE=database` fetches from Supabase; otherwise 
 
 ## Environment Variables
 
-Configured in `.env.local` per app. Key variables (also in `turbo.json` globalEnv):
+See `.env.example` in each app for the full list. Key vars per app documented in the "Environment Variables" section above.
 
-```
-NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY
-PORTFOLIO_DATA_SOURCE        # "database" or omit for hardcoded
-RESEND_API_KEY, RESEND_FROM_EMAIL
-NEXT_PUBLIC_OPENWEATHER_API_KEY, GITHUB_TOKEN
-NEXT_PUBLIC_SITE_URL
-```
+**GUEST_EMAIL_LOGIN / GUEST_PASSWORD_LOGIN** — legacy, no longer used. Guest login uses Supabase Anonymous Sign-In.
 
 ## Deployment
 

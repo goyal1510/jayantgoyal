@@ -45,5 +45,13 @@ Main app (`apps/jayantgoyal`)
 - New `manage.mjs`: list, delete, and edit (delete + re-post) commands
 - LinkedIn API doesn't support true edits — edit = delete + re-create
 
+### CLAUDE.md & env updates
+- Added SEO checklist to "Add New Feature" (metadata, OG, breadcrumbs, sitemap, proxy, auth-gate)
+- Added "Blog & LinkedIn Workflow" section (create post, LinkedIn posting, manage commands)
+- Added SEO conventions (mandatory metadata, breadcrumb files, CSP updates)
+- Updated env vars section: split per app, removed legacy GUEST_EMAIL/PASSWORD
+- Updated `.env.example` for both apps with all required vars and comments
+- Removed `GUEST_EMAIL_LOGIN`/`GUEST_PASSWORD_LOGIN` from `turbo.json` (unused legacy)
+
 ## Commits
 - `6ee2911` — blog routes, scroll fixes — pushed to main
