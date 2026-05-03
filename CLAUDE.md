@@ -189,6 +189,14 @@ pnpm start --filter admin
 
 Configure in `.env.local` files per app. See `.env.example` in each app for the full list.
 
+**All env vars are identical across development, preview, and production** — no per-environment configs. Only exception: `NEXT_PUBLIC_SITE_URL` (`http://localhost:3000` for dev, `https://www.jayantgoyal.com` for prod). When adding new vars to Vercel, always add to all three environments at once.
+
+**Vercel CLI setup** — both apps are linked. To sync envs locally:
+```bash
+cd apps/jayantgoyal && vercel env pull .env.local
+cd apps/admin && vercel env pull .env.local
+```
+
 ### Main App (`apps/jayantgoyal/.env.local`)
 
 ```env

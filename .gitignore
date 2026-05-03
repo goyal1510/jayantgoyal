@@ -8,6 +8,9 @@ node_modules
 # testing
 coverage
 
+# vercel
+.vercel
+
 # next.js
 .next/
 out/
@@ -42,4 +45,4 @@ CLAUDE.local.md
 .turbo
 
 # ui
-dist/
+dist/.vercel
