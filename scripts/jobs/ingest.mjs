@@ -15,6 +15,7 @@ import { fetchRemotive } from "./sources/remotive.mjs";
 import { fetchWwr } from "./sources/wwr.mjs";
 import { fetchGreenhouse } from "./sources/greenhouse.mjs";
 import { fetchLever } from "./sources/lever.mjs";
+import { fetchAshby } from "./sources/ashby.mjs";
 import { fetchHnHiring } from "./sources/hn-hiring.mjs";
 
 const HANDLERS = {
@@ -22,6 +23,7 @@ const HANDLERS = {
   wwr: fetchWwr,
   greenhouse: fetchGreenhouse,
   lever: fetchLever,
+  ashby: fetchAshby,
   hn_hiring: fetchHnHiring,
 };
 

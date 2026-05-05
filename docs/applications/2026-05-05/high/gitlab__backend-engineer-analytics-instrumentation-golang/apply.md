@@ -1,4 +1,4 @@
-**Apply now:** https://job-boards.greenhouse.io/gitlab/jobs/8481922002
+**Apply now:** https://job-boards.greenhouse.io/gitlab/jobs/8481929002
 
 ## Manual checklist
 - [ ] Open the apply URL
@@ -7,7 +7,7 @@
 - [ ] Confirm location preference: India / Remote-India
 - [ ] Custom Qs likely: "Why GitLab?" / "Years of experience" / "Salary expectation"
 - [ ] Submit
-- [ ] Mark this listing as `applied` in admin (or via /apply-job 019df72f-449a-7eda-b0c7-e4ac84ea699f)
+- [ ] Mark this listing as `applied` in admin (or via /apply-job 019df7bc-5a8c-7631-a2c8-b544a74c0ee6)
 
 ## Follow-up
 - 1 week: poll status, send polite follow-up

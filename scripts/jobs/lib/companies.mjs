@@ -51,11 +51,32 @@ export const COMPANIES = [
   { slug: "cars24", name: "Cars24", ats: "auto" },
   { slug: "innovaccer", name: "Innovaccer", ats: "auto" },
   { slug: "browserstack", name: "BrowserStack", ats: "auto" },
+
+  // Ashby ATS — verified working orgs (2026-05)
+  { slug: "linear", name: "Linear", ats: "ashby" },
+  { slug: "notion", name: "Notion", ats: "ashby" },
+  { slug: "replit", name: "Replit", ats: "ashby" },
+  { slug: "supabase", name: "Supabase", ats: "ashby" },
+  { slug: "ramp", name: "Ramp", ats: "ashby" },
+  { slug: "ashby", name: "Ashby", ats: "ashby" },
+  { slug: "openai", name: "OpenAI", ats: "ashby" },
+  { slug: "deel", name: "Deel", ats: "ashby" },
+  { slug: "cohere", name: "Cohere", ats: "ashby" },
+  { slug: "perplexity", name: "Perplexity", ats: "ashby" },
+  { slug: "mistral", name: "Mistral AI", ats: "ashby" },
+  { slug: "wealthsimple", name: "Wealthsimple", ats: "ashby" },
+  { slug: "posthog", name: "PostHog", ats: "ashby" },
+  { slug: "modal", name: "Modal Labs", ats: "ashby" },
+  { slug: "pinecone", name: "Pinecone", ats: "ashby" },
+  { slug: "weaviate", name: "Weaviate", ats: "ashby" },
+  { slug: "railway", name: "Railway", ats: "ashby" },
 ];
 
 export const ATS_PROBES = {
   greenhouse: (slug) =>
     `https://boards-api.greenhouse.io/v1/boards/${encodeURIComponent(slug)}/jobs`,
+  ashby: (slug) =>
+    `https://api.ashbyhq.com/posting-api/job-board/${encodeURIComponent(slug)}`,
   lever: (slug) =>
     `https://api.lever.co/v0/postings/${encodeURIComponent(slug)}?mode=json`,
 };

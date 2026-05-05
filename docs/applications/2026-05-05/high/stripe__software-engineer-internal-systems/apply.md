@@ -7,7 +7,7 @@
 - [ ] Confirm location preference: India / Remote-India
 - [ ] Custom Qs likely: "Why Stripe?" / "Years of experience" / "Salary expectation"
 - [ ] Submit
-- [ ] Mark this listing as `applied` in admin (or via /apply-job 019df72f-0109-74bf-af2c-ab3f70dd4323)
+- [ ] Mark this listing as `applied` in admin (or via /apply-job 019df7bb-d657-7013-93c7-732e75c96c8c)
 
 ## Follow-up
 - 1 week: poll status, send polite follow-up

@@ -33,6 +33,10 @@ async function probe(slug, ats) {
       const count = Array.isArray(data) ? data.length : 0;
       return { ok: true, count };
     }
+    if (ats === "ashby") {
+      const count = Array.isArray(data?.jobs) ? data.jobs.length : 0;
+      return { ok: count > 0, count }; // ashby returns 200 even when empty
+    }
     return { ok: false, status: 0 };
   } catch (err) {
     return { ok: false, status: 0, err: err.message };
@@ -40,7 +44,7 @@ async function probe(slug, ats) {
 }
 
 async function probeCompany(c) {
-  const order = c.ats === "auto" ? ["greenhouse", "lever"] : [c.ats];
+  const order = c.ats === "auto" ? ["greenhouse", "lever", "ashby"] : [c.ats];
   for (const ats of order) {
     const r = await probe(c.slug, ats);
     if (r.ok) return { ...c, ats, count: r.count };
@@ -82,12 +86,21 @@ async function main() {
     return;
   }
 
-  const rows = found.map((r) => ({
-    kind: r.ats,
-    label: r.slug,
-    config: { company: r.slug, name: r.name },
-    is_active: true,
-  }));
+  // Dedupe: same (kind, label) can appear twice if a slug is in COMPANIES
+  // both as "auto" and as an explicit ATS — keep the first.
+  const seen = new Set();
+  const rows = [];
+  for (const r of found) {
+    const key = `${r.ats}::${r.slug}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    rows.push({
+      kind: r.ats,
+      label: r.slug,
+      config: { company: r.slug, name: r.name },
+      is_active: true,
+    });
+  }
 
   if (rows.length === 0) {
     console.log("\nNothing to insert.");

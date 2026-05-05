@@ -1,6 +1,6 @@
 Hi Stripe team,
 
-Applying for the Software Engineer, Core Technology role — what caught my attention is have an unprecedented opportunity to put the global economy within everyone's reach while doing the most important work of your career.
+Applying for the Software Engineer, Core Technology role — what caught my attention is Software Engineer, Core Technology role at Stripe.
 
 At NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. I ship visibly: jayantgoyal.com hosts a portfolio plus tools, calculators, and games I built end-to-end with Next.js — all live, all open-source.
 

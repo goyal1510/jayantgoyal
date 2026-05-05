@@ -87,7 +87,7 @@ export const DEFAULT_FILTERS: FilterBarState = {
   india: true,
   aiScored: true,
   matchesKeywords: false,
-  minScore: 60,
+  minScore: 50,
   sort: "ai_score",
 };
 

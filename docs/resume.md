@@ -10,7 +10,8 @@
 - **Location:** Hyderabad, India (open to India remote / hybrid / onsite anywhere in India)
 - **Email:** goyal151002@gmail.com
 - **Phone:** +91 9413495328
-- **Links:** [Portfolio](https://www.jayantgoyal.com) · [GitHub](https://github.com/goyal1510) · [LinkedIn](https://www.linkedin.com/in/goyal1510)
+- **Links:** [Portfolio](https://www.jayantgoyal.com) · [GitHub](https://github.com/goyal1510) · [GitLab](https://gitlab.com/goyal1510) · [LinkedIn](https://www.linkedin.com/in/goyal1510)
+  - GitLab handle is `goyal1510` (confirmed). No public GitLab projects yet — use GitHub or jayantgoyal.com for code samples.
 - **Career stage:** Early-career (≈1 year + 6-month internship). Targeting **junior / associate / SDE-1 / 0-3 yr experience** roles.
 - **Salary target:** ₹10 LPA minimum.
 
@@ -108,6 +109,7 @@ Plus a personal portfolio + admin app (this monorepo): Next.js 16, React 19, Tai
 | Location (free text) | `Hyderabad, India` |
 | LinkedIn URL | `https://www.linkedin.com/in/goyal1510` |
 | GitHub URL | `https://github.com/goyal1510` |
+| GitLab URL / Username | `https://gitlab.com/goyal1510` (handle: `goyal1510`) — no public projects yet |
 | Personal website / Portfolio URL | `https://www.jayantgoyal.com` |
 | Twitter / X | _(leave blank)_ |
 | Stack Overflow | _(leave blank)_ |

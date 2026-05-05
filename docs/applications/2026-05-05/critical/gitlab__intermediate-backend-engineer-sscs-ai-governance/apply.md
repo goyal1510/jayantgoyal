@@ -7,7 +7,7 @@
 - [ ] Confirm location preference: India / Remote-India
 - [ ] Custom Qs likely: "Why GitLab?" / "Years of experience" / "Salary expectation"
 - [ ] Submit
-- [ ] Mark this listing as `applied` in admin (or via /apply-job 019df72f-44fa-7415-ae6a-adcdfbf31055)
+- [ ] Mark this listing as `applied` in admin (or via /apply-job 019df7bc-5b0d-7ded-b95e-1abd10147930)
 
 ## Follow-up
 - 1 week: poll status, send polite follow-up

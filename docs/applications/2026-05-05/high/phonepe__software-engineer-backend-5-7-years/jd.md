@@ -1,0 +1,12 @@
+# Software Engineer, Backend (5-7 Years) @ PhonePe
+**Location:** Bengaluru
+**Apply URL:** https://job-boards.greenhouse.io/phonepe/jobs/7609730003
+**Posted:** 2026-04-24
+**Salary:** (not visible)
+## AI verdict
+- **Score:** 80/100
+- **Recommendation:** apply
+- **Priority:** high
+- **Reasoning:** explicit India location; backend title; tier-2 company
+## Job description
+<div class="content-intro"><p><strong>About PhonePe Limited:</strong></p> <p>Headquartered in India, its flagship product, the PhonePe digital payments app, was launched in Aug 2016. As of April 2025, PhonePe has over 60 Crore (600 Million) registered users and a digital payments acceptance network spre

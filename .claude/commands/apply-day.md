@@ -69,7 +69,7 @@ Target volume: **50–60 marked `interested` per run**. Better fewer than weak f
     - **Skipped (with reasoning):** brief table — useful audit
     - **Stats:** total scored, total interested, score distribution
 12. **Auto-prepare application forms for the finalised picks** (NEW — was previously a separate per-job step):
-    - For every listing whose priority is `critical` or `high`, run the same logic as `/prepare-application <id>`:
+    - For every listing whose priority is `critical`, `high`, or `medium`, run the same logic as `/prepare-application <id>`:
       - Call `node scripts/jobs/fetch-form.mjs <id>` to pull the live form schema.
       - For Greenhouse / Lever forms with `format !== "fallback_html"`, build the `ai_application_qa` array using the rules in `.claude/commands/prepare-application.md` (Standard Form Answers from `docs/resume.md` for identity/work-auth/education, draft per-listing for custom essays, demographic = decline, etc.).
       - For `fallback_html` (HN, Lever without form schema, manual saves), skip — the user will run `/prepare-application` later if they want to apply.

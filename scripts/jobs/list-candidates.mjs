@@ -64,9 +64,10 @@ function buildQuery(opts) {
     "ai_recommendation",
     "ai_processed_at",
     "ai_application_qa",
+    "description_text",
     "source:job_sources(kind,label)",
   ].join(",");
-  const fullSelect = compactSelect + ",description_text";
+  const fullSelect = compactSelect;
 
   let q = `select=${opts.mode === "full" ? fullSelect : compactSelect}`;
 
@@ -85,9 +86,29 @@ function buildQuery(opts) {
   return q;
 }
 
+async function selectPaginated(table, baseQuery, totalLimit) {
+  const PAGE = 1000;
+  const all = [];
+  let offset = 0;
+  while (offset < totalLimit) {
+    const remaining = Math.min(PAGE, totalLimit - offset);
+    // PostgREST limit is per request; we paginate via offset.
+    const q = baseQuery.replace(/&limit=\d+/, "") + `&limit=${remaining}&offset=${offset}`;
+    const page = await select(table, q);
+    if (!page || page.length === 0) break;
+    all.push(...page);
+    if (page.length < remaining) break;
+    offset += page.length;
+  }
+  return all;
+}
+
 async function main() {
   const opts = parseArgs();
-  const data = await select("job_listings", buildQuery(opts));
+  const baseQuery = buildQuery(opts);
+  const data = opts.limit > 1000
+    ? await selectPaginated("job_listings", baseQuery, opts.limit)
+    : await select("job_listings", baseQuery);
 
   const out = (data ?? []).map((row) => {
     const base = {
