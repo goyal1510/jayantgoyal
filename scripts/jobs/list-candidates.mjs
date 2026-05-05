@@ -63,7 +63,6 @@ function buildQuery(opts) {
     "ai_score",
     "ai_recommendation",
     "ai_processed_at",
-    "ai_application_qa",
     "source:job_sources(kind,label)",
   ].join(",");
   const fullSelect = compactSelect + ",description_text";
