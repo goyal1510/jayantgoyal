@@ -13,9 +13,6 @@ import {
   Rocket,
   KeyRound,
   FileText,
-  Search,
-  Kanban,
-  Database,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
@@ -49,10 +46,4 @@ export const adminNavItems: NavItem[] = [
 export const deploymentNavItems: NavItem[] = [
   { label: "Deployments", href: "/deployments", icon: Rocket },
   { label: "Env Variables", href: "/deployments/env", icon: KeyRound },
-]
-
-export const jobsNavItems: NavItem[] = [
-  { label: "Listings", href: "/jobs/listings", icon: Search },
-  { label: "Pipeline", href: "/jobs/pipeline", icon: Kanban },
-  { label: "Sources", href: "/jobs/sources", icon: Database },
 ]

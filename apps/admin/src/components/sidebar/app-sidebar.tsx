@@ -21,7 +21,7 @@ import {
 } from "@repo/ui/sidebar"
 import { TeamSwitcher } from "@/components/sidebar/team-switcher"
 import { NavUser } from "@/components/sidebar/nav-user"
-import { portfolioNavItems, blogNavItems, adminNavItems, deploymentNavItems, jobsNavItems } from "@/lib/config/nav-config"
+import { portfolioNavItems, blogNavItems, adminNavItems, deploymentNavItems } from "@/lib/config/nav-config"
 import type { AuthUser } from "@/lib/types"
 
 const adminBrand = {
@@ -87,31 +87,6 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-
-        {/* Jobs (super_admin only) */}
-        {user.role === "super_admin" && (
-          <SidebarGroup>
-            <SidebarGroupLabel>Jobs</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {jobsNavItems.map((item) => (
-                  <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={pathname === item.href}
-                      tooltip={item.label}
-                    >
-                      <Link href={item.href}>
-                        <item.icon />
-                        <span>{item.label}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
 
         {/* Deployments (super_admin only) */}
         {user.role === "super_admin" && (
