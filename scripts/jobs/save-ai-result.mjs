@@ -13,6 +13,7 @@
  *     ai_red_flags: ["string", ...],     // optional
  *     ai_cover_letter: "markdown string", // optional, only for jobs you draft
  *     ai_referral_message: "markdown string", // optional
+ *     ai_application_qa: [ { question, answer, category, needs_answer? }, ... ], // optional
  *     ai_resume_version: "2026-05-05" or git sha, // optional
  *     application: {
  *       status: "interested" | "applied" | "skip" | null,
@@ -104,6 +105,13 @@ async function main() {
     if (item.ai_red_flags != null) patch.ai_red_flags = item.ai_red_flags;
     if (item.ai_cover_letter != null) patch.ai_cover_letter = item.ai_cover_letter;
     if (item.ai_referral_message != null) patch.ai_referral_message = item.ai_referral_message;
+    if (item.ai_application_qa != null) {
+      if (!Array.isArray(item.ai_application_qa)) {
+        console.error(`Item ${i}: ai_application_qa must be an array`);
+        process.exit(1);
+      }
+      patch.ai_application_qa = item.ai_application_qa;
+    }
     if (item.ai_resume_version != null) patch.ai_resume_version = item.ai_resume_version;
 
     listingPatches.push({ listing_id: item.listing_id, patch });

@@ -1,5 +1,6 @@
 "use client"
 
+import { Fragment } from "react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
 import { Home } from "lucide-react"
@@ -12,19 +13,37 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@repo/ui/breadcrumb"
-import { portfolioNavItems, blogNavItems, adminNavItems, deploymentNavItems } from "@/lib/config/nav-config"
+import { portfolioNavItems, blogNavItems, adminNavItems, deploymentNavItems, jobsNavItems } from "@/lib/config/nav-config"
+import { useBreadcrumbContext } from "@/components/providers/breadcrumb-context"
+
+type Crumb = { label: string; href: string }
 
 export function DynamicBreadcrumb() {
   const pathname = usePathname()
+  const { label: dynamicLabel } = useBreadcrumbContext()
 
-  const { groupName, groupHref, pageName } = (() => {
+  const { groupName, groupHref, trail } = (() => {
+    // Jobs routes
+    if (pathname.startsWith("/jobs")) {
+      const trail: Crumb[] = []
+      const navItem = jobsNavItems.find((item) => pathname.startsWith(item.href))
+      if (navItem) {
+        trail.push({ label: navItem.label, href: navItem.href })
+      }
+      // detail page: /jobs/listings/[id]
+      if (/^\/jobs\/listings\/[^/]+$/.test(pathname)) {
+        trail.push({ label: dynamicLabel ?? "Job Detail", href: pathname })
+      }
+      return { groupName: "Jobs", groupHref: "/jobs/listings", trail }
+    }
+
     // Portfolio routes
     if (pathname.startsWith("/portfolio")) {
       const navItem = portfolioNavItems.find((item) => item.href === pathname)
       return {
         groupName: "Portfolio",
         groupHref: "/portfolio/hero",
-        pageName: navItem?.label ?? null,
+        trail: navItem ? [{ label: navItem.label, href: navItem.href }] : [],
       }
     }
 
@@ -34,7 +53,7 @@ export function DynamicBreadcrumb() {
       return {
         groupName: "Blog",
         groupHref: "/blog",
-        pageName: navItem?.label ?? null,
+        trail: navItem ? [{ label: navItem.label, href: navItem.href }] : [],
       }
     }
 
@@ -45,13 +64,13 @@ export function DynamicBreadcrumb() {
         return {
           groupName: "Deployments",
           groupHref: "/deployments",
-          pageName: "Deployment Detail",
+          trail: [{ label: "Deployment Detail", href: pathname }],
         }
       }
       return {
         groupName: "Deployments",
         groupHref: "/deployments",
-        pageName: navItem?.label ?? null,
+        trail: navItem ? [{ label: navItem.label, href: navItem.href }] : [],
       }
     }
 
@@ -61,11 +80,11 @@ export function DynamicBreadcrumb() {
       return {
         groupName: "Administration",
         groupHref: "/users",
-        pageName: navItem?.label ?? null,
+        trail: navItem ? [{ label: navItem.label, href: navItem.href }] : [],
       }
     }
 
-    return { groupName: null, groupHref: null, pageName: null }
+    return { groupName: null, groupHref: null, trail: [] as Crumb[] }
   })()
 
   return (
@@ -81,8 +100,8 @@ export function DynamicBreadcrumb() {
         {groupName && (
           <>
             <BreadcrumbSeparator className="shrink-0" />
-            <BreadcrumbItem className="shrink-0 max-w-[200px]">
-              {pageName ? (
+            <BreadcrumbItem className="shrink-0 max-w-[160px]">
+              {trail.length > 0 ? (
                 <BreadcrumbLink asChild>
                   <Link href={groupHref!} className="truncate block">{groupName}</Link>
                 </BreadcrumbLink>
@@ -92,16 +111,23 @@ export function DynamicBreadcrumb() {
             </BreadcrumbItem>
           </>
         )}
-        {pageName && (
-          <>
-            <BreadcrumbSeparator className="shrink-0" />
-            <BreadcrumbItem className="min-w-0 flex-1">
-              <BreadcrumbPage className="block truncate">
-                {pageName}
-              </BreadcrumbPage>
-            </BreadcrumbItem>
-          </>
-        )}
+        {trail.map((crumb, idx) => {
+          const isLast = idx === trail.length - 1
+          return (
+            <Fragment key={`${idx}-${crumb.href}`}>
+              <BreadcrumbSeparator className="shrink-0" />
+              <BreadcrumbItem className={isLast ? "min-w-0 flex-1" : "shrink-0 max-w-[160px]"}>
+                {isLast ? (
+                  <BreadcrumbPage className="block truncate">{crumb.label}</BreadcrumbPage>
+                ) : (
+                  <BreadcrumbLink asChild>
+                    <Link href={crumb.href} className="truncate block">{crumb.label}</Link>
+                  </BreadcrumbLink>
+                )}
+              </BreadcrumbItem>
+            </Fragment>
+          )
+        })}
       </BreadcrumbList>
     </Breadcrumb>
   )

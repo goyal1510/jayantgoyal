@@ -46,14 +46,20 @@ export async function GET(request: Request) {
   }
   if (india) query = query.eq("is_india", true);
   if (remote) query = query.eq("is_remote", true);
-  if (sourceKind && sourceKind !== "all") query = query.eq("source.kind", sourceKind);
+  if (sourceKind && sourceKind !== "all") {
+    const kinds = sourceKind.split(",").filter(Boolean);
+    if (kinds.length === 1) query = query.eq("source.kind", kinds[0]);
+    else if (kinds.length > 1) query = query.in("source.kind", kinds);
+  }
   if (sourceId) query = query.eq("source_id", sourceId);
   if (hasSalary) query = query.not("salary_min_inr", "is", null);
   if (minSalaryInr) query = query.gte("salary_min_inr", parseInt(minSalaryInr, 10));
   if (aiScored) query = query.not("ai_processed_at", "is", null);
   if (minAiScore) query = query.gte("ai_score", parseInt(minAiScore, 10));
   if (recommendation && recommendation !== "all") {
-    query = query.eq("ai_recommendation", recommendation);
+    const recs = recommendation.split(",").filter(Boolean);
+    if (recs.length === 1) query = query.eq("ai_recommendation", recs[0]);
+    else if (recs.length > 1) query = query.in("ai_recommendation", recs);
   }
 
   if (matchesKeywords) {
@@ -99,18 +105,19 @@ export async function GET(request: Request) {
   });
 
   if (status && status !== "all") {
-    if (status === "none") {
-      listings = listings.filter((l: { application: unknown }) => !l.application);
-    } else {
-      listings = listings.filter(
-        (l: { application: { status?: string } | null }) => l.application?.status === status
-      );
-    }
+    const statuses = new Set(status.split(",").filter(Boolean));
+    listings = listings.filter((l: { application: { status?: string } | null }) => {
+      if (statuses.has("none") && !l.application) return true;
+      if (l.application?.status && statuses.has(l.application.status)) return true;
+      return false;
+    });
   }
 
   if (priority && priority !== "all") {
+    const priorities = new Set(priority.split(",").filter(Boolean));
     listings = listings.filter(
-      (l: { application: { priority?: string } | null }) => l.application?.priority === priority
+      (l: { application: { priority?: string } | null }) =>
+        l.application?.priority ? priorities.has(l.application.priority) : false
     );
   }
 

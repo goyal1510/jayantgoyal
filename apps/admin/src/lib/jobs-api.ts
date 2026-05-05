@@ -1,4 +1,5 @@
 import type {
+  JobApplicationQaItem,
   JobApplicationStatus,
   JobListingFilters,
   JobListingsResponse,
@@ -34,6 +35,45 @@ export async function setListingStatus(
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ status, ...extras }),
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+export async function addQuestion(
+  listingId: string,
+  question: string,
+  extras?: { answer?: string; category?: string }
+): Promise<{ data: JobApplicationQaItem[] }> {
+  const res = await fetch(`/api/jobs/listings/${listingId}/qa`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ question, ...(extras ?? {}) }),
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+export async function updateQuestion(
+  listingId: string,
+  index: number,
+  patch: Partial<JobApplicationQaItem>
+): Promise<{ data: JobApplicationQaItem[] }> {
+  const res = await fetch(`/api/jobs/listings/${listingId}/qa`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ index, patch }),
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+export async function deleteQuestion(
+  listingId: string,
+  index: number
+): Promise<{ data: JobApplicationQaItem[] }> {
+  const res = await fetch(`/api/jobs/listings/${listingId}/qa?index=${index}`, {
+    method: "DELETE",
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();

@@ -593,6 +593,7 @@ CREATE TABLE IF NOT EXISTS "jg_app"."job_listings" (
     "ai_referral_message" "text",
     "ai_processed_at" timestamp with time zone,
     "ai_resume_version" "text",
+    "ai_application_qa" "jsonb" DEFAULT '[]'::"jsonb" NOT NULL,
     CONSTRAINT "job_listings_ai_score_range" CHECK ((("ai_score" IS NULL) OR (("ai_score" >= 0) AND ("ai_score" <= 100))))
 );
 
@@ -851,6 +852,10 @@ CREATE INDEX "idx_job_listings_is_remote" ON "jg_app"."job_listings" USING "btre
 
 
 CREATE INDEX "idx_job_listings_posted_at" ON "jg_app"."job_listings" USING "btree" ("posted_at" DESC NULLS LAST);
+
+
+
+CREATE INDEX "idx_job_listings_qa_count" ON "jg_app"."job_listings" USING "btree" ("jsonb_array_length"("ai_application_qa")) WHERE ("jsonb_array_length"("ai_application_qa") > 0);
 
 
 

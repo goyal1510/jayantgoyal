@@ -155,4 +155,44 @@ RESEND_API_KEY=
 
 ---
 
+## Internal: Daily Job-Search Workflow
+
+The admin app includes an internal job-search system (`super_admin` gated). All execution is **manual from the terminal** — no cron, no scheduled jobs.
+
+```bash
+# Step 1 — refresh the candidate pool from public ATS feeds
+node scripts/jobs/ingest.mjs
+
+# Step 2 — in Claude Code, run the daily slash command:
+/apply-day
+```
+
+`/apply-day` is the single entry point that does everything in one pass:
+1. Reads `docs/resume.md` (canonical resume + Standard Form Answers appendix)
+2. Pulls unscored India-eligible listings from the last 21 days
+3. Scores 0–100, picks top 50–60, drafts cover letter + referral DM per pick
+4. **Auto-prepares the live application form fields** for every `critical` / `high` priority listing (no need to run `/prepare-application` per job — that's now part of `/apply-day`)
+5. Marks them `interested` with priority and writes:
+   - `docs/applications/YYYY-MM-DD/SUMMARY.md` (ranked tables)
+   - Per-job folders with `jd.md`, `cover_letter.md`, `referral_message.md`, `apply.md`
+   - `payload.json` (raw input to `save-ai-result.mjs`)
+
+Then open `http://localhost:3001/jobs/listings` (admin app):
+- Filter, click any row → detail page with **prev/next** that respect the filter
+- **Autofill** button generates a JS snippet / bookmarklet that fills the actual form's text fields when pasted into the apply page's DevTools console
+
+### Other commands (when needed)
+
+| Command | When |
+|---|---|
+| `/apply-day` | The daily run — full triage + draft + form-prep |
+| `/apply-job <id>` | Deep-dive a single listing |
+| `/save-from-url <url>` | Capture a job from any URL (LinkedIn etc.) into the pipeline |
+| `/prepare-application <id>` | Re-prep form for one listing (auto-runs in `/apply-day` for top picks) |
+| `/answer-questions [id]` | Drafts answers for ad-hoc questions you type into the admin UI |
+
+See [CLAUDE.md](CLAUDE.md#job-search-workflow) for the full architecture.
+
+---
+
 Built with Next.js 16, React 19, TypeScript, Supabase, and Turborepo

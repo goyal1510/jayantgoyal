@@ -418,6 +418,69 @@ No test framework configured. Quality assurance via:
    ```
 4. LinkedIn token expires **2026-07-01**. Re-auth: `node scripts/linkedin/auth.mjs`
 
+### Job Search Workflow
+
+Internal-only feature, lives entirely under the admin app (`super_admin` gated). Everything is **manual / terminal-driven** — no cron, no scheduled jobs. The user (Jayant) executes daily.
+
+#### Daily routine
+
+```bash
+# 1. Refresh the candidate pool from public sources
+node scripts/jobs/ingest.mjs
+
+# 2. In Claude Code, type the slash command:
+/apply-day
+```
+
+`/apply-day` does **everything in one pass**:
+- Pulls unscored India-eligible listings (last 21 days)
+- Scores 0–100 using `docs/resume.md` as profile context
+- Picks top 50–60, drafts cover letter + referral DM per pick
+- **Auto-prepares the live application form** (Greenhouse `?questions=true`, Lever, etc.) for every `critical`/`high` priority listing — `ai_application_qa` populated in DB
+- Marks them `interested` with priority
+- Writes per-job folders to `docs/applications/YYYY-MM-DD/<priority>/<company>__<role>/`
+- Writes `SUMMARY.md` ranked table
+
+Then in the admin UI (`http://localhost:3001/jobs/listings`):
+- Filter chips on top, sort by AI score, click any row → detail page
+- Detail page has **prev/next** that respect the filter set
+- **Autofill button** (next to Apply): copy a JS snippet/bookmarklet that fills the actual form's text fields when you paste it in the apply page's console
+- Manual selects + file upload still need clicks; the script logs which option to pick
+
+#### Slash commands (in `.claude/commands/`)
+
+| Command | When |
+|---|---|
+| `/apply-day` | Once a day after `ingest.mjs` — full triage + draft + form-prep |
+| `/apply-job <listing-id>` | Deep-dive a single listing (re-score, re-draft) |
+| `/save-from-url <url>` | Paste a LinkedIn / custom careers-page URL → extracts + adds to pipeline + scores |
+| `/prepare-application <id>` | Manually re-prep form for a specific listing (e.g. when ATS form changes; auto-runs in `/apply-day` for top picks) |
+| `/answer-questions [id]` | Fallback — drafts answers for any user-typed pending Q&A items in the admin UI |
+
+#### Key files
+
+| File | Purpose |
+|---|---|
+| `docs/resume.md` | Canonical resume + **Standard Form Answers appendix** (identity, work auth, demographics defaults). Single source of truth for `/apply-day` and `/prepare-application` |
+| `scripts/jobs/ingest.mjs` | Fetch listings from Remotive / WWR / Greenhouse / Lever / HN |
+| `scripts/jobs/list-candidates.mjs` | Outputs candidate JSON for the AI loop |
+| `scripts/jobs/save-ai-result.mjs` | Persists scoring + drafts back to Supabase |
+| `scripts/jobs/fetch-form.mjs` | Per-listing live form schema (Greenhouse/Lever public APIs) |
+| `scripts/jobs/seed-companies.mjs` | One-off — re-probe Greenhouse/Lever for new company slugs |
+| `apps/admin/src/app/(admin)/jobs/` | Admin UI: listings table, detail page, sources, pipeline |
+| `docs/applications/YYYY-MM-DD/` | Daily output: SUMMARY + per-job folders + payload.json |
+
+#### Re-prep an existing day
+
+If the auto-prep step in `/apply-day` got interrupted or you want to re-run forms for a specific listing:
+
+```bash
+# In Claude Code:
+/prepare-application <listing-uuid>
+```
+
+This re-fetches the form, regenerates `ai_application_qa`, and updates the admin UI panel.
+
 ### Add Shared Component
 
 1. Create in `packages/ui/src/components/`

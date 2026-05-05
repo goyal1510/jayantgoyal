@@ -140,3 +140,20 @@ User has no Anthropic API key, so AI runs via this terminal manually each day.
 - Expanded view: AI reasoning panel + cover-letter draft (with copy button) + referral DM draft + collapsed full JD
 
 `pnpm lint` + `check-types` pass.
+
+## Day-2 polish (2026-05-05 evening)
+
+- TanStack table replacing card layout, slimmed columns (dropped AI verdict — score color implies it; native salary/posted/IN-OK chips)
+- `[jobId]` detail page with prev/next nav that honor URL filter context (server component re-runs same filter, computes neighbors)
+- Dynamic-width filter bar per `dynamic-width-aware-filter-bar.md` spec — multi-select chips (Source, Recommendation, Priority, Status), inline/overflow split, ResizeObserver-driven
+- URL-backed filter state (refresh-safe, share-link-able)
+- Breadcrumb context: detail page sets `${title} @ ${company}` via `useDynamicBreadcrumb`, layout breadcrumb reads it
+- AI reasoning + JD cards removed from detail page per user direction (focus on action items: Q&A panel + cover letter + referral DM)
+- Compact title bar (single row instead of stacked) + tighter pipeline strip
+- "Autofill" button next to Apply: copy-to-clipboard JS snippet (and bookmarklet variant) that fills text inputs by `name` attribute on the live apply page using React-compatible `nativeInputValueSetter` + synthetic events. Surfaces manual selects + file uploads to console with the values to pick.
+
+## Cron — removed
+
+GitHub Actions workflow `.github/workflows/jobs-ingest.yml` deleted. All job-search ops are manual / terminal-driven now (user prefers explicit control).
+
+`/apply-day` was extended to **also auto-prepare the application form** for every `critical`/`high` priority listing — `prepare-application` no longer needs to be run per-job for those. Manual `/prepare-application <id>` is still there as a fallback for re-running, lower-priority listings, and one-off `save-from-url` captures.
