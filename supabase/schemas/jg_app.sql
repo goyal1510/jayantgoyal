@@ -19,6 +19,55 @@ CREATE SCHEMA IF NOT EXISTS "jg_app";
 ALTER SCHEMA "jg_app" OWNER TO "postgres";
 
 
+CREATE TYPE "jg_app"."job_ai_recommendation" AS ENUM (
+    'apply',
+    'apply_with_referral',
+    'apply_if_time',
+    'skip',
+    'skip_red_flags'
+);
+
+
+ALTER TYPE "jg_app"."job_ai_recommendation" OWNER TO "postgres";
+
+
+CREATE TYPE "jg_app"."job_application_status" AS ENUM (
+    'new',
+    'interested',
+    'applied',
+    'interviewing',
+    'offer',
+    'rejected',
+    'withdrawn'
+);
+
+
+ALTER TYPE "jg_app"."job_application_status" OWNER TO "postgres";
+
+
+CREATE TYPE "jg_app"."job_priority" AS ENUM (
+    'low',
+    'medium',
+    'high',
+    'critical'
+);
+
+
+ALTER TYPE "jg_app"."job_priority" OWNER TO "postgres";
+
+
+CREATE TYPE "jg_app"."job_source_kind" AS ENUM (
+    'remotive',
+    'wwr',
+    'greenhouse',
+    'lever',
+    'hn_hiring'
+);
+
+
+ALTER TYPE "jg_app"."job_source_kind" OWNER TO "postgres";
+
+
 CREATE OR REPLACE FUNCTION "jg_app"."copy_file"("p_file_id" "uuid", "p_target_directory_path" "text", "p_user_id" "uuid") RETURNS "uuid"
     LANGUAGE "plpgsql"
     AS $_$
@@ -492,6 +541,99 @@ CREATE TABLE IF NOT EXISTS "jg_app"."game_hub_typing_speed_results" (
 ALTER TABLE "jg_app"."game_hub_typing_speed_results" OWNER TO "postgres";
 
 
+CREATE TABLE IF NOT EXISTS "jg_app"."job_applications" (
+    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
+    "listing_id" "uuid",
+    "title" "text" NOT NULL,
+    "company" "text" NOT NULL,
+    "apply_url" "text",
+    "status" "jg_app"."job_application_status" DEFAULT 'new'::"jg_app"."job_application_status" NOT NULL,
+    "applied_at" timestamp with time zone,
+    "notes" "text",
+    "referral_contact" "text",
+    "referral_status" "text",
+    "next_action_at" timestamp with time zone,
+    "next_action_note" "text",
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "priority" "jg_app"."job_priority" DEFAULT 'medium'::"jg_app"."job_priority" NOT NULL
+);
+
+
+ALTER TABLE "jg_app"."job_applications" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "jg_app"."job_listings" (
+    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
+    "source_id" "uuid" NOT NULL,
+    "external_id" "text" NOT NULL,
+    "title" "text" NOT NULL,
+    "company" "text" NOT NULL,
+    "location" "text",
+    "is_remote" boolean DEFAULT false NOT NULL,
+    "is_india" boolean DEFAULT false NOT NULL,
+    "salary_text" "text",
+    "salary_min_inr" bigint,
+    "salary_max_inr" bigint,
+    "salary_currency" "text",
+    "description_html" "text",
+    "description_text" "text",
+    "apply_url" "text" NOT NULL,
+    "tags" "text"[] DEFAULT '{}'::"text"[] NOT NULL,
+    "posted_at" timestamp with time zone,
+    "raw" "jsonb",
+    "fetched_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "ai_score" smallint,
+    "ai_recommendation" "jg_app"."job_ai_recommendation",
+    "ai_reasoning" "text",
+    "ai_red_flags" "text"[] DEFAULT '{}'::"text"[] NOT NULL,
+    "ai_cover_letter" "text",
+    "ai_referral_message" "text",
+    "ai_processed_at" timestamp with time zone,
+    "ai_resume_version" "text",
+    CONSTRAINT "job_listings_ai_score_range" CHECK ((("ai_score" IS NULL) OR (("ai_score" >= 0) AND ("ai_score" <= 100))))
+);
+
+
+ALTER TABLE "jg_app"."job_listings" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "jg_app"."job_search_criteria" (
+    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
+    "is_active" boolean DEFAULT true NOT NULL,
+    "keywords" "text"[] DEFAULT '{}'::"text"[] NOT NULL,
+    "excluded_keywords" "text"[] DEFAULT '{}'::"text"[] NOT NULL,
+    "locations" "text"[] DEFAULT '{}'::"text"[] NOT NULL,
+    "min_salary_inr" bigint,
+    "remote_ok" boolean DEFAULT true NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL
+);
+
+
+ALTER TABLE "jg_app"."job_search_criteria" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "jg_app"."job_sources" (
+    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
+    "kind" "jg_app"."job_source_kind" NOT NULL,
+    "label" "text" NOT NULL,
+    "config" "jsonb" DEFAULT '{}'::"jsonb" NOT NULL,
+    "is_active" boolean DEFAULT true NOT NULL,
+    "last_fetched_at" timestamp with time zone,
+    "last_fetch_status" "text",
+    "last_fetch_error" "text",
+    "last_fetch_count" integer,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL
+);
+
+
+ALTER TABLE "jg_app"."job_sources" OWNER TO "postgres";
+
+
 CREATE TABLE IF NOT EXISTS "jg_app"."messenger_messages" (
     "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
     "user_id" "uuid" NOT NULL,
@@ -560,6 +702,26 @@ ALTER TABLE ONLY "jg_app"."file_manager_type_categories"
 
 ALTER TABLE ONLY "jg_app"."game_hub_typing_speed_results"
     ADD CONSTRAINT "game_hub_typing_speed_results_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "jg_app"."job_applications"
+    ADD CONSTRAINT "job_applications_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "jg_app"."job_listings"
+    ADD CONSTRAINT "job_listings_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "jg_app"."job_search_criteria"
+    ADD CONSTRAINT "job_search_criteria_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "jg_app"."job_sources"
+    ADD CONSTRAINT "job_sources_pkey" PRIMARY KEY ("id");
 
 
 
@@ -644,6 +806,70 @@ CREATE INDEX "idx_gh_typing_user_id" ON "jg_app"."game_hub_typing_speed_results"
 
 
 
+CREATE INDEX "idx_job_applications_listing" ON "jg_app"."job_applications" USING "btree" ("listing_id");
+
+
+
+CREATE UNIQUE INDEX "idx_job_applications_listing_unique" ON "jg_app"."job_applications" USING "btree" ("listing_id") WHERE ("listing_id" IS NOT NULL);
+
+
+
+CREATE INDEX "idx_job_applications_next_action" ON "jg_app"."job_applications" USING "btree" ("next_action_at") WHERE ("next_action_at" IS NOT NULL);
+
+
+
+CREATE INDEX "idx_job_applications_priority" ON "jg_app"."job_applications" USING "btree" ("priority");
+
+
+
+CREATE INDEX "idx_job_applications_status" ON "jg_app"."job_applications" USING "btree" ("status");
+
+
+
+CREATE INDEX "idx_job_listings_ai_processed" ON "jg_app"."job_listings" USING "btree" ("ai_processed_at" DESC NULLS LAST);
+
+
+
+CREATE INDEX "idx_job_listings_ai_recommendation" ON "jg_app"."job_listings" USING "btree" ("ai_recommendation");
+
+
+
+CREATE INDEX "idx_job_listings_ai_score" ON "jg_app"."job_listings" USING "btree" ("ai_score" DESC NULLS LAST);
+
+
+
+CREATE INDEX "idx_job_listings_company" ON "jg_app"."job_listings" USING "btree" ("company");
+
+
+
+CREATE INDEX "idx_job_listings_is_india" ON "jg_app"."job_listings" USING "btree" ("is_india") WHERE ("is_india" = true);
+
+
+
+CREATE INDEX "idx_job_listings_is_remote" ON "jg_app"."job_listings" USING "btree" ("is_remote") WHERE ("is_remote" = true);
+
+
+
+CREATE INDEX "idx_job_listings_posted_at" ON "jg_app"."job_listings" USING "btree" ("posted_at" DESC NULLS LAST);
+
+
+
+CREATE UNIQUE INDEX "idx_job_listings_source_external" ON "jg_app"."job_listings" USING "btree" ("source_id", "external_id");
+
+
+
+CREATE INDEX "idx_job_listings_tags" ON "jg_app"."job_listings" USING "gin" ("tags");
+
+
+
+CREATE INDEX "idx_job_sources_active" ON "jg_app"."job_sources" USING "btree" ("is_active") WHERE ("is_active" = true);
+
+
+
+CREATE UNIQUE INDEX "idx_job_sources_kind_label" ON "jg_app"."job_sources" USING "btree" ("kind", "label");
+
+
+
 CREATE INDEX "idx_msg_messages_created_at" ON "jg_app"."messenger_messages" USING "btree" ("created_at" DESC);
 
 
@@ -661,6 +887,22 @@ CREATE OR REPLACE TRIGGER "update_blog_posts_updated_at" BEFORE UPDATE ON "jg_ap
 
 
 CREATE OR REPLACE TRIGGER "update_child_count_trigger" AFTER INSERT OR DELETE ON "jg_app"."file_manager_files" FOR EACH ROW EXECUTE FUNCTION "jg_app"."update_parent_child_count"();
+
+
+
+CREATE OR REPLACE TRIGGER "update_job_applications_updated_at" BEFORE UPDATE ON "jg_app"."job_applications" FOR EACH ROW EXECUTE FUNCTION "jg_app"."update_updated_at"();
+
+
+
+CREATE OR REPLACE TRIGGER "update_job_listings_updated_at" BEFORE UPDATE ON "jg_app"."job_listings" FOR EACH ROW EXECUTE FUNCTION "jg_app"."update_updated_at"();
+
+
+
+CREATE OR REPLACE TRIGGER "update_job_search_criteria_updated_at" BEFORE UPDATE ON "jg_app"."job_search_criteria" FOR EACH ROW EXECUTE FUNCTION "jg_app"."update_updated_at"();
+
+
+
+CREATE OR REPLACE TRIGGER "update_job_sources_updated_at" BEFORE UPDATE ON "jg_app"."job_sources" FOR EACH ROW EXECUTE FUNCTION "jg_app"."update_updated_at"();
 
 
 
@@ -712,8 +954,34 @@ ALTER TABLE ONLY "jg_app"."game_hub_typing_speed_results"
 
 
 
+ALTER TABLE ONLY "jg_app"."job_applications"
+    ADD CONSTRAINT "job_applications_listing_id_fkey" FOREIGN KEY ("listing_id") REFERENCES "jg_app"."job_listings"("id") ON DELETE SET NULL;
+
+
+
+ALTER TABLE ONLY "jg_app"."job_listings"
+    ADD CONSTRAINT "job_listings_source_id_fkey" FOREIGN KEY ("source_id") REFERENCES "jg_app"."job_sources"("id") ON DELETE CASCADE;
+
+
+
 ALTER TABLE ONLY "jg_app"."messenger_messages"
     ADD CONSTRAINT "messenger_messages_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
+
+
+
+CREATE POLICY "Admins can manage job_applications" ON "jg_app"."job_applications" TO "authenticated" USING ("jg_account"."is_admin"()) WITH CHECK ("jg_account"."is_admin"());
+
+
+
+CREATE POLICY "Admins can manage job_listings" ON "jg_app"."job_listings" TO "authenticated" USING ("jg_account"."is_admin"()) WITH CHECK ("jg_account"."is_admin"());
+
+
+
+CREATE POLICY "Admins can manage job_search_criteria" ON "jg_app"."job_search_criteria" TO "authenticated" USING ("jg_account"."is_admin"()) WITH CHECK ("jg_account"."is_admin"());
+
+
+
+CREATE POLICY "Admins can manage job_sources" ON "jg_app"."job_sources" TO "authenticated" USING ("jg_account"."is_admin"()) WITH CHECK ("jg_account"."is_admin"());
 
 
 
@@ -845,6 +1113,18 @@ CREATE POLICY "insert_own_denominations" ON "jg_app"."currency_calculator_denomi
 
 
 
+ALTER TABLE "jg_app"."job_applications" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "jg_app"."job_listings" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "jg_app"."job_search_criteria" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "jg_app"."job_sources" ENABLE ROW LEVEL SECURITY;
+
+
 ALTER TABLE "jg_app"."messenger_messages" ENABLE ROW LEVEL SECURITY;
 
 
@@ -873,6 +1153,26 @@ CREATE POLICY "update_own_denominations" ON "jg_app"."currency_calculator_denomi
 GRANT USAGE ON SCHEMA "jg_app" TO "anon";
 GRANT USAGE ON SCHEMA "jg_app" TO "authenticated";
 GRANT USAGE ON SCHEMA "jg_app" TO "service_role";
+
+
+
+GRANT ALL ON TYPE "jg_app"."job_ai_recommendation" TO "authenticated";
+GRANT ALL ON TYPE "jg_app"."job_ai_recommendation" TO "service_role";
+
+
+
+GRANT ALL ON TYPE "jg_app"."job_application_status" TO "authenticated";
+GRANT ALL ON TYPE "jg_app"."job_application_status" TO "service_role";
+
+
+
+GRANT ALL ON TYPE "jg_app"."job_priority" TO "authenticated";
+GRANT ALL ON TYPE "jg_app"."job_priority" TO "service_role";
+
+
+
+GRANT ALL ON TYPE "jg_app"."job_source_kind" TO "authenticated";
+GRANT ALL ON TYPE "jg_app"."job_source_kind" TO "service_role";
 
 
 
@@ -991,6 +1291,30 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "jg_app"."file_manager_type_categorie
 GRANT ALL ON TABLE "jg_app"."game_hub_typing_speed_results" TO "authenticated";
 GRANT ALL ON TABLE "jg_app"."game_hub_typing_speed_results" TO "service_role";
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "jg_app"."game_hub_typing_speed_results" TO "anon";
+
+
+
+GRANT SELECT ON TABLE "jg_app"."job_applications" TO "anon";
+GRANT ALL ON TABLE "jg_app"."job_applications" TO "authenticated";
+GRANT ALL ON TABLE "jg_app"."job_applications" TO "service_role";
+
+
+
+GRANT SELECT ON TABLE "jg_app"."job_listings" TO "anon";
+GRANT ALL ON TABLE "jg_app"."job_listings" TO "authenticated";
+GRANT ALL ON TABLE "jg_app"."job_listings" TO "service_role";
+
+
+
+GRANT SELECT ON TABLE "jg_app"."job_search_criteria" TO "anon";
+GRANT ALL ON TABLE "jg_app"."job_search_criteria" TO "authenticated";
+GRANT ALL ON TABLE "jg_app"."job_search_criteria" TO "service_role";
+
+
+
+GRANT SELECT ON TABLE "jg_app"."job_sources" TO "anon";
+GRANT ALL ON TABLE "jg_app"."job_sources" TO "authenticated";
+GRANT ALL ON TABLE "jg_app"."job_sources" TO "service_role";
 
 
 

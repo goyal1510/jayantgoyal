@@ -1,0 +1,1058 @@
+[
+  {
+    "listing_id": "019df72f-449f-7f7e-80d4-fcf3408ca10d",
+    "ai_score": 96,
+    "ai_recommendation": "apply",
+    "ai_reasoning": "explicit India location; backend title; Next/React/TS stack match",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "ai_cover_letter": "Hi GitLab team,\n\nApplying for the Backend Engineer, Knowledge Graph (Rust) role — what caught my attention is build and operate a graph data service that supports GitLab Duo agents, analytics, and architecture-level features across GitLab.\n\nAt NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. I designed Supabase RLS policies and SQL hot-paths that gave us tenant isolation plus a measurable ~30% perf win — comfortable thinking about correctness and throughput together.\n\nYour stack overlaps directly with mine: TypeScript, Ruby, Rust, Golang. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.\n\nPortfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510\n\nHappy to walk through any of the work whenever it's useful.\n\nThanks,\nJayant Goyal",
+    "ai_referral_message": "Hey {{connection_name}},\n\nSaw you're at GitLab — wanted to reach out before I send my application into the void. I'm an early-career engineer (Next.js + Supabase, with Java foundations) and GitLab just opened a \"Backend Engineer, Knowledge Graph (Rust)\" role I genuinely fit (India remote).\n\nQuick proof: I ship a multi-tenant Next.js/Supabase RCM platform at NeuraOak and have a public portfolio (jayantgoyal.com) + GitHub.\n\nWould you be willing to refer me, or even just point me to whoever's hiring on the Backend Engineer, Knowledge Graph (Rust) side? Either way — appreciate you reading this. 🙏",
+    "application": {
+      "status": "interested",
+      "priority": "critical",
+      "notes": "Score 96. explicit India location; backend title; Next/React/TS stack match."
+    }
+  },
+  {
+    "listing_id": "019df72f-44fa-7415-ae6a-adcdfbf31055",
+    "ai_score": 86,
+    "ai_recommendation": "apply",
+    "ai_reasoning": "explicit India location; intermediate level (good fit at GitLab); tier-1 company",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "ai_cover_letter": "Hi GitLab team,\n\nApplying for the Intermediate Backend Engineer, SSCS: AI Governance role — what caught my attention is lay the foundation for governance controls that enterprise customers rely on.\n\nAt NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. I've built RLS-backed multi-tenant data layers in Postgres/Supabase with real query optimization — performance gains around ~30% on production workloads.\n\nYour stack overlaps directly with mine: PostgreSQL, Ruby, GraphQL. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.\n\nPortfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510\n\nHappy to walk through any of the work whenever it's useful.\n\nThanks,\nJayant Goyal",
+    "ai_referral_message": "Hey {{connection_name}},\n\nSaw you're at GitLab — wanted to reach out before I send my application into the void. I'm an early-career engineer (Next.js + Supabase, with Java foundations) and GitLab just opened a \"Intermediate Backend Engineer, SSCS: AI Governance\" role I genuinely fit (India remote).\n\nQuick proof: I ship a multi-tenant Next.js/Supabase RCM platform at NeuraOak and have a public portfolio (jayantgoyal.com) + GitHub.\n\nWould you be willing to refer me, or even just point me to whoever's hiring on the Intermediate Backend Engineer, SSCS: AI Governance side? Either way — appreciate you reading this. 🙏",
+    "application": {
+      "status": "interested",
+      "priority": "critical",
+      "notes": "Score 86. explicit India location; intermediate level (good fit at GitLab); tier-1 company."
+    }
+  },
+  {
+    "listing_id": "019df72f-44f5-7313-b0fb-e3831beecbbd",
+    "ai_score": 86,
+    "ai_recommendation": "apply",
+    "ai_reasoning": "explicit India location; intermediate level (good fit at GitLab); tier-1 company",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "ai_cover_letter": "Hi GitLab team,\n\nApplying for the Intermediate Backend Engineer, Database Automation (Ruby) role — what caught my attention is develop and enhance the frameworks, patterns, and tooling that keep GitLab's application datastores scalable, healthy, and safe across GitLa.\n\nAt NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. I've built RLS-backed multi-tenant data layers in Postgres/Supabase with real query optimization — performance gains around ~30% on production workloads.\n\nYour stack overlaps directly with mine: PostgreSQL, Ruby. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.\n\nPortfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510\n\nHappy to walk through any of the work whenever it's useful.\n\nThanks,\nJayant Goyal",
+    "ai_referral_message": "Hey {{connection_name}},\n\nSaw you're at GitLab — wanted to reach out before I send my application into the void. I'm an early-career engineer (Next.js + Supabase, with Java foundations) and GitLab just opened a \"Intermediate Backend Engineer, Database Automation (Ruby)\" role I genuinely fit (India remote).\n\nQuick proof: I ship a multi-tenant Next.js/Supabase RCM platform at NeuraOak and have a public portfolio (jayantgoyal.com) + GitHub.\n\nWould you be willing to refer me, or even just point me to whoever's hiring on the Intermediate Backend Engineer, Database Automation (Ruby) side? Either way — appreciate you reading this. 🙏",
+    "application": {
+      "status": "interested",
+      "priority": "critical",
+      "notes": "Score 86. explicit India location; intermediate level (good fit at GitLab); tier-1 company."
+    }
+  },
+  {
+    "listing_id": "019df72f-44f4-7379-9a83-10960a1f38d4",
+    "ai_score": 86,
+    "ai_recommendation": "apply",
+    "ai_reasoning": "explicit India location; intermediate level (good fit at GitLab); tier-1 company",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "ai_cover_letter": "Hi GitLab team,\n\nApplying for the Intermediate Backend Engineer (C), Tenant Scale: Git role — what caught my attention is improve one of the most widely used foundations of modern software development.\n\nAt NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. I designed Supabase RLS policies and SQL hot-paths that gave us tenant isolation plus a measurable ~30% perf win — comfortable thinking about correctness and throughput together.\n\nYour stack overlaps directly with mine: Golang. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.\n\nPortfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510\n\nHappy to walk through any of the work whenever it's useful.\n\nThanks,\nJayant Goyal",
+    "ai_referral_message": "Hey {{connection_name}},\n\nSaw you're at GitLab — wanted to reach out before I send my application into the void. I'm an early-career engineer (Next.js + Supabase, with Java foundations) and GitLab just opened a \"Intermediate Backend Engineer (C), Tenant Scale: Git\" role I genuinely fit (India remote).\n\nQuick proof: I ship a multi-tenant Next.js/Supabase RCM platform at NeuraOak and have a public portfolio (jayantgoyal.com) + GitHub.\n\nWould you be willing to refer me, or even just point me to whoever's hiring on the Intermediate Backend Engineer (C), Tenant Scale: Git side? Either way — appreciate you reading this. 🙏",
+    "application": {
+      "status": "interested",
+      "priority": "critical",
+      "notes": "Score 86. explicit India location; intermediate level (good fit at GitLab); tier-1 company."
+    }
+  },
+  {
+    "listing_id": "019df72f-44fd-7255-9733-e0a76fdd9ed0",
+    "ai_score": 86,
+    "ai_recommendation": "apply",
+    "ai_reasoning": "explicit India location; intermediate level (good fit at GitLab); tier-1 company",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "ai_cover_letter": "Hi GitLab team,\n\nApplying for the Intermediate Backend Engineer,  SSCS: Supply Chain role — what caught my attention is Because the team — small, you'll have meaningful influence on implementation details, team practices, and the product experience.\n\nAt NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. I've built RLS-backed multi-tenant data layers in Postgres/Supabase with real query optimization — performance gains around ~30% on production workloads.\n\nYour stack overlaps directly with mine: PostgreSQL, Ruby, Golang. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.\n\nPortfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510\n\nHappy to walk through any of the work whenever it's useful.\n\nThanks,\nJayant Goyal",
+    "ai_referral_message": "Hey {{connection_name}},\n\nSaw you're at GitLab — wanted to reach out before I send my application into the void. I'm an early-career engineer (Next.js + Supabase, with Java foundations) and GitLab just opened a \"Intermediate Backend Engineer,  SSCS: Supply Chain\" role I genuinely fit (India remote).\n\nQuick proof: I ship a multi-tenant Next.js/Supabase RCM platform at NeuraOak and have a public portfolio (jayantgoyal.com) + GitHub.\n\nWould you be willing to refer me, or even just point me to whoever's hiring on the Intermediate Backend Engineer,  SSCS: Supply Chain side? Either way — appreciate you reading this. 🙏",
+    "application": {
+      "status": "interested",
+      "priority": "critical",
+      "notes": "Score 86. explicit India location; intermediate level (good fit at GitLab); tier-1 company."
+    }
+  },
+  {
+    "listing_id": "019df72f-44f9-71cd-9ab9-362fa5101ac3",
+    "ai_score": 86,
+    "ai_recommendation": "apply",
+    "ai_reasoning": "explicit India location; intermediate level (good fit at GitLab); tier-1 company",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "ai_cover_letter": "Hi GitLab team,\n\nApplying for the Intermediate Backend Engineer, Gitlab Delivery: Upgrades role — what caught my attention is Intermediate Backend Engineer, Gitlab Delivery: Upgrades role at GitLab.\n\nAt NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. I've built RLS-backed multi-tenant data layers in Postgres/Supabase with real query optimization — performance gains around ~30% on production workloads.\n\nYour stack overlaps directly with mine: PostgreSQL, Ruby, Golang, Kubernetes. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.\n\nPortfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510\n\nHappy to walk through any of the work whenever it's useful.\n\nThanks,\nJayant Goyal",
+    "ai_referral_message": "Hey {{connection_name}},\n\nSaw you're at GitLab — wanted to reach out before I send my application into the void. I'm an early-career engineer (Next.js + Supabase, with Java foundations) and GitLab just opened a \"Intermediate Backend Engineer, Gitlab Delivery: Upgrades\" role I genuinely fit (India remote).\n\nQuick proof: I ship a multi-tenant Next.js/Supabase RCM platform at NeuraOak and have a public portfolio (jayantgoyal.com) + GitHub.\n\nWould you be willing to refer me, or even just point me to whoever's hiring on the Intermediate Backend Engineer, Gitlab Delivery: Upgrades side? Either way — appreciate you reading this. 🙏",
+    "application": {
+      "status": "interested",
+      "priority": "critical",
+      "notes": "Score 86. explicit India location; intermediate level (good fit at GitLab); tier-1 company."
+    }
+  },
+  {
+    "listing_id": "019df72e-fb5e-7d25-a259-3ccea9fb895f",
+    "ai_score": 85,
+    "ai_recommendation": "apply",
+    "ai_reasoning": "global remote in JD; frontend title; Next/React/TS stack match",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "ai_cover_letter": "Hi Stripe team,\n\nApplying for the Frontend Platform Engineer, JavaScript Infrastructure role — what caught my attention is JavaScript Infrastructure Engineering team — a high impact, high leverage, and high visibility team that supports the productivity of Stripe’s frontend engineers.\n\nAt NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. I built and shipped a reusable Tailwind/CVA component system at NeuraOak that cut billing task completion time by ~40% — design-system rigor under product constraints.\n\nYour stack overlaps directly with mine: React, TypeScript. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.\n\nPortfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510\n\nHappy to walk through any of the work whenever it's useful.\n\nThanks,\nJayant Goyal",
+    "ai_referral_message": "Hey {{connection_name}},\n\nSaw you're at Stripe — wanted to reach out before I send my application into the void. I'm an early-career engineer (Next.js + Supabase, with Java foundations) and Stripe just opened a \"Frontend Platform Engineer, JavaScript Infrastructure\" role I genuinely fit .\n\nQuick proof: I ship a multi-tenant Next.js/Supabase RCM platform at NeuraOak and have a public portfolio (jayantgoyal.com) + GitHub.\n\nWould you be willing to refer me, or even just point me to whoever's hiring on the Frontend Platform Engineer, JavaScript Infrastructure side? Either way — appreciate you reading this. 🙏",
+    "application": {
+      "status": "interested",
+      "priority": "critical",
+      "notes": "Score 85. global remote in JD; frontend title; Next/React/TS stack match."
+    }
+  },
+  {
+    "listing_id": "019df72f-449b-78a5-b1ca-cdd8bbd45f2b",
+    "ai_score": 84,
+    "ai_recommendation": "apply",
+    "ai_reasoning": "explicit India location; backend title; tier-1 company",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "ai_cover_letter": "Hi GitLab team,\n\nApplying for the Backend Engineer, Analytics Instrumentation (Golang) role — what caught my attention is the role's the unified service stack.\n\nAt NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. I designed Supabase RLS policies and SQL hot-paths that gave us tenant isolation plus a measurable ~30% perf win — comfortable thinking about correctness and throughput together.\n\nYour stack overlaps directly with mine: Ruby, Golang. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.\n\nPortfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510\n\nHappy to walk through any of the work whenever it's useful.\n\nThanks,\nJayant Goyal",
+    "ai_referral_message": "Hey {{connection_name}},\n\nSaw you're at GitLab — wanted to reach out before I send my application into the void. I'm an early-career engineer (Next.js + Supabase, with Java foundations) and GitLab just opened a \"Backend Engineer, Analytics Instrumentation (Golang)\" role I genuinely fit (India remote).\n\nQuick proof: I ship a multi-tenant Next.js/Supabase RCM platform at NeuraOak and have a public portfolio (jayantgoyal.com) + GitHub.\n\nWould you be willing to refer me, or even just point me to whoever's hiring on the Backend Engineer, Analytics Instrumentation (Golang) side? Either way — appreciate you reading this. 🙏",
+    "application": {
+      "status": "interested",
+      "priority": "high",
+      "notes": "Score 84. explicit India location; backend title; tier-1 company."
+    }
+  },
+  {
+    "listing_id": "019df72f-449a-7eda-b0c7-e4ac84ea699f",
+    "ai_score": 84,
+    "ai_recommendation": "apply",
+    "ai_reasoning": "explicit India location; backend title; tier-1 company",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "ai_cover_letter": "Hi GitLab team,\n\nApplying for the Backend Engineer, Analytics Instrumentation (Golang) role — what caught my attention is the role's the unified service stack.\n\nAt NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. I designed Supabase RLS policies and SQL hot-paths that gave us tenant isolation plus a measurable ~30% perf win — comfortable thinking about correctness and throughput together.\n\nYour stack overlaps directly with mine: Ruby, Golang. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.\n\nPortfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510\n\nHappy to walk through any of the work whenever it's useful.\n\nThanks,\nJayant Goyal",
+    "ai_referral_message": "Hey {{connection_name}},\n\nSaw you're at GitLab — wanted to reach out before I send my application into the void. I'm an early-career engineer (Next.js + Supabase, with Java foundations) and GitLab just opened a \"Backend Engineer, Analytics Instrumentation (Golang)\" role I genuinely fit (India remote).\n\nQuick proof: I ship a multi-tenant Next.js/Supabase RCM platform at NeuraOak and have a public portfolio (jayantgoyal.com) + GitHub.\n\nWould you be willing to refer me, or even just point me to whoever's hiring on the Backend Engineer, Analytics Instrumentation (Golang) side? Either way — appreciate you reading this. 🙏",
+    "application": {
+      "status": "interested",
+      "priority": "high",
+      "notes": "Score 84. explicit India location; backend title; tier-1 company."
+    }
+  },
+  {
+    "listing_id": "019df72f-a053-7c1f-8017-42eb64220f72",
+    "ai_score": 81,
+    "ai_recommendation": "apply",
+    "ai_reasoning": "global remote in JD; Next/React/TS stack match; Java mentioned",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "ai_cover_letter": "Hi MongoDB team,\n\nApplying for the Software Engineer, Code Generation role — what caught my attention is the role's a modern technology stack stack.\n\nAt NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. My HighRadius internship was Java/Spring/Hibernate — I'm comfortable jumping back into the JVM ecosystem alongside JS work.\n\nYour stack overlaps directly with mine: React, PostgreSQL, Java, Spring. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.\n\nPortfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510\n\nHappy to walk through any of the work whenever it's useful.\n\nThanks,\nJayant Goyal",
+    "ai_referral_message": "Hey {{connection_name}},\n\nSaw you're at MongoDB — wanted to reach out before I send my application into the void. I'm an early-career engineer (Next.js + Supabase, with Java foundations) and MongoDB just opened a \"Software Engineer, Code Generation\" role I genuinely fit .\n\nQuick proof: I ship a multi-tenant Next.js/Supabase RCM platform at NeuraOak and have a public portfolio (jayantgoyal.com) + GitHub.\n\nWould you be willing to refer me, or even just point me to whoever's hiring on the Code Generation side? Either way — appreciate you reading this. 🙏",
+    "application": {
+      "status": "interested",
+      "priority": "high",
+      "notes": "Score 81. global remote in JD; Next/React/TS stack match; Java mentioned."
+    }
+  },
+  {
+    "listing_id": "019df72f-a052-7004-8dae-8a73dbd07ac0",
+    "ai_score": 81,
+    "ai_recommendation": "apply",
+    "ai_reasoning": "global remote in JD; Next/React/TS stack match; Java mentioned",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "ai_cover_letter": "Hi MongoDB team,\n\nApplying for the Software Engineer, Code Generation role — what caught my attention is the role's a modern technology stack stack.\n\nAt NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. My HighRadius internship was Java/Spring/Hibernate — I'm comfortable jumping back into the JVM ecosystem alongside JS work.\n\nYour stack overlaps directly with mine: React, PostgreSQL, Java, Spring. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.\n\nPortfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510\n\nHappy to walk through any of the work whenever it's useful.\n\nThanks,\nJayant Goyal",
+    "ai_referral_message": "Hey {{connection_name}},\n\nSaw you're at MongoDB — wanted to reach out before I send my application into the void. I'm an early-career engineer (Next.js + Supabase, with Java foundations) and MongoDB just opened a \"Software Engineer, Code Generation\" role I genuinely fit .\n\nQuick proof: I ship a multi-tenant Next.js/Supabase RCM platform at NeuraOak and have a public portfolio (jayantgoyal.com) + GitHub.\n\nWould you be willing to refer me, or even just point me to whoever's hiring on the Code Generation side? Either way — appreciate you reading this. 🙏",
+    "application": {
+      "status": "interested",
+      "priority": "high",
+      "notes": "Score 81. global remote in JD; Next/React/TS stack match; Java mentioned."
+    }
+  },
+  {
+    "listing_id": "019df72f-0109-74bf-af2c-ab3f70dd4323",
+    "ai_score": 78,
+    "ai_recommendation": "apply",
+    "ai_reasoning": "explicit India location; tier-1 company",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "ai_cover_letter": "Hi Stripe team,\n\nApplying for the Software Engineer, Internal Systems role — what caught my attention is Finance Engineering team — at the core of Stripe to empower mission-critical financial domains including Accounting, Finance operations, Finance &amp; Strategy, and Tr.\n\nAt NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. I ship visibly: jayantgoyal.com hosts a portfolio plus tools, calculators, and games I built end-to-end with Next.js — all live, all open-source.\n\nYour stack overlaps directly with mine: Ruby, Golang, GraphQL, AWS. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.\n\nPortfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510\n\nHappy to walk through any of the work whenever it's useful.\n\nThanks,\nJayant Goyal",
+    "ai_referral_message": "Hey {{connection_name}},\n\nSaw you're at Stripe — wanted to reach out before I send my application into the void. I'm an early-career engineer (Next.js + Supabase, with Java foundations) and Stripe just opened a \"Software Engineer, Internal Systems\" role I genuinely fit (India remote).\n\nQuick proof: I ship a multi-tenant Next.js/Supabase RCM platform at NeuraOak and have a public portfolio (jayantgoyal.com) + GitHub.\n\nWould you be willing to refer me, or even just point me to whoever's hiring on the Internal Systems side? Either way — appreciate you reading this. 🙏",
+    "application": {
+      "status": "interested",
+      "priority": "high",
+      "notes": "Score 78. explicit India location; tier-1 company."
+    }
+  },
+  {
+    "listing_id": "019df72e-feaf-7fff-b079-5bde09373468",
+    "ai_score": 78,
+    "ai_recommendation": "apply",
+    "ai_reasoning": "explicit India location; tier-1 company",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "ai_cover_letter": "Hi Stripe team,\n\nApplying for the Software Engineer, Core Technology role — what caught my attention is have an unprecedented opportunity to put the global economy within everyone's reach while doing the most important work of your career.\n\nAt NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. I ship visibly: jayantgoyal.com hosts a portfolio plus tools, calculators, and games I built end-to-end with Next.js — all live, all open-source.\n\nYour stack is in my wheelhouse — TypeScript, Next.js, Supabase, and Postgres are what I ship in daily. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.\n\nPortfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510\n\nHappy to walk through any of the work whenever it's useful.\n\nThanks,\nJayant Goyal",
+    "ai_referral_message": "Hey {{connection_name}},\n\nSaw you're at Stripe — wanted to reach out before I send my application into the void. I'm an early-career engineer (Next.js + Supabase, with Java foundations) and Stripe just opened a \"Software Engineer, Core Technology\" role I genuinely fit (India remote).\n\nQuick proof: I ship a multi-tenant Next.js/Supabase RCM platform at NeuraOak and have a public portfolio (jayantgoyal.com) + GitHub.\n\nWould you be willing to refer me, or even just point me to whoever's hiring on the Core Technology side? Either way — appreciate you reading this. 🙏",
+    "application": {
+      "status": "interested",
+      "priority": "high",
+      "notes": "Score 78. explicit India location; tier-1 company."
+    }
+  },
+  {
+    "listing_id": "019df72f-ac4f-7f04-a1a1-f7c337411f34",
+    "ai_score": 75,
+    "ai_recommendation": "apply",
+    "ai_reasoning": "explicit India location; L2 = mid-level; asks 3-4 yrs",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "ai_cover_letter": "Hi Twilio team,\n\nApplying for the Technical Support Engineer 2 (Email Infra) role — what caught my attention is function as the voice of Twilio to our customers and partners, and operate as a subject matter expert for Twilio’s APIs and SDKs.\n\nAt NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. I designed Supabase RLS policies and SQL hot-paths that gave us tenant isolation plus a measurable ~30% perf win — comfortable thinking about correctness and throughput together.\n\nYour stack is in my wheelhouse — TypeScript, Next.js, Supabase, and Postgres are what I ship in daily. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.\n\nPortfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510\n\nHappy to walk through any of the work whenever it's useful.\n\nThanks,\nJayant Goyal",
+    "ai_referral_message": "Hey {{connection_name}},\n\nSaw you're at Twilio — wanted to reach out before I send my application into the void. I'm an early-career engineer (Next.js + Supabase, with Java foundations) and Twilio just opened a \"Technical Support Engineer 2 (Email Infra)\" role I genuinely fit (India remote).\n\nQuick proof: I ship a multi-tenant Next.js/Supabase RCM platform at NeuraOak and have a public portfolio (jayantgoyal.com) + GitHub.\n\nWould you be willing to refer me, or even just point me to whoever's hiring on the Technical Support Engineer 2 (Email Infra) side? Either way — appreciate you reading this. 🙏",
+    "application": {
+      "status": "interested",
+      "priority": "high",
+      "notes": "Score 75. explicit India location; L2 = mid-level; asks 3-4 yrs."
+    }
+  },
+  {
+    "listing_id": "019df72f-abb0-7de1-a231-90848b81bd44",
+    "ai_score": 75,
+    "ai_recommendation": "apply",
+    "ai_reasoning": "explicit India location; L2 = mid-level; asks 3-4 yrs",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "ai_cover_letter": "Hi Twilio team,\n\nApplying for the Applications Engineer 2 role — what caught my attention is in the unique position of joining a growing development team that you can learn with and help shape.\n\nAt NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. I ship visibly: jayantgoyal.com hosts a portfolio plus tools, calculators, and games I built end-to-end with Next.js — all live, all open-source.\n\nYour stack overlaps directly with mine: Golang. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.\n\nPortfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510\n\nHappy to walk through any of the work whenever it's useful.\n\nThanks,\nJayant Goyal",
+    "ai_referral_message": "Hey {{connection_name}},\n\nSaw you're at Twilio — wanted to reach out before I send my application into the void. I'm an early-career engineer (Next.js + Supabase, with Java foundations) and Twilio just opened a \"Applications Engineer 2\" role I genuinely fit (India remote).\n\nQuick proof: I ship a multi-tenant Next.js/Supabase RCM platform at NeuraOak and have a public portfolio (jayantgoyal.com) + GitHub.\n\nWould you be willing to refer me, or even just point me to whoever's hiring on the Applications Engineer 2 side? Either way — appreciate you reading this. 🙏",
+    "application": {
+      "status": "interested",
+      "priority": "high",
+      "notes": "Score 75. explicit India location; L2 = mid-level; asks 3-4 yrs."
+    }
+  },
+  {
+    "listing_id": "019df72e-fb04-713b-bfb5-979b1fa25e3d",
+    "ai_score": 71,
+    "ai_recommendation": "apply",
+    "ai_reasoning": "global remote in JD; backend title; entry/junior welcome",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "ai_cover_letter": "Hi Stripe team,\n\nApplying for the Backend/API Engineer, Money as a Service role — what caught my attention is have an unprecedented opportunity to put the global economy within everyone's reach while doing the most important work of your career.\n\nAt NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. I designed Supabase RLS policies and SQL hot-paths that gave us tenant isolation plus a measurable ~30% perf win — comfortable thinking about correctness and throughput together.\n\nYour stack overlaps directly with mine: GraphQL, AWS, Kubernetes. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.\n\nPortfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510\n\nHappy to walk through any of the work whenever it's useful.\n\nThanks,\nJayant Goyal",
+    "ai_referral_message": "Hey {{connection_name}},\n\nSaw you're at Stripe — wanted to reach out before I send my application into the void. I'm an early-career engineer (Next.js + Supabase, with Java foundations) and Stripe just opened a \"Backend/API Engineer, Money as a Service\" role I genuinely fit .\n\nQuick proof: I ship a multi-tenant Next.js/Supabase RCM platform at NeuraOak and have a public portfolio (jayantgoyal.com) + GitHub.\n\nWould you be willing to refer me, or even just point me to whoever's hiring on the Backend/API Engineer, Money as a Service side? Either way — appreciate you reading this. 🙏",
+    "application": {
+      "status": "interested",
+      "priority": "high",
+      "notes": "Score 71. global remote in JD; backend title; entry/junior welcome."
+    }
+  },
+  {
+    "listing_id": "019df72e-feb0-7598-9c97-ecb339711058",
+    "ai_score": 71,
+    "ai_recommendation": "apply",
+    "ai_reasoning": "explicit India location; asks 3-4 yrs; tier-1 company",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "ai_cover_letter": "Hi Stripe team,\n\nApplying for the Software Engineer, Data & AI role — what caught my attention is have an unprecedented opportunity to put the global economy within everyone's reach while doing the most important work of your career.\n\nAt NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. I ship visibly: jayantgoyal.com hosts a portfolio plus tools, calculators, and games I built end-to-end with Next.js — all live, all open-source.\n\nYour stack is in my wheelhouse — TypeScript, Next.js, Supabase, and Postgres are what I ship in daily. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.\n\nPortfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510\n\nHappy to walk through any of the work whenever it's useful.\n\nThanks,\nJayant Goyal",
+    "ai_referral_message": "Hey {{connection_name}},\n\nSaw you're at Stripe — wanted to reach out before I send my application into the void. I'm an early-career engineer (Next.js + Supabase, with Java foundations) and Stripe just opened a \"Software Engineer, Data & AI\" role I genuinely fit (India remote).\n\nQuick proof: I ship a multi-tenant Next.js/Supabase RCM platform at NeuraOak and have a public portfolio (jayantgoyal.com) + GitHub.\n\nWould you be willing to refer me, or even just point me to whoever's hiring on the Data & AI side? Either way — appreciate you reading this. 🙏",
+    "application": {
+      "status": "interested",
+      "priority": "high",
+      "notes": "Score 71. explicit India location; asks 3-4 yrs; tier-1 company."
+    }
+  },
+  {
+    "listing_id": "019df72e-fb0d-7fc4-82b8-6bb981453719",
+    "ai_score": 71,
+    "ai_recommendation": "apply",
+    "ai_reasoning": "global remote in JD; backend title; entry/junior welcome",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "ai_cover_letter": "Hi Stripe team,\n\nApplying for the Backend Engineer, Payments and Risk role — what caught my attention is have an unprecedented opportunity to put the global economy within everyone's reach while doing the most important work of your career.\n\nAt NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. I designed Supabase RLS policies and SQL hot-paths that gave us tenant isolation plus a measurable ~30% perf win — comfortable thinking about correctness and throughput together.\n\nYour stack overlaps directly with mine: GraphQL, AWS, Kubernetes. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.\n\nPortfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510\n\nHappy to walk through any of the work whenever it's useful.\n\nThanks,\nJayant Goyal",
+    "ai_referral_message": "Hey {{connection_name}},\n\nSaw you're at Stripe — wanted to reach out before I send my application into the void. I'm an early-career engineer (Next.js + Supabase, with Java foundations) and Stripe just opened a \"Backend Engineer, Payments and Risk\" role I genuinely fit .\n\nQuick proof: I ship a multi-tenant Next.js/Supabase RCM platform at NeuraOak and have a public portfolio (jayantgoyal.com) + GitHub.\n\nWould you be willing to refer me, or even just point me to whoever's hiring on the Backend Engineer, Payments and Risk side? Either way — appreciate you reading this. 🙏",
+    "application": {
+      "status": "interested",
+      "priority": "high",
+      "notes": "Score 71. global remote in JD; backend title; entry/junior welcome."
+    }
+  },
+  {
+    "listing_id": "019df72e-fb0c-7f10-b1b5-ff65a67895b2",
+    "ai_score": 71,
+    "ai_recommendation": "apply",
+    "ai_reasoning": "global remote in JD; backend title; entry/junior welcome",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "ai_cover_letter": "Hi Stripe team,\n\nApplying for the Backend Engineer, Payments and Risk role — what caught my attention is have an unprecedented opportunity to put the global economy within everyone's reach while doing the most important work of your career.\n\nAt NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. I designed Supabase RLS policies and SQL hot-paths that gave us tenant isolation plus a measurable ~30% perf win — comfortable thinking about correctness and throughput together.\n\nYour stack overlaps directly with mine: GraphQL, AWS, Kubernetes. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.\n\nPortfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510\n\nHappy to walk through any of the work whenever it's useful.\n\nThanks,\nJayant Goyal",
+    "ai_referral_message": "Hey {{connection_name}},\n\nSaw you're at Stripe — wanted to reach out before I send my application into the void. I'm an early-career engineer (Next.js + Supabase, with Java foundations) and Stripe just opened a \"Backend Engineer, Payments and Risk\" role I genuinely fit .\n\nQuick proof: I ship a multi-tenant Next.js/Supabase RCM platform at NeuraOak and have a public portfolio (jayantgoyal.com) + GitHub.\n\nWould you be willing to refer me, or even just point me to whoever's hiring on the Backend Engineer, Payments and Risk side? Either way — appreciate you reading this. 🙏",
+    "application": {
+      "status": "interested",
+      "priority": "high",
+      "notes": "Score 71. global remote in JD; backend title; entry/junior welcome."
+    }
+  },
+  {
+    "listing_id": "019df72e-fb05-7dc0-b5cc-ed7835e87a58",
+    "ai_score": 71,
+    "ai_recommendation": "apply",
+    "ai_reasoning": "global remote in JD; backend title; entry/junior welcome",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "ai_cover_letter": "Hi Stripe team,\n\nApplying for the Backend / API Engineer, Payouts role — what caught my attention is are an intern, new grad, or staff applicant, please do not apply using this link and visit our </em><a href=\"https://stripe.\n\nAt NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. I designed Supabase RLS policies and SQL hot-paths that gave us tenant isolation plus a measurable ~30% perf win — comfortable thinking about correctness and throughput together.\n\nYour stack overlaps directly with mine: GraphQL, AWS, Kubernetes. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.\n\nPortfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510\n\nHappy to walk through any of the work whenever it's useful.\n\nThanks,\nJayant Goyal",
+    "ai_referral_message": "Hey {{connection_name}},\n\nSaw you're at Stripe — wanted to reach out before I send my application into the void. I'm an early-career engineer (Next.js + Supabase, with Java foundations) and Stripe just opened a \"Backend / API Engineer, Payouts\" role I genuinely fit .\n\nQuick proof: I ship a multi-tenant Next.js/Supabase RCM platform at NeuraOak and have a public portfolio (jayantgoyal.com) + GitHub.\n\nWould you be willing to refer me, or even just point me to whoever's hiring on the Backend / API Engineer, Payouts side? Either way — appreciate you reading this. 🙏",
+    "application": {
+      "status": "interested",
+      "priority": "high",
+      "notes": "Score 71. global remote in JD; backend title; entry/junior welcome."
+    }
+  },
+  {
+    "listing_id": "019df72e-fb63-7d96-a943-568e3f1e9e5f",
+    "ai_score": 68,
+    "ai_recommendation": "apply",
+    "ai_reasoning": "global remote in JD; full-stack title; asks 3-4 yrs",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "ai_cover_letter": "Hi Stripe team,\n\nApplying for the Full Stack Engineer, Web Presence and Platform role — what caught my attention is have an unprecedented opportunity to put the global economy within everyone’s reach while doing the most important work of your career.\n\nAt NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. I designed Supabase RLS policies and SQL hot-paths that gave us tenant isolation plus a measurable ~30% perf win — comfortable thinking about correctness and throughput together.\n\nYour stack is in my wheelhouse — TypeScript, Next.js, Supabase, and Postgres are what I ship in daily. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.\n\nPortfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510\n\nHappy to walk through any of the work whenever it's useful.\n\nThanks,\nJayant Goyal",
+    "ai_referral_message": "Hey {{connection_name}},\n\nSaw you're at Stripe — wanted to reach out before I send my application into the void. I'm an early-career engineer (Next.js + Supabase, with Java foundations) and Stripe just opened a \"Full Stack Engineer, Web Presence and Platform\" role I genuinely fit .\n\nQuick proof: I ship a multi-tenant Next.js/Supabase RCM platform at NeuraOak and have a public portfolio (jayantgoyal.com) + GitHub.\n\nWould you be willing to refer me, or even just point me to whoever's hiring on the Full Stack Engineer, Web Presence and Platform side? Either way — appreciate you reading this. 🙏",
+    "application": {
+      "status": "interested",
+      "priority": "high",
+      "notes": "Score 68. global remote in JD; full-stack title; asks 3-4 yrs."
+    }
+  },
+  {
+    "listing_id": "019df72f-a044-7127-8a47-c5aba4b33795",
+    "ai_score": 67,
+    "ai_recommendation": "apply",
+    "ai_reasoning": "India mentioned in JD; L3 = mid-senior; Next/React/TS stack match",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "ai_cover_letter": "Hi MongoDB team,\n\nApplying for the Software Engineer 3 role — what caught my attention is Enterprise Advanced team — a diverse group of individuals across Europe and India, who develop software to run MongoDB on any type of infrastructure at global scale.\n\nAt NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. My HighRadius internship was Java/Spring/Hibernate — I'm comfortable jumping back into the JVM ecosystem alongside JS work.\n\nYour stack overlaps directly with mine: React, Java, Golang, AWS. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.\n\nPortfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510\n\nHappy to walk through any of the work whenever it's useful.\n\nThanks,\nJayant Goyal",
+    "ai_referral_message": "Hey {{connection_name}},\n\nSaw you're at MongoDB — wanted to reach out before I send my application into the void. I'm an early-career engineer (Next.js + Supabase, with Java foundations) and MongoDB just opened a \"Software Engineer 3\" role I genuinely fit .\n\nQuick proof: I ship a multi-tenant Next.js/Supabase RCM platform at NeuraOak and have a public portfolio (jayantgoyal.com) + GitHub.\n\nWould you be willing to refer me, or even just point me to whoever's hiring on the 3 side? Either way — appreciate you reading this. 🙏",
+    "application": {
+      "status": "interested",
+      "priority": "high",
+      "notes": "Score 67. India mentioned in JD; L3 = mid-senior; Next/React/TS stack match."
+    }
+  },
+  {
+    "listing_id": "019df72e-d921-7125-a6c5-0de3ddd1293a",
+    "ai_score": 67,
+    "ai_recommendation": "apply",
+    "ai_reasoning": "global remote in JD; backend title; Next/React/TS stack match",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "ai_cover_letter": "Hi Tether team,\n\nApplying for the Backend Engineer - Wallets role — what caught my attention is work on groundbreaking, high-availability projects utilizing microservices and P2P technologies.\n\nAt NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. I designed Supabase RLS policies and SQL hot-paths that gave us tenant isolation plus a measurable ~30% perf win — comfortable thinking about correctness and throughput together.\n\nYour stack overlaps directly with mine: Node.js. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.\n\nPortfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510\n\nHappy to walk through any of the work whenever it's useful.\n\nThanks,\nJayant Goyal",
+    "ai_referral_message": "Hey {{connection_name}},\n\nSaw you're at Tether — wanted to reach out before I send my application into the void. I'm an early-career engineer (Next.js + Supabase, with Java foundations) and Tether just opened a \"Backend Engineer - Wallets\" role I genuinely fit .\n\nQuick proof: I ship a multi-tenant Next.js/Supabase RCM platform at NeuraOak and have a public portfolio (jayantgoyal.com) + GitHub.\n\nWould you be willing to refer me, or even just point me to whoever's hiring on the Backend Engineer side? Either way — appreciate you reading this. 🙏",
+    "application": {
+      "status": "interested",
+      "priority": "high",
+      "notes": "Score 67. global remote in JD; backend title; Next/React/TS stack match."
+    }
+  },
+  {
+    "listing_id": "019df72f-0107-78f1-8b71-c6d5fca4c379",
+    "ai_score": 66,
+    "ai_recommendation": "apply",
+    "ai_reasoning": "explicit India location; asks 5+ years (significant stretch); entry/junior welcome",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "ai_cover_letter": "Hi Stripe team,\n\nApplying for the Software Engineer, Fee Insights role — what caught my attention is have an unprecedented opportunity to put the global economy within everyone’s reach while doing the most important work of your career.\n\nAt NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. I ship visibly: jayantgoyal.com hosts a portfolio plus tools, calculators, and games I built end-to-end with Next.js — all live, all open-source.\n\nYour stack is in my wheelhouse — TypeScript, Next.js, Supabase, and Postgres are what I ship in daily. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.\n\nPortfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510\n\nHappy to walk through any of the work whenever it's useful.\n\nThanks,\nJayant Goyal",
+    "ai_referral_message": "Hey {{connection_name}},\n\nSaw you're at Stripe — wanted to reach out before I send my application into the void. I'm an early-career engineer (Next.js + Supabase, with Java foundations) and Stripe just opened a \"Software Engineer, Fee Insights\" role I genuinely fit (India remote).\n\nQuick proof: I ship a multi-tenant Next.js/Supabase RCM platform at NeuraOak and have a public portfolio (jayantgoyal.com) + GitHub.\n\nWould you be willing to refer me, or even just point me to whoever's hiring on the Fee Insights side? Either way — appreciate you reading this. 🙏",
+    "application": {
+      "status": "interested",
+      "priority": "high",
+      "notes": "Score 66. explicit India location; asks 5+ years (significant stretch); entry/junior welcome."
+    }
+  },
+  {
+    "listing_id": "019df72f-a041-73d1-b9c9-70eba4a05275",
+    "ai_score": 65,
+    "ai_recommendation": "apply",
+    "ai_reasoning": "explicit India location; L3 = mid-senior; Java mentioned",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "ai_cover_letter": "Hi MongoDB team,\n\nApplying for the Software Engineer 3 role — what caught my attention is responsible for developing cutting edge technologies related to enabling deployment at scale of AI applications.\n\nAt NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. My HighRadius internship was Java/Spring/Hibernate — I'm comfortable jumping back into the JVM ecosystem alongside JS work.\n\nYour stack overlaps directly with mine: Java, Golang, AWS, Kubernetes. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.\n\nPortfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510\n\nHappy to walk through any of the work whenever it's useful.\n\nThanks,\nJayant Goyal",
+    "ai_referral_message": "Hey {{connection_name}},\n\nSaw you're at MongoDB — wanted to reach out before I send my application into the void. I'm an early-career engineer (Next.js + Supabase, with Java foundations) and MongoDB just opened a \"Software Engineer 3\" role I genuinely fit (India remote).\n\nQuick proof: I ship a multi-tenant Next.js/Supabase RCM platform at NeuraOak and have a public portfolio (jayantgoyal.com) + GitHub.\n\nWould you be willing to refer me, or even just point me to whoever's hiring on the 3 side? Either way — appreciate you reading this. 🙏",
+    "application": {
+      "status": "interested",
+      "priority": "high",
+      "notes": "Score 65. explicit India location; L3 = mid-senior; Java mentioned."
+    }
+  },
+  {
+    "listing_id": "019df72f-010b-7132-9fd3-75ce45fbcc5a",
+    "ai_score": 65,
+    "ai_recommendation": "apply",
+    "ai_reasoning": "global remote in JD; entry/junior welcome; tier-1 company",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "ai_cover_letter": "Hi Stripe team,\n\nApplying for the Software Engineer, Machine Learning Infrastructure role — what caught my attention is have an unprecedented opportunity to put the global economy within everyone’s reach while doing the most important work of your career.\n\nAt NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. I designed Supabase RLS policies and SQL hot-paths that gave us tenant isolation plus a measurable ~30% perf win — comfortable thinking about correctness and throughput together.\n\nYour stack is in my wheelhouse — TypeScript, Next.js, Supabase, and Postgres are what I ship in daily. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.\n\nPortfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510\n\nHappy to walk through any of the work whenever it's useful.\n\nThanks,\nJayant Goyal",
+    "ai_referral_message": "Hey {{connection_name}},\n\nSaw you're at Stripe — wanted to reach out before I send my application into the void. I'm an early-career engineer (Next.js + Supabase, with Java foundations) and Stripe just opened a \"Software Engineer, Machine Learning Infrastructure\" role I genuinely fit .\n\nQuick proof: I ship a multi-tenant Next.js/Supabase RCM platform at NeuraOak and have a public portfolio (jayantgoyal.com) + GitHub.\n\nWould you be willing to refer me, or even just point me to whoever's hiring on the Machine Learning Infrastructure side? Either way — appreciate you reading this. 🙏",
+    "application": {
+      "status": "interested",
+      "priority": "high",
+      "notes": "Score 65. global remote in JD; entry/junior welcome; tier-1 company."
+    }
+  },
+  {
+    "listing_id": "019df72e-fb07-76c6-90d3-65e47710c103",
+    "ai_score": 65,
+    "ai_recommendation": "apply",
+    "ai_reasoning": "global remote in JD; backend title; Java mentioned",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "ai_cover_letter": "Hi Stripe team,\n\nApplying for the Backend Engineer, Billing/Tax role — what caught my attention is have an unprecedented opportunity to put the global economy within everyone’s reach while doing the most important work of your career.\n\nAt NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. My HighRadius internship was Java/Spring/Hibernate — I'm comfortable jumping back into the JVM ecosystem alongside JS work.\n\nYour stack overlaps directly with mine: Java, Golang. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.\n\nPortfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510\n\nHappy to walk through any of the work whenever it's useful.\n\nThanks,\nJayant Goyal",
+    "ai_referral_message": "Hey {{connection_name}},\n\nSaw you're at Stripe — wanted to reach out before I send my application into the void. I'm an early-career engineer (Next.js + Supabase, with Java foundations) and Stripe just opened a \"Backend Engineer, Billing/Tax\" role I genuinely fit .\n\nQuick proof: I ship a multi-tenant Next.js/Supabase RCM platform at NeuraOak and have a public portfolio (jayantgoyal.com) + GitHub.\n\nWould you be willing to refer me, or even just point me to whoever's hiring on the Backend Engineer, Billing/Tax side? Either way — appreciate you reading this. 🙏",
+    "application": {
+      "status": "interested",
+      "priority": "high",
+      "notes": "Score 65. global remote in JD; backend title; Java mentioned."
+    }
+  },
+  {
+    "listing_id": "019df72e-d905-728b-8f55-53f42bbbe78b",
+    "ai_score": 63,
+    "ai_recommendation": "apply",
+    "ai_reasoning": "global remote in JD; entry-level title",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "ai_cover_letter": "Hi Enveritas team,\n\nApplying for the Backend Software Engineer role — what caught my attention is Backend Software Engineer role at Enveritas.\n\nAt NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. I've built RLS-backed multi-tenant data layers in Postgres/Supabase with real query optimization — performance gains around ~30% on production workloads.\n\nYour stack overlaps directly with mine: PostgreSQL, AWS. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.\n\nPortfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510\n\nHappy to walk through any of the work whenever it's useful.\n\nThanks,\nJayant Goyal",
+    "ai_referral_message": "Hey {{connection_name}},\n\nSaw you're at Enveritas — wanted to reach out before I send my application into the void. I'm an early-career engineer (Next.js + Supabase, with Java foundations) and Enveritas just opened a \"Backend Software Engineer\" role I genuinely fit .\n\nQuick proof: I ship a multi-tenant Next.js/Supabase RCM platform at NeuraOak and have a public portfolio (jayantgoyal.com) + GitHub.\n\nWould you be willing to refer me, or even just point me to whoever's hiring on the Backend Software Engineer side? Either way — appreciate you reading this. 🙏",
+    "application": {
+      "status": "interested",
+      "priority": "medium",
+      "notes": "Score 63. global remote in JD; entry-level title."
+    }
+  },
+  {
+    "listing_id": "019df72e-d915-71f1-b810-5f9dc46e171f",
+    "ai_score": 59,
+    "ai_recommendation": "apply_with_referral",
+    "ai_reasoning": "global remote in JD; full-stack title",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "ai_cover_letter": "Hi Entex team,\n\nApplying for the Full-stack Dev role — what caught my attention is the role's Dev | Remote (Worldwide) | 60 to 100 % entex is a small established Swiss IT ser stack.\n\nAt NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. I ship visibly: jayantgoyal.com hosts a portfolio plus tools, calculators, and games I built end-to-end with Next.js — all live, all open-source.\n\nYour stack is in my wheelhouse — TypeScript, Next.js, Supabase, and Postgres are what I ship in daily. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.\n\nPortfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510\n\nHappy to walk through any of the work whenever it's useful.\n\nThanks,\nJayant Goyal",
+    "ai_referral_message": "Hey {{connection_name}},\n\nSaw you're at Entex — wanted to reach out before I send my application into the void. I'm an early-career engineer (Next.js + Supabase, with Java foundations) and Entex just opened a \"Full-stack Dev\" role I genuinely fit .\n\nQuick proof: I ship a multi-tenant Next.js/Supabase RCM platform at NeuraOak and have a public portfolio (jayantgoyal.com) + GitHub.\n\nWould you be willing to refer me, or even just point me to whoever's hiring on the Full side? Either way — appreciate you reading this. 🙏",
+    "application": {
+      "status": "interested",
+      "priority": "medium",
+      "notes": "Score 59. global remote in JD; full-stack title."
+    }
+  },
+  {
+    "listing_id": "019df72f-a04e-7960-8db7-5d59f480ccf8",
+    "ai_score": 55,
+    "ai_recommendation": "apply_with_referral",
+    "ai_reasoning": "India mentioned in JD; L3 = mid-senior; Java mentioned",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "ai_cover_letter": "Hi MongoDB team,\n\nApplying for the Software Engineer 3, Private Cloud Backup role — what caught my attention is Enterprise Advanced team — a diverse group of individuals across Europe and India, who develop software to run MongoDB on any type of infrastructure at global scale.\n\nAt NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. My HighRadius internship was Java/Spring/Hibernate — I'm comfortable jumping back into the JVM ecosystem alongside JS work.\n\nYour stack overlaps directly with mine: Java, Golang, AWS. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.\n\nPortfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510\n\nHappy to walk through any of the work whenever it's useful.\n\nThanks,\nJayant Goyal",
+    "ai_referral_message": "Hey {{connection_name}},\n\nSaw you're at MongoDB — wanted to reach out before I send my application into the void. I'm an early-career engineer (Next.js + Supabase, with Java foundations) and MongoDB just opened a \"Software Engineer 3, Private Cloud Backup\" role I genuinely fit .\n\nQuick proof: I ship a multi-tenant Next.js/Supabase RCM platform at NeuraOak and have a public portfolio (jayantgoyal.com) + GitHub.\n\nWould you be willing to refer me, or even just point me to whoever's hiring on the 3, Private Cloud Backup side? Either way — appreciate you reading this. 🙏",
+    "application": {
+      "status": "interested",
+      "priority": "medium",
+      "notes": "Score 55. India mentioned in JD; L3 = mid-senior; Java mentioned."
+    }
+  },
+  {
+    "listing_id": "019df72f-5e26-75a8-85b0-7983e253008e",
+    "ai_score": 52,
+    "ai_recommendation": "apply_with_referral",
+    "ai_reasoning": "global remote in JD; Java mentioned; asks 3-4 yrs",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "ai_cover_letter": "Hi Reddit team,\n\nApplying for the iOS Software Engineer, Contributions role — what caught my attention is Contributions team — responsible for two of the most important actions on the platform: Posting and Commenting.\n\nAt NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. My HighRadius internship was Java/Spring/Hibernate — I'm comfortable jumping back into the JVM ecosystem alongside JS work.\n\nYour stack overlaps directly with mine: Java, Rust, Golang, GraphQL. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.\n\nPortfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510\n\nHappy to walk through any of the work whenever it's useful.\n\nThanks,\nJayant Goyal",
+    "ai_referral_message": "Hey {{connection_name}},\n\nSaw you're at Reddit — wanted to reach out before I send my application into the void. I'm an early-career engineer (Next.js + Supabase, with Java foundations) and Reddit just opened a \"iOS Software Engineer, Contributions\" role I genuinely fit .\n\nQuick proof: I ship a multi-tenant Next.js/Supabase RCM platform at NeuraOak and have a public portfolio (jayantgoyal.com) + GitHub.\n\nWould you be willing to refer me, or even just point me to whoever's hiring on the iOS Software Engineer, Contributions side? Either way — appreciate you reading this. 🙏",
+    "application": {
+      "status": "interested",
+      "priority": "medium",
+      "notes": "Score 52. global remote in JD; Java mentioned; asks 3-4 yrs."
+    }
+  },
+  {
+    "listing_id": "019df72f-a057-7f84-98d0-7a16c969403a",
+    "ai_score": 48,
+    "ai_recommendation": "apply_if_time",
+    "ai_reasoning": "global remote in JD; asks 3-4 yrs; tier-1 company",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "application": {
+      "status": "interested",
+      "priority": "low",
+      "notes": "Score 48. global remote in JD; asks 3-4 yrs; tier-1 company."
+    }
+  },
+  {
+    "listing_id": "019df72f-ac24-7549-a970-d37533b00fe5",
+    "ai_score": 45,
+    "ai_recommendation": "apply_if_time",
+    "ai_reasoning": "global remote in JD; L3 = mid-senior; Next/React/TS stack match",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "application": {
+      "status": "interested",
+      "priority": "low",
+      "notes": "Score 45. global remote in JD; L3 = mid-senior; Next/React/TS stack match."
+    }
+  },
+  {
+    "listing_id": "019df72e-fb09-7e31-9558-5a6d10dccd18",
+    "ai_score": 43,
+    "ai_recommendation": "apply_if_time",
+    "ai_reasoning": "global remote in JD; backend title; Java mentioned",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05",
+    "application": {
+      "status": "interested",
+      "priority": "low",
+      "notes": "Score 43. global remote in JD; backend title; Java mentioned."
+    }
+  },
+  {
+    "listing_id": "019df72f-ac1c-7343-8016-778d65c7a416",
+    "ai_score": 43,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "entry-level title; Next/React/TS stack match; Java mentioned",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-abb1-7e72-9046-8b00ec697978",
+    "ai_score": 41,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "entry-level title; Java mentioned; entry/junior welcome",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-ac21-79d2-a668-14ba281dbb5b",
+    "ai_score": 41,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "entry-level title; Java mentioned; entry/junior welcome",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-ac20-7c6b-a154-c32175593a77",
+    "ai_score": 41,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "entry-level title; Java mentioned; entry/junior welcome",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-ac1f-70e2-a386-10646252716c",
+    "ai_score": 41,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "entry-level title; Java mentioned; entry/junior welcome",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-996f-7fda-b577-d6ef4a20cf6f",
+    "ai_score": 38,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "location unclear; L3 = mid-senior; entry/junior welcome",
+    "ai_red_flags": [
+      "Visa/clearance/US-only restriction"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-010f-72c4-ba96-f6e8f124dba0",
+    "ai_score": 37,
+    "ai_recommendation": "skip",
+    "ai_reasoning": "global remote in JD; Java mentioned; asks 5+ years (significant stretch)",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72e-feb0-7228-b0ab-695d75a7f5b7",
+    "ai_score": 37,
+    "ai_recommendation": "skip",
+    "ai_reasoning": "global remote in JD; Java mentioned; asks 5+ years (significant stretch)",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-654c-78a2-a37a-2dbb449b221d",
+    "ai_score": 35,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "full-stack title; Next/React/TS stack match; tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72e-fb0b-722c-b817-75be5a7e3b41",
+    "ai_score": 34,
+    "ai_recommendation": "skip",
+    "ai_reasoning": "location unclear; backend title; Next/React/TS stack match",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-a041-7085-8c16-98c2fd7b292b",
+    "ai_score": 33,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "L2 = mid-level; Next/React/TS stack match; Java mentioned",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72e-feae-7c6d-9bd6-25154d49d7c3",
+    "ai_score": 31,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "entry-level title; Java mentioned; tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72e-feae-72ce-83b1-d46cedc046a2",
+    "ai_score": 31,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "entry-level title; Java mentioned; tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-ac1e-7ddd-9220-a9e5ef7358d9",
+    "ai_score": 31,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "entry-level title; Java mentioned; tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-ac21-76df-8dd2-90542a9feee5",
+    "ai_score": 31,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "entry-level title; Java mentioned; tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-a04e-7e44-8bee-d253a80aa31f",
+    "ai_score": 29,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "L3 = mid-senior; Next/React/TS stack match; Java mentioned",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-a04d-7ce3-bede-7070b24743a8",
+    "ai_score": 29,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "L3 = mid-senior; Next/React/TS stack match; Java mentioned",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-010a-7fc9-becd-2aaf44b12985",
+    "ai_score": 29,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "L2 = mid-level; Next/React/TS stack match; tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72e-fb06-74bc-93ef-1794e26186d9",
+    "ai_score": 29,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "backend title; entry/junior welcome; tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-5087-7017-8737-e02e24500ba3",
+    "ai_score": 25,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "Next/React/TS stack match; tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-010b-7492-bbab-4528a3904111",
+    "ai_score": 23,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "entry/junior welcome; tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72e-fb0a-79f5-94be-754016ba64d0",
+    "ai_score": 23,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "backend title; Java mentioned; tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72e-fb07-794e-ab0c-fa76ed5ef30d",
+    "ai_score": 23,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "backend title; Java mentioned; tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72e-fb04-7abb-acf1-2969d807dad1",
+    "ai_score": 23,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "backend title; Java mentioned; tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72e-fb09-757e-9f5c-fcf31b97ff73",
+    "ai_score": 23,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "backend title; Java mentioned; tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-506b-742b-abb9-69293bab9d25",
+    "ai_score": 23,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "entry/junior welcome; tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-a051-743a-a261-496d80f3af02",
+    "ai_score": 22,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "Next/React/TS stack match; Java mentioned; asks 3-4 yrs",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72e-fb0c-7839-9488-93e168d1b654",
+    "ai_score": 22,
+    "ai_recommendation": "skip",
+    "ai_reasoning": "location unclear; backend title; asks 5+ years (significant stretch)",
+    "ai_red_flags": [],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-a03e-77a9-be1c-ff3232b6a04e",
+    "ai_score": 21,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "L2 = mid-level; Java mentioned; tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-a04c-7fe4-95cd-8f47b4040133",
+    "ai_score": 19,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "L3 = mid-senior; Next/React/TS stack match; Java mentioned",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72e-fb08-79f4-b97a-88b33caec8b0",
+    "ai_score": 19,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "backend title; tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-50c0-75ff-8769-57cddeff8c87",
+    "ai_score": 19,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "entry-level title; Java mentioned; asks 5+ years (significant stretch)",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-a056-7cab-be7a-d9ba39945abb",
+    "ai_score": 18,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "Next/React/TS stack match; asks 3-4 yrs; tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-a050-7b1b-b201-ea2292958278",
+    "ai_score": 17,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "L3 = mid-senior; Java mentioned; entry/junior welcome",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-a04b-7163-8a16-85515d50a839",
+    "ai_score": 17,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "L3 = mid-senior; Java mentioned; entry/junior welcome",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-a04a-75b8-9c76-2ec58d6ef689",
+    "ai_score": 17,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "L3 = mid-senior; Java mentioned; entry/junior welcome",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-a049-7b85-950a-ff74f2819378",
+    "ai_score": 17,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "L3 = mid-senior; Java mentioned; entry/junior welcome",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-5081-7394-81ed-4883c7355b59",
+    "ai_score": 13,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-5080-7e1c-9298-01a718b879b9",
+    "ai_score": 13,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-a048-7e69-9528-b699caaab2c9",
+    "ai_score": 12,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "L3 = mid-senior; Next/React/TS stack match; Java mentioned",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-a04b-7ab4-b56e-dd66b0866ae7",
+    "ai_score": 10,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "L3 = mid-senior; Java mentioned; asks 3-4 yrs",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-a046-771a-b8cb-460635b06c6c",
+    "ai_score": 7,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "L3 = mid-senior; Java mentioned; tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-a047-7eb8-982c-6429a6b86e2f",
+    "ai_score": 7,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "L3 = mid-senior; Java mentioned; tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-010e-7da3-9cce-a4d5ceab5281",
+    "ai_score": 7,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "Next/React/TS stack match; Java mentioned; asks 5+ years (significant stretch)",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-a046-746c-8121-d90e94f7bfb7",
+    "ai_score": 3,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "L3 = mid-senior; tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72e-fb62-7087-9a44-a6660f011514",
+    "ai_score": 1,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "full-stack title; asks 5+ years (significant stretch); tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-a042-7ff6-bbbd-ccd49f0490c8",
+    "ai_score": 0,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "L3 = mid-senior; Java mentioned; asks 3-4 yrs",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-a050-73b2-bd31-d5cb8ad16f5d",
+    "ai_score": 0,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "L3 = mid-senior; asks 3-4 yrs; tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-a039-73e2-b937-56a2bba4eb00",
+    "ai_score": 0,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "L3 = mid-senior; asks 3-4 yrs; tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-a038-7977-8903-6934cf1bfeba",
+    "ai_score": 0,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "L3 = mid-senior; asks 3-4 yrs; tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-a04f-7413-9512-d40645eb35c2",
+    "ai_score": 0,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "L3 = mid-senior; asks 3-4 yrs; tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-6545-7f07-a723-d9448588c9ad",
+    "ai_score": 0,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "asks 5+ years (significant stretch); tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72e-feaf-79f7-87c9-81017a11eca3",
+    "ai_score": 0,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "asks 5+ years (significant stretch); tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72e-fb06-7129-9188-d1c06b26e108",
+    "ai_score": 0,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "backend title; asks 5+ years (significant stretch); tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-50be-71ea-98b0-f9943901ea75",
+    "ai_score": 0,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "asks 5+ years (significant stretch); tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  },
+  {
+    "listing_id": "019df72f-50be-7cb5-97b4-1e0fad1bf1aa",
+    "ai_score": 0,
+    "ai_recommendation": "skip_red_flags",
+    "ai_reasoning": "asks 5+ years (significant stretch); tier-1 company",
+    "ai_red_flags": [
+      "Posted for non-India location"
+    ],
+    "ai_resume_version": "2026-05-05"
+  }
+]

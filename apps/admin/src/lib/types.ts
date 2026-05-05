@@ -192,6 +192,133 @@ export interface NavItem {
 }
 
 /**
+ * Jobs Types
+ */
+
+export type JobSourceKind = "remotive" | "wwr" | "greenhouse" | "lever" | "hn_hiring";
+
+export type JobApplicationStatus =
+  | "new"
+  | "interested"
+  | "applied"
+  | "interviewing"
+  | "offer"
+  | "rejected"
+  | "withdrawn";
+
+export type JobAiRecommendation =
+  | "apply"
+  | "apply_with_referral"
+  | "apply_if_time"
+  | "skip"
+  | "skip_red_flags";
+
+export type JobPriority = "low" | "medium" | "high" | "critical";
+
+export interface JobSource {
+  id: string;
+  kind: JobSourceKind;
+  label: string;
+  config: Record<string, unknown>;
+  is_active: boolean;
+  last_fetched_at: string | null;
+  last_fetch_status: string | null;
+  last_fetch_error: string | null;
+  last_fetch_count: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface JobListing {
+  id: string;
+  source_id: string;
+  external_id: string;
+  title: string;
+  company: string;
+  location: string | null;
+  is_remote: boolean;
+  is_india: boolean;
+  salary_text: string | null;
+  salary_min_inr: number | null;
+  salary_max_inr: number | null;
+  salary_currency: string | null;
+  description_html: string | null;
+  description_text: string | null;
+  apply_url: string;
+  tags: string[];
+  posted_at: string | null;
+  fetched_at: string;
+  created_at: string;
+  updated_at: string;
+  ai_score: number | null;
+  ai_recommendation: JobAiRecommendation | null;
+  ai_reasoning: string | null;
+  ai_red_flags: string[];
+  ai_cover_letter: string | null;
+  ai_referral_message: string | null;
+  ai_processed_at: string | null;
+  // joined
+  source_kind?: JobSourceKind;
+  application?: JobApplication | null;
+}
+
+export interface JobApplication {
+  id: string;
+  listing_id: string | null;
+  title: string;
+  company: string;
+  apply_url: string | null;
+  status: JobApplicationStatus;
+  priority: JobPriority;
+  applied_at: string | null;
+  notes: string | null;
+  referral_contact: string | null;
+  referral_status: string | null;
+  next_action_at: string | null;
+  next_action_note: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface JobSearchCriteria {
+  id: string;
+  is_active: boolean;
+  keywords: string[];
+  excluded_keywords: string[];
+  locations: string[];
+  min_salary_inr: number | null;
+  remote_ok: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface JobListingsResponse {
+  data: JobListing[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface JobListingFilters {
+  q?: string;
+  india?: boolean;
+  remote?: boolean;
+  source_kind?: JobSourceKind | "all";
+  source_id?: string;
+  matches_keywords?: boolean;
+  has_salary?: boolean;
+  min_salary_inr?: number;
+  status?: JobApplicationStatus | "none" | "all";
+  ai_scored?: boolean;
+  min_ai_score?: number;
+  recommendation?: JobAiRecommendation | "all";
+  priority?: JobPriority | "all";
+  sort?: "ai_score" | "posted_at";
+  page?: number;
+  pageSize?: number;
+}
+
+/**
  * Vercel Types
  */
 
