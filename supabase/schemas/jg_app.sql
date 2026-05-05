@@ -61,8 +61,7 @@ CREATE TYPE "jg_app"."job_source_kind" AS ENUM (
     'wwr',
     'greenhouse',
     'lever',
-    'hn_hiring',
-    'ashby'
+    'hn_hiring'
 );
 
 

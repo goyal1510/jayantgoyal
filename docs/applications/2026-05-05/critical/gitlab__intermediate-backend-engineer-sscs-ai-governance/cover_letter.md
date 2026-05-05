@@ -1,10 +1,10 @@
 Hi GitLab team,
 
-Applying for the Intermediate Backend Engineer, SSCS: AI Governance role — what caught my attention is Intermediate Backend Engineer, SSCS: AI Governance role at GitLab.
+Applying for the Intermediate Backend Engineer, SSCS: AI Governance role — what caught my attention is lay the foundation for governance controls that enterprise customers rely on.
 
-At NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. I designed Supabase RLS policies and SQL hot-paths that gave us tenant isolation plus a measurable ~30% perf win — comfortable thinking about correctness and throughput together.
+At NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. I've built RLS-backed multi-tenant data layers in Postgres/Supabase with real query optimization — performance gains around ~30% on production workloads.
 
-Your stack is in my wheelhouse — TypeScript, Next.js, Supabase, and Postgres are what I ship in daily. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.
+Your stack overlaps directly with mine: PostgreSQL, Ruby, GraphQL. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.
 
 Portfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510
 

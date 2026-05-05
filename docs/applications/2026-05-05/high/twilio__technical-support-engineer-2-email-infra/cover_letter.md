@@ -1,6 +1,6 @@
 Hi Twilio team,
 
-Applying for the Technical Support Engineer 2 (Email Infra) role — what caught my attention is Technical Support Engineer 2 (Email Infra) role at Twilio.
+Applying for the Technical Support Engineer 2 (Email Infra) role — what caught my attention is function as the voice of Twilio to our customers and partners, and operate as a subject matter expert for Twilio’s APIs and SDKs.
 
 At NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. I designed Supabase RLS policies and SQL hot-paths that gave us tenant isolation plus a measurable ~30% perf win — comfortable thinking about correctness and throughput together.
 

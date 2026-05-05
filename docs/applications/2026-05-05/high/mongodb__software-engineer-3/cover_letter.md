@@ -1,10 +1,10 @@
 Hi MongoDB team,
 
-Applying for the Software Engineer 3 role — what caught my attention is Software Engineer 3 role at MongoDB.
+Applying for the Software Engineer 3 role — what caught my attention is responsible for developing cutting edge technologies related to enabling deployment at scale of AI applications.
 
-At NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. I ship visibly: jayantgoyal.com hosts a portfolio plus tools, calculators, and games I built end-to-end with Next.js — all live, all open-source.
+At NeuraOak I built and ship a multi-tenant RCM platform on Next.js + Supabase that cut claim processing time by ~35% and serves real billing teams in production. My HighRadius internship was Java/Spring/Hibernate — I'm comfortable jumping back into the JVM ecosystem alongside JS work.
 
-Your stack is in my wheelhouse — TypeScript, Next.js, Supabase, and Postgres are what I ship in daily. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.
+Your stack overlaps directly with mine: Java, Golang, AWS, Kubernetes. I'm an early-career engineer (≈1 yr full-time + a 6-mo Java/Spring internship at HighRadius), and I treat shipping the small details with the same seriousness as the headline features.
 
 Portfolio + projects: https://www.jayantgoyal.com  ·  GitHub: https://github.com/goyal1510  ·  LinkedIn: https://www.linkedin.com/in/goyal1510
 
