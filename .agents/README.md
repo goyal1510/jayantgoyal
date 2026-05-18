@@ -1,11 +1,11 @@
-# .claude Configuration
+# .agents Configuration
 
-This directory configures [Claude Code](https://claude.ai/code) for the jayantgoyal monorepo. It defines slash commands, AI agents, auto-invoked skills, rules, and permissions.
+This directory configures [Codex](https://claude.ai/code) for the jayantgoyal monorepo. It defines slash commands, AI agents, auto-invoked skills, rules, and permissions.
 
 ## Directory Structure
 
 ```
-.claude/
+.agents/
 ├── README.md                 # This file
 ├── settings.json             # Shared permissions (checked in)
 ├── settings.local.json       # Local permissions allowlist (gitignored)
@@ -29,7 +29,7 @@ This directory configures [Claude Code](https://claude.ai/code) for the jayantgo
 
 ## Commands
 
-Commands are custom workflows invoked manually with `/command-name` in a Claude Code session.
+Commands are custom workflows invoked manually with `/command-name` in a Codex session.
 
 ### `/fix-issue <number>`
 
@@ -46,7 +46,7 @@ Fixes a GitHub issue end-to-end.
 1. Switches GitHub CLI auth to `goyal1510`
 2. Fetches issue details via `gh issue view`
 3. Explores the codebase to locate the root cause
-4. Implements the fix following CLAUDE.md conventions
+4. Implements the fix following AGENTS.md conventions
 5. Runs `pnpm check-types --filter jg` and `pnpm lint` to verify
 6. Summarizes what was changed and why
 
@@ -190,7 +190,7 @@ Skills are specialized workflows that Claude invokes automatically based on cont
 
 ## Rules
 
-Rules are always-on context files that are automatically loaded into every Claude Code session. They provide persistent instructions that guide all responses without any manual invocation.
+Rules are always-on context files that are automatically loaded into every Codex session. They provide persistent instructions that guide all responses without any manual invocation.
 
 ### `code-style.md`
 
@@ -227,7 +227,7 @@ Checked into the repo. Contains default allow/deny lists (currently empty — no
 
 ### `settings.local.json` (Local, Gitignored)
 
-Your personal allowlist controlling which tools Claude Code can use without prompting:
+Your personal allowlist controlling which tools Codex can use without prompting:
 
 | Category | Allowed |
 |----------|---------|
@@ -243,9 +243,9 @@ Anything not in this list will prompt for approval before executing.
 
 | What | Type | How to invoke | Auto? |
 |------|------|--------------|-------|
-| `/fix-issue 42` | Command | Type in Claude Code | No |
-| `/review` | Command | Type in Claude Code | No |
-| `/ship` | Command | Type in Claude Code | No |
+| `/fix-issue 42` | Command | Type in Codex | No |
+| `/review` | Command | Type in Codex | No |
+| `/ship` | Command | Type in Codex | No |
 | `code-reviewer` | Agent | Reference in conversation | No |
 | `security-auditor` | Agent | Reference in conversation | No |
 | `security-review` | Skill | Triggers on auth/API/DB changes | **Yes** |

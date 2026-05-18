@@ -31,7 +31,7 @@
 - File manager (9 files, 24+ refs): tables → `file_manager_files` / `file_manager_type_categories`
 - Game hub (1 file): table → `game_hub_typing_speed_results`
 - Messenger (3 files): table → `messenger_messages` (including Realtime subscriptions)
-- Updated CLAUDE.md, .claude/rules/database.md
+- Updated AGENTS.md, .agents/rules/database.md
 - Created `supabase/schemas/jg_app.sql`, deleted 5 old schema files
 
 ### Phase 3: Blog Feature

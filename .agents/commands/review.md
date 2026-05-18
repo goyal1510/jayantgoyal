@@ -9,7 +9,7 @@ Review the current uncommitted changes for issues.
    - Missing error handling
    - Breaking changes to existing functionality
    - Performance concerns (unnecessary re-renders, missing memoization)
-3. Check adherence to project conventions from CLAUDE.md:
+3. Check adherence to project conventions from AGENTS.md:
    - Server component wraps client component pattern
    - `cn()` for class merging
    - Sonner toasts for notifications

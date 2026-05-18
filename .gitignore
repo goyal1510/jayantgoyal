@@ -38,7 +38,7 @@ supabase/migrations/
 supabase/.temp/
 
 # claude code
-.claude/settings.local.json
+.agents/settings.local.json
 CLAUDE.local.md
 
 # turbo

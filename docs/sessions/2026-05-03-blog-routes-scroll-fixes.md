@@ -45,7 +45,7 @@ Main app (`apps/jayantgoyal`)
 - New `manage.mjs`: list, delete, and edit (delete + re-post) commands
 - LinkedIn API doesn't support true edits — edit = delete + re-create
 
-### CLAUDE.md & env updates
+### AGENTS.md & env updates
 - Added SEO checklist to "Add New Feature" (metadata, OG, breadcrumbs, sitemap, proxy, auth-gate)
 - Added "Blog & LinkedIn Workflow" section (create post, LinkedIn posting, manage commands)
 - Added SEO conventions (mandatory metadata, breadcrumb files, CSP updates)
