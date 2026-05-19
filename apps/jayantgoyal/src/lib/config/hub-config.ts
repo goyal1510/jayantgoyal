@@ -27,6 +27,8 @@ import {
   Type,
   Puzzle,
   FileText,
+  Crown,
+  Dice5,
   type LucideIcon,
 } from "lucide-react"
 
@@ -70,6 +72,8 @@ const GAME_HUB_NAV: NavItem[] = [
   { id: "memory-match", label: "Memory Match", icon: Brain, color: "text-pink-500 dark:text-pink-400", url: "/games/memory-match" },
   { id: "wordle", label: "Wordle", icon: Puzzle, color: "text-emerald-500 dark:text-emerald-400", url: "/games/wordle" },
   { id: "typing-speed", label: "Typing Speed", icon: Type, color: "text-cyan-500 dark:text-cyan-400", url: "/games/typing-speed" },
+  { id: "chess", label: "Chess", icon: Crown, color: "text-stone-600 dark:text-stone-300", url: "/games/chess" },
+  { id: "ludo", label: "Ludo", icon: Dice5, color: "text-rose-500 dark:text-rose-400", url: "/games/ludo" },
 ]
 
 // Tech Tools - uses nested navigation from lib/tools/tools.ts

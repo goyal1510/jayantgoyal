@@ -1,9 +1,13 @@
 "use client"
 
-import { RotateCcw, BarChart3 } from "lucide-react"
+import { useState } from "react"
+import { RotateCcw, BarChart3, Loader2, Wifi } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 import { Button } from "@repo/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card"
+import { Input } from "@repo/ui/input"
 
 import {
   useWordle,
@@ -11,8 +15,10 @@ import {
   STATE_COLORS,
   KEY_COLORS,
 } from "@/components/games/use-wordle"
+import { createWordleState } from "@/lib/games/wordle"
 
 export function Wordle() {
+  const router = useRouter()
   const {
     mode,
     guesses,
@@ -28,6 +34,48 @@ export function Wordle() {
     startGame,
     handleKey,
   } = useWordle()
+  const [onlineRoomCode, setOnlineRoomCode] = useState("")
+  const [creatingOnlineRoom, setCreatingOnlineRoom] = useState(false)
+  const [joiningOnlineRoom, setJoiningOnlineRoom] = useState(false)
+
+  const createOnlineRoom = async () => {
+    setCreatingOnlineRoom(true)
+    const response = await fetch("/api/games/sessions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        gameSlug: "wordle",
+        displayName: "Wordle P1",
+        settings: {
+          initialState: createWordleState(),
+        },
+      }),
+    })
+    setCreatingOnlineRoom(false)
+
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}))
+      toast.error(data.error ?? "Unable to create online room")
+      return
+    }
+
+    const data = await response.json()
+    const roomCode = data.session?.session?.room_code
+    if (typeof roomCode === "string") {
+      router.push(`/games/wordle/room/${roomCode}`)
+    }
+  }
+
+  const joinOnlineRoom = () => {
+    const normalized = onlineRoomCode.trim().toUpperCase()
+    if (!normalized) {
+      toast.error("Enter a room code")
+      return
+    }
+
+    setJoiningOnlineRoom(true)
+    router.push(`/games/wordle/room/${normalized}`)
+  }
 
   if (!mode) {
     return (
@@ -46,6 +94,39 @@ export function Wordle() {
             Random Word
           </Button>
         </div>
+        <Card className="w-full">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Wifi className="h-4 w-4" />
+              Online room
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Button
+              onClick={() => void createOnlineRoom()}
+              disabled={creatingOnlineRoom}
+              className="w-full"
+            >
+              {creatingOnlineRoom ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create online challenge"}
+            </Button>
+            <div className="flex gap-2">
+              <Input
+                value={onlineRoomCode}
+                onChange={(event) => setOnlineRoomCode(event.target.value)}
+                placeholder="Room code"
+                className="uppercase"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={joinOnlineRoom}
+                disabled={joiningOnlineRoom}
+              >
+                {joiningOnlineRoom ? <Loader2 className="h-4 w-4 animate-spin" /> : "Join"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
         {stats.gamesPlayed > 0 && (
           <Card className="w-full">
             <CardHeader className="pb-2">

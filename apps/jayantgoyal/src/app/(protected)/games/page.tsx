@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import type { ComponentType } from "react"
-import { ArrowRight, Grid3X3, HandHeart, Scissors, Layers, Brain, Puzzle, Type } from "lucide-react"
+import { ArrowRight, Grid3X3, HandHeart, Scissors, Layers, Brain, Puzzle, Type, Crown, Dice5 } from "lucide-react"
 
 import { GAME_META } from "@/lib/games/config"
 import { cn } from "@repo/ui/lib/utils"
@@ -9,7 +9,7 @@ import { cn } from "@repo/ui/lib/utils"
 export const metadata: Metadata = {
   title: "Games",
   description:
-    "Play 7 interactive games — Tic Tac Toe, Connect Four, Memory Match, Wordle, Typing Speed Test, and more.",
+    "Play interactive games — Tic Tac Toe, Connect Four, Memory Match, Wordle, Chess, Ludo, and more.",
 }
 
 const CARD_THEMES: Record<
@@ -83,6 +83,24 @@ const CARD_THEMES: Record<
       "bg-cyan-100/80 border-cyan-200/70 dark:bg-cyan-500/10 dark:border-cyan-500/30",
     accentText: "text-cyan-800 dark:text-cyan-50",
     border: "border-slate-200/60 dark:border-slate-800",
+  },
+  chess: {
+    gradient:
+      "from-stone-300/70 via-amber-50 to-white dark:from-stone-500/25 dark:via-zinc-950 dark:to-black",
+    icon: Crown,
+    accent:
+      "bg-stone-100/90 border-stone-300/80 dark:bg-stone-500/10 dark:border-stone-400/30",
+    accentText: "text-stone-900 dark:text-stone-50",
+    border: "border-stone-300/70 dark:border-stone-800",
+  },
+  ludo: {
+    gradient:
+      "from-rose-200/60 via-orange-50 to-white dark:from-rose-500/25 dark:via-zinc-950 dark:to-black",
+    icon: Dice5,
+    accent:
+      "bg-rose-100/90 border-rose-300/80 dark:bg-rose-500/10 dark:border-rose-400/30",
+    accentText: "text-rose-900 dark:text-rose-50",
+    border: "border-rose-300/70 dark:border-rose-800",
   },
 }
 

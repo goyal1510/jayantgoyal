@@ -63,7 +63,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const gamePages = [
     "tic-tac-toe", "connect-four", "memory-match",
-    "rock-paper-scissors", "dare-x", "wordle", "typing-speed",
+    "rock-paper-scissors", "dare-x", "wordle", "typing-speed", "chess", "ludo",
   ].map((game) => ({
     url: `${BASE_URL}/games/${game}`,
     lastModified: LAST_MODIFIED,

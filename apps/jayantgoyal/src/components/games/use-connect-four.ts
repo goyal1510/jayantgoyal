@@ -16,7 +16,11 @@ export const DEFAULT_NAMES = {
   Y: "Player Yellow",
 }
 
-function getAvailableRow(col: number, boardState: Cell[][]): number | null {
+export function createEmptyConnectFourBoard(): Cell[][] {
+  return Array(ROWS).fill(null).map(() => Array(COLS).fill("") as Cell[])
+}
+
+export function getAvailableRow(col: number, boardState: Cell[][]): number | null {
   for (let row = ROWS - 1; row >= 0; row--) {
     if (boardState[row]![col] === "") {
       return row
@@ -25,7 +29,7 @@ function getAvailableRow(col: number, boardState: Cell[][]): number | null {
   return null
 }
 
-function checkWinner(board: Cell[][], row: number, col: number, player: "R" | "Y"): Array<{ row: number; col: number }> | null {
+export function checkWinner(board: Cell[][], row: number, col: number, player: "R" | "Y"): Array<{ row: number; col: number }> | null {
   const directions = [
     [0, 1],
     [1, 0],
@@ -76,15 +80,13 @@ function checkWinner(board: Cell[][], row: number, col: number, player: "R" | "Y
   return null
 }
 
-function isBoardFull(board: Cell[][]): boolean {
+export function isBoardFull(board: Cell[][]): boolean {
   return board[0]!.every((cell) => cell !== "")
 }
 
 export function useConnectFour() {
   const [mode, setMode] = useState<Mode>("vs_computer")
-  const [board, setBoard] = useState<Cell[][]>(
-    Array(ROWS).fill(null).map(() => Array(COLS).fill("") as Cell[])
-  )
+  const [board, setBoard] = useState<Cell[][]>(createEmptyConnectFourBoard())
   const [currentPlayer, setCurrentPlayer] = useState<"R" | "Y">("R")
   const [winner, setWinner] = useState<WinnerResult>(null)
   const [isDraw, setIsDraw] = useState(false)
@@ -112,7 +114,7 @@ export function useConnectFour() {
   }
 
   const resetBoard = () => {
-    setBoard(Array(ROWS).fill(null).map(() => Array(COLS).fill("") as Cell[]))
+    setBoard(createEmptyConnectFourBoard())
     setCurrentPlayer("R")
     setWinner(null)
     setIsDraw(false)
@@ -125,7 +127,7 @@ export function useConnectFour() {
 
   const startSession = (nextMode: Mode) => {
     setMode(nextMode)
-    const newBoard = Array(ROWS).fill(null).map(() => Array(COLS).fill("") as Cell[])
+    const newBoard = createEmptyConnectFourBoard()
     setBoard(newBoard)
     setCurrentPlayer("R")
     setWinner(null)
