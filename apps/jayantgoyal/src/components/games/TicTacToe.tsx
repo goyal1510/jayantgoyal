@@ -1,13 +1,17 @@
 "use client"
 
+import { useState } from "react"
 import {
   Loader2,
+  Globe2,
   RefreshCcw,
   Settings,
   Square,
   User,
   UserCheck,
 } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 import { Button } from "@repo/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card"
@@ -23,8 +27,10 @@ import {
 import { cn } from "@repo/ui/lib/utils"
 
 import { useTicTacToe } from "@/components/games/use-tic-tac-toe"
+import { EMPTY_TIC_TAC_TOE_STATE } from "@/lib/games/tic-tac-toe"
 
 export function TicTacToe() {
+  const router = useRouter()
   const {
     mode,
     setMode,
@@ -44,6 +50,47 @@ export function TicTacToe() {
     startSession,
     handleBoxClick,
   } = useTicTacToe()
+  const [onlineName, setOnlineName] = useState("Player X")
+  const [joinCode, setJoinCode] = useState("")
+  const [creatingRoom, setCreatingRoom] = useState(false)
+
+  const createOnlineRoom = async () => {
+    setCreatingRoom(true)
+    const response = await fetch("/api/games/sessions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        gameSlug: "tic-tac-toe",
+        displayName: onlineName,
+        settings: { initialState: EMPTY_TIC_TAC_TOE_STATE },
+      }),
+    })
+    setCreatingRoom(false)
+
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}))
+      toast.error(data.error ?? "Unable to create Tic Tac Toe room")
+      return
+    }
+
+    const data = await response.json()
+    const roomCode = data?.session?.session?.room_code
+    if (typeof roomCode !== "string") {
+      toast.error("Room created, but no room code was returned")
+      return
+    }
+
+    router.push(`/games/tic-tac-toe/room/${roomCode}`)
+  }
+
+  const joinOnlineRoom = () => {
+    const roomCode = joinCode.trim().toUpperCase()
+    if (!/^[A-Z0-9]{6,10}$/.test(roomCode)) {
+      toast.error("Enter a valid room code")
+      return
+    }
+    router.push(`/games/tic-tac-toe/room/${roomCode}`)
+  }
 
   return (
     <>
@@ -209,6 +256,35 @@ export function TicTacToe() {
               >
                 Cancel
               </Button>
+            </div>
+
+            <div className="space-y-3 rounded-lg border bg-muted/30 p-3">
+              <div className="flex items-center gap-2 text-sm font-medium">
+                <Globe2 className="h-4 w-4" />
+                Online room
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="tic-online-name">Your display name</Label>
+                <Input
+                  id="tic-online-name"
+                  value={onlineName}
+                  onChange={(event) => setOnlineName(event.target.value)}
+                />
+              </div>
+              <Button onClick={createOnlineRoom} disabled={creatingRoom} className="w-full">
+                {creatingRoom ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create online room"}
+              </Button>
+              <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+                <Input
+                  value={joinCode}
+                  onChange={(event) => setJoinCode(event.target.value.toUpperCase())}
+                  placeholder="Room code"
+                  maxLength={10}
+                />
+                <Button variant="outline" onClick={joinOnlineRoom}>
+                  Join
+                </Button>
+              </div>
             </div>
           </div>
         </SheetContent>

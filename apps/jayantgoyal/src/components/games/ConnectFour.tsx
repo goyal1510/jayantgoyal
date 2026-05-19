@@ -1,5 +1,7 @@
 "use client"
 
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 import {
   Loader2,
   RefreshCcw,
@@ -7,7 +9,9 @@ import {
   Circle,
   User,
   UserCheck,
+  Globe2,
 } from "lucide-react"
+import { toast } from "sonner"
 
 import { Button } from "@repo/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card"
@@ -25,6 +29,7 @@ import { cn } from "@repo/ui/lib/utils"
 import { useConnectFour, ROWS, COLS } from "@/components/games/use-connect-four"
 
 export function ConnectFour() {
+  const router = useRouter()
   const {
     mode,
     setMode,
@@ -48,6 +53,46 @@ export function ConnectFour() {
     startSession,
     handleColumnClick,
   } = useConnectFour()
+  const [onlineName, setOnlineName] = useState("Player Red")
+  const [joinCode, setJoinCode] = useState("")
+  const [isCreatingOnlineRoom, setIsCreatingOnlineRoom] = useState(false)
+
+  const createOnlineRoom = async () => {
+    setIsCreatingOnlineRoom(true)
+    const response = await fetch("/api/games/sessions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        gameSlug: "connect-four",
+        displayName: onlineName,
+      }),
+    })
+    setIsCreatingOnlineRoom(false)
+
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}))
+      toast.error(data.error ?? "Unable to create online room")
+      return
+    }
+
+    const data = await response.json()
+    const roomCode = data?.session?.session?.room_code
+    if (typeof roomCode !== "string") {
+      toast.error("Room created, but no room code was returned")
+      return
+    }
+
+    router.push(`/games/connect-four/room/${roomCode}`)
+  }
+
+  const joinOnlineRoom = () => {
+    const roomCode = joinCode.trim().toUpperCase()
+    if (!/^[A-Z0-9]{6,10}$/.test(roomCode)) {
+      toast.error("Enter a valid room code")
+      return
+    }
+    router.push(`/games/connect-four/room/${roomCode}`)
+  }
 
   return (
     <>
@@ -196,6 +241,46 @@ export function ConnectFour() {
                   Player vs Computer
                 </Button>
               </div>
+            </div>
+
+            <div className="space-y-3 rounded-lg border p-3">
+              <div className="flex items-center gap-2 text-sm font-medium">
+                <Globe2 className="h-4 w-4" />
+                Online room
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="online-player-name" className="text-xs text-muted-foreground">
+                  Your online display name
+                </Label>
+                <Input
+                  id="online-player-name"
+                  value={onlineName}
+                  onChange={(event) => setOnlineName(event.target.value)}
+                />
+              </div>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={createOnlineRoom}
+                disabled={isCreatingOnlineRoom}
+                className="w-full"
+              >
+                {isCreatingOnlineRoom ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create online room"}
+              </Button>
+              <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+                <Input
+                  value={joinCode}
+                  onChange={(event) => setJoinCode(event.target.value.toUpperCase())}
+                  placeholder="Room code"
+                  maxLength={10}
+                />
+                <Button type="button" variant="outline" onClick={joinOnlineRoom}>
+                  Join
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Online rooms open a shareable link for another signed-in player.
+              </p>
             </div>
 
             <div className="space-y-3">

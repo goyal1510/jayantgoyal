@@ -1,7 +1,9 @@
 "use client"
 
+import { useState } from "react"
 import {
   Check,
+  Globe2,
   Loader2,
   RefreshCcw,
   Settings,
@@ -9,9 +11,13 @@ import {
   X,
   Zap,
 } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 import { Button } from "@repo/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card"
+import { Input } from "@repo/ui/input"
+import { Label } from "@repo/ui/label"
 import { Separator } from "@repo/ui/separator"
 
 import { useDareX } from "@/components/games/use-dare-x"
@@ -20,8 +26,10 @@ import {
   DareXCustomListSheet,
   DareXHistorySheet,
 } from "@/components/games/dare-x-sheets"
+import { createDareXState } from "@/lib/games/dare-x"
 
 export function DareX() {
+  const router = useRouter()
   const {
     fileInputRef,
     customDares,
@@ -60,6 +68,54 @@ export function DareX() {
     handleExport,
     handleCountChange,
   } = useDareX()
+  const [onlineName, setOnlineName] = useState("Player 1")
+  const [joinCode, setJoinCode] = useState("")
+  const [creatingRoom, setCreatingRoom] = useState(false)
+
+  const createOnlineRoom = async () => {
+    setCreatingRoom(true)
+    const response = await fetch("/api/games/sessions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        gameSlug: "dare-x",
+        displayName: onlineName,
+        settings: {
+          maxPlayers: playerCount,
+          initialState: createDareXState({
+            dares: activeDares,
+            currentSeat: "P1",
+            targetRounds: Math.max(playerCount * 3, 6),
+          }),
+        },
+      }),
+    })
+    setCreatingRoom(false)
+
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}))
+      toast.error(data.error ?? "Unable to create Dare X room")
+      return
+    }
+
+    const data = await response.json()
+    const roomCode = data?.session?.session?.room_code
+    if (typeof roomCode !== "string") {
+      toast.error("Room created, but no room code was returned")
+      return
+    }
+
+    router.push(`/games/dare-x/room/${roomCode}`)
+  }
+
+  const joinOnlineRoom = () => {
+    const roomCode = joinCode.trim().toUpperCase()
+    if (!/^[A-Z0-9]{6,10}$/.test(roomCode)) {
+      toast.error("Enter a valid room code")
+      return
+    }
+    router.push(`/games/dare-x/room/${roomCode}`)
+  }
 
   return (
     <>
@@ -168,6 +224,39 @@ export function DareX() {
           </div>
 
           <Separator />
+
+          <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
+            <div className="flex items-center gap-2 text-sm font-medium">
+              <Globe2 className="h-4 w-4" />
+              Online room
+            </div>
+            <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+              <div className="space-y-2">
+                <Label htmlFor="dare-online-name">Your display name</Label>
+                <Input
+                  id="dare-online-name"
+                  value={onlineName}
+                  onChange={(event) => setOnlineName(event.target.value)}
+                />
+              </div>
+              <div className="flex items-end">
+                <Button onClick={createOnlineRoom} disabled={creatingRoom || activeDares.length === 0} className="w-full">
+                  {creatingRoom ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create online room"}
+                </Button>
+              </div>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+              <Input
+                value={joinCode}
+                onChange={(event) => setJoinCode(event.target.value.toUpperCase())}
+                placeholder="Room code"
+                maxLength={10}
+              />
+              <Button variant="outline" onClick={joinOnlineRoom}>
+                Join
+              </Button>
+            </div>
+          </div>
 
           <div className="rounded-lg border bg-muted/30 p-4">
             <div className="flex items-center justify-between gap-3">

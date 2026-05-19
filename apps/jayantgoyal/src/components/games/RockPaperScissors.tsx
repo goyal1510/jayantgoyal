@@ -2,11 +2,16 @@
 
 import Image from "next/image"
 import { useState } from "react"
-import { Loader2 } from "lucide-react"
+import { Globe2, Loader2 } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 
 import { Button } from "@repo/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card"
+import { Input } from "@repo/ui/input"
+import { Label } from "@repo/ui/label"
+
+import { EMPTY_RPS_STATE } from "@/lib/games/rock-paper-scissors"
 
 type Choice = "rock" | "paper" | "scissors"
 
@@ -29,6 +34,7 @@ const CHOICES: { key: Choice; label: string; image: string }[] = [
 ]
 
 export function RockPaperScissors() {
+  const router = useRouter()
   const [totals, setTotals] = useState({ humanWins: 0, computerWins: 0, draws: 0 })
   const [lastRound, setLastRound] = useState<{
     roundNumber: number
@@ -38,6 +44,9 @@ export function RockPaperScissors() {
   } | null>(null)
   const [message, setMessage] = useState<string>("Pick a move to start playing.")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [onlineName, setOnlineName] = useState("Player 1")
+  const [joinCode, setJoinCode] = useState("")
+  const [creatingRoom, setCreatingRoom] = useState(false)
 
   const getChoiceMeta = (key: Choice) =>
     CHOICES.find((choice) => choice.key === key) ?? CHOICES[0]!
@@ -84,6 +93,44 @@ export function RockPaperScissors() {
     setTotals({ humanWins: 0, computerWins: 0, draws: 0 })
     setLastRound(null)
     setMessage("Pick a move to start playing.")
+  }
+
+  const createOnlineRoom = async () => {
+    setCreatingRoom(true)
+    const response = await fetch("/api/games/sessions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        gameSlug: "rock-paper-scissors",
+        displayName: onlineName,
+        settings: { initialState: EMPTY_RPS_STATE },
+      }),
+    })
+    setCreatingRoom(false)
+
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}))
+      toast.error(data.error ?? "Unable to create Rock Paper Scissors room")
+      return
+    }
+
+    const data = await response.json()
+    const roomCode = data?.session?.session?.room_code
+    if (typeof roomCode !== "string") {
+      toast.error("Room created, but no room code was returned")
+      return
+    }
+
+    router.push(`/games/rock-paper-scissors/room/${roomCode}`)
+  }
+
+  const joinOnlineRoom = () => {
+    const roomCode = joinCode.trim().toUpperCase()
+    if (!/^[A-Z0-9]{6,10}$/.test(roomCode)) {
+      toast.error("Enter a valid room code")
+      return
+    }
+    router.push(`/games/rock-paper-scissors/room/${roomCode}`)
   }
 
   return (
@@ -187,6 +234,35 @@ export function RockPaperScissors() {
           ) : (
             <div className="mt-2 text-muted-foreground">No rounds yet.</div>
           )}
+        </div>
+
+        <div className="rounded-lg border bg-muted/30 p-3 space-y-3">
+          <div className="flex items-center gap-2 text-sm font-medium">
+            <Globe2 className="h-4 w-4" />
+            Online room
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="rps-online-name">Your display name</Label>
+            <Input
+              id="rps-online-name"
+              value={onlineName}
+              onChange={(event) => setOnlineName(event.target.value)}
+            />
+          </div>
+          <Button onClick={createOnlineRoom} disabled={creatingRoom} className="w-full">
+            {creatingRoom ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create online room"}
+          </Button>
+          <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+            <Input
+              value={joinCode}
+              onChange={(event) => setJoinCode(event.target.value.toUpperCase())}
+              placeholder="Room code"
+              maxLength={10}
+            />
+            <Button variant="outline" onClick={joinOnlineRoom}>
+              Join
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>

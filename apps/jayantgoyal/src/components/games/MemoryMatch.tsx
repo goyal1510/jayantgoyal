@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import {
   Loader2,
   RefreshCcw,
@@ -7,7 +8,10 @@ import {
   User,
   UserCheck,
   Trophy,
+  Wifi,
 } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 import { Button } from "@repo/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card"
@@ -23,8 +27,10 @@ import {
 import { cn } from "@repo/ui/lib/utils"
 
 import { useMemoryMatch, GRID_SIZES } from "@/components/games/use-memory-match"
+import { createMemoryMatchState, type MemoryMatchDifficulty } from "@/lib/games/memory-match"
 
 export function MemoryMatch() {
+  const router = useRouter()
   const {
     mode,
     setMode,
@@ -50,6 +56,50 @@ export function MemoryMatch() {
     startSession,
     handleCardClick,
   } = useMemoryMatch()
+  const [onlineRoomCode, setOnlineRoomCode] = useState("")
+  const [onlineDifficulty, setOnlineDifficulty] = useState<MemoryMatchDifficulty>("medium")
+  const [creatingOnlineRoom, setCreatingOnlineRoom] = useState(false)
+  const [joiningOnlineRoom, setJoiningOnlineRoom] = useState(false)
+
+  const createOnlineRoom = async () => {
+    setCreatingOnlineRoom(true)
+    const response = await fetch("/api/games/sessions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        gameSlug: "memory-match",
+        displayName: player1Name,
+        settings: {
+          difficulty: onlineDifficulty,
+          initialState: createMemoryMatchState(onlineDifficulty),
+        },
+      }),
+    })
+    setCreatingOnlineRoom(false)
+
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}))
+      toast.error(data.error ?? "Unable to create online room")
+      return
+    }
+
+    const data = await response.json()
+    const roomCode = data.session?.session?.room_code
+    if (typeof roomCode === "string") {
+      router.push(`/games/memory-match/room/${roomCode}`)
+    }
+  }
+
+  const joinOnlineRoom = () => {
+    const normalized = onlineRoomCode.trim().toUpperCase()
+    if (!normalized) {
+      toast.error("Enter a room code")
+      return
+    }
+
+    setJoiningOnlineRoom(true)
+    router.push(`/games/memory-match/room/${normalized}`)
+  }
 
   return (
     <>
@@ -221,6 +271,50 @@ export function MemoryMatch() {
                     {size.label}
                   </Button>
                 ))}
+              </div>
+            </div>
+
+            <div className="space-y-3 rounded-lg border bg-muted/20 p-3">
+              <div className="flex items-center gap-2 text-sm font-medium">
+                <Wifi className="h-4 w-4" />
+                Online room
+              </div>
+              <div className="grid gap-2 sm:grid-cols-3">
+                {(["easy", "medium", "hard"] as const).map((difficulty) => (
+                  <Button
+                    key={difficulty}
+                    type="button"
+                    variant={onlineDifficulty === difficulty ? "secondary" : "outline"}
+                    onClick={() => setOnlineDifficulty(difficulty)}
+                    className="justify-start capitalize"
+                  >
+                    {difficulty}
+                  </Button>
+                ))}
+              </div>
+              <Button
+                type="button"
+                onClick={() => void createOnlineRoom()}
+                disabled={creatingOnlineRoom}
+                className="w-full"
+              >
+                {creatingOnlineRoom ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create online room"}
+              </Button>
+              <div className="flex gap-2">
+                <Input
+                  value={onlineRoomCode}
+                  onChange={(event) => setOnlineRoomCode(event.target.value)}
+                  placeholder="Room code"
+                  className="uppercase"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={joinOnlineRoom}
+                  disabled={joiningOnlineRoom}
+                >
+                  {joiningOnlineRoom ? <Loader2 className="h-4 w-4 animate-spin" /> : "Join"}
+                </Button>
               </div>
             </div>
 
