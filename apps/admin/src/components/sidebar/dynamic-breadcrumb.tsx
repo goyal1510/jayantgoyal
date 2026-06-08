@@ -12,7 +12,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@repo/ui/breadcrumb"
-import { portfolioNavItems, blogNavItems, adminNavItems, deploymentNavItems } from "@/lib/config/nav-config"
+import { portfolioNavItems, blogNavItems, commerceNavItems, adminNavItems, deploymentNavItems } from "@/lib/config/nav-config"
 
 export function DynamicBreadcrumb() {
   const pathname = usePathname()
@@ -34,6 +34,16 @@ export function DynamicBreadcrumb() {
       return {
         groupName: "Blog",
         groupHref: "/blog",
+        pageName: navItem?.label ?? null,
+      }
+    }
+
+    // Commerce routes
+    if (pathname.startsWith("/commerce")) {
+      const navItem = commerceNavItems.find((item) => item.href === pathname)
+      return {
+        groupName: "Commerce",
+        groupHref: "/commerce/analytics",
         pageName: navItem?.label ?? null,
       }
     }

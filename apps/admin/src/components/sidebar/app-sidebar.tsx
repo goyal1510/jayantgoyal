@@ -21,7 +21,7 @@ import {
 } from "@repo/ui/sidebar"
 import { TeamSwitcher } from "@/components/sidebar/team-switcher"
 import { NavUser } from "@/components/sidebar/nav-user"
-import { portfolioNavItems, blogNavItems, adminNavItems, deploymentNavItems } from "@/lib/config/nav-config"
+import { portfolioNavItems, blogNavItems, commerceNavItems, adminNavItems, deploymentNavItems } from "@/lib/config/nav-config"
 import type { AuthUser } from "@/lib/types"
 
 const adminBrand = {
@@ -71,6 +71,29 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
           <SidebarGroupContent>
             <SidebarMenu>
               {blogNavItems.map((item) => (
+                <SidebarMenuItem key={item.href}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathname === item.href}
+                    tooltip={item.label}
+                  >
+                    <Link href={item.href}>
+                      <item.icon />
+                      <span>{item.label}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Commerce Management */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Commerce</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {commerceNavItems.map((item) => (
                 <SidebarMenuItem key={item.href}>
                   <SidebarMenuButton
                     asChild

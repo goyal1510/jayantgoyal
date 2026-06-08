@@ -277,3 +277,84 @@ export interface BlogPost {
   created_at: string;
   updated_at: string;
 }
+
+/**
+ * Commerce Types
+ */
+
+export type CommercePaymentProvider = "razorpay" | "stripe";
+export type CommerceProductType = "digital" | "subscription" | "service" | "bundle";
+export type CommerceProductStatus = "draft" | "published" | "archived";
+export type CommercePriceType = "one_time" | "recurring";
+export type CommerceBillingInterval = "day" | "week" | "month" | "year";
+export type CommerceOrderStatus = "pending" | "paid" | "failed" | "refunded" | "canceled" | "expired";
+
+export interface CommerceProduct {
+  id: string;
+  slug: string;
+  name: string;
+  short_description: string | null;
+  description: string | null;
+  product_type: CommerceProductType;
+  status: CommerceProductStatus;
+  payment_provider: CommercePaymentProvider | null;
+  stripe_product_id: string | null;
+  image_url: string | null;
+  is_featured: boolean;
+  sort_order: number;
+  metadata: Record<string, unknown>;
+  created_by: string | null;
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CommercePrice {
+  id: string;
+  product_id: string;
+  payment_provider: CommercePaymentProvider;
+  provider_price_id: string | null;
+  stripe_price_id: string | null;
+  lookup_key: string | null;
+  nickname: string | null;
+  price_type: CommercePriceType;
+  currency: string;
+  unit_amount: number;
+  billing_interval: CommerceBillingInterval | null;
+  trial_period_days: number | null;
+  is_active: boolean;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CommerceProductWithPrices extends CommerceProduct {
+  prices: CommercePrice[];
+}
+
+export interface CommerceOrder {
+  id: string;
+  user_id: string;
+  customer_id: string | null;
+  product_id: string | null;
+  price_id: string | null;
+  payment_provider: CommercePaymentProvider;
+  provider_order_id: string | null;
+  provider_payment_id: string | null;
+  stripe_checkout_session_id: string | null;
+  stripe_payment_intent_id: string | null;
+  status: CommerceOrderStatus;
+  currency: string;
+  amount_subtotal: number;
+  amount_total: number;
+  metadata: Record<string, unknown>;
+  completed_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CommerceOrderWithDetails extends CommerceOrder {
+  product: CommerceProduct | null;
+  price: CommercePrice | null;
+  buyer_email: string | null;
+}

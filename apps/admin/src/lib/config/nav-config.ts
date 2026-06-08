@@ -8,11 +8,15 @@ import {
   GraduationCap,
   Mail,
   Navigation,
+  BarChart3,
   MonitorSmartphone,
   Palette,
   Rocket,
   KeyRound,
   FileText,
+  LifeBuoy,
+  Receipt,
+  ShoppingBag,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
@@ -37,6 +41,13 @@ export const portfolioNavItems: NavItem[] = [
 
 export const blogNavItems: NavItem[] = [
   { label: "Blog Posts", href: "/blog", icon: FileText },
+]
+
+export const commerceNavItems: NavItem[] = [
+  { label: "Analytics", href: "/commerce/analytics", icon: BarChart3 },
+  { label: "Products", href: "/commerce/products", icon: ShoppingBag },
+  { label: "Orders", href: "/commerce/orders", icon: Receipt },
+  { label: "Support", href: "/commerce/support", icon: LifeBuoy },
 ]
 
 export const adminNavItems: NavItem[] = [
