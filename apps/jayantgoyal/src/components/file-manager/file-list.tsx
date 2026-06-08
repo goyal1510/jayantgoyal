@@ -10,9 +10,14 @@ import { UploadDialog } from "@/components/file-manager/upload-dialog"
 import { FileViewer } from "@/components/file-manager/file-viewer"
 import { MoveDialog } from "@/components/file-manager/move-dialog"
 import { CopyDialog } from "@/components/file-manager/copy-dialog"
+import { BulkActionBar } from "@/components/file-manager/bulk-action-bar"
+import { BulkDeleteDialog } from "@/components/file-manager/bulk-delete-dialog"
+import { BulkMoveDialog } from "@/components/file-manager/bulk-move-dialog"
+import { BulkCopyDialog } from "@/components/file-manager/bulk-copy-dialog"
 import { FileListToolbar } from "@/components/file-manager/file-list-toolbar"
 import { FileGridView } from "@/components/file-manager/file-grid-view"
 import { FileListView } from "@/components/file-manager/file-list-view"
+import { StorageSummary } from "@/components/file-manager/storage-summary"
 import { useFileList } from "@/components/file-manager/use-file-list"
 
 interface FileListProps {
@@ -23,11 +28,20 @@ interface FileListProps {
 export function FileList({ initialPath = "/" }: FileListProps) {
   const {
     files,
+    selectedFiles,
+    selectedIds,
+    selectedFileCount,
+    selectedFolderCount,
+    allVisibleSelected,
     currentPath,
     sortField,
     sortOrder,
     viewMode,
+    searchQuery,
+    trashMode,
+    collectionMode,
     loading,
+    storageUsage,
     selectedFile,
     createFolderOpen,
     uploadDialogOpen,
@@ -35,16 +49,27 @@ export function FileList({ initialPath = "/" }: FileListProps) {
     deleteDialogOpen,
     moveDialogOpen,
     copyDialogOpen,
+    bulkDeleteDialogOpen,
+    bulkMoveDialogOpen,
+    bulkCopyDialogOpen,
     fileViewerOpen,
     setViewMode,
+    setSearchQuery,
+    setCollectionMode,
     setCreateFolderOpen,
     setUploadDialogOpen,
     setRenameDialogOpen,
     setDeleteDialogOpen,
     setMoveDialogOpen,
     setCopyDialogOpen,
+    setBulkDeleteDialogOpen,
+    setBulkMoveDialogOpen,
+    setBulkCopyDialogOpen,
     setFileViewerOpen,
     setSelectedFile,
+    clearSelection,
+    selectAllVisible,
+    toggleFileSelection,
     handleItemClick,
     handleRefresh,
     handleRename,
@@ -52,6 +77,10 @@ export function FileList({ initialPath = "/" }: FileListProps) {
     handleMove,
     handleCopy,
     handleDownload,
+    handleBulkDownload,
+    handleRestore,
+    handlePermanentDelete,
+    handleToggleStar,
     handleSortFieldChange,
     handleSortOrderToggle,
     navigateToPath,
@@ -64,22 +93,57 @@ export function FileList({ initialPath = "/" }: FileListProps) {
         sortField={sortField}
         sortOrder={sortOrder}
         viewMode={viewMode}
+        searchQuery={searchQuery}
+        collectionMode={collectionMode}
         onSortFieldChange={handleSortFieldChange}
         onSortOrderToggle={handleSortOrderToggle}
         onViewModeChange={setViewMode}
+        onSearchQueryChange={setSearchQuery}
+        onCollectionModeChange={setCollectionMode}
         onUploadClick={() => setUploadDialogOpen(true)}
         onCreateFolderClick={() => setCreateFolderOpen(true)}
         onBreadcrumbClick={navigateToPath}
       />
+
+      <StorageSummary usage={storageUsage} />
+
+      {!trashMode && (
+        <BulkActionBar
+          selectedCount={selectedFiles.length}
+          selectedFileCount={selectedFileCount}
+          selectedFolderCount={selectedFolderCount}
+          allSelected={allVisibleSelected}
+          onSelectAll={selectAllVisible}
+          onClearSelection={clearSelection}
+          onBulkDownload={handleBulkDownload}
+          onBulkMove={() => setBulkMoveDialogOpen(true)}
+          onBulkCopy={() => setBulkCopyDialogOpen(true)}
+          onBulkDelete={() => setBulkDeleteDialogOpen(true)}
+        />
+      )}
 
       {loading && files.length === 0 ? (
         <PageSpinner />
       ) : files.length === 0 ? (
         <Card className="p-12">
           <div className="text-center space-y-2">
-            <p className="text-muted-foreground">This folder is empty</p>
+            <p className="text-muted-foreground">
+              {collectionMode === "trash"
+                ? "Trash is empty"
+                : collectionMode === "recent"
+                  ? "No recent files"
+                  : collectionMode === "starred"
+                    ? "No starred files"
+                    : "This folder is empty"}
+            </p>
             <p className="text-sm text-muted-foreground">
-              Upload files or create folders to get started
+              {collectionMode === "trash"
+                ? "Deleted files and folders will appear here"
+                : collectionMode === "recent"
+                  ? "Files you update will appear here"
+                  : collectionMode === "starred"
+                    ? "Star files or folders to keep them here"
+                    : "Upload files or create folders to get started"}
             </p>
           </div>
         </Card>
@@ -94,23 +158,38 @@ export function FileList({ initialPath = "/" }: FileListProps) {
             <FileGridView
               files={files}
               viewMode={viewMode}
+              selectedIds={selectedIds}
               onItemClick={handleItemClick}
+              onSelectionToggle={toggleFileSelection}
               onDownload={handleDownload}
               onRename={handleRename}
               onDelete={handleDelete}
               onMove={handleMove}
               onCopy={handleCopy}
+              onRestore={handleRestore}
+              onPermanentDelete={handlePermanentDelete}
+              onToggleStar={handleToggleStar}
+              trashMode={trashMode}
             />
 
             {viewMode === "list" && (
               <FileListView
                 files={files}
+                selectedIds={selectedIds}
+                allVisibleSelected={allVisibleSelected}
                 onItemClick={handleItemClick}
+                onSelectionToggle={toggleFileSelection}
+                onSelectAll={selectAllVisible}
+                onClearSelection={clearSelection}
                 onDownload={handleDownload}
                 onRename={handleRename}
                 onDelete={handleDelete}
                 onMove={handleMove}
                 onCopy={handleCopy}
+                onRestore={handleRestore}
+                onPermanentDelete={handlePermanentDelete}
+                onToggleStar={handleToggleStar}
+                trashMode={trashMode}
               />
             )}
           </>
@@ -152,6 +231,33 @@ export function FileList({ initialPath = "/" }: FileListProps) {
         onOpenChange={setCopyDialogOpen}
         file={selectedFile}
         onSuccess={handleRefresh}
+      />
+      <BulkDeleteDialog
+        open={bulkDeleteDialogOpen}
+        onOpenChange={setBulkDeleteDialogOpen}
+        files={selectedFiles}
+        onSuccess={() => {
+          clearSelection()
+          handleRefresh()
+        }}
+      />
+      <BulkMoveDialog
+        open={bulkMoveDialogOpen}
+        onOpenChange={setBulkMoveDialogOpen}
+        files={selectedFiles}
+        onSuccess={() => {
+          clearSelection()
+          handleRefresh()
+        }}
+      />
+      <BulkCopyDialog
+        open={bulkCopyDialogOpen}
+        onOpenChange={setBulkCopyDialogOpen}
+        files={selectedFiles}
+        onSuccess={() => {
+          clearSelection()
+          handleRefresh()
+        }}
       />
       <FileViewer
         open={fileViewerOpen}

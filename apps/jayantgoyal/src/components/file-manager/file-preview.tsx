@@ -12,6 +12,10 @@ export interface FileDetails {
   size_bytes: number
   file_type: string
   is_directory: boolean
+  version?: number
+  is_latest_version?: boolean
+  file_hash?: string | null
+  is_starred?: boolean
   created_at: string
   updated_at: string
   url: string

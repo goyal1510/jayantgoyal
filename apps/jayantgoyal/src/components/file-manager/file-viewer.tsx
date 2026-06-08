@@ -9,10 +9,11 @@ import {
 } from "@repo/ui/dialog"
 import { Button } from "@repo/ui/button"
 import { Spinner } from "@/components/ui/spinner"
-import { AlertCircle, ChevronLeft, ChevronRight, Download } from "lucide-react"
+import { AlertCircle, ChevronLeft, ChevronRight, Download, Star } from "lucide-react"
 import type { DirectoryListingItem } from "@/lib/file-manager/types"
 import { FilePreview } from "@/components/file-manager/file-preview"
 import type { FileDetails } from "@/components/file-manager/file-preview"
+import { formatDate, formatFileSize } from "@/lib/file-manager/format-utils"
 
 interface FileViewerProps {
   file: DirectoryListingItem | null
@@ -152,6 +153,18 @@ export function FileViewer({ file, files, open, onOpenChange, onFileChange }: Fi
   if (!file) return null
 
   const displayName = file.display_name || file.file_name
+  const detailRows = fileDetails
+    ? [
+        ["Type", fileDetails.file_type],
+        ["MIME", fileDetails.mime_type],
+        ["Size", formatFileSize(fileDetails.size_bytes || 0)],
+        ["Path", fileDetails.path],
+        ["Created", formatDate(fileDetails.created_at)],
+        ["Modified", formatDate(fileDetails.updated_at)],
+        ["Version", `${fileDetails.version || 1}${fileDetails.is_latest_version === false ? " (older)" : ""}`],
+        ["Hash", fileDetails.file_hash || "Not captured"],
+      ]
+    : []
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -205,23 +218,51 @@ export function FileViewer({ file, files, open, onOpenChange, onFileChange }: Fi
           )}
 
           <div className="h-full overflow-auto px-8 sm:px-12">
-            {loading ? (
-              <div className="flex items-center justify-center h-[60vh] sm:h-[80vh]">
-                <Spinner size="lg" />
+            <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_280px]">
+              <div className="min-w-0">
+                {loading ? (
+                  <div className="flex items-center justify-center h-[60vh] sm:h-[80vh]">
+                    <Spinner size="lg" />
+                  </div>
+                ) : error ? (
+                  <div className="flex flex-col items-center justify-center gap-4 h-[60vh] sm:h-[80vh] bg-destructive/10 rounded-lg px-4">
+                    <AlertCircle className="h-12 w-12 sm:h-16 sm:w-16 text-destructive" />
+                    <p className="text-base sm:text-lg font-medium text-destructive text-center">Error loading file</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground text-center">{error}</p>
+                  </div>
+                ) : fileDetails ? (
+                  <FilePreview file={fileDetails} url={fileDetails.url} />
+                ) : (
+                  <div className="flex items-center justify-center h-[60vh] sm:h-[80vh]">
+                    <Spinner size="lg" />
+                  </div>
+                )}
               </div>
-            ) : error ? (
-              <div className="flex flex-col items-center justify-center gap-4 h-[60vh] sm:h-[80vh] bg-destructive/10 rounded-lg px-4">
-                <AlertCircle className="h-12 w-12 sm:h-16 sm:w-16 text-destructive" />
-                <p className="text-base sm:text-lg font-medium text-destructive text-center">Error loading file</p>
-                <p className="text-xs sm:text-sm text-muted-foreground text-center">{error}</p>
-              </div>
-            ) : fileDetails ? (
-              <FilePreview file={fileDetails} url={fileDetails.url} />
-            ) : (
-              <div className="flex items-center justify-center h-[60vh] sm:h-[80vh]">
-                <Spinner size="lg" />
-              </div>
-            )}
+
+              {fileDetails && !loading && !error && (
+                <aside className="space-y-4 border-t pt-4 lg:border-l lg:border-t-0 lg:pl-4 lg:pt-0">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium">Details</p>
+                      {fileDetails.is_starred && (
+                        <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
+                      )}
+                    </div>
+                    <p className="truncate text-xs text-muted-foreground" title={fileDetails.original_filename}>
+                      {fileDetails.original_filename}
+                    </p>
+                  </div>
+                  <dl className="space-y-3 text-sm">
+                    {detailRows.map(([label, value]) => (
+                      <div key={label} className="space-y-1">
+                        <dt className="text-xs uppercase text-muted-foreground">{label}</dt>
+                        <dd className="break-words">{value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </aside>
+              )}
+            </div>
           </div>
         </div>
       </DialogContent>

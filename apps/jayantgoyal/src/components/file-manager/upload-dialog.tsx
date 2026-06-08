@@ -222,6 +222,8 @@ export function UploadDialog({
                           e.stopPropagation()
                           removeFile(uploadFile.id)
                         }}
+                        aria-label={`Remove ${uploadFile.file.name}`}
+                        title={`Remove ${uploadFile.file.name}`}
                       >
                         <X className="h-4 w-4" />
                       </Button>

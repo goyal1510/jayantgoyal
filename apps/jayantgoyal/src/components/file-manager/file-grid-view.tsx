@@ -11,7 +11,7 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu"
 import { Card } from "@repo/ui/card"
-import { MoreVertical } from "lucide-react"
+import { MoreVertical, Star } from "lucide-react"
 import { cn } from "@repo/ui/lib/utils"
 import { formatFileSize } from "@/lib/file-manager/format-utils"
 import type { DirectoryListingItem } from "@/lib/file-manager/types"
@@ -20,23 +20,35 @@ import { FileItemDropdownContent, FileItemContextContent } from "@/components/fi
 interface FileGridViewProps {
   files: DirectoryListingItem[]
   viewMode: "grid" | "list"
+  selectedIds: Set<string>
   onItemClick: (file: DirectoryListingItem) => void
+  onSelectionToggle: (fileId: string, checked?: boolean) => void
   onDownload: (e: React.MouseEvent, file: DirectoryListingItem) => void
   onRename: (e: React.MouseEvent, file: DirectoryListingItem) => void
   onDelete: (e: React.MouseEvent, file: DirectoryListingItem) => void
   onMove: (e: React.MouseEvent, file: DirectoryListingItem) => void
   onCopy: (e: React.MouseEvent, file: DirectoryListingItem) => void
+  onRestore?: (e: React.MouseEvent, file: DirectoryListingItem) => void
+  onPermanentDelete?: (e: React.MouseEvent, file: DirectoryListingItem) => void
+  onToggleStar?: (e: React.MouseEvent, file: DirectoryListingItem) => void
+  trashMode?: boolean
 }
 
 export function FileGridView({
   files,
   viewMode,
+  selectedIds,
   onItemClick,
+  onSelectionToggle,
   onDownload,
   onRename,
   onDelete,
   onMove,
   onCopy,
+  onRestore,
+  onPermanentDelete,
+  onToggleStar,
+  trashMode = false,
 }: FileGridViewProps) {
   const handlers = {
     onView: onItemClick,
@@ -45,6 +57,9 @@ export function FileGridView({
     onMove,
     onCopy,
     onDelete,
+    onRestore,
+    onPermanentDelete,
+    onToggleStar,
   }
 
   return (
@@ -57,16 +72,33 @@ export function FileGridView({
       {files.map((file) => {
         const displayName = file.display_name || file.file_name
         const isDirectory = file.is_directory
+        const isSelected = selectedIds.has(file.id)
         return (
           <ContextMenu key={file.id}>
             <ContextMenuTrigger asChild>
               <Card
                 className={cn(
                   "p-4 cursor-pointer transition-colors hover:bg-accent relative group",
-                  isDirectory && "hover:bg-accent/80"
+                  isDirectory && "hover:bg-accent/80",
+                  isSelected && "border-primary bg-primary/5 ring-1 ring-primary"
                 )}
                 onClick={() => onItemClick(file)}
               >
+                <input
+                  type="checkbox"
+                  checked={isSelected}
+                  onChange={(event) =>
+                    onSelectionToggle(file.id, event.target.checked)
+                  }
+                  onClick={(event) => event.stopPropagation()}
+                  className={cn(
+                    "absolute left-2 top-2 h-4 w-4 cursor-pointer accent-primary",
+                    isSelected
+                      ? "opacity-100"
+                      : "opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
+                  )}
+                  aria-label={`Select ${displayName}`}
+                />
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
@@ -74,11 +106,13 @@ export function FileGridView({
                       size="icon"
                       className="absolute top-1 right-1 h-7 w-7 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
                       onClick={(e) => e.stopPropagation()}
+                      aria-label={`Actions for ${displayName}`}
+                      title={`Actions for ${displayName}`}
                     >
                       <MoreVertical className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <FileItemDropdownContent file={file} handlers={handlers} />
+                  <FileItemDropdownContent file={file} handlers={handlers} trashMode={trashMode} />
                 </DropdownMenu>
                 <div className="flex flex-col items-center gap-2">
                   <FileThumbnail
@@ -89,6 +123,11 @@ export function FileGridView({
                     <p className="text-sm font-medium truncate" title={displayName}>
                       {displayName}
                     </p>
+                    {file.is_starred && !trashMode && (
+                      <div className="mt-1 flex justify-center text-amber-500">
+                        <Star className="h-3.5 w-3.5 fill-current" />
+                      </div>
+                    )}
                     {!isDirectory && (
                       <p className="text-xs text-muted-foreground">
                         {formatFileSize(file.size_bytes || 0)}
@@ -103,7 +142,7 @@ export function FileGridView({
                 </div>
               </Card>
             </ContextMenuTrigger>
-            <FileItemContextContent file={file} handlers={handlers} />
+            <FileItemContextContent file={file} handlers={handlers} trashMode={trashMode} />
           </ContextMenu>
         )
       })}

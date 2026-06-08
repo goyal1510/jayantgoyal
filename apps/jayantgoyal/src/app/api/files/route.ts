@@ -39,6 +39,7 @@ export async function GET(request: NextRequest) {
 
     const sortField = searchParams.get("sort") || "name";
     const sortOrder = searchParams.get("order") || "asc";
+    const searchQuery = searchParams.get("q")?.trim().toLowerCase() || "";
 
     // Validate sort field
     const validSortFields = ["name", "date", "size", "type"];
@@ -106,6 +107,43 @@ export async function GET(request: NextRequest) {
       return filePath !== dirPath
     })
 
+    if (files.length > 0) {
+      const { data: starredRows, error: starredError } = await supabase
+        .schema("jg_app")
+        .from("file_manager_files")
+        .select("id,is_starred")
+        .eq("user_id", user.id)
+        .in("id", files.map((file) => file.id));
+
+      if (starredError) {
+        console.error("Error loading starred state:", starredError);
+      } else {
+        const starredById = new Map(
+          (starredRows || []).map((row) => [row.id, row.is_starred])
+        );
+        files = files.map((file) => ({
+          ...file,
+          is_starred: starredById.get(file.id) || false,
+        }));
+      }
+    }
+
+    if (searchQuery) {
+      files = files.filter((file) => {
+        const searchable = [
+          file.display_name,
+          file.file_name,
+          file.mime_type,
+          file.file_type,
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+
+        return searchable.includes(searchQuery);
+      });
+    }
+
     // Sort files
     const sortedFiles = [...files].sort((a, b) => {
       let comparison = 0;
@@ -140,6 +178,7 @@ export async function GET(request: NextRequest) {
       files: sortedFiles,
       directoryPath,
       count: sortedFiles.length,
+      query: searchQuery,
     });
   } catch (error) {
     console.error("Error listing files:", error);
