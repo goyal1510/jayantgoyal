@@ -38,11 +38,11 @@ export async function POST() {
   }
 
   let removed = 0;
-  for (const factor of factors.totp) {
-    if (factor.status === "unverified") {
+  for (const factor of factors.factors) {
+    if (factor.factor_type === "totp" && factor.status === "unverified") {
       const { error } = await adminClient.auth.admin.mfa.deleteFactor({
         userId: user.id,
-        factorId: factor.id,
+        id: factor.id,
       });
       if (!error) removed++;
     }

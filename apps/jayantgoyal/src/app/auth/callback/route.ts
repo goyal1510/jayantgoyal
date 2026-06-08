@@ -9,7 +9,9 @@ async function userHasMfa(userId: string): Promise<boolean> {
     const adminClient = createSupabaseAdminClient();
     const { data, error } = await adminClient.auth.admin.mfa.listFactors({ userId });
     if (error || !data) return false;
-    return data.totp.some((f) => f.status === "verified");
+    return data.factors.some(
+      (factor) => factor.factor_type === "totp" && factor.status === "verified"
+    );
   } catch {
     return false;
   }
