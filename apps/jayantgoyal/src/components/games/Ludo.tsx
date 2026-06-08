@@ -22,6 +22,7 @@ import {
   LUDO_SAFE_GLOBAL_INDICES,
   LUDO_SEAT_META,
   LUDO_SEATS,
+  LUDO_YARD_COORDINATES,
   type LudoSeat,
   type LudoState,
   type LudoToken,
@@ -37,17 +38,24 @@ const TOKEN_CLASSES: Record<LudoSeat, string> = {
 }
 
 const HOME_CELL_CLASSES: Record<LudoSeat, string> = {
-  P1: "border-red-200 bg-red-100/80 dark:border-red-900 dark:bg-red-950/40",
-  P2: "border-emerald-200 bg-emerald-100/80 dark:border-emerald-900 dark:bg-emerald-950/40",
-  P3: "border-amber-200 bg-amber-100/80 dark:border-amber-900 dark:bg-amber-950/40",
-  P4: "border-sky-200 bg-sky-100/80 dark:border-sky-900 dark:bg-sky-950/40",
+  P1: "border-red-200/80 bg-white/85 shadow-inner dark:border-red-900 dark:bg-red-950/50",
+  P2: "border-emerald-200/80 bg-white/85 shadow-inner dark:border-emerald-900 dark:bg-emerald-950/50",
+  P3: "border-amber-200/80 bg-white/85 shadow-inner dark:border-amber-900 dark:bg-amber-950/50",
+  P4: "border-sky-200/80 bg-white/85 shadow-inner dark:border-sky-900 dark:bg-sky-950/50",
 }
 
 const HOME_PATH_CLASSES: Record<LudoSeat, string> = {
-  P1: "border-red-300 bg-red-200 dark:border-red-900 dark:bg-red-950",
-  P2: "border-emerald-300 bg-emerald-200 dark:border-emerald-900 dark:bg-emerald-950",
-  P3: "border-amber-300 bg-amber-200 dark:border-amber-900 dark:bg-amber-950",
-  P4: "border-sky-300 bg-sky-200 dark:border-sky-900 dark:bg-sky-950",
+  P1: "border-red-300 bg-red-200 shadow-sm dark:border-red-900 dark:bg-red-950",
+  P2: "border-emerald-300 bg-emerald-200 shadow-sm dark:border-emerald-900 dark:bg-emerald-950",
+  P3: "border-amber-300 bg-amber-200 shadow-sm dark:border-amber-900 dark:bg-amber-950",
+  P4: "border-sky-300 bg-sky-200 shadow-sm dark:border-sky-900 dark:bg-sky-950",
+}
+
+const HOME_PANEL_CLASSES: Record<LudoSeat, string> = {
+  P1: "border-red-200 bg-red-500/10 dark:border-red-900/70 dark:bg-red-500/15",
+  P2: "border-emerald-200 bg-emerald-500/10 dark:border-emerald-900/70 dark:bg-emerald-500/15",
+  P3: "border-amber-200 bg-amber-400/10 dark:border-amber-900/70 dark:bg-amber-400/15",
+  P4: "border-sky-200 bg-sky-500/10 dark:border-sky-900/70 dark:bg-sky-500/15",
 }
 
 const HOME_PATH_KEYS = new Map<string, LudoSeat>()
@@ -71,35 +79,34 @@ LUDO_PATH_COORDINATES.forEach(([row, column], index) => {
   PATH_KEYS.set(coordinateKey(row, column), index)
 })
 
+const YARD_KEYS = new Map<string, LudoSeat>()
+for (const seat of LUDO_SEATS) {
+  for (const [row, column] of LUDO_YARD_COORDINATES[seat]) {
+    YARD_KEYS.set(coordinateKey(row, column), seat)
+  }
+}
+
 function coordinateKey(row: number, column: number) {
   return `${row}:${column}`
 }
 
-function getHomeSeat(row: number, column: number): LudoSeat | null {
-  if (row <= 5 && column <= 5) return "P1"
-  if (row <= 5 && column >= 9) return "P2"
-  if (row >= 9 && column >= 9) return "P3"
-  if (row >= 9 && column <= 5) return "P4"
-  return null
-}
-
 function getCellClass(row: number, column: number) {
   const key = coordinateKey(row, column)
-  const homeSeat = getHomeSeat(row, column)
   const homePathSeat = HOME_PATH_KEYS.get(key)
   const pathIndex = PATH_KEYS.get(key)
+  const yardSeat = YARD_KEYS.get(key)
 
   if (row === 7 && column === 7) {
-    return "border-zinc-300 bg-zinc-950 text-white dark:border-zinc-600"
+    return "rounded-xl border-zinc-300 bg-zinc-950 text-white shadow-lg dark:border-zinc-600"
   }
   if (homePathSeat) return HOME_PATH_CLASSES[homePathSeat]
+  if (yardSeat) return cn("rounded-full", HOME_CELL_CLASSES[yardSeat])
   if (typeof pathIndex === "number") {
     return cn(
-      "border-zinc-300 bg-white dark:border-zinc-700 dark:bg-zinc-900",
+      "rounded-md border-zinc-300 bg-white shadow-sm dark:border-zinc-700 dark:bg-zinc-900",
       LUDO_SAFE_GLOBAL_INDICES.has(pathIndex) && "ring-2 ring-inset ring-zinc-500"
     )
   }
-  if (homeSeat) return HOME_CELL_CLASSES[homeSeat]
   return "border-transparent bg-transparent"
 }
 
@@ -147,70 +154,100 @@ function LudoBoard({
   canMove,
   submitting,
   onTokenMove,
+  lastMovedTokenId,
+  capturedTokenIds,
 }: {
   state: LudoState
   legalTokenIds: string[]
   canMove: boolean
   submitting: boolean
   onTokenMove: (tokenId: string) => void
+  lastMovedTokenId: string | null | undefined
+  capturedTokenIds: Set<string>
 }) {
   const tokenMap = tokensByCoordinate(state.tokens)
 
   return (
-    <div className="mx-auto grid w-full max-w-[min(92vw,720px)] grid-cols-[repeat(15,minmax(0,1fr))] rounded-2xl border bg-white/70 p-2 shadow-inner dark:bg-black/20">
-      {Array.from({ length: 225 }, (_, index) => {
-        const row = Math.floor(index / 15)
-        const column = index % 15
-        const key = coordinateKey(row, column)
-        const tokens = tokenMap.get(key) ?? []
-        const pathIndex = PATH_KEYS.get(key)
-
-        return (
+    <div className="relative mx-auto aspect-square w-full max-w-[min(92vw,720px)] overflow-hidden rounded-[1.75rem] border border-rose-200/70 bg-[radial-gradient(circle_at_center,#fff7ed,transparent_34%),linear-gradient(135deg,#fff,#fff7ed)] p-2 shadow-inner dark:border-rose-900/60 dark:bg-[linear-gradient(135deg,#18181b,#09090b)]">
+      <div className="pointer-events-none absolute inset-2 grid grid-cols-[repeat(15,minmax(0,1fr))] grid-rows-[repeat(15,minmax(0,1fr))] gap-0.5">
+        {[
+          { seat: "P1" as LudoSeat, gridColumn: "1 / span 6", gridRow: "1 / span 6" },
+          { seat: "P2" as LudoSeat, gridColumn: "10 / span 6", gridRow: "1 / span 6" },
+          { seat: "P3" as LudoSeat, gridColumn: "10 / span 6", gridRow: "10 / span 6" },
+          { seat: "P4" as LudoSeat, gridColumn: "1 / span 6", gridRow: "10 / span 6" },
+        ].map((panel) => (
           <div
-            key={key}
+            key={panel.seat}
             className={cn(
-              "relative flex aspect-square min-w-0 items-center justify-center border text-[9px]",
-              getCellClass(row, column)
+              "rounded-[1.4rem] border backdrop-blur-sm",
+              HOME_PANEL_CLASSES[panel.seat]
             )}
-          >
-            {typeof pathIndex === "number" && LUDO_SAFE_GLOBAL_INDICES.has(pathIndex) && (
-              <span className="absolute left-1 top-0.5 text-[8px] font-semibold text-zinc-500">
-                S
-              </span>
-            )}
-            {row === 7 && column === 7 && (
-              <span className="text-[8px] font-bold tracking-widest">HOME</span>
-            )}
-            <div className="flex flex-wrap items-center justify-center gap-0.5">
-              {tokens.map((token) => {
-                const tokenCanMove = canMove && legalTokenIds.includes(token.id)
-                const label = `${LUDO_SEAT_META[token.seat].label} token ${token.index + 1}${
-                  tokenCanMove ? ", legal move" : ""
-                }`
+            style={{
+              gridColumn: panel.gridColumn,
+              gridRow: panel.gridRow,
+            }}
+          />
+        ))}
+      </div>
+      <div className="relative z-10 grid h-full w-full grid-cols-[repeat(15,minmax(0,1fr))] grid-rows-[repeat(15,minmax(0,1fr))] gap-0.5">
+        {Array.from({ length: 225 }, (_, index) => {
+          const row = Math.floor(index / 15)
+          const column = index % 15
+          const key = coordinateKey(row, column)
+          const tokens = tokenMap.get(key) ?? []
+          const pathIndex = PATH_KEYS.get(key)
 
-                return (
-                  <button
-                    key={token.id}
-                    type="button"
-                    onClick={() => onTokenMove(token.id)}
-                    disabled={!tokenCanMove || submitting}
-                    className={cn(
-                      "flex h-5 w-5 items-center justify-center rounded-full border-2 text-[10px] font-black shadow-sm transition sm:h-6 sm:w-6",
-                      TOKEN_CLASSES[token.seat],
-                      tokenCanMove && "scale-110 ring-2 ring-white hover:-translate-y-0.5",
-                      !tokenCanMove && "disabled:cursor-default"
-                    )}
-                    aria-label={label}
-                    title={label}
-                  >
-                    {token.index + 1}
-                  </button>
-                )
-              })}
+          return (
+            <div
+              key={key}
+              className={cn(
+                "relative flex aspect-square min-w-0 items-center justify-center border text-[9px]",
+                getCellClass(row, column)
+              )}
+            >
+              {typeof pathIndex === "number" && LUDO_SAFE_GLOBAL_INDICES.has(pathIndex) && (
+                <span className="absolute left-1 top-0.5 text-[8px] font-semibold text-zinc-500">
+                  S
+                </span>
+              )}
+              {row === 7 && column === 7 && (
+                <span className="text-[8px] font-bold tracking-widest">HOME</span>
+              )}
+              <div className="flex flex-wrap items-center justify-center gap-0.5">
+                {tokens.map((token) => {
+                  const tokenCanMove = canMove && legalTokenIds.includes(token.id)
+                  const isLastMoved = lastMovedTokenId === token.id
+                  const wasCaptured = capturedTokenIds.has(token.id)
+                  const label = `${LUDO_SEAT_META[token.seat].label} token ${token.index + 1}${
+                    tokenCanMove ? ", legal move" : ""
+                  }`
+
+                  return (
+                    <button
+                      key={token.id}
+                      type="button"
+                      onClick={() => onTokenMove(token.id)}
+                      disabled={!tokenCanMove || submitting}
+                      className={cn(
+                        "flex h-5 w-5 items-center justify-center rounded-full border-2 text-[10px] font-black shadow-sm transition-all duration-200 sm:h-6 sm:w-6",
+                        TOKEN_CLASSES[token.seat],
+                        tokenCanMove && "scale-110 animate-bounce ring-2 ring-white hover:-translate-y-0.5",
+                        isLastMoved && "scale-110 ring-2 ring-zinc-950 ring-offset-2 dark:ring-white",
+                        wasCaptured && "opacity-70",
+                        !tokenCanMove && "disabled:cursor-default"
+                      )}
+                      aria-label={label}
+                      title={label}
+                    >
+                      {token.index + 1}
+                    </button>
+                  )
+                })}
+              </div>
             </div>
-          </div>
-        )
-      })}
+          )
+        })}
+      </div>
     </div>
   )
 }
@@ -235,6 +272,9 @@ export function Ludo() {
     () => getLegalLudoMoves(state, state.currentSeat),
     [state]
   )
+  const lastMovedTokenId =
+    state.lastMove?.action === "move" ? state.lastMove.tokenId : null
+  const capturedTokenIds = new Set(state.lastMove?.capturedTokenIds ?? [])
   const status = state.winner
     ? `${LUDO_SEAT_META[state.winner].label} wins`
     : isComputerTurn || computerThinking
@@ -351,6 +391,8 @@ export function Ludo() {
             canMove={canAct && state.phase === "move"}
             submitting={computerThinking}
             onTokenMove={handleTokenMove}
+            lastMovedTokenId={lastMovedTokenId}
+            capturedTokenIds={capturedTokenIds}
           />
           <div className="mx-auto grid max-w-xl gap-3 rounded-xl border bg-background/85 p-3 sm:grid-cols-[1fr_auto] sm:items-center">
             <div className="min-w-0">
@@ -361,7 +403,13 @@ export function Ludo() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="flex h-16 w-16 items-center justify-center rounded-xl border bg-white text-3xl font-black text-zinc-950 shadow-sm">
+              <div
+                className={cn(
+                  "flex h-16 w-16 items-center justify-center rounded-xl border bg-white text-3xl font-black text-zinc-950 shadow-sm transition-transform duration-200",
+                  computerThinking && "animate-pulse",
+                  state.phase === "move" && "scale-105"
+                )}
+              >
                 {state.diceValue ?? state.lastMove?.diceValue ?? "-"}
               </div>
               <Button

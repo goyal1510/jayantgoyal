@@ -27,6 +27,12 @@ import {
 import { cn } from "@repo/ui/lib/utils"
 
 import { useConnectFour, ROWS, COLS } from "@/components/games/use-connect-four"
+import {
+  GameClockCard,
+  ROUND_TIME_PRESETS,
+  TimeControlPicker,
+  useGameCountdown,
+} from "@/components/games/game-time-controls"
 
 export function ConnectFour() {
   const router = useRouter()
@@ -56,6 +62,35 @@ export function ConnectFour() {
   const [onlineName, setOnlineName] = useState("Player Red")
   const [joinCode, setJoinCode] = useState("")
   const [isCreatingOnlineRoom, setIsCreatingOnlineRoom] = useState(false)
+  const [turnSeconds, setTurnSeconds] = useState(10)
+  const [timerResetKey, setTimerResetKey] = useState(0)
+  const [timeoutWinner, setTimeoutWinner] = useState<"R" | "Y" | null>(null)
+
+  const isTimedGameActive =
+    !showSetupSheet &&
+    !winner &&
+    !isDraw &&
+    !timeoutWinner &&
+    !isLoading &&
+    !isProcessingMove
+  const turnClock = useGameCountdown({
+    durationSeconds: turnSeconds,
+    active: isTimedGameActive,
+    resetKey: `${timerResetKey}-${currentPlayer}-${lastMove?.row ?? "start"}-${lastMove?.col ?? "start"}`,
+    onExpire: () => setTimeoutWinner(currentPlayer === "R" ? "Y" : "R"),
+  })
+
+  const resetTimedBoard = () => {
+    setTimeoutWinner(null)
+    setTimerResetKey((current) => current + 1)
+    resetBoard()
+  }
+
+  const startTimedSession = () => {
+    setTimeoutWinner(null)
+    setTimerResetKey((current) => current + 1)
+    startSession(mode)
+  }
 
   const createOnlineRoom = async () => {
     setIsCreatingOnlineRoom(true)
@@ -111,7 +146,14 @@ export function ConnectFour() {
               <Settings className="mr-2 h-4 w-4" />
               Setup
             </Button>
-            <Button variant="ghost" size="icon" onClick={resetBoard} disabled={isLoading}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={resetTimedBoard}
+              disabled={isLoading}
+              aria-label="Reset board"
+              title="Reset board"
+            >
               <RefreshCcw className="h-4 w-4" />
             </Button>
           </div>
@@ -128,6 +170,8 @@ export function ConnectFour() {
               )}>
                 {winner
                   ? `\uD83C\uDF89 Winner: ${winner === "R" ? playerR : playerY} \uD83C\uDF89`
+                  : timeoutWinner
+                    ? `Winner on time: ${timeoutWinner === "R" ? playerR : playerY}`
                   : isDraw
                     ? "Game Draw"
                     : `Turn: ${playerLabels.current}`}
@@ -137,6 +181,27 @@ export function ConnectFour() {
                 {winningLine.length > 0 && ` · ${winningLine.length} winning cells`}
               </div>
             </div>
+          </div>
+
+          <div className="grid gap-3 lg:grid-cols-[220px_1fr]">
+            <GameClockCard
+              label={`${playerLabels.current} clock`}
+              helper={currentPlayer === "R" ? "Red to move" : "Yellow to move"}
+              remainingMs={turnClock.remainingMs}
+              active={isTimedGameActive}
+              expired={!!timeoutWinner}
+              tone={currentPlayer === "R" ? "rose" : "amber"}
+            />
+            <TimeControlPicker
+              label="Turn limit"
+              presets={ROUND_TIME_PRESETS}
+              valueSeconds={turnSeconds}
+              onChange={(seconds) => {
+                setTurnSeconds(seconds)
+                setTimerResetKey((current) => current + 1)
+              }}
+              disabled={!showSetupSheet && !winner && !isDraw}
+            />
           </div>
 
           <div className="flex justify-center">
@@ -149,7 +214,16 @@ export function ConnectFour() {
                       size="sm"
                       className="h-8 w-full mb-1"
                       onClick={() => handleColumnClick(col)}
-                      disabled={!!winner || !!isDraw || isLoading || isProcessingMove || (mode === "vs_computer" && currentPlayer === "Y")}
+                      disabled={
+                        !!winner ||
+                        !!isDraw ||
+                        !!timeoutWinner ||
+                        isLoading ||
+                        isProcessingMove ||
+                        (mode === "vs_computer" && currentPlayer === "Y")
+                      }
+                      aria-label={`Drop disc in column ${col + 1}`}
+                      title={`Drop disc in column ${col + 1}`}
                     >
                       \u2193
                     </Button>
@@ -309,7 +383,7 @@ export function ConnectFour() {
 
             <div className="flex flex-col gap-2">
               <Button
-                onClick={() => startSession(mode)}
+                onClick={startTimedSession}
                 disabled={isLoading}
                 className="w-full"
               >
@@ -318,7 +392,7 @@ export function ConnectFour() {
               <Button
                 variant="outline"
                 onClick={() => {
-                  resetBoard()
+                  resetTimedBoard()
                   setShowSetupSheet(false)
                 }}
               >

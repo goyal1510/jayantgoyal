@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import { useState } from "react"
+import * as React from "react"
 import { Globe2, Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
@@ -10,8 +10,15 @@ import { Button } from "@repo/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card"
 import { Input } from "@repo/ui/input"
 import { Label } from "@repo/ui/label"
+import { cn } from "@repo/ui/lib/utils"
 
 import { EMPTY_RPS_STATE } from "@/lib/games/rock-paper-scissors"
+import {
+  GameClockCard,
+  ROUND_TIME_PRESETS,
+  TimeControlPicker,
+  useGameCountdown,
+} from "@/components/games/game-time-controls"
 
 type Choice = "rock" | "paper" | "scissors"
 
@@ -35,24 +42,29 @@ const CHOICES: { key: Choice; label: string; image: string }[] = [
 
 export function RockPaperScissors() {
   const router = useRouter()
-  const [totals, setTotals] = useState({ humanWins: 0, computerWins: 0, draws: 0 })
-  const [lastRound, setLastRound] = useState<{
+  const [totals, setTotals] = React.useState({ humanWins: 0, computerWins: 0, draws: 0 })
+  const [lastRound, setLastRound] = React.useState<{
     roundNumber: number
     userChoice: Choice
     computerChoice: Choice
     outcome: "win" | "loss" | "draw"
+    timedOut?: boolean
   } | null>(null)
-  const [message, setMessage] = useState<string>("Pick a move to start playing.")
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [onlineName, setOnlineName] = useState("Player 1")
-  const [joinCode, setJoinCode] = useState("")
-  const [creatingRoom, setCreatingRoom] = useState(false)
+  const [message, setMessage] = React.useState<string>("Pick a move before the round timer expires.")
+  const [selectedChoice, setSelectedChoice] = React.useState<Choice | null>(null)
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
+  const [roundSeconds, setRoundSeconds] = React.useState(10)
+  const [roundResetKey, setRoundResetKey] = React.useState(0)
+  const [onlineName, setOnlineName] = React.useState("Player 1")
+  const [joinCode, setJoinCode] = React.useState("")
+  const [creatingRoom, setCreatingRoom] = React.useState(false)
 
   const getChoiceMeta = (key: Choice) =>
     CHOICES.find((choice) => choice.key === key) ?? CHOICES[0]!
 
-  const playRound = async (choice: Choice) => {
+  const playRound = async (choice: Choice, timedOut = false) => {
     setIsSubmitting(true)
+    setSelectedChoice(choice)
     const computerChoice = CHOICES[Math.floor(Math.random() * CHOICES.length)]!.key
     const humanWins =
       (choice === "rock" && computerChoice === "scissors") ||
@@ -74,25 +86,42 @@ export function RockPaperScissors() {
       userChoice: choice,
       computerChoice,
       outcome,
+      timedOut,
     }))
 
     const nextMessage =
-      outcome === "draw"
-        ? "Draw."
-        : outcome === "win"
-          ? "You win this round!"
-          : "Computer wins this round."
+      timedOut
+        ? `Time expired. ${getChoiceMeta(choice).label} was auto-picked.`
+        : outcome === "draw"
+          ? "Draw."
+          : outcome === "win"
+            ? "You win this round!"
+            : "Computer wins this round."
     setMessage(nextMessage)
-    if (outcome === "win") toast.success("You win this round!")
+    if (timedOut) toast("Round timer expired", { description: nextMessage })
+    else if (outcome === "win") toast.success("You win this round!")
     else if (outcome === "loss") toast.error("Computer wins this round.")
     else toast("Draw", { description: "Both picked the same move." })
     setIsSubmitting(false)
+    setRoundResetKey((current) => current + 1)
   }
+
+  const roundClock = useGameCountdown({
+    durationSeconds: roundSeconds,
+    active: !isSubmitting,
+    resetKey: roundResetKey,
+    onExpire: () => {
+      const fallbackChoice = CHOICES[Math.floor(Math.random() * CHOICES.length)]!.key
+      void playRound(fallbackChoice, true)
+    },
+  })
 
   const resetLocal = () => {
     setTotals({ humanWins: 0, computerWins: 0, draws: 0 })
     setLastRound(null)
-    setMessage("Pick a move to start playing.")
+    setSelectedChoice(null)
+    setMessage("Pick a move before the round timer expires.")
+    setRoundResetKey((current) => current + 1)
   }
 
   const createOnlineRoom = async () => {
@@ -149,23 +178,53 @@ export function RockPaperScissors() {
             <Button
               key={choice.key}
               variant="secondary"
-              className="flex flex-col items-center gap-3 py-6 min-h-[140px]"
+              className={cn(
+                "flex min-h-[140px] flex-col items-center gap-3 py-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg active:translate-y-0",
+                selectedChoice === choice.key && "ring-2 ring-rose-400 ring-offset-2"
+              )}
               disabled={isSubmitting}
               onClick={() => playRound(choice.key)}
             >
-              <div className="flex h-20 w-20 items-center justify-center rounded-lg border bg-background">
+              <div
+                className={cn(
+                  "flex h-20 w-20 items-center justify-center rounded-lg border bg-background transition-transform duration-200",
+                  selectedChoice === choice.key && "scale-105",
+                  isSubmitting && selectedChoice === choice.key && "animate-pulse"
+                )}
+              >
                 <Image
                   src={choice.image}
                   alt={choice.label}
                   width={64}
                   height={64}
-                  className="h-16 w-16 object-contain"
+                  className="h-16 w-16 object-contain transition-transform duration-200 group-hover:scale-105"
                   priority={choice.key === "rock"}
                 />
               </div>
               <span className="text-sm font-medium">{choice.label}</span>
             </Button>
           ))}
+        </div>
+
+        <div className="grid gap-3 lg:grid-cols-[220px_1fr]">
+          <GameClockCard
+            label="Round timer"
+            helper="Auto-picks if it expires"
+            remainingMs={roundClock.remainingMs}
+            active={!isSubmitting}
+            expired={roundClock.isExpired}
+            tone="rose"
+          />
+          <TimeControlPicker
+            label="Round limit"
+            presets={ROUND_TIME_PRESETS}
+            valueSeconds={roundSeconds}
+            onChange={(seconds) => {
+              setRoundSeconds(seconds)
+              setRoundResetKey((current) => current + 1)
+            }}
+            disabled={isSubmitting}
+          />
         </div>
 
         <div className="rounded-lg border bg-muted/30 p-3 text-sm">
@@ -186,10 +245,10 @@ export function RockPaperScissors() {
           </div>
           {lastRound ? (
             <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
-              <div className="rounded-md bg-background p-4 space-y-3">
+              <div className="space-y-3 rounded-md bg-background p-4 ring-1 ring-rose-300/60 transition">
                 <div className="text-xs text-muted-foreground">You</div>
                 <div className="flex items-center gap-2">
-                  <div className="h-14 w-14 rounded-md border bg-muted/40">
+                  <div className="h-14 w-14 rounded-md border bg-muted/40 transition-transform duration-200 hover:scale-105">
                     <Image
                       src={getChoiceMeta(lastRound.userChoice).image}
                       alt={getChoiceMeta(lastRound.userChoice).label}
@@ -203,10 +262,10 @@ export function RockPaperScissors() {
                   </div>
                 </div>
               </div>
-              <div className="rounded-md bg-background p-4 space-y-3">
+              <div className="space-y-3 rounded-md bg-background p-4 ring-1 ring-slate-300/60 transition">
                 <div className="text-xs text-muted-foreground">Computer</div>
                 <div className="flex items-center gap-2">
-                  <div className="h-14 w-14 rounded-md border bg-muted/40">
+                  <div className="h-14 w-14 rounded-md border bg-muted/40 transition-transform duration-200 hover:scale-105">
                     <Image
                       src={getChoiceMeta(lastRound.computerChoice).image}
                       alt={getChoiceMeta(lastRound.computerChoice).label}
@@ -229,6 +288,7 @@ export function RockPaperScissors() {
                       ? "You win"
                       : "Computer wins"}
                 </span>
+                {lastRound.timedOut && " · timer auto-picked your move"}
               </div>
             </div>
           ) : (

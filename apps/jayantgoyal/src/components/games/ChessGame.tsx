@@ -18,24 +18,32 @@ import {
   getChessCompletion,
   type ChessSquare,
 } from "@/lib/games/chess"
+import {
+  GameClockCard,
+  TimeControlPicker,
+  TURN_TIME_PRESETS,
+  useGameCountdown,
+} from "@/components/games/game-time-controls"
 
 function ChessBoard({
   chess,
   selected,
   legalTargets,
+  lastMoveSquares,
   onSquareClick,
   disabled,
 }: {
   chess: Chess
   selected: ChessSquare | null
   legalTargets: Set<string>
+  lastMoveSquares: { from: ChessSquare; to: ChessSquare } | null
   onSquareClick: (square: ChessSquare) => void
   disabled?: boolean
 }) {
   const board = chess.board()
 
   return (
-    <div className="grid aspect-square w-full max-w-[min(86vw,620px)] grid-cols-8 overflow-hidden rounded-xl border border-stone-950/20 bg-stone-900 shadow-2xl shadow-stone-950/20">
+    <div className="grid aspect-square w-full max-w-[min(86vw,620px)] grid-cols-[repeat(8,minmax(0,1fr))] grid-rows-[repeat(8,minmax(0,1fr))] overflow-hidden rounded-xl border border-stone-950/20 bg-stone-900 shadow-2xl shadow-stone-950/20">
       {board.flat().map((piece, index) => {
         const row = Math.floor(index / 8)
         const col = index % 8
@@ -45,6 +53,8 @@ function ChessBoard({
         const light = (row + col) % 2 === 0
         const isSelected = selected === square
         const isLegal = legalTargets.has(square)
+        const isLastMove =
+          lastMoveSquares?.from === square || lastMoveSquares?.to === square
         const pieceName = piece
           ? `${piece.color === "w" ? "White" : "Black"} ${piece.type}`
           : "Empty"
@@ -57,8 +67,10 @@ function ChessBoard({
             onClick={() => onSquareClick(square)}
             disabled={disabled}
             className={cn(
-              "relative flex items-center justify-center text-3xl font-semibold transition sm:text-5xl",
+              "group relative flex aspect-square min-h-0 min-w-0 items-center justify-center overflow-hidden font-semibold transition-colors duration-150",
               light ? "bg-[#e8d7b2]" : "bg-[#8b5f3c]",
+              !disabled && "hover:brightness-110",
+              isLastMove && "before:absolute before:inset-0 before:bg-amber-300/35 before:content-['']",
               isSelected && "ring-4 ring-amber-400 ring-inset",
               isLegal && "after:absolute after:h-4 after:w-4 after:rounded-full after:bg-emerald-500/70 sm:after:h-5 sm:after:w-5",
               disabled && "cursor-not-allowed"
@@ -66,11 +78,20 @@ function ChessBoard({
             aria-label={label}
             title={label}
           >
-            <span className={piece?.color === "w" ? "text-stone-50 drop-shadow-[0_2px_2px_rgba(0,0,0,0.45)]" : "text-stone-950 drop-shadow-[0_1px_1px_rgba(255,255,255,0.35)]"}>
+            <span
+              className={cn(
+                "relative z-10 flex h-full w-full items-center justify-center leading-none transition-transform duration-200 group-hover:scale-105",
+                "text-[clamp(1.35rem,6vw,3.6rem)] sm:text-[clamp(2.2rem,4.4vw,4.2rem)]",
+                isLastMove && "animate-pulse",
+                piece?.color === "w"
+                  ? "text-stone-50 drop-shadow-[0_2px_2px_rgba(0,0,0,0.45)]"
+                  : "text-stone-950 drop-shadow-[0_1px_1px_rgba(255,255,255,0.35)]"
+              )}
+            >
               {piece ? CHESS_PIECES[`${piece.color}${piece.type}`] : ""}
             </span>
             {(row === 7 || col === 0) && (
-              <span className="absolute bottom-1 left-1 text-[10px] font-bold text-black/45">
+              <span className="pointer-events-none absolute bottom-1 left-1 z-20 text-[10px] font-bold leading-none text-black/45">
                 {col === 0 ? rank : ""}
                 {row === 7 ? file : ""}
               </span>
@@ -121,9 +142,16 @@ export function ChessGame() {
   const [chess, setChess] = React.useState(() => new Chess())
   const [selected, setSelected] = React.useState<ChessSquare | null>(null)
   const [lastSan, setLastSan] = React.useState<string | null>(null)
+  const [lastMoveSquares, setLastMoveSquares] = React.useState<{
+    from: ChessSquare
+    to: ChessSquare
+  } | null>(null)
   const [moveHistory, setMoveHistory] = React.useState<string[]>([])
   const [mode, setMode] = React.useState<ChessMode>("vs_computer")
   const [computerThinking, setComputerThinking] = React.useState(false)
+  const [clockSeconds, setClockSeconds] = React.useState(300)
+  const [clockResetKey, setClockResetKey] = React.useState(0)
+  const [timeoutWinner, setTimeoutWinner] = React.useState<"w" | "b" | null>(null)
   const [onlineName, setOnlineName] = React.useState("White Player")
   const [joinCode, setJoinCode] = React.useState("")
   const [creating, setCreating] = React.useState(false)
@@ -137,13 +165,21 @@ export function ChessGame() {
     setChess(new Chess())
     setSelected(null)
     setLastSan(null)
+    setLastMoveSquares(null)
     setMoveHistory([])
     setComputerThinking(false)
+    setTimeoutWinner(null)
+    setClockResetKey((current) => current + 1)
   }
 
-  const applyMove = React.useCallback((next: Chess, san: string) => {
+  const applyMove = React.useCallback((
+    next: Chess,
+    san: string,
+    squares: { from: ChessSquare; to: ChessSquare }
+  ) => {
     setChess(next)
     setLastSan(san)
+    setLastMoveSquares(squares)
     setMoveHistory((current) => [...current, san])
     setSelected(null)
   }, [])
@@ -151,7 +187,22 @@ export function ChessGame() {
   const isComputerTurn =
     mode === "vs_computer" &&
     chess.turn() === "b" &&
-    !getChessCompletion(chess, null)
+    !getChessCompletion(chess, null) &&
+    !timeoutWinner
+
+  const completion = getChessCompletion(chess, null)
+  const whiteClock = useGameCountdown({
+    durationSeconds: clockSeconds,
+    active: chess.turn() === "w" && !completion && !timeoutWinner,
+    resetKey: clockResetKey,
+    onExpire: () => setTimeoutWinner("b"),
+  })
+  const blackClock = useGameCountdown({
+    durationSeconds: clockSeconds,
+    active: chess.turn() === "b" && !completion && !timeoutWinner,
+    resetKey: clockResetKey,
+    onExpire: () => setTimeoutWinner("w"),
+  })
 
   React.useEffect(() => {
     if (!isComputerTurn) return
@@ -163,7 +214,10 @@ export function ChessGame() {
 
       if (move) {
         const result = next.move(move)
-        applyMove(next, result.san)
+        applyMove(next, result.san, {
+          from: result.from as ChessSquare,
+          to: result.to as ChessSquare,
+        })
       }
 
       setComputerThinking(false)
@@ -173,7 +227,7 @@ export function ChessGame() {
   }, [applyMove, chess, isComputerTurn])
 
   const onSquareClick = (square: ChessSquare) => {
-    if (computerThinking || isComputerTurn) return
+    if (computerThinking || isComputerTurn || timeoutWinner) return
 
     const piece = chess.get(square)
 
@@ -201,7 +255,10 @@ export function ChessGame() {
       return
     }
 
-    applyMove(next, move.san)
+    applyMove(next, move.san, {
+      from: selected,
+      to: square,
+    })
   }
 
   const createOnlineRoom = async () => {
@@ -242,8 +299,9 @@ export function ChessGame() {
     router.push(`/games/chess/room/${roomCode}`)
   }
 
-  const completion = getChessCompletion(chess, null)
-  const status = completion
+  const status = timeoutWinner
+    ? `${timeoutWinner === "w" ? "White" : "Black"} wins on time`
+    : completion
     ? chess.isCheckmate()
       ? "Checkmate"
       : "Draw"
@@ -271,8 +329,9 @@ export function ChessGame() {
             chess={chess}
             selected={selected}
             legalTargets={legalTargets}
+            lastMoveSquares={lastMoveSquares}
             onSquareClick={onSquareClick}
-            disabled={computerThinking}
+            disabled={computerThinking || !!timeoutWinner}
           />
         </CardContent>
       </Card>
@@ -296,6 +355,33 @@ export function ChessGame() {
               <div className="text-xs uppercase tracking-wide text-muted-foreground">Last move</div>
               <div className="font-mono text-lg">{lastSan ?? "—"}</div>
             </div>
+            <div className="grid grid-cols-2 gap-2">
+              <GameClockCard
+                label="White clock"
+                helper={mode === "vs_computer" ? "You" : "White"}
+                remainingMs={whiteClock.remainingMs}
+                active={chess.turn() === "w" && !completion && !timeoutWinner}
+                expired={timeoutWinner === "b"}
+                tone="amber"
+              />
+              <GameClockCard
+                label="Black clock"
+                helper={mode === "vs_computer" ? "Computer" : "Black"}
+                remainingMs={blackClock.remainingMs}
+                active={chess.turn() === "b" && !completion && !timeoutWinner}
+                expired={timeoutWinner === "w"}
+                tone="blue"
+              />
+            </div>
+            <TimeControlPicker
+              label="Game clock"
+              presets={TURN_TIME_PRESETS}
+              valueSeconds={clockSeconds}
+              onChange={(seconds) => {
+                setClockSeconds(seconds)
+                reset()
+              }}
+            />
             <div className="grid grid-cols-2 gap-2">
               <Button
                 type="button"

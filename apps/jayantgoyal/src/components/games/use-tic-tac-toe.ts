@@ -87,6 +87,8 @@ export function useTicTacToe() {
     }
   }, [turnO, mode, playerO, playerX])
 
+  const currentSymbol: "O" | "X" = turnO ? "O" : "X"
+
   const announceOutcome = (outcome: WinnerResult | "draw") => {
     if (outcome === "draw") {
       return
@@ -194,6 +196,7 @@ export function useTicTacToe() {
     setPlayerX,
     moveHistory,
     playerLabels,
+    currentSymbol,
     resetBoard,
     startSession,
     handleBoxClick,
