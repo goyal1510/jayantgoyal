@@ -219,23 +219,32 @@ export function OnlineTicTacToeRoom({ roomCode }: { roomCode: string }) {
         </CardHeader>
         <CardContent className="flex justify-center pb-6">
           <div className="grid w-full max-w-[min(86vw,500px)] grid-cols-3 gap-2">
-            {state.board.map((cell, index) => (
-              <button
-                key={index}
-                type="button"
-                onClick={() => void submitMove(index)}
-                disabled={!isMyTurn || !!cell || !!state.winner || state.isDraw || submittingMove}
-                className={cn(
-                  "aspect-square rounded-xl border bg-background/90 text-5xl font-black transition sm:text-7xl",
-                  "disabled:cursor-not-allowed disabled:opacity-85",
-                  isMyTurn && !cell && !state.winner && !state.isDraw && "hover:-translate-y-0.5 hover:bg-sky-50 dark:hover:bg-sky-950",
-                  state.winningLine.includes(index) && "border-emerald-500 bg-emerald-100 text-emerald-700 dark:bg-emerald-950"
-                )}
-                aria-label={`cell ${index + 1}`}
-              >
-                {cell}
-              </button>
-            ))}
+            {state.board.map((cell, index) => {
+              const row = Math.floor(index / 3) + 1
+              const column = (index % 3) + 1
+              const label = cell
+                ? `Cell row ${row}, column ${column}: ${cell}`
+                : `Empty cell row ${row}, column ${column}`
+
+              return (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() => void submitMove(index)}
+                  disabled={!isMyTurn || !!cell || !!state.winner || state.isDraw || submittingMove}
+                  className={cn(
+                    "aspect-square rounded-xl border bg-background/90 text-5xl font-black transition sm:text-7xl",
+                    "disabled:cursor-not-allowed disabled:opacity-85",
+                    isMyTurn && !cell && !state.winner && !state.isDraw && "hover:-translate-y-0.5 hover:bg-sky-50 dark:hover:bg-sky-950",
+                    state.winningLine.includes(index) && "border-emerald-500 bg-emerald-100 text-emerald-700 dark:bg-emerald-950"
+                  )}
+                  aria-label={label}
+                  title={label}
+                >
+                  {cell}
+                </button>
+              )
+            })}
           </div>
         </CardContent>
       </Card>

@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Chess } from "chess.js"
 import { useRouter } from "next/navigation"
-import { Crown, Globe2, Loader2, RotateCcw } from "lucide-react"
+import { Bot, Crown, Globe2, Loader2, RotateCcw, Users } from "lucide-react"
 import { toast } from "sonner"
 
 import { Button } from "@repo/ui/button"
@@ -24,11 +24,13 @@ function ChessBoard({
   selected,
   legalTargets,
   onSquareClick,
+  disabled,
 }: {
   chess: Chess
   selected: ChessSquare | null
   legalTargets: Set<string>
   onSquareClick: (square: ChessSquare) => void
+  disabled?: boolean
 }) {
   const board = chess.board()
 
@@ -43,19 +45,26 @@ function ChessBoard({
         const light = (row + col) % 2 === 0
         const isSelected = selected === square
         const isLegal = legalTargets.has(square)
+        const pieceName = piece
+          ? `${piece.color === "w" ? "White" : "Black"} ${piece.type}`
+          : "Empty"
+        const label = `${square}: ${pieceName}`
 
         return (
           <button
             key={square}
             type="button"
             onClick={() => onSquareClick(square)}
+            disabled={disabled}
             className={cn(
               "relative flex items-center justify-center text-3xl font-semibold transition sm:text-5xl",
               light ? "bg-[#e8d7b2]" : "bg-[#8b5f3c]",
               isSelected && "ring-4 ring-amber-400 ring-inset",
-              isLegal && "after:absolute after:h-4 after:w-4 after:rounded-full after:bg-emerald-500/70 sm:after:h-5 sm:after:w-5"
+              isLegal && "after:absolute after:h-4 after:w-4 after:rounded-full after:bg-emerald-500/70 sm:after:h-5 sm:after:w-5",
+              disabled && "cursor-not-allowed"
             )}
-            aria-label={square}
+            aria-label={label}
+            title={label}
           >
             <span className={piece?.color === "w" ? "text-stone-50 drop-shadow-[0_2px_2px_rgba(0,0,0,0.45)]" : "text-stone-950 drop-shadow-[0_1px_1px_rgba(255,255,255,0.35)]"}>
               {piece ? CHESS_PIECES[`${piece.color}${piece.type}`] : ""}
@@ -73,11 +82,48 @@ function ChessBoard({
   )
 }
 
+type ChessMode = "local_pvp" | "vs_computer"
+
+const PIECE_VALUES: Record<string, number> = {
+  p: 100,
+  n: 320,
+  b: 330,
+  r: 500,
+  q: 900,
+  k: 0,
+}
+
+function chooseComputerMove(chess: Chess) {
+  const moves = chess.moves({ verbose: true })
+  if (moves.length === 0) return null
+
+  const scoredMoves = moves.map((move) => {
+    const next = new Chess(chess.fen())
+    next.move(move)
+
+    let score = 0
+    if (next.isCheckmate()) score += 100000
+    if (next.inCheck()) score += 45
+    if (move.captured) score += (PIECE_VALUES[move.captured] ?? 0) + 20
+    if (move.promotion) score += PIECE_VALUES[move.promotion] ?? 0
+    if (["d4", "e4", "d5", "e5"].includes(move.to)) score += 8
+    score += Math.random() * 10
+
+    return { move, score }
+  })
+
+  scoredMoves.sort((a, b) => b.score - a.score)
+  return scoredMoves[0]?.move ?? null
+}
+
 export function ChessGame() {
   const router = useRouter()
   const [chess, setChess] = React.useState(() => new Chess())
   const [selected, setSelected] = React.useState<ChessSquare | null>(null)
   const [lastSan, setLastSan] = React.useState<string | null>(null)
+  const [moveHistory, setMoveHistory] = React.useState<string[]>([])
+  const [mode, setMode] = React.useState<ChessMode>("vs_computer")
+  const [computerThinking, setComputerThinking] = React.useState(false)
   const [onlineName, setOnlineName] = React.useState("White Player")
   const [joinCode, setJoinCode] = React.useState("")
   const [creating, setCreating] = React.useState(false)
@@ -91,9 +137,44 @@ export function ChessGame() {
     setChess(new Chess())
     setSelected(null)
     setLastSan(null)
+    setMoveHistory([])
+    setComputerThinking(false)
   }
 
+  const applyMove = React.useCallback((next: Chess, san: string) => {
+    setChess(next)
+    setLastSan(san)
+    setMoveHistory((current) => [...current, san])
+    setSelected(null)
+  }, [])
+
+  const isComputerTurn =
+    mode === "vs_computer" &&
+    chess.turn() === "b" &&
+    !getChessCompletion(chess, null)
+
+  React.useEffect(() => {
+    if (!isComputerTurn) return
+
+    setComputerThinking(true)
+    const timeoutId = window.setTimeout(() => {
+      const next = new Chess(chess.fen())
+      const move = chooseComputerMove(next)
+
+      if (move) {
+        const result = next.move(move)
+        applyMove(next, result.san)
+      }
+
+      setComputerThinking(false)
+    }, 650)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [applyMove, chess, isComputerTurn])
+
   const onSquareClick = (square: ChessSquare) => {
+    if (computerThinking || isComputerTurn) return
+
     const piece = chess.get(square)
 
     if (!selected) {
@@ -120,9 +201,7 @@ export function ChessGame() {
       return
     }
 
-    setChess(next)
-    setLastSan(move.san)
-    setSelected(null)
+    applyMove(next, move.san)
   }
 
   const createOnlineRoom = async () => {
@@ -163,10 +242,13 @@ export function ChessGame() {
     router.push(`/games/chess/room/${roomCode}`)
   }
 
-  const status = getChessCompletion(chess, null)
+  const completion = getChessCompletion(chess, null)
+  const status = completion
     ? chess.isCheckmate()
       ? "Checkmate"
       : "Draw"
+    : computerThinking
+      ? "Computer thinking"
     : chess.inCheck()
       ? "Check"
       : `${chess.turn() === "w" ? "White" : "Black"} to move`
@@ -185,7 +267,13 @@ export function ChessGame() {
           </Button>
         </CardHeader>
         <CardContent className="flex justify-center pb-6">
-          <ChessBoard chess={chess} selected={selected} legalTargets={legalTargets} onSquareClick={onSquareClick} />
+          <ChessBoard
+            chess={chess}
+            selected={selected}
+            legalTargets={legalTargets}
+            onSquareClick={onSquareClick}
+            disabled={computerThinking}
+          />
         </CardContent>
       </Card>
 
@@ -198,10 +286,60 @@ export function ChessGame() {
             <div className="rounded-lg border p-3">
               <div className="text-xs uppercase tracking-wide text-muted-foreground">Status</div>
               <div className="text-lg font-semibold">{status}</div>
+              <div className="text-xs text-muted-foreground">
+                {mode === "vs_computer"
+                  ? "You play White. Computer plays Black."
+                  : "Local players alternate turns."}
+              </div>
             </div>
             <div className="rounded-lg border p-3">
               <div className="text-xs uppercase tracking-wide text-muted-foreground">Last move</div>
               <div className="font-mono text-lg">{lastSan ?? "—"}</div>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                type="button"
+                variant={mode === "vs_computer" ? "secondary" : "outline"}
+                onClick={() => {
+                  setMode("vs_computer")
+                  reset()
+                }}
+              >
+                <Bot className="mr-2 h-4 w-4" />
+                Vs Computer
+              </Button>
+              <Button
+                type="button"
+                variant={mode === "local_pvp" ? "secondary" : "outline"}
+                onClick={() => {
+                  setMode("local_pvp")
+                  reset()
+                }}
+              >
+                <Users className="mr-2 h-4 w-4" />
+                Local PvP
+              </Button>
+            </div>
+            <div className="rounded-lg border p-3">
+              <div className="mb-2 text-xs uppercase tracking-wide text-muted-foreground">
+                Move list
+              </div>
+              {moveHistory.length === 0 ? (
+                <div className="text-sm text-muted-foreground">No moves yet.</div>
+              ) : (
+                <div className="max-h-36 overflow-y-auto font-mono text-sm">
+                  {Array.from(
+                    { length: Math.ceil(moveHistory.length / 2) },
+                    (_, index) => (
+                      <div key={index} className="grid grid-cols-[32px_1fr_1fr] gap-2 py-0.5">
+                        <span className="text-muted-foreground">{index + 1}.</span>
+                        <span>{moveHistory[index * 2] ?? ""}</span>
+                        <span>{moveHistory[index * 2 + 1] ?? ""}</span>
+                      </div>
+                    )
+                  )}
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

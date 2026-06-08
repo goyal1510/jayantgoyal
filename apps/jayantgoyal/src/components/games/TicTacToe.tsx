@@ -109,7 +109,14 @@ export function TicTacToe() {
               <Settings className="mr-2 h-4 w-4" />
               Setup
             </Button>
-            <Button variant="ghost" size="icon" onClick={resetBoard} disabled={isLoading}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={resetBoard}
+              disabled={isLoading}
+              aria-label="Reset board"
+              title="Reset board"
+            >
               <RefreshCcw className="h-4 w-4" />
             </Button>
           </div>
@@ -133,19 +140,29 @@ export function TicTacToe() {
 
             <div className="flex justify-center">
               <div className="grid grid-cols-3 gap-2 max-w-xs sm:max-w-md w-full">
-              {board.map((value, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleBoxClick(index)}
-                  disabled={!!value || !!winner || isDraw || isLoading}
-                  className={cn(
-                    "aspect-square cursor-pointer rounded-lg border bg-background text-3xl font-semibold transition hover:bg-muted",
-                    "disabled:cursor-not-allowed disabled:opacity-70 flex items-center justify-center"
-                  )}
-                >
-                  {value}
-                </button>
-              ))}
+                {board.map((value, index) => {
+                  const row = Math.floor(index / 3) + 1
+                  const column = (index % 3) + 1
+                  const label = value
+                    ? `Cell row ${row}, column ${column}: ${value}`
+                    : `Empty cell row ${row}, column ${column}`
+
+                  return (
+                    <button
+                      key={index}
+                      onClick={() => handleBoxClick(index)}
+                      disabled={!!value || !!winner || isDraw || isLoading}
+                      className={cn(
+                        "aspect-square cursor-pointer rounded-lg border bg-background text-3xl font-semibold transition hover:bg-muted",
+                        "disabled:cursor-not-allowed disabled:opacity-70 flex items-center justify-center"
+                      )}
+                      aria-label={label}
+                      title={label}
+                    >
+                      {value}
+                    </button>
+                  )
+                })}
               </div>
             </div>
           </div>

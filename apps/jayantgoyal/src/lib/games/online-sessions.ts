@@ -5,7 +5,6 @@ export const ONLINE_GAME_SLUGS = [
   "connect-four",
   "memory-match",
   "wordle",
-  "typing-speed",
   "chess",
   "ludo",
 ] as const
