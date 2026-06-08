@@ -50,9 +50,7 @@ export function MessageInputDialog({ onSend, trigger }: MessageInputDialogProps)
       <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>New Message</DialogTitle>
-          <DialogDescription>
-            Send a text message or share code with proper formatting. Indentation will be preserved for code.
-          </DialogDescription>
+          <DialogDescription>Start a self-chat message.</DialogDescription>
         </DialogHeader>
         <div className="py-4">
           <MessageInput onSend={handleSend} disabled={isSending} />

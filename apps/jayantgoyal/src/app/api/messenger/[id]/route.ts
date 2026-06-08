@@ -28,7 +28,7 @@ export async function PATCH(
     const { data: existingMessage, error: fetchError } = await supabase
       .schema("jg_app")
       .from("messenger_messages")
-      .select("user_id, message_type")
+      .select("user_id, sender_id, message_type")
       .eq("id", id)
       .single();
 
@@ -39,7 +39,9 @@ export async function PATCH(
       );
     }
 
-    if (existingMessage.user_id !== user.id) {
+    const messageOwnerId = existingMessage.sender_id ?? existingMessage.user_id;
+
+    if (messageOwnerId !== user.id) {
       return NextResponse.json(
         { error: "Forbidden" },
         { status: 403 }
@@ -47,7 +49,10 @@ export async function PATCH(
     }
 
     const updateData: Record<string, unknown> = {};
-    if (content !== undefined) updateData.content = content.trim();
+    if (content !== undefined) {
+      updateData.content = content.trim();
+      updateData.edited_at = new Date().toISOString();
+    }
     if (message_type !== undefined) {
       if (message_type !== "text" && message_type !== "code") {
         return NextResponse.json(
@@ -72,7 +77,6 @@ export async function PATCH(
       .from("messenger_messages")
       .update(updateData)
       .eq("id", id)
-      .eq("user_id", user.id)
       .select()
       .single();
 
@@ -119,7 +123,7 @@ export async function DELETE(
     const { data: existingMessage, error: fetchError } = await supabase
       .schema("jg_app")
       .from("messenger_messages")
-      .select("user_id")
+      .select("user_id, sender_id")
       .eq("id", id)
       .single();
 
@@ -130,7 +134,9 @@ export async function DELETE(
       );
     }
 
-    if (existingMessage.user_id !== user.id) {
+    const messageOwnerId = existingMessage.sender_id ?? existingMessage.user_id;
+
+    if (messageOwnerId !== user.id) {
       return NextResponse.json(
         { error: "Forbidden" },
         { status: 403 }
@@ -141,8 +147,7 @@ export async function DELETE(
       .schema("jg_app")
       .from("messenger_messages")
       .delete()
-      .eq("id", id)
-      .eq("user_id", user.id);
+      .eq("id", id);
 
     if (error) {
       console.error("Error deleting message:", error);
