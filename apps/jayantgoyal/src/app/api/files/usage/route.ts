@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getWorkspaceAccessForUser } from "@/lib/commerce/entitlements.server";
+import { getPrivateStorageUsageBytes } from "@/lib/commerce/file-gates.server";
 
 export async function GET() {
   try {
@@ -37,11 +39,22 @@ export async function GET() {
     }, {});
     const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
 
+    const fileManagerUsedBytes = rows.reduce(
+      (total, row) => total + (row.is_directory ? 0 : row.size_bytes || 0),
+      0
+    );
+    const [access, usedBytes] = await Promise.all([
+      getWorkspaceAccessForUser(user.id),
+      getPrivateStorageUsageBytes(user.id),
+    ]);
+
     return NextResponse.json({
-      usedBytes: rows.reduce(
-        (total, row) => total + (row.is_directory ? 0 : row.size_bytes || 0),
-        0
-      ),
+      usedBytes,
+      plan: access.plan,
+      isPro: access.isPro,
+      storageLimitBytes: access.limits.fileStorageBytes,
+      storageRemainingBytes: Math.max(0, access.limits.fileStorageBytes - usedBytes),
+      singleUploadLimitBytes: access.limits.singleUploadBytes,
       fileCount: rows.filter((row) => !row.is_directory).length,
       folderCount: rows.filter((row) => row.is_directory).length,
       starredCount: rows.filter((row) => row.is_starred).length,
@@ -49,6 +62,8 @@ export async function GET() {
         (row) => new Date(row.updated_at).getTime() >= thirtyDaysAgo
       ).length,
       usageByType,
+      usageByTypeScope: "file_manager",
+      fileManagerUsedBytes,
     });
   } catch (error) {
     console.error("Error loading file usage:", error);

@@ -29,6 +29,20 @@ export interface ConversationSummary extends ConversationRow {
   display_title: string
 }
 
+function metadataText(
+  metadata: ConversationRow["metadata"],
+  key: string
+) {
+  if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) {
+    return null
+  }
+
+  const value = metadata[key]
+  return typeof value === "string" && value.trim().length > 0
+    ? value.trim()
+    : null
+}
+
 export function getMessengerDisplayName(
   profile: MessengerProfile | null | undefined,
   fallbackUserId: string,
@@ -169,8 +183,12 @@ export function buildConversationSummary({
   const otherParticipants = participantPayload.filter(
     (participant) => !participant.is_self
   )
+  const supportProductName = metadataText(conversation.metadata, "product_name")
   const displayTitle =
     conversation.title?.trim() ||
+    (conversation.conversation_type === "support" && supportProductName
+      ? `Support: ${supportProductName}`
+      : "") ||
     (conversation.conversation_type === "self"
       ? "Self chat"
       : otherParticipants.map((participant) => participant.display_label).join(", ")) ||

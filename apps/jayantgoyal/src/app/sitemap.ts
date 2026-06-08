@@ -11,7 +11,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/tools`, lastModified: LAST_MODIFIED, changeFrequency: "monthly" as const, priority: 0.8 },
     { url: `${BASE_URL}/weather`, lastModified: LAST_MODIFIED, changeFrequency: "daily" as const, priority: 0.6 },
     { url: `${BASE_URL}/custom-calculator`, lastModified: LAST_MODIFIED, changeFrequency: "monthly" as const, priority: 0.5 },
+    { url: `${BASE_URL}/pricing`, lastModified: LAST_MODIFIED, changeFrequency: "weekly" as const, priority: 0.8 },
+    { url: `${BASE_URL}/store`, lastModified: LAST_MODIFIED, changeFrequency: "weekly" as const, priority: 0.8 },
     { url: `${BASE_URL}/terms-conditions`, lastModified: LAST_MODIFIED, changeFrequency: "yearly" as const, priority: 0.3 },
+    { url: `${BASE_URL}/privacy-policy`, lastModified: LAST_MODIFIED, changeFrequency: "yearly" as const, priority: 0.3 },
+    { url: `${BASE_URL}/refund-policy`, lastModified: LAST_MODIFIED, changeFrequency: "yearly" as const, priority: 0.3 },
+    { url: `${BASE_URL}/contact-policy`, lastModified: LAST_MODIFIED, changeFrequency: "yearly" as const, priority: 0.3 },
     { url: `${BASE_URL}/github-stats`, lastModified: LAST_MODIFIED, changeFrequency: "daily" as const, priority: 0.5 },
   ]
 
@@ -112,5 +117,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  return [...publicPages, ...toolPages, ...gamePages, ...appPages, ...blogPages]
+  const storePages: MetadataRoute.Sitemap = []
+  if (supabaseUrl && supabaseKey) {
+    const { createClient } = await import("@supabase/supabase-js")
+    const supabase = createClient(supabaseUrl, supabaseKey)
+    const { data: products } = await supabase
+      .schema("jg_app")
+      .from("commerce_products")
+      .select("slug, updated_at")
+      .eq("status", "published")
+    if (products) {
+      storePages.push(
+        ...products.map((p) => ({
+          url: `${BASE_URL}/store/${p.slug}`,
+          lastModified: p.updated_at,
+          changeFrequency: "weekly" as const,
+          priority: 0.7,
+        }))
+      )
+    }
+  }
+
+  return [...publicPages, ...toolPages, ...gamePages, ...appPages, ...blogPages, ...storePages]
 }

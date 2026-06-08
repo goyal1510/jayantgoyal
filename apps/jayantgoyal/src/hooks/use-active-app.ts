@@ -7,6 +7,11 @@ const ROUTE_MAP: { prefix: string; appId: string; navResolver?: (pathname: strin
   { prefix: "/tools", appId: "tech-tools" },
   { prefix: "/messenger", appId: "messenger" },
   {
+    prefix: "/account",
+    appId: "account",
+    navResolver: (p) => (p.includes("/purchases") ? "purchases" : "billing"),
+  },
+  {
     prefix: "/calculator",
     appId: "currency-calculator",
     navResolver: (p) => (p === "/calculator/new" ? "new" : "history"),

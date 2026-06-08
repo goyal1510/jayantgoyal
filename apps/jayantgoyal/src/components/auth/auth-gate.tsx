@@ -7,8 +7,23 @@ import { Lock } from "lucide-react";
 import { Button } from "@repo/ui/button";
 
 /** Public paths that don't require auth — must match proxy PUBLIC_PAGES */
-const PUBLIC_PREFIXES = ["/tools", "/blogs", "/blog", "/weather", "/custom-calculator", "/github-stats"];
-const PUBLIC_EXACT = new Set(["/", "/terms-conditions"]);
+const PUBLIC_PREFIXES = [
+  "/tools",
+  "/blogs",
+  "/blog",
+  "/weather",
+  "/custom-calculator",
+  "/github-stats",
+  "/pricing",
+  "/store",
+];
+const PUBLIC_EXACT = new Set([
+  "/",
+  "/terms-conditions",
+  "/privacy-policy",
+  "/refund-policy",
+  "/contact-policy",
+]);
 
 function isPublicPath(pathname: string): boolean {
   if (PUBLIC_EXACT.has(pathname)) return true;

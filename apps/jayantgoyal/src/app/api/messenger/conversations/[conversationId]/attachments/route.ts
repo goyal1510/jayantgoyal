@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getFileStorageGate } from "@/lib/commerce/file-gates.server";
 
 const MAX_ATTACHMENT_SIZE = 25 * 1024 * 1024;
 
@@ -75,6 +76,22 @@ export async function POST(
       return NextResponse.json(
         { error: "Attachment must be between 1 byte and 25MB" },
         { status: 400 }
+      );
+    }
+
+    const storageGate = await getFileStorageGate({
+      userId,
+      incomingBytes: fileSize,
+    });
+
+    if (!storageGate.allowed) {
+      return NextResponse.json(
+        {
+          error: "Storage limit reached. Upgrade to Pro for more messenger attachments.",
+          code: "MESSENGER_STORAGE_LIMIT_REACHED",
+          gate: storageGate,
+        },
+        { status: 402 }
       );
     }
 

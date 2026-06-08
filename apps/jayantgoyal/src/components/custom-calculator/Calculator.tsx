@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useCalculatorStore } from "@/lib/custom-calculator/useCalculatorStore";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card";
 import { Button } from "@repo/ui/button";
+import { evaluateCalculatorExpression } from "@/lib/custom-calculator/evaluate";
 import Display from "./Display";
 
 const Calculator: React.FC = () => {
@@ -14,8 +15,7 @@ const Calculator: React.FC = () => {
   const handleClick = (label: string) => {
     try {
       if (label === "=") {
-        // Basic calculation
-        const result = Function(`"use strict"; return (${input})`)();
+        const result = evaluateCalculatorExpression(input);
         const calculation = `${input} = ${result}`;
         setHistory(prev => [calculation, ...prev.slice(0, 4)]);
         setInput(result.toString());

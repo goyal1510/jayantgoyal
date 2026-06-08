@@ -10,7 +10,7 @@ import {
   ContextMenuItem,
   ContextMenuSeparator,
 } from "@/components/ui/context-menu"
-import { ArchiveRestore, Eye, Download, Pencil, FolderInput, Copy, Trash2, Star } from "lucide-react"
+import { ArchiveRestore, Eye, Download, Pencil, FolderInput, Copy, Trash2, Star, Share2 } from "lucide-react"
 import type { DirectoryListingItem } from "@/lib/file-manager/types"
 
 interface FileActionHandlers {
@@ -19,6 +19,7 @@ interface FileActionHandlers {
   onRename: (e: React.MouseEvent, file: DirectoryListingItem) => void
   onMove: (e: React.MouseEvent, file: DirectoryListingItem) => void
   onCopy: (e: React.MouseEvent, file: DirectoryListingItem) => void
+  onShare: (e: React.MouseEvent, file: DirectoryListingItem) => void
   onDelete: (e: React.MouseEvent, file: DirectoryListingItem) => void
   onRestore?: (e: React.MouseEvent, file: DirectoryListingItem) => void
   onPermanentDelete?: (e: React.MouseEvent, file: DirectoryListingItem) => void
@@ -64,6 +65,10 @@ export function FileItemDropdownContent({ file, handlers, trashMode = false }: F
           <DropdownMenuItem onClick={(e: React.MouseEvent) => handlers.onDownload(e, file)}>
             <Download className="h-4 w-4 mr-2" />
             Download
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={(e: React.MouseEvent) => handlers.onShare(e, file)}>
+            <Share2 className="h-4 w-4 mr-2" />
+            Share
           </DropdownMenuItem>
           <DropdownMenuSeparator />
         </>
@@ -137,6 +142,10 @@ export function FileItemContextContent({ file, handlers, trashMode = false }: Fi
           <ContextMenuItem onClick={(e: React.MouseEvent) => handlers.onDownload(e, file)}>
             <Download className="h-4 w-4 mr-2" />
             Download
+          </ContextMenuItem>
+          <ContextMenuItem onClick={(e: React.MouseEvent) => handlers.onShare(e, file)}>
+            <Share2 className="h-4 w-4 mr-2" />
+            Share
           </ContextMenuItem>
           <ContextMenuSeparator />
         </>

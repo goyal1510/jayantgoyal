@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { allTools } from "@/lib/tools/tools"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
+import { Button } from "@repo/ui/button"
 
 export const metadata: Metadata = {
   title: "Developer Tools",
@@ -11,12 +12,17 @@ export const metadata: Metadata = {
 export default function ToolsPage() {
   return (
     <div className="space-y-8">
-      {/* <div>
-        <h1 className="text-3xl font-bold tracking-tight">Tech Tools</h1>
-        <p className="text-muted-foreground">
-          99+ utilities for developers and power users
-        </p>
-      </div> */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Tech Tools</h1>
+          <p className="text-sm text-muted-foreground">
+            Utilities with saved workspaces, bulk actions, and exportable results.
+          </p>
+        </div>
+        <Button asChild variant="outline">
+          <Link href="/tools/workspace">Open workspace</Link>
+        </Button>
+      </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {allTools.map((tool) => {

@@ -27,6 +27,8 @@ export const useCalculatorStore = create<CalculatorStore>()(
         components: state.components.filter((_, i) => i !== index),
       })),
 
+      setComponents: (components: CalculatorComponent[]) => set({ components }),
+
       clearComponents: () => set({ components: [] }),
     }),
     {

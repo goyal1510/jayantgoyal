@@ -29,6 +29,7 @@ interface FileListViewProps {
   onDelete: (e: React.MouseEvent, file: DirectoryListingItem) => void
   onMove: (e: React.MouseEvent, file: DirectoryListingItem) => void
   onCopy: (e: React.MouseEvent, file: DirectoryListingItem) => void
+  onShare: (e: React.MouseEvent, file: DirectoryListingItem) => void
   onRestore?: (e: React.MouseEvent, file: DirectoryListingItem) => void
   onPermanentDelete?: (e: React.MouseEvent, file: DirectoryListingItem) => void
   onToggleStar?: (e: React.MouseEvent, file: DirectoryListingItem) => void
@@ -48,6 +49,7 @@ export function FileListView({
   onDelete,
   onMove,
   onCopy,
+  onShare,
   onRestore,
   onPermanentDelete,
   onToggleStar,
@@ -59,6 +61,7 @@ export function FileListView({
     onRename,
     onMove,
     onCopy,
+    onShare,
     onDelete,
     onRestore,
     onPermanentDelete,

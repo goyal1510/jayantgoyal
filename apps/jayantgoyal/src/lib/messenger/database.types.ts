@@ -62,7 +62,7 @@ export interface Database {
       conversations: {
         Row: {
           id: string
-          conversation_type: "direct" | "group" | "self"
+          conversation_type: "direct" | "group" | "self" | "support"
           title: string | null
           created_by: string
           metadata: Json
@@ -73,7 +73,7 @@ export interface Database {
         }
         Insert: {
           id?: string
-          conversation_type?: "direct" | "group" | "self"
+          conversation_type?: "direct" | "group" | "self" | "support"
           title?: string | null
           created_by: string
           metadata?: Json
@@ -84,7 +84,7 @@ export interface Database {
         }
         Update: {
           id?: string
-          conversation_type?: "direct" | "group" | "self"
+          conversation_type?: "direct" | "group" | "self" | "support"
           title?: string | null
           created_by?: string
           metadata?: Json
@@ -99,7 +99,7 @@ export interface Database {
           id: string
           conversation_id: string
           user_id: string
-          role: "owner" | "member"
+          role: "owner" | "member" | "support_agent"
           display_name: string | null
           last_read_at: string | null
           muted_until: string | null
@@ -112,7 +112,7 @@ export interface Database {
           id?: string
           conversation_id: string
           user_id: string
-          role?: "owner" | "member"
+          role?: "owner" | "member" | "support_agent"
           display_name?: string | null
           last_read_at?: string | null
           muted_until?: string | null
@@ -125,7 +125,7 @@ export interface Database {
           id?: string
           conversation_id?: string
           user_id?: string
-          role?: "owner" | "member"
+          role?: "owner" | "member" | "support_agent"
           display_name?: string | null
           last_read_at?: string | null
           muted_until?: string | null

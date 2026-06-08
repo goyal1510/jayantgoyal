@@ -1,11 +1,13 @@
 "use client"
 
 import * as React from "react"
-import { Save, Sparkles } from "lucide-react"
+import { Crown, Save, Sparkles } from "lucide-react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 
 import { createCalculation } from "@/lib/calculator/client-calculations"
 import { CURRENCY_DENOMINATIONS } from "@/lib/calculator/database"
+import type { WorkspaceAccess } from "@/lib/commerce/entitlements.server"
 import { Button } from "@repo/ui/button"
 import { Card, CardContent } from "@repo/ui/card"
 import { Input } from "@repo/ui/input"
@@ -17,7 +19,11 @@ interface DenominationInput {
   total: number
 }
 
-export function CurrencyCalculatorForm() {
+interface CurrencyCalculatorFormProps {
+  workspaceAccess: WorkspaceAccess | null
+}
+
+export function CurrencyCalculatorForm({ workspaceAccess }: CurrencyCalculatorFormProps) {
   const router = useRouter()
   const [note, setNote] = React.useState("")
   const [isSubmitting, setIsSubmitting] = React.useState(false)
@@ -128,9 +134,29 @@ export function CurrencyCalculatorForm() {
 
   const totalAmount = getTotalAmount()
   const totalTone = totalAmount >= 0 ? "text-emerald-600" : "text-destructive"
+  const isPro = workspaceAccess?.isPro === true
+  const savedCalculationLimit = workspaceAccess?.limits.savedCalculations ?? 25
 
   return (
     <div className="w-full space-y-4 p-3 sm:space-y-6 sm:p-6">
+      <div className="flex flex-col gap-3 rounded-lg border bg-background p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <div className="space-y-1">
+          <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
+            <Crown className="h-4 w-4 text-amber-500" />
+            Saved calculation history
+          </p>
+          <p className="text-sm text-muted-foreground">
+            {isPro
+              ? `Pro can save up to ${savedCalculationLimit.toLocaleString()} calculations.`
+              : `Free includes ${savedCalculationLimit} saved calculations. Upgrade when your history grows.`}
+          </p>
+        </div>
+        {!isPro ? (
+          <Button asChild size="sm" variant="outline">
+            <Link href="/pricing">Upgrade history</Link>
+          </Button>
+        ) : null}
+      </div>
       <Card className="border-primary/10 shadow-sm">
         <CardContent className="p-2 sm:p-4">
           <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">

@@ -13,7 +13,7 @@ import {
 } from "@repo/ui/dialog";
 import { Input } from "@repo/ui/input";
 import { Separator } from "@repo/ui/separator";
-import { MessageCircle, Plus, Search, UserRound } from "lucide-react";
+import { LifeBuoy, MessageCircle, Plus, Search, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { MessageInput } from "@/components/messenger/message-input";
 import type { PendingMessengerAttachment } from "@/components/messenger/message-input";
@@ -195,7 +195,11 @@ function ContactPicker({
   );
 }
 
-export function MessagesPage() {
+export function MessagesPage({
+  initialConversationId,
+}: {
+  initialConversationId?: string;
+}) {
   const supabase = React.useMemo(() => createSupabaseBrowserClient(), []);
   const [userId, setUserId] = React.useState<string | null>(null);
   const [conversations, setConversations] = React.useState<
@@ -272,7 +276,7 @@ export function MessagesPage() {
     async function loadConversations() {
       try {
         setLoadingConversations(true);
-        await refreshConversations();
+        await refreshConversations(initialConversationId);
       } catch (error) {
         if (!cancelled) {
           console.error("Conversation load failed:", error);
@@ -288,7 +292,7 @@ export function MessagesPage() {
     return () => {
       cancelled = true;
     };
-  }, [refreshConversations, userId]);
+  }, [initialConversationId, refreshConversations, userId]);
 
   React.useEffect(() => {
     if (!activeConversationId) {
@@ -787,6 +791,12 @@ export function MessagesPage() {
                           Self
                         </Badge>
                       )}
+                      {conversation.conversation_type === "support" && (
+                        <Badge variant="outline" className="shrink-0 gap-1">
+                          <LifeBuoy className="size-3" />
+                          Support
+                        </Badge>
+                      )}
                     </div>
                     <p className="truncate text-xs text-muted-foreground">
                       {lastMessagePreview(conversation)}
@@ -827,6 +837,12 @@ export function MessagesPage() {
                     {activeConversation.display_title}
                   </h2>
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    {activeConversation.conversation_type === "support" && (
+                      <Badge variant="outline" className="gap-1">
+                        <LifeBuoy className="size-3" />
+                        Purchase support
+                      </Badge>
+                    )}
                     <UserRound className="h-3.5 w-3.5" />
                     <span>
                       {activeConversation.participants.length} participant

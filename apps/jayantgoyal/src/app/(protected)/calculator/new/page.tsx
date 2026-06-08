@@ -1,4 +1,8 @@
 import type { Metadata } from "next"
+
+import { getWorkspaceAccessForUser } from "@/lib/commerce/entitlements.server"
+import { createSupabaseServerClient } from "@/lib/supabase/server"
+
 import NewCalculatorClient from "./client"
 
 export const metadata: Metadata = {
@@ -6,6 +10,18 @@ export const metadata: Metadata = {
   description: "Cash denomination calculator — count currency notes and coins with instant totals.",
 }
 
-export default function Page() {
-  return <NewCalculatorClient />
+async function getCalculatorWorkspaceAccess() {
+  const supabase = await createSupabaseServerClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) return null
+  return getWorkspaceAccessForUser(user.id)
+}
+
+export default async function Page() {
+  const workspaceAccess = await getCalculatorWorkspaceAccess()
+
+  return <NewCalculatorClient workspaceAccess={workspaceAccess} />
 }

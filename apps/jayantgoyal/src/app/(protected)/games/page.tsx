@@ -20,6 +20,7 @@ import {
 
 import { Badge } from "@repo/ui/badge"
 import { GAME_META } from "@/lib/games/config"
+import { getWorkspaceAccessForUser } from "@/lib/commerce/entitlements.server"
 import { createSupabaseAdminClient } from "@/lib/supabase/admin"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 import { cn } from "@repo/ui/lib/utils"
@@ -354,12 +355,30 @@ async function getGameHistoryAndStats(): Promise<{
   }
 }
 
+async function getGamesWorkspaceAccess() {
+  try {
+    const auth = await createSupabaseServerClient()
+    const {
+      data: { user },
+    } = await auth.auth.getUser()
+
+    if (!user) return null
+
+    return getWorkspaceAccessForUser(user.id)
+  } catch (error) {
+    console.error("Unable to load game workspace access:", error)
+    return null
+  }
+}
+
 export default async function GamesPage() {
-  const [activeRooms, historyAndStats] = await Promise.all([
+  const [activeRooms, historyAndStats, workspaceAccess] = await Promise.all([
     getActiveGameRooms(),
     getGameHistoryAndStats(),
+    getGamesWorkspaceAccess(),
   ])
   const { history, stats } = historyAndStats
+  const isPro = workspaceAccess?.isPro === true
   const cards = Object.entries(GAME_META).map(([slug, meta]) => {
     const theme = CARD_THEMES[slug as keyof typeof GAME_META]
     const modesLabel =
@@ -375,6 +394,7 @@ export default async function GamesPage() {
       description: meta.description,
       modesLabel,
       onlineReady: meta.onlineReady === true,
+      onlineRequiresPro: meta.onlineReady === true,
       theme,
     }
   })
@@ -396,6 +416,30 @@ export default async function GamesPage() {
             <div className="mt-2 text-2xl font-semibold">{value}</div>
           </div>
         ))}
+      </section>
+
+      <section className="rounded-lg border bg-background p-4">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-base font-semibold">Online Rooms</h2>
+              <Badge variant={isPro ? "default" : "secondary"}>
+                {isPro ? "Pro active" : "Pro feature"}
+              </Badge>
+            </div>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Local and computer games stay available. Creating shareable online rooms requires Pro.
+            </p>
+          </div>
+          {!isPro && (
+            <Link
+              href="/pricing"
+              className="inline-flex h-9 items-center justify-center rounded-md border px-3 text-sm font-medium transition-colors hover:bg-muted"
+            >
+              Upgrade for rooms
+            </Link>
+          )}
+        </div>
       </section>
 
       {activeRooms.length > 0 && (
@@ -554,7 +598,7 @@ export default async function GamesPage() {
                     </span>
                     {card.onlineReady && (
                       <span className="inline-flex items-center gap-2 rounded-lg border px-3 py-1 text-xs bg-white/70 text-slate-800 dark:bg-black/20 dark:text-slate-200">
-                        Online rooms
+                        Online rooms {card.onlineRequiresPro ? "Pro" : ""}
                       </span>
                     )}
                   </div>

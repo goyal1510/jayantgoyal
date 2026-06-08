@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createSupabaseAdminClient } from "@/lib/supabase/admin"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
+import { getFileStorageGate } from "@/lib/commerce/file-gates.server"
 import type { Json } from "@/lib/messenger/database.types"
 
 type MessengerAttachment = {
@@ -169,6 +170,29 @@ export async function POST(
         { error: "Invalid attachment payload" },
         { status: 400 }
       )
+    }
+
+    const attachmentBytes = attachments.reduce(
+      (total, attachment) => total + attachment.size_bytes,
+      0
+    )
+
+    if (attachmentBytes > 0) {
+      const storageGate = await getFileStorageGate({
+        userId,
+        incomingBytes: attachmentBytes,
+      })
+
+      if (!storageGate.allowed) {
+        return NextResponse.json(
+          {
+            error: "Storage limit reached. Upgrade to Pro for more messenger attachments.",
+            code: "MESSENGER_STORAGE_LIMIT_REACHED",
+            gate: storageGate,
+          },
+          { status: 402 }
+        )
+      }
     }
 
     const metadata: Json =

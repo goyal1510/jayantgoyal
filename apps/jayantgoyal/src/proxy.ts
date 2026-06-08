@@ -20,6 +20,9 @@ const ZERO_COST_PATHS = [
   "/api/contact",
   "/api/github-loc",
   "/api/github-stats",
+  "/api/commerce/products",
+  "/api/commerce/webhooks/razorpay",
+  "/api/files/share/",
   "/favicon_io/site.webmanifest",
   "/assets/",
   "/sitemap.xml",
@@ -39,7 +42,12 @@ const PUBLIC_PAGES = [
   "/blog",
   "/weather",
   "/custom-calculator",
+  "/pricing",
+  "/store",
   "/terms-conditions",
+  "/privacy-policy",
+  "/refund-policy",
+  "/contact-policy",
   "/github-stats",
   "/forgot-password",
   "/reset-password",
@@ -52,9 +60,24 @@ const AUTH_PUBLIC_PATHS = [
   "/mfa-verify",
   "/api/account/accept-terms",
   "/api/account/init",
+  "/api/account/entitlements",
+  "/api/account/purchases",
+  "/api/commerce/checkout",
+  "/api/commerce/billing-portal",
+  "/api/custom-calculator/templates",
+  "/api/tools/bulk",
+  "/api/tools/saved",
 ];
 
-const EXACT_MATCH = new Set(["/", "/weather", "/custom-calculator", "/terms-conditions"]);
+const EXACT_MATCH = new Set([
+  "/",
+  "/weather",
+  "/custom-calculator",
+  "/terms-conditions",
+  "/privacy-policy",
+  "/refund-policy",
+  "/contact-policy",
+]);
 
 function matchPath(pathname: string, paths: string[]): boolean {
   return paths.some((p) => {

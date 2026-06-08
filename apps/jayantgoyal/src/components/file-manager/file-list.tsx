@@ -10,6 +10,7 @@ import { UploadDialog } from "@/components/file-manager/upload-dialog"
 import { FileViewer } from "@/components/file-manager/file-viewer"
 import { MoveDialog } from "@/components/file-manager/move-dialog"
 import { CopyDialog } from "@/components/file-manager/copy-dialog"
+import { ShareDialog } from "@/components/file-manager/share-dialog"
 import { BulkActionBar } from "@/components/file-manager/bulk-action-bar"
 import { BulkDeleteDialog } from "@/components/file-manager/bulk-delete-dialog"
 import { BulkMoveDialog } from "@/components/file-manager/bulk-move-dialog"
@@ -49,6 +50,7 @@ export function FileList({ initialPath = "/" }: FileListProps) {
     deleteDialogOpen,
     moveDialogOpen,
     copyDialogOpen,
+    shareDialogOpen,
     bulkDeleteDialogOpen,
     bulkMoveDialogOpen,
     bulkCopyDialogOpen,
@@ -62,6 +64,7 @@ export function FileList({ initialPath = "/" }: FileListProps) {
     setDeleteDialogOpen,
     setMoveDialogOpen,
     setCopyDialogOpen,
+    setShareDialogOpen,
     setBulkDeleteDialogOpen,
     setBulkMoveDialogOpen,
     setBulkCopyDialogOpen,
@@ -76,6 +79,7 @@ export function FileList({ initialPath = "/" }: FileListProps) {
     handleDelete,
     handleMove,
     handleCopy,
+    handleShare,
     handleDownload,
     handleBulkDownload,
     handleRestore,
@@ -166,6 +170,7 @@ export function FileList({ initialPath = "/" }: FileListProps) {
               onDelete={handleDelete}
               onMove={handleMove}
               onCopy={handleCopy}
+              onShare={handleShare}
               onRestore={handleRestore}
               onPermanentDelete={handlePermanentDelete}
               onToggleStar={handleToggleStar}
@@ -186,6 +191,7 @@ export function FileList({ initialPath = "/" }: FileListProps) {
                 onDelete={handleDelete}
                 onMove={handleMove}
                 onCopy={handleCopy}
+                onShare={handleShare}
                 onRestore={handleRestore}
                 onPermanentDelete={handlePermanentDelete}
                 onToggleStar={handleToggleStar}
@@ -231,6 +237,11 @@ export function FileList({ initialPath = "/" }: FileListProps) {
         onOpenChange={setCopyDialogOpen}
         file={selectedFile}
         onSuccess={handleRefresh}
+      />
+      <ShareDialog
+        open={shareDialogOpen}
+        onOpenChange={setShareDialogOpen}
+        file={selectedFile}
       />
       <BulkDeleteDialog
         open={bulkDeleteDialogOpen}

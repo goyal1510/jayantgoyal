@@ -74,6 +74,7 @@ export function useFileList() {
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false)
   const [moveDialogOpen, setMoveDialogOpen] = React.useState(false)
   const [copyDialogOpen, setCopyDialogOpen] = React.useState(false)
+  const [shareDialogOpen, setShareDialogOpen] = React.useState(false)
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = React.useState(false)
   const [bulkMoveDialogOpen, setBulkMoveDialogOpen] = React.useState(false)
   const [bulkCopyDialogOpen, setBulkCopyDialogOpen] = React.useState(false)
@@ -348,6 +349,12 @@ export function useFileList() {
     setCopyDialogOpen(true)
   }
 
+  const handleShare = (e: React.MouseEvent, file: DirectoryListingItem) => {
+    e.stopPropagation()
+    setSelectedFile(file)
+    setShareDialogOpen(true)
+  }
+
   const downloadFile = async (
     file: DirectoryListingItem,
     options: { showToast?: boolean } = {}
@@ -525,6 +532,7 @@ export function useFileList() {
     deleteDialogOpen,
     moveDialogOpen,
     copyDialogOpen,
+    shareDialogOpen,
     bulkDeleteDialogOpen,
     bulkMoveDialogOpen,
     bulkCopyDialogOpen,
@@ -538,6 +546,7 @@ export function useFileList() {
     setDeleteDialogOpen,
     setMoveDialogOpen,
     setCopyDialogOpen,
+    setShareDialogOpen,
     setBulkDeleteDialogOpen,
     setBulkMoveDialogOpen,
     setBulkCopyDialogOpen,
@@ -552,6 +561,7 @@ export function useFileList() {
     handleDelete,
     handleMove,
     handleCopy,
+    handleShare,
     handleDownload,
     handleBulkDownload,
     handleRestore,
