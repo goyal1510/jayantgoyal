@@ -35,6 +35,7 @@ export interface CommerceProductPayload {
     | "image_url"
     | "is_featured"
     | "sort_order"
+    | "metadata"
   >;
   prices: CommercePricePayload[];
 }

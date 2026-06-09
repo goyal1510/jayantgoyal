@@ -38,6 +38,7 @@ function toProductForm(item: CommerceProductWithPrices): CommerceProductFormData
       image_url: item.image_url ?? "",
       is_featured: item.is_featured,
       sort_order: item.sort_order,
+      metadata: item.metadata ?? {},
     },
     prices:
       item.prices.length > 0

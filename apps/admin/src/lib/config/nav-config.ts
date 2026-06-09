@@ -17,6 +17,8 @@ import {
   LifeBuoy,
   Receipt,
   ShoppingBag,
+  LayoutDashboard,
+  ClipboardCheck,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
@@ -25,6 +27,10 @@ export interface NavItem {
   href: string
   icon: LucideIcon
 }
+
+export const dashboardNavItems: NavItem[] = [
+  { label: "Command Center", href: "/", icon: LayoutDashboard },
+]
 
 export const portfolioNavItems: NavItem[] = [
   { label: "Hero", href: "/portfolio/hero", icon: MonitorSmartphone },
@@ -45,6 +51,7 @@ export const blogNavItems: NavItem[] = [
 
 export const commerceNavItems: NavItem[] = [
   { label: "Analytics", href: "/commerce/analytics", icon: BarChart3 },
+  { label: "Launch", href: "/commerce/launch", icon: ClipboardCheck },
   { label: "Products", href: "/commerce/products", icon: ShoppingBag },
   { label: "Orders", href: "/commerce/orders", icon: Receipt },
   { label: "Support", href: "/commerce/support", icon: LifeBuoy },

@@ -110,6 +110,23 @@ function integerValue(value: unknown, fallback: number) {
   return Math.trunc(parsed);
 }
 
+function safeMetadataText(value: unknown, maxLength: number) {
+  if (typeof value !== "string") return null;
+  const normalized = value.replace(/\s+/g, " ").trim();
+  return normalized ? normalized.slice(0, maxLength) : null;
+}
+
+function normalizeProductMetadata(value: unknown) {
+  const metadata = value && typeof value === "object" && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {};
+
+  return {
+    delivery_plan: safeMetadataText(metadata.delivery_plan, 600),
+    launch_note: safeMetadataText(metadata.launch_note, 600),
+  };
+}
+
 export function normalizeCommerceProductPayload(body: unknown, userId: string) {
   const payload = body as {
     product?: Record<string, unknown>;
@@ -149,7 +166,7 @@ export function normalizeCommerceProductPayload(body: unknown, userId: string) {
     image_url: nullableText(productInput.image_url),
     is_featured: Boolean(productInput.is_featured),
     sort_order: integerValue(productInput.sort_order, 0),
-    metadata: {},
+    metadata: normalizeProductMetadata(productInput.metadata),
     created_by: userId,
     published_at: status === "published" ? new Date().toISOString() : null,
   };

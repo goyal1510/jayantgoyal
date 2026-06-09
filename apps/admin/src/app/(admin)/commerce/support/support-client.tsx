@@ -1,15 +1,27 @@
 "use client";
 
+import Link from "next/link";
 import * as React from "react";
 import { Badge } from "@repo/ui/badge";
 import { Button } from "@repo/ui/button";
+import { Input } from "@repo/ui/input";
 import { Textarea } from "@repo/ui/textarea";
 import { cn } from "@repo/ui/lib/utils";
-import { LifeBuoy, Loader2, MessageCircle, RefreshCw, Send } from "lucide-react";
+import {
+  AlertTriangle,
+  Clock,
+  LifeBuoy,
+  Loader2,
+  MessageCircle,
+  RefreshCw,
+  Search,
+  Send,
+} from "lucide-react";
 import { toast } from "sonner";
 import { shortId } from "@/lib/commerce-format";
 
 type SupportStatus = "open" | "pending" | "resolved";
+type SupportFilter = SupportStatus | "all" | "needs_response";
 
 interface SupportMessage {
   id: string;
@@ -59,6 +71,39 @@ function statusVariant(status: SupportStatus) {
   return "default";
 }
 
+function latestFromBuyer(thread: SupportThread) {
+  const latest = thread.latest_message;
+  if (!latest) return false;
+  return (latest.sender_id ?? latest.user_id) === thread.buyer_user_id;
+}
+
+function needsResponse(thread: SupportThread) {
+  return thread.status !== "resolved" && latestFromBuyer(thread);
+}
+
+function minutesSince(value: string | null) {
+  if (!value) return null;
+  const minutes = Math.floor((Date.now() - new Date(value).getTime()) / 60000);
+  return Number.isFinite(minutes) ? Math.max(minutes, 0) : null;
+}
+
+function slaLabel(thread: SupportThread) {
+  if (thread.status === "resolved") return "Closed";
+  const minutes = minutesSince(thread.last_message_at ?? thread.created_at);
+  if (minutes === null) return "No activity";
+  if (minutes >= 24 * 60) return `${Math.floor(minutes / (24 * 60))}d waiting`;
+  if (minutes >= 60) return `${Math.floor(minutes / 60)}h waiting`;
+  return `${minutes}m waiting`;
+}
+
+function slaTone(thread: SupportThread) {
+  const minutes = minutesSince(thread.last_message_at ?? thread.created_at);
+  if (thread.status === "resolved" || minutes === null) return "text-muted-foreground";
+  if (needsResponse(thread) && minutes >= 24 * 60) return "text-destructive";
+  if (needsResponse(thread) && minutes >= 4 * 60) return "text-amber-600 dark:text-amber-400";
+  return "text-muted-foreground";
+}
+
 function senderName(
   message: SupportMessage,
   profilesById: Map<string, Profile>,
@@ -81,10 +126,47 @@ export function CommerceSupportClient() {
   const [loadingThreads, setLoadingThreads] = React.useState(true);
   const [loadingMessages, setLoadingMessages] = React.useState(false);
   const [sending, setSending] = React.useState(false);
+  const [statusFilter, setStatusFilter] = React.useState<SupportFilter>("all");
+  const [searchQuery, setSearchQuery] = React.useState("");
 
   const activeThread = React.useMemo(
     () => threads.find((thread) => thread.id === activeThreadId) ?? null,
     [activeThreadId, threads]
+  );
+
+  const filteredThreads = React.useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+
+    return threads.filter((thread) => {
+      const filterMatches =
+        statusFilter === "all" ||
+        (statusFilter === "needs_response" ? needsResponse(thread) : thread.status === statusFilter);
+
+      if (!filterMatches) return false;
+      if (!query) return true;
+
+      return [
+        thread.product_name,
+        thread.buyer_name,
+        thread.buyer_email,
+        thread.order_id,
+        thread.latest_message?.content,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase()
+        .includes(query);
+    });
+  }, [searchQuery, statusFilter, threads]);
+
+  const supportStats = React.useMemo(
+    () => ({
+      open: threads.filter((thread) => thread.status === "open").length,
+      pending: threads.filter((thread) => thread.status === "pending").length,
+      resolved: threads.filter((thread) => thread.status === "resolved").length,
+      needsResponse: threads.filter(needsResponse).length,
+    }),
+    [threads]
   );
 
   const profilesById = React.useMemo(
@@ -221,6 +303,7 @@ export function CommerceSupportClient() {
           thread.id === activeThread.id ? { ...thread, status } : thread
         )
       );
+      toast.success("Support status updated");
     } catch (error) {
       console.error("Support status update failed:", error);
       toast.error(error instanceof Error ? error.message : "Unable to update status");
@@ -245,25 +328,67 @@ export function CommerceSupportClient() {
         </Button>
       </div>
 
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <SupportMetric label="Open" value={supportStats.open} />
+        <SupportMetric label="Needs response" value={supportStats.needsResponse} tone="urgent" />
+        <SupportMetric label="Pending" value={supportStats.pending} />
+        <SupportMetric label="Resolved" value={supportStats.resolved} />
+      </div>
+
       <div className="grid min-h-0 flex-1 overflow-hidden rounded-lg border lg:grid-cols-[360px_minmax(0,1fr)]">
         <aside className="min-h-0 border-b bg-muted/20 lg:border-b-0 lg:border-r">
-          <div className="flex h-14 items-center justify-between border-b px-4">
-            <span className="text-sm font-medium">{threads.length} threads</span>
-            <LifeBuoy className="size-4 text-muted-foreground" />
+          <div className="border-b p-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium">{filteredThreads.length} threads</span>
+              <LifeBuoy className="size-4 text-muted-foreground" />
+            </div>
+            <div className="relative mt-3">
+              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder="Search buyer, order, product"
+                aria-label="Search support threads"
+                className="pl-9"
+              />
+            </div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {[
+                ["all", "All"],
+                ["needs_response", "Needs response"],
+                ["open", "Open"],
+                ["pending", "Pending"],
+                ["resolved", "Resolved"],
+              ].map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setStatusFilter(value as SupportFilter)}
+                  className={cn(
+                    "rounded-full border px-3 py-1 text-xs font-medium transition",
+                    statusFilter === value
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "bg-background text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
           <div className="max-h-[70vh] overflow-y-auto p-2">
             {loadingThreads ? (
               <div className="flex min-h-40 items-center justify-center">
                 <Loader2 className="size-5 animate-spin text-muted-foreground" />
               </div>
-            ) : threads.length === 0 ? (
+            ) : filteredThreads.length === 0 ? (
               <div className="flex min-h-40 flex-col items-center justify-center gap-2 text-center text-sm text-muted-foreground">
                 <MessageCircle className="size-8" />
-                No support threads yet.
+                No support threads match this view.
               </div>
             ) : (
               <div className="flex flex-col gap-1">
-                {threads.map((thread) => (
+                {filteredThreads.map((thread) => (
                   <button
                     key={thread.id}
                     type="button"
@@ -281,9 +406,15 @@ export function CommerceSupportClient() {
                         {thread.status}
                       </Badge>
                     </div>
-                    <p className="mt-1 truncate text-xs text-muted-foreground">
-                      {thread.buyer_name}
-                    </p>
+                    <div className="mt-1 flex items-center justify-between gap-2">
+                      <p className="min-w-0 truncate text-xs text-muted-foreground">
+                        {thread.buyer_name}
+                      </p>
+                      <span className={cn("flex shrink-0 items-center gap-1 text-[11px]", slaTone(thread))}>
+                        <Clock className="size-3" />
+                        {slaLabel(thread)}
+                      </span>
+                    </div>
                     <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">
                       {thread.latest_message?.content ?? "No messages yet"}
                     </p>
@@ -291,6 +422,12 @@ export function CommerceSupportClient() {
                       <span>{thread.order_id ? shortId(thread.order_id) : "No order"}</span>
                       <span>{formatDateTime(thread.last_message_at ?? thread.created_at)}</span>
                     </div>
+                    {needsResponse(thread) && (
+                      <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-1 text-[11px] font-medium text-amber-700 dark:text-amber-300">
+                        <AlertTriangle className="size-3" />
+                        Buyer waiting
+                      </div>
+                    )}
                   </button>
                 ))}
               </div>
@@ -310,22 +447,37 @@ export function CommerceSupportClient() {
                     <Badge variant={statusVariant(activeThread.status)} className="capitalize">
                       {activeThread.status}
                     </Badge>
+                    {needsResponse(activeThread) && (
+                      <Badge variant="outline" className="gap-1 text-amber-700 dark:text-amber-300">
+                        <AlertTriangle className="size-3" />
+                        Needs response
+                      </Badge>
+                    )}
                   </div>
                   <p className="mt-1 truncate text-xs text-muted-foreground">
                     {activeThread.buyer_email ?? activeThread.buyer_name}
                     {activeThread.order_id ? ` · Order ${shortId(activeThread.order_id)}` : ""}
                   </p>
                 </div>
-                <select
-                  value={activeThread.status}
-                  onChange={(event) => updateStatus(event.target.value as SupportStatus)}
-                  className="h-9 rounded-md border bg-background px-3 text-sm"
-                  aria-label="Support status"
-                >
-                  <option value="open">Open</option>
-                  <option value="pending">Pending</option>
-                  <option value="resolved">Resolved</option>
-                </select>
+                <div className="flex flex-wrap gap-2">
+                  {activeThread.order_id && (
+                    <Button asChild variant="outline" size="sm">
+                      <Link href={`/commerce/orders/${activeThread.order_id}`}>
+                        Order {shortId(activeThread.order_id)}
+                      </Link>
+                    </Button>
+                  )}
+                  <select
+                    value={activeThread.status}
+                    onChange={(event) => updateStatus(event.target.value as SupportStatus)}
+                    className="h-9 rounded-md border bg-background px-3 text-sm"
+                    aria-label="Support status"
+                  >
+                    <option value="open">Open</option>
+                    <option value="pending">Pending</option>
+                    <option value="resolved">Resolved</option>
+                  </select>
+                </div>
               </div>
 
               <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5">
@@ -367,6 +519,7 @@ export function CommerceSupportClient() {
                   value={reply}
                   onChange={(event) => setReply(event.target.value)}
                   placeholder="Reply to this buyer"
+                  aria-label="Support reply"
                   className="min-h-24 resize-none"
                   maxLength={2000}
                 />
@@ -386,6 +539,25 @@ export function CommerceSupportClient() {
           )}
         </section>
       </div>
+    </div>
+  );
+}
+
+function SupportMetric({
+  label,
+  value,
+  tone = "default",
+}: {
+  label: string;
+  value: number;
+  tone?: "default" | "urgent";
+}) {
+  return (
+    <div className="rounded-lg border bg-background p-3">
+      <p className="text-xs font-medium uppercase text-muted-foreground">{label}</p>
+      <p className={cn("mt-1 text-2xl font-semibold", tone === "urgent" && value > 0 ? "text-amber-600 dark:text-amber-400" : "")}>
+        {value}
+      </p>
     </div>
   );
 }

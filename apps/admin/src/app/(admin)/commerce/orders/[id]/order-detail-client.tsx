@@ -3,7 +3,15 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { CalendarDays, ExternalLink, Loader2, PackageCheck, RotateCcw } from "lucide-react";
+import {
+  CalendarDays,
+  ExternalLink,
+  FileText,
+  Loader2,
+  PackageCheck,
+  RotateCcw,
+  Search,
+} from "lucide-react";
 import { Badge } from "@repo/ui/badge";
 import { Button } from "@repo/ui/button";
 import {
@@ -60,6 +68,19 @@ type DeliveryForm = {
   admin_note: string;
 };
 
+type DeliveryFile = {
+  id: string;
+  bucket_id: string;
+  storage_path: string;
+  display_name: string | null;
+  file_name: string;
+  file_path: string;
+  file_type: string;
+  mime_type: string | null;
+  size_bytes: number;
+  updated_at: string;
+};
+
 function emptyDeliveryForm(): DeliveryForm {
   return {
     label: "",
@@ -100,6 +121,18 @@ function metadataLabel(delivery: CommerceDelivery) {
   return typeof label === "string" && label.trim() ? label : "Delivery";
 }
 
+function fileLabel(file: DeliveryFile) {
+  return file.display_name?.trim() || file.file_name || "Untitled file";
+}
+
+function formatFileSize(size: number) {
+  if (!Number.isFinite(size) || size <= 0) return "0 B";
+  const units = ["B", "KB", "MB", "GB"] as const;
+  const index = Math.min(Math.floor(Math.log(size) / Math.log(1024)), units.length - 1);
+  const value = size / 1024 ** index;
+  return `${value >= 10 || index === 0 ? value.toFixed(0) : value.toFixed(1)} ${units[index]}`;
+}
+
 export function OrderDetailClient({
   initialOrder,
 }: {
@@ -112,10 +145,52 @@ export function OrderDetailClient({
   const [savingStatus, setSavingStatus] = React.useState(false);
   const [deliveryForm, setDeliveryForm] = React.useState<DeliveryForm>(() => emptyDeliveryForm());
   const [savingDelivery, setSavingDelivery] = React.useState(false);
+  const [fileSearch, setFileSearch] = React.useState("");
+  const [deliveryFiles, setDeliveryFiles] = React.useState<DeliveryFile[]>([]);
+  const [loadingFiles, setLoadingFiles] = React.useState(false);
+  const [filePickerMessage, setFilePickerMessage] = React.useState<string | null>(null);
 
   const refresh = React.useCallback(() => {
     router.refresh();
   }, [router]);
+
+  const loadDeliveryFiles = React.useCallback(async () => {
+    setLoadingFiles(true);
+    setFilePickerMessage(null);
+
+    try {
+      const response = await fetch(
+        `/api/commerce/orders/${order.id}/delivery-files?q=${encodeURIComponent(fileSearch)}`
+      );
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "Unable to load buyer files");
+      }
+
+      const files = (payload.files ?? []) as DeliveryFile[];
+      setDeliveryFiles(files);
+      setFilePickerMessage(files.length ? null : "No uploaded buyer files matched this search.");
+    } catch (error) {
+      setDeliveryFiles([]);
+      setFilePickerMessage(error instanceof Error ? error.message : "Unable to load buyer files");
+    } finally {
+      setLoadingFiles(false);
+    }
+  }, [fileSearch, order.id]);
+
+  const applyDeliveryFile = React.useCallback((file: DeliveryFile) => {
+    setDeliveryForm((current) => ({
+      ...current,
+      label: current.label || fileLabel(file),
+      delivery_type: "download",
+      status: current.status === "pending" ? "available" : current.status,
+      external_url: "",
+      storage_bucket: file.bucket_id,
+      storage_path: file.storage_path,
+    }));
+    toast.success("Buyer file attached to delivery");
+  }, []);
 
   const handleStatusSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -435,6 +510,67 @@ export function OrderDetailClient({
                   placeholder="https://..."
                   type="url"
                 />
+              </div>
+              <div className="rounded-lg border bg-muted/20 p-3">
+                <div className="flex items-start gap-2">
+                  <FileText className="mt-0.5 size-4 text-muted-foreground" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium">Buyer file manager</p>
+                    <p className="text-xs text-muted-foreground">
+                      Search uploaded files owned by this order buyer and attach one as a private download.
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-3 flex gap-2">
+                  <Input
+                    value={fileSearch}
+                    onChange={(event) => setFileSearch(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") {
+                        event.preventDefault();
+                        void loadDeliveryFiles();
+                      }
+                    }}
+                    placeholder="Search buyer files"
+                    aria-label="Search buyer files"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => void loadDeliveryFiles()}
+                    disabled={loadingFiles}
+                    aria-label="Search buyer file manager"
+                  >
+                    {loadingFiles ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <Search className="size-4" />
+                    )}
+                  </Button>
+                </div>
+                <div className="mt-3 space-y-2">
+                  {deliveryFiles.map((file) => (
+                    <button
+                      key={file.id}
+                      type="button"
+                      onClick={() => applyDeliveryFile(file)}
+                      className="flex w-full min-w-0 items-start justify-between gap-3 rounded-md border bg-background p-3 text-left text-sm transition hover:border-primary/60 hover:bg-primary/5"
+                    >
+                      <span className="min-w-0">
+                        <span className="block truncate font-medium">{fileLabel(file)}</span>
+                        <span className="block truncate text-xs text-muted-foreground">
+                          {file.file_path} · {formatFileSize(file.size_bytes)} · {file.file_type}
+                        </span>
+                      </span>
+                      <span className="shrink-0 text-xs font-medium text-primary">Attach</span>
+                    </button>
+                  ))}
+                  {filePickerMessage && (
+                    <p className="rounded-md border border-dashed p-3 text-xs text-muted-foreground">
+                      {filePickerMessage}
+                    </p>
+                  )}
+                </div>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-2">

@@ -54,6 +54,10 @@ export const emptyCommerceProductForm: CommerceProductFormData = {
     image_url: "",
     is_featured: false,
     sort_order: 0,
+    metadata: {
+      delivery_plan: "",
+      launch_note: "",
+    },
   },
   prices: [defaultPrice],
 };
@@ -85,6 +89,31 @@ function updatePrice(
     prices: formData.prices.map((price, priceIndex) =>
       priceIndex === index ? { ...price, ...patch } : price
     ),
+  };
+}
+
+function metadataText(
+  metadata: Record<string, unknown> | null | undefined,
+  key: "delivery_plan" | "launch_note"
+) {
+  const value = metadata?.[key];
+  return typeof value === "string" ? value : "";
+}
+
+function updateMetadata(
+  formData: CommerceProductFormData,
+  key: "delivery_plan" | "launch_note",
+  value: string
+) {
+  return {
+    ...formData,
+    product: {
+      ...formData.product,
+      metadata: {
+        ...(formData.product.metadata ?? {}),
+        [key]: value,
+      },
+    },
   };
 }
 
@@ -311,6 +340,34 @@ export function CommerceProductDialog({
                 })
               }
             />
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="delivery-plan">Delivery plan</Label>
+              <Textarea
+                id="delivery-plan"
+                rows={3}
+                placeholder="Download link, service handoff, template access, or manual delivery steps"
+                value={metadataText(formData.product.metadata, "delivery_plan")}
+                onChange={(event) =>
+                  setFormData(updateMetadata(formData, "delivery_plan", event.target.value))
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="launch-note">Launch note</Label>
+              <Textarea
+                id="launch-note"
+                rows={3}
+                placeholder="Internal checklist notes, test buyer, or launch risk"
+                value={metadataText(formData.product.metadata, "launch_note")}
+                onChange={(event) =>
+                  setFormData(updateMetadata(formData, "launch_note", event.target.value))
+                }
+              />
+            </div>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">

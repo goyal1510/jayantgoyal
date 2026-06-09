@@ -21,7 +21,14 @@ import {
 } from "@repo/ui/sidebar"
 import { TeamSwitcher } from "@/components/sidebar/team-switcher"
 import { NavUser } from "@/components/sidebar/nav-user"
-import { portfolioNavItems, blogNavItems, commerceNavItems, adminNavItems, deploymentNavItems } from "@/lib/config/nav-config"
+import {
+  dashboardNavItems,
+  portfolioNavItems,
+  blogNavItems,
+  commerceNavItems,
+  adminNavItems,
+  deploymentNavItems,
+} from "@/lib/config/nav-config"
 import type { AuthUser } from "@/lib/types"
 
 const adminBrand = {
@@ -42,6 +49,29 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
         <TeamSwitcher brand={adminBrand} />
       </SidebarHeader>
       <SidebarContent>
+        {/* Command Center */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Command</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {dashboardNavItems.map((item) => (
+                <SidebarMenuItem key={item.href}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathname === item.href}
+                    tooltip={item.label}
+                  >
+                    <Link href={item.href}>
+                      <item.icon />
+                      <span>{item.label}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
         {/* Portfolio Management */}
         <SidebarGroup>
           <SidebarGroupLabel>Portfolio</SidebarGroupLabel>

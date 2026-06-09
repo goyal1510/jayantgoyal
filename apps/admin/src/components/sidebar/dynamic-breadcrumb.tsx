@@ -12,12 +12,27 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@repo/ui/breadcrumb"
-import { portfolioNavItems, blogNavItems, commerceNavItems, adminNavItems, deploymentNavItems } from "@/lib/config/nav-config"
+import {
+  dashboardNavItems,
+  portfolioNavItems,
+  blogNavItems,
+  commerceNavItems,
+  adminNavItems,
+  deploymentNavItems,
+} from "@/lib/config/nav-config"
 
 export function DynamicBreadcrumb() {
   const pathname = usePathname()
 
   const { groupName, groupHref, pageName } = (() => {
+    if (pathname === "/") {
+      return {
+        groupName: "Command",
+        groupHref: "/",
+        pageName: dashboardNavItems[0]?.label ?? "Command Center",
+      }
+    }
+
     // Portfolio routes
     if (pathname.startsWith("/portfolio")) {
       const navItem = portfolioNavItems.find((item) => item.href === pathname)
@@ -83,7 +98,7 @@ export function DynamicBreadcrumb() {
       <BreadcrumbList className="flex-nowrap overflow-hidden">
         <BreadcrumbItem className="shrink-0">
           <BreadcrumbLink asChild>
-            <Link href="/portfolio/hero" aria-label="Home">
+            <Link href="/" aria-label="Command Center">
               <Home className="size-4" />
             </Link>
           </BreadcrumbLink>
