@@ -12,6 +12,7 @@ The product audit found that the app has many useful surfaces but still feels mo
 ## Plan Created
 
 Created `docs/plan/product-improvement-execution-guide.md` with:
+
 - Operating contract and stop conditions.
 - Interface contracts for commerce, messenger, games, file manager, and tools.
 - Persistent task queue from Phase 1 through Phase 5.
@@ -103,3 +104,19 @@ Created `docs/plan/product-improvement-execution-guide.md` with:
 - Phase 7 validation fix: added a concrete fallback daily challenge after TypeScript still treated the first challenge in each pool as possibly undefined.
 - Phase 7 validation: `pnpm lint --filter jg`, `pnpm check-types --filter jg`, and `git diff --check` passed. Authenticated smoke on `http://localhost:3001/games` returned `200` and rendered `Daily Challenges`, `Achievement Ladder`, `Fresh targets`, `Online Rooms`, and game cards.
 - Phase 8 final validation: reviewed the changed admin delivery picker, support triage UI, and games hub retention code for raw HTML, client-side service role exposure, unsafe Supabase filter strings, and error leakage. Final `pnpm lint`, `pnpm check-types`, and `git diff --check` passed across the monorepo.
+
+## Payment Reliability Follow-up
+
+- New recommendation scope: build the next sellable-product foundation slice around payment reconciliation. Target admin visibility into provider/webhook/order/entitlement mismatches before adding more paid products.
+- Added the first admin payment reconciliation workflow plan: a server-rendered `/commerce/reconciliation` page scanning existing order, entitlement, delivery, webhook, and commerce email rows for mismatches; added it to commerce navigation and the admin command center next-actions list.
+- Tightened the reconciliation review queue UI for real use: desktop keeps the table structure, while mobile switches to compact issue rows so payment problems remain readable without clipped columns.
+- Started the buyer post-purchase access follow-up by adding a protected `/account/purchases/[orderId]` order detail page. It reuses authenticated purchase lookups, exposes receipt/support/delivery actions, and links from purchase library rows so paid products have a durable account-bound access page.
+- Fixed checkout return paths around the new purchase detail surface: unauthenticated checkout returns buyers to the page they started from, Razorpay verification redirects to `/account/purchases/[orderId]?checkout=success`, and Stripe success URLs can resolve a `:orderId` placeholder after the pending order is created.
+- Added buyer-facing checkout-success confirmation banners on both the purchase library and purchase detail pages so successful payment return paths visibly explain that the order and access state have refreshed.
+- Started storefront conversion polish by replacing the static catalog grid with a client catalog surface. Buyers can search products, filter by product type, sort by featured or price, see result counts, and reset empty searches without schema changes.
+- Fixed a storefront dead-action state found in browser verification: products without an active price now render disabled checkout buttons instead of an enabled Buy button that can only fail with a toast.
+- Improved the product detail page using existing commerce metadata: it now surfaces delivery plan, launch note, account-bound access, receipt, support, and checkout reassurance sections so the product page reads like a sellable offer instead of a thin detail screen.
+- Hardened the admin order status mutation used from order details/reconciliation: invalid order ids now return a generic validation error and database load/update failures no longer return raw Supabase messages.
+- Hardened the admin commerce analytics API by replacing raw database/catch error responses with generic messages and moving active-entitlement expiry filtering out of a dynamic Supabase `.or(...)` string.
+- Hardened remaining admin commerce product/support API surfaces so unknown database failures use generic responses while known validation and duplicate-key cases still return actionable copy.
+- Added UUID validation to admin commerce support status/message routes after smoke testing showed invalid support thread IDs were reaching database parsing and returning a generic 500 instead of a 400 validation response.
