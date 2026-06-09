@@ -109,7 +109,7 @@ async function processRazorpayEvent(payload: RazorpayWebhookPayload) {
         providerOrderId,
         providerPaymentId,
         amount,
-        currency,
+        currency: currency.toLowerCase(),
       })
       break
     }
