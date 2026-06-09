@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { authorizeCommerceAdmin } from "../helpers";
+import { authorizeCommerceAdmin, commerceAdminErrorResponse } from "../helpers";
 import { createSupabaseAdminClient } from "@/lib/supabase/server";
 
 type SupportMetadata = {
@@ -42,8 +42,15 @@ function metadataStatus(metadata: SupportMetadata) {
   return status === "pending" || status === "resolved" ? status : "open";
 }
 
-function displayName(profile: ProfileRow | null, email: string | null, fallbackId: string) {
-  const name = [profile?.first_name, profile?.last_name].filter(Boolean).join(" ").trim();
+function displayName(
+  profile: ProfileRow | null,
+  email: string | null,
+  fallbackId: string,
+) {
+  const name = [profile?.first_name, profile?.last_name]
+    .filter(Boolean)
+    .join(" ")
+    .trim();
   return name || email || `User ${fallbackId.slice(0, 8)}`;
 }
 
@@ -56,7 +63,9 @@ export async function GET() {
     const app = supabase.schema("jg_app");
     const { data: conversations, error } = await app
       .from("messenger_conversations")
-      .select("id, title, created_by, metadata, last_message_at, created_at, updated_at")
+      .select(
+        "id, title, created_by, metadata, last_message_at, created_at, updated_at",
+      )
       .eq("conversation_type", "support")
       .eq("is_archived", false)
       .order("last_message_at", { ascending: false, nullsFirst: false })
@@ -64,47 +73,66 @@ export async function GET() {
       .limit(100);
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json(
+        { error: "Unable to load support conversations." },
+        { status: 500 },
+      );
     }
 
-    const typedConversations = (conversations ?? []) as SupportConversationRow[];
+    const typedConversations = (conversations ??
+      []) as SupportConversationRow[];
     if (!typedConversations.length) {
       return NextResponse.json({ data: [] });
     }
 
-    const conversationIds = typedConversations.map((conversation) => conversation.id);
-    const buyerIds = [...new Set(typedConversations.map((conversation) => conversation.created_by))];
-
-    const [{ data: latestMessages }, { data: profiles }, buyerEntries] = await Promise.all([
-      app
-        .from("messenger_messages")
-        .select("id, conversation_id, sender_id, content, message_type, created_at, deleted_at")
-        .in("conversation_id", conversationIds)
-        .is("deleted_at", null)
-        .order("created_at", { ascending: false })
-        .limit(500),
-      supabase
-        .schema("jg_account")
-        .from("profiles")
-        .select("user_id, first_name, last_name, avatar_url")
-        .in("user_id", buyerIds),
-      Promise.all(
-        buyerIds.map(async (userId) => {
-          const { data } = await supabase.auth.admin.getUserById(userId);
-          return [userId, data.user?.email ?? null] as const;
-        })
+    const conversationIds = typedConversations.map(
+      (conversation) => conversation.id,
+    );
+    const buyerIds = [
+      ...new Set(
+        typedConversations.map((conversation) => conversation.created_by),
       ),
-    ]);
+    ];
+
+    const [{ data: latestMessages }, { data: profiles }, buyerEntries] =
+      await Promise.all([
+        app
+          .from("messenger_messages")
+          .select(
+            "id, conversation_id, sender_id, content, message_type, created_at, deleted_at",
+          )
+          .in("conversation_id", conversationIds)
+          .is("deleted_at", null)
+          .order("created_at", { ascending: false })
+          .limit(500),
+        supabase
+          .schema("jg_account")
+          .from("profiles")
+          .select("user_id, first_name, last_name, avatar_url")
+          .in("user_id", buyerIds),
+        Promise.all(
+          buyerIds.map(async (userId) => {
+            const { data } = await supabase.auth.admin.getUserById(userId);
+            return [userId, data.user?.email ?? null] as const;
+          }),
+        ),
+      ]);
 
     const latestByConversation = new Map<string, SupportMessageRow>();
     for (const message of (latestMessages ?? []) as SupportMessageRow[]) {
-      if (message.conversation_id && !latestByConversation.has(message.conversation_id)) {
+      if (
+        message.conversation_id &&
+        !latestByConversation.has(message.conversation_id)
+      ) {
         latestByConversation.set(message.conversation_id, message);
       }
     }
 
     const profilesByUser = new Map(
-      ((profiles ?? []) as ProfileRow[]).map((profile) => [profile.user_id, profile])
+      ((profiles ?? []) as ProfileRow[]).map((profile) => [
+        profile.user_id,
+        profile,
+      ]),
     );
     const emailsByUser = new Map(buyerEntries);
 
@@ -133,9 +161,6 @@ export async function GET() {
       }),
     });
   } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Internal server error" },
-      { status: 500 }
-    );
+    return commerceAdminErrorResponse(error);
   }
 }

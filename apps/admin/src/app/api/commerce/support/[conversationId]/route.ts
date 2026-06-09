@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authorizeCommerceAdmin } from "../../helpers";
+import {
+  authorizeCommerceAdmin,
+  commerceAdminErrorResponse,
+} from "../../helpers";
 import { createSupabaseAdminClient } from "@/lib/supabase/server";
 
 const SUPPORT_STATUSES = new Set(["open", "pending", "resolved"]);
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ conversationId: string }> }
+  { params }: { params: Promise<{ conversationId: string }> },
 ) {
   try {
     const auth = await authorizeCommerceAdmin();
@@ -16,10 +21,20 @@ export async function PATCH(
     const status = typeof body.status === "string" ? body.status : "";
 
     if (!SUPPORT_STATUSES.has(status)) {
-      return NextResponse.json({ error: "Invalid support status" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid support status" },
+        { status: 400 },
+      );
     }
 
     const { conversationId } = await params;
+    if (!UUID_PATTERN.test(conversationId)) {
+      return NextResponse.json(
+        { error: "Support thread id is invalid." },
+        { status: 400 },
+      );
+    }
+
     const app = createSupabaseAdminClient().schema("jg_app");
     const { data: conversation, error: loadError } = await app
       .from("messenger_conversations")
@@ -30,11 +45,17 @@ export async function PATCH(
       .maybeSingle();
 
     if (loadError) {
-      return NextResponse.json({ error: loadError.message }, { status: 500 });
+      return NextResponse.json(
+        { error: "Unable to load support thread." },
+        { status: 500 },
+      );
     }
 
     if (!conversation) {
-      return NextResponse.json({ error: "Support thread not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Support thread not found" },
+        { status: 404 },
+      );
     }
 
     const metadata =
@@ -58,16 +79,13 @@ export async function PATCH(
 
     if (error || !data) {
       return NextResponse.json(
-        { error: error?.message ?? "Unable to update support status" },
-        { status: 500 }
+        { error: "Unable to update support status." },
+        { status: 500 },
       );
     }
 
     return NextResponse.json({ data });
   } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Internal server error" },
-      { status: 500 }
-    );
+    return commerceAdminErrorResponse(error);
   }
 }

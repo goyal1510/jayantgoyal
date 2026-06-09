@@ -8,6 +8,9 @@ import {
 } from "../../helpers";
 import type { CommerceOrder } from "@/lib/types";
 
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 async function grantOrderAccess({
   client,
   order,
@@ -96,14 +99,23 @@ async function revokeOrderAccess({
 
 export async function PATCH(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const auth = await authorizeCommerceAdmin();
     if ("error" in auth) return auth.error;
 
     const { id } = await params;
-    const payload = normalizeCommerceOrderStatusPayload(await request.json().catch(() => ({})));
+    if (!UUID_PATTERN.test(id)) {
+      return NextResponse.json(
+        { error: "Order id is invalid." },
+        { status: 400 },
+      );
+    }
+
+    const payload = normalizeCommerceOrderStatusPayload(
+      await request.json().catch(() => ({})),
+    );
     const { data: currentOrder, error: loadError } = await auth.client
       .from("commerce_orders")
       .select("*")
@@ -111,7 +123,10 @@ export async function PATCH(
       .maybeSingle();
 
     if (loadError) {
-      return NextResponse.json({ error: loadError.message }, { status: 500 });
+      return NextResponse.json(
+        { error: "Unable to load order." },
+        { status: 500 },
+      );
     }
     if (!currentOrder) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
@@ -120,7 +135,9 @@ export async function PATCH(
     const now = new Date().toISOString();
     const order = currentOrder as CommerceOrder;
     const nextMetadata =
-      order.metadata && typeof order.metadata === "object" && !Array.isArray(order.metadata)
+      order.metadata &&
+      typeof order.metadata === "object" &&
+      !Array.isArray(order.metadata)
         ? order.metadata
         : {};
 
@@ -128,7 +145,10 @@ export async function PATCH(
       .from("commerce_orders")
       .update({
         status: payload.status,
-        completed_at: payload.status === "paid" ? order.completed_at ?? now : order.completed_at,
+        completed_at:
+          payload.status === "paid"
+            ? (order.completed_at ?? now)
+            : order.completed_at,
         metadata: {
           ...nextMetadata,
           manual_status_reason: payload.reason,
@@ -143,8 +163,8 @@ export async function PATCH(
 
     if (updateError || !updatedOrder) {
       return NextResponse.json(
-        { error: updateError?.message ?? "Unable to update order" },
-        { status: 500 }
+        { error: "Unable to update order." },
+        { status: 500 },
       );
     }
 

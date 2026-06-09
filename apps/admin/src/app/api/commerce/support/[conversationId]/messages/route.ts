@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authorizeCommerceAdmin } from "../../../helpers";
+import {
+  authorizeCommerceAdmin,
+  commerceAdminErrorResponse,
+} from "../../../helpers";
 import { createSupabaseAdminClient } from "@/lib/supabase/server";
 
 type SupportMessageRow = {
@@ -23,6 +26,9 @@ type ProfileRow = {
   avatar_url: string | null;
 };
 
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 function normalizeMessage(value: unknown) {
   if (typeof value !== "string") return "";
   return value.trim().slice(0, 2000);
@@ -30,7 +36,7 @@ function normalizeMessage(value: unknown) {
 
 async function loadSupportConversation(
   app: ReturnType<ReturnType<typeof createSupabaseAdminClient>["schema"]>,
-  conversationId: string
+  conversationId: string,
 ) {
   const { data, error } = await app
     .from("messenger_conversations")
@@ -40,7 +46,7 @@ async function loadSupportConversation(
     .eq("is_archived", false)
     .maybeSingle();
 
-  if (error) throw new Error(error.message);
+  if (error) throw new Error("Unable to load support thread.");
   return data;
 }
 
@@ -53,33 +59,45 @@ async function ensureSupportAgentParticipant({
   conversationId: string;
   userId: string;
 }) {
-  const { error } = await app.from("messenger_conversation_participants").upsert(
-    {
-      conversation_id: conversationId,
-      user_id: userId,
-      role: "support_agent",
-    },
-    { onConflict: "conversation_id,user_id" }
-  );
+  const { error } = await app
+    .from("messenger_conversation_participants")
+    .upsert(
+      {
+        conversation_id: conversationId,
+        user_id: userId,
+        role: "support_agent",
+      },
+      { onConflict: "conversation_id,user_id" },
+    );
 
-  if (error) throw new Error(error.message);
+  if (error) throw new Error("Unable to join support thread.");
 }
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: Promise<{ conversationId: string }> }
+  { params }: { params: Promise<{ conversationId: string }> },
 ) {
   try {
     const auth = await authorizeCommerceAdmin();
     if ("error" in auth) return auth.error;
 
     const { conversationId } = await params;
+    if (!UUID_PATTERN.test(conversationId)) {
+      return NextResponse.json(
+        { error: "Support thread id is invalid." },
+        { status: 400 },
+      );
+    }
+
     const supabase = createSupabaseAdminClient();
     const app = supabase.schema("jg_app");
     const conversation = await loadSupportConversation(app, conversationId);
 
     if (!conversation) {
-      return NextResponse.json({ error: "Support thread not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Support thread not found" },
+        { status: 404 },
+      );
     }
 
     const { data: messages, error } = await app
@@ -90,7 +108,10 @@ export async function GET(
       .limit(300);
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json(
+        { error: "Unable to load support messages." },
+        { status: 500 },
+      );
     }
 
     const messageRows = (messages ?? []) as SupportMessageRow[];
@@ -98,7 +119,7 @@ export async function GET(
       ...new Set(
         messageRows
           .map((message) => message.sender_id ?? message.user_id)
-          .filter(Boolean)
+          .filter(Boolean),
       ),
     ];
     const { data: profiles } = senderIds.length
@@ -115,35 +136,45 @@ export async function GET(
       profiles: (profiles ?? []) as ProfileRow[],
     });
   } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Internal server error" },
-      { status: 500 }
-    );
+    return commerceAdminErrorResponse(error);
   }
 }
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ conversationId: string }> }
+  { params }: { params: Promise<{ conversationId: string }> },
 ) {
   try {
     const auth = await authorizeCommerceAdmin();
     if ("error" in auth) return auth.error;
 
     const { conversationId } = await params;
+    if (!UUID_PATTERN.test(conversationId)) {
+      return NextResponse.json(
+        { error: "Support thread id is invalid." },
+        { status: 400 },
+      );
+    }
+
     const supabase = createSupabaseAdminClient();
     const app = supabase.schema("jg_app");
     const conversation = await loadSupportConversation(app, conversationId);
 
     if (!conversation) {
-      return NextResponse.json({ error: "Support thread not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Support thread not found" },
+        { status: 404 },
+      );
     }
 
     const body = await request.json().catch(() => ({}));
     const content = normalizeMessage((body as { content?: unknown }).content);
 
     if (!content) {
-      return NextResponse.json({ error: "Message content is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Message content is required" },
+        { status: 400 },
+      );
     }
 
     await ensureSupportAgentParticipant({
@@ -169,8 +200,8 @@ export async function POST(
 
     if (error || !message) {
       return NextResponse.json(
-        { error: error?.message ?? "Unable to send support reply" },
-        { status: 500 }
+        { error: "Unable to send support reply." },
+        { status: 500 },
       );
     }
 
@@ -188,9 +219,6 @@ export async function POST(
 
     return NextResponse.json({ message }, { status: 201 });
   } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Internal server error" },
-      { status: 500 }
-    );
+    return commerceAdminErrorResponse(error);
   }
 }

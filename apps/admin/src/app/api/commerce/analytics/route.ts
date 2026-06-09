@@ -69,11 +69,15 @@ type EntitlementRow = {
 };
 
 function startOfUtcDay(value: Date) {
-  return new Date(Date.UTC(value.getUTCFullYear(), value.getUTCMonth(), value.getUTCDate()));
+  return new Date(
+    Date.UTC(value.getUTCFullYear(), value.getUTCMonth(), value.getUTCDate()),
+  );
 }
 
 function dateKey(value: string | Date) {
-  return startOfUtcDay(value instanceof Date ? value : new Date(value)).toISOString().slice(0, 10);
+  return startOfUtcDay(value instanceof Date ? value : new Date(value))
+    .toISOString()
+    .slice(0, 10);
 }
 
 function addMinor(map: Map<string, number>, currency: string, amount: number) {
@@ -121,7 +125,9 @@ export async function GET() {
     ] = await Promise.all([
       app
         .from("commerce_orders")
-        .select("id,user_id,product_id,price_id,payment_provider,status,currency,amount_total,completed_at,created_at")
+        .select(
+          "id,user_id,product_id,price_id,payment_provider,status,currency,amount_total,completed_at,created_at",
+        )
         .gte("created_at", rangeStartIso)
         .order("created_at", { ascending: false }),
       app
@@ -155,7 +161,6 @@ export async function GET() {
         .select("id,user_id,status,starts_at,expires_at")
         .eq("status", "active")
         .lte("starts_at", now.toISOString())
-        .or(`expires_at.is.null,expires_at.gt.${now.toISOString()}`)
         .limit(5000),
     ]);
 
@@ -170,7 +175,10 @@ export async function GET() {
     ].find(Boolean);
 
     if (firstError) {
-      return NextResponse.json({ error: firstError.message }, { status: 500 });
+      return NextResponse.json(
+        { error: "Unable to load commerce analytics." },
+        { status: 500 },
+      );
     }
 
     const orders = (ordersResult.data ?? []) as OrderRow[];
@@ -178,8 +186,15 @@ export async function GET() {
     const subscriptions = (subscriptionsResult.data ?? []) as SubscriptionRow[];
     const events = (eventsResult.data ?? []) as EventRow[];
     const webhooks = (webhooksResult.data ?? []) as WebhookRow[];
-    const supportThreads = (supportResult.data ?? []) as SupportConversationRow[];
-    const entitlements = (entitlementsResult.data ?? []) as EntitlementRow[];
+    const supportThreads = (supportResult.data ??
+      []) as SupportConversationRow[];
+    const entitlements = (
+      (entitlementsResult.data ?? []) as EntitlementRow[]
+    ).filter(
+      (entitlement) =>
+        !entitlement.expires_at ||
+        new Date(entitlement.expires_at).getTime() > now.getTime(),
+    );
 
     const paidOrders = orders.filter((order) => order.status === "paid");
     const revenueByCurrencyMap = new Map<string, number>();
@@ -199,7 +214,8 @@ export async function GET() {
 
     for (const event of events) increment(eventTypeMap, event.event_type);
     for (const webhook of webhooks) increment(webhookStatusMap, webhook.status);
-    for (const thread of supportThreads) increment(supportStatusMap, supportStatus(thread.metadata));
+    for (const thread of supportThreads)
+      increment(supportStatusMap, supportStatus(thread.metadata));
 
     const revenueByCurrency = [...revenueByCurrencyMap.entries()]
       .map(([currency, amountMinor]) => ({
@@ -207,10 +223,16 @@ export async function GET() {
         amountMinor,
         paidOrders: paidOrdersByCurrencyMap.get(currency) ?? 0,
       }))
-      .sort((a, b) => b.amountMinor - a.amountMinor || a.currency.localeCompare(b.currency));
+      .sort(
+        (a, b) =>
+          b.amountMinor - a.amountMinor || a.currency.localeCompare(b.currency),
+      );
     const primaryCurrency = revenueByCurrency[0]?.currency ?? "inr";
 
-    const dailyRevenueMap = new Map<string, { amountMinor: number; paidOrders: number }>();
+    const dailyRevenueMap = new Map<
+      string,
+      { amountMinor: number; paidOrders: number }
+    >();
     for (let index = RANGE_DAYS - 1; index >= 0; index -= 1) {
       const key = dateKey(new Date(now.getTime() - index * DAY_MS));
       dailyRevenueMap.set(key, { amountMinor: 0, paidOrders: 0 });
@@ -225,13 +247,21 @@ export async function GET() {
     }
 
     const productRows = products.map((product) => {
-      const productOrders = orders.filter((order) => order.product_id === product.id);
-      const productPaidOrders = productOrders.filter((order) => order.status === "paid");
-      const productEvents = events.filter((event) => event.product_id === product.id);
+      const productOrders = orders.filter(
+        (order) => order.product_id === product.id,
+      );
+      const productPaidOrders = productOrders.filter(
+        (order) => order.status === "paid",
+      );
+      const productEvents = events.filter(
+        (event) => event.product_id === product.id,
+      );
       const checkoutStarts = productEvents.filter(
-        (event) => event.event_type === "checkout_started"
+        (event) => event.event_type === "checkout_started",
       ).length;
-      const productViews = productEvents.filter((event) => event.event_type === "product_view").length;
+      const productViews = productEvents.filter(
+        (event) => event.event_type === "product_view",
+      ).length;
       const revenueMinor = productPaidOrders
         .filter((order) => order.currency === primaryCurrency)
         .reduce((total, order) => total + order.amount_total, 0);
@@ -246,17 +276,22 @@ export async function GET() {
         checkoutStarts,
         paidOrders: productPaidOrders.length,
         revenueMinor,
-        conversionRate: ratio(productPaidOrders.length, checkoutStarts || productViews),
+        conversionRate: ratio(
+          productPaidOrders.length,
+          checkoutStarts || productViews,
+        ),
       };
     });
 
     const activeSubscriptions = subscriptions.filter((subscription) =>
-      ACTIVE_SUBSCRIPTION_STATUSES.has(subscription.status)
+      ACTIVE_SUBSCRIPTION_STATUSES.has(subscription.status),
     );
     const churnedSubscriptions = subscriptions.filter((subscription) =>
-      CHURNED_SUBSCRIPTION_STATUSES.has(subscription.status)
+      CHURNED_SUBSCRIPTION_STATUSES.has(subscription.status),
     );
-    const activeEntitlementUsers = new Set(entitlements.map((entitlement) => entitlement.user_id));
+    const activeEntitlementUsers = new Set(
+      entitlements.map((entitlement) => entitlement.user_id),
+    );
     const checkoutStarted = eventTypeMap.get("checkout_started") ?? 0;
     const checkoutVerified = eventTypeMap.get("checkout_verified") ?? 0;
     const productViews = eventTypeMap.get("product_view") ?? 0;
@@ -282,7 +317,10 @@ export async function GET() {
             amountMinor: 0,
             paidOrders: 0,
           },
-          checkoutConversionRate: ratio(checkoutVerified || paidOrders.length, checkoutStarted),
+          checkoutConversionRate: ratio(
+            checkoutVerified || paidOrders.length,
+            checkoutStarted,
+          ),
           activeSubscriptions: activeSubscriptions.length,
           churnedSubscriptions: churnedSubscriptions.length,
           activeEntitlementUsers: activeEntitlementUsers.size,
@@ -292,10 +330,26 @@ export async function GET() {
         },
         funnel: [
           { key: "product_view", label: "Product views", count: productViews },
-          { key: "checkout_started", label: "Checkout started", count: checkoutStarted },
-          { key: "checkout_verified", label: "Checkout verified", count: checkoutVerified },
-          { key: "paid_orders", label: "Paid orders", count: paidOrders.length },
-          { key: "entitlement_granted", label: "Entitlements granted", count: eventTypeMap.get("entitlement_granted") ?? 0 },
+          {
+            key: "checkout_started",
+            label: "Checkout started",
+            count: checkoutStarted,
+          },
+          {
+            key: "checkout_verified",
+            label: "Checkout verified",
+            count: checkoutVerified,
+          },
+          {
+            key: "paid_orders",
+            label: "Paid orders",
+            count: paidOrders.length,
+          },
+          {
+            key: "entitlement_granted",
+            label: "Entitlements granted",
+            count: eventTypeMap.get("entitlement_granted") ?? 0,
+          },
         ],
         revenueByCurrency,
         dailyRevenue: [...dailyRevenueMap.entries()].map(([date, value]) => ({
@@ -303,7 +357,10 @@ export async function GET() {
           ...value,
         })),
         productSales: productRows.sort(
-          (a, b) => b.revenueMinor - a.revenueMinor || b.paidOrders - a.paidOrders || a.name.localeCompare(b.name)
+          (a, b) =>
+            b.revenueMinor - a.revenueMinor ||
+            b.paidOrders - a.paidOrders ||
+            a.name.localeCompare(b.name),
         ),
         orderStatus: toCountArray(orderStatusMap),
         eventCounts: toCountArray(eventTypeMap),
@@ -311,10 +368,10 @@ export async function GET() {
         supportStatus: toCountArray(supportStatusMap),
       },
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Internal server error" },
-      { status: 500 }
+      { error: "Internal server error" },
+      { status: 500 },
     );
   }
 }

@@ -19,18 +19,19 @@ import {
   ShoppingBag,
   LayoutDashboard,
   ClipboardCheck,
-} from "lucide-react"
-import type { LucideIcon } from "lucide-react"
+  ShieldCheck,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 export interface NavItem {
-  label: string
-  href: string
-  icon: LucideIcon
+  label: string;
+  href: string;
+  icon: LucideIcon;
 }
 
 export const dashboardNavItems: NavItem[] = [
   { label: "Command Center", href: "/", icon: LayoutDashboard },
-]
+];
 
 export const portfolioNavItems: NavItem[] = [
   { label: "Hero", href: "/portfolio/hero", icon: MonitorSmartphone },
@@ -43,25 +44,30 @@ export const portfolioNavItems: NavItem[] = [
   { label: "Certificates", href: "/portfolio/certificates", icon: Award },
   { label: "Contact", href: "/portfolio/contact", icon: Mail },
   { label: "Navigation", href: "/portfolio/navigation", icon: Navigation },
-]
+];
 
 export const blogNavItems: NavItem[] = [
   { label: "Blog Posts", href: "/blog", icon: FileText },
-]
+];
 
 export const commerceNavItems: NavItem[] = [
   { label: "Analytics", href: "/commerce/analytics", icon: BarChart3 },
   { label: "Launch", href: "/commerce/launch", icon: ClipboardCheck },
+  {
+    label: "Reconciliation",
+    href: "/commerce/reconciliation",
+    icon: ShieldCheck,
+  },
   { label: "Products", href: "/commerce/products", icon: ShoppingBag },
   { label: "Orders", href: "/commerce/orders", icon: Receipt },
   { label: "Support", href: "/commerce/support", icon: LifeBuoy },
-]
+];
 
 export const adminNavItems: NavItem[] = [
   { label: "User Management", href: "/users", icon: Users },
-]
+];
 
 export const deploymentNavItems: NavItem[] = [
   { label: "Deployments", href: "/deployments", icon: Rocket },
   { label: "Env Variables", href: "/deployments/env", icon: KeyRound },
-]
+];

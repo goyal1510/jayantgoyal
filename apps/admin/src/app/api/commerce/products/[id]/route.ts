@@ -1,12 +1,16 @@
 import { NextResponse } from "next/server";
 import {
   authorizeCommerceAdmin,
+  commerceAdminErrorResponse,
   commerceMutationError,
   type CommerceAdminClient,
   normalizeCommerceProductPayload,
 } from "../../helpers";
 
-async function loadProductWithPrices(client: CommerceAdminClient, productId: string) {
+async function loadProductWithPrices(
+  client: CommerceAdminClient,
+  productId: string,
+) {
   const { data: product, error: productError } = await client
     .from("commerce_products")
     .select("*")
@@ -28,14 +32,17 @@ async function loadProductWithPrices(client: CommerceAdminClient, productId: str
 
 export async function PUT(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const auth = await authorizeCommerceAdmin();
     if ("error" in auth) return auth.error;
 
     const { id } = await params;
-    const payload = normalizeCommerceProductPayload(await request.json(), auth.user.id);
+    const payload = normalizeCommerceProductPayload(
+      await request.json(),
+      auth.user.id,
+    );
     const { created_by: createdBy, ...productUpdate } = payload.product;
     void createdBy;
 
@@ -47,7 +54,7 @@ export async function PUT(
     if (productError) {
       return NextResponse.json(
         { error: commerceMutationError(productError) },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -63,7 +70,7 @@ export async function PUT(
         if (error) {
           return NextResponse.json(
             { error: commerceMutationError(error) },
-            { status: 400 }
+            { status: 400 },
           );
         }
       } else {
@@ -74,7 +81,7 @@ export async function PUT(
         if (error) {
           return NextResponse.json(
             { error: commerceMutationError(error) },
-            { status: 400 }
+            { status: 400 },
           );
         }
       }
@@ -84,9 +91,6 @@ export async function PUT(
       data: await loadProductWithPrices(auth.client, id),
     });
   } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Internal server error" },
-      { status: 500 }
-    );
+    return commerceAdminErrorResponse(error);
   }
 }

@@ -17,13 +17,37 @@ export type CommerceAdminClient = ReturnType<
 >;
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const PRODUCT_TYPES: CommerceProductType[] = ["digital", "subscription", "service", "bundle"];
-const PRODUCT_STATUSES: CommerceProductStatus[] = ["draft", "published", "archived"];
+const PRODUCT_TYPES: CommerceProductType[] = [
+  "digital",
+  "subscription",
+  "service",
+  "bundle",
+];
+const PRODUCT_STATUSES: CommerceProductStatus[] = [
+  "draft",
+  "published",
+  "archived",
+];
 const PAYMENT_PROVIDERS: CommercePaymentProvider[] = ["razorpay", "stripe"];
 const PRICE_TYPES: CommercePriceType[] = ["one_time", "recurring"];
-const BILLING_INTERVALS: CommerceBillingInterval[] = ["day", "week", "month", "year"];
-const DELIVERY_TYPES: CommerceDeliveryType[] = ["download", "link", "manual", "service"];
-const DELIVERY_STATUSES: CommerceDeliveryStatus[] = ["pending", "available", "fulfilled", "revoked"];
+const BILLING_INTERVALS: CommerceBillingInterval[] = [
+  "day",
+  "week",
+  "month",
+  "year",
+];
+const DELIVERY_TYPES: CommerceDeliveryType[] = [
+  "download",
+  "link",
+  "manual",
+  "service",
+];
+const DELIVERY_STATUSES: CommerceDeliveryStatus[] = [
+  "pending",
+  "available",
+  "fulfilled",
+  "revoked",
+];
 const MANUAL_ORDER_STATUSES: CommerceOrderStatus[] = [
   "pending",
   "paid",
@@ -95,11 +119,19 @@ function requiredText(value: unknown, field: string) {
   return trimmed;
 }
 
-function enumValue<T extends string>(value: unknown, allowed: T[], fallback: T) {
+function enumValue<T extends string>(
+  value: unknown,
+  allowed: T[],
+  fallback: T,
+) {
   return allowed.includes(value as T) ? (value as T) : fallback;
 }
 
-function strictEnumValue<T extends string>(value: unknown, allowed: T[], field: string) {
+function strictEnumValue<T extends string>(
+  value: unknown,
+  allowed: T[],
+  field: string,
+) {
   if (allowed.includes(value as T)) return value as T;
   throw new Error(`${field} is invalid.`);
 }
@@ -117,9 +149,10 @@ function safeMetadataText(value: unknown, maxLength: number) {
 }
 
 function normalizeProductMetadata(value: unknown) {
-  const metadata = value && typeof value === "object" && !Array.isArray(value)
-    ? value as Record<string, unknown>
-    : {};
+  const metadata =
+    value && typeof value === "object" && !Array.isArray(value)
+      ? (value as Record<string, unknown>)
+      : {};
 
   return {
     delivery_plan: safeMetadataText(metadata.delivery_plan, 600),
@@ -142,12 +175,12 @@ export function normalizeCommerceProductPayload(body: unknown, userId: string) {
   const status = enumValue(
     productInput.status,
     PRODUCT_STATUSES,
-    "draft" satisfies CommerceProductStatus
+    "draft" satisfies CommerceProductStatus,
   );
   const paymentProvider = enumValue(
     productInput.payment_provider,
     PAYMENT_PROVIDERS,
-    "razorpay" satisfies CommercePaymentProvider
+    "razorpay" satisfies CommercePaymentProvider,
   );
 
   const product = {
@@ -158,7 +191,7 @@ export function normalizeCommerceProductPayload(body: unknown, userId: string) {
     product_type: enumValue(
       productInput.product_type,
       PRODUCT_TYPES,
-      "digital" satisfies CommerceProductType
+      "digital" satisfies CommerceProductType,
     ),
     status,
     payment_provider: paymentProvider,
@@ -175,9 +208,12 @@ export function normalizeCommerceProductPayload(body: unknown, userId: string) {
     const priceType = enumValue(
       priceInput.price_type,
       PRICE_TYPES,
-      "one_time" satisfies CommercePriceType
+      "one_time" satisfies CommercePriceType,
     );
-    const currency = requiredText(priceInput.currency, "Currency").toLowerCase();
+    const currency = requiredText(
+      priceInput.currency,
+      "Currency",
+    ).toLowerCase();
     if (currency.length !== 3) {
       throw new Error("Currency must be a three-letter ISO code.");
     }
@@ -192,13 +228,17 @@ export function normalizeCommerceProductPayload(body: unknown, userId: string) {
         ? enumValue(
             priceInput.billing_interval,
             BILLING_INTERVALS,
-            "month" satisfies CommerceBillingInterval
+            "month" satisfies CommerceBillingInterval,
           )
         : null;
 
     return {
       id: nullableText(priceInput.id),
-      payment_provider: enumValue(priceInput.payment_provider, PAYMENT_PROVIDERS, paymentProvider),
+      payment_provider: enumValue(
+        priceInput.payment_provider,
+        PAYMENT_PROVIDERS,
+        paymentProvider,
+      ),
       provider_price_id: nullableText(priceInput.provider_price_id),
       stripe_price_id: nullableText(priceInput.stripe_price_id),
       lookup_key: nullableText(priceInput.lookup_key),
@@ -208,7 +248,8 @@ export function normalizeCommerceProductPayload(body: unknown, userId: string) {
       unit_amount: unitAmount,
       billing_interval: billingInterval,
       trial_period_days:
-        priceInput.trial_period_days === null || priceInput.trial_period_days === ""
+        priceInput.trial_period_days === null ||
+        priceInput.trial_period_days === ""
           ? null
           : Math.max(integerValue(priceInput.trial_period_days, 0), 0),
       is_active: Boolean(priceInput.is_active),
@@ -228,12 +269,12 @@ export function normalizeCommerceDeliveryPayload(body: unknown) {
   const deliveryType = strictEnumValue(
     payload.delivery_type,
     DELIVERY_TYPES,
-    "Delivery type"
+    "Delivery type",
   );
   const status = strictEnumValue(
     payload.status,
     DELIVERY_STATUSES,
-    "Delivery status"
+    "Delivery status",
   );
   const externalUrl = nullableText(payload.external_url);
   if (externalUrl && !validHttpUrl(externalUrl)) {
@@ -259,7 +300,7 @@ export function normalizeCommerceOrderStatusPayload(body: unknown) {
   const status = strictEnumValue(
     payload.status,
     MANUAL_ORDER_STATUSES,
-    "Order status"
+    "Order status",
   );
   const reason = nullableText(payload.reason);
   if (!reason) {
@@ -273,7 +314,11 @@ function sanitizeEventMetadata(metadata: Record<string, unknown>) {
   const safe: Record<string, string | number | boolean | null> = {};
   for (const [key, value] of Object.entries(metadata)) {
     if (!/^[a-zA-Z0-9_:-]{1,64}$/.test(key)) continue;
-    if (value === null || typeof value === "boolean" || typeof value === "number") {
+    if (
+      value === null ||
+      typeof value === "boolean" ||
+      typeof value === "number"
+    ) {
       safe[key] = value;
     } else if (typeof value === "string") {
       safe[key] = value.slice(0, 160);
@@ -319,7 +364,8 @@ export async function recordCommerceAdminEvent({
 }
 
 export function commerceAdminErrorResponse(error: unknown) {
-  const message = error instanceof Error ? error.message : "Internal server error";
+  const message =
+    error instanceof Error ? error.message : "Internal server error";
   const isValidationError =
     message.endsWith(" is invalid.") ||
     message.endsWith(" is required.") ||
@@ -328,11 +374,14 @@ export function commerceAdminErrorResponse(error: unknown) {
 
   return NextResponse.json(
     { error: isValidationError ? message : "Internal server error" },
-    { status: isValidationError ? 400 : 500 }
+    { status: isValidationError ? 400 : 500 },
   );
 }
 
-export function commerceMutationError(error: { message?: string; code?: string }) {
+export function commerceMutationError(error: {
+  message?: string;
+  code?: string;
+}) {
   const message = error.message ?? "Unable to save commerce data.";
   if (message.includes("commerce_products_slug_key")) {
     return "A product with this slug already exists.";
@@ -346,5 +395,5 @@ export function commerceMutationError(error: { message?: string; code?: string }
   if (message.includes("commerce_prices_stripe_price_id_key")) {
     return "A price with this Stripe price id already exists.";
   }
-  return message;
+  return "Unable to save commerce data.";
 }

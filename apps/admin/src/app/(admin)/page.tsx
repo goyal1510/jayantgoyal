@@ -9,6 +9,7 @@ import {
   PackageCheck,
   Receipt,
   Rocket,
+  ShieldCheck,
   ShoppingBag,
   TrendingUp,
 } from "lucide-react";
@@ -16,7 +17,11 @@ import { Badge } from "@repo/ui/badge";
 import { Button } from "@repo/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card";
 import { createSupabaseAdminClient } from "@/lib/supabase/server";
-import { formatDateTime, formatMoneyMinor, shortId } from "@/lib/commerce-format";
+import {
+  formatDateTime,
+  formatMoneyMinor,
+  shortId,
+} from "@/lib/commerce-format";
 import type {
   CommerceOrder,
   CommercePrice,
@@ -26,7 +31,8 @@ import type {
 
 export const metadata: Metadata = {
   title: "Admin Command Center",
-  description: "Commerce, support, product, and launch-readiness command center.",
+  description:
+    "Commerce, support, product, and launch-readiness command center.",
 };
 
 type SupportStatus = "open" | "pending" | "resolved";
@@ -60,7 +66,9 @@ function supportStatus(metadata: Record<string, unknown>): SupportStatus {
   return value === "pending" || value === "resolved" ? value : "open";
 }
 
-function statusBadgeVariant(status: CommerceOrder["status"] | CommerceProductStatus) {
+function statusBadgeVariant(
+  status: CommerceOrder["status"] | CommerceProductStatus,
+) {
   if (status === "paid" || status === "published") return "default";
   if (status === "pending" || status === "draft") return "secondary";
   return "outline";
@@ -72,46 +80,51 @@ function countByStatus<T extends string>(items: { status: T }[]) {
       ...acc,
       [item.status]: (acc[item.status] ?? 0) + 1,
     }),
-    {} as Record<T, number>
+    {} as Record<T, number>,
   );
 }
 
 async function getDashboardData(): Promise<DashboardData> {
   const app = createSupabaseAdminClient().schema("jg_app");
 
-  const [ordersResult, productsResult, pricesResult, supportResult, webhooksResult] =
-    await Promise.all([
-      app
-        .from("commerce_orders")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(25),
-      app
-        .from("commerce_products")
-        .select("*")
-        .order("sort_order", { ascending: true })
-        .order("created_at", { ascending: false })
-        .limit(50),
-      app
-        .from("commerce_prices")
-        .select("*")
-        .eq("is_active", true)
-        .order("created_at", { ascending: false })
-        .limit(100),
-      app
-        .from("messenger_conversations")
-        .select("id,title,metadata,created_at,last_message_at")
-        .eq("conversation_type", "support")
-        .eq("is_archived", false)
-        .order("last_message_at", { ascending: false, nullsFirst: false })
-        .limit(20),
-      app
-        .from("commerce_webhook_events")
-        .select("id,provider,event_type,status,created_at")
-        .eq("status", "failed")
-        .order("created_at", { ascending: false })
-        .limit(5),
-    ]);
+  const [
+    ordersResult,
+    productsResult,
+    pricesResult,
+    supportResult,
+    webhooksResult,
+  ] = await Promise.all([
+    app
+      .from("commerce_orders")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(25),
+    app
+      .from("commerce_products")
+      .select("*")
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: false })
+      .limit(50),
+    app
+      .from("commerce_prices")
+      .select("*")
+      .eq("is_active", true)
+      .order("created_at", { ascending: false })
+      .limit(100),
+    app
+      .from("messenger_conversations")
+      .select("id,title,metadata,created_at,last_message_at")
+      .eq("conversation_type", "support")
+      .eq("is_archived", false)
+      .order("last_message_at", { ascending: false, nullsFirst: false })
+      .limit(20),
+    app
+      .from("commerce_webhook_events")
+      .select("id,provider,event_type,status,created_at")
+      .eq("status", "failed")
+      .order("created_at", { ascending: false })
+      .limit(5),
+  ]);
 
   if (ordersResult.error) throw new Error(ordersResult.error.message);
   if (productsResult.error) throw new Error(productsResult.error.message);
@@ -129,7 +142,9 @@ async function getDashboardData(): Promise<DashboardData> {
 }
 
 function productReadiness(product: CommerceProduct, prices: CommercePrice[]) {
-  const productPrices = prices.filter((price) => price.product_id === product.id);
+  const productPrices = prices.filter(
+    (price) => price.product_id === product.id,
+  );
   const hasActivePrice = productPrices.some((price) => price.is_active);
   const checks = [
     Boolean(product.short_description || product.description),
@@ -152,23 +167,35 @@ function productReadiness(product: CommerceProduct, prices: CommercePrice[]) {
 export default async function DashboardPage() {
   const data = await getDashboardData();
   const paidOrders = data.orders.filter((order) => order.status === "paid");
-  const pendingOrders = data.orders.filter((order) => order.status === "pending");
-  const revenueByCurrency = paidOrders.reduce<Record<string, number>>((acc, order) => {
-    acc[order.currency] = (acc[order.currency] ?? 0) + order.amount_total;
-    return acc;
-  }, {});
-  const primaryRevenue = Object.entries(revenueByCurrency).sort((a, b) => b[1] - a[1])[0];
+  const pendingOrders = data.orders.filter(
+    (order) => order.status === "pending",
+  );
+  const revenueByCurrency = paidOrders.reduce<Record<string, number>>(
+    (acc, order) => {
+      acc[order.currency] = (acc[order.currency] ?? 0) + order.amount_total;
+      return acc;
+    },
+    {},
+  );
+  const primaryRevenue = Object.entries(revenueByCurrency).sort(
+    (a, b) => b[1] - a[1],
+  )[0];
   const productCounts = countByStatus(data.products);
-  const supportCounts = data.supportThreads.reduce<Record<SupportStatus, number>>(
+  const supportCounts = data.supportThreads.reduce<
+    Record<SupportStatus, number>
+  >(
     (acc, thread) => {
       const status = supportStatus(thread.metadata);
       acc[status] += 1;
       return acc;
     },
-    { open: 0, pending: 0, resolved: 0 }
+    { open: 0, pending: 0, resolved: 0 },
   );
   const productsNeedingWork = data.products
-    .map((product) => ({ product, readiness: productReadiness(product, data.prices) }))
+    .map((product) => ({
+      product,
+      readiness: productReadiness(product, data.prices),
+    }))
     .filter((item) => item.readiness.completed < item.readiness.total)
     .slice(0, 5);
   const recentOrders = data.orders.slice(0, 5);
@@ -179,7 +206,9 @@ export default async function DashboardPage() {
   const summaryCards = [
     {
       label: "Revenue",
-      value: primaryRevenue ? formatMoneyMinor(primaryRevenue[1], primaryRevenue[0]) : "₹0.00",
+      value: primaryRevenue
+        ? formatMoneyMinor(primaryRevenue[1], primaryRevenue[0])
+        : "₹0.00",
       detail: `${paidOrders.length} paid orders in latest sample`,
       icon: TrendingUp,
     },
@@ -210,10 +239,13 @@ export default async function DashboardPage() {
           <p className="text-sm font-medium uppercase tracking-[0.24em] text-muted-foreground">
             Admin OS
           </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight">Command Center</h1>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight">
+            Command Center
+          </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            A business dashboard for products, orders, support, and launch readiness.
-            Portfolio editing still exists, but the first admin screen now starts from revenue operations.
+            A business dashboard for products, orders, support, and launch
+            readiness. Portfolio editing still exists, but the first admin
+            screen now starts from revenue operations.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -243,7 +275,9 @@ export default async function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-semibold">{card.value}</div>
-              <p className="mt-1 text-xs text-muted-foreground">{card.detail}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {card.detail}
+              </p>
             </CardContent>
           </Card>
         ))}
@@ -255,7 +289,8 @@ export default async function DashboardPage() {
             <div>
               <CardTitle>Launch Readiness</CardTitle>
               <p className="mt-1 text-sm text-muted-foreground">
-                Products missing offer copy, active pricing, media, or publish state.
+                Products missing offer copy, active pricing, media, or publish
+                state.
               </p>
             </div>
             <Button asChild variant="outline" size="sm">
@@ -269,9 +304,12 @@ export default async function DashboardPage() {
             {productsNeedingWork.length === 0 ? (
               <div className="rounded-lg border border-dashed p-6 text-center">
                 <CheckCircle2 className="mx-auto size-6 text-emerald-600" />
-                <p className="mt-2 text-sm font-medium">All listed products are launch-ready.</p>
+                <p className="mt-2 text-sm font-medium">
+                  All listed products are launch-ready.
+                </p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Keep pricing, delivery, and support proof current before promoting them.
+                  Keep pricing, delivery, and support proof current before
+                  promoting them.
                 </p>
               </div>
             ) : (
@@ -282,8 +320,13 @@ export default async function DashboardPage() {
                 >
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="truncate text-sm font-medium">{product.name}</p>
-                      <Badge variant={statusBadgeVariant(product.status)} className="capitalize">
+                      <p className="truncate text-sm font-medium">
+                        {product.name}
+                      </p>
+                      <Badge
+                        variant={statusBadgeVariant(product.status)}
+                        className="capitalize"
+                      >
                         {product.status}
                       </Badge>
                     </div>
@@ -292,7 +335,9 @@ export default async function DashboardPage() {
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs font-medium uppercase text-muted-foreground">Checklist</p>
+                    <p className="text-xs font-medium uppercase text-muted-foreground">
+                      Checklist
+                    </p>
                     <p className="mt-1 text-sm">
                       {readiness.completed}/{readiness.total} complete
                     </p>
@@ -319,6 +364,12 @@ export default async function DashboardPage() {
               icon={PackageCheck}
               title="Run launch checklist"
               detail="Confirm offer, price, delivery plan, test checkout, and publish state."
+            />
+            <ActionLink
+              href="/commerce/reconciliation"
+              icon={ShieldCheck}
+              title="Reconcile payments"
+              detail="Find provider, webhook, entitlement, delivery, and receipt mismatches."
             />
             <ActionLink
               href="/commerce/orders"
@@ -371,8 +422,13 @@ export default async function DashboardPage() {
                 >
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="font-mono text-sm font-medium">{shortId(order.id)}</p>
-                      <Badge variant={statusBadgeVariant(order.status)} className="capitalize">
+                      <p className="font-mono text-sm font-medium">
+                        {shortId(order.id)}
+                      </p>
+                      <Badge
+                        variant={statusBadgeVariant(order.status)}
+                        className="capitalize"
+                      >
                         {order.status}
                       </Badge>
                     </div>
@@ -381,7 +437,9 @@ export default async function DashboardPage() {
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs font-medium uppercase text-muted-foreground">Amount</p>
+                    <p className="text-xs font-medium uppercase text-muted-foreground">
+                      Amount
+                    </p>
                     <p className="mt-1 text-sm font-medium">
                       {formatMoneyMinor(order.amount_total, order.currency)}
                     </p>
@@ -435,11 +493,17 @@ export default async function DashboardPage() {
                         )}
                       </div>
                       <p className="mt-1 text-xs text-muted-foreground">
-                        Last activity {formatDateTime(thread.last_message_at ?? thread.created_at)}
+                        Last activity{" "}
+                        {formatDateTime(
+                          thread.last_message_at ?? thread.created_at,
+                        )}
                       </p>
                     </div>
                     <div className="flex items-start md:justify-end">
-                      <Badge variant={status === "open" ? "default" : "outline"} className="capitalize">
+                      <Badge
+                        variant={status === "open" ? "default" : "outline"}
+                        className="capitalize"
+                      >
                         {status}
                       </Badge>
                     </div>
@@ -459,7 +523,8 @@ export default async function DashboardPage() {
               Failed Webhooks
             </CardTitle>
             <p className="mt-1 text-sm text-muted-foreground">
-              Payment provider events that failed processing and need investigation.
+              Payment provider events that failed processing and need
+              investigation.
             </p>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -471,7 +536,9 @@ export default async function DashboardPage() {
                 <Badge variant="outline" className="w-fit capitalize">
                   {webhook.provider}
                 </Badge>
-                <p className="min-w-0 truncate text-sm font-medium">{webhook.event_type}</p>
+                <p className="min-w-0 truncate text-sm font-medium">
+                  {webhook.event_type}
+                </p>
                 <p className="text-sm text-muted-foreground">
                   {formatDateTime(webhook.created_at)}
                 </p>
@@ -505,7 +572,9 @@ function ActionLink({
       </span>
       <span className="min-w-0">
         <span className="block text-sm font-medium">{title}</span>
-        <span className="mt-1 block text-sm text-muted-foreground">{detail}</span>
+        <span className="mt-1 block text-sm text-muted-foreground">
+          {detail}
+        </span>
       </span>
     </Link>
   );
