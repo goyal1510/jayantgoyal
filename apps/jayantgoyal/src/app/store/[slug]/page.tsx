@@ -6,6 +6,7 @@ import {
   ArrowLeft,
   CheckCircle2,
   Clock3,
+  Files,
   LifeBuoy,
   PackageCheck,
   ReceiptText,
@@ -14,7 +15,6 @@ import {
 
 import { Badge } from "@repo/ui/badge";
 import { Button } from "@repo/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card";
 
 import { CheckoutButton } from "@/components/commerce/checkout-button";
 import { CommercePolicyLinks } from "@/components/commerce/policy-links";
@@ -67,9 +67,7 @@ export async function generateMetadata({
         product.short_description ??
         product.description ??
         "Jayant Tools product detail.",
-      images: product.image_url
-        ? [product.image_url]
-        : ["/assets/ProjectImages/Dark/ecommerce.png"],
+      images: ["/assets/ProjectImages/Dark/tools.png"],
     },
   };
 }
@@ -105,11 +103,15 @@ export default async function StoreProductPage({
     metadataString(product.metadata, "delivery_plan") ??
     "Access details appear in your account purchase library after payment verification.";
   const launchNote = metadataString(product.metadata, "launch_note");
+  const productSummary =
+    product.description ??
+    product.short_description ??
+    "Product details are coming soon.";
 
   return (
-    <main className="min-h-screen bg-zinc-50 text-zinc-950">
-      <section className="border-b bg-white">
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[1fr_0.9fr] lg:px-8">
+    <main className="min-h-[calc(100vh-4rem)] bg-stone-50 text-stone-950 dark:bg-zinc-950 dark:text-zinc-50">
+      <section className="border-b border-stone-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[minmax(0,1fr)_440px] lg:px-8">
           <div className="space-y-6">
             <Button asChild variant="ghost" className="px-0">
               <Link href="/store">
@@ -118,20 +120,21 @@ export default async function StoreProductPage({
               </Link>
             </Button>
             <div className="space-y-4">
-              <Badge variant="outline" className="capitalize">
-                {product.product_type}
-              </Badge>
-              <h1 className="text-4xl font-semibold tracking-normal sm:text-5xl">
+              <div className="flex flex-wrap items-center gap-3">
+                <Badge className="capitalize">{product.product_type}</Badge>
+                <span className="text-sm text-stone-500 dark:text-zinc-400">
+                  Account-bound access
+                </span>
+              </div>
+              <h1 className="text-4xl font-semibold tracking-normal text-balance sm:text-5xl">
                 {product.name}
               </h1>
-              <p className="max-w-2xl text-base leading-7 text-zinc-600">
-                {product.description ??
-                  product.short_description ??
-                  "Product details are coming soon."}
+              <p className="max-w-2xl text-base leading-7 text-stone-600 dark:text-zinc-300">
+                {productSummary}
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              <div className="rounded-lg border bg-zinc-50 px-4 py-2 font-mono text-lg font-semibold">
+              <div className="rounded-lg border border-stone-200 bg-stone-50 px-4 py-2 font-mono text-lg font-semibold dark:border-zinc-800 dark:bg-zinc-900">
                 {priceLabel}
               </div>
               <CheckoutButton priceId={primaryPrice?.id}>
@@ -139,77 +142,107 @@ export default async function StoreProductPage({
               </CheckoutButton>
             </div>
             {launchNote ? (
-              <div className="rounded-lg border border-amber-500/30 bg-amber-50 p-4 text-sm leading-6 text-amber-900">
+              <div className="rounded-lg border border-amber-500/30 bg-amber-50 p-4 text-sm leading-6 text-amber-900 dark:bg-amber-950/30 dark:text-amber-200">
                 {launchNote}
               </div>
             ) : null}
-            <CommercePolicyLinks className="text-zinc-500" />
+            <CommercePolicyLinks className="text-stone-500 dark:text-zinc-400" />
           </div>
-          <div className="overflow-hidden rounded-lg border bg-zinc-950 shadow-xl">
-            {product.image_url ? (
-              <div
-                role="img"
-                aria-label={product.name}
-                className="aspect-[4/3] w-full bg-cover bg-center"
-                style={{ backgroundImage: `url(${product.image_url})` }}
-              />
-            ) : (
+
+          <div className="space-y-4">
+            <div className="rounded-lg border border-stone-200 bg-stone-950 p-3 shadow-sm dark:border-zinc-800">
               <Image
-                src="/assets/ProjectImages/Dark/ecommerce.png"
-                alt={product.name}
+                src="/assets/ProjectImages/Dark/tools.png"
+                alt="Jayant Tools workspace"
                 width={900}
                 height={675}
-                className="aspect-[4/3] w-full object-cover"
+                className="aspect-[16/10] rounded-md object-cover"
+                priority
               />
-            )}
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                <Image
+                  src="/assets/ProjectImages/Dark/files.png"
+                  alt="Purchase delivery files"
+                  width={520}
+                  height={390}
+                  className="aspect-[4/3] rounded-md object-cover"
+                />
+                <Image
+                  src="/assets/ProjectImages/Dark/custom-calculator.png"
+                  alt="Workspace utility builder"
+                  width={520}
+                  height={390}
+                  className="aspect-[4/3] rounded-md object-cover"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                ["Checkout", "Razorpay"],
+                ["Receipt", "Ready"],
+                ["Support", "Linked"],
+              ].map(([label, value]) => (
+                <div
+                  key={label}
+                  className="rounded-lg border border-stone-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900"
+                >
+                  <div className="text-sm font-semibold">{value}</div>
+                  <div className="mt-1 text-xs uppercase tracking-wide text-stone-500 dark:text-zinc-400">
+                    {label}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-6 px-4 py-10 sm:px-6 lg:grid-cols-3 lg:px-8">
-        <Card className="rounded-lg border-zinc-200 bg-white shadow-none">
-          <CardHeader>
-            <PackageCheck className="size-5 text-emerald-600" />
-            <CardTitle className="text-lg">Delivery plan</CardTitle>
-          </CardHeader>
-          <CardContent className="text-sm leading-6 text-zinc-600">
-            {deliveryPlan}
-          </CardContent>
-        </Card>
-        <Card className="rounded-lg border-zinc-200 bg-white shadow-none">
-          <CardHeader>
-            <ShieldCheck className="size-5 text-sky-600" />
-            <CardTitle className="text-lg">Account access</CardTitle>
-          </CardHeader>
-          <CardContent className="text-sm leading-6 text-zinc-600">
-            Payment is verified server-side. Your order, receipt, downloads, and
-            support state stay linked to your signed-in account.
-          </CardContent>
-        </Card>
-        <Card className="rounded-lg border-zinc-200 bg-white shadow-none">
-          <CardHeader>
-            <LifeBuoy className="size-5 text-amber-600" />
-            <CardTitle className="text-lg">Support included</CardTitle>
-          </CardHeader>
-          <CardContent className="text-sm leading-6 text-zinc-600">
-            Every paid order can open a support thread with the product,
-            payment, and delivery context attached automatically.
-          </CardContent>
-        </Card>
+      <section className="mx-auto grid max-w-7xl gap-4 px-4 py-6 sm:px-6 lg:grid-cols-3 lg:px-8">
+        {[
+          {
+            icon: PackageCheck,
+            title: "Delivery plan",
+            body: deliveryPlan,
+            tone: "text-emerald-600 dark:text-emerald-400",
+          },
+          {
+            icon: ShieldCheck,
+            title: "Account access",
+            body: "Payment is verified server-side. Your order, receipt, downloads, and support state stay linked to your signed-in account.",
+            tone: "text-sky-600 dark:text-sky-400",
+          },
+          {
+            icon: LifeBuoy,
+            title: "Support included",
+            body: "Every paid order can open a support thread with the product, payment, and delivery context attached automatically.",
+            tone: "text-amber-600 dark:text-amber-400",
+          },
+        ].map((item) => (
+          <div
+            key={item.title}
+            className="rounded-lg border border-stone-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900"
+          >
+            <item.icon className={`size-5 ${item.tone}`} />
+            <h2 className="mt-4 font-semibold">{item.title}</h2>
+            <p className="mt-2 text-sm leading-6 text-stone-600 dark:text-zinc-400">
+              {item.body}
+            </p>
+          </div>
+        ))}
       </section>
 
-      <section className="border-y bg-white">
-        <div className="mx-auto grid max-w-7xl gap-4 px-4 py-8 sm:px-6 md:grid-cols-4 lg:px-8">
+      <section className="border-y border-stone-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="mx-auto grid max-w-7xl gap-4 px-4 py-6 sm:px-6 md:grid-cols-4 lg:px-8">
           {[
             {
               icon: CheckCircle2,
               title: "Secure checkout",
-              body: "Razorpay handles payment collection.",
+              body: "Provider order and app order stay linked.",
             },
             {
               icon: ReceiptText,
               title: "Receipt",
-              body: "Printable receipt is available after purchase.",
+              body: "Printable receipt appears after purchase.",
             },
             {
               icon: Clock3,
@@ -217,15 +250,18 @@ export default async function StoreProductPage({
               body: "Delivery readiness is visible in Purchases.",
             },
             {
-              icon: LifeBuoy,
-              title: "Order support",
-              body: "Get help from a purchase-linked thread.",
+              icon: Files,
+              title: "Delivery",
+              body: "Links, files, manual work, or service details.",
             },
           ].map((item) => (
-            <div key={item.title} className="rounded-lg border bg-zinc-50 p-4">
-              <item.icon className="h-5 w-5 text-zinc-700" />
+            <div
+              key={item.title}
+              className="rounded-lg border border-stone-200 bg-stone-50 p-4 dark:border-zinc-800 dark:bg-zinc-900"
+            >
+              <item.icon className="h-5 w-5 text-stone-700 dark:text-zinc-300" />
               <p className="mt-3 text-sm font-medium">{item.title}</p>
-              <p className="mt-1 text-sm leading-6 text-zinc-600">
+              <p className="mt-1 text-sm leading-6 text-stone-600 dark:text-zinc-400">
                 {item.body}
               </p>
             </div>

@@ -4,14 +4,15 @@ import * as React from "react";
 import Link from "next/link";
 import {
   ArrowRight,
+  CheckCircle2,
   PackageOpen,
+  PackageSearch,
   Search,
   SlidersHorizontal,
 } from "lucide-react";
 
 import { Badge } from "@repo/ui/badge";
 import { Button } from "@repo/ui/button";
-import { Card, CardContent } from "@repo/ui/card";
 import { Input } from "@repo/ui/input";
 
 import { CheckoutButton } from "@/components/commerce/checkout-button";
@@ -102,14 +103,14 @@ export function StoreCatalog({
 
   return (
     <div className="space-y-5">
-      <div className="grid gap-3 rounded-lg border bg-white p-3 lg:grid-cols-[minmax(0,1fr)_auto]">
+      <div className="grid gap-3 rounded-lg border border-stone-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900 xl:grid-cols-[minmax(0,1fr)_auto]">
         <label className="relative block">
-          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-500" />
+          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-stone-500 dark:text-zinc-400" />
           <Input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search products, services, bundles..."
-            className="pl-9"
+            className="pl-9 dark:bg-zinc-950"
           />
         </label>
         <div className="flex flex-wrap items-center gap-2">
@@ -126,12 +127,12 @@ export function StoreCatalog({
               </Button>
             ))}
           </div>
-          <div className="flex items-center gap-2 rounded-md border px-2 py-1">
-            <SlidersHorizontal className="size-4 text-zinc-500" />
+          <div className="flex items-center gap-2 rounded-md border border-stone-200 px-2 py-1 dark:border-zinc-800">
+            <SlidersHorizontal className="size-4 text-stone-500 dark:text-zinc-400" />
             <select
               value={sort}
               onChange={(event) => setSort(event.target.value as CatalogSort)}
-              className="h-8 bg-transparent text-sm outline-none"
+              className="h-8 bg-transparent text-sm outline-none dark:bg-zinc-900"
               aria-label="Sort catalog"
             >
               <option value="featured">Featured</option>
@@ -142,7 +143,7 @@ export function StoreCatalog({
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-zinc-600">
+      <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-stone-600 dark:text-zinc-400">
         <span>
           {filteredProducts.length} of {products.length} product
           {products.length === 1 ? "" : "s"}
@@ -151,58 +152,80 @@ export function StoreCatalog({
       </div>
 
       {filteredProducts.length > 0 ? (
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <div className="overflow-hidden rounded-lg border border-stone-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="hidden grid-cols-[minmax(0,1.4fr)_130px_120px_140px_210px] border-b border-stone-200 px-5 py-3 text-xs font-medium uppercase tracking-wide text-stone-500 dark:border-zinc-800 dark:text-zinc-500 lg:grid">
+            <span>Product</span>
+            <span>Type</span>
+            <span>Price</span>
+            <span>Status</span>
+            <span className="text-right">Actions</span>
+          </div>
           {filteredProducts.map((product) => {
             const primaryPrice = product.prices[0];
 
             return (
-              <Card key={product.id} className="overflow-hidden rounded-lg">
-                {product.image_url ? (
-                  <div
-                    role="img"
-                    aria-label={product.name}
-                    className="aspect-[16/9] w-full bg-cover bg-center"
-                    style={{ backgroundImage: `url(${product.image_url})` }}
-                  />
-                ) : null}
-                <CardContent className="space-y-4 p-5">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <Badge variant="secondary" className="mb-3 capitalize">
-                        {product.product_type}
-                      </Badge>
-                      <h3 className="text-lg font-semibold">{product.name}</h3>
-                    </div>
-                    <div className="shrink-0 font-mono text-sm font-semibold">
-                      {priceLabel(product)}
-                    </div>
+              <div
+                key={product.id}
+                className="grid gap-4 border-b border-stone-200 px-5 py-5 last:border-b-0 dark:border-zinc-800 lg:grid-cols-[minmax(0,1.4fr)_130px_120px_140px_210px] lg:items-center"
+              >
+                <div className="flex min-w-0 gap-3">
+                  <div className="flex size-11 shrink-0 items-center justify-center rounded-md border border-stone-200 bg-stone-100 text-stone-700 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-200">
+                    <PackageSearch className="size-5" />
                   </div>
-                  <p className="min-h-12 text-sm leading-6 text-zinc-600">
-                    {product.short_description ??
-                      product.description ??
-                      "Product details are coming soon."}
-                  </p>
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    <Button asChild variant="outline">
-                      <Link href={`/store/${product.slug}`}>
-                        Details
-                        <ArrowRight className="size-4" />
-                      </Link>
-                    </Button>
-                    <CheckoutButton priceId={primaryPrice?.id}>
-                      Buy
-                    </CheckoutButton>
+                  <div className="min-w-0">
+                    <h3 className="text-base font-semibold leading-6">
+                      {product.name}
+                    </h3>
+                    <p className="mt-1 max-w-2xl text-sm leading-6 text-stone-600 dark:text-zinc-400">
+                      {product.short_description ??
+                        product.description ??
+                        "Product details are coming soon."}
+                    </p>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+                <div>
+                  <div className="mb-1 text-xs font-medium uppercase tracking-wide text-stone-500 dark:text-zinc-500 lg:hidden">
+                    Type
+                  </div>
+                  <Badge variant="secondary" className="capitalize">
+                    {product.product_type}
+                  </Badge>
+                </div>
+                <div>
+                  <div className="mb-1 text-xs font-medium uppercase tracking-wide text-stone-500 dark:text-zinc-500 lg:hidden">
+                    Price
+                  </div>
+                  <div className="w-fit rounded-md bg-stone-100 px-2 py-1 font-mono text-sm font-semibold dark:bg-zinc-950">
+                    {priceLabel(product)}
+                  </div>
+                </div>
+                <div>
+                  <div className="mb-1 text-xs font-medium uppercase tracking-wide text-stone-500 dark:text-zinc-500 lg:hidden">
+                    Status
+                  </div>
+                  <div className="flex w-fit items-center gap-1.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                    <CheckCircle2 className="size-3.5" />
+                    Published
+                  </div>
+                </div>
+                <div className="grid gap-2 sm:grid-cols-2 lg:justify-end">
+                  <Button asChild variant="outline">
+                    <Link href={`/store/${product.slug}`}>
+                      Details
+                      <ArrowRight className="size-4" />
+                    </Link>
+                  </Button>
+                  <CheckoutButton priceId={primaryPrice?.id}>Buy</CheckoutButton>
+                </div>
+              </div>
             );
           })}
         </div>
       ) : (
-        <div className="rounded-lg border border-dashed bg-white p-8 text-center">
-          <Search className="mx-auto h-10 w-10 text-zinc-500" />
+        <div className="rounded-lg border border-dashed border-stone-300 bg-white p-8 text-center dark:border-zinc-700 dark:bg-zinc-900">
+          <Search className="mx-auto h-10 w-10 text-stone-500 dark:text-zinc-400" />
           <h3 className="mt-4 text-lg font-semibold">No products match</h3>
-          <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-zinc-600">
+          <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-stone-600 dark:text-zinc-400">
             Clear the search or switch category filters to see the full catalog.
           </p>
           <Button
