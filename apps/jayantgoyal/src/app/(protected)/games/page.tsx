@@ -453,45 +453,56 @@ export default async function GamesPage() {
             </div>
             <Badge variant="secondary">{activeRooms.length} active</Badge>
           </div>
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-            {activeRooms.map((room) => (
-              <Link
-                key={room.id}
-                href={room.href}
-                className="group rounded-lg border bg-background p-4 transition-colors hover:bg-muted/40"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="truncate text-sm font-semibold">
-                      {room.gameName}
-                    </div>
-                    <div className="mt-1 font-mono text-xs text-muted-foreground">
-                      {room.roomCode}
-                    </div>
-                  </div>
-                  <Badge
-                    variant={room.status === "active" ? "default" : "secondary"}
-                    className="capitalize"
+          <div className="overflow-x-auto rounded-lg border bg-background">
+            <div className="min-w-[760px]">
+              <div className="grid grid-cols-[minmax(170px,1.3fr)_110px_110px_120px_150px_92px] gap-3 border-b bg-muted/50 px-4 py-2 text-xs font-medium text-muted-foreground">
+                <div>Game</div>
+                <div>Status</div>
+                <div>Players</div>
+                <div>Seat</div>
+                <div>Updated</div>
+                <div></div>
+              </div>
+              <div className="divide-y">
+                {activeRooms.map((room) => (
+                  <Link
+                    key={room.id}
+                    href={room.href}
+                    className="grid grid-cols-[minmax(170px,1.3fr)_110px_110px_120px_150px_92px] items-center gap-3 px-4 py-3 text-sm transition-colors hover:bg-muted/40"
                   >
-                    {room.status}
-                  </Badge>
-                </div>
-                <div className="mt-4 grid grid-cols-2 gap-2 text-xs text-muted-foreground">
-                  <div className="flex items-center gap-1.5">
-                    <Users className="h-3.5 w-3.5" />
-                    {room.participantCount}/{room.maxPlayers}
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Play className="h-3.5 w-3.5" />
-                    {room.isHost ? "Host" : `Seat ${room.seat}`}
-                  </div>
-                  <div className="col-span-2 flex items-center gap-1.5">
-                    <Clock3 className="h-3.5 w-3.5" />
-                    {formatRoomUpdatedAt(room.updatedAt)}
-                  </div>
-                </div>
-              </Link>
-            ))}
+                    <div className="min-w-0">
+                      <div className="truncate font-medium">{room.gameName}</div>
+                      <div className="font-mono text-xs text-muted-foreground">
+                        {room.roomCode}
+                      </div>
+                    </div>
+                    <div>
+                      <Badge
+                        variant={room.status === "active" ? "default" : "secondary"}
+                        className="capitalize"
+                      >
+                        {room.status}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Users className="h-3.5 w-3.5" />
+                      {room.participantCount}/{room.maxPlayers}
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Play className="h-3.5 w-3.5" />
+                      {room.isHost ? "Host" : `Seat ${room.seat}`}
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Clock3 className="h-3.5 w-3.5" />
+                      {formatRoomUpdatedAt(room.updatedAt)}
+                    </div>
+                    <div className="flex justify-end text-xs font-medium">
+                      Continue
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
       )}
@@ -507,47 +518,49 @@ export default async function GamesPage() {
             </div>
             <Badge variant="secondary">{history.length} recent</Badge>
           </div>
-          <div className="overflow-hidden rounded-lg border">
-            <div className="grid grid-cols-[1fr_110px_140px_110px] gap-3 border-b bg-muted/50 px-4 py-2 text-xs font-medium text-muted-foreground">
-              <div>Game</div>
-              <div>Result</div>
-              <div>Completed</div>
-              <div></div>
-            </div>
-            <div className="divide-y">
-              {history.map((item) => (
-                <div
-                  key={item.id}
-                  className="grid grid-cols-[1fr_110px_140px_110px] items-center gap-3 px-4 py-3 text-sm"
-                >
-                  <div className="min-w-0">
-                    <div className="truncate font-medium">{item.gameName}</div>
-                    <div className="font-mono text-xs text-muted-foreground">
-                      {item.roomCode}
+          <div className="overflow-x-auto rounded-lg border bg-background">
+            <div className="min-w-[680px]">
+              <div className="grid grid-cols-[minmax(180px,1fr)_110px_150px_120px] gap-3 border-b bg-muted/50 px-4 py-2 text-xs font-medium text-muted-foreground">
+                <div>Game</div>
+                <div>Result</div>
+                <div>Completed</div>
+                <div></div>
+              </div>
+              <div className="divide-y">
+                {history.map((item) => (
+                  <div
+                    key={item.id}
+                    className="grid grid-cols-[minmax(180px,1fr)_110px_150px_120px] items-center gap-3 px-4 py-3 text-sm"
+                  >
+                    <div className="min-w-0">
+                      <div className="truncate font-medium">{item.gameName}</div>
+                      <div className="font-mono text-xs text-muted-foreground">
+                        {item.roomCode}
+                      </div>
+                    </div>
+                    <div>
+                      <Badge
+                        variant={item.outcome === "win" ? "default" : "secondary"}
+                        className="capitalize"
+                      >
+                        {item.outcome}
+                      </Badge>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {formatRoomUpdatedAt(item.completedAt)}
+                    </div>
+                    <div className="flex justify-end">
+                      <Link
+                        href={item.playAgainHref}
+                        className="inline-flex items-center gap-1 rounded-md border px-2.5 py-1.5 text-xs transition-colors hover:bg-muted"
+                      >
+                        <Trophy className="h-3.5 w-3.5" />
+                        Play Again
+                      </Link>
                     </div>
                   </div>
-                  <div>
-                    <Badge
-                      variant={item.outcome === "win" ? "default" : "secondary"}
-                      className="capitalize"
-                    >
-                      {item.outcome}
-                    </Badge>
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    {formatRoomUpdatedAt(item.completedAt)}
-                  </div>
-                  <div className="flex justify-end">
-                    <Link
-                      href={item.playAgainHref}
-                      className="inline-flex items-center gap-1 rounded-md border px-2.5 py-1.5 text-xs transition-colors hover:bg-muted"
-                    >
-                      <Trophy className="h-3.5 w-3.5" />
-                      Play Again
-                    </Link>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </section>

@@ -63,6 +63,20 @@ const HOME_PATH_CLASSES: Record<LudoSeat, string> = {
   P4: "border-sky-300 bg-sky-200 dark:border-sky-900 dark:bg-sky-950",
 }
 
+const CENTER_TURN_CLASSES: Record<LudoSeat, string> = {
+  P1: "border-red-200 bg-red-600 text-white shadow-red-900/35 ring-red-200/70 dark:border-red-300",
+  P2: "border-emerald-200 bg-emerald-600 text-white shadow-emerald-900/35 ring-emerald-200/70 dark:border-emerald-300",
+  P3: "border-amber-200 bg-amber-400 text-amber-950 shadow-amber-900/35 ring-amber-200/80 dark:border-amber-200",
+  P4: "border-sky-200 bg-sky-600 text-white shadow-sky-900/35 ring-sky-200/70 dark:border-sky-300",
+}
+
+const CENTER_GLOW_CLASSES: Record<LudoSeat, string> = {
+  P1: "bg-red-500/40",
+  P2: "bg-emerald-500/40",
+  P3: "bg-amber-400/45",
+  P4: "bg-sky-500/40",
+}
+
 const HOME_PATH_KEYS = new Map<string, LudoSeat>()
 for (const seat of LUDO_SEATS) {
   const coordinates: readonly (readonly [number, number])[] = seat === "P1"
@@ -105,30 +119,44 @@ function getHomeSeat(row: number, column: number): LudoSeat | null {
   return null
 }
 
-function getCellClass(row: number, column: number) {
+function getVisualLudoSeat(seat: LudoSeat, activeSeats: readonly LudoSeat[]): LudoSeat {
+  if (activeSeats.length === 2 && seat === "P2") return "P3"
+  if (activeSeats.length === 3 && seat === "P3") return "P4"
+  return seat
+}
+
+function getVisualLudoTokenCoordinate(token: LudoToken, activeSeats: readonly LudoSeat[]) {
+  const visualSeat = getVisualLudoSeat(token.seat, activeSeats)
+  return getLudoTokenCoordinate(
+    visualSeat === token.seat ? token : { ...token, seat: visualSeat }
+  )
+}
+
+function getCellClass(row: number, column: number, activeSeats: readonly LudoSeat[]) {
   const key = coordinateKey(row, column)
+  const visualActiveSeats = activeSeats.map((seat) => getVisualLudoSeat(seat, activeSeats))
   const homeSeat = getHomeSeat(row, column)
   const homePathSeat = HOME_PATH_KEYS.get(key)
   const pathIndex = PATH_KEYS.get(key)
 
   if (row === 7 && column === 7) {
-    return "border-zinc-300 bg-zinc-950 text-white dark:border-zinc-600"
+    return "rounded-xl border-zinc-300/40 bg-zinc-950/5 shadow-inner dark:border-zinc-700/60 dark:bg-white/5"
   }
-  if (homePathSeat) return HOME_PATH_CLASSES[homePathSeat]
+  if (homePathSeat && visualActiveSeats.includes(homePathSeat)) return HOME_PATH_CLASSES[homePathSeat]
   if (typeof pathIndex === "number") {
     return cn(
-      "border-zinc-300 bg-white dark:border-zinc-700 dark:bg-zinc-900",
-      LUDO_SAFE_GLOBAL_INDICES.has(pathIndex) && "ring-2 ring-inset ring-zinc-500"
+      "rounded-full border-zinc-200 bg-white/95 shadow-sm dark:border-zinc-700 dark:bg-zinc-900",
+      LUDO_SAFE_GLOBAL_INDICES.has(pathIndex) && "ring-2 ring-inset ring-amber-400"
     )
   }
-  if (homeSeat) return HOME_CELL_CLASSES[homeSeat]
+  if (homeSeat && visualActiveSeats.includes(homeSeat)) return cn("rounded-full", HOME_CELL_CLASSES[homeSeat])
   return "border-transparent bg-transparent"
 }
 
-function tokensByCoordinate(tokens: LudoToken[]) {
+function tokensByCoordinate(tokens: LudoToken[], activeSeats: readonly LudoSeat[]) {
   const map = new Map<string, LudoToken[]>()
   for (const token of tokens) {
-    const [row, column] = getLudoTokenCoordinate(token)
+    const [row, column] = getVisualLudoTokenCoordinate(token, activeSeats)
     const key = coordinateKey(row, column)
     const existing = map.get(key) ?? []
     existing.push(token)
@@ -226,13 +254,15 @@ export function OnlineLudoRoom({ roomCode }: { roomCode: string }) {
     session?.status === "active" &&
     me?.seat === state.currentSeat &&
     (!session.current_turn_participant_id || session.current_turn_participant_id === me.id)
-  const tokenMap = tokensByCoordinate(state.tokens)
+  const canRoll = isMyTurn && state.phase === "roll" && session?.status === "active"
+  const tokenMap = tokensByCoordinate(state.tokens, state.activeSeats)
+  const currentVisualSeat = getVisualLudoSeat(state.currentSeat, state.activeSeats)
   const status =
     session?.status === "waiting"
       ? `Waiting for ${state.activeSeats.length - participants.length} player${state.activeSeats.length - participants.length === 1 ? "" : "s"}`
       : state.winner
-        ? `${LUDO_SEAT_META[state.winner].label} wins`
-        : `${LUDO_SEAT_META[state.currentSeat].label} to ${state.phase}`
+        ? `${LUDO_SEAT_META[getVisualLudoSeat(state.winner, state.activeSeats)].label} wins`
+        : `${LUDO_SEAT_META[currentVisualSeat].label} to ${state.phase}`
 
   const submitAction = async (actionPayload: JsonObject) => {
     if (submittingAction) return
@@ -309,62 +339,93 @@ export function OnlineLudoRoom({ roomCode }: { roomCode: string }) {
           </div>
         </CardHeader>
         <CardContent className="space-y-4 pb-6">
-          <div className="mx-auto grid w-full max-w-[min(92vw,720px)] grid-cols-[repeat(15,minmax(0,1fr))] rounded-2xl border bg-white/60 p-2 shadow-inner dark:bg-black/20">
-            {Array.from({ length: 225 }, (_, index) => {
-              const row = Math.floor(index / 15)
-              const column = index % 15
-              const key = coordinateKey(row, column)
-              const tokens = tokenMap.get(key) ?? []
-              const pathIndex = PATH_KEYS.get(key)
-              return (
-                <div
-                  key={key}
-                  className={cn(
-                    "relative flex aspect-square min-w-0 items-center justify-center border text-[9px]",
-                    getCellClass(row, column)
-                  )}
-                >
-                  {typeof pathIndex === "number" && LUDO_SAFE_GLOBAL_INDICES.has(pathIndex) && (
-                    <span className="absolute left-1 top-0.5 text-[8px] font-semibold text-zinc-500">S</span>
-                  )}
-                  {row === 7 && column === 7 && <span className="text-[8px] font-bold tracking-widest">HOME</span>}
-                  <div className="flex flex-wrap items-center justify-center gap-0.5">
-                    {tokens.map((token) => {
-                      const canMove = isMyTurn && legalTokenIds.includes(token.id) && state.phase === "move"
-                      return (
-                        <button
-                          key={token.id}
-                          type="button"
-                          onClick={() => void submitAction({ action: "move", tokenId: token.id })}
-                          disabled={!canMove || submittingAction}
-                          className={cn(
-                            "flex h-5 w-5 items-center justify-center rounded-full border-2 text-[10px] font-black shadow-sm transition sm:h-6 sm:w-6",
-                            TOKEN_CLASSES[token.seat],
-                            canMove && "scale-110 ring-2 ring-white hover:-translate-y-0.5",
-                            !canMove && "disabled:cursor-default"
-                          )}
-                          aria-label={`token ${token.id}`}
-                        >
-                          {token.index + 1}
-                        </button>
-                      )
-                    })}
+          <div
+            className={cn(
+              "relative mx-auto aspect-square w-full max-w-[min(92vw,720px)] overflow-hidden rounded-[1.75rem] border border-zinc-200/80 bg-[radial-gradient(circle_at_center,#fff7ed,transparent_25%),linear-gradient(135deg,#ffffff,#f8fafc)] p-2 shadow-inner dark:border-zinc-800 dark:bg-[linear-gradient(135deg,#18181b,#09090b)]",
+              state.activeSeats.length === 3 && "bg-[radial-gradient(circle_at_center,#ecfeff,transparent_24%),linear-gradient(135deg,#ffffff,#f8fafc)] dark:bg-[linear-gradient(135deg,#0f172a,#111827)]"
+            )}
+          >
+            {state.activeSeats.length === 3 && (
+              <div className="pointer-events-none absolute inset-5 z-0 border border-white/70 bg-white/30 shadow-inner [clip-path:polygon(50%_4%,96%_92%,4%_92%)] dark:border-white/10 dark:bg-white/5" />
+            )}
+            <div className="relative z-10 grid h-full w-full grid-cols-[repeat(15,minmax(0,1fr))] grid-rows-[repeat(15,minmax(0,1fr))] gap-1">
+              {Array.from({ length: 225 }, (_, index) => {
+                const row = Math.floor(index / 15)
+                const column = index % 15
+                const key = coordinateKey(row, column)
+                const tokens = tokenMap.get(key) ?? []
+                const pathIndex = PATH_KEYS.get(key)
+                return (
+                  <div
+                    key={key}
+                    className={cn(
+                      "relative flex aspect-square min-w-0 items-center justify-center border text-[9px]",
+                      getCellClass(row, column, state.activeSeats)
+                    )}
+                  >
+                    {typeof pathIndex === "number" && LUDO_SAFE_GLOBAL_INDICES.has(pathIndex) && (
+                      <span className="absolute left-1/2 top-1/2 text-[8px] font-semibold text-amber-600 -translate-x-1/2 -translate-y-1/2">
+                        ★
+                      </span>
+                    )}
+                    <div className="flex flex-wrap items-center justify-center gap-0.5">
+                      {tokens.map((token) => {
+                        const tokenCanMove = isMyTurn && legalTokenIds.includes(token.id) && state.phase === "move"
+                        const visualSeat = getVisualLudoSeat(token.seat, state.activeSeats)
+                        return (
+                          <button
+                            key={token.id}
+                            type="button"
+                            onClick={() => void submitAction({ action: "move", tokenId: token.id })}
+                            disabled={!tokenCanMove || submittingAction}
+                            className={cn(
+                              "flex h-5 w-5 items-center justify-center rounded-full border-2 text-[10px] font-black shadow-sm transition sm:h-6 sm:w-6",
+                              TOKEN_CLASSES[visualSeat],
+                              tokenCanMove && "scale-110 animate-bounce ring-2 ring-white hover:-translate-y-0.5 hover:shadow-lg",
+                              !tokenCanMove && "disabled:cursor-default"
+                            )}
+                            aria-label={`token ${token.id}`}
+                          >
+                            {token.index + 1}
+                          </button>
+                        )
+                      })}
+                    </div>
                   </div>
-                </div>
-              )
-            })}
-          </div>
-          <div className="mx-auto flex max-w-md items-center justify-center gap-3 rounded-xl border bg-background/80 p-3">
-            <div className="flex h-16 w-16 items-center justify-center rounded-xl border bg-white text-3xl font-black text-zinc-950 shadow-sm">
-              {state.diceValue ?? state.lastMove?.diceValue ?? "-"}
+                )
+              })}
             </div>
-            <Button
+            <div
+              className={cn(
+                "pointer-events-none absolute left-1/2 top-1/2 z-20 h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full blur-2xl transition-colors duration-500 sm:h-36 sm:w-36",
+                CENTER_GLOW_CLASSES[currentVisualSeat],
+                !state.winner && "animate-pulse"
+              )}
+            />
+            <button
+              type="button"
               onClick={() => void submitAction({ action: "roll" })}
-              disabled={!isMyTurn || state.phase !== "roll" || submittingAction || session?.status !== "active"}
-              className="min-w-32"
+              disabled={!canRoll || submittingAction}
+              className={cn(
+                "absolute left-1/2 top-1/2 z-30 flex h-[18%] min-h-20 w-[18%] min-w-20 max-w-32 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-[1.35rem] border-2 p-2 text-center shadow-2xl ring-4 transition-all duration-300 sm:min-h-24 sm:min-w-24",
+                CENTER_TURN_CLASSES[currentVisualSeat],
+                canRoll && "hover:scale-105 active:scale-95",
+                submittingAction && "animate-pulse",
+                (!canRoll || submittingAction) && "cursor-default"
+              )}
+              aria-label={`Roll dice for ${LUDO_SEAT_META[currentVisualSeat].label}`}
+              title={`Turn: ${LUDO_SEAT_META[currentVisualSeat].label}`}
             >
-              {submittingAction ? <Loader2 className="h-4 w-4 animate-spin" /> : "Roll"}
-            </Button>
+              <span className="text-[10px] font-bold uppercase tracking-wide opacity-85">
+                {state.phase === "roll" ? "Roll" : "Move"}
+              </span>
+              <span className="leading-none text-4xl font-black sm:text-5xl">
+                {submittingAction ? "..." : state.diceValue ?? state.lastMove?.diceValue ?? "-"}
+              </span>
+              <span className="mt-1 max-w-full truncate text-[10px] font-semibold uppercase tracking-wide">
+                {LUDO_SEAT_META[currentVisualSeat].label}
+              </span>
+            </button>
           </div>
         </CardContent>
       </Card>
@@ -406,11 +467,12 @@ export function OnlineLudoRoom({ roomCode }: { roomCode: string }) {
               {state.activeSeats.map((seat) => {
                 const participant = participants.find((item) => item.seat === seat)
                 const isCurrent = state.currentSeat === seat && session?.status !== "completed"
+                const visualSeat = getVisualLudoSeat(seat, state.activeSeats)
                 return (
                   <div key={seat} className={cn("rounded-lg border p-3", isCurrent && "ring-2 ring-rose-400")}>
                     <div className="flex items-center justify-between gap-2">
-                      <div className="text-xs uppercase tracking-wide text-muted-foreground">{LUDO_SEAT_META[seat].label}</div>
-                      <div className={cn("h-3 w-3 rounded-full", TOKEN_CLASSES[seat])} />
+                      <div className="text-xs uppercase tracking-wide text-muted-foreground">{LUDO_SEAT_META[visualSeat].label}</div>
+                      <div className={cn("h-3 w-3 rounded-full", TOKEN_CLASSES[visualSeat])} />
                     </div>
                     <div className="truncate font-medium">{participant?.display_name ?? "Open"}</div>
                     <div className="text-xs text-muted-foreground">

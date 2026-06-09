@@ -23,6 +23,7 @@ import {
   LUDO_SAFE_GLOBAL_INDICES,
   LUDO_SEAT_META,
   LUDO_SEATS,
+  LUDO_TOKENS_PER_PLAYER,
   LUDO_YARD_COORDINATES,
   type LudoSeat,
   type LudoState,
@@ -59,6 +60,20 @@ const HOME_PANEL_CLASSES: Record<LudoSeat, string> = {
   P4: "border-sky-200 bg-sky-500/10 dark:border-sky-900/70 dark:bg-sky-500/15",
 }
 
+const CENTER_TURN_CLASSES: Record<LudoSeat, string> = {
+  P1: "border-red-200 bg-red-600 text-white shadow-red-900/35 ring-red-200/70 dark:border-red-300",
+  P2: "border-emerald-200 bg-emerald-600 text-white shadow-emerald-900/35 ring-emerald-200/70 dark:border-emerald-300",
+  P3: "border-amber-200 bg-amber-400 text-amber-950 shadow-amber-900/35 ring-amber-200/80 dark:border-amber-200",
+  P4: "border-sky-200 bg-sky-600 text-white shadow-sky-900/35 ring-sky-200/70 dark:border-sky-300",
+}
+
+const CENTER_GLOW_CLASSES: Record<LudoSeat, string> = {
+  P1: "bg-red-500/40",
+  P2: "bg-emerald-500/40",
+  P3: "bg-amber-400/45",
+  P4: "bg-sky-500/40",
+}
+
 const HOME_PATH_KEYS = new Map<string, LudoSeat>()
 for (const seat of LUDO_SEATS) {
   const coordinates: readonly (readonly [number, number])[] =
@@ -91,17 +106,17 @@ function coordinateKey(row: number, column: number) {
   return `${row}:${column}`
 }
 
-function getCellClass(row: number, column: number) {
+function getCellClass(row: number, column: number, activeSeats: readonly LudoSeat[]) {
   const key = coordinateKey(row, column)
   const homePathSeat = HOME_PATH_KEYS.get(key)
   const pathIndex = PATH_KEYS.get(key)
   const yardSeat = YARD_KEYS.get(key)
 
   if (row === 7 && column === 7) {
-    return "rounded-xl border-zinc-300 bg-zinc-950 text-white shadow-lg dark:border-zinc-600"
+    return "rounded-xl border-zinc-300/40 bg-zinc-950/5 shadow-inner dark:border-zinc-700/60 dark:bg-white/5"
   }
-  if (homePathSeat) return HOME_PATH_CLASSES[homePathSeat]
-  if (yardSeat) return cn("rounded-full", HOME_CELL_CLASSES[yardSeat])
+  if (homePathSeat && activeSeats.includes(homePathSeat)) return HOME_PATH_CLASSES[homePathSeat]
+  if (yardSeat && activeSeats.includes(yardSeat)) return cn("rounded-full", HOME_CELL_CLASSES[yardSeat])
   if (typeof pathIndex === "number") {
     return cn(
       "rounded-full border-zinc-200 bg-white/95 shadow-sm dark:border-zinc-700 dark:bg-zinc-900",
@@ -125,6 +140,35 @@ function tokensByCoordinate(tokens: LudoToken[]) {
 
 function rollDice() {
   return Math.floor(Math.random() * 6) + 1
+}
+
+function createLocalLudoState(maxPlayers = 2, targetTokens = LUDO_TOKENS_PER_PLAYER): LudoState {
+  const playerCount = Math.min(Math.max(Math.trunc(maxPlayers), 2), 4)
+  const activeSeats: LudoSeat[] =
+    playerCount === 2 ? ["P1", "P3"] : playerCount === 3 ? ["P1", "P2", "P4"] : [...LUDO_SEATS]
+  const normalizedTarget = Math.min(
+    Math.max(Math.trunc(targetTokens), 1),
+    LUDO_TOKENS_PER_PLAYER
+  )
+
+  return {
+    activeSeats,
+    currentSeat: "P1",
+    tokens: activeSeats.flatMap((seat) =>
+      Array.from({ length: LUDO_TOKENS_PER_PLAYER }, (_, index) => ({
+        id: `${seat}-${index + 1}`,
+        seat,
+        index,
+        progress: -1,
+      }))
+    ),
+    diceValue: null,
+    phase: "roll",
+    turnNumber: 1,
+    targetTokens: normalizedTarget,
+    winner: null,
+    lastMove: null,
+  }
 }
 
 function chooseComputerToken(state: LudoState, seat: LudoSeat) {
@@ -153,7 +197,9 @@ function LudoBoard({
   state,
   legalTokenIds,
   canMove,
+  canRoll,
   submitting,
+  onRoll,
   onTokenMove,
   lastMovedTokenId,
   capturedTokenIds,
@@ -161,22 +207,35 @@ function LudoBoard({
   state: LudoState
   legalTokenIds: string[]
   canMove: boolean
+  canRoll: boolean
   submitting: boolean
+  onRoll: () => void
   onTokenMove: (tokenId: string) => void
   lastMovedTokenId: string | null | undefined
   capturedTokenIds: Set<string>
 }) {
   const tokenMap = tokensByCoordinate(state.tokens)
+  const currentSeatMeta = LUDO_SEAT_META[state.currentSeat]
+  const visibleDice = state.diceValue ?? state.lastMove?.diceValue
+  const homePanels = [
+    { seat: "P1" as LudoSeat, gridColumn: "1 / span 6", gridRow: "1 / span 6" },
+    { seat: "P2" as LudoSeat, gridColumn: "10 / span 6", gridRow: "1 / span 6" },
+    { seat: "P3" as LudoSeat, gridColumn: "10 / span 6", gridRow: "10 / span 6" },
+    { seat: "P4" as LudoSeat, gridColumn: "1 / span 6", gridRow: "10 / span 6" },
+  ].filter((panel) => state.activeSeats.includes(panel.seat))
 
   return (
-    <div className="relative mx-auto aspect-square w-full max-w-[min(92vw,720px)] overflow-hidden rounded-[1.75rem] border border-zinc-200/80 bg-[radial-gradient(circle_at_center,#fef3c7,transparent_26%),linear-gradient(135deg,#ffffff,#f8fafc)] p-2 shadow-inner dark:border-zinc-800 dark:bg-[linear-gradient(135deg,#18181b,#09090b)]">
+    <div
+      className={cn(
+        "relative mx-auto aspect-square w-full max-w-[min(92vw,720px)] overflow-hidden rounded-[1.75rem] border border-zinc-200/80 bg-[radial-gradient(circle_at_center,#fff7ed,transparent_25%),linear-gradient(135deg,#ffffff,#f8fafc)] p-2 shadow-inner dark:border-zinc-800 dark:bg-[linear-gradient(135deg,#18181b,#09090b)]",
+        state.activeSeats.length === 3 && "bg-[radial-gradient(circle_at_center,#ecfeff,transparent_24%),linear-gradient(135deg,#ffffff,#f8fafc)] dark:bg-[linear-gradient(135deg,#0f172a,#111827)]"
+      )}
+    >
+      {state.activeSeats.length === 3 && (
+        <div className="pointer-events-none absolute inset-5 z-0 border border-white/70 bg-white/30 shadow-inner [clip-path:polygon(50%_4%,96%_92%,4%_92%)] dark:border-white/10 dark:bg-white/5" />
+      )}
       <div className="pointer-events-none absolute inset-2 grid grid-cols-[repeat(15,minmax(0,1fr))] grid-rows-[repeat(15,minmax(0,1fr))] gap-0.5">
-        {[
-          { seat: "P1" as LudoSeat, gridColumn: "1 / span 6", gridRow: "1 / span 6" },
-          { seat: "P2" as LudoSeat, gridColumn: "10 / span 6", gridRow: "1 / span 6" },
-          { seat: "P3" as LudoSeat, gridColumn: "10 / span 6", gridRow: "10 / span 6" },
-          { seat: "P4" as LudoSeat, gridColumn: "1 / span 6", gridRow: "10 / span 6" },
-        ].map((panel) => (
+        {homePanels.map((panel) => (
           <div
             key={panel.seat}
             className={cn(
@@ -203,16 +262,13 @@ function LudoBoard({
               key={key}
               className={cn(
                 "relative flex aspect-square min-w-0 items-center justify-center text-[9px]",
-                getCellClass(row, column)
+                getCellClass(row, column, state.activeSeats)
               )}
             >
               {typeof pathIndex === "number" && LUDO_SAFE_GLOBAL_INDICES.has(pathIndex) && (
                 <span className="absolute left-1/2 top-1/2 text-[8px] font-semibold text-amber-600 -translate-x-1/2 -translate-y-1/2">
                   ★
                 </span>
-              )}
-              {row === 7 && column === 7 && (
-                <span className="text-[8px] font-bold tracking-widest">HOME</span>
               )}
               <div className="flex flex-wrap items-center justify-center gap-0.5">
                 {tokens.map((token) => {
@@ -232,8 +288,8 @@ function LudoBoard({
                       className={cn(
                         "flex h-5 w-5 items-center justify-center rounded-full border-2 text-[10px] font-black shadow-sm transition-all duration-200 sm:h-6 sm:w-6",
                         TOKEN_CLASSES[token.seat],
-                        tokenCanMove && "scale-110 animate-bounce ring-2 ring-white hover:-translate-y-0.5",
-                        isLastMoved && "scale-110 ring-2 ring-zinc-950 ring-offset-2 dark:ring-white",
+                        tokenCanMove && "scale-110 animate-bounce ring-2 ring-white hover:-translate-y-0.5 hover:shadow-lg",
+                        isLastMoved && "scale-110 animate-pulse ring-2 ring-zinc-950 ring-offset-2 dark:ring-white",
                         wasCaptured && "opacity-70",
                         !tokenCanMove && "disabled:cursor-default"
                       )}
@@ -249,6 +305,37 @@ function LudoBoard({
           )
         })}
       </div>
+      <div
+        className={cn(
+          "pointer-events-none absolute left-1/2 top-1/2 z-20 h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full blur-2xl transition-colors duration-500 sm:h-36 sm:w-36",
+          CENTER_GLOW_CLASSES[state.currentSeat],
+          !state.winner && "animate-pulse"
+        )}
+      />
+      <button
+        type="button"
+        onClick={onRoll}
+        disabled={!canRoll || submitting}
+        className={cn(
+          "absolute left-1/2 top-1/2 z-30 flex h-[18%] min-h-20 w-[18%] min-w-20 max-w-32 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-[1.35rem] border-2 p-2 text-center shadow-2xl ring-4 transition-all duration-300 sm:min-h-24 sm:min-w-24",
+          CENTER_TURN_CLASSES[state.currentSeat],
+          canRoll && "hover:scale-105 active:scale-95",
+          submitting && "animate-pulse",
+          (!canRoll || submitting) && "cursor-default"
+        )}
+        aria-label={`Roll dice for ${currentSeatMeta.label}`}
+        title={`Turn: ${currentSeatMeta.label}`}
+      >
+        <span className="text-[10px] font-bold uppercase tracking-wide opacity-85">
+          {state.phase === "roll" ? "Roll" : "Move"}
+        </span>
+        <span className="leading-none text-4xl font-black sm:text-5xl">
+          {submitting ? "..." : visibleDice ?? "-"}
+        </span>
+        <span className="mt-1 max-w-full truncate text-[10px] font-semibold uppercase tracking-wide">
+          {currentSeatMeta.label}
+        </span>
+      </button>
     </div>
   )
 }
@@ -260,7 +347,7 @@ export function Ludo() {
   const [roomCode, setRoomCode] = useState("")
   const [playerCount, setPlayerCount] = useState(2)
   const [targetTokens, setTargetTokens] = useState(4)
-  const [state, setState] = useState(() => createLudoState(2, 4))
+  const [state, setState] = useState(() => createLocalLudoState(2, 4))
   const [creating, setCreating] = useState(false)
   const [joining, setJoining] = useState(false)
   const [computerThinking, setComputerThinking] = useState(false)
@@ -271,6 +358,7 @@ export function Ludo() {
     state.currentSeat !== "P1" &&
     !state.winner
   const canAct = gameStarted && (mode === "local_pvp" || state.currentSeat === "P1")
+  const canRoll = canAct && state.phase === "roll" && !state.winner && !computerThinking
   const legalTokenIds = useMemo(
     () => getLegalLudoMoves(state, state.currentSeat),
     [state]
@@ -286,7 +374,7 @@ export function Ludo() {
 
   const resetLocalGame = (nextMode = mode, nextPlayerCount = playerCount, nextTarget = targetTokens) => {
     const seats = nextMode === "vs_computer" ? 2 : nextPlayerCount
-    setState(createLudoState(seats, nextTarget))
+    setState(createLocalLudoState(seats, nextTarget))
     setComputerThinking(false)
   }
 
@@ -433,7 +521,7 @@ export function Ludo() {
           </div>
           {mode === "vs_computer" && (
             <p className="text-xs text-muted-foreground">
-              You play Red. Green is controlled by the computer.
+              You play Red. The opposite corner is controlled by the computer.
             </p>
           )}
         </div>
@@ -513,36 +601,20 @@ export function Ludo() {
             state={state}
             legalTokenIds={legalTokenIds}
             canMove={canAct && state.phase === "move"}
+            canRoll={canRoll}
             submitting={computerThinking}
+            onRoll={handleRoll}
             onTokenMove={handleTokenMove}
             lastMovedTokenId={lastMovedTokenId}
             capturedTokenIds={capturedTokenIds}
           />
-          <div className="mx-auto grid max-w-xl gap-3 rounded-xl border bg-background/85 p-3 sm:grid-cols-[1fr_auto] sm:items-center">
+          <div className="mx-auto max-w-xl rounded-xl border bg-background/85 p-3">
             <div className="min-w-0">
               <div className="text-xs uppercase tracking-wide text-muted-foreground">Status</div>
               <div className="truncate text-lg font-semibold">{status}</div>
               <div className="text-xs text-muted-foreground">
                 Turn {state.turnNumber} - Target {state.targetTokens} token{state.targetTokens === 1 ? "" : "s"}
               </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div
-                className={cn(
-                  "flex h-16 w-16 items-center justify-center rounded-xl border bg-white text-3xl font-black text-zinc-950 shadow-sm transition-transform duration-200",
-                  computerThinking && "animate-pulse",
-                  state.phase === "move" && "scale-105"
-                )}
-              >
-                {state.diceValue ?? state.lastMove?.diceValue ?? "-"}
-              </div>
-              <Button
-                onClick={handleRoll}
-                disabled={!canAct || state.phase !== "roll" || !!state.winner || computerThinking}
-                className="min-w-28"
-              >
-                {computerThinking ? <Loader2 className="h-4 w-4 animate-spin" /> : "Roll"}
-              </Button>
             </div>
           </div>
         </CardContent>
@@ -599,7 +671,7 @@ export function Ludo() {
               </div>
               {mode === "vs_computer" && (
                 <p className="text-xs text-muted-foreground">
-                  You play Red. Green is controlled by the computer.
+                  You play Red. The opposite corner is controlled by the computer.
                 </p>
               )}
             </div>
