@@ -14,6 +14,7 @@ import { Button } from "@repo/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card"
 
 import { useTypingSpeedTest, type Duration } from "@/components/games/use-typing-speed-test"
+import { GameSetupShell } from "@/components/games/game-setup-shell"
 import { TypingSpeedHistory } from "@/components/games/typing-speed-history"
 
 export function TypingSpeedTest() {
@@ -43,6 +44,7 @@ export function TypingSpeedTest() {
     avgAccuracy,
     handleInput,
     handleKeyDown,
+    startTest,
     saveResult,
     resetTest,
     loadHistory,
@@ -73,27 +75,38 @@ export function TypingSpeedTest() {
 
       {tab === "test" ? (
         <div className="space-y-4">
-          {!started && (
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-muted-foreground">Duration:</span>
-              {([30, 60, 120] as Duration[]).map((d) => (
-                <Button
-                  key={d}
-                  variant={duration === d ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setDuration(d)}
-                >
-                  {d}s
+          {!started && !finished && (
+            <GameSetupShell
+              title="Typing Speed"
+              description="Pick the test length and review the text before the timer starts."
+              onStart={startTest}
+              startLabel="Start test"
+              className="max-w-3xl"
+            >
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="text-sm text-muted-foreground">Duration:</span>
+                {([30, 60, 120] as Duration[]).map((d) => (
+                  <Button
+                    key={d}
+                    variant={duration === d ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setDuration(d)}
+                  >
+                    {d}s
+                  </Button>
+                ))}
+                <Button variant="ghost" size="sm" onClick={resetTest} className="ml-auto gap-1">
+                  <RotateCcw className="h-3.5 w-3.5" />
+                  New text
                 </Button>
-              ))}
-              <Button variant="ghost" size="sm" onClick={resetTest} className="ml-auto gap-1">
-                <RotateCcw className="h-3.5 w-3.5" />
-                New text
-              </Button>
-            </div>
+              </div>
+              <div className="rounded-lg border bg-background/70 p-4 font-mono text-sm leading-6 text-muted-foreground">
+                {text}
+              </div>
+            </GameSetupShell>
           )}
 
-          <div className="grid grid-cols-4 gap-3">
+          {(started || finished) && <div className="grid grid-cols-4 gap-3">
             <Card>
               <CardContent className="flex items-center gap-2 p-3">
                 <Zap className="h-4 w-4 text-amber-500" />
@@ -132,16 +145,16 @@ export function TypingSpeedTest() {
                 </div>
               </CardContent>
             </Card>
-          </div>
+          </div>}
 
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+          {(started || finished) && <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
             <div
               className="h-full rounded-full bg-emerald-500 transition-all duration-300"
               style={{ width: `${progress}%` }}
             />
-          </div>
+          </div>}
 
-          <Card
+          {(started || finished) && <Card
             className="cursor-text"
             onClick={() => inputRef.current?.focus()}
           >
@@ -170,7 +183,7 @@ export function TypingSpeedTest() {
                 value={typed}
                 onChange={handleInput}
                 onKeyDown={handleKeyDown}
-                disabled={finished}
+                disabled={!started || finished}
                 className="absolute inset-0 h-full w-full cursor-text resize-none opacity-0"
                 autoFocus
                 autoComplete="off"
@@ -186,7 +199,7 @@ export function TypingSpeedTest() {
                 </div>
               )}
             </CardContent>
-          </Card>
+          </Card>}
 
           {finished && (
             <Card className="border-emerald-200 dark:border-emerald-800">

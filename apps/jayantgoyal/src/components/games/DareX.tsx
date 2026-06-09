@@ -22,6 +22,7 @@ import { Label } from "@repo/ui/label"
 import { Separator } from "@repo/ui/separator"
 
 import { useDareX } from "@/components/games/use-dare-x"
+import { GameSetupShell } from "@/components/games/game-setup-shell"
 import {
   DareXSetupSheet,
   DareXCustomListSheet,
@@ -160,6 +161,131 @@ export function DareX() {
       return
     }
     router.push(`/games/dare-x/room/${roomCode}`)
+  }
+
+  if (!configLocked) {
+    return (
+      <>
+        <GameSetupShell
+          title="Dare X"
+          description="Choose players, mode, and dare source before the first dare is generated."
+          onStart={handleStartGame}
+          disabled={isSpinning}
+        >
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              type="button"
+              variant={mode === "local_pvp" ? "secondary" : "outline"}
+              onClick={() => {
+                switchMode("local_pvp")
+                setShowSetupSheet(false)
+              }}
+              disabled={isSpinning}
+            >
+              <Users className="mr-2 h-4 w-4" />
+              Local PvP
+            </Button>
+            <Button
+              type="button"
+              variant={mode === "vs_computer" ? "secondary" : "outline"}
+              onClick={() => {
+                switchMode("vs_computer")
+                setShowSetupSheet(false)
+              }}
+              disabled={isSpinning}
+            >
+              <Bot className="mr-2 h-4 w-4" />
+              Vs Computer
+            </Button>
+          </div>
+
+          <div className="rounded-lg border bg-background/70 p-3">
+            <div className="mb-3 flex items-center justify-between gap-2">
+              <div>
+                <div className="text-sm font-medium">Players and dares</div>
+                <div className="text-xs text-muted-foreground">
+                  {playerCount} player{playerCount === 1 ? "" : "s"} · {activeDares.length} active dare{activeDares.length === 1 ? "" : "s"}
+                </div>
+              </div>
+              <Button type="button" variant="outline" size="sm" onClick={() => setShowSetupSheet(true)}>
+                Advanced setup
+              </Button>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {activePlayers.map((player) => (
+                <div key={player.id} className="rounded-md border bg-muted/20 p-2 text-sm">
+                  {player.name}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-lg border bg-muted/20 p-3 space-y-3">
+            <div className="flex items-center gap-2 text-sm font-medium">
+              <Globe2 className="h-4 w-4" />
+              Online room
+            </div>
+            <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+              <div className="space-y-2">
+                <Label htmlFor="dare-online-name">Your display name</Label>
+                <Input
+                  id="dare-online-name"
+                  value={onlineName}
+                  onChange={(event) => setOnlineName(event.target.value)}
+                />
+              </div>
+              <div className="flex items-end">
+                <Button onClick={createOnlineRoom} disabled={creatingRoom || activeDares.length === 0} className="w-full">
+                  {creatingRoom ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create online room"}
+                </Button>
+              </div>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+              <Input
+                value={joinCode}
+                onChange={(event) => setJoinCode(event.target.value.toUpperCase())}
+                placeholder="Room code"
+                maxLength={10}
+              />
+              <Button variant="outline" onClick={joinOnlineRoom}>
+                Join
+              </Button>
+            </div>
+          </div>
+        </GameSetupShell>
+
+        <DareXSetupSheet
+          open={showSetupSheet}
+          onOpenChange={setShowSetupSheet}
+          playerCount={playerCount}
+          handleCountChange={handleCountChange}
+          configLocked={configLocked}
+          players={players}
+          setPlayers={setPlayers}
+          dareSource={dareSource}
+          setDareSource={setDareSource}
+          customDares={customDares}
+          handleExport={handleExport}
+          isImporting={isImporting}
+          fileInputRef={fileInputRef}
+          handleImport={handleImport}
+          newCustomDare={newCustomDare}
+          setNewCustomDare={setNewCustomDare}
+          addCustomDare={addCustomDare}
+          setShowCustomListSheet={setShowCustomListSheet}
+          handleStartGame={handleStartGame}
+          isSpinning={isSpinning}
+          resetSession={resetSession}
+        />
+        <DareXCustomListSheet
+          open={showCustomListSheet}
+          onOpenChange={setShowCustomListSheet}
+          customDares={customDares}
+          deleteCustomDare={deleteCustomDare}
+          configLocked={configLocked}
+        />
+      </>
+    )
   }
 
   return (

@@ -11,6 +11,7 @@ import { Input } from "@repo/ui/input"
 import { Label } from "@repo/ui/label"
 import { cn } from "@repo/ui/lib/utils"
 
+import { GameSetupShell } from "@/components/games/game-setup-shell"
 import {
   applyLudoMove,
   applyLudoRoll,
@@ -103,8 +104,8 @@ function getCellClass(row: number, column: number) {
   if (yardSeat) return cn("rounded-full", HOME_CELL_CLASSES[yardSeat])
   if (typeof pathIndex === "number") {
     return cn(
-      "rounded-md border-zinc-300 bg-white shadow-sm dark:border-zinc-700 dark:bg-zinc-900",
-      LUDO_SAFE_GLOBAL_INDICES.has(pathIndex) && "ring-2 ring-inset ring-zinc-500"
+      "rounded-full border-zinc-200 bg-white/95 shadow-sm dark:border-zinc-700 dark:bg-zinc-900",
+      LUDO_SAFE_GLOBAL_INDICES.has(pathIndex) && "ring-2 ring-inset ring-amber-400"
     )
   }
   return "border-transparent bg-transparent"
@@ -168,7 +169,7 @@ function LudoBoard({
   const tokenMap = tokensByCoordinate(state.tokens)
 
   return (
-    <div className="relative mx-auto aspect-square w-full max-w-[min(92vw,720px)] overflow-hidden rounded-[1.75rem] border border-rose-200/70 bg-[radial-gradient(circle_at_center,#fff7ed,transparent_34%),linear-gradient(135deg,#fff,#fff7ed)] p-2 shadow-inner dark:border-rose-900/60 dark:bg-[linear-gradient(135deg,#18181b,#09090b)]">
+    <div className="relative mx-auto aspect-square w-full max-w-[min(92vw,720px)] overflow-hidden rounded-[1.75rem] border border-zinc-200/80 bg-[radial-gradient(circle_at_center,#fef3c7,transparent_26%),linear-gradient(135deg,#ffffff,#f8fafc)] p-2 shadow-inner dark:border-zinc-800 dark:bg-[linear-gradient(135deg,#18181b,#09090b)]">
       <div className="pointer-events-none absolute inset-2 grid grid-cols-[repeat(15,minmax(0,1fr))] grid-rows-[repeat(15,minmax(0,1fr))] gap-0.5">
         {[
           { seat: "P1" as LudoSeat, gridColumn: "1 / span 6", gridRow: "1 / span 6" },
@@ -189,7 +190,7 @@ function LudoBoard({
           />
         ))}
       </div>
-      <div className="relative z-10 grid h-full w-full grid-cols-[repeat(15,minmax(0,1fr))] grid-rows-[repeat(15,minmax(0,1fr))] gap-0.5">
+      <div className="relative z-10 grid h-full w-full grid-cols-[repeat(15,minmax(0,1fr))] grid-rows-[repeat(15,minmax(0,1fr))] gap-1">
         {Array.from({ length: 225 }, (_, index) => {
           const row = Math.floor(index / 15)
           const column = index % 15
@@ -201,13 +202,13 @@ function LudoBoard({
             <div
               key={key}
               className={cn(
-                "relative flex aspect-square min-w-0 items-center justify-center border text-[9px]",
+                "relative flex aspect-square min-w-0 items-center justify-center text-[9px]",
                 getCellClass(row, column)
               )}
             >
               {typeof pathIndex === "number" && LUDO_SAFE_GLOBAL_INDICES.has(pathIndex) && (
-                <span className="absolute left-1 top-0.5 text-[8px] font-semibold text-zinc-500">
-                  S
+                <span className="absolute left-1/2 top-1/2 text-[8px] font-semibold text-amber-600 -translate-x-1/2 -translate-y-1/2">
+                  ★
                 </span>
               )}
               {row === 7 && column === 7 && (
@@ -254,6 +255,7 @@ function LudoBoard({
 
 export function Ludo() {
   const router = useRouter()
+  const [gameStarted, setGameStarted] = useState(false)
   const [mode, setMode] = useState<LudoMode>("vs_computer")
   const [roomCode, setRoomCode] = useState("")
   const [playerCount, setPlayerCount] = useState(2)
@@ -264,10 +266,11 @@ export function Ludo() {
   const [computerThinking, setComputerThinking] = useState(false)
 
   const isComputerTurn =
+    gameStarted &&
     mode === "vs_computer" &&
     state.currentSeat !== "P1" &&
     !state.winner
-  const canAct = mode === "local_pvp" || state.currentSeat === "P1"
+  const canAct = gameStarted && (mode === "local_pvp" || state.currentSeat === "P1")
   const legalTokenIds = useMemo(
     () => getLegalLudoMoves(state, state.currentSeat),
     [state]
@@ -285,6 +288,16 @@ export function Ludo() {
     const seats = nextMode === "vs_computer" ? 2 : nextPlayerCount
     setState(createLudoState(seats, nextTarget))
     setComputerThinking(false)
+  }
+
+  const startLocalGame = () => {
+    resetLocalGame()
+    setGameStarted(true)
+  }
+
+  const openSetup = () => {
+    resetLocalGame()
+    setGameStarted(false)
   }
 
   useEffect(() => {
@@ -367,6 +380,114 @@ export function Ludo() {
     router.push(`/games/ludo/room/${normalized}`)
   }
 
+  if (!gameStarted) {
+    return (
+      <GameSetupShell
+        title="Ludo"
+        description="Choose local/computer mode, player count, and finish target before the board accepts rolls."
+        onStart={startLocalGame}
+      >
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            type="button"
+            variant={mode === "vs_computer" ? "secondary" : "outline"}
+            onClick={() => {
+              setMode("vs_computer")
+              setPlayerCount(2)
+              resetLocalGame("vs_computer", 2)
+            }}
+          >
+            <Bot className="mr-2 h-4 w-4" />
+            Vs Computer
+          </Button>
+          <Button
+            type="button"
+            variant={mode === "local_pvp" ? "secondary" : "outline"}
+            onClick={() => {
+              setMode("local_pvp")
+              resetLocalGame("local_pvp")
+            }}
+          >
+            <Users className="mr-2 h-4 w-4" />
+            Local PvP
+          </Button>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Players</Label>
+          <div className="grid grid-cols-3 gap-2">
+            {[2, 3, 4].map((count) => (
+              <Button
+                key={count}
+                type="button"
+                variant={playerCount === count ? "secondary" : "outline"}
+                onClick={() => {
+                  setPlayerCount(count)
+                  resetLocalGame(mode, count)
+                }}
+                disabled={mode === "vs_computer" && count !== 2}
+              >
+                {count}
+              </Button>
+            ))}
+          </div>
+          {mode === "vs_computer" && (
+            <p className="text-xs text-muted-foreground">
+              You play Red. Green is controlled by the computer.
+            </p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label>Finish target</Label>
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              type="button"
+              variant={targetTokens === 1 ? "secondary" : "outline"}
+              onClick={() => {
+                setTargetTokens(1)
+                resetLocalGame(mode, playerCount, 1)
+              }}
+            >
+              Quick
+            </Button>
+            <Button
+              type="button"
+              variant={targetTokens === 4 ? "secondary" : "outline"}
+              onClick={() => {
+                setTargetTokens(4)
+                resetLocalGame(mode, playerCount, 4)
+              }}
+            >
+              Classic
+            </Button>
+          </div>
+        </div>
+
+        <div className="space-y-3 rounded-lg border bg-muted/20 p-3">
+          <div className="flex items-center gap-2 text-sm font-medium">
+            <Users className="h-4 w-4" />
+            Online room
+          </div>
+          <Button onClick={() => void createRoom()} disabled={creating} className="w-full">
+            {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create Ludo room"}
+          </Button>
+          <div className="flex gap-2">
+            <Input
+              value={roomCode}
+              onChange={(event) => setRoomCode(event.target.value)}
+              placeholder="Room code"
+              className="uppercase"
+            />
+            <Button variant="outline" onClick={joinRoom} disabled={joining}>
+              {joining ? <Loader2 className="h-4 w-4 animate-spin" /> : "Join"}
+            </Button>
+          </div>
+        </div>
+      </GameSetupShell>
+    )
+  }
+
   return (
     <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
       <Card className="overflow-hidden border-rose-200 bg-[radial-gradient(circle_at_top_left,#ffe4e6,transparent_34%),linear-gradient(135deg,#fff7ed,#fff1f2)] dark:border-rose-900/70 dark:bg-[linear-gradient(135deg,#111827,#4c0519)]">
@@ -382,6 +503,9 @@ export function Ludo() {
           >
             <RotateCcw className="mr-2 h-4 w-4" />
             Reset
+          </Button>
+          <Button variant="ghost" size="sm" onClick={openSetup}>
+            Setup
           </Button>
         </CardHeader>
         <CardContent className="space-y-4 pb-6">

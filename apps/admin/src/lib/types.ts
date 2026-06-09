@@ -288,6 +288,8 @@ export type CommerceProductStatus = "draft" | "published" | "archived";
 export type CommercePriceType = "one_time" | "recurring";
 export type CommerceBillingInterval = "day" | "week" | "month" | "year";
 export type CommerceOrderStatus = "pending" | "paid" | "failed" | "refunded" | "canceled" | "expired";
+export type CommerceDeliveryType = "download" | "link" | "manual" | "service";
+export type CommerceDeliveryStatus = "pending" | "available" | "fulfilled" | "revoked";
 
 export interface CommerceProduct {
   id: string;
@@ -357,4 +359,40 @@ export interface CommerceOrderWithDetails extends CommerceOrder {
   product: CommerceProduct | null;
   price: CommercePrice | null;
   buyer_email: string | null;
+}
+
+export interface CommerceDelivery {
+  id: string;
+  user_id: string;
+  order_id: string | null;
+  product_id: string;
+  delivery_type: CommerceDeliveryType;
+  storage_bucket: string | null;
+  storage_path: string | null;
+  external_url: string | null;
+  status: CommerceDeliveryStatus;
+  download_count: number;
+  expires_at: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CommerceEvent {
+  id: string;
+  event_type: string;
+  user_id: string | null;
+  product_id: string | null;
+  price_id: string | null;
+  order_id: string | null;
+  subscription_id: string | null;
+  payment_provider: CommercePaymentProvider | null;
+  source: string;
+  metadata: Record<string, unknown>;
+  created_at: string;
+}
+
+export interface CommerceOrderOperationalDetails extends CommerceOrderWithDetails {
+  deliveries: CommerceDelivery[];
+  events: CommerceEvent[];
 }

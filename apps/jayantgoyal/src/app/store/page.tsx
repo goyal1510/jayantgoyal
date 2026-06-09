@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowRight, PackageOpen, Search } from "lucide-react"
+import { ArrowRight, CheckCircle2, LifeBuoy, PackageOpen, ReceiptText, Search } from "lucide-react"
 
 import { Badge } from "@repo/ui/badge"
 import { Button } from "@repo/ui/button"
@@ -41,6 +41,24 @@ const fallbackShowcase = [
     title: "Portfolio Launch Package",
     image: "/assets/ProjectImages/Dark/ecommerce.png",
     body: "A fixed-scope commercial setup package for the portfolio.",
+  },
+]
+
+const buyerFlow = [
+  {
+    icon: CheckCircle2,
+    title: "Choose a product",
+    body: "Browse published digital products, service packages, and workspace upgrades from the catalog.",
+  },
+  {
+    icon: ReceiptText,
+    title: "Pay with Razorpay",
+    body: "Checkout creates an account-bound order, then server verification unlocks access after payment.",
+  },
+  {
+    icon: LifeBuoy,
+    title: "Get delivery and support",
+    body: "Downloads, service links, and purchase support stay available from your account workspace.",
   },
 ]
 
@@ -100,6 +118,18 @@ export default async function StorePage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="border-b bg-white">
+        <div className="mx-auto grid max-w-7xl gap-4 px-4 py-8 sm:px-6 md:grid-cols-3 lg:px-8">
+          {buyerFlow.map((item) => (
+            <div key={item.title} className="rounded-lg border border-zinc-200 p-5">
+              <item.icon className="h-5 w-5 text-zinc-700" />
+              <h2 className="mt-4 font-semibold">{item.title}</h2>
+              <p className="mt-2 text-sm leading-6 text-zinc-600">{item.body}</p>
+            </div>
+          ))}
         </div>
       </section>
 

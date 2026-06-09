@@ -134,7 +134,8 @@ export default async function StoreProductPage({
         {[
           "Secure Razorpay checkout",
           "Purchase record in your account",
-          "Delivery and support hooks in the workspace",
+          "Delivery status in purchase library",
+          "Support thread linked to the order",
         ].map((item) => (
           <div key={item} className="rounded-lg border bg-white p-5">
             <CheckCircle2 className="h-5 w-5 text-emerald-600" />

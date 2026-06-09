@@ -19,8 +19,10 @@ import {
   TimeControlPicker,
   useGameCountdown,
 } from "@/components/games/game-time-controls"
+import { GameSetupShell } from "@/components/games/game-setup-shell"
 
 type Choice = "rock" | "paper" | "scissors"
+type ComputerDifficulty = "casual" | "adaptive" | "ruthless"
 
 const CHOICES: { key: Choice; label: string; image: string }[] = [
   {
@@ -40,8 +42,58 @@ const CHOICES: { key: Choice; label: string; image: string }[] = [
   },
 ]
 
+const DIFFICULTY_LABELS: Record<ComputerDifficulty, string> = {
+  casual: "Casual",
+  adaptive: "Adaptive",
+  ruthless: "Ruthless",
+}
+
+const COUNTER_MOVE: Record<Choice, Choice> = {
+  rock: "paper",
+  paper: "scissors",
+  scissors: "rock",
+}
+
+function randomChoice() {
+  return CHOICES[Math.floor(Math.random() * CHOICES.length)]!.key
+}
+
+function mostCommonChoice(history: Choice[]) {
+  if (history.length === 0) return null
+  const counts = history.reduce<Record<Choice, number>>(
+    (acc, choice) => {
+      acc[choice] += 1
+      return acc
+    },
+    { rock: 0, paper: 0, scissors: 0 }
+  )
+  return [...CHOICES].sort((a, b) => counts[b.key] - counts[a.key])[0]?.key ?? null
+}
+
+function chooseComputerChoice({
+  playerChoice,
+  playerHistory,
+  difficulty,
+}: {
+  playerChoice: Choice
+  playerHistory: Choice[]
+  difficulty: ComputerDifficulty
+}) {
+  if (difficulty === "casual") return randomChoice()
+
+  const predicted =
+    difficulty === "ruthless"
+      ? playerHistory.at(-1) ?? mostCommonChoice(playerHistory) ?? playerChoice
+      : mostCommonChoice(playerHistory.slice(-5)) ?? playerChoice
+
+  const skillChance = difficulty === "ruthless" ? 0.82 : 0.58
+  return Math.random() < skillChance ? COUNTER_MOVE[predicted] : randomChoice()
+}
+
 export function RockPaperScissors() {
   const router = useRouter()
+  const [gameStarted, setGameStarted] = React.useState(false)
+  const [playerName, setPlayerName] = React.useState("You")
   const [totals, setTotals] = React.useState({ humanWins: 0, computerWins: 0, draws: 0 })
   const [lastRound, setLastRound] = React.useState<{
     roundNumber: number
@@ -55,6 +107,8 @@ export function RockPaperScissors() {
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [roundSeconds, setRoundSeconds] = React.useState(10)
   const [roundResetKey, setRoundResetKey] = React.useState(0)
+  const [difficulty, setDifficulty] = React.useState<ComputerDifficulty>("adaptive")
+  const [playerHistory, setPlayerHistory] = React.useState<Choice[]>([])
   const [onlineName, setOnlineName] = React.useState("Player 1")
   const [joinCode, setJoinCode] = React.useState("")
   const [creatingRoom, setCreatingRoom] = React.useState(false)
@@ -65,7 +119,11 @@ export function RockPaperScissors() {
   const playRound = async (choice: Choice, timedOut = false) => {
     setIsSubmitting(true)
     setSelectedChoice(choice)
-    const computerChoice = CHOICES[Math.floor(Math.random() * CHOICES.length)]!.key
+    const computerChoice = chooseComputerChoice({
+      playerChoice: choice,
+      playerHistory,
+      difficulty,
+    })
     const humanWins =
       (choice === "rock" && computerChoice === "scissors") ||
       (choice === "paper" && computerChoice === "rock") ||
@@ -88,6 +146,7 @@ export function RockPaperScissors() {
       outcome,
       timedOut,
     }))
+    setPlayerHistory((current) => [...current.slice(-9), choice])
 
     const nextMessage =
       timedOut
@@ -108,7 +167,7 @@ export function RockPaperScissors() {
 
   const roundClock = useGameCountdown({
     durationSeconds: roundSeconds,
-    active: !isSubmitting,
+    active: gameStarted && !isSubmitting,
     resetKey: roundResetKey,
     onExpire: () => {
       const fallbackChoice = CHOICES[Math.floor(Math.random() * CHOICES.length)]!.key
@@ -120,8 +179,15 @@ export function RockPaperScissors() {
     setTotals({ humanWins: 0, computerWins: 0, draws: 0 })
     setLastRound(null)
     setSelectedChoice(null)
+    setPlayerHistory([])
     setMessage("Pick a move before the round timer expires.")
     setRoundResetKey((current) => current + 1)
+  }
+
+  const startLocalGame = () => {
+    resetLocal()
+    setPlayerName((current) => current.trim() || "You")
+    setGameStarted(true)
   }
 
   const createOnlineRoom = async () => {
@@ -162,13 +228,96 @@ export function RockPaperScissors() {
     router.push(`/games/rock-paper-scissors/room/${roomCode}`)
   }
 
+  if (!gameStarted) {
+    return (
+      <GameSetupShell
+        title="Rock Paper Scissors"
+        description="Set your player name, round timer, and computer difficulty before the first countdown starts."
+        onStart={startLocalGame}
+      >
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="rps-player-name">Player name</Label>
+            <Input
+              id="rps-player-name"
+              name="rps-player-name"
+              value={playerName}
+              onChange={(event) => setPlayerName(event.target.value)}
+              autoComplete="off"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="rps-computer-name">Opponent</Label>
+            <Input id="rps-computer-name" value="Computer" disabled />
+          </div>
+        </div>
+
+        <TimeControlPicker
+          label="Round limit"
+          presets={ROUND_TIME_PRESETS}
+          valueSeconds={roundSeconds}
+          onChange={(seconds) => {
+            setRoundSeconds(seconds)
+            setRoundResetKey((current) => current + 1)
+          }}
+        />
+
+        <div className="rounded-lg border bg-background/70 p-3">
+          <div className="mb-2 text-sm font-medium">Computer difficulty</div>
+          <div className="grid grid-cols-3 gap-2">
+            {(Object.keys(DIFFICULTY_LABELS) as ComputerDifficulty[]).map((level) => (
+              <Button
+                key={level}
+                type="button"
+                variant={difficulty === level ? "default" : "outline"}
+                size="sm"
+                onClick={() => setDifficulty(level)}
+              >
+                {DIFFICULTY_LABELS[level]}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-lg border bg-muted/20 p-3 space-y-3">
+          <div className="flex items-center gap-2 text-sm font-medium">
+            <Globe2 className="h-4 w-4" />
+            Online room
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="rps-online-name">Your display name</Label>
+            <Input
+              id="rps-online-name"
+              value={onlineName}
+              onChange={(event) => setOnlineName(event.target.value)}
+            />
+          </div>
+          <Button onClick={createOnlineRoom} disabled={creatingRoom} className="w-full">
+            {creatingRoom ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create online room"}
+          </Button>
+          <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+            <Input
+              value={joinCode}
+              onChange={(event) => setJoinCode(event.target.value.toUpperCase())}
+              placeholder="Room code"
+              maxLength={10}
+            />
+            <Button variant="outline" onClick={joinOnlineRoom}>
+              Join
+            </Button>
+          </div>
+        </div>
+      </GameSetupShell>
+    )
+  }
+
   return (
     <Card className="bg-card">
       <CardHeader>
         <CardTitle className="flex items-center justify-between gap-2">
           <span>Rock Paper Scissors</span>
-          <Button variant="outline" size="sm" onClick={resetLocal} disabled={isSubmitting}>
-            Reset
+          <Button variant="outline" size="sm" onClick={() => setGameStarted(false)} disabled={isSubmitting}>
+            Setup
           </Button>
         </CardTitle>
       </CardHeader>
@@ -211,7 +360,7 @@ export function RockPaperScissors() {
             label="Round timer"
             helper="Auto-picks if it expires"
             remainingMs={roundClock.remainingMs}
-            active={!isSubmitting}
+            active={gameStarted && !isSubmitting}
             expired={roundClock.isExpired}
             tone="rose"
           />
@@ -227,13 +376,33 @@ export function RockPaperScissors() {
           />
         </div>
 
+        <div className="rounded-lg border bg-muted/20 p-3">
+          <div className="mb-2 text-sm font-medium">Computer difficulty</div>
+          <div className="grid grid-cols-3 gap-2">
+            {(Object.keys(DIFFICULTY_LABELS) as ComputerDifficulty[]).map((level) => (
+              <Button
+                key={level}
+                type="button"
+                variant={difficulty === level ? "default" : "outline"}
+                size="sm"
+                onClick={() => setDifficulty(level)}
+                disabled={isSubmitting}
+              >
+                {DIFFICULTY_LABELS[level]}
+              </Button>
+            ))}
+          </div>
+        </div>
+
         <div className="rounded-lg border bg-muted/30 p-3 text-sm">
           <div className="font-medium">Message</div>
-          <div className="text-muted-foreground">{isSubmitting ? "Playing..." : message}</div>
+          <div className="text-muted-foreground">
+            {isSubmitting ? "Playing..." : `${message} ${DIFFICULTY_LABELS[difficulty]} bot active.`}
+          </div>
         </div>
 
         <div className="grid grid-cols-3 gap-3 text-sm">
-          <StatBadge label="You" value={totals.humanWins} highlight />
+          <StatBadge label={playerName} value={totals.humanWins} highlight />
           <StatBadge label="Computer" value={totals.computerWins} />
           <StatBadge label="Draws" value={totals.draws} />
         </div>

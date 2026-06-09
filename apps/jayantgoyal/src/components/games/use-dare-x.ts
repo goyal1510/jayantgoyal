@@ -85,7 +85,7 @@ export function useDareX() {
   )
 
   const [newCustomDare, setNewCustomDare] = useState("")
-  const [showSetupSheet, setShowSetupSheet] = useState(true)
+  const [showSetupSheet, setShowSetupSheet] = useState(false)
   const [showCustomListSheet, setShowCustomListSheet] = useState(false)
   const [showHistorySheet, setShowHistorySheet] = useState(false)
   const [configLocked, setConfigLocked] = useState(false)

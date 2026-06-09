@@ -156,6 +156,9 @@ export function UploadDialog({
           <div className="space-y-4">
             <div
               ref={dropZoneRef}
+              role="button"
+              tabIndex={0}
+              aria-label="Choose files to upload or drop files here"
               className={cn(
                 "relative border-2 border-dashed rounded-lg p-4 sm:p-8 transition-colors",
                 "flex flex-col items-center justify-center gap-2 cursor-pointer",
@@ -168,6 +171,12 @@ export function UploadDialog({
               onDragOver={handleDragOver}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault()
+                  fileInputRef.current?.click()
+                }
+              }}
             >
               <input
                 ref={fileInputRef}
@@ -175,6 +184,7 @@ export function UploadDialog({
                 multiple
                 className="hidden"
                 onChange={handleFileInputChange}
+                aria-label="Upload files"
               />
               <Upload className={cn("h-8 w-8 sm:h-10 sm:w-10", isDragging ? "text-primary" : "text-muted-foreground")} />
               <div className="text-center">

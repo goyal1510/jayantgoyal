@@ -43,6 +43,13 @@ interface FlipTextProps {
      * @default false
      */
     together?: boolean;
+
+    /**
+     * Hide animated characters from assistive technology when a parent
+     * exposes the semantic text.
+     * @default false
+     */
+    ariaHidden?: boolean;
 }
 
 export function FlipText({
@@ -53,6 +60,7 @@ export function FlipText({
     loop = true,
     separator = " ",
     together = false,
+    ariaHidden = false,
 }: FlipTextProps) {
     const words = useMemo(() => children.split(separator), [children, separator]);
     const totalChars = children.length;
@@ -68,6 +76,7 @@ export function FlipText({
 
     return (
         <div
+            aria-hidden={ariaHidden}
             className={cn(
                 "flip-text-wrapper inline-block leading-none",
                 className

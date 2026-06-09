@@ -41,6 +41,14 @@ const proFeatures = [
   "Buyer support through messenger",
 ]
 
+const launchChecklist = [
+  "Product and price created in admin",
+  "Razorpay order created at checkout",
+  "Webhook or verification marks order paid",
+  "Entitlements and delivery rows appear in account",
+  "Purchase support routes into Messenger",
+]
+
 async function getSubscriptionPrice() {
   try {
     const products = await listPublishedCommerceProducts()
@@ -217,6 +225,27 @@ export default async function PricingPage() {
               <p className="mt-2 text-sm leading-6 text-zinc-600">{item.body}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="border-t bg-zinc-50 px-4 py-12 text-zinc-950 sm:px-6 lg:px-8">
+        <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[0.8fr_1.2fr]">
+          <div>
+            <Badge variant="outline" className="mb-4">Launch readiness</Badge>
+            <h2 className="text-2xl font-semibold">What paid access means here</h2>
+            <p className="mt-3 text-sm leading-6 text-zinc-600">
+              The paid layer is account-bound: purchases, deliveries, support, and feature access
+              all stay connected to the logged-in user instead of one-off browser state.
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {launchChecklist.map((item) => (
+              <div key={item} className="flex gap-3 rounded-lg border bg-white p-4 text-sm">
+                <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                <span>{item}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     </main>

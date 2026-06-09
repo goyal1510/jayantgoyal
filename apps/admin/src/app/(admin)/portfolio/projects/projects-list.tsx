@@ -20,6 +20,14 @@ import {
 } from "@/lib/portfolio-api";
 import { Button } from "@repo/ui/button";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@repo/ui/dialog";
+import {
   Card,
   CardContent,
   CardDescription,
@@ -42,6 +50,7 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
   const [formData, setFormData] = useState<ProjectFormData>(emptyProjectForm);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Project | null>(null);
 
   const openAddDialog = () => {
     setEditingItem(null);
@@ -95,16 +104,17 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this project?")) return;
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
 
-    setDeleting(id);
+    setDeleting(deleteTarget.id);
 
     try {
-      const result = await deletePortfolioData("projects", id);
+      const result = await deletePortfolioData("projects", deleteTarget.id);
       if (result.error) throw new Error(result.error);
       toast.success("Project deleted");
-      setItems(items.filter((i) => i.id !== id));
+      setItems(items.filter((i) => i.id !== deleteTarget.id));
+      setDeleteTarget(null);
       router.refresh();
     } catch (error) {
       toast.error(
@@ -210,6 +220,8 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
                       variant="ghost"
                       size="icon"
                       onClick={() => toggleVisibility(item)}
+                      aria-label={item.is_visible ? `Hide ${item.name}` : `Show ${item.name}`}
+                      title={item.is_visible ? `Hide ${item.name}` : `Show ${item.name}`}
                     >
                       {item.is_visible ? (
                         <Eye className="h-4 w-4" />
@@ -221,14 +233,18 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
                       variant="ghost"
                       size="icon"
                       onClick={() => openEditDialog(item)}
+                      aria-label={`Edit ${item.name}`}
+                      title={`Edit ${item.name}`}
                     >
                       <Pencil className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => handleDelete(item.id)}
+                      onClick={() => setDeleteTarget(item)}
                       disabled={deleting === item.id}
+                      aria-label={`Delete ${item.name}`}
+                      title={`Delete ${item.name}`}
                     >
                       {deleting === item.id ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -253,6 +269,39 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
         onSubmit={handleSubmit}
         saving={saving}
       />
+
+      <Dialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => !open && !deleting && setDeleteTarget(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete project?</DialogTitle>
+            <DialogDescription>
+              This will permanently delete {deleteTarget?.name ?? "this project"} from the portfolio.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setDeleteTarget(null)}
+              disabled={!!deleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={!!deleting}
+            >
+              {deleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Delete project
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

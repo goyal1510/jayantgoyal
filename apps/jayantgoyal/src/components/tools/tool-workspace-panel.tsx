@@ -3,6 +3,8 @@
 import * as React from "react"
 import { Button } from "@repo/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card"
+import { Input } from "@repo/ui/input"
+import { Label } from "@repo/ui/label"
 import { Download, History, RotateCcw, Save, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 
@@ -49,6 +51,7 @@ export function ToolWorkspacePanel({
   const [plan, setPlan] = React.useState<string>("free")
   const [isLoading, setIsLoading] = React.useState(true)
   const [isSaving, setIsSaving] = React.useState(false)
+  const [historyQuery, setHistoryQuery] = React.useState("")
 
   const loadSavedItems = React.useCallback(async () => {
     setIsLoading(true)
@@ -131,6 +134,12 @@ export function ToolWorkspacePanel({
     })
   }
 
+  const filteredItems = React.useMemo(() => {
+    const query = historyQuery.trim().toLowerCase()
+    if (!query) return savedItems
+    return savedItems.filter((item) => item.title.toLowerCase().includes(query))
+  }, [historyQuery, savedItems])
+
   return (
     <Card>
       <CardHeader className="space-y-3">
@@ -145,12 +154,19 @@ export function ToolWorkspacePanel({
           </div>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row">
-          <input
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-            placeholder="Save title"
-            className="h-9 min-w-0 flex-1 rounded-md border border-input bg-transparent px-3 text-sm"
-          />
+          <div className="min-w-0 flex-1 space-y-1">
+            <Label htmlFor={`${toolId}-save-title`} className="sr-only">
+              Save title
+            </Label>
+            <Input
+              id={`${toolId}-save-title`}
+              name="save-title"
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
+              placeholder="Save title"
+              autoComplete="off"
+            />
+          </div>
           <div className="flex gap-2">
             <Button type="button" size="sm" onClick={saveCurrent} disabled={isSaving || !canSave}>
               <Save className="mr-2 h-4 w-4" />
@@ -162,6 +178,21 @@ export function ToolWorkspacePanel({
             </Button>
           </div>
         </div>
+        {savedItems.length > 0 && (
+          <div className="space-y-1">
+            <Label htmlFor={`${toolId}-history-search`} className="sr-only">
+              Search saved workspace items
+            </Label>
+            <Input
+              id={`${toolId}-history-search`}
+              name="workspace-history-search"
+              value={historyQuery}
+              onChange={(event) => setHistoryQuery(event.target.value)}
+              placeholder="Search saved items"
+              autoComplete="off"
+            />
+          </div>
+        )}
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -172,9 +203,13 @@ export function ToolWorkspacePanel({
           <div className="rounded-md border border-dashed py-6 text-center text-sm text-muted-foreground">
             No saved items yet.
           </div>
+        ) : filteredItems.length === 0 ? (
+          <div className="rounded-md border border-dashed py-6 text-center text-sm text-muted-foreground">
+            No saved items match your search.
+          </div>
         ) : (
           <div className="space-y-2">
-            {savedItems.map((item) => (
+            {filteredItems.map((item) => (
               <div
                 key={item.id}
                 className="flex items-center justify-between gap-3 rounded-md border p-3"

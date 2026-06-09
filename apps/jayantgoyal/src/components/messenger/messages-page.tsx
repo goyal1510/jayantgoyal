@@ -13,7 +13,7 @@ import {
 } from "@repo/ui/dialog";
 import { Input } from "@repo/ui/input";
 import { Separator } from "@repo/ui/separator";
-import { LifeBuoy, MessageCircle, Plus, Search, UserRound } from "lucide-react";
+import { ArrowLeft, LifeBuoy, MessageCircle, Plus, Search, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { MessageInput } from "@/components/messenger/message-input";
 import type { PendingMessengerAttachment } from "@/components/messenger/message-input";
@@ -725,7 +725,12 @@ export function MessagesPage({
 
   return (
     <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden lg:grid-cols-[340px_minmax(0,1fr)]">
-      <aside className="flex min-h-0 flex-col border-r bg-muted/20">
+      <aside
+        className={cn(
+          "min-h-0 flex-col border-r bg-muted/20",
+          activeConversation ? "hidden lg:flex" : "flex"
+        )}
+      >
         <div className="flex h-16 items-center justify-between border-b px-4">
           <div>
             <h1 className="text-base font-semibold">Messenger</h1>
@@ -823,11 +828,27 @@ export function MessagesPage({
         </div>
       </aside>
 
-      <section className="flex min-h-0 flex-col bg-background">
+      <section
+        className={cn(
+          "min-h-0 flex-col bg-background",
+          activeConversation ? "flex" : "hidden lg:flex"
+        )}
+      >
         {activeConversation ? (
           <>
             <div className="flex h-16 items-center justify-between border-b px-4">
               <div className="flex min-w-0 items-center gap-3">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="-ml-2 shrink-0 lg:hidden"
+                  onClick={() => setActiveConversationId(null)}
+                  aria-label="Back to conversations"
+                  title="Back to conversations"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
                 <ConversationAvatar
                   conversation={activeConversation}
                   currentUserId={userId}
@@ -876,7 +897,7 @@ export function MessagesPage({
             </div>
 
             <Separator />
-            <div className="p-4">
+            <div className="border-t bg-background p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:p-4">
               {typingLabels.length > 0 && (
                 <div className="mb-2 text-xs text-muted-foreground">
                   {typingLabels.join(", ")} typing...

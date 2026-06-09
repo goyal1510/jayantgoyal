@@ -34,6 +34,7 @@ import {
   TimeControlPicker,
   useGameCountdown,
 } from "@/components/games/game-time-controls"
+import { GameSetupShell } from "@/components/games/game-setup-shell"
 
 export function TicTacToe() {
   const router = useRouter()
@@ -46,6 +47,7 @@ export function TicTacToe() {
     isLoading,
     showSetupSheet,
     setShowSetupSheet,
+    gameStarted,
     playerO,
     setPlayerO,
     playerX,
@@ -64,7 +66,7 @@ export function TicTacToe() {
   const [timerResetKey, setTimerResetKey] = useState(0)
   const [timeoutWinner, setTimeoutWinner] = useState<"X" | "O" | null>(null)
 
-  const isTimedGameActive = !showSetupSheet && !winner && !isDraw && !timeoutWinner
+  const isTimedGameActive = gameStarted && !showSetupSheet && !winner && !isDraw && !timeoutWinner
   const turnClock = useGameCountdown({
     durationSeconds: turnSeconds,
     active: isTimedGameActive,
@@ -120,6 +122,99 @@ export function TicTacToe() {
       return
     }
     router.push(`/games/tic-tac-toe/room/${roomCode}`)
+  }
+
+  if (!gameStarted) {
+    return (
+      <GameSetupShell
+        title="Tic Tac Toe"
+        description="Choose the mode, player names, and turn timer before the board accepts a move."
+        onStart={startTimedSession}
+        disabled={isLoading}
+      >
+        <div className="grid gap-2 sm:grid-cols-2">
+          <Button
+            variant={mode === "local_pvp" ? "secondary" : "outline"}
+            onClick={() => setMode("local_pvp")}
+            className="justify-start"
+          >
+            <User className="mr-2 h-4 w-4" />
+            Player vs Player
+          </Button>
+          <Button
+            variant={mode === "vs_computer" ? "secondary" : "outline"}
+            onClick={() => setMode("vs_computer")}
+            className="justify-start"
+          >
+            <UserCheck className="mr-2 h-4 w-4" />
+            Player vs Computer
+          </Button>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="tic-player-o">Player O</Label>
+            <Input
+              id="tic-player-o"
+              name="tic-player-o"
+              value={playerO}
+              onChange={(event) => setPlayerO(event.target.value)}
+              autoComplete="off"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="tic-player-x">Player X</Label>
+            <Input
+              id="tic-player-x"
+              name="tic-player-x"
+              value={playerX}
+              onChange={(event) => setPlayerX(event.target.value)}
+              disabled={mode === "vs_computer"}
+              autoComplete="off"
+            />
+          </div>
+        </div>
+
+        <TimeControlPicker
+          label="Turn limit"
+          presets={ROUND_TIME_PRESETS}
+          valueSeconds={turnSeconds}
+          onChange={(seconds) => {
+            setTurnSeconds(seconds)
+            setTimerResetKey((current) => current + 1)
+          }}
+        />
+
+        <div className="space-y-3 rounded-lg border bg-muted/20 p-3">
+          <div className="flex items-center gap-2 text-sm font-medium">
+            <Globe2 className="h-4 w-4" />
+            Online room
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="tic-online-name">Your display name</Label>
+            <Input
+              id="tic-online-name"
+              value={onlineName}
+              onChange={(event) => setOnlineName(event.target.value)}
+            />
+          </div>
+          <Button onClick={createOnlineRoom} disabled={creatingRoom} className="w-full">
+            {creatingRoom ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create online room"}
+          </Button>
+          <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+            <Input
+              value={joinCode}
+              onChange={(event) => setJoinCode(event.target.value.toUpperCase())}
+              placeholder="Room code"
+              maxLength={10}
+            />
+            <Button variant="outline" onClick={joinOnlineRoom}>
+              Join
+            </Button>
+          </div>
+        </div>
+      </GameSetupShell>
+    )
   }
 
   return (
@@ -187,7 +282,7 @@ export function TicTacToe() {
                   setTurnSeconds(seconds)
                   setTimerResetKey((current) => current + 1)
                 }}
-                disabled={!showSetupSheet && moveHistory.length > 0 && !winner && !isDraw}
+                disabled
               />
             </div>
 
@@ -204,7 +299,7 @@ export function TicTacToe() {
                     <button
                       key={index}
                       onClick={() => handleBoxClick(index)}
-                      disabled={!!value || !!winner || isDraw || isLoading || !!timeoutWinner}
+                      disabled={!gameStarted || !!value || !!winner || isDraw || isLoading || !!timeoutWinner}
                       className={cn(
                         "aspect-square cursor-pointer rounded-lg border bg-background text-3xl font-semibold transition hover:bg-muted",
                         "disabled:cursor-not-allowed disabled:opacity-70 flex items-center justify-center"

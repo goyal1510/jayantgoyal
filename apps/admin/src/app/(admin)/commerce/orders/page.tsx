@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { Badge } from "@repo/ui/badge";
+import { Button } from "@repo/ui/button";
 import { createSupabaseAdminClient } from "@/lib/supabase/server";
 import { formatDateTime, formatMoneyMinor, shortId } from "@/lib/commerce-format";
 import type {
@@ -88,7 +90,7 @@ export default async function CommerceOrdersPage() {
           orders.map((order, index) => (
             <div
               key={order.id}
-              className={`grid gap-4 px-4 py-4 xl:grid-cols-[minmax(0,1fr)_190px_150px_170px_160px] ${
+              className={`grid gap-4 px-4 py-4 xl:grid-cols-[minmax(0,1fr)_190px_150px_170px_160px_110px] ${
                 index !== orders.length - 1 ? "border-b" : ""
               }`}
             >
@@ -133,6 +135,12 @@ export default async function CommerceOrdersPage() {
               <div>
                 <p className="text-xs font-medium uppercase text-muted-foreground">Created</p>
                 <p className="mt-1 text-sm">{formatDateTime(order.created_at)}</p>
+              </div>
+
+              <div className="flex items-start xl:justify-end">
+                <Button asChild variant="outline" size="sm">
+                  <Link href={`/commerce/orders/${order.id}`}>Open</Link>
+                </Button>
               </div>
             </div>
           ))

@@ -19,8 +19,16 @@ export function HeroName({
   // Before hydration: plain text (server HTML, instant LCP)
   // After hydration: FlipText animation takes over
   if (!hydrated) {
-    return <span className={className}>{name}</span>
+    return (
+      <span aria-hidden="true" className={className}>
+        {name}
+      </span>
+    )
   }
 
-  return <FlipText className={className} duration={3}>{name}</FlipText>
+  return (
+    <FlipText ariaHidden className={className} duration={3}>
+      {name}
+    </FlipText>
+  )
 }

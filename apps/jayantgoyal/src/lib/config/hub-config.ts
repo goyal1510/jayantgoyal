@@ -23,6 +23,7 @@ import {
   MessageSquare,
   Cloud,
   ShoppingCart,
+  Store,
   Github,
   Type,
   Puzzle,
@@ -98,6 +99,11 @@ const CURRENCY_CALC_NAV: NavItem[] = [
 const ACCOUNT_NAV: NavItem[] = [
   { id: "billing", label: "Billing", icon: CreditCard, color: "text-sky-500 dark:text-sky-400", url: "/account/billing" },
   { id: "purchases", label: "Purchases", icon: ReceiptText, color: "text-emerald-500 dark:text-emerald-400", url: "/account/purchases" },
+]
+
+const COMMERCE_NAV: NavItem[] = [
+  { id: "store", label: "Store", icon: Store, color: "text-pink-500 dark:text-pink-400", url: "/store" },
+  { id: "pricing", label: "Pricing", icon: CreditCard, color: "text-sky-500 dark:text-sky-400", url: "/pricing" },
 ]
 
 
@@ -204,6 +210,14 @@ export const HUB_APPS: AppConfig[] = [
     color: "text-gray-700 dark:text-gray-300",
     isPublic: true,
     navItems: [],
+  },
+  {
+    id: "commerce",
+    name: "Store",
+    icon: ShoppingCart,
+    color: "text-pink-500 dark:text-pink-400",
+    isPublic: true,
+    navItems: COMMERCE_NAV,
   },
   {
     id: "ecommerce",

@@ -3,6 +3,7 @@
 import * as React from "react"
 import { Button } from "@repo/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card"
+import { Label } from "@repo/ui/label"
 import { Download, Layers3, Play } from "lucide-react"
 import { toast } from "sonner"
 
@@ -108,12 +109,19 @@ export function ToolBulkJsonPanel({ toolId, actionLabel }: ToolBulkJsonPanelProp
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        <textarea
-          value={rawItems}
-          onChange={(event) => setRawItems(event.target.value)}
-          placeholder='{"id":1}\n{"id":2}'
-          className="min-h-[140px] w-full rounded-md border border-input bg-transparent px-3 py-2 font-mono text-sm"
-        />
+        <div className="space-y-2">
+          <Label htmlFor={`${toolId}-bulk-json-input`}>
+            JSON documents
+          </Label>
+          <textarea
+            id={`${toolId}-bulk-json-input`}
+            name="bulk-json-input"
+            value={rawItems}
+            onChange={(event) => setRawItems(event.target.value)}
+            placeholder='{"id":1}\n{"id":2}'
+            className="min-h-[140px] w-full rounded-md border border-input bg-transparent px-3 py-2 font-mono text-sm"
+          />
+        </div>
         {results.length > 0 && (
           <div className="space-y-2">
             {results.map((result) => (

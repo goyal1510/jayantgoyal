@@ -33,6 +33,7 @@ import {
   TimeControlPicker,
   useGameCountdown,
 } from "@/components/games/game-time-controls"
+import { GameSetupShell } from "@/components/games/game-setup-shell"
 
 export function ConnectFour() {
   const router = useRouter()
@@ -46,6 +47,7 @@ export function ConnectFour() {
     isLoading,
     showSetupSheet,
     setShowSetupSheet,
+    gameStarted,
     playerR,
     setPlayerR,
     playerY,
@@ -68,6 +70,7 @@ export function ConnectFour() {
 
   const isTimedGameActive =
     !showSetupSheet &&
+    gameStarted &&
     !winner &&
     !isDraw &&
     !timeoutWinner &&
@@ -127,6 +130,105 @@ export function ConnectFour() {
       return
     }
     router.push(`/games/connect-four/room/${roomCode}`)
+  }
+
+  if (!gameStarted) {
+    return (
+      <GameSetupShell
+        title="Connect Four"
+        description="Choose players, mode, and the per-turn clock before the first disc can drop."
+        onStart={startTimedSession}
+        disabled={isLoading}
+      >
+        <div className="grid gap-2 sm:grid-cols-2">
+          <Button
+            variant={mode === "local_pvp" ? "secondary" : "outline"}
+            onClick={() => setMode("local_pvp")}
+            className="justify-start"
+          >
+            <User className="mr-2 h-4 w-4" />
+            Player vs Player
+          </Button>
+          <Button
+            variant={mode === "vs_computer" ? "secondary" : "outline"}
+            onClick={() => setMode("vs_computer")}
+            className="justify-start"
+          >
+            <UserCheck className="mr-2 h-4 w-4" />
+            Player vs Computer
+          </Button>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="connect-player-r">Red player</Label>
+            <Input
+              id="connect-player-r"
+              name="connect-player-r"
+              value={playerR}
+              onChange={(event) => setPlayerR(event.target.value)}
+              autoComplete="off"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="connect-player-y">Yellow player</Label>
+            <Input
+              id="connect-player-y"
+              name="connect-player-y"
+              value={playerY}
+              onChange={(event) => setPlayerY(event.target.value)}
+              disabled={mode === "vs_computer"}
+              autoComplete="off"
+            />
+          </div>
+        </div>
+
+        <TimeControlPicker
+          label="Turn limit"
+          presets={ROUND_TIME_PRESETS}
+          valueSeconds={turnSeconds}
+          onChange={(seconds) => {
+            setTurnSeconds(seconds)
+            setTimerResetKey((current) => current + 1)
+          }}
+        />
+
+        <div className="space-y-3 rounded-lg border bg-muted/20 p-3">
+          <div className="flex items-center gap-2 text-sm font-medium">
+            <Globe2 className="h-4 w-4" />
+            Online room
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="online-player-name">Your online display name</Label>
+            <Input
+              id="online-player-name"
+              value={onlineName}
+              onChange={(event) => setOnlineName(event.target.value)}
+            />
+          </div>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={createOnlineRoom}
+            disabled={isCreatingOnlineRoom}
+            className="w-full"
+          >
+            {isCreatingOnlineRoom ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create online room"}
+          </Button>
+          <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+            <Input
+              value={joinCode}
+              onChange={(event) => setJoinCode(event.target.value.toUpperCase())}
+              placeholder="Room code"
+              maxLength={10}
+            />
+            <Button type="button" variant="outline" onClick={joinOnlineRoom}>
+              Join
+            </Button>
+          </div>
+        </div>
+      </GameSetupShell>
+    )
   }
 
   return (
@@ -200,7 +302,7 @@ export function ConnectFour() {
                 setTurnSeconds(seconds)
                 setTimerResetKey((current) => current + 1)
               }}
-              disabled={!showSetupSheet && !winner && !isDraw}
+                disabled
             />
           </div>
 
@@ -218,6 +320,7 @@ export function ConnectFour() {
                         !!winner ||
                         !!isDraw ||
                         !!timeoutWinner ||
+                        !gameStarted ||
                         isLoading ||
                         isProcessingMove ||
                         (mode === "vs_computer" && currentPlayer === "Y")

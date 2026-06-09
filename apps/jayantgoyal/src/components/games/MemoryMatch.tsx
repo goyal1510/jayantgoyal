@@ -28,6 +28,7 @@ import { cn } from "@repo/ui/lib/utils"
 
 import { useMemoryMatch, GRID_SIZES } from "@/components/games/use-memory-match"
 import { createMemoryMatchState, type MemoryMatchDifficulty } from "@/lib/games/memory-match"
+import { GameSetupShell } from "@/components/games/game-setup-shell"
 
 export function MemoryMatch() {
   const router = useRouter()
@@ -99,6 +100,120 @@ export function MemoryMatch() {
 
     setJoiningOnlineRoom(true)
     router.push(`/games/memory-match/room/${normalized}`)
+  }
+
+  if (!gameStarted) {
+    return (
+      <GameSetupShell
+        title="Memory Match"
+        description="Pick the grid, names, and opponent type before cards are dealt."
+        onStart={() => startSession(mode)}
+        disabled={isLoading}
+      >
+        <div className="grid gap-2 sm:grid-cols-2">
+          <Button
+            variant={mode === "local_pvp" ? "secondary" : "outline"}
+            onClick={() => setMode("local_pvp")}
+            className="justify-start"
+          >
+            <User className="mr-2 h-4 w-4" />
+            Player vs Player
+          </Button>
+          <Button
+            variant={mode === "vs_computer" ? "secondary" : "outline"}
+            onClick={() => setMode("vs_computer")}
+            className="justify-start"
+          >
+            <UserCheck className="mr-2 h-4 w-4" />
+            Player vs Computer
+          </Button>
+        </div>
+
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Difficulty</Label>
+          <div className="grid gap-2">
+            {GRID_SIZES.map((size, index) => (
+              <Button
+                key={size.label}
+                variant={gridSize === index ? "secondary" : "outline"}
+                onClick={() => setGridSize(index)}
+                className="justify-start"
+              >
+                {size.label}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="memory-player-1">Player 1</Label>
+            <Input
+              id="memory-player-1"
+              name="memory-player-1"
+              value={player1Name}
+              onChange={(event) => setPlayer1Name(event.target.value)}
+              autoComplete="off"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="memory-player-2">Player 2</Label>
+            <Input
+              id="memory-player-2"
+              name="memory-player-2"
+              value={player2Name}
+              onChange={(event) => setPlayer2Name(event.target.value)}
+              disabled={mode === "vs_computer"}
+              autoComplete="off"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-3 rounded-lg border bg-muted/20 p-3">
+          <div className="flex items-center gap-2 text-sm font-medium">
+            <Wifi className="h-4 w-4" />
+            Online room
+          </div>
+          <div className="grid gap-2 sm:grid-cols-3">
+            {(["easy", "medium", "hard"] as const).map((difficulty) => (
+              <Button
+                key={difficulty}
+                type="button"
+                variant={onlineDifficulty === difficulty ? "secondary" : "outline"}
+                onClick={() => setOnlineDifficulty(difficulty)}
+                className="justify-start capitalize"
+              >
+                {difficulty}
+              </Button>
+            ))}
+          </div>
+          <Button
+            type="button"
+            onClick={() => void createOnlineRoom()}
+            disabled={creatingOnlineRoom}
+            className="w-full"
+          >
+            {creatingOnlineRoom ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create online room"}
+          </Button>
+          <div className="flex gap-2">
+            <Input
+              value={onlineRoomCode}
+              onChange={(event) => setOnlineRoomCode(event.target.value)}
+              placeholder="Room code"
+              className="uppercase"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={joinOnlineRoom}
+              disabled={joiningOnlineRoom}
+            >
+              {joiningOnlineRoom ? <Loader2 className="h-4 w-4 animate-spin" /> : "Join"}
+            </Button>
+          </div>
+        </div>
+      </GameSetupShell>
+    )
   }
 
   return (
@@ -195,12 +310,6 @@ export function MemoryMatch() {
                   </button>
                 ))}
               </div>
-            </div>
-          )}
-
-          {!gameStarted && (
-            <div className="text-center py-8 text-muted-foreground">
-              Click Setup to start a new game
             </div>
           )}
 

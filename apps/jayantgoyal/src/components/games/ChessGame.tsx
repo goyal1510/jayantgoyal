@@ -24,6 +24,7 @@ import {
   TURN_TIME_PRESETS,
   useGameCountdown,
 } from "@/components/games/game-time-controls"
+import { GameSetupShell } from "@/components/games/game-setup-shell"
 
 function ChessBoard({
   chess,
@@ -104,6 +105,7 @@ function ChessBoard({
 }
 
 type ChessMode = "local_pvp" | "vs_computer"
+type ChessDifficulty = "beginner" | "balanced" | "sharp"
 
 const PIECE_VALUES: Record<string, number> = {
   p: 100,
@@ -114,21 +116,45 @@ const PIECE_VALUES: Record<string, number> = {
   k: 0,
 }
 
-function chooseComputerMove(chess: Chess) {
+function scoreChessMove(chess: Chess, move: ReturnType<Chess["moves"]>[number]) {
+  const next = new Chess(chess.fen())
+  next.move(move)
+
+  let score = 0
+  if (next.isCheckmate()) score += 100000
+  if (next.inCheck()) score += 45
+  if (typeof move === "object" && "captured" in move && move.captured) {
+    score += (PIECE_VALUES[move.captured] ?? 0) + 20
+  }
+  if (typeof move === "object" && "promotion" in move && move.promotion) {
+    score += PIECE_VALUES[move.promotion] ?? 0
+  }
+  if (typeof move === "object" && "to" in move && ["d4", "e4", "d5", "e5"].includes(move.to)) {
+    score += 8
+  }
+  return score
+}
+
+function chooseComputerMove(chess: Chess, difficulty: ChessDifficulty) {
   const moves = chess.moves({ verbose: true })
   if (moves.length === 0) return null
+  if (difficulty === "beginner") {
+    return moves[Math.floor(Math.random() * moves.length)] ?? null
+  }
 
   const scoredMoves = moves.map((move) => {
     const next = new Chess(chess.fen())
     next.move(move)
 
-    let score = 0
-    if (next.isCheckmate()) score += 100000
-    if (next.inCheck()) score += 45
-    if (move.captured) score += (PIECE_VALUES[move.captured] ?? 0) + 20
-    if (move.promotion) score += PIECE_VALUES[move.promotion] ?? 0
-    if (["d4", "e4", "d5", "e5"].includes(move.to)) score += 8
-    score += Math.random() * 10
+    let score = scoreChessMove(chess, move)
+    if (difficulty === "sharp" && !next.isGameOver()) {
+      const bestReply = next
+        .moves({ verbose: true })
+        .map((reply) => scoreChessMove(next, reply))
+        .sort((a, b) => b - a)[0] ?? 0
+      score -= bestReply * 0.65
+    }
+    score += Math.random() * (difficulty === "sharp" ? 4 : 10)
 
     return { move, score }
   })
@@ -139,6 +165,7 @@ function chooseComputerMove(chess: Chess) {
 
 export function ChessGame() {
   const router = useRouter()
+  const [gameStarted, setGameStarted] = React.useState(false)
   const [chess, setChess] = React.useState(() => new Chess())
   const [selected, setSelected] = React.useState<ChessSquare | null>(null)
   const [lastSan, setLastSan] = React.useState<string | null>(null)
@@ -148,6 +175,9 @@ export function ChessGame() {
   } | null>(null)
   const [moveHistory, setMoveHistory] = React.useState<string[]>([])
   const [mode, setMode] = React.useState<ChessMode>("vs_computer")
+  const [difficulty, setDifficulty] = React.useState<ChessDifficulty>("balanced")
+  const [whiteName, setWhiteName] = React.useState("You")
+  const [blackName, setBlackName] = React.useState("Computer")
   const [computerThinking, setComputerThinking] = React.useState(false)
   const [clockSeconds, setClockSeconds] = React.useState(300)
   const [clockResetKey, setClockResetKey] = React.useState(0)
@@ -161,7 +191,7 @@ export function ChessGame() {
     return new Set(chess.moves({ square: selected, verbose: true }).map((move) => move.to))
   }, [chess, selected])
 
-  const reset = () => {
+  const resetBoardState = React.useCallback(() => {
     setChess(new Chess())
     setSelected(null)
     setLastSan(null)
@@ -170,6 +200,23 @@ export function ChessGame() {
     setComputerThinking(false)
     setTimeoutWinner(null)
     setClockResetKey((current) => current + 1)
+  }, [])
+
+  const reset = () => {
+    resetBoardState()
+    setGameStarted(true)
+  }
+
+  const openSetup = () => {
+    resetBoardState()
+    setGameStarted(false)
+  }
+
+  const startLocalGame = () => {
+    setWhiteName((current) => current.trim() || "White")
+    setBlackName((current) => mode === "vs_computer" ? "Computer" : current.trim() || "Black")
+    resetBoardState()
+    setGameStarted(true)
   }
 
   const applyMove = React.useCallback((
@@ -185,6 +232,7 @@ export function ChessGame() {
   }, [])
 
   const isComputerTurn =
+    gameStarted &&
     mode === "vs_computer" &&
     chess.turn() === "b" &&
     !getChessCompletion(chess, null) &&
@@ -193,13 +241,13 @@ export function ChessGame() {
   const completion = getChessCompletion(chess, null)
   const whiteClock = useGameCountdown({
     durationSeconds: clockSeconds,
-    active: chess.turn() === "w" && !completion && !timeoutWinner,
+    active: gameStarted && chess.turn() === "w" && !completion && !timeoutWinner,
     resetKey: clockResetKey,
     onExpire: () => setTimeoutWinner("b"),
   })
   const blackClock = useGameCountdown({
     durationSeconds: clockSeconds,
-    active: chess.turn() === "b" && !completion && !timeoutWinner,
+    active: gameStarted && chess.turn() === "b" && !completion && !timeoutWinner,
     resetKey: clockResetKey,
     onExpire: () => setTimeoutWinner("w"),
   })
@@ -210,7 +258,7 @@ export function ChessGame() {
     setComputerThinking(true)
     const timeoutId = window.setTimeout(() => {
       const next = new Chess(chess.fen())
-      const move = chooseComputerMove(next)
+      const move = chooseComputerMove(next, difficulty)
 
       if (move) {
         const result = next.move(move)
@@ -224,10 +272,10 @@ export function ChessGame() {
     }, 650)
 
     return () => window.clearTimeout(timeoutId)
-  }, [applyMove, chess, isComputerTurn])
+  }, [applyMove, chess, difficulty, isComputerTurn])
 
   const onSquareClick = (square: ChessSquare) => {
-    if (computerThinking || isComputerTurn || timeoutWinner) return
+    if (!gameStarted || computerThinking || isComputerTurn || timeoutWinner) return
 
     const piece = chess.get(square)
 
@@ -299,6 +347,117 @@ export function ChessGame() {
     router.push(`/games/chess/room/${roomCode}`)
   }
 
+  if (!gameStarted) {
+    return (
+      <GameSetupShell
+        title="Chess"
+        description="Choose match type, player names, computer strength, and the clock before either side starts losing time."
+        onStart={startLocalGame}
+      >
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Button
+            type="button"
+            variant={mode === "vs_computer" ? "secondary" : "outline"}
+            onClick={() => {
+              setMode("vs_computer")
+              setBlackName("Computer")
+            }}
+          >
+            <Bot className="mr-2 h-4 w-4" />
+            Vs Computer
+          </Button>
+          <Button
+            type="button"
+            variant={mode === "local_pvp" ? "secondary" : "outline"}
+            onClick={() => {
+              setMode("local_pvp")
+              setBlackName((current) => current === "Computer" ? "Black" : current)
+            }}
+          >
+            <Users className="mr-2 h-4 w-4" />
+            Local PvP
+          </Button>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="chess-white-name">White player</Label>
+            <Input
+              id="chess-white-name"
+              name="chess-white-name"
+              value={whiteName}
+              onChange={(event) => setWhiteName(event.target.value)}
+              autoComplete="off"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="chess-black-name">Black player</Label>
+            <Input
+              id="chess-black-name"
+              name="chess-black-name"
+              value={blackName}
+              onChange={(event) => setBlackName(event.target.value)}
+              disabled={mode === "vs_computer"}
+              autoComplete="off"
+            />
+          </div>
+        </div>
+
+        <TimeControlPicker
+          label="Game clock"
+          presets={TURN_TIME_PRESETS}
+          valueSeconds={clockSeconds}
+          onChange={(seconds) => {
+            setClockSeconds(seconds)
+            setClockResetKey((current) => current + 1)
+          }}
+        />
+
+        {mode === "vs_computer" && (
+          <div className="rounded-lg border bg-background/70 p-3">
+            <div className="mb-2 text-xs uppercase tracking-wide text-muted-foreground">
+              Computer strength
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {(["beginner", "balanced", "sharp"] as ChessDifficulty[]).map((level) => (
+                <Button
+                  key={level}
+                  type="button"
+                  variant={difficulty === level ? "secondary" : "outline"}
+                  size="sm"
+                  className="capitalize"
+                  onClick={() => setDifficulty(level)}
+                >
+                  {level}
+                </Button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="rounded-lg border bg-muted/20 p-3 space-y-3">
+          <div className="flex items-center gap-2 text-sm font-medium">
+            <Globe2 className="h-4 w-4" />
+            Online room
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="chess-online-name">Your display name</Label>
+            <Input id="chess-online-name" value={onlineName} onChange={(event) => setOnlineName(event.target.value)} />
+          </div>
+          <Button onClick={createOnlineRoom} disabled={creating} className="w-full">
+            {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create chess room"}
+          </Button>
+          <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+            <Input value={joinCode} onChange={(event) => setJoinCode(event.target.value.toUpperCase())} placeholder="Room code" maxLength={10} />
+            <Button variant="outline" onClick={joinOnlineRoom}>
+              Join
+            </Button>
+          </div>
+        </div>
+      </GameSetupShell>
+    )
+  }
+
   const status = timeoutWinner
     ? `${timeoutWinner === "w" ? "White" : "Black"} wins on time`
     : completion
@@ -322,6 +481,9 @@ export function ChessGame() {
           <Button variant="outline" size="sm" onClick={reset}>
             <RotateCcw className="mr-2 h-4 w-4" />
             Reset
+          </Button>
+          <Button variant="ghost" size="sm" onClick={openSetup}>
+            Setup
           </Button>
         </CardHeader>
         <CardContent className="flex justify-center pb-6">
@@ -358,17 +520,17 @@ export function ChessGame() {
             <div className="grid grid-cols-2 gap-2">
               <GameClockCard
                 label="White clock"
-                helper={mode === "vs_computer" ? "You" : "White"}
+                helper={whiteName}
                 remainingMs={whiteClock.remainingMs}
-                active={chess.turn() === "w" && !completion && !timeoutWinner}
+                active={gameStarted && chess.turn() === "w" && !completion && !timeoutWinner}
                 expired={timeoutWinner === "b"}
                 tone="amber"
               />
               <GameClockCard
                 label="Black clock"
-                helper={mode === "vs_computer" ? "Computer" : "Black"}
+                helper={blackName}
                 remainingMs={blackClock.remainingMs}
-                active={chess.turn() === "b" && !completion && !timeoutWinner}
+                active={gameStarted && chess.turn() === "b" && !completion && !timeoutWinner}
                 expired={timeoutWinner === "w"}
                 tone="blue"
               />
@@ -381,6 +543,7 @@ export function ChessGame() {
                 setClockSeconds(seconds)
                 reset()
               }}
+              disabled
             />
             <div className="grid grid-cols-2 gap-2">
               <Button
@@ -406,6 +569,30 @@ export function ChessGame() {
                 Local PvP
               </Button>
             </div>
+            {mode === "vs_computer" && (
+              <div className="rounded-lg border p-3">
+                <div className="mb-2 text-xs uppercase tracking-wide text-muted-foreground">
+                  Computer strength
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  {(["beginner", "balanced", "sharp"] as ChessDifficulty[]).map((level) => (
+                    <Button
+                      key={level}
+                      type="button"
+                      variant={difficulty === level ? "secondary" : "outline"}
+                      size="sm"
+                      className="capitalize"
+                      onClick={() => {
+                        setDifficulty(level)
+                        reset()
+                      }}
+                    >
+                      {level}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
             <div className="rounded-lg border p-3">
               <div className="mb-2 text-xs uppercase tracking-wide text-muted-foreground">
                 Move list

@@ -76,6 +76,7 @@ export function useTicTacToe() {
   const [isDraw, setIsDraw] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [showSetupSheet, setShowSetupSheet] = useState(true)
+  const [gameStarted, setGameStarted] = useState(false)
   const [playerO, setPlayerO] = useState("You (O)")
   const [playerX, setPlayerX] = useState("Computer (X)")
   const [moveHistory, setMoveHistory] = useState<Move[]>([])
@@ -102,19 +103,21 @@ export function useTicTacToe() {
     setWinner(null)
     setIsDraw(false)
     setMoveHistory([])
-    setShowSetupSheet(true);
+    setGameStarted(false)
+    setShowSetupSheet(true)
   }
 
   const startSession = (nextMode: Mode) => {
     setMode(nextMode)
     resetBoard()
+    setGameStarted(true)
     setShowSetupSheet(false)
     if (nextMode === "vs_computer") {
-      setPlayerO("You (O)")
+      setPlayerO((current) => current.trim() || "You (O)")
       setPlayerX("Computer (X)")
     } else {
-      setPlayerO(DEFAULT_NAMES.O)
-      setPlayerX(DEFAULT_NAMES.X)
+      setPlayerO((current) => current.trim() || DEFAULT_NAMES.O)
+      setPlayerX((current) => current.trim() || DEFAULT_NAMES.X)
     }
   }
 
@@ -157,7 +160,7 @@ export function useTicTacToe() {
   }
 
   const handleBoxClick = async (index: number) => {
-    if (board[index] || winner || isDraw || isLoading) return
+    if (!gameStarted || board[index] || winner || isDraw || isLoading) return
     const symbol = turnO ? "O" : "X"
     const name = symbol === "O" ? playerO : playerX
     const updatedBoard = [...board]
@@ -190,6 +193,7 @@ export function useTicTacToe() {
     isLoading,
     showSetupSheet,
     setShowSetupSheet,
+    gameStarted,
     playerO,
     setPlayerO,
     playerX,

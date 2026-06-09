@@ -247,6 +247,7 @@ export function MessageInput({
         value={content}
         onChange={handleContentChange}
         onKeyDown={handleKeyDown}
+        aria-label={placeholder ?? "Message"}
         placeholder={
           placeholder ??
           (messageType === "code"

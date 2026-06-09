@@ -34,6 +34,35 @@ function formatDate(value: string | null) {
   }).format(new Date(value))
 }
 
+function deliveryLabel(delivery: {
+  delivery_type: string
+  metadata: Record<string, unknown>
+}) {
+  const label = delivery.metadata?.label
+  if (typeof label === "string" && label.trim()) return label
+  if (delivery.delivery_type === "service") return "Service delivery"
+  if (delivery.delivery_type === "manual") return "Manual delivery"
+  if (delivery.delivery_type === "link") return "Open delivery"
+  return "Download"
+}
+
+function deliveryActionLabel(deliveryType: string) {
+  if (deliveryType === "service" || deliveryType === "link") return "Open"
+  return "Download"
+}
+
+function canOpenDelivery(delivery: {
+  status: string
+  external_url: string | null
+  storage_bucket: string | null
+  storage_path: string | null
+  expires_at: string | null
+}) {
+  if (delivery.status !== "available" && delivery.status !== "fulfilled") return false
+  if (delivery.expires_at && new Date(delivery.expires_at).getTime() <= Date.now()) return false
+  return !!delivery.external_url || (!!delivery.storage_bucket && !!delivery.storage_path)
+}
+
 export default async function AccountPurchasesPage() {
   let user
 
@@ -121,9 +150,9 @@ export default async function AccountPurchasesPage() {
                     <span>Status: {purchase.status}</span>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {purchase.deliveries
-                      .filter((delivery) => delivery.status !== "revoked")
-                      .map((delivery) => (
+                    {purchase.deliveries.map((delivery) => {
+                      const openable = canOpenDelivery(delivery)
+                      return openable ? (
                         <Button key={delivery.id} asChild variant="outline">
                           <Link
                             href={`/api/account/purchases/${purchase.id}/deliveries/${delivery.id}`}
@@ -131,10 +160,15 @@ export default async function AccountPurchasesPage() {
                             rel="noreferrer"
                           >
                             <Download className="size-4" />
-                            {delivery.delivery_type === "service" ? "Open delivery" : "Download"}
+                            {deliveryActionLabel(delivery.delivery_type)}
                           </Link>
                         </Button>
-                      ))}
+                      ) : (
+                        <Badge key={delivery.id} variant="outline" className="h-10 rounded-md px-3">
+                          {deliveryLabel(delivery)} · {delivery.status}
+                        </Badge>
+                      )
+                    })}
                     <PurchaseSupportButton
                       orderId={purchase.id}
                       productName={purchase.product?.name ?? "Paid product"}

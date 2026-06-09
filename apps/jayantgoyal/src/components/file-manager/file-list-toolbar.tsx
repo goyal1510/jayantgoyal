@@ -167,6 +167,12 @@ export function FileListToolbar({
         <div className="relative min-w-[220px] flex-1 sm:flex-none">
           <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
+            aria-label={
+              collectionMode === "files"
+                ? "Search this folder"
+                : `Search ${specialCollectionLabel?.toLowerCase()}`
+            }
+            name="file-search"
             value={searchQuery}
             onChange={(event) => onSearchQueryChange(event.target.value)}
             placeholder={

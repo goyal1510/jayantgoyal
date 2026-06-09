@@ -7,6 +7,7 @@ import {
   CheckCircle2,
   CreditCard,
   Crown,
+  LifeBuoy,
   PackageCheck,
   ReceiptText,
   ShieldCheck,
@@ -194,6 +195,27 @@ export default async function AccountBillingPage({
             </CardDescription>
           </CardHeader>
         </Card>
+      </section>
+
+      <section className="rounded-lg border bg-card p-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex gap-3">
+            <LifeBuoy className="mt-1 size-5 shrink-0 text-primary" />
+            <div>
+              <h2 className="font-semibold">Need help with a purchase?</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Open support from a purchase row so the conversation is linked to the exact order,
+                product, and delivery state.
+              </p>
+            </div>
+          </div>
+          <Button asChild variant="outline">
+            <Link href="/account/purchases">
+              Open purchase library
+              <ArrowRight className="size-4" />
+            </Link>
+          </Button>
+        </div>
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[1fr_420px]">
