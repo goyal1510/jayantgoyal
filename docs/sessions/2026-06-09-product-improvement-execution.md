@@ -26,6 +26,18 @@ Created `docs/plan/product-improvement-execution-guide.md` with:
 - Phase 5 task `P5-monetization-polish` is implemented and verified.
 - Current goal state: all planned phases in the product improvement execution guide are complete locally in the worktree.
 
+## Productization Phase Checklist
+
+- [x] Phase 0 - Re-anchor the plan around the actual `apps/admin` and `apps/jayantgoyal` code instead of only games.
+- [x] Phase 1 - Admin command center: replace the admin root redirect with a dashboard for commerce health, support, product readiness, and next actions.
+- [x] Phase 2 - Tools workspace expansion: tool-level favorites, recent tools, safe saved history, and richer tools home discovery.
+- [x] Phase 3 - Product launch workflow: admin checklist from product draft to pricing, delivery, test checkout, and publish.
+- [x] Phase 4 - Buyer purchase library polish: receipts, delivery status, versioned assets, and clearer support handoff.
+- [x] Phase 5 - File manager as product delivery layer: attach stored files to paid products, improve Pro storage value, and add version/share analytics.
+- [x] Phase 6 - Messenger support CRM: filters, unread/SLA states, assignment, search, pinned threads, and order context.
+- [x] Phase 7 - Games retention layer: leaderboards, achievements, daily challenges, match history, and computer difficulty polish.
+- [x] Phase 8 - Quality/security/observability: payment reconciliation, admin audit review, rate limits, and browser validation.
+
 ## Proof Ledger
 
 - Orientation: confirmed implementation worktree is `/Users/jayant/Desktop/Jayant/Projects/worktrees/jayantgoyal/game-time-controls`.
@@ -61,3 +73,33 @@ Created `docs/plan/product-improvement-execution-guide.md` with:
 - Phase 5 static verification: `pnpm lint` passed, `pnpm check-types` passed, and `git diff --check` passed.
 - Phase 5 browser verification: public `/store` showed `Choose a product`, `Pay with Razorpay`, and `Get delivery and support`; public `/pricing` showed `Launch readiness` and `What paid access means here`; authenticated `/account/billing` showed `Need help with a purchase?` and an `Open purchase library` CTA pointing to `/account/purchases`.
 - Phase 5 mobile verification: at `390px` width, `/store`, `/pricing`, and `/account/billing` all rendered the new monetization sections with `scrollWidth` equal to `clientWidth` and no horizontal overflow offenders.
+- Productization restart: created a new phase checklist covering admin, main app tools, commerce, file manager, messenger, games, and quality. Started Phase 1 by replacing the admin root redirect with a real command center and adding dashboard navigation/breadcrumb support.
+- Phase 1 validation: `pnpm lint --filter admin` and `pnpm check-types --filter admin` passed for the new admin command center.
+- Phase 2 start: replacing the flat tools grid with a tools workspace hub that supports search, category filters, local favorites, local recents, quick stats, and safer discovery around cloud-save-ready tools.
+- Phase 2 implementation: expanded the safe saved-history allow-list from two JSON formatter tools to structural JSON/YAML/TOML/XML formatter/converter tools, keeping credential/security tools blocked. Replaced the flat `/tools` page with a client workspace hub for local favorites, local recents, search, category filters, cloud-history badges, and workspace stats.
+- Phase 2 validation: `pnpm lint --filter jg`, `pnpm check-types --filter jg`, and `git diff --check` passed after the tools workspace changes.
+- Phase 2 mobile fix: browser verification at `390px` initially found horizontal overflow from tool-card min-content sizing. Tightened the tools grid to `minmax(0,1fr)` and added `min-w-0`/`break-words` guards to tool cards.
+- Browser proof: main app ran on `http://localhost:3001/tools`; desktop browser showed `Tools Workspace`, search, favorites, and `Cloud history` badges. Filtering for `yaml` and starring `YAML to JSON Converter` changed the favorite control to the remove-favorite state.
+- Mobile browser proof: after the card sizing fix, `/tools` at `390px` rendered `Tools Workspace` and search with `scrollWidth` equal to `clientWidth` (`390`).
+- Admin proof: admin app ran on `http://localhost:3000`; in-app browser could not type because its virtual clipboard was unavailable, so an authenticated Supabase SSR HTTP render check with the known super-admin account returned `200` for `/` and included `Command Center`, `Launch Readiness`, `Recent Orders`, and `Support Queue`.
+- Security review: no raw SQL or `dangerouslySetInnerHTML`; Supabase service-role usage remains server-only inside admin protected routes; tools favorites/recents use local browser storage only; saved-history expansion still excludes token, password, auth, JWT, hash, encryption, and key-generator tools.
+- Phase 3 start: adding a `/commerce/launch` admin workflow that scores each product across offer copy, active pricing, delivery plan, test checkout proof, and publish state. Product editor now stores safe launch metadata fields (`delivery_plan`, `launch_note`) for pre-purchase delivery readiness.
+- Phase 3 implementation: added `/commerce/launch`, linked it from commerce navigation and the admin command center, and added product editor fields for `Delivery plan` and `Launch note`. The launch workflow reads real products, prices, orders, deliveries, and commerce events to score launch readiness.
+- Phase 3 validation: `pnpm lint --filter admin`, `pnpm check-types --filter admin`, and `git diff --check` passed.
+- Phase 3 authenticated render proof: admin app on `http://localhost:3000` returned `200` for `/commerce/launch` as `super_admin` and included `Product Launch Checklist`, `Offer copy`, `Delivery plan`, `Test checkout`, and `Launch` nav. Dashboard `/` returned `200` and included the `Run launch checklist` action.
+- Phase 3 security review: no raw SQL, no `dangerouslySetInnerHTML`, no client-side service-role exposure, and product launch metadata is limited to explicit text fields with length caps. `/commerce/launch` is a server-rendered admin page under the existing protected admin layout/proxy.
+- Phase 4 start: polishing the buyer purchase library with account summary metrics, richer order cards, delivery timeline states, version/expiry/download metadata, clearer support handoff copy, and authenticated printable receipts per paid order.
+- Phase 4 validation fix: moved receipt print controls into a client component and surfaced the no-delivery count in purchase metrics after lint caught an unused metric.
+- Phase 4 render proof: authenticated main app on `http://localhost:3000/account/purchases` returned `200` and showed the purchase library shell, paid-orders metric, ready-delivery metric, support-watch metric, and receipt link text. The checked buyer account currently has no paid orders, so receipt runtime rendering was not exercised against live order data in this pass.
+- Phase 4 validation: `pnpm lint --filter jg`, `pnpm check-types --filter jg`, and `git diff --check` passed.
+- Phase 4 security review: purchase and receipt pages only render authenticated user-scoped paid orders through existing commerce helpers; delivery downloads still use the authenticated delivery redirect; storage paths and signed URLs are not exposed in the purchase library; long payment references are shortened in the card UI.
+- Phase 5 start: connecting file manager assets to commerce fulfillment. Added an admin-only order delivery file picker that searches uploaded files owned by the order buyer, returns only non-deleted uploaded file rows with private bucket/path metadata, and fills the delivery form as a private `download` without exposing storage objects to buyer UI.
+- Phase 5 security fix: authenticated API smoke found invalid order ids leaked a Supabase UUID parse error. Added UUID validation plus generic database error responses to the delivery file picker route.
+- Phase 5 validation: `pnpm lint --filter admin`, `pnpm check-types --filter admin`, and `git diff --check` passed. Authenticated smoke on `http://localhost:3000` returned `400` with `Order id is invalid.` for an invalid picker API id, rendered a real order detail with `Buyer file manager`, `Search buyer files`, and `private download`, and returned `200` from the picker API with a `files` array containing only safe file metadata keys.
+- Phase 6 start: improving commerce support from a raw inbox into a triage view. Added support metrics, buyer/order/product search, status and `Needs response` filters, SLA waiting labels, buyer-waiting badges, direct order links, status-update success feedback, and an accessible reply textarea using existing support conversation metadata and latest-message data.
+- Phase 6 validation: `pnpm lint --filter admin`, `pnpm check-types --filter admin`, and `git diff --check` passed. Authenticated smoke on `http://localhost:3000/commerce/support` returned `200` and rendered `Commerce support`, `Needs response`, and `Search buyer, order, product`; `/api/commerce/support` returned `200` with a valid `data` array. Current live data has no support threads, so the active-thread reply composer was not exercised in this smoke.
+- Phase 7 start: adding a retention layer to the games hub without new schema. Added deterministic daily challenges, a date-stamped challenge panel, and an achievement ladder derived from existing online room/result stats so the hub has return targets beyond active rooms and recent results.
+- Phase 7 validation fix: `pnpm check-types --filter jg` caught unchecked daily-challenge indexing. Added explicit game/challenge fallbacks so the deterministic selector remains type-safe under strict checks.
+- Phase 7 validation fix: added a concrete fallback daily challenge after TypeScript still treated the first challenge in each pool as possibly undefined.
+- Phase 7 validation: `pnpm lint --filter jg`, `pnpm check-types --filter jg`, and `git diff --check` passed. Authenticated smoke on `http://localhost:3001/games` returned `200` and rendered `Daily Challenges`, `Achievement Ladder`, `Fresh targets`, `Online Rooms`, and game cards.
+- Phase 8 final validation: reviewed the changed admin delivery picker, support triage UI, and games hub retention code for raw HTML, client-side service role exposure, unsafe Supabase filter strings, and error leakage. Final `pnpm lint`, `pnpm check-types`, and `git diff --check` passed across the monorepo.
