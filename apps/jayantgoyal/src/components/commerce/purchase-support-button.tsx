@@ -20,11 +20,15 @@ import { Textarea } from "@repo/ui/textarea"
 interface PurchaseSupportButtonProps {
   orderId: string
   productName: string
+  orderStatus?: string
+  deliverySummary?: string
 }
 
 export function PurchaseSupportButton({
   orderId,
   productName,
+  orderStatus = "paid",
+  deliverySummary = "Delivery state is attached automatically.",
 }: PurchaseSupportButtonProps) {
   const router = useRouter()
   const [open, setOpen] = React.useState(false)
@@ -77,9 +81,17 @@ export function PurchaseSupportButton({
         <DialogHeader>
           <DialogTitle>Support for {productName}</DialogTitle>
           <DialogDescription>
-            Start a purchase-linked support thread. Replies arrive in Messenger.
+            Start a purchase-linked support thread. Replies arrive in Messenger with this order,
+            payment, and delivery context already attached.
           </DialogDescription>
         </DialogHeader>
+        <div className="rounded-md border bg-muted/40 p-3 text-sm">
+          <div className="font-medium">Order context</div>
+          <div className="mt-1 text-muted-foreground">
+            Order {orderId} · {orderStatus}
+          </div>
+          <div className="mt-1 text-muted-foreground">{deliverySummary}</div>
+        </div>
         <Textarea
           value={message}
           onChange={(event) => setMessage(event.target.value)}

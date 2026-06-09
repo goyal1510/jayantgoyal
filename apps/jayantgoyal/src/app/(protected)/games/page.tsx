@@ -4,15 +4,18 @@ import type { ComponentType } from "react"
 import {
   ArrowRight,
   Brain,
+  CalendarDays,
   Clock3,
   Crown,
   Dice5,
+  Flame,
   Grid3X3,
   HandHeart,
   Layers,
   Play,
   Puzzle,
   Scissors,
+  Target,
   Trophy,
   Type,
   Users,
@@ -158,6 +161,86 @@ type GameStats = {
   abandoned: number
 }
 
+type DailyChallenge = {
+  gameSlug: GameSlug
+  title: string
+  objective: string
+  reward: string
+  href: string
+}
+
+const DAILY_CHALLENGE_POOL: Record<GameSlug, Omit<DailyChallenge, "gameSlug" | "href">[]> = {
+  "rock-paper-scissors": [
+    {
+      title: "Pattern Breaker",
+      objective: "Win a best-of-five match against Adaptive computer.",
+      reward: "RPS focus badge",
+    },
+  ],
+  "tic-tac-toe": [
+    {
+      title: "Center Control",
+      objective: "Win while taking the center square first.",
+      reward: "Grid tactician badge",
+    },
+  ],
+  "dare-x": [
+    {
+      title: "No Skip Round",
+      objective: "Complete five dares without marking one not done.",
+      reward: "Courage streak badge",
+    },
+  ],
+  "connect-four": [
+    {
+      title: "Vertical Stack",
+      objective: "Win a match with at least one vertical four threat.",
+      reward: "Stack builder badge",
+    },
+  ],
+  "memory-match": [
+    {
+      title: "Sharp Recall",
+      objective: "Finish medium difficulty with fewer than 22 flips.",
+      reward: "Memory sprint badge",
+    },
+  ],
+  wordle: [
+    {
+      title: "Four Guess Line",
+      objective: "Solve the daily word in four guesses or fewer.",
+      reward: "Word hunter badge",
+    },
+  ],
+  "typing-speed": [
+    {
+      title: "Clean Speed",
+      objective: "Finish one test above 50 WPM with 95% accuracy.",
+      reward: "Precision typing badge",
+    },
+  ],
+  chess: [
+    {
+      title: "No Blunder Opening",
+      objective: "Play ten legal moves against Balanced computer without losing material.",
+      reward: "Opening discipline badge",
+    },
+  ],
+  ludo: [
+    {
+      title: "Token Sprint",
+      objective: "Move every active token out of home before the first finish.",
+      reward: "Race starter badge",
+    },
+  ],
+}
+
+const FALLBACK_DAILY_CHALLENGE: Omit<DailyChallenge, "gameSlug" | "href"> = {
+  title: "Play one round",
+  objective: "Complete one game from the hub today.",
+  reward: "Daily check-in badge",
+}
+
 function formatRoomUpdatedAt(value: string) {
   return new Intl.DateTimeFormat("en-US", {
     month: "short",
@@ -165,6 +248,63 @@ function formatRoomUpdatedAt(value: string) {
     hour: "2-digit",
     minute: "2-digit",
   }).format(new Date(value))
+}
+
+function todayKey() {
+  return new Date().toISOString().slice(0, 10)
+}
+
+function challengeIndex(seed: string, length: number) {
+  const total = seed.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0)
+  return total % length
+}
+
+function getDailyChallenges(): DailyChallenge[] {
+  const slugs = Object.keys(GAME_META) as GameSlug[]
+  const key = todayKey()
+  const start = challengeIndex(key, slugs.length)
+
+  return [0, 1, 2].map((offset) => {
+    const gameSlug = slugs[(start + offset * 3) % slugs.length] ?? "rock-paper-scissors"
+    const pool = DAILY_CHALLENGE_POOL[gameSlug]
+    const challenge =
+      pool[challengeIndex(`${key}-${gameSlug}`, pool.length)] ?? FALLBACK_DAILY_CHALLENGE
+
+    return {
+      ...challenge,
+      gameSlug,
+      href: `/games/${gameSlug}`,
+    }
+  })
+}
+
+function getAchievements(stats: GameStats) {
+  return [
+    {
+      title: "First finish",
+      detail: "Complete any online match.",
+      unlocked: stats.completed >= 1,
+      progress: `${Math.min(stats.completed, 1)}/1`,
+    },
+    {
+      title: "Win column",
+      detail: "Win three completed online matches.",
+      unlocked: stats.wins >= 3,
+      progress: `${Math.min(stats.wins, 3)}/3`,
+    },
+    {
+      title: "Long session",
+      detail: "Finish ten online matches.",
+      unlocked: stats.completed >= 10,
+      progress: `${Math.min(stats.completed, 10)}/10`,
+    },
+    {
+      title: "No abandon run",
+      detail: "Keep five completed matches with zero abandoned rooms.",
+      unlocked: stats.completed >= 5 && stats.abandoned === 0,
+      progress: stats.completed >= 5 ? `${stats.abandoned} abandoned` : `${stats.completed}/5`,
+    },
+  ]
 }
 
 async function getActiveGameRooms(): Promise<ActiveGameRoom[]> {
@@ -379,6 +519,8 @@ export default async function GamesPage() {
   ])
   const { history, stats } = historyAndStats
   const isPro = workspaceAccess?.isPro === true
+  const dailyChallenges = getDailyChallenges()
+  const achievements = getAchievements(stats)
   const cards = Object.entries(GAME_META).map(([slug, meta]) => {
     const theme = CARD_THEMES[slug as keyof typeof GAME_META]
     const modesLabel =
@@ -416,6 +558,70 @@ export default async function GamesPage() {
             <div className="mt-2 text-2xl font-semibold">{value}</div>
           </div>
         ))}
+      </section>
+
+      <section className="grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.8fr)]">
+        <div className="rounded-lg border bg-background p-4">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <CalendarDays className="size-4 text-muted-foreground" />
+                <h2 className="text-base font-semibold">Daily Challenges</h2>
+              </div>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Fresh targets for {todayKey()}.
+              </p>
+            </div>
+            <Badge variant="secondary">{dailyChallenges.length} today</Badge>
+          </div>
+          <div className="mt-4 grid gap-3 lg:grid-cols-3">
+            {dailyChallenges.map((challenge) => {
+              const Icon = CARD_THEMES[challenge.gameSlug].icon
+              return (
+                <Link
+                  key={`${challenge.gameSlug}-${challenge.title}`}
+                  href={challenge.href}
+                  className="group rounded-lg border p-3 transition hover:border-primary/50 hover:bg-muted/30"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium">{challenge.title}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {GAME_META[challenge.gameSlug].name}
+                      </p>
+                    </div>
+                    <Icon className="size-5 shrink-0 text-muted-foreground transition group-hover:text-primary" />
+                  </div>
+                  <p className="mt-3 text-sm leading-6">{challenge.objective}</p>
+                  <div className="mt-3 flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                    <Flame className="size-3.5" />
+                    {challenge.reward}
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
+        </div>
+
+        <div className="rounded-lg border bg-background p-4">
+          <div className="flex items-center gap-2">
+            <Target className="size-4 text-muted-foreground" />
+            <h2 className="text-base font-semibold">Achievement Ladder</h2>
+          </div>
+          <div className="mt-4 space-y-3">
+            {achievements.map((achievement) => (
+              <div key={achievement.title} className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium">{achievement.title}</p>
+                  <p className="text-xs text-muted-foreground">{achievement.detail}</p>
+                </div>
+                <Badge variant={achievement.unlocked ? "default" : "outline"}>
+                  {achievement.unlocked ? "Unlocked" : achievement.progress}
+                </Badge>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       <section className="rounded-lg border bg-background p-4">

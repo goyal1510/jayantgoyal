@@ -4,6 +4,16 @@ export const TOOL_BULK_MAX_ITEM_BYTES = 64 * 1024
 export const SAFE_SAVED_TOOL_ID_LIST = [
   "json-minify",
   "json-prettify",
+  "json-to-toml",
+  "json-to-xml",
+  "json-to-yaml",
+  "toml-to-json",
+  "toml-to-yaml",
+  "xml-formatter",
+  "xml-to-json",
+  "yaml-prettify",
+  "yaml-to-json",
+  "yaml-to-toml",
 ] as const
 
 export const SAFE_SAVED_TOOL_IDS = new Set<string>(SAFE_SAVED_TOOL_ID_LIST)
