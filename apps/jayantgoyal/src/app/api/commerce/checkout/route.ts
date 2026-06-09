@@ -1,4 +1,4 @@
-import { NextResponse, type NextRequest } from "next/server"
+import { NextResponse, type NextRequest } from "next/server";
 
 import {
   commerceErrorResponse,
@@ -6,7 +6,7 @@ import {
   getAuthenticatedCommerceUser,
   getCommerceSiteUrl,
   normalizeCommercePath,
-} from "@/lib/commerce/api.server"
+} from "@/lib/commerce/api.server";
 import {
   createPendingCommerceOrder,
   getActiveCommercePriceForCheckout,
@@ -14,35 +14,44 @@ import {
   updateCommerceOrderCheckoutSession,
   updateCommerceOrderProviderOrder,
   upsertCommerceCustomer,
-} from "@/lib/commerce/database.server"
-import { trackCommerceEvent } from "@/lib/commerce/events.server"
-import { createRazorpayOrder, getRazorpayKeyId } from "@/lib/commerce/razorpay.server"
-import { CommerceError } from "@/lib/commerce/types"
-import { getStripeClient } from "@/lib/commerce/stripe.server"
+} from "@/lib/commerce/database.server";
+import { trackCommerceEvent } from "@/lib/commerce/events.server";
+import {
+  createRazorpayOrder,
+  getRazorpayKeyId,
+} from "@/lib/commerce/razorpay.server";
+import { CommerceError } from "@/lib/commerce/types";
+import { getStripeClient } from "@/lib/commerce/stripe.server";
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await getAuthenticatedCommerceUser()
+    const user = await getAuthenticatedCommerceUser();
     const body = (await request.json()) as {
-      priceId?: unknown
-      successPath?: unknown
-      cancelPath?: unknown
-    }
+      priceId?: unknown;
+      successPath?: unknown;
+      cancelPath?: unknown;
+    };
 
     if (typeof body.priceId !== "string" || body.priceId.length === 0) {
-      throw new CommerceError("invalid_checkout_price", "A valid priceId is required.", 400)
+      throw new CommerceError(
+        "invalid_checkout_price",
+        "A valid priceId is required.",
+        400,
+      );
     }
 
-    const { price, product } = await getActiveCommercePriceForCheckout(body.priceId)
-    const paymentProvider = getCommercePaymentProvider()
+    const { price, product } = await getActiveCommercePriceForCheckout(
+      body.priceId,
+    );
+    const paymentProvider = getCommercePaymentProvider();
 
     if (paymentProvider === "razorpay") {
       if (price.price_type !== "one_time") {
         throw new CommerceError(
           "razorpay_recurring_not_ready",
           "Razorpay subscriptions are not configured for this product yet.",
-          409
-        )
+          409,
+        );
       }
 
       const order = await createPendingCommerceOrder({
@@ -54,20 +63,20 @@ export async function POST(request: NextRequest) {
         amountSubtotal: price.unit_amount,
         amountTotal: price.unit_amount,
         paymentProvider: "razorpay",
-      })
+      });
       const razorpayOrder = await createRazorpayOrder({
         orderId: order.id,
         userId: user.id,
         productName: product.name,
         amount: price.unit_amount,
         currency: price.currency,
-      })
+      });
 
       await updateCommerceOrderProviderOrder({
         orderId: order.id,
         paymentProvider: "razorpay",
         providerOrderId: razorpayOrder.id,
-      })
+      });
       trackCommerceEvent({
         eventType: "checkout_started",
         userId: user.id,
@@ -81,7 +90,7 @@ export async function POST(request: NextRequest) {
           amountTotal: price.unit_amount,
           priceType: price.price_type,
         },
-      })
+      });
 
       return NextResponse.json({
         provider: "razorpay",
@@ -98,19 +107,19 @@ export async function POST(request: NextRequest) {
         prefill: {
           email: user.email ?? undefined,
         },
-      })
+      });
     }
 
     if (!price.stripe_price_id) {
       throw new CommerceError(
         "missing_stripe_price",
         "This product is not connected to a Stripe price yet.",
-        409
-      )
+        409,
+      );
     }
 
-    const stripe = getStripeClient()
-    const existingCustomer = await getCommerceCustomerByUserId(user.id)
+    const stripe = getStripeClient();
+    const existingCustomer = await getCommerceCustomerByUserId(user.id);
     const stripeCustomerId =
       existingCustomer?.stripe_customer_id ??
       (
@@ -120,12 +129,12 @@ export async function POST(request: NextRequest) {
             app_user_id: user.id,
           },
         })
-      ).id
+      ).id;
     const customer = await upsertCommerceCustomer({
       userId: user.id,
       stripeCustomerId,
       email: user.email ?? null,
-    })
+    });
     const order = await createPendingCommerceOrder({
       userId: user.id,
       customerId: customer.id,
@@ -134,16 +143,20 @@ export async function POST(request: NextRequest) {
       currency: price.currency,
       amountSubtotal: price.unit_amount,
       amountTotal: price.unit_amount,
-    })
-    const siteUrl = getCommerceSiteUrl()
-    const successPath = normalizeCommercePath(
+    });
+    const siteUrl = getCommerceSiteUrl();
+    const requestedSuccessPath = normalizeCommercePath(
       body.successPath,
-      "/account/billing?checkout=success"
-    )
-    const cancelPath = normalizeCommercePath(body.cancelPath, "/pricing?checkout=cancel")
-    const successUrl = new URL(successPath, siteUrl)
-    successUrl.searchParams.set("session_id", "{CHECKOUT_SESSION_ID}")
-    const cancelUrl = new URL(cancelPath, siteUrl)
+      `/account/purchases/${order.id}?checkout=success`,
+    );
+    const successPath = requestedSuccessPath.replaceAll(":orderId", order.id);
+    const cancelPath = normalizeCommercePath(
+      body.cancelPath,
+      "/pricing?checkout=cancel",
+    );
+    const successUrl = new URL(successPath, siteUrl);
+    successUrl.searchParams.set("session_id", "{CHECKOUT_SESSION_ID}");
+    const cancelUrl = new URL(cancelPath, siteUrl);
     const session = await stripe.checkout.sessions.create({
       mode: price.price_type === "recurring" ? "subscription" : "payment",
       customer: stripeCustomerId,
@@ -168,20 +181,20 @@ export async function POST(request: NextRequest) {
               },
             }
           : undefined,
-    })
+    });
 
     if (!session.url) {
       throw new CommerceError(
         "checkout_session_missing_url",
         "Stripe did not return a checkout URL.",
-        502
-      )
+        502,
+      );
     }
 
     await updateCommerceOrderCheckoutSession({
       orderId: order.id,
       stripeCheckoutSessionId: session.id,
-    })
+    });
     trackCommerceEvent({
       eventType: "checkout_started",
       userId: user.id,
@@ -195,10 +208,10 @@ export async function POST(request: NextRequest) {
         amountTotal: price.unit_amount,
         priceType: price.price_type,
       },
-    })
+    });
 
-    return NextResponse.json({ url: session.url, orderId: order.id })
+    return NextResponse.json({ url: session.url, orderId: order.id });
   } catch (error) {
-    return commerceErrorResponse(error)
+    return commerceErrorResponse(error);
   }
 }
