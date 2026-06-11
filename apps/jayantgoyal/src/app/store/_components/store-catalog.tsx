@@ -253,6 +253,15 @@ function statusOptions(rows: CatalogRow[]): FacetedOption[] {
   ].filter((option) => option.count > 0);
 }
 
+function isCenteredColumn(columnId: string) {
+  return (
+    columnId === "productType" ||
+    columnId === "priceAmount" ||
+    columnId === "status" ||
+    columnId === "actions"
+  );
+}
+
 export function StoreCatalog({
   products,
 }: {
@@ -450,7 +459,10 @@ export function StoreCatalog({
       <div className="overflow-hidden rounded-lg border bg-background shadow-sm">
         <div className="hidden grid-cols-[minmax(0,1fr)_140px_140px_150px_128px] items-center gap-3 border-b bg-muted/35 px-4 py-2 lg:grid">
           {table.getHeaderGroups()[0]?.headers.map((header) => (
-            <div key={header.id}>
+            <div
+              key={header.id}
+              className={cn(isCenteredColumn(header.column.id) && "flex justify-center")}
+            >
               {header.isPlaceholder
                 ? null
                 : flexRender(header.column.columnDef.header, header.getContext())}
@@ -469,11 +481,7 @@ export function StoreCatalog({
                     key={cell.id}
                     className={cn(
                       cell.column.id !== "name" && "text-sm",
-                      (cell.column.id === "productType" ||
-                        cell.column.id === "priceAmount" ||
-                        cell.column.id === "status" ||
-                        cell.column.id === "actions") &&
-                        "lg:flex lg:justify-center",
+                      isCenteredColumn(cell.column.id) && "lg:flex lg:justify-center",
                     )}
                   >
                     <div className="mb-1 text-xs font-medium text-muted-foreground lg:hidden">

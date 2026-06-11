@@ -43,3 +43,4 @@
 - Replaced body-cell text alignment with flex centering for Type, Price, Status, and Actions so badges and icon controls align to their column headers.
 - Combined the details and cart actions into a single pill-shaped control with an internal divider.
 - Matched header and row grid gaps so Status and other fixed columns share the same visual center.
+- Added shared centered-column handling for both header and body cells, matching the RCM table pattern of applying alignment at the column wrapper level.
