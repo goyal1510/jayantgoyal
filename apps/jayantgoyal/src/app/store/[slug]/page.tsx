@@ -52,7 +52,7 @@ export async function generateMetadata({
 
   if (!product) {
     return {
-      title: "Product not found | Jayant Tools",
+      title: "Product not found | Store",
     };
   }
 
@@ -60,10 +60,10 @@ export async function generateMetadata({
   const description = getPublicProductDescription(product);
 
   return {
-    title: `${name} | Jayant Tools Store`,
+    title: `${name} | Store`,
     description,
     openGraph: {
-      title: `${name} | Jayant Tools Store`,
+      title: `${name} | Store | Jayant`,
       description,
       images: ["/assets/ProjectImages/Dark/tools.png"],
     },

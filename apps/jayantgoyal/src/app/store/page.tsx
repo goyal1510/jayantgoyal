@@ -22,10 +22,10 @@ import { StoreCatalog } from "./_components/store-catalog";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Store | Jayant Tools",
-  description: "Buy Jayant Tools products and workspace access.",
+  title: "Store",
+  description: "Buy Jayant products and workspace access.",
   openGraph: {
-    title: "Store | Jayant Tools",
+    title: "Store | Jayant",
     description: "Products, plans, checkout, and purchases in one place.",
     images: ["/assets/ProjectImages/Dark/tools.png"],
   },

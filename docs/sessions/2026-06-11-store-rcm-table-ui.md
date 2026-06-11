@@ -30,3 +30,6 @@
 - Removed the raw product name from store breadcrumbs and rebuilt product detail as a smaller account-access page without the oversized media hero.
 - Aligned sidebar and `/pricing` redirect anchors to the cleaned `#plans` section.
 - Final browser pass confirmed `/store`, `/store/jayant-tools-starter-pass`, filter overlay behavior, and `/pricing -> /store#plans`.
+- Fixed the store document title by letting the root title template produce `Store | Jayant` instead of nesting `Jayant Tools` into the page title.
+- Matched the store catalog toolbar sizing to the RCM table toolbar reference: 36px search and filter controls, shrink-stable filter buttons, and no dynamic count badge in the filter trigger so active filters do not shift the row.
+- Browser validation confirmed `/store` title is `Store | Jayant`, product detail title is `Tools Access | Store | Jayant`, and the active Type filter remains 92px wide by 36px tall while the search input stays 36px tall.

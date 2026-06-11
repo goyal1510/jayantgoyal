@@ -139,18 +139,21 @@ function FacetedFilter<TData>({
   options: FacetedOption[];
 }) {
   const values = selectedValues(column);
+  const hasSelection = values.length > 0;
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 border-dashed px-2">
-          <PlusCircle className="mr-1.5 size-3.5" />
+        <Button
+          variant="outline"
+          size="sm"
+          className={cn(
+            "h-9 min-w-[92px] shrink-0 justify-start border-dashed px-3",
+            hasSelection && "border-foreground/30 bg-muted/60 text-foreground",
+          )}
+        >
+          <PlusCircle className="mr-2 size-4" />
           {title}
-          {values.length > 0 ? (
-            <Badge variant="secondary" className="ml-1.5 rounded-sm px-1">
-              {values.length}
-            </Badge>
-          ) : null}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-48">
@@ -387,14 +390,14 @@ export function StoreCatalog({
             <Button
               variant="ghost"
               size="sm"
-              className="h-8"
+              className="h-9 shrink-0 px-3"
               disabled={!hasFilters}
               onClick={() => {
                 setGlobalFilter("");
                 setColumnFilters([]);
               }}
             >
-              <XCircle className="mr-1.5 size-3.5" />
+              <XCircle className="mr-2 size-4" />
               Reset
             </Button>
           </div>
