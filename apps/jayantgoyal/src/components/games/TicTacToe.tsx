@@ -28,13 +28,6 @@ import { cn } from "@repo/ui/lib/utils"
 
 import { useTicTacToe } from "@/components/games/use-tic-tac-toe"
 import { EMPTY_TIC_TAC_TOE_STATE } from "@/lib/games/tic-tac-toe"
-import {
-  GameClockCard,
-  ROUND_TIME_PRESETS,
-  TimeControlPicker,
-  useGameCountdown,
-} from "@/components/games/game-time-controls"
-import { GameSetupShell } from "@/components/games/game-setup-shell"
 
 export function TicTacToe() {
   const router = useRouter()
@@ -47,14 +40,12 @@ export function TicTacToe() {
     isLoading,
     showSetupSheet,
     setShowSetupSheet,
-    gameStarted,
     playerO,
     setPlayerO,
     playerX,
     setPlayerX,
     moveHistory,
     playerLabels,
-    currentSymbol,
     resetBoard,
     startSession,
     handleBoxClick,
@@ -62,29 +53,6 @@ export function TicTacToe() {
   const [onlineName, setOnlineName] = useState("Player X")
   const [joinCode, setJoinCode] = useState("")
   const [creatingRoom, setCreatingRoom] = useState(false)
-  const [turnSeconds, setTurnSeconds] = useState(10)
-  const [timerResetKey, setTimerResetKey] = useState(0)
-  const [timeoutWinner, setTimeoutWinner] = useState<"X" | "O" | null>(null)
-
-  const isTimedGameActive = gameStarted && !showSetupSheet && !winner && !isDraw && !timeoutWinner
-  const turnClock = useGameCountdown({
-    durationSeconds: turnSeconds,
-    active: isTimedGameActive,
-    resetKey: `${timerResetKey}-${moveHistory.length}-${currentSymbol}`,
-    onExpire: () => setTimeoutWinner(currentSymbol === "O" ? "X" : "O"),
-  })
-
-  const resetTimedBoard = () => {
-    setTimeoutWinner(null)
-    setTimerResetKey((current) => current + 1)
-    resetBoard()
-  }
-
-  const startTimedSession = () => {
-    setTimeoutWinner(null)
-    setTimerResetKey((current) => current + 1)
-    startSession(mode)
-  }
 
   const createOnlineRoom = async () => {
     setCreatingRoom(true)
@@ -124,99 +92,6 @@ export function TicTacToe() {
     router.push(`/games/tic-tac-toe/room/${roomCode}`)
   }
 
-  if (!gameStarted) {
-    return (
-      <GameSetupShell
-        title="Tic Tac Toe"
-        description="Choose the mode, player names, and turn timer before the board accepts a move."
-        onStart={startTimedSession}
-        disabled={isLoading}
-      >
-        <div className="grid gap-2 sm:grid-cols-2">
-          <Button
-            variant={mode === "local_pvp" ? "secondary" : "outline"}
-            onClick={() => setMode("local_pvp")}
-            className="justify-start"
-          >
-            <User className="mr-2 h-4 w-4" />
-            Player vs Player
-          </Button>
-          <Button
-            variant={mode === "vs_computer" ? "secondary" : "outline"}
-            onClick={() => setMode("vs_computer")}
-            className="justify-start"
-          >
-            <UserCheck className="mr-2 h-4 w-4" />
-            Player vs Computer
-          </Button>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="tic-player-o">Player O</Label>
-            <Input
-              id="tic-player-o"
-              name="tic-player-o"
-              value={playerO}
-              onChange={(event) => setPlayerO(event.target.value)}
-              autoComplete="off"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="tic-player-x">Player X</Label>
-            <Input
-              id="tic-player-x"
-              name="tic-player-x"
-              value={playerX}
-              onChange={(event) => setPlayerX(event.target.value)}
-              disabled={mode === "vs_computer"}
-              autoComplete="off"
-            />
-          </div>
-        </div>
-
-        <TimeControlPicker
-          label="Turn limit"
-          presets={ROUND_TIME_PRESETS}
-          valueSeconds={turnSeconds}
-          onChange={(seconds) => {
-            setTurnSeconds(seconds)
-            setTimerResetKey((current) => current + 1)
-          }}
-        />
-
-        <div className="space-y-3 rounded-lg border bg-muted/20 p-3">
-          <div className="flex items-center gap-2 text-sm font-medium">
-            <Globe2 className="h-4 w-4" />
-            Online room
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="tic-online-name">Your display name</Label>
-            <Input
-              id="tic-online-name"
-              value={onlineName}
-              onChange={(event) => setOnlineName(event.target.value)}
-            />
-          </div>
-          <Button onClick={createOnlineRoom} disabled={creatingRoom} className="w-full">
-            {creatingRoom ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create online room"}
-          </Button>
-          <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
-            <Input
-              value={joinCode}
-              onChange={(event) => setJoinCode(event.target.value.toUpperCase())}
-              placeholder="Room code"
-              maxLength={10}
-            />
-            <Button variant="outline" onClick={joinOnlineRoom}>
-              Join
-            </Button>
-          </div>
-        </div>
-      </GameSetupShell>
-    )
-  }
-
   return (
     <>
       <Card className="bg-card">
@@ -234,14 +109,7 @@ export function TicTacToe() {
               <Settings className="mr-2 h-4 w-4" />
               Setup
             </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={resetTimedBoard}
-              disabled={isLoading}
-              aria-label="Reset board"
-              title="Reset board"
-            >
+            <Button variant="ghost" size="icon" onClick={resetBoard} disabled={isLoading}>
               <RefreshCcw className="h-4 w-4" />
             </Button>
           </div>
@@ -253,8 +121,6 @@ export function TicTacToe() {
                 <div className="text-sm font-semibold">
                   {winner
                     ? `Winner: ${winner === "O" ? playerO : playerX}`
-                    : timeoutWinner
-                      ? `Winner on time: ${timeoutWinner === "O" ? playerO : playerX}`
                     : isDraw
                       ? "Game Draw"
                       : `Turn: ${playerLabels.current}`}
@@ -265,52 +131,21 @@ export function TicTacToe() {
               </div>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-[220px_1fr]">
-              <GameClockCard
-                label={`${playerLabels.current} clock`}
-                helper={`Current symbol: ${currentSymbol}`}
-                remainingMs={turnClock.remainingMs}
-                active={isTimedGameActive}
-                expired={!!timeoutWinner}
-                tone={currentSymbol === "O" ? "emerald" : "blue"}
-              />
-              <TimeControlPicker
-                label="Turn limit"
-                presets={ROUND_TIME_PRESETS}
-                valueSeconds={turnSeconds}
-                onChange={(seconds) => {
-                  setTurnSeconds(seconds)
-                  setTimerResetKey((current) => current + 1)
-                }}
-                disabled
-              />
-            </div>
-
             <div className="flex justify-center">
               <div className="grid grid-cols-3 gap-2 max-w-xs sm:max-w-md w-full">
-                {board.map((value, index) => {
-                  const row = Math.floor(index / 3) + 1
-                  const column = (index % 3) + 1
-                  const label = value
-                    ? `Cell row ${row}, column ${column}: ${value}`
-                    : `Empty cell row ${row}, column ${column}`
-
-                  return (
-                    <button
-                      key={index}
-                      onClick={() => handleBoxClick(index)}
-                      disabled={!gameStarted || !!value || !!winner || isDraw || isLoading || !!timeoutWinner}
-                      className={cn(
-                        "aspect-square cursor-pointer rounded-lg border bg-background text-3xl font-semibold transition hover:bg-muted",
-                        "disabled:cursor-not-allowed disabled:opacity-70 flex items-center justify-center"
-                      )}
-                      aria-label={label}
-                      title={label}
-                    >
-                      {value}
-                    </button>
-                  )
-                })}
+              {board.map((value, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleBoxClick(index)}
+                  disabled={!!value || !!winner || isDraw || isLoading}
+                  className={cn(
+                    "aspect-square cursor-pointer rounded-lg border bg-background text-3xl font-semibold transition hover:bg-muted",
+                    "disabled:cursor-not-allowed disabled:opacity-70 flex items-center justify-center"
+                  )}
+                >
+                  {value}
+                </button>
+              ))}
               </div>
             </div>
           </div>
@@ -406,7 +241,7 @@ export function TicTacToe() {
 
             <div className="flex flex-col gap-2">
               <Button
-                onClick={startTimedSession}
+                onClick={() => startSession(mode)}
                 disabled={isLoading}
                 className="w-full"
               >
@@ -415,7 +250,7 @@ export function TicTacToe() {
               <Button
                 variant="outline"
                 onClick={() => {
-                  resetTimedBoard()
+                  resetBoard()
                   setShowSetupSheet(false)
                 }}
               >

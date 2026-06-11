@@ -68,10 +68,6 @@ export default async function proxy(request: NextRequest) {
   // --- Unauthenticated users ---
   if (!isAuthed) {
     if (!isPublic) {
-      if (pathname.startsWith("/api/")) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-      }
-
       const loginUrl = new URL("/welcome", request.url);
       loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
@@ -137,10 +133,6 @@ export default async function proxy(request: NextRequest) {
       .single();
 
     if (!profile || !["admin", "super_admin"].includes(profile.role)) {
-      if (pathname.startsWith("/api/")) {
-        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-      }
-
       return NextResponse.redirect(new URL("/unauthorized", request.url));
     }
 

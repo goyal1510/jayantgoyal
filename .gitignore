@@ -33,7 +33,8 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
-# supabase — track schemas, config, and migration SQL
+# supabase — track schemas + config, ignore migrations (applied via CLI)
+supabase/migrations/
 supabase/.temp/
 
 # claude code

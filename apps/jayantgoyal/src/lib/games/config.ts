@@ -7,7 +7,6 @@ export const GAME_META: Record<
     description: string
     modes: ("local_pvp" | "vs_computer")[]
     onlineReady?: boolean
-    modeLabel?: string
   }
 > = {
   "rock-paper-scissors": {
@@ -20,12 +19,11 @@ export const GAME_META: Record<
     name: "Tic Tac Toe",
     description: "3x3 grid, play locally or versus computer.",
     modes: ["local_pvp", "vs_computer"],
-    onlineReady: true,
   },
   "dare-x": {
     name: "Dare X",
-    description: "Multi-player dare challenge for local, computer, or online rooms.",
-    modes: ["local_pvp", "vs_computer"],
+    description: "Multi-player dare challenge for local or online rooms.",
+    modes: ["local_pvp"],
     onlineReady: true,
   },
   "connect-four": {
@@ -53,14 +51,14 @@ export const GAME_META: Record<
   },
   chess: {
     name: "Chess",
-    description: "Classic strategy with legal moves, computer play, notation, and online rooms.",
-    modes: ["local_pvp", "vs_computer"],
+    description: "Classic strategy with legal moves, notation, and online rooms.",
+    modes: ["local_pvp"],
     onlineReady: true,
   },
   ludo: {
     name: "Ludo",
-    description: "Roll, race, capture, and bring every token home locally, against the computer, or online.",
-    modes: ["local_pvp", "vs_computer"],
+    description: "Roll, race, capture, and bring every token home in an online room.",
+    modes: ["local_pvp"],
     onlineReady: true,
   },
 }

@@ -13,7 +13,6 @@ import {
   normalizeRoomCode,
 } from "@/lib/games/online-sessions"
 import { getOnlineSessionBundle } from "@/lib/games/online-sessions.server"
-import { getWorkspaceAccessForUser } from "@/lib/commerce/entitlements.server"
 
 export async function GET(request: NextRequest) {
   const auth = await createSupabaseServerClient()
@@ -74,19 +73,6 @@ export async function POST(request: NextRequest) {
 
   if (!isOnlineGameSlug(gameSlug)) {
     return NextResponse.json({ error: "Unsupported gameSlug." }, { status: 400 })
-  }
-
-  const access = await getWorkspaceAccessForUser(user.id)
-  if (!access.isPro) {
-    return NextResponse.json(
-      {
-        error: "Online game rooms are included with Pro.",
-        code: "ONLINE_GAMES_PRO_REQUIRED",
-        upgradePath: "/pricing",
-        plan: access.plan,
-      },
-      { status: 402 }
-    )
   }
 
   const supabase = createSupabaseAdminClient()

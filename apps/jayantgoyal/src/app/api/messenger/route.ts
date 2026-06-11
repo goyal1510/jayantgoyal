@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { ensureSelfConversation } from "@/lib/messenger/server";
 
 // GET /api/messages - Fetch all messages for the authenticated user
 export async function GET() {
@@ -19,14 +17,11 @@ export async function GET() {
       );
     }
 
-    const admin = createSupabaseAdminClient();
-    const selfConversation = await ensureSelfConversation(admin, user.id);
-
-    const { data: messages, error } = await admin
+    const { data: messages, error } = await supabase
       .schema("jg_app")
       .from("messenger_messages")
       .select("*")
-      .eq("conversation_id", selfConversation.id)
+      .eq("user_id", user.id)
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -80,21 +75,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const admin = createSupabaseAdminClient();
-    const selfConversation = await ensureSelfConversation(admin, user.id);
-    const now = new Date().toISOString();
-
-    const { data: message, error } = await admin
+    const { data: message, error } = await supabase
       .schema("jg_app")
       .from("messenger_messages")
       .insert({
         user_id: user.id,
-        sender_id: user.id,
-        conversation_id: selfConversation.id,
         content: content.trim(),
         message_type,
         language: message_type === "code" ? language || null : null,
-        is_read: true,
       })
       .select()
       .single();
@@ -106,12 +94,6 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
-
-    await admin
-      .schema("jg_app")
-      .from("messenger_conversations")
-      .update({ last_message_at: now })
-      .eq("id", selfConversation.id);
 
     return NextResponse.json({ message }, { status: 201 });
   } catch (error) {

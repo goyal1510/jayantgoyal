@@ -81,8 +81,13 @@ export function useTypingSpeedTest() {
   }, [started, finished, startTime, duration])
 
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    if (finished || !started) return
+    if (finished) return
     const value = e.target.value
+
+    if (!started && value.length > 0) {
+      setStarted(true)
+      setStartTime(Date.now())
+    }
 
     setTyped(value)
 
@@ -132,15 +137,6 @@ export function useTypingSpeedTest() {
     setElapsed(0)
     if (timerRef.current) clearInterval(timerRef.current)
     inputRef.current?.focus()
-  }
-
-  const startTest = () => {
-    setTyped("")
-    setFinished(false)
-    setElapsed(0)
-    setStarted(true)
-    setStartTime(Date.now())
-    window.setTimeout(() => inputRef.current?.focus(), 0)
   }
 
   const loadHistory = React.useCallback(async (page: number) => {
@@ -205,7 +201,6 @@ export function useTypingSpeedTest() {
     avgAccuracy,
     handleInput,
     handleKeyDown,
-    startTest,
     saveResult,
     resetTest,
     loadHistory,

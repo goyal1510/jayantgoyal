@@ -45,9 +45,6 @@ export function DynamicBreadcrumb() {
 
     // Tech Tools routes
     if (pathname.startsWith("/tools")) {
-      if (pathname === "/tools/workspace") {
-        return { appName: "Tech Tools", appHref: "/tools", pageName: "Workspace" }
-      }
       const tool = getToolByPath(pathname)
       if (tool) {
         // Find the category this tool belongs to
@@ -66,11 +63,6 @@ export function DynamicBreadcrumb() {
     // Messenger routes
     if (pathname === "/messenger" || pathname.startsWith("/messenger/")) {
       return { appName: "Sync Messenger", appHref: "/messenger", pageName: null }
-    }
-
-    if (pathname.startsWith("/account")) {
-      const pageName = pathname.includes("/purchases") ? "Purchases" : "Billing"
-      return { appName: "Account", appHref: "/account/billing", pageName }
     }
 
     // Currency Calculator routes
@@ -101,22 +93,6 @@ export function DynamicBreadcrumb() {
     // GitHub Stats route
     if (pathname === "/github-stats") {
       return { appName: "GitHub Stats", appHref: "/github-stats", pageName: null }
-    }
-
-    if (pathname === "/pricing") {
-      return { appName: "Pricing", appHref: "/pricing", pageName: null }
-    }
-
-    if (pathname === "/store" || pathname.startsWith("/store/")) {
-      const segments = pathname.split("/").filter(Boolean)
-      if (segments.length > 1 && segments[1]) {
-        const pageName =
-          segments[1] === "jayant-tools-starter-pass"
-            ? "Tools Access"
-            : segments[1].split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")
-        return { appName: "Store", appHref: "/store", pageName }
-      }
-      return { appName: "Store", appHref: "/store", pageName: null }
     }
 
     // Custom Calculator route

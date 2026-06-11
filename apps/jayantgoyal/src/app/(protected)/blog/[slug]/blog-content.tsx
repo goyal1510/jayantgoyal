@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element */
+
 import type { Components } from "react-markdown";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -37,7 +39,6 @@ const markdownComponents: Components = {
   pre: ({ children }) => <pre className="rounded-lg bg-muted p-4 overflow-x-auto my-4">{children}</pre>,
   hr: () => <hr className="my-8 border-border" />,
   img: ({ src, alt }) => (
-    // eslint-disable-next-line @next/next/no-img-element
     <img src={src} alt={alt ?? ""} className="rounded-lg my-6 max-w-full" />
   ),
   table: ({ children }) => (
@@ -56,7 +57,6 @@ export function BlogContent({ post }: { post: BlogPost }) {
       {/* Header — fixed */}
       <div className="shrink-0 border-b p-4 sm:p-6">
         {post.cover_image && (
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={post.cover_image}
             alt={post.title}

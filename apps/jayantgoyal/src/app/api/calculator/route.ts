@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
 
-import { getWorkspaceAccessForUser } from "@/lib/commerce/entitlements.server"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 
 export async function GET(request: NextRequest) {
@@ -218,34 +217,6 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
     const { note, ist_timestamp, denominations } = body ?? {}
-    const access = await getWorkspaceAccessForUser(user.id)
-
-    const { count: savedCalculationCount, error: countError } = await supabase
-      .schema("jg_app")
-      .from("currency_calculator_calculations")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", user.id)
-
-    if (countError) {
-      return NextResponse.json(
-        { error: countError.message || "Unable to check calculation history usage." },
-        { status: 500 }
-      )
-    }
-
-    const savedCalculationLimit = access.limits.savedCalculations
-    if (!access.isPro && (savedCalculationCount ?? savedCalculationLimit) >= savedCalculationLimit) {
-      return NextResponse.json(
-        {
-          error: `Free plan includes ${savedCalculationLimit} saved calculations. Upgrade to Pro for more history.`,
-          code: "SAVED_CALCULATIONS_LIMIT_REACHED",
-          upgradePath: "/pricing",
-          plan: access.plan,
-          limit: savedCalculationLimit,
-        },
-        { status: 402 }
-      )
-    }
 
     const { data: calculation, error: calcError } = await supabase
       .schema("jg_app")

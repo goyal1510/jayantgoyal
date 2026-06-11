@@ -40,7 +40,6 @@ export interface FileRecord {
   version: number;
   is_latest_version: boolean;
   file_hash: string | null;
-  is_starred: boolean;
   created_at: string; // ISO timestamp
   updated_at: string; // ISO timestamp
   deleted_at: string | null; // ISO timestamp
@@ -93,9 +92,6 @@ export interface DirectoryListingItem {
   child_count: number;
   created_at: string;
   updated_at: string;
-  deleted_at?: string | null;
-  is_deleted?: boolean;
-  is_starred?: boolean;
 }
 
 // ============================================

@@ -6,15 +6,9 @@ import Calculator from "@/components/custom-calculator/Calculator"
 import ComponentLibrary from "@/components/custom-calculator/ComponentLibrary"
 import DragDropContainer from "@/components/custom-calculator/DragDropContainer"
 import DragDropProvider from "@/components/custom-calculator/DragDropProvider"
-import TemplateManager from "@/components/custom-calculator/TemplateManager"
-import type { CustomCalculatorTemplateAccess } from "@/lib/custom-calculator/templates"
 import { useCalculatorStore } from "@/lib/custom-calculator/useCalculatorStore"
 
-interface CalculatorAppProps {
-  templateAccess: CustomCalculatorTemplateAccess
-}
-
-function CalculatorApp({ templateAccess }: CalculatorAppProps) {
+function CalculatorApp() {
   return (
     <DragDropProvider>
       <div className="relative flex min-h-[calc(100vh-4rem)] flex-col overflow-hidden">
@@ -24,7 +18,6 @@ function CalculatorApp({ templateAccess }: CalculatorAppProps) {
 
         <main className="relative z-10 flex flex-1 flex-col">
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 py-6">
-            <TemplateManager initialAccess={templateAccess} />
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
               <ComponentLibrary />
               <DragDropContainer />
@@ -37,11 +30,7 @@ function CalculatorApp({ templateAccess }: CalculatorAppProps) {
   )
 }
 
-interface CustomCalculatorClientProps {
-  templateAccess: CustomCalculatorTemplateAccess
-}
-
-export default function CustomCalculatorClient({ templateAccess }: CustomCalculatorClientProps) {
+export default function CustomCalculatorClient() {
   const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
@@ -69,5 +58,5 @@ export default function CustomCalculatorClient({ templateAccess }: CustomCalcula
     )
   }
 
-  return <CalculatorApp templateAccess={templateAccess} />
+  return <CalculatorApp />
 }

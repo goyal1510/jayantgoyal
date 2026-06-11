@@ -2,7 +2,7 @@
 
 import React from "react"
 import Link from "next/link"
-import { ChevronRight, Star } from "lucide-react"
+import { ChevronRight } from "lucide-react"
 import { cn } from "@repo/ui/lib/utils"
 import type { AppConfig } from "@/lib/config/hub-config"
 import { toolCategories } from "@/lib/tools/tools"
@@ -52,14 +52,6 @@ function TechToolsFlyoutContent({
 
   return (
     <>
-      <FlyoutItem
-        href="/tools/workspace"
-        icon={Star}
-        label="Workspace"
-        color="text-amber-500 dark:text-amber-400"
-        isActive={pathname === "/tools/workspace"}
-        onClick={onNavigate}
-      />
       {toolCategories.map((category: ToolCategory) => {
         const isExpanded = expandedCategories.has(category.id)
         return (
@@ -166,14 +158,6 @@ export function TechToolsMenuItem({
         )}
         <CollapsibleContent>
           <SidebarMenuSub>
-            <SidebarMenuSubItem>
-              <SidebarMenuSubButton asChild isActive={pathname === "/tools/workspace"}>
-                <Link href="/tools/workspace" prefetch={false} onClick={closeMobileSidebar}>
-                  <Star className="size-4 text-amber-500 dark:text-amber-400" />
-                  <span>Workspace</span>
-                </Link>
-              </SidebarMenuSubButton>
-            </SidebarMenuSubItem>
             {toolCategories.map((category) => {
               const isCategoryActive = activeCategoryId === category.id
               return (

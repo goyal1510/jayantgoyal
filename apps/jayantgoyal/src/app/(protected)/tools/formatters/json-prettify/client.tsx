@@ -6,26 +6,10 @@ import { Button } from "@repo/ui/button"
 import { Copy } from "lucide-react"
 import { toast } from "sonner"
 
-import { ToolBulkJsonPanel } from "@/components/tools/tool-bulk-json-panel"
-import { ToolWorkspacePanel } from "@/components/tools/tool-workspace-panel"
-
-const DRAFT_KEY = "jg-tool-draft:json-prettify"
-
 export default function JSONPrettifyClient() {
   const [input, setInput] = React.useState("")
   const [output, setOutput] = React.useState("")
   const [error, setError] = React.useState("")
-
-  React.useEffect(() => {
-    const draft = window.localStorage.getItem(DRAFT_KEY)
-    if (draft) {
-      setInput(draft)
-    }
-  }, [])
-
-  React.useEffect(() => {
-    window.localStorage.setItem(DRAFT_KEY, input)
-  }, [input])
 
   const prettify = React.useCallback(() => {
     if (!input.trim()) {
@@ -99,23 +83,6 @@ export default function JSONPrettifyClient() {
           </CardContent>
         </Card>
       </div>
-
-      <ToolWorkspacePanel
-        toolId="json-prettify"
-        toolName="JSON Prettify"
-        inputPayload={{ text: input }}
-        outputPayload={{ text: output }}
-        canSave={Boolean(output && !error)}
-        onRestore={(item) => {
-          const payload = item.input_payload as { text?: unknown } | null
-          if (payload && typeof payload.text === "string") {
-            setInput(payload.text)
-            toast.success("Restored saved JSON")
-          }
-        }}
-      />
-
-      <ToolBulkJsonPanel toolId="json-prettify" actionLabel="Prettify batch" />
     </div>
   )
 }

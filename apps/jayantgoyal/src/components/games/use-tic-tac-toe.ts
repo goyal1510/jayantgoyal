@@ -76,7 +76,6 @@ export function useTicTacToe() {
   const [isDraw, setIsDraw] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [showSetupSheet, setShowSetupSheet] = useState(true)
-  const [gameStarted, setGameStarted] = useState(false)
   const [playerO, setPlayerO] = useState("You (O)")
   const [playerX, setPlayerX] = useState("Computer (X)")
   const [moveHistory, setMoveHistory] = useState<Move[]>([])
@@ -87,8 +86,6 @@ export function useTicTacToe() {
       modeLabel: mode === "vs_computer" ? "You vs Computer" : "Local PvP",
     }
   }, [turnO, mode, playerO, playerX])
-
-  const currentSymbol: "O" | "X" = turnO ? "O" : "X"
 
   const announceOutcome = (outcome: WinnerResult | "draw") => {
     if (outcome === "draw") {
@@ -103,21 +100,19 @@ export function useTicTacToe() {
     setWinner(null)
     setIsDraw(false)
     setMoveHistory([])
-    setGameStarted(false)
-    setShowSetupSheet(true)
+    setShowSetupSheet(true);
   }
 
   const startSession = (nextMode: Mode) => {
     setMode(nextMode)
     resetBoard()
-    setGameStarted(true)
     setShowSetupSheet(false)
     if (nextMode === "vs_computer") {
-      setPlayerO((current) => current.trim() || "You (O)")
+      setPlayerO("You (O)")
       setPlayerX("Computer (X)")
     } else {
-      setPlayerO((current) => current.trim() || DEFAULT_NAMES.O)
-      setPlayerX((current) => current.trim() || DEFAULT_NAMES.X)
+      setPlayerO(DEFAULT_NAMES.O)
+      setPlayerX(DEFAULT_NAMES.X)
     }
   }
 
@@ -160,7 +155,7 @@ export function useTicTacToe() {
   }
 
   const handleBoxClick = async (index: number) => {
-    if (!gameStarted || board[index] || winner || isDraw || isLoading) return
+    if (board[index] || winner || isDraw || isLoading) return
     const symbol = turnO ? "O" : "X"
     const name = symbol === "O" ? playerO : playerX
     const updatedBoard = [...board]
@@ -193,14 +188,12 @@ export function useTicTacToe() {
     isLoading,
     showSetupSheet,
     setShowSetupSheet,
-    gameStarted,
     playerO,
     setPlayerO,
     playerX,
     setPlayerX,
     moveHistory,
     playerLabels,
-    currentSymbol,
     resetBoard,
     startSession,
     handleBoxClick,

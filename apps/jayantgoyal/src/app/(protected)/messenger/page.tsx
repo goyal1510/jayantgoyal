@@ -6,11 +6,6 @@ export const metadata: Metadata = {
   description: "Real-time messaging with Supabase Realtime — send and receive messages instantly.",
 }
 
-export default async function MessengerPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ conversation?: string }>
-}) {
-  const params = await searchParams
-  return <MessagesPage initialConversationId={params.conversation} />
+export default function MessengerPage() {
+  return <MessagesPage />
 }

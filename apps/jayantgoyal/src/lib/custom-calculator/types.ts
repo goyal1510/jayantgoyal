@@ -8,7 +8,6 @@ export interface CalculatorStore {
   darkMode: boolean;
   addComponent: (component: CalculatorComponent) => void;
   removeComponent: (index: number) => void;
-  setComponents: (components: CalculatorComponent[]) => void;
   clearComponents: () => void;
   toggleDarkMode: () => void;
 }

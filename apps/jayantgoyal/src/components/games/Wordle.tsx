@@ -9,7 +9,6 @@ import { Button } from "@repo/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card"
 import { Input } from "@repo/ui/input"
 
-import { GameSetupShell } from "@/components/games/game-setup-shell"
 import {
   useWordle,
   KEYBOARD_ROWS,
@@ -35,7 +34,6 @@ export function Wordle() {
     startGame,
     handleKey,
   } = useWordle()
-  const [selectedMode, setSelectedMode] = useState<"daily" | "random">("daily")
   const [onlineRoomCode, setOnlineRoomCode] = useState("")
   const [creatingOnlineRoom, setCreatingOnlineRoom] = useState(false)
   const [joiningOnlineRoom, setJoiningOnlineRoom] = useState(false)
@@ -81,28 +79,18 @@ export function Wordle() {
 
   if (!mode) {
     return (
-      <GameSetupShell
-        title="Wordle"
-        description="Choose daily or random mode before the keyboard becomes active."
-        onStart={() => startGame(selectedMode)}
-      >
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Button
-            type="button"
-            size="lg"
-            variant={selectedMode === "daily" ? "secondary" : "outline"}
-            onClick={() => setSelectedMode("daily")}
-            className="w-full"
-          >
+      <div className="mx-auto flex max-w-md flex-col items-center gap-6 pt-8">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold">Wordle</h1>
+          <p className="mt-2 text-muted-foreground">
+            Guess the 5-letter word in 6 tries
+          </p>
+        </div>
+        <div className="flex w-full flex-col gap-3">
+          <Button size="lg" onClick={() => startGame("daily")} className="w-full">
             Daily Challenge
           </Button>
-          <Button
-            type="button"
-            size="lg"
-            variant={selectedMode === "random" ? "secondary" : "outline"}
-            onClick={() => setSelectedMode("random")}
-            className="w-full"
-          >
+          <Button size="lg" variant="outline" onClick={() => startGame("random")} className="w-full">
             Random Word
           </Button>
         </div>
@@ -173,7 +161,7 @@ export function Wordle() {
             </CardContent>
           </Card>
         )}
-      </GameSetupShell>
+      </div>
     )
   }
 

@@ -119,8 +119,6 @@ export function UsersTable({
                           onRemoveUser(profile.id, profile.user_id)
                         }
                         disabled={isLoading}
-                        aria-label={`Remove ${profile.email || profile.user_id}`}
-                        title={`Remove ${profile.email || profile.user_id}`}
                       >
                         {isLoading ? (
                           <Loader2 className="h-3.5 w-3.5 animate-spin" />

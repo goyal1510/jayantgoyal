@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getFileByPath, generateStoragePath, createDirectoryPath } from "@/lib/file-manager/database";
 import type { FileTypeCategory } from "@/lib/file-manager/types";
-import { getFileStorageGate } from "@/lib/commerce/file-gates.server";
 
 // Maximum file size: 25MB
 const MAX_FILE_SIZE = 25 * 1024 * 1024;
@@ -205,25 +204,6 @@ export async function POST(request: NextRequest) {
           { status: 409 }
         );
       }
-    }
-
-    const storageGate = await getFileStorageGate({
-      userId: user.id,
-      incomingBytes: fileSize,
-      replacingBytes: overwrite && existingFile && !existingFile.is_directory
-        ? existingFile.size_bytes ?? 0
-        : 0,
-    });
-
-    if (!storageGate.allowed) {
-      return NextResponse.json(
-        {
-          error: "Storage limit reached. Upgrade to Pro for more file storage.",
-          code: "FILE_STORAGE_LIMIT_REACHED",
-          gate: storageGate,
-        },
-        { status: 402 }
-      );
     }
 
     // Ensure parent directory exists

@@ -83,11 +83,11 @@ export function useMemoryMatch() {
     setShowSetupSheet(false)
 
     if (nextMode === "vs_computer") {
-      setPlayer1Name((current) => current.trim() || "You")
+      setPlayer1Name("You")
       setPlayer2Name("Computer")
     } else {
-      setPlayer1Name((current) => current.trim() || DEFAULT_NAMES.player1)
-      setPlayer2Name((current) => current.trim() || DEFAULT_NAMES.player2)
+      setPlayer1Name(DEFAULT_NAMES.player1)
+      setPlayer2Name(DEFAULT_NAMES.player2)
     }
   }
 

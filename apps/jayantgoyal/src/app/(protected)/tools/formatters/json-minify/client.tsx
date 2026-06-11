@@ -6,26 +6,10 @@ import { Button } from "@repo/ui/button"
 import { Copy } from "lucide-react"
 import { toast } from "sonner"
 
-import { ToolBulkJsonPanel } from "@/components/tools/tool-bulk-json-panel"
-import { ToolWorkspacePanel } from "@/components/tools/tool-workspace-panel"
-
-const DRAFT_KEY = "jg-tool-draft:json-minify"
-
 export default function JSONMinifyClient() {
   const [input, setInput] = React.useState("")
   const [output, setOutput] = React.useState("")
   const [error, setError] = React.useState("")
-
-  React.useEffect(() => {
-    const draft = window.localStorage.getItem(DRAFT_KEY)
-    if (draft) {
-      setInput(draft)
-    }
-  }, [])
-
-  React.useEffect(() => {
-    window.localStorage.setItem(DRAFT_KEY, input)
-  }, [input])
 
   const minify = React.useCallback(() => {
     if (!input.trim()) {
@@ -105,23 +89,6 @@ export default function JSONMinifyClient() {
           </CardContent>
         </Card>
       </div>
-
-      <ToolWorkspacePanel
-        toolId="json-minify"
-        toolName="JSON Minify"
-        inputPayload={{ text: input }}
-        outputPayload={{ text: output }}
-        canSave={Boolean(output && !error)}
-        onRestore={(item) => {
-          const payload = item.input_payload as { text?: unknown } | null
-          if (payload && typeof payload.text === "string") {
-            setInput(payload.text)
-            toast.success("Restored saved JSON")
-          }
-        }}
-      />
-
-      <ToolBulkJsonPanel toolId="json-minify" actionLabel="Minify batch" />
     </div>
   )
 }

@@ -72,6 +72,7 @@ export function checkWinner(board: Cell[][], row: number, col: number, player: "
 
     if (winningCells.length >= WIN_LENGTH) {
       const result = winningCells.slice(0, WIN_LENGTH)
+      console.log("Winner found!", { player, winningCells: result, direction: [dx, dy] })
       return result
     }
   }
@@ -91,7 +92,6 @@ export function useConnectFour() {
   const [isDraw, setIsDraw] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [showSetupSheet, setShowSetupSheet] = useState(true)
-  const [gameStarted, setGameStarted] = useState(false)
   const [playerR, setPlayerR] = useState("You (Red)")
   const [playerY, setPlayerY] = useState("Computer (Yellow)")
   const [lastMove, setLastMove] = useState<{ row: number; col: number } | null>(null)
@@ -122,7 +122,6 @@ export function useConnectFour() {
     setWinningLine([])
     setAnimatingCell(null)
     setIsProcessingMove(false)
-    setGameStarted(false)
     setShowSetupSheet(true)
   }
 
@@ -137,14 +136,13 @@ export function useConnectFour() {
     setWinningLine([])
     setAnimatingCell(null)
     setIsProcessingMove(false)
-    setGameStarted(true)
     setShowSetupSheet(false)
     if (nextMode === "vs_computer") {
-      setPlayerR((current) => current.trim() || "You (Red)")
+      setPlayerR("You (Red)")
       setPlayerY("Computer (Yellow)")
     } else {
-      setPlayerR((current) => current.trim() || DEFAULT_NAMES.R)
-      setPlayerY((current) => current.trim() || DEFAULT_NAMES.Y)
+      setPlayerR(DEFAULT_NAMES.R)
+      setPlayerY(DEFAULT_NAMES.Y)
     }
   }
 
@@ -171,6 +169,7 @@ export function useConnectFour() {
         setBoard(newBoard)
         setLastMove({ row, col })
         setAnimatingCell(null)
+        console.log("Computer wins:", { winningLine: winLine })
         setWinningLine(winLine)
         setWinner("Y")
         toast.error(`${playerY} wins!`, {
@@ -230,7 +229,7 @@ export function useConnectFour() {
   }
 
   const handleColumnClick = async (col: number) => {
-    if (!gameStarted || winner || isDraw || isLoading || isProcessingMove) return
+    if (winner || isDraw || isLoading || isProcessingMove) return
 
     const row = getAvailableRow(col, board)
     if (row === null) return
@@ -248,6 +247,7 @@ export function useConnectFour() {
 
     const winLine = checkWinner(newBoard, row, col, currentPlayer)
     if (winLine) {
+      console.log("Setting winner:", { currentPlayer, winningLine: winLine })
       setWinningLine(winLine)
       setWinner(currentPlayer)
       setIsProcessingMove(false)
@@ -289,7 +289,6 @@ export function useConnectFour() {
     isLoading,
     showSetupSheet,
     setShowSetupSheet,
-    gameStarted,
     playerR,
     setPlayerR,
     playerY,

@@ -16,10 +16,6 @@ function getBreadcrumbItems(pathname: string): { name: string; url: string }[] {
   // Tools routes
   if (pathname.startsWith("/tools")) {
     items.push({ name: "Tools", url: `${BASE_URL}/tools` });
-    if (pathname === "/tools/workspace") {
-      items.push({ name: "Workspace", url: `${BASE_URL}${pathname}` });
-      return items;
-    }
     const tool = getToolByPath(pathname);
     if (tool) {
       const category = toolCategories.find((cat) =>
@@ -64,13 +60,6 @@ function getBreadcrumbItems(pathname: string): { name: string; url: string }[] {
     return items;
   }
 
-  if (pathname.startsWith("/account")) {
-    items.push({ name: "Account", url: `${BASE_URL}/account/billing` });
-    if (pathname === "/account/billing") items.push({ name: "Billing", url: `${BASE_URL}${pathname}` });
-    else if (pathname === "/account/purchases") items.push({ name: "Purchases", url: `${BASE_URL}${pathname}` });
-    return items;
-  }
-
   // Blog routes
   if (pathname === "/blogs" || pathname.startsWith("/blogs/")) {
     items.push({ name: "Blogs", url: `${BASE_URL}/blogs` });
@@ -95,8 +84,6 @@ function getBreadcrumbItems(pathname: string): { name: string; url: string }[] {
     "/github-stats": "GitHub Stats",
     "/custom-calculator": "Custom Calculator",
     "/terms-conditions": "Terms & Conditions",
-    "/pricing": "Pricing",
-    "/store": "Store",
   };
 
   for (const [path, name] of Object.entries(simplePages)) {

@@ -7,11 +7,6 @@ const ROUTE_MAP: { prefix: string; appId: string; navResolver?: (pathname: strin
   { prefix: "/tools", appId: "tech-tools" },
   { prefix: "/messenger", appId: "messenger" },
   {
-    prefix: "/account",
-    appId: "account",
-    navResolver: (p) => (p.includes("/purchases") ? "purchases" : "billing"),
-  },
-  {
     prefix: "/calculator",
     appId: "currency-calculator",
     navResolver: (p) => (p === "/calculator/new" ? "new" : "history"),
@@ -29,12 +24,6 @@ const ROUTE_MAP: { prefix: string; appId: string; navResolver?: (pathname: strin
   { prefix: "/weather", appId: "weather" },
   { prefix: "/github-stats", appId: "github-stats" },
   { prefix: "/custom-calculator", appId: "custom-calculator" },
-  { prefix: "/pricing", appId: "commerce", navResolver: () => "pricing" },
-  {
-    prefix: "/store",
-    appId: "commerce",
-    navResolver: (p) => (p === "/store" ? "store" : "store"),
-  },
   { prefix: "/blogs", appId: "blog" },
   { prefix: "/blog", appId: "blog" },
 ]

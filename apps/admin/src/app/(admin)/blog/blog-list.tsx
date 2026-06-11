@@ -17,14 +17,6 @@ import {
   deleteBlogData,
 } from "@/lib/blog-api";
 import { Button } from "@repo/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@repo/ui/dialog";
 import { Badge } from "@repo/ui/badge";
 import type { BlogPost } from "@/lib/types";
 import { BlogDialog, emptyBlogForm, type BlogFormData } from "./blog-dialog";
@@ -41,7 +33,6 @@ export function BlogList({ initialData }: BlogListProps) {
   const [formData, setFormData] = useState<BlogFormData>(emptyBlogForm);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<BlogPost | null>(null);
 
   const openAddDialog = () => {
     setEditingItem(null);
@@ -107,16 +98,14 @@ export function BlogList({ initialData }: BlogListProps) {
     }
   };
 
-  const handleDelete = async () => {
-    if (!deleteTarget) return;
-
-    setDeleting(deleteTarget.id);
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this blog post?")) return;
+    setDeleting(id);
     try {
-      const result = await deleteBlogData("blog_posts", deleteTarget.id);
+      const result = await deleteBlogData("blog_posts", id);
       if (result.error) throw new Error(result.error);
       toast.success("Blog post deleted");
-      setItems(items.filter((i) => i.id !== deleteTarget.id));
-      setDeleteTarget(null);
+      setItems(items.filter((i) => i.id !== id));
       router.refresh();
     } catch (error) {
       toast.error(
@@ -184,35 +173,13 @@ export function BlogList({ initialData }: BlogListProps) {
                 </time>
               )}
               <div className="flex shrink-0 items-center gap-1">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => toggleVisibility(item)}
-                  aria-label={item.is_visible ? `Hide ${item.title}` : `Show ${item.title}`}
-                  title={item.is_visible ? `Hide ${item.title}` : `Show ${item.title}`}
-                >
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => toggleVisibility(item)}>
                   {item.is_visible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => openEditDialog(item)}
-                  aria-label={`Edit ${item.title}`}
-                  title={`Edit ${item.title}`}
-                >
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEditDialog(item)}>
                   <Pencil className="h-4 w-4" />
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => setDeleteTarget(item)}
-                  disabled={deleting === item.id}
-                  aria-label={`Delete ${item.title}`}
-                  title={`Delete ${item.title}`}
-                >
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDelete(item.id)} disabled={deleting === item.id}>
                   {deleting === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
                 </Button>
               </div>
@@ -230,39 +197,6 @@ export function BlogList({ initialData }: BlogListProps) {
         onSubmit={handleSubmit}
         saving={saving}
       />
-
-      <Dialog
-        open={!!deleteTarget}
-        onOpenChange={(open) => !open && !deleting && setDeleteTarget(null)}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete blog post?</DialogTitle>
-            <DialogDescription>
-              This will permanently delete {deleteTarget?.title ?? "this blog post"}.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setDeleteTarget(null)}
-              disabled={!!deleting}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={!!deleting}
-            >
-              {deleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Delete post
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </>
   );
 }

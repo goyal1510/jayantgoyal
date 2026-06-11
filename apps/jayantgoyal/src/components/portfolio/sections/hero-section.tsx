@@ -36,10 +36,7 @@ export function HeroSection({
           </span>
         </div>
         <div className="space-y-3">
-          <h1
-            aria-label={`Hi, I'm ${hero.name}`}
-            className="flex items-center justify-center gap-[0.3em] flex-wrap text-4xl font-bold text-foreground sm:text-5xl lg:text-6xl uppercase tracking-wide leading-[1.2]"
-          >
+          <h1 className="flex items-center justify-center gap-[0.3em] flex-wrap text-4xl font-bold text-foreground sm:text-5xl lg:text-6xl uppercase tracking-wide leading-[1.2]">
             <span>HI, I&apos;M</span>
             <HeroName
               name={hero.name.toUpperCase()}

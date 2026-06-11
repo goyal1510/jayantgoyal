@@ -23,15 +23,12 @@ import {
   MessageSquare,
   Cloud,
   ShoppingCart,
-  Store,
   Github,
   Type,
   Puzzle,
   FileText,
   Crown,
   Dice5,
-  CreditCard,
-  ReceiptText,
   type LucideIcon,
 } from "lucide-react"
 
@@ -96,16 +93,6 @@ const CURRENCY_CALC_NAV: NavItem[] = [
   { id: "history", label: "History", icon: History, color: "text-blue-500 dark:text-blue-400", url: "/calculator/history" },
 ]
 
-const ACCOUNT_NAV: NavItem[] = [
-  { id: "billing", label: "Billing", icon: CreditCard, color: "text-sky-500 dark:text-sky-400", url: "/account/billing" },
-  { id: "purchases", label: "Purchases", icon: ReceiptText, color: "text-emerald-500 dark:text-emerald-400", url: "/account/purchases" },
-]
-
-const COMMERCE_NAV: NavItem[] = [
-  { id: "store", label: "Catalog", icon: Store, color: "text-pink-500 dark:text-pink-400", url: "/store#catalog" },
-  { id: "pricing", label: "Plans", icon: CreditCard, color: "text-sky-500 dark:text-sky-400", url: "/store#plans" },
-]
-
 
 // All apps configuration
 // Ordered: private apps first (dropdowns → direct links), then public apps (dropdowns → direct links)
@@ -152,14 +139,6 @@ export const HUB_APPS: AppConfig[] = [
     isPublic: false,
     navItems: [],
     url: "/messenger",
-  },
-  {
-    id: "account",
-    name: "Account",
-    icon: CreditCard,
-    color: "text-sky-500 dark:text-sky-400",
-    isPublic: false,
-    navItems: ACCOUNT_NAV,
   },
   // --- Public apps (dropdowns first) ---
   {
@@ -210,14 +189,6 @@ export const HUB_APPS: AppConfig[] = [
     color: "text-gray-700 dark:text-gray-300",
     isPublic: true,
     navItems: [],
-  },
-  {
-    id: "commerce",
-    name: "Store",
-    icon: ShoppingCart,
-    color: "text-pink-500 dark:text-pink-400",
-    isPublic: true,
-    navItems: COMMERCE_NAV,
   },
   {
     id: "ecommerce",
