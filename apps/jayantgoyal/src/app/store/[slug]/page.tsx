@@ -1,14 +1,11 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   ArrowLeft,
-  CheckCircle2,
-  Clock3,
+  Check,
   Files,
   LifeBuoy,
-  PackageCheck,
   ReceiptText,
   ShieldCheck,
 } from "lucide-react";
@@ -24,6 +21,10 @@ import {
   formatCommerceInterval,
   formatCommercePrice,
 } from "@/lib/commerce/format";
+import {
+  getPublicProductDescription,
+  getPublicProductName,
+} from "@/lib/commerce/public-copy";
 
 export const dynamic = "force-dynamic";
 
@@ -55,18 +56,15 @@ export async function generateMetadata({
     };
   }
 
+  const name = getPublicProductName(product);
+  const description = getPublicProductDescription(product);
+
   return {
-    title: `${product.name} | Jayant Tools Store`,
-    description:
-      product.short_description ??
-      product.description ??
-      "Jayant Tools product detail.",
+    title: `${name} | Jayant Tools Store`,
+    description,
     openGraph: {
-      title: `${product.name} | Jayant Tools Store`,
-      description:
-        product.short_description ??
-        product.description ??
-        "Jayant Tools product detail.",
+      title: `${name} | Jayant Tools Store`,
+      description,
       images: ["/assets/ProjectImages/Dark/tools.png"],
     },
   };
@@ -93,181 +91,109 @@ export default async function StoreProductPage({
       productType: product.product_type,
     },
   });
+
+  const productName = getPublicProductName(product);
+  const productSummary = getPublicProductDescription(product);
   const priceLabel = primaryPrice
     ? `${formatCommercePrice(
         primaryPrice.unit_amount,
         primaryPrice.currency,
       )}${formatCommerceInterval(primaryPrice.billing_interval)}`
-    : "Price coming soon";
+    : "Coming soon";
   const deliveryPlan =
     metadataString(product.metadata, "delivery_plan") ??
-    "Access details appear in your account purchase library after payment verification.";
-  const launchNote = metadataString(product.metadata, "launch_note");
-  const productSummary =
-    product.description ??
-    product.short_description ??
-    "Product details are coming soon.";
+    "Access appears in Purchases after payment.";
 
   return (
-    <main className="min-h-[calc(100vh-4rem)] bg-stone-50 text-stone-950 dark:bg-zinc-950 dark:text-zinc-50">
-      <section className="border-b border-stone-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[minmax(0,1fr)_440px] lg:px-8">
-          <div className="space-y-6">
-            <Button asChild variant="ghost" className="px-0">
-              <Link href="/store">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to store
-              </Link>
-            </Button>
+    <main className="min-h-[calc(100vh-4rem)] bg-background text-foreground">
+      <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6 lg:px-8">
+        <section className="border-b pb-5">
+          <Button asChild variant="ghost" className="mb-4 px-0">
+            <Link href="/store">
+              <ArrowLeft className="mr-2 size-4" />
+              Back to store
+            </Link>
+          </Button>
+
+          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
             <div className="space-y-4">
-              <div className="flex flex-wrap items-center gap-3">
-                <Badge className="capitalize">{product.product_type}</Badge>
-                <span className="text-sm text-stone-500 dark:text-zinc-400">
-                  Account-bound access
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge variant="outline" className="capitalize">
+                  {product.product_type}
+                </Badge>
+                <span className="text-sm text-muted-foreground">
+                  Account access
                 </span>
               </div>
-              <h1 className="text-4xl font-semibold tracking-normal text-balance sm:text-5xl">
-                {product.name}
-              </h1>
-              <p className="max-w-2xl text-base leading-7 text-stone-600 dark:text-zinc-300">
-                {productSummary}
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="rounded-lg border border-stone-200 bg-stone-50 px-4 py-2 font-mono text-lg font-semibold dark:border-zinc-800 dark:bg-zinc-900">
-                {priceLabel}
+              <div>
+                <h1 className="text-2xl font-semibold tracking-normal sm:text-3xl">
+                  {productName}
+                </h1>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+                  {productSummary}
+                </p>
               </div>
-              <CheckoutButton priceId={primaryPrice?.id}>
-                Buy product
-              </CheckoutButton>
-            </div>
-            {launchNote ? (
-              <div className="rounded-lg border border-amber-500/30 bg-amber-50 p-4 text-sm leading-6 text-amber-900 dark:bg-amber-950/30 dark:text-amber-200">
-                {launchNote}
-              </div>
-            ) : null}
-            <CommercePolicyLinks className="text-stone-500 dark:text-zinc-400" />
-          </div>
-
-          <div className="space-y-4">
-            <div className="rounded-lg border border-stone-200 bg-stone-950 p-3 shadow-sm dark:border-zinc-800">
-              <Image
-                src="/assets/ProjectImages/Dark/tools.png"
-                alt="Jayant Tools workspace"
-                width={900}
-                height={675}
-                className="aspect-[16/10] rounded-md object-cover"
-                priority
-              />
-              <div className="mt-3 grid grid-cols-2 gap-3">
-                <Image
-                  src="/assets/ProjectImages/Dark/files.png"
-                  alt="Purchase delivery files"
-                  width={520}
-                  height={390}
-                  className="aspect-[4/3] rounded-md object-cover"
-                />
-                <Image
-                  src="/assets/ProjectImages/Dark/custom-calculator.png"
-                  alt="Workspace utility builder"
-                  width={520}
-                  height={390}
-                  className="aspect-[4/3] rounded-md object-cover"
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                ["Checkout", "Razorpay"],
-                ["Receipt", "Ready"],
-                ["Support", "Linked"],
-              ].map(([label, value]) => (
-                <div
-                  key={label}
-                  className="rounded-lg border border-stone-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900"
-                >
-                  <div className="text-sm font-semibold">{value}</div>
-                  <div className="mt-1 text-xs uppercase tracking-wide text-stone-500 dark:text-zinc-400">
-                    {label}
-                  </div>
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="rounded-lg border bg-muted/40 px-3 py-2 font-mono text-lg font-semibold">
+                  {priceLabel}
                 </div>
-              ))}
+                <CheckoutButton priceId={primaryPrice?.id}>
+                  Buy product
+                </CheckoutButton>
+              </div>
+              <CommercePolicyLinks className="text-muted-foreground" />
+            </div>
+
+            <div className="rounded-lg border bg-background p-4 shadow-sm">
+              <h2 className="text-sm font-semibold">Included</h2>
+              <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
+                {[
+                  "Purchase record",
+                  "Receipt access",
+                  deliveryPlan,
+                  "Order support",
+                ].map((item) => (
+                  <li key={item} className="flex gap-2">
+                    <Check className="mt-0.5 size-4 shrink-0 text-emerald-600" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="mx-auto grid max-w-7xl gap-4 px-4 py-6 sm:px-6 lg:grid-cols-3 lg:px-8">
-        {[
-          {
-            icon: PackageCheck,
-            title: "Delivery plan",
-            body: deliveryPlan,
-            tone: "text-emerald-600 dark:text-emerald-400",
-          },
-          {
-            icon: ShieldCheck,
-            title: "Account access",
-            body: "Payment is verified server-side. Your order, receipt, downloads, and support state stay linked to your signed-in account.",
-            tone: "text-sky-600 dark:text-sky-400",
-          },
-          {
-            icon: LifeBuoy,
-            title: "Support included",
-            body: "Every paid order can open a support thread with the product, payment, and delivery context attached automatically.",
-            tone: "text-amber-600 dark:text-amber-400",
-          },
-        ].map((item) => (
-          <div
-            key={item.title}
-            className="rounded-lg border border-stone-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900"
-          >
-            <item.icon className={`size-5 ${item.tone}`} />
-            <h2 className="mt-4 font-semibold">{item.title}</h2>
-            <p className="mt-2 text-sm leading-6 text-stone-600 dark:text-zinc-400">
-              {item.body}
-            </p>
-          </div>
-        ))}
-      </section>
-
-      <section className="border-y border-stone-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="mx-auto grid max-w-7xl gap-4 px-4 py-6 sm:px-6 md:grid-cols-4 lg:px-8">
+        <section className="grid gap-3 py-5 text-sm text-muted-foreground sm:grid-cols-3">
           {[
             {
-              icon: CheckCircle2,
-              title: "Secure checkout",
-              body: "Provider order and app order stay linked.",
+              icon: ShieldCheck,
+              title: "Checkout",
+              body: "Payment is verified server-side.",
             },
             {
               icon: ReceiptText,
               title: "Receipt",
-              body: "Printable receipt appears after purchase.",
-            },
-            {
-              icon: Clock3,
-              title: "Access status",
-              body: "Delivery readiness is visible in Purchases.",
+              body: "Order details stay in Purchases.",
             },
             {
               icon: Files,
               title: "Delivery",
-              body: "Links, files, manual work, or service details.",
+              body: deliveryPlan,
+            },
+            {
+              icon: LifeBuoy,
+              title: "Support",
+              body: "Help stays linked to the order.",
             },
           ].map((item) => (
-            <div
-              key={item.title}
-              className="rounded-lg border border-stone-200 bg-stone-50 p-4 dark:border-zinc-800 dark:bg-zinc-900"
-            >
-              <item.icon className="h-5 w-5 text-stone-700 dark:text-zinc-300" />
-              <p className="mt-3 text-sm font-medium">{item.title}</p>
-              <p className="mt-1 text-sm leading-6 text-stone-600 dark:text-zinc-400">
-                {item.body}
-              </p>
+            <div key={item.title} className="rounded-lg border bg-background p-4">
+              <item.icon className="size-5 text-foreground" />
+              <h2 className="mt-3 font-medium text-foreground">{item.title}</h2>
+              <p className="mt-1 leading-6">{item.body}</p>
             </div>
           ))}
-        </div>
-      </section>
+        </section>
+      </div>
     </main>
   );
 }

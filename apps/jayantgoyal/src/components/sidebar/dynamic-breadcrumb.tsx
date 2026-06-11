@@ -110,7 +110,10 @@ export function DynamicBreadcrumb() {
     if (pathname === "/store" || pathname.startsWith("/store/")) {
       const segments = pathname.split("/").filter(Boolean)
       if (segments.length > 1 && segments[1]) {
-        const pageName = segments[1].split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")
+        const pageName =
+          segments[1] === "jayant-tools-starter-pass"
+            ? "Tools Access"
+            : segments[1].split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")
         return { appName: "Store", appHref: "/store", pageName }
       }
       return { appName: "Store", appHref: "/store", pageName: null }

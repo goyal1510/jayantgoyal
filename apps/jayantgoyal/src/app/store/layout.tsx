@@ -7,10 +7,9 @@ import { DynamicBreadcrumbJsonLd } from "@/components/seo/dynamic-breadcrumb-jso
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { DynamicBreadcrumb } from "@/components/sidebar/dynamic-breadcrumb";
 import ThemeToogle from "@/components/theme/theme-toogle";
-import { LazyCommandPalette, LazyThreeBgWrapper } from "@/components/providers/lazy-components";
+import { LazyCommandPalette } from "@/components/providers/lazy-components";
 import { LazyMotionProvider } from "@/components/providers/lazy-motion-provider";
 import { RouteChangeProvider } from "@/components/providers/route-change-provider";
-import { ThreeBgToggle } from "@/components/three/three-bg-toggle";
 import { getPortfolioDataFromHeaders } from "@/lib/portfolio/server";
 import { PortfolioDataProvider } from "@/lib/portfolio/use-portfolio-data";
 import { Separator } from "@repo/ui/separator";
@@ -51,7 +50,6 @@ export default async function StoreLayout({
       <AuthToast />
       <DynamicBreadcrumbJsonLd />
       <SidebarProvider defaultOpen={defaultOpen} defaultWidth={defaultWidth}>
-        <LazyThreeBgWrapper />
         <AppSidebar />
         <SidebarInset>
           <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center gap-2 border-b bg-background/95 px-4 transition-[width,height] ease-linear backdrop-blur supports-[backdrop-filter]:bg-background/80 group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 max-w-full">
@@ -64,7 +62,6 @@ export default async function StoreLayout({
             </div>
             <div className="flex shrink-0 items-center gap-2">
               <LazyCommandPalette />
-              <ThreeBgToggle />
               <ThemeToogle />
             </div>
           </header>

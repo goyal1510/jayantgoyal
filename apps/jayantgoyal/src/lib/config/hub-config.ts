@@ -102,8 +102,8 @@ const ACCOUNT_NAV: NavItem[] = [
 ]
 
 const COMMERCE_NAV: NavItem[] = [
-  { id: "store", label: "Store", icon: Store, color: "text-pink-500 dark:text-pink-400", url: "/store" },
-  { id: "pricing", label: "Pricing", icon: CreditCard, color: "text-sky-500 dark:text-sky-400", url: "/pricing" },
+  { id: "store", label: "Catalog", icon: Store, color: "text-pink-500 dark:text-pink-400", url: "/store#catalog" },
+  { id: "pricing", label: "Plans", icon: CreditCard, color: "text-sky-500 dark:text-sky-400", url: "/store#plans" },
 ]
 
 
