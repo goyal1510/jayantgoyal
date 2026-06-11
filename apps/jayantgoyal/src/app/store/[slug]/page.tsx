@@ -1,17 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import {
-  ArrowLeft,
-  Check,
-  Files,
-  LifeBuoy,
-  ReceiptText,
-  ShieldCheck,
-} from "lucide-react";
-
-import { Badge } from "@repo/ui/badge";
-import { Button } from "@repo/ui/button";
 
 import { CheckoutButton } from "@/components/commerce/checkout-button";
 import { CommercePolicyLinks } from "@/components/commerce/policy-links";
@@ -35,11 +23,6 @@ async function getProduct(slug: string) {
     console.error("Unable to load store product:", error);
     return null;
   }
-}
-
-function metadataString(metadata: Record<string, unknown>, key: string) {
-  const value = metadata[key];
-  return typeof value === "string" && value.trim() ? value.trim() : null;
 }
 
 export async function generateMetadata({
@@ -93,105 +76,39 @@ export default async function StoreProductPage({
   });
 
   const productName = getPublicProductName(product);
-  const productSummary = getPublicProductDescription(product);
+  const productImage = product.image_url || "/assets/ProjectImages/Dark/tools.png";
   const priceLabel = primaryPrice
     ? `${formatCommercePrice(
         primaryPrice.unit_amount,
         primaryPrice.currency,
       )}${formatCommerceInterval(primaryPrice.billing_interval)}`
     : "Coming soon";
-  const deliveryPlan =
-    metadataString(product.metadata, "delivery_plan") ??
-    "Access appears in Purchases after payment.";
 
   return (
     <main className="min-h-[calc(100vh-4rem)] bg-background text-foreground">
       <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6 lg:px-8">
-        <section className="border-b pb-5">
-          <Button asChild variant="ghost" className="mb-4 px-0">
-            <Link href="/store">
-              <ArrowLeft className="mr-2 size-4" />
-              Back to store
-            </Link>
-          </Button>
-
-          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
-            <div className="space-y-4">
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge variant="outline" className="capitalize">
-                  {product.product_type}
-                </Badge>
-                <span className="text-sm text-muted-foreground">
-                  Account access
-                </span>
-              </div>
-              <div>
-                <h1 className="text-2xl font-semibold tracking-normal sm:text-3xl">
-                  {productName}
-                </h1>
-                <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-                  {productSummary}
-                </p>
-              </div>
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="rounded-lg border bg-muted/40 px-3 py-2 font-mono text-lg font-semibold">
-                  {priceLabel}
-                </div>
-                <CheckoutButton priceId={primaryPrice?.id}>
-                  Buy product
-                </CheckoutButton>
-              </div>
-              <CommercePolicyLinks className="text-muted-foreground" />
-            </div>
-
-            <div className="rounded-lg border bg-background p-4 shadow-sm">
-              <h2 className="text-sm font-semibold">Included</h2>
-              <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
-                {[
-                  "Purchase record",
-                  "Receipt access",
-                  deliveryPlan,
-                  "Order support",
-                ].map((item) => (
-                  <li key={item} className="flex gap-2">
-                    <Check className="mt-0.5 size-4 shrink-0 text-emerald-600" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+        <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start">
+          <div className="overflow-hidden rounded-lg border bg-muted/20">
+            {/* eslint-disable-next-line @next/next/no-img-element -- Product media can be external; project guidance avoids next/image proxying for external URLs. */}
+            <img
+              src={productImage}
+              alt={productName}
+              className="aspect-[16/10] w-full object-cover"
+            />
           </div>
-        </section>
 
-        <section className="grid gap-3 py-5 text-sm text-muted-foreground sm:grid-cols-3">
-          {[
-            {
-              icon: ShieldCheck,
-              title: "Checkout",
-              body: "Payment is verified server-side.",
-            },
-            {
-              icon: ReceiptText,
-              title: "Receipt",
-              body: "Order details stay in Purchases.",
-            },
-            {
-              icon: Files,
-              title: "Delivery",
-              body: deliveryPlan,
-            },
-            {
-              icon: LifeBuoy,
-              title: "Support",
-              body: "Help stays linked to the order.",
-            },
-          ].map((item) => (
-            <div key={item.title} className="rounded-lg border bg-background p-4">
-              <item.icon className="size-5 text-foreground" />
-              <h2 className="mt-3 font-medium text-foreground">{item.title}</h2>
-              <p className="mt-1 leading-6">{item.body}</p>
+          <div className="space-y-4">
+            <div>
+              <h1 className="text-2xl font-semibold tracking-normal sm:text-3xl">
+                {productName}
+              </h1>
             </div>
-          ))}
+            <div className="font-mono text-2xl font-semibold">{priceLabel}</div>
+            <CheckoutButton priceId={primaryPrice?.id} className="w-full">
+              Buy
+            </CheckoutButton>
+            <CommercePolicyLinks className="text-muted-foreground" />
+          </div>
         </section>
       </div>
     </main>

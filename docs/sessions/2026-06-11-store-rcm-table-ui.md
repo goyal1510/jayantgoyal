@@ -33,3 +33,7 @@
 - Fixed the store document title by letting the root title template produce `Store | Jayant` instead of nesting `Jayant Tools` into the page title.
 - Matched the store catalog toolbar sizing to the RCM table toolbar reference: 36px search and filter controls, shrink-stable filter buttons, and no dynamic count badge in the filter trigger so active filters do not shift the row.
 - Browser validation confirmed `/store` title is `Store | Jayant`, product detail title is `Tools Access | Store | Jayant`, and the active Type filter remains 92px wide by 36px tall while the search input stays 36px tall.
+- Removed the remaining store pill, helper paragraph, top anchor buttons, catalog helper copy, and bottom explainer cards after user feedback that the page still had too much useless text.
+- Reworked the catalog table header and row alignment: normal capitalization, centered Type/Status/Action columns, right-aligned price, and a single action dropdown with Details and Buy.
+- Restored product media on the detail page using `commerce_products.image_url` with a tools image fallback, and simplified the detail page to image, name, price, buy button, and policy links.
+- Further reduced visible store copy by removing plan feature lists and the product summary from the detail page; the action dropdown trigger is now an explicit `Action` button instead of an icon-only control.

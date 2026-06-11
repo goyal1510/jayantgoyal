@@ -15,9 +15,9 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import {
-  ArrowRight,
   ArrowUpDown,
   CheckCircle2,
+  Eye,
   PackageOpen,
   PlusCircle,
   Search,
@@ -30,6 +30,7 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -188,20 +189,27 @@ function FacetedFilter<TData>({
 function SortableHeader<TData>({
   column,
   label,
+  align = "left",
 }: {
   column: Column<TData, unknown>;
   label: string;
+  align?: "left" | "center" | "right";
 }) {
   return (
     <Button
       type="button"
       variant="ghost"
       size="sm"
-      className="-ml-2 h-7 px-2 text-xs font-medium uppercase tracking-wide text-muted-foreground hover:text-foreground"
+      className={cn(
+        "h-8 gap-1.5 px-0 text-sm font-medium text-muted-foreground hover:bg-transparent hover:text-foreground",
+        align === "center" && "mx-auto justify-center",
+        align === "right" && "ml-auto justify-end",
+        align === "left" && "justify-start",
+      )}
       onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
     >
       {label}
-      <ArrowUpDown className="ml-1.5 size-3" />
+      <ArrowUpDown className="size-3.5" />
     </Button>
   );
 }
@@ -257,17 +265,16 @@ export function StoreCatalog({
             >
               {row.original.name}
             </Link>
-            <p className="mt-1 line-clamp-2 text-sm leading-5 text-muted-foreground">
-              {row.original.description}
-            </p>
           </div>
         ),
       },
       {
         accessorKey: "productType",
-        header: ({ column }) => <SortableHeader column={column} label="Type" />,
+        header: ({ column }) => (
+          <SortableHeader column={column} label="Type" align="center" />
+        ),
         cell: ({ row }) => (
-          <Badge variant="outline" className="capitalize">
+          <Badge variant="outline" className="mx-auto capitalize">
             {typeLabels[row.original.productType]}
           </Badge>
         ),
@@ -275,9 +282,11 @@ export function StoreCatalog({
       },
       {
         accessorKey: "priceAmount",
-        header: ({ column }) => <SortableHeader column={column} label="Price" />,
+        header: ({ column }) => (
+          <SortableHeader column={column} label="Price" align="right" />
+        ),
         cell: ({ row }) => (
-          <div className="font-mono text-sm font-semibold">
+          <div className="text-right font-mono text-sm font-semibold">
             {row.original.priceLabel}
           </div>
         ),
@@ -285,11 +294,15 @@ export function StoreCatalog({
       },
       {
         accessorKey: "status",
-        header: "Status",
+        header: () => (
+          <div className="text-center text-sm font-medium text-muted-foreground">
+            Status
+          </div>
+        ),
         cell: ({ row }) => (
           <div
             className={cn(
-              "flex w-fit items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs font-medium",
+              "mx-auto flex w-fit items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs font-medium",
               row.original.status === "ready"
                 ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
                 : "border-amber-500/25 bg-amber-500/10 text-amber-700 dark:text-amber-300",
@@ -303,22 +316,40 @@ export function StoreCatalog({
       },
       {
         id: "actions",
-        header: () => <div className="text-right">Action</div>,
-        cell: ({ row }) => (
-          <div className="flex justify-end gap-2">
-            <Button asChild variant="outline" size="sm" className="h-8">
-              <Link href={`/store/${row.original.slug}`}>
-                Details
-                <ArrowRight className="size-3.5" />
-              </Link>
-            </Button>
-            <CheckoutButton
-              priceId={row.original.primaryPriceId}
-              className="h-8 px-3 text-sm"
-            >
-              Buy
-            </CheckoutButton>
+        header: () => (
+          <div className="text-center text-sm font-medium text-muted-foreground">
+            Action
           </div>
+        ),
+        cell: ({ row }) => (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="mx-auto h-9 px-3"
+                aria-label={`Actions for ${row.original.name}`}
+              >
+                Action
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuItem asChild>
+                <Link href={`/store/${row.original.slug}`}>
+                  <Eye className="size-4" />
+                  Details
+                </Link>
+              </DropdownMenuItem>
+              <CheckoutButton
+                priceId={row.original.primaryPriceId}
+                variant="ghost"
+                className="h-8 w-full justify-start px-2 text-sm font-normal shadow-none"
+              >
+                Buy
+              </CheckoutButton>
+            </DropdownMenuContent>
+          </DropdownMenu>
         ),
         enableSorting: false,
       },
@@ -405,12 +436,9 @@ export function StoreCatalog({
       </div>
 
       <div className="overflow-hidden rounded-lg border bg-background shadow-sm">
-        <div className="hidden grid-cols-[minmax(0,1fr)_110px_90px_100px_170px] border-b bg-muted/35 px-4 py-2 text-xs font-medium uppercase tracking-wide text-muted-foreground lg:grid">
+        <div className="hidden grid-cols-[minmax(0,1fr)_130px_120px_130px_96px] items-center border-b bg-muted/35 px-4 py-2 lg:grid">
           {table.getHeaderGroups()[0]?.headers.map((header) => (
-            <div
-              key={header.id}
-              className={header.column.id === "actions" ? "text-right" : ""}
-            >
+            <div key={header.id}>
               {header.isPlaceholder
                 ? null
                 : flexRender(header.column.columnDef.header, header.getContext())}
@@ -422,21 +450,26 @@ export function StoreCatalog({
             table.getRowModel().rows.map((row) => (
               <div
                 key={row.id}
-                className="grid gap-3 border-b px-4 py-4 last:border-b-0 lg:grid-cols-[minmax(0,1fr)_110px_90px_100px_170px] lg:items-center"
+                className="grid gap-3 border-b px-4 py-4 last:border-b-0 lg:grid-cols-[minmax(0,1fr)_130px_120px_130px_96px] lg:items-center"
               >
                 {row.getVisibleCells().map((cell) => (
                   <div
                     key={cell.id}
                     className={cn(
-                      cell.column.id === "actions" && "lg:text-right",
+                      (cell.column.id === "productType" ||
+                        cell.column.id === "status" ||
+                        cell.column.id === "actions") &&
+                        "lg:text-center",
                       cell.column.id !== "name" && "text-sm",
                     )}
                   >
-                    <div className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground lg:hidden">
+                    <div className="mb-1 text-xs font-medium text-muted-foreground lg:hidden">
                       {cell.column.id === "productType"
                         ? "Type"
                         : cell.column.id === "priceAmount"
                           ? "Price"
+                          : cell.column.id === "actions"
+                            ? "Action"
                           : cell.column.id}
                     </div>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

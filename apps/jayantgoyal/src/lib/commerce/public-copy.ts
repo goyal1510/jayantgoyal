@@ -8,7 +8,7 @@ type PublicProduct = Pick<
 const publicProductCopy: Record<string, { name: string; description: string }> = {
   "jayant-tools-starter-pass": {
     name: "Tools Access",
-    description: "Paid access for tools, purchases, delivery, and support.",
+    description: "Access pass for Jayant tools.",
   },
 };
 
