@@ -30,7 +30,6 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -149,12 +148,27 @@ function FacetedFilter<TData>({
           variant="outline"
           size="sm"
           className={cn(
-            "h-9 min-w-[92px] shrink-0 justify-start border-dashed px-3",
+            "h-9 w-[134px] shrink-0 justify-start border-dashed px-3",
             hasSelection && "border-foreground/30 bg-muted/60 text-foreground",
           )}
         >
           <PlusCircle className="mr-2 size-4" />
           {title}
+          <span
+            className={cn(
+              "mx-2 h-4 w-px bg-border",
+              !hasSelection && "invisible",
+            )}
+          />
+          <Badge
+            variant="secondary"
+            className={cn(
+              "min-w-5 rounded-sm px-1 text-center font-normal",
+              !hasSelection && "invisible",
+            )}
+          >
+            {hasSelection ? values.length : ""}
+          </Badge>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-48">
@@ -265,6 +279,9 @@ export function StoreCatalog({
             >
               {row.original.name}
             </Link>
+            <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">
+              {row.original.description}
+            </p>
           </div>
         ),
       },
@@ -274,7 +291,7 @@ export function StoreCatalog({
           <SortableHeader column={column} label="Type" align="center" />
         ),
         cell: ({ row }) => (
-          <Badge variant="outline" className="mx-auto capitalize">
+          <Badge variant="outline" className="capitalize">
             {typeLabels[row.original.productType]}
           </Badge>
         ),
@@ -283,10 +300,10 @@ export function StoreCatalog({
       {
         accessorKey: "priceAmount",
         header: ({ column }) => (
-          <SortableHeader column={column} label="Price" align="right" />
+          <SortableHeader column={column} label="Price" align="center" />
         ),
         cell: ({ row }) => (
-          <div className="text-right font-mono text-sm font-semibold">
+          <div className="text-center font-mono text-sm font-semibold">
             {row.original.priceLabel}
           </div>
         ),
@@ -302,7 +319,7 @@ export function StoreCatalog({
         cell: ({ row }) => (
           <div
             className={cn(
-              "mx-auto flex w-fit items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs font-medium",
+              "flex w-fit items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs font-medium",
               row.original.status === "ready"
                 ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
                 : "border-amber-500/25 bg-amber-500/10 text-amber-700 dark:text-amber-300",
@@ -318,38 +335,33 @@ export function StoreCatalog({
         id: "actions",
         header: () => (
           <div className="text-center text-sm font-medium text-muted-foreground">
-            Action
+            Actions
           </div>
         ),
         cell: ({ row }) => (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="mx-auto h-9 px-3"
-                aria-label={`Actions for ${row.original.name}`}
-              >
-                Action
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40">
-              <DropdownMenuItem asChild>
-                <Link href={`/store/${row.original.slug}`}>
-                  <Eye className="size-4" />
-                  Details
-                </Link>
-              </DropdownMenuItem>
-              <CheckoutButton
-                priceId={row.original.primaryPriceId}
-                variant="ghost"
-                className="h-8 w-full justify-start px-2 text-sm font-normal shadow-none"
-              >
-                Buy
-              </CheckoutButton>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="inline-flex h-9 overflow-hidden rounded-full border bg-background shadow-xs">
+            <Button
+              asChild
+              variant="ghost"
+              size="icon"
+              className="size-9 rounded-none shadow-none"
+              title="Details"
+              aria-label={`Details for ${row.original.name}`}
+            >
+              <Link href={`/store/${row.original.slug}`}>
+                <Eye className="size-4" />
+              </Link>
+            </Button>
+            <span className="my-2 w-px bg-border" />
+            <CheckoutButton
+              priceId={row.original.primaryPriceId}
+              variant="ghost"
+              size="icon"
+              iconOnly
+              ariaLabel={`Buy ${row.original.name}`}
+              className="size-9 rounded-none shadow-none"
+            />
+          </div>
         ),
         enableSorting: false,
       },
@@ -436,7 +448,7 @@ export function StoreCatalog({
       </div>
 
       <div className="overflow-hidden rounded-lg border bg-background shadow-sm">
-        <div className="hidden grid-cols-[minmax(0,1fr)_130px_120px_130px_96px] items-center border-b bg-muted/35 px-4 py-2 lg:grid">
+        <div className="hidden grid-cols-[minmax(0,1fr)_140px_140px_150px_128px] items-center gap-3 border-b bg-muted/35 px-4 py-2 lg:grid">
           {table.getHeaderGroups()[0]?.headers.map((header) => (
             <div key={header.id}>
               {header.isPlaceholder
@@ -450,17 +462,18 @@ export function StoreCatalog({
             table.getRowModel().rows.map((row) => (
               <div
                 key={row.id}
-                className="grid gap-3 border-b px-4 py-4 last:border-b-0 lg:grid-cols-[minmax(0,1fr)_130px_120px_130px_96px] lg:items-center"
+                className="grid gap-3 border-b px-4 py-4 last:border-b-0 lg:grid-cols-[minmax(0,1fr)_140px_140px_150px_128px] lg:items-center"
               >
                 {row.getVisibleCells().map((cell) => (
                   <div
                     key={cell.id}
                     className={cn(
+                      cell.column.id !== "name" && "text-sm",
                       (cell.column.id === "productType" ||
+                        cell.column.id === "priceAmount" ||
                         cell.column.id === "status" ||
                         cell.column.id === "actions") &&
-                        "lg:text-center",
-                      cell.column.id !== "name" && "text-sm",
+                        "lg:flex lg:justify-center",
                     )}
                   >
                     <div className="mb-1 text-xs font-medium text-muted-foreground lg:hidden">

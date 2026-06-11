@@ -90,11 +90,17 @@ export function CheckoutButton({
   children = "Buy now",
   className,
   variant,
+  size,
+  iconOnly = false,
+  ariaLabel,
 }: {
   priceId?: string | null;
   children?: React.ReactNode;
   className?: string;
   variant?: React.ComponentProps<typeof Button>["variant"];
+  size?: React.ComponentProps<typeof Button>["size"];
+  iconOnly?: boolean;
+  ariaLabel?: string;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -233,18 +239,26 @@ export function CheckoutButton({
       disabled={!priceId || isLoading}
       className={className}
       variant={variant}
+      size={size}
+      aria-label={iconOnly ? (ariaLabel ?? "Buy") : undefined}
       title={
         !priceId
           ? "Checkout is not configured for this product yet."
-          : undefined
+          : iconOnly
+            ? (ariaLabel ?? "Buy")
+            : undefined
       }
     >
       {isLoading ? (
-        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        <Loader2
+          className={
+            iconOnly ? "h-4 w-4 animate-spin" : "mr-2 h-4 w-4 animate-spin"
+          }
+        />
       ) : (
-        <ShoppingCart className="mr-2 h-4 w-4" />
+        <ShoppingCart className={iconOnly ? "h-4 w-4" : "mr-2 h-4 w-4"} />
       )}
-      {children}
+      {iconOnly ? null : children}
     </Button>
   );
 }

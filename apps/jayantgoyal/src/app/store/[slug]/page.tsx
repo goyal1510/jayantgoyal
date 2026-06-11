@@ -76,6 +76,7 @@ export default async function StoreProductPage({
   });
 
   const productName = getPublicProductName(product);
+  const productSummary = getPublicProductDescription(product);
   const productImage = product.image_url || "/assets/ProjectImages/Dark/tools.png";
   const priceLabel = primaryPrice
     ? `${formatCommercePrice(
@@ -102,11 +103,17 @@ export default async function StoreProductPage({
               <h1 className="text-2xl font-semibold tracking-normal sm:text-3xl">
                 {productName}
               </h1>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                {productSummary}
+              </p>
             </div>
             <div className="font-mono text-2xl font-semibold">{priceLabel}</div>
             <CheckoutButton priceId={primaryPrice?.id} className="w-full">
               Buy
             </CheckoutButton>
+            <div className="rounded-lg border bg-muted/20 p-3 text-sm text-muted-foreground">
+              Includes access tracking, purchase history, and order support.
+            </div>
             <CommercePolicyLinks className="text-muted-foreground" />
           </div>
         </section>

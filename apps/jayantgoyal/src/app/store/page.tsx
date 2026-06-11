@@ -67,6 +67,9 @@ export default async function StorePage() {
           <h1 className="text-2xl font-semibold tracking-normal sm:text-3xl">
             Store
           </h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+            Compare access and buy from your account.
+          </p>
         </section>
 
         <section id="plans" className="grid gap-4 border-b py-5 lg:grid-cols-2">
@@ -77,6 +80,9 @@ export default async function StorePage() {
                   Free
                 </Badge>
                 <h2 className="mt-3 text-lg font-semibold">Explore</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Public tools, games, and utilities.
+                </p>
                 <div className="mt-1 font-mono text-2xl font-semibold">$0</div>
               </div>
               <Button asChild variant="outline" size="sm">
@@ -94,6 +100,9 @@ export default async function StorePage() {
                     ? getPublicProductName(primaryPaidProduct)
                     : "Paid access"}
                 </h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Paid tools, purchase library, and support.
+                </p>
                 <div className="mt-1 font-mono text-2xl font-semibold">
                   {getPriceLabel(primaryPaidProduct)}
                 </div>

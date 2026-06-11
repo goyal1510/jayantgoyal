@@ -37,3 +37,9 @@
 - Reworked the catalog table header and row alignment: normal capitalization, centered Type/Status/Action columns, right-aligned price, and a single action dropdown with Details and Buy.
 - Restored product media on the detail page using `commerce_products.image_url` with a tools image fallback, and simplified the detail page to image, name, price, buy button, and policy links.
 - Further reduced visible store copy by removing plan feature lists and the product summary from the detail page; the action dropdown trigger is now an explicit `Action` button instead of an icon-only control.
+- Replaced the catalog action dropdown with two icon-only controls for details and cart checkout, restored stable active-filter count badges, and added short useful context back to the store cards and detail page.
+- Fixed the active filter count to render inside a fixed-width trigger and restored a single-line product description in the catalog row.
+- Tightened table geometry after screenshot review: Type, Price, Status, and Actions now use fixed-width centered columns while Product remains left-aligned.
+- Replaced body-cell text alignment with flex centering for Type, Price, Status, and Actions so badges and icon controls align to their column headers.
+- Combined the details and cart actions into a single pill-shaped control with an internal divider.
+- Matched header and row grid gaps so Status and other fixed columns share the same visual center.
