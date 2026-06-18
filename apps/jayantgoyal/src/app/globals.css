@@ -106,7 +106,6 @@
   body {
     @apply bg-background text-foreground;
   }
-
 }
 
 /* LogoSlider - CSS Variables & Animations */
@@ -119,15 +118,19 @@
   -webkit-mask: linear-gradient(90deg, transparent, black 15% 85%, transparent);
 }
 
-.logo-slider__blur>div {
+.logo-slider__blur > div {
   z-index: var(--blur-index);
-  mask: linear-gradient(90deg,
-      transparent calc(var(--blur-index) * calc((100 / var(--blurs)) * 1%)),
-      black calc((var(--blur-index) + 1) * calc((100 / var(--blurs)) * 1%)),
-      black calc((var(--blur-index) + 2) * calc((100 / var(--blurs)) * 1%)),
-      transparent calc((var(--blur-index) + 3) * calc((100 / var(--blurs)) * 1%)));
+  mask: linear-gradient(
+    90deg,
+    transparent calc(var(--blur-index) * calc((100 / var(--blurs)) * 1%)),
+    black calc((var(--blur-index) + 1) * calc((100 / var(--blurs)) * 1%)),
+    black calc((var(--blur-index) + 2) * calc((100 / var(--blurs)) * 1%)),
+    transparent calc((var(--blur-index) + 3) * calc((100 / var(--blurs)) * 1%))
+  );
   backdrop-filter: blur(calc((var(--blur-index, 0) * var(--blur, 0)) * 1px));
-  -webkit-backdrop-filter: blur(calc((var(--blur-index, 0) * var(--blur, 0)) * 1px));
+  -webkit-backdrop-filter: blur(
+    calc((var(--blur-index, 0) * var(--blur, 0)) * 1px)
+  );
 }
 
 @keyframes marquee {
@@ -155,36 +158,6 @@
 .logo-slider__container[data-pause-on-hover="true"]:hover .logo-slider__track {
   animation-play-state: paused;
 }
-
-/* 3D Background - make SidebarInset semi-transparent when active */
-body[data-three-bg="active"] [data-slot="sidebar-inset"] {
-  background: hsl(var(--background) / 0.82) !important;
-}
-
-.dark body[data-three-bg="active"] [data-slot="sidebar-inset"] {
-  background: hsl(var(--background) / 0.6) !important;
-}
-
-/* 3D Background - make Sidebar semi-transparent when active */
-body[data-three-bg="active"] [data-slot="sidebar-inner"] {
-  background: hsl(0 0% 98% / 0.25) !important;
-}
-
-.dark body[data-three-bg="active"] [data-slot="sidebar-inner"] {
-  background: hsl(240 5.9% 10% / 0.2) !important;
-}
-
-/* Frosted-glass cards when 3D background is active */
-body[data-three-bg="active"] [data-slot="card"] {
-  background: hsl(var(--card) / 0.88) !important;
-}
-
-.dark body[data-three-bg="active"] [data-slot="card"] {
-  background: hsl(var(--card) / 0.75) !important;
-}
-
-/* Note: backdrop-filter is injected at runtime via ThreeBgWrapper
-   to prevent the production CSS bundler from stripping it */
 
 /* FlipText Component Animations */
 .flip-char {
@@ -226,7 +199,6 @@ body[data-three-bg="active"] [data-slot="card"] {
 }
 
 @keyframes flip {
-
   0%,
   40% {
     transform: rotateX(0deg);
@@ -239,7 +211,6 @@ body[data-three-bg="active"] [data-slot="card"] {
 }
 
 @keyframes fade {
-
   0%,
   40% {
     opacity: 1;
@@ -250,4 +221,3 @@ body[data-three-bg="active"] [data-slot="card"] {
     opacity: var(--opacity, 0);
   }
 }
-
