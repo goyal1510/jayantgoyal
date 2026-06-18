@@ -1,14 +1,12 @@
-import {
-  Database,
-  Download,
-  FileCode2,
-  Sparkles,
-} from "lucide-react";
+import { Database, Download, FileCode2, Sparkles } from "lucide-react";
 import { Button } from "@repo/ui/button";
 import { cn } from "@repo/ui/lib/utils";
 import type { PortfolioDataSource } from "@/lib/portfolio/use-portfolio-data";
 import type { SerializablePortfolioData } from "@/lib/portfolio/serializable";
-import { sectionId, sectionScrollMargin } from "@/components/portfolio/constants";
+import {
+  sectionId,
+  sectionScrollMargin,
+} from "@/components/portfolio/constants";
 import { HeroCta } from "@/components/portfolio/sections/hero-cta";
 import { HeroName } from "@/components/portfolio/sections/hero-name";
 
@@ -31,7 +29,11 @@ export function HeroSection({
             Welcome to my portfolio
           </span>
           <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
-            {source === "database" ? <Database className="size-4" /> : <FileCode2 className="size-4" />}
+            {source === "database" ? (
+              <Database className="size-4" />
+            ) : (
+              <FileCode2 className="size-4" />
+            )}
             {source === "database" ? "Database" : "System"}
           </span>
         </div>
@@ -40,7 +42,9 @@ export function HeroSection({
             <span>HI, I&apos;M</span>
             <HeroName
               name={hero.name.toUpperCase()}
-              className={source === "database" ? "text-cyan-500" : "text-amber-500"}
+              className={
+                source === "database" ? "text-cyan-500" : "text-amber-500"
+              }
             />
           </h1>
           <p className="text-2xl text-muted-foreground uppercase tracking-wider">
@@ -50,7 +54,7 @@ export function HeroSection({
         <div className="flex flex-wrap items-center justify-center gap-4">
           <HeroCta />
           <Button asChild size="lg" variant="outline" className="group h-11">
-            <a href="/assets/Jayant_Resume.pdf" download="Jayant_Resume.pdf">
+            <a href="/api/resume" download="Jayant_Resume.pdf">
               Download CV
               <Download className="ml-2 size-4 transition-transform group-hover:translate-y-0.5" />
             </a>
