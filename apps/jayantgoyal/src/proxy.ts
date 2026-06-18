@@ -20,6 +20,7 @@ const ZERO_COST_PATHS = [
   "/api/contact",
   "/api/github-loc",
   "/api/github-stats",
+  "/api/resume",
   "/favicon_io/site.webmanifest",
   "/assets/",
   "/sitemap.xml",
@@ -54,7 +55,12 @@ const AUTH_PUBLIC_PATHS = [
   "/api/account/init",
 ];
 
-const EXACT_MATCH = new Set(["/", "/weather", "/custom-calculator", "/terms-conditions"]);
+const EXACT_MATCH = new Set([
+  "/",
+  "/weather",
+  "/custom-calculator",
+  "/terms-conditions",
+]);
 
 function matchPath(pathname: string, paths: string[]): boolean {
   return paths.some((p) => {
@@ -64,11 +70,15 @@ function matchPath(pathname: string, paths: string[]): boolean {
 }
 
 /** Decode AAL from JWT in auth cookie. No network call. */
-function getAalFromCookie(request: NextRequest, supabaseUrl: string): string | null {
+function getAalFromCookie(
+  request: NextRequest,
+  supabaseUrl: string,
+): string | null {
   const projectRef = new URL(supabaseUrl).hostname.split(".")[0];
   const tokenName = `sb-${projectRef}-auth-token`;
-  const cookie = request.cookies.get(tokenName)?.value
-    ?? request.cookies.get(`${tokenName}.0`)?.value;
+  const cookie =
+    request.cookies.get(tokenName)?.value ??
+    request.cookies.get(`${tokenName}.0`)?.value;
   if (!cookie) return null;
   try {
     const raw = cookie.startsWith("base64-") ? atob(cookie.slice(7)) : cookie;
@@ -112,7 +122,9 @@ export default async function proxy(request: NextRequest) {
   const response = NextResponse.next({ request: { headers: requestHeaders } });
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    const isPublic = matchPath(pathname, PUBLIC_PAGES) || matchPath(pathname, AUTH_PUBLIC_PATHS);
+    const isPublic =
+      matchPath(pathname, PUBLIC_PAGES) ||
+      matchPath(pathname, AUTH_PUBLIC_PATHS);
     if (isPublic) return response;
     return NextResponse.redirect(new URL("/welcome", request.url));
   }
@@ -133,7 +145,10 @@ export default async function proxy(request: NextRequest) {
   // Auth gate is handled at the layout level, not the proxy.
   // Skip getUser() entirely when no auth cookie exists.
   // ──────────────────────────────────────────────────────────────
-  if (!pathname.startsWith("/api/") && !getAalFromCookie(request, supabaseUrl)) {
+  if (
+    !pathname.startsWith("/api/") &&
+    !getAalFromCookie(request, supabaseUrl)
+  ) {
     return response;
   }
 
@@ -151,7 +166,9 @@ export default async function proxy(request: NextRequest) {
     },
   });
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   const isAuthed = Boolean(user);
 
   // Trust httpOnly cookie as cache; fall back to DB check for API routes
@@ -183,7 +200,8 @@ export default async function proxy(request: NextRequest) {
     if (user.email) requestHeaders.set("x-user-email", user.email);
   }
 
-  const isPublic = !pathname.startsWith("/api/") || matchPath(pathname, AUTH_PUBLIC_PATHS);
+  const isPublic =
+    !pathname.startsWith("/api/") || matchPath(pathname, AUTH_PUBLIC_PATHS);
 
   const ctx: ProxyContext = {
     request,
