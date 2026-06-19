@@ -2,7 +2,7 @@
 
 import React from "react"
 import Link from "next/link"
-import { ChevronRight } from "lucide-react"
+import { ChevronRight, LayoutDashboard } from "lucide-react"
 import { cn } from "@repo/ui/lib/utils"
 import type { AppConfig } from "@/lib/config/hub-config"
 import { toolCategories } from "@/lib/tools/tools"
@@ -23,6 +23,7 @@ import {
 
 import { CollapsedFlyout } from "./collapsed-flyout"
 import { FlyoutItem } from "./flyout-items"
+import { ToolQuickLinks } from "./tool-quick-links"
 import { getToolColor } from "./tool-colors"
 
 function TechToolsFlyoutContent({
@@ -52,6 +53,15 @@ function TechToolsFlyoutContent({
 
   return (
     <>
+      <FlyoutItem
+        href="/tools"
+        icon={LayoutDashboard}
+        label="All Tools"
+        color="text-orange-500 dark:text-orange-400"
+        isActive={pathname === "/tools"}
+        onClick={onNavigate}
+      />
+      <ToolQuickLinks pathname={pathname} onNavigate={onNavigate} />
       {toolCategories.map((category: ToolCategory) => {
         const isExpanded = expandedCategories.has(category.id)
         return (
@@ -158,6 +168,20 @@ export function TechToolsMenuItem({
         )}
         <CollapsibleContent>
           <SidebarMenuSub>
+            <SidebarMenuSubItem>
+              <SidebarMenuSubButton asChild isActive={pathname === "/tools"}>
+                <Link href="/tools" prefetch={false} onClick={closeMobileSidebar}>
+                  <LayoutDashboard className="size-4 text-orange-500 dark:text-orange-400" />
+                  <span>All Tools</span>
+                </Link>
+              </SidebarMenuSubButton>
+            </SidebarMenuSubItem>
+            <SidebarMenuSubItem>
+              <ToolQuickLinks
+                pathname={pathname}
+                onNavigate={closeMobileSidebar}
+              />
+            </SidebarMenuSubItem>
             {toolCategories.map((category) => {
               const isCategoryActive = activeCategoryId === category.id
               return (
