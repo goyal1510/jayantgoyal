@@ -1,6 +1,6 @@
-# Jayant Goyal
+# JG
 
-**Full-Stack Developer** · Hyderabad, India
+Portfolio, tools, games, and productivity apps by **Jayant**.
 
 [![Portfolio](https://img.shields.io/badge/Portfolio-jayantgoyal.com-000?style=for-the-badge&logo=vercel)](https://jayantgoyal.com)
 [![GitHub](https://img.shields.io/badge/GitHub-goyal1510-181717?style=for-the-badge&logo=github)](https://github.com/goyal1510)

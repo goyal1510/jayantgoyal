@@ -2,9 +2,9 @@ import type { MetadataRoute } from "next"
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Jayant — Developer Platform",
-    short_name: "Jayant",
-    description: "A unified platform — portfolio, 99+ developer tools, games, file manager, messenger, and more. Built with Next.js, React, TypeScript, and Supabase.",
+    name: "JG",
+    short_name: "JG",
+    description: "A unified platform by Jayant — portfolio, 99+ developer tools, games, file manager, messenger, and more. Built with Next.js, React, TypeScript, and Supabase.",
     start_url: "/",
     display: "standalone",
     background_color: "#0a0a0a",

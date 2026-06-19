@@ -11,8 +11,11 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Admin Panel",
-  description: "Admin panel for management",
+  title: {
+    default: "JG Admin",
+    template: "%s | JG Admin",
+  },
+  description: "Admin panel for managing JG portfolio content and platform operations.",
   icons: {
     icon: [
       { url: "/assets/Jayant_favicon_io/favicon.ico" },

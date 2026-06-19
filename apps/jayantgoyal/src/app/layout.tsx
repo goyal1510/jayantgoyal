@@ -16,8 +16,8 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.jayantgoyal.com"),
   title: {
-    default: "Jayant — Full-Stack Developer",
-    template: "%s | Jayant",
+    default: "Jayant | Full-Stack Developer",
+    template: "%s | JG",
   },
   description:
     "Full-stack developer portfolio by Jayant. Explore projects, 99+ developer tools, games, and utilities built with Next.js, React, TypeScript, and Supabase.",
@@ -34,8 +34,8 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "https://www.jayantgoyal.com",
-    siteName: "Jayant",
-    title: "Jayant — Full-Stack Developer",
+    siteName: "JG",
+    title: "Jayant | Full-Stack Developer",
     description:
       "Full-stack developer portfolio by Jayant. Explore projects, 99+ developer tools, interactive games, and utilities built with Next.js, React, TypeScript, and Supabase.",
     images: [
@@ -43,14 +43,14 @@ export const metadata: Metadata = {
         url: "https://www.jayantgoyal.com/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "Jayant — Full-Stack Developer",
+        alt: "Jayant | Full-Stack Developer",
         type: "image/png",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Jayant — Full-Stack Developer",
+    title: "Jayant | Full-Stack Developer",
     description:
       "Full-stack developer portfolio by Jayant. Explore projects, 99+ developer tools, interactive games, and utilities built with Next.js, React, TypeScript, and Supabase.",
     images: [
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
         url: "https://www.jayantgoyal.com/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "Jayant — Full-Stack Developer",
+        alt: "Jayant | Full-Stack Developer",
       },
     ],
   },

@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og"
 
 export const runtime = "edge"
-export const alt = "jayantgoyal.com — Full-Stack Developer Platform"
+export const alt = "Jayant | Full-Stack Developer"
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
 
@@ -30,12 +30,16 @@ export default function OgImage() {
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20 }}>
           {/* Platform name */}
           <div style={{ fontSize: 56, fontWeight: 800, color: "white", letterSpacing: "-0.02em" }}>
-            jayantgoyal.com
+            Jayant
           </div>
 
           {/* Tagline */}
           <div style={{ fontSize: 24, color: "rgba(255,255,255,0.5)", letterSpacing: "0.15em", textTransform: "uppercase" }}>
-            Full-Stack Developer Platform
+            Full-Stack Developer • JG
+          </div>
+
+          <div style={{ fontSize: 18, color: "rgba(255,255,255,0.42)" }}>
+            jayantgoyal.com
           </div>
 
           {/* Divider */}
@@ -90,9 +94,9 @@ export default function OgImage() {
           </div>
         </div>
 
-        {/* Built by */}
+        {/* Domain */}
         <div style={{ position: "absolute", bottom: 36, fontSize: 18, color: "rgba(255,255,255,0.3)" }}>
-          Built by Jayant
+          jayantgoyal.com
         </div>
       </div>
     ),

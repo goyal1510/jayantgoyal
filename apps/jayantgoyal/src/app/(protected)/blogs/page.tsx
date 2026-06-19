@@ -5,7 +5,7 @@ import { getPublishedBlogPosts } from "@/lib/blog/queries";
 
 export const metadata: Metadata = {
   title: "Blog",
-  description: "Blog posts by Jayant Goyal — thoughts on web development, tech, and more.",
+  description: "Blog posts by Jayant on web development, tech, and more.",
 };
 
 export default async function BlogPage() {

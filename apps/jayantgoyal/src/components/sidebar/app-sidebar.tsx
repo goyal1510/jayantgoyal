@@ -39,7 +39,7 @@ const publicApps = HUB_APPS.filter((app) => app.isPublic && !app.externalUrl)
 const privateApps = HUB_APPS.filter((app) => !app.isPublic && !app.externalUrl)
 const externalApps = HUB_APPS.filter((app) => app.externalUrl)
 
-const hubBrand = { name: "Jayant", logo: LayoutGrid }
+const hubBrand = { name: "JG", logo: LayoutGrid }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()

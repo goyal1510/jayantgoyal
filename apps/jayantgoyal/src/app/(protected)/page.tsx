@@ -8,18 +8,31 @@ import { computeLOCStats } from "@/lib/github-stats/compute"
 import type { GitHubLOCStats } from "@/lib/github-stats/types"
 
 export const metadata: Metadata = {
-  title: { absolute: "Jayant" },
+  title: { absolute: "Jayant | Full-Stack Developer" },
   description: "A unified platform by Jayant — portfolio, 99+ developer tools, interactive games, file manager, real-time messenger, weather, activity tracker, and more. Built with Next.js, React, TypeScript, and Supabase.",
   openGraph: {
-    title: "jayantgoyal.com — Developer Platform",
+    title: "Jayant | Full-Stack Developer",
     description: "A unified platform by Jayant — portfolio, 99+ developer tools, interactive games, file manager, real-time messenger, weather, activity tracker, and more. Built with Next.js, React, TypeScript, and Supabase.",
     images: [
       {
         url: "https://www.jayantgoyal.com/opengraph-image?v=2",
         width: 1200,
         height: 630,
-        alt: "Jayant — Full-Stack Developer Platform",
+        alt: "Jayant | Full-Stack Developer",
         type: "image/png",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Jayant | Full-Stack Developer",
+    description: "A unified platform by Jayant — portfolio, 99+ developer tools, interactive games, file manager, real-time messenger, weather, activity tracker, and more. Built with Next.js, React, TypeScript, and Supabase.",
+    images: [
+      {
+        url: "https://www.jayantgoyal.com/opengraph-image?v=2",
+        width: 1200,
+        height: 630,
+        alt: "Jayant | Full-Stack Developer",
       },
     ],
   },

@@ -4,7 +4,7 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 
 ## Commands
 
-**Jayant Goyal** is a full-stack developer portfolio and productivity hub built as a Turborepo monorepo. The platform combines a personal portfolio with practical tools, games, and utilities.
+**JG** is a full-stack developer portfolio and productivity hub by Jayant, built as a Turborepo monorepo. The platform combines a personal portfolio with practical tools, games, and utilities.
 
 ### Tech Stack
 

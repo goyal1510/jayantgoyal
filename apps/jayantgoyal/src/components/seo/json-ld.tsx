@@ -34,9 +34,9 @@ export function WebSiteJsonLd() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "Jayant",
+    name: "JG",
     url: "https://www.jayantgoyal.com",
-    description: "Full-stack developer portfolio with 99+ dev tools, games, and utilities.",
+    description: "Full-stack developer portfolio by Jayant with 99+ dev tools, games, and utilities.",
     author: {
       "@type": "Person",
       name: "Jayant",
@@ -61,7 +61,7 @@ export function ProfilePageJsonLd() {
       url: "https://www.jayantgoyal.com",
       jobTitle: "Full-Stack Developer",
       image: "https://www.jayantgoyal.com/assets/Jayant_favicon_io/android-chrome-512x512.png",
-      description: "Full-stack developer skilled in Next.js, React, TypeScript, and Supabase. Building innovative web applications.",
+      description: "Jayant is a full-stack developer skilled in Next.js, React, TypeScript, and Supabase. Building innovative web applications.",
       sameAs: [
         "https://github.com/goyal1510",
         "https://www.linkedin.com/in/jayant-goyal-83b0b3228/",
@@ -87,11 +87,11 @@ export function SoftwareAppJsonLd() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    name: "Jayant Dev Tools",
+    name: "Developer Tools | JG",
     url: "https://www.jayantgoyal.com/tools",
     applicationCategory: "DeveloperApplication",
     operatingSystem: "Web",
-    description: "A collection of 99+ free developer tools including UUID generator, JSON formatter, Base64 encoder, hash generators, regex tester, and more.",
+    description: "A collection of 99+ free developer tools by Jayant, including UUID generator, JSON formatter, Base64 encoder, hash generators, regex tester, and more.",
     offers: {
       "@type": "Offer",
       price: "0",
