@@ -50,7 +50,7 @@ export interface SerializablePortfolioData {
     title: string
     icon_key: string
     color: string
-    items: { name: string; level: number }[]
+    items: { name: string; icon_key: string; level: number }[]
   }[]
   TECH_ICONS: {
     icon_key: string
@@ -140,6 +140,7 @@ export function transformLegacyToSerializable(data: LegacyData): SerializablePor
       color: set.color,
       items: set.items.map((item) => ({
         name: item.name,
+        icon_key: item.name,
         level: item.level,
       })),
     })),

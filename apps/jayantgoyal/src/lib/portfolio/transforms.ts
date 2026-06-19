@@ -69,6 +69,7 @@ function transformSkillSets(categories: SkillCategoryWithSkills[]): SkillSetData
     color: cat.color ?? "",
     items: cat.skills.map((skill) => ({
       name: skill.name,
+      icon_key: skill.icon_key,
       level: skill.level ?? 0,
     })),
   }))

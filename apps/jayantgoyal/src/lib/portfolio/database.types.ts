@@ -87,6 +87,7 @@ export interface SkillRow {
   id: string
   category_id: string
   name: string
+  icon_key: string
   level: number | null
   sort_order: number
   is_visible: boolean
@@ -360,7 +361,7 @@ export interface SkillSetData {
   title: string
   icon_key: string
   color: string
-  items: { name: string; level: number }[]
+  items: { name: string; icon_key: string; level: number }[]
 }
 
 /**

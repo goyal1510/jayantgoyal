@@ -150,6 +150,7 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
     setSkillForm({
       category_id: skill.category_id,
       name: skill.name,
+      icon_key: skill.icon_key,
       level: skill.level,
       sort_order: skill.sort_order,
       is_visible: skill.is_visible,

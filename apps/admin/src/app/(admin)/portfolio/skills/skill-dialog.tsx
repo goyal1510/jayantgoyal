@@ -20,6 +20,7 @@ export type SkillFormData = Omit<Skill, "id" | "created_at" | "updated_at">;
 export const emptySkillForm: SkillFormData = {
   category_id: "",
   name: "",
+  icon_key: "",
   level: null,
   sort_order: 0,
   is_visible: true,
@@ -70,6 +71,20 @@ export function SkillDialog({
                 placeholder="React"
                 required
               />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="skill-icon-key">Icon Key</Label>
+              <Input
+                id="skill-icon-key"
+                value={formData.icon_key}
+                onChange={(e) =>
+                  setFormData({ ...formData, icon_key: e.target.value })
+                }
+                placeholder="react, java, supabase, nextjs"
+              />
+              <p className="text-xs text-muted-foreground">
+                Optional. Leave blank to use the skill name as the icon key.
+              </p>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">

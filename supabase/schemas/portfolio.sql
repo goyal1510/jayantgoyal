@@ -188,6 +188,7 @@ CREATE TABLE IF NOT EXISTS "portfolio"."skills" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "category_id" "uuid" NOT NULL,
     "name" "text" NOT NULL,
+    "icon_key" "text" DEFAULT ''::"text" NOT NULL,
     "level" integer,
     "sort_order" integer DEFAULT 0,
     "is_visible" boolean DEFAULT true,
@@ -561,7 +562,6 @@ ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "portfolio" GRANT SELECT,
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "portfolio" GRANT SELECT ON TABLES TO "anon";
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "portfolio" GRANT SELECT ON TABLES TO "authenticated";
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "portfolio" GRANT ALL ON TABLES TO "service_role";
-
 
 
 

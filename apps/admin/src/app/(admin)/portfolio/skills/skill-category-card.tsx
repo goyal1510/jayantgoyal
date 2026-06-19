@@ -117,6 +117,11 @@ export function SkillCategoryCard({
                 >
                   <div className="flex-1">
                     <span className="font-medium">{skill.name}</span>
+                    {skill.icon_key && (
+                      <span className="ml-2 text-sm text-muted-foreground">
+                        Icon: {skill.icon_key}
+                      </span>
+                    )}
                     {skill.level !== null && (
                       <span className="ml-2 text-sm text-muted-foreground">
                         Level: {skill.level}%

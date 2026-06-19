@@ -111,6 +111,7 @@ export interface Skill {
   id: string;
   category_id: string;
   name: string;
+  icon_key: string;
   level: number | null;
   sort_order: number;
   is_visible: boolean;
