@@ -508,6 +508,32 @@ CREATE TABLE IF NOT EXISTS "jg_app"."messenger_messages" (
 ALTER TABLE "jg_app"."messenger_messages" OWNER TO "postgres";
 
 
+CREATE TABLE IF NOT EXISTS "jg_app"."tool_favorites" (
+    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
+    "user_id" "uuid" NOT NULL,
+    "tool_id" "text" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    CONSTRAINT "tool_favorites_tool_id_check" CHECK (("length"("btrim"("tool_id")) > 0))
+);
+
+
+ALTER TABLE "jg_app"."tool_favorites" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "jg_app"."tool_history" (
+    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
+    "user_id" "uuid" NOT NULL,
+    "tool_id" "text" NOT NULL,
+    "visited_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "visit_count" integer DEFAULT 1 NOT NULL,
+    CONSTRAINT "tool_history_tool_id_check" CHECK (("length"("btrim"("tool_id")) > 0)),
+    CONSTRAINT "tool_history_visit_count_check" CHECK (("visit_count" > 0))
+);
+
+
+ALTER TABLE "jg_app"."tool_history" OWNER TO "postgres";
+
+
 ALTER TABLE ONLY "jg_app"."activity_tracker_activities"
     ADD CONSTRAINT "activity_tracker_activities_pkey" PRIMARY KEY ("id");
 
@@ -565,6 +591,25 @@ ALTER TABLE ONLY "jg_app"."game_hub_typing_speed_results"
 
 ALTER TABLE ONLY "jg_app"."messenger_messages"
     ADD CONSTRAINT "messenger_messages_pkey" PRIMARY KEY ("id");
+
+
+ALTER TABLE ONLY "jg_app"."tool_favorites"
+    ADD CONSTRAINT "tool_favorites_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "jg_app"."tool_favorites"
+    ADD CONSTRAINT "tool_favorites_user_tool_key" UNIQUE ("user_id", "tool_id");
+
+
+
+ALTER TABLE ONLY "jg_app"."tool_history"
+    ADD CONSTRAINT "tool_history_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "jg_app"."tool_history"
+    ADD CONSTRAINT "tool_history_user_tool_key" UNIQUE ("user_id", "tool_id");
 
 
 
@@ -651,6 +696,13 @@ CREATE INDEX "idx_msg_messages_created_at" ON "jg_app"."messenger_messages" USIN
 CREATE INDEX "idx_msg_messages_user_id" ON "jg_app"."messenger_messages" USING "btree" ("user_id");
 
 
+CREATE INDEX "idx_tool_favorites_user_created" ON "jg_app"."tool_favorites" USING "btree" ("user_id", "created_at" DESC);
+
+
+
+CREATE INDEX "idx_tool_history_user_visited" ON "jg_app"."tool_history" USING "btree" ("user_id", "visited_at" DESC);
+
+
 
 CREATE OR REPLACE TRIGGER "handle_soft_delete_trigger" BEFORE UPDATE ON "jg_app"."file_manager_files" FOR EACH ROW EXECUTE FUNCTION "jg_app"."handle_soft_delete"();
 
@@ -716,6 +768,15 @@ ALTER TABLE ONLY "jg_app"."messenger_messages"
     ADD CONSTRAINT "messenger_messages_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
 
 
+ALTER TABLE ONLY "jg_app"."tool_favorites"
+    ADD CONSTRAINT "tool_favorites_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "jg_app"."tool_history"
+    ADD CONSTRAINT "tool_history_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
+
+
 
 CREATE POLICY "Admins can manage posts" ON "jg_app"."blog_posts" TO "authenticated" USING ("jg_account"."is_admin"()) WITH CHECK ("jg_account"."is_admin"());
 
@@ -745,6 +806,14 @@ CREATE POLICY "Users can delete own messages" ON "jg_app"."messenger_messages" F
 
 
 
+CREATE POLICY "Users can delete own tool favorites" ON "jg_app"."tool_favorites" FOR DELETE TO "authenticated" USING (("auth"."uid"() = "user_id"));
+
+
+
+CREATE POLICY "Users can delete own tool history" ON "jg_app"."tool_history" FOR DELETE TO "authenticated" USING (("auth"."uid"() = "user_id"));
+
+
+
 CREATE POLICY "Users can insert own activities" ON "jg_app"."activity_tracker_activities" FOR INSERT WITH CHECK (("auth"."uid"() = "user_id"));
 
 
@@ -758,6 +827,14 @@ CREATE POLICY "Users can insert own files" ON "jg_app"."file_manager_files" FOR 
 
 
 CREATE POLICY "Users can insert own messages" ON "jg_app"."messenger_messages" FOR INSERT WITH CHECK (("auth"."uid"() = "user_id"));
+
+
+
+CREATE POLICY "Users can insert own tool favorites" ON "jg_app"."tool_favorites" FOR INSERT TO "authenticated" WITH CHECK (("auth"."uid"() = "user_id"));
+
+
+
+CREATE POLICY "Users can insert own tool history" ON "jg_app"."tool_history" FOR INSERT TO "authenticated" WITH CHECK (("auth"."uid"() = "user_id"));
 
 
 
@@ -781,6 +858,10 @@ CREATE POLICY "Users can update own messages" ON "jg_app"."messenger_messages" F
 
 
 
+CREATE POLICY "Users can update own tool history" ON "jg_app"."tool_history" FOR UPDATE TO "authenticated" USING (("auth"."uid"() = "user_id")) WITH CHECK (("auth"."uid"() = "user_id"));
+
+
+
 CREATE POLICY "Users can view own activities" ON "jg_app"."activity_tracker_activities" FOR SELECT USING (("auth"."uid"() = "user_id"));
 
 
@@ -794,6 +875,14 @@ CREATE POLICY "Users can view own files" ON "jg_app"."file_manager_files" FOR SE
 
 
 CREATE POLICY "Users can view own messages" ON "jg_app"."messenger_messages" FOR SELECT USING (("auth"."uid"() = "user_id"));
+
+
+
+CREATE POLICY "Users can view own tool favorites" ON "jg_app"."tool_favorites" FOR SELECT TO "authenticated" USING (("auth"."uid"() = "user_id"));
+
+
+
+CREATE POLICY "Users can view own tool history" ON "jg_app"."tool_history" FOR SELECT TO "authenticated" USING (("auth"."uid"() = "user_id"));
 
 
 
@@ -846,6 +935,12 @@ CREATE POLICY "insert_own_denominations" ON "jg_app"."currency_calculator_denomi
 
 
 ALTER TABLE "jg_app"."messenger_messages" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "jg_app"."tool_favorites" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "jg_app"."tool_history" ENABLE ROW LEVEL SECURITY;
 
 
 CREATE POLICY "select_own_calculations" ON "jg_app"."currency_calculator_calculations" FOR SELECT TO "authenticated" USING (("user_id" = "auth"."uid"()));
@@ -999,6 +1094,20 @@ GRANT ALL ON TABLE "jg_app"."messenger_messages" TO "service_role";
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "jg_app"."messenger_messages" TO "anon";
 
 
+GRANT ALL ON TABLE "jg_app"."tool_favorites" TO "authenticated";
+GRANT ALL ON TABLE "jg_app"."tool_favorites" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "jg_app"."tool_history" TO "authenticated";
+GRANT ALL ON TABLE "jg_app"."tool_history" TO "service_role";
+
+
+
+REVOKE ALL ON TABLE "jg_app"."tool_favorites" FROM "anon";
+REVOKE ALL ON TABLE "jg_app"."tool_history" FROM "anon";
+
+
 
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "jg_app" GRANT ALL ON FUNCTIONS TO "anon";
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "jg_app" GRANT ALL ON FUNCTIONS TO "authenticated";
@@ -1008,7 +1117,3 @@ ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "jg_app" GRANT ALL ON FUN
 
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "jg_app" GRANT SELECT ON TABLES TO "anon";
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "jg_app" GRANT SELECT,INSERT,DELETE,UPDATE ON TABLES TO "authenticated";
-
-
-
-

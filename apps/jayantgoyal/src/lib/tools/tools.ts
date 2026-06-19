@@ -773,6 +773,18 @@ export const toolCategories: ToolCategory[] = [
 // Flatten all tools for easy access
 export const allTools = toolCategories.flatMap((category) => category.tools)
 
+export function getToolCategoryByToolId(toolId: string): ToolCategory | undefined {
+  return toolCategories.find((category) =>
+    category.tools.some((tool) => tool.id === toolId)
+  )
+}
+
+export function getToolCategoryByPath(path: string): ToolCategory | undefined {
+  return toolCategories.find((category) =>
+    category.tools.some((tool) => tool.path === path)
+  )
+}
+
 // Get tool by path
 export function getToolByPath(path: string): Tool | undefined {
   return allTools.find((tool) => tool.path === path)
