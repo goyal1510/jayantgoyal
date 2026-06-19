@@ -53,6 +53,7 @@ const AUTH_PUBLIC_PATHS = [
   "/mfa-verify",
   "/api/account/accept-terms",
   "/api/account/init",
+  "/api/tools/usage",
 ];
 
 const EXACT_MATCH = new Set([
