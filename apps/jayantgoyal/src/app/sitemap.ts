@@ -61,31 +61,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }))
 
-  const gamePages = [
-    "tic-tac-toe", "connect-four", "memory-match",
-    "rock-paper-scissors", "dare-x", "wordle", "typing-speed", "chess", "ludo",
-  ].map((game) => ({
-    url: `${BASE_URL}/games/${game}`,
-    lastModified: LAST_MODIFIED,
-    changeFrequency: "monthly" as const,
-    priority: 0.5,
-  }))
-
-  const appPages = [
-    "games",
-    "messenger",
-    "files",
-    "calculator/new",
-    "calculator/history",
-    "activity-tracker/dashboard",
-    "activity-tracker/tracker",
-    "activity-tracker/management",
-  ].map((page) => ({
-    url: `${BASE_URL}/${page}`,
-    lastModified: LAST_MODIFIED,
-    changeFrequency: "monthly" as const,
-    priority: 0.4,
-  }))
 
   const blogPages: MetadataRoute.Sitemap = []
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -112,5 +87,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  return [...publicPages, ...toolPages, ...gamePages, ...appPages, ...blogPages]
+  return [...publicPages, ...toolPages, ...blogPages]
 }

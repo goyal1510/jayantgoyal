@@ -120,6 +120,8 @@ export default async function proxy(request: NextRequest) {
   requestHeaders.delete("x-page-public");
   requestHeaders.delete("x-user-id");
   requestHeaders.delete("x-user-email");
+  requestHeaders.delete("x-pathname");
+  requestHeaders.set("x-pathname", pathname);
   const response = NextResponse.next({ request: { headers: requestHeaders } });
 
   if (!supabaseUrl || !supabaseAnonKey) {
