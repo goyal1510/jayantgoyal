@@ -56,3 +56,17 @@ identifiers like package names, domains, paths, emails, or database values.
 - SEO follow-up fixes duplicate homepage canonicals by generating route-specific canonical URLs, adds dynamic noindex for auth-gated routes, and removes sign-in-gated app/game URLs from the sitemap. Local production checks verified /tools is indexable with a self-canonical URL, /games is noindex, and /sitemap.xml lists public URLs with the pinned lastModified value.
 - Replaced the generated Open Graph card artwork with the existing JG favicon
   as the only visual and bumped OG image references to `?v=4` for cache refresh.
+- Reduced empty space in the Open Graph card by matching the canvas background
+  to the favicon blue and scaling the JG mark much larger.
+- Revised the Open Graph card composition to place the JG favicon mark on the
+  left and `Jayant` text on the right.
+- Bumped Open Graph image metadata references from `?v=4` to `?v=5` so social
+  scrapers pick up the revised left/right image.
+- Replaced the experimental `Jayant` wordmark with a stacked JG favicon mark
+  and `Portfolio / Tools / Projects` descriptor row for a cleaner link card.
+- Matched the Open Graph card background and descriptor color to the favicon's
+  exact blue/navy palette to avoid a visible icon tile edge.
+- Revalidated the final stacked Open Graph card with `git diff --check`,
+  `pnpm --filter jg lint`, `pnpm --filter jg check-types`,
+  `pnpm build --filter jg`, and a local production render at
+  `/opengraph-image`.

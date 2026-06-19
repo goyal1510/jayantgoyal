@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og"
 import { readFile } from "node:fs/promises"
 import { join } from "node:path"
 
-export const alt = "JG"
+export const alt = "JG Portfolio Tools Projects"
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
 
@@ -16,12 +16,15 @@ export default async function OgImage() {
     (
       <div
         style={{
-          background: "#0a0a0a",
+          background: "#55aaff",
           width: "100%",
           height: "100%",
           display: "flex",
+          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
+          gap: 34,
+          fontFamily: "system-ui, sans-serif",
         }}
       >
         <img
@@ -33,6 +36,41 @@ export default async function OgImage() {
             borderRadius: 72,
           }}
         />
+        <div
+          style={{
+            color: "#112244",
+            display: "flex",
+            alignItems: "center",
+            gap: 22,
+            fontSize: 46,
+            fontWeight: 750,
+            letterSpacing: 1.2,
+            lineHeight: 1.1,
+            textTransform: "uppercase",
+          }}
+        >
+          <span>Portfolio</span>
+          <span
+            style={{
+              background: "#112244",
+              borderRadius: 999,
+              display: "flex",
+              height: 10,
+              width: 10,
+            }}
+          />
+          <span>Tools</span>
+          <span
+            style={{
+              background: "#112244",
+              borderRadius: 999,
+              display: "flex",
+              height: 10,
+              width: 10,
+            }}
+          />
+          <span>Projects</span>
+        </div>
       </div>
     ),
     { ...size }

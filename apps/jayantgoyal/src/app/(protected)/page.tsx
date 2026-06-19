@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     description: "A unified platform by Jayant — portfolio, 99+ developer tools, interactive games, file manager, real-time messenger, weather, activity tracker, and more. Built with Next.js, React, TypeScript, and Supabase.",
     images: [
       {
-        url: "https://www.jayantgoyal.com/opengraph-image?v=4",
+        url: "https://www.jayantgoyal.com/opengraph-image?v=5",
         width: 1200,
         height: 630,
         alt: "Jayant | Full-Stack Developer",
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     description: "A unified platform by Jayant — portfolio, 99+ developer tools, interactive games, file manager, real-time messenger, weather, activity tracker, and more. Built with Next.js, React, TypeScript, and Supabase.",
     images: [
       {
-        url: "https://www.jayantgoyal.com/opengraph-image?v=4",
+        url: "https://www.jayantgoyal.com/opengraph-image?v=5",
         width: 1200,
         height: 630,
         alt: "Jayant | Full-Stack Developer",
