@@ -3,7 +3,7 @@ import type { MetadataRoute } from "next"
 const BASE_URL = "https://www.jayantgoyal.com"
 
 // Last modified date — update when deploying significant changes
-const LAST_MODIFIED = new Date().toISOString()
+const LAST_MODIFIED = "2026-06-19T00:00:00.000Z"
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const publicPages = [

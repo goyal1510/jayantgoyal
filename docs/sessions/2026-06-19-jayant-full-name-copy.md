@@ -31,7 +31,8 @@ identifiers like package names, domains, paths, emails, or database values.
   `jayantgoyal.com` for domain-only surfaces.
 - Audited page/card metadata and updated the homepage Open Graph/Twitter card
   title, card image headline/alt text, manifest description, JSON-LD
-  descriptions, and admin app title template/description for the final model.
+  descriptions, admin app title template/description, and sitemap last-modified
+  date for the final model.
 - Corrected the public blog listing metadata to use `Jayant` as the author
   name instead of the full domain-style name.
 - Updated the README and repo agent guide to use `JG` for the project label and
@@ -51,3 +52,4 @@ identifiers like package names, domains, paths, emails, or database values.
 - `pnpm --filter jg lint` passed.
 - `pnpm --filter jg check-types` passed.
 - `pnpm build --filter jg` passed.
+- Sitemap follow-up sets shared non-blog lastModified to 2026-06-19T00:00:00.000Z and the build confirms /sitemap.xml is generated.
