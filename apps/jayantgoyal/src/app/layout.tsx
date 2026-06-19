@@ -40,7 +40,7 @@ const baseMetadata: Metadata = {
       "Full-stack developer portfolio by Jayant. Explore projects, 99+ developer tools, interactive games, and utilities built with Next.js, React, TypeScript, and Supabase.",
     images: [
       {
-        url: "https://www.jayantgoyal.com/opengraph-image",
+        url: "https://www.jayantgoyal.com/opengraph-image?v=4",
         width: 1200,
         height: 630,
         alt: "Jayant | Full-Stack Developer",
@@ -55,7 +55,7 @@ const baseMetadata: Metadata = {
       "Full-stack developer portfolio by Jayant. Explore projects, 99+ developer tools, interactive games, and utilities built with Next.js, React, TypeScript, and Supabase.",
     images: [
       {
-        url: "https://www.jayantgoyal.com/opengraph-image",
+        url: "https://www.jayantgoyal.com/opengraph-image?v=4",
         width: 1200,
         height: 630,
         alt: "Jayant | Full-Stack Developer",
@@ -125,7 +125,7 @@ export async function generateMetadata(): Promise<Metadata> {
         "Full-stack developer portfolio by Jayant. Explore projects, 99+ developer tools, interactive games, and utilities built with Next.js, React, TypeScript, and Supabase.",
       images: [
         {
-          url: "https://www.jayantgoyal.com/opengraph-image",
+          url: "https://www.jayantgoyal.com/opengraph-image?v=4",
           width: 1200,
           height: 630,
           alt: "Jayant | Full-Stack Developer",

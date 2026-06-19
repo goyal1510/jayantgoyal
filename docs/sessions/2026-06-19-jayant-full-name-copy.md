@@ -54,3 +54,5 @@ identifiers like package names, domains, paths, emails, or database values.
 - `pnpm build --filter jg` passed.
 - Sitemap follow-up sets shared non-blog lastModified to 2026-06-19T00:00:00.000Z and the build confirms /sitemap.xml is generated.
 - SEO follow-up fixes duplicate homepage canonicals by generating route-specific canonical URLs, adds dynamic noindex for auth-gated routes, and removes sign-in-gated app/game URLs from the sitemap. Local production checks verified /tools is indexable with a self-canonical URL, /games is noindex, and /sitemap.xml lists public URLs with the pinned lastModified value.
+- Replaced the generated Open Graph card artwork with the existing JG favicon
+  as the only visual and bumped OG image references to `?v=4` for cache refresh.
