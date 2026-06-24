@@ -23,7 +23,7 @@ const NAV_ITEMS = [
 ] as const
 
 const HERO = {
-  name: "Jayant",
+  name: "Jayant Goyal",
   role: "Full Stack Developer",
   tagline:
     "Building clean, functional web experiences with modern technologies.",
@@ -36,7 +36,7 @@ const ABOUT = {
   summary:
     "Get to know me better - my journey, passion, and what drives me to create amazing digital experiences.",
   personal: [
-    { label: "Name", value: "Jayant" },
+    { label: "Name", value: "Jayant Goyal" },
     { label: "Location", value: "Hyderabad, India" },
     { label: "Experience", value: "1+ Years" },
     { label: "Email", value: "goyal151002@gmail.com" },

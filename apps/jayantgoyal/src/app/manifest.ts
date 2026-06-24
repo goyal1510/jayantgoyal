@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "JG",
     short_name: "JG",
-    description: "A unified platform by Jayant — portfolio, 99+ developer tools, games, file manager, messenger, and more. Built with Next.js, React, TypeScript, and Supabase.",
+    description: "A unified platform by Jayant Goyal — portfolio, 99+ developer tools, games, file manager, messenger, and more. Built with Next.js, React, TypeScript, and Supabase.",
     start_url: "/",
     display: "standalone",
     background_color: "#0a0a0a",

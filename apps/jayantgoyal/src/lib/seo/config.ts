@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 
 export const SITE_URL = "https://www.jayantgoyal.com";
 export const SITE_NAME = "JG";
-export const SITE_TITLE = "Jayant | Full-Stack Developer";
+export const PERSON_NAME = "Jayant Goyal";
+export const SITE_TITLE = `${PERSON_NAME} | Full-Stack Developer`;
 export const SITE_DESCRIPTION =
-  "Full-stack developer portfolio by Jayant. Explore projects, 99+ developer tools, games, and utilities built with Next.js, React, TypeScript, and Supabase.";
+  "Full-stack developer portfolio by Jayant Goyal. Explore projects, 99+ developer tools, games, and utilities built with Next.js, React, TypeScript, and Supabase.";
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/opengraph-image?v=5`;
 export const LAST_SIGNIFICANT_UPDATE = "2026-06-24T00:00:00.000Z";
 

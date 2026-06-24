@@ -34,8 +34,8 @@ const baseMetadata: Metadata = {
     "Jayant", "full-stack developer", "portfolio", "Next.js",
     "React", "TypeScript", "developer tools", "web developer",
   ],
-  authors: [{ name: "Jayant", url: SITE_URL }],
-  creator: "Jayant",
+  authors: [{ name: "Jayant Goyal", url: SITE_URL }],
+  creator: "Jayant Goyal",
   openGraph: {
     type: "website",
     locale: "en_US",

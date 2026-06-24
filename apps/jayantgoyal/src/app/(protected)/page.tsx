@@ -6,33 +6,34 @@ import { PortfolioInteractive } from "./portfolio-interactive"
 import { fetchGitHubUser, fetchGitHubRepos, fetchRepoLanguages } from "@/lib/github-stats/api.server"
 import { computeLOCStats } from "@/lib/github-stats/compute"
 import type { GitHubLOCStats } from "@/lib/github-stats/types"
+import { DEFAULT_OG_IMAGE, SITE_DESCRIPTION, SITE_TITLE } from "@/lib/seo/config"
 
 export const metadata: Metadata = {
-  title: { absolute: "Jayant | Full-Stack Developer" },
-  description: "A unified platform by Jayant — portfolio, 99+ developer tools, interactive games, file manager, real-time messenger, weather, activity tracker, and more. Built with Next.js, React, TypeScript, and Supabase.",
+  title: { absolute: SITE_TITLE },
+  description: SITE_DESCRIPTION,
   openGraph: {
-    title: "Jayant | Full-Stack Developer",
-    description: "A unified platform by Jayant — portfolio, 99+ developer tools, interactive games, file manager, real-time messenger, weather, activity tracker, and more. Built with Next.js, React, TypeScript, and Supabase.",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     images: [
       {
-        url: "https://www.jayantgoyal.com/opengraph-image?v=5",
+        url: DEFAULT_OG_IMAGE,
         width: 1200,
         height: 630,
-        alt: "Jayant | Full-Stack Developer",
+        alt: SITE_TITLE,
         type: "image/png",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Jayant | Full-Stack Developer",
-    description: "A unified platform by Jayant — portfolio, 99+ developer tools, interactive games, file manager, real-time messenger, weather, activity tracker, and more. Built with Next.js, React, TypeScript, and Supabase.",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     images: [
       {
-        url: "https://www.jayantgoyal.com/opengraph-image?v=5",
+        url: DEFAULT_OG_IMAGE,
         width: 1200,
         height: 630,
-        alt: "Jayant | Full-Stack Developer",
+        alt: SITE_TITLE,
       },
     ],
   },

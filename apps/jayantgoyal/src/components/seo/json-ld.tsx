@@ -1,10 +1,12 @@
-import { LAST_SIGNIFICANT_UPDATE, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/seo/config";
+import { LAST_SIGNIFICANT_UPDATE, PERSON_NAME, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/seo/config";
 
 export function PersonJsonLd() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
-    name: "Jayant",
+    name: PERSON_NAME,
+    givenName: "Jayant",
+    familyName: "Goyal",
     url: SITE_URL,
     jobTitle: "Full-Stack Developer",
     image: `${SITE_URL}/assets/Jayant_favicon_io/android-chrome-512x512.png`,
@@ -41,7 +43,8 @@ export function WebSiteJsonLd() {
     description: SITE_DESCRIPTION,
     author: {
       "@type": "Person",
-      name: "Jayant",
+      name: PERSON_NAME,
+      url: SITE_URL,
     },
   }
 
@@ -59,7 +62,9 @@ export function ProfilePageJsonLd() {
     "@type": "ProfilePage",
     mainEntity: {
       "@type": "Person",
-      name: "Jayant",
+      name: PERSON_NAME,
+      givenName: "Jayant",
+      familyName: "Goyal",
       url: SITE_URL,
       jobTitle: "Full-Stack Developer",
       image: `${SITE_URL}/assets/Jayant_favicon_io/android-chrome-512x512.png`,
@@ -101,7 +106,7 @@ export function SoftwareAppJsonLd() {
     },
     author: {
       "@type": "Person",
-      name: "Jayant",
+      name: PERSON_NAME,
       url: SITE_URL,
     },
   }

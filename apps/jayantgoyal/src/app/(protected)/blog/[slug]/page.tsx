@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getBlogPostBySlug } from "@/lib/blog/queries";
 import { BlogContent } from "./blog-content";
-import { DEFAULT_OG_IMAGE, SITE_URL } from "@/lib/seo/config";
+import { DEFAULT_OG_IMAGE, PERSON_NAME, SITE_URL } from "@/lib/seo/config";
 
 export async function generateMetadata({
   params,
@@ -54,7 +54,7 @@ export default async function BlogPostPage({
     image: post.cover_image,
     datePublished: post.published_at,
     dateModified: post.updated_at,
-    author: { "@type": "Person", name: "Jayant", url: SITE_URL },
+    author: { "@type": "Person", name: PERSON_NAME, url: SITE_URL },
     mainEntityOfPage: `${SITE_URL}/blog/${slug}`,
   };
 
