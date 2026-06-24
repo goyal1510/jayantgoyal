@@ -1,5 +1,9 @@
 import type { NextConfig } from "next";
 
+const noindexHeaders = [
+  { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+];
+
 const nextConfig: NextConfig = {
   transpilePackages: ["@repo/ui"],
   typescript: {
@@ -29,6 +33,42 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
+      {
+        source: "/activity-tracker/:path*",
+        headers: noindexHeaders,
+      },
+      {
+        source: "/calculator/:path*",
+        headers: noindexHeaders,
+      },
+      {
+        source: "/files/:path*",
+        headers: noindexHeaders,
+      },
+      {
+        source: "/games/:path*",
+        headers: noindexHeaders,
+      },
+      {
+        source: "/messenger/:path*",
+        headers: noindexHeaders,
+      },
+      {
+        source: "/welcome",
+        headers: noindexHeaders,
+      },
+      {
+        source: "/forgot-password",
+        headers: noindexHeaders,
+      },
+      {
+        source: "/reset-password",
+        headers: noindexHeaders,
+      },
+      {
+        source: "/mfa-verify",
+        headers: noindexHeaders,
+      },
       {
         source: "/(.*)",
         headers: [
