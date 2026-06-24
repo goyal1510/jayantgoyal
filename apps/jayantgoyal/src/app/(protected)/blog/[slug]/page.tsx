@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getBlogPostBySlug } from "@/lib/blog/queries";
 import { BlogContent } from "./blog-content";
-
-const BASE_URL = "https://www.jayantgoyal.com";
+import { DEFAULT_OG_IMAGE, SITE_URL } from "@/lib/seo/config";
 
 export async function generateMetadata({
   params,
@@ -13,18 +12,27 @@ export async function generateMetadata({
   const { slug } = await params;
   const post = await getBlogPostBySlug(slug);
   if (!post) return { title: "Post Not Found" };
+  const url = `${SITE_URL}/blog/${slug}`;
+  const description = post.excerpt ?? undefined;
+
   return {
     title: post.title,
-    description: post.excerpt ?? undefined,
-    alternates: { canonical: `${BASE_URL}/blog/${slug}` },
+    description,
+    alternates: { canonical: url },
     openGraph: {
       type: "article",
       title: post.title,
-      description: post.excerpt ?? undefined,
-      url: `${BASE_URL}/blog/${slug}`,
+      description,
+      url,
       publishedTime: post.published_at ?? undefined,
       modifiedTime: post.updated_at,
-      images: post.cover_image ? [{ url: post.cover_image }] : undefined,
+      images: post.cover_image ? [{ url: post.cover_image }] : [{ url: DEFAULT_OG_IMAGE }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description,
+      images: [post.cover_image ?? DEFAULT_OG_IMAGE],
     },
   };
 }
@@ -46,7 +54,8 @@ export default async function BlogPostPage({
     image: post.cover_image,
     datePublished: post.published_at,
     dateModified: post.updated_at,
-    author: { "@type": "Person", name: "Jayant", url: BASE_URL },
+    author: { "@type": "Person", name: "Jayant", url: SITE_URL },
+    mainEntityOfPage: `${SITE_URL}/blog/${slug}`,
   };
 
   return (

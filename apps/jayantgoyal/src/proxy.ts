@@ -7,6 +7,7 @@ import { recoveryMiddleware } from "@/proxy/recovery";
 import { termsMiddleware } from "@/proxy/terms";
 import { routeGuardMiddleware } from "@/proxy/route-guard";
 import type { ProxyContext } from "@/proxy/types";
+import { matchesPathOrChild } from "@/lib/seo/config";
 
 export const config = {
   matcher: [
@@ -66,7 +67,7 @@ const EXACT_MATCH = new Set([
 function matchPath(pathname: string, paths: string[]): boolean {
   return paths.some((p) => {
     if (EXACT_MATCH.has(p)) return pathname === p;
-    return pathname.startsWith(p);
+    return matchesPathOrChild(pathname, p);
   });
 }
 

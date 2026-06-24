@@ -7,8 +7,15 @@ import { ToastSoundProvider } from "@/components/providers/toast-sound-provider"
 import { Toaster } from "@repo/ui/sonner";
 import Script from "next/script";
 import { PersonJsonLd, WebSiteJsonLd, ProfilePageJsonLd, SoftwareAppJsonLd } from "@/components/seo/json-ld";
-
-const SITE_URL = "https://www.jayantgoyal.com";
+import {
+  DEFAULT_OG_IMAGE,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_TITLE,
+  SITE_URL,
+  isIndexablePath,
+  normalizePathname,
+} from "@/lib/seo/config";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -19,11 +26,10 @@ const inter = Inter({
 const baseMetadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Jayant | Full-Stack Developer",
+    default: SITE_TITLE,
     template: "%s | JG",
   },
-  description:
-    "Full-stack developer portfolio by Jayant. Explore projects, 99+ developer tools, games, and utilities built with Next.js, React, TypeScript, and Supabase.",
+  description: SITE_DESCRIPTION,
   keywords: [
     "Jayant", "full-stack developer", "portfolio", "Next.js",
     "React", "TypeScript", "developer tools", "web developer",
@@ -34,31 +40,29 @@ const baseMetadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: SITE_URL,
-    siteName: "JG",
-    title: "Jayant | Full-Stack Developer",
-    description:
-      "Full-stack developer portfolio by Jayant. Explore projects, 99+ developer tools, interactive games, and utilities built with Next.js, React, TypeScript, and Supabase.",
+    siteName: SITE_NAME,
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     images: [
       {
-        url: "https://www.jayantgoyal.com/opengraph-image?v=5",
+        url: DEFAULT_OG_IMAGE,
         width: 1200,
         height: 630,
-        alt: "Jayant | Full-Stack Developer",
+        alt: SITE_TITLE,
         type: "image/png",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Jayant | Full-Stack Developer",
-    description:
-      "Full-stack developer portfolio by Jayant. Explore projects, 99+ developer tools, interactive games, and utilities built with Next.js, React, TypeScript, and Supabase.",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     images: [
       {
-        url: "https://www.jayantgoyal.com/opengraph-image?v=5",
+        url: DEFAULT_OG_IMAGE,
         width: 1200,
         height: 630,
-        alt: "Jayant | Full-Stack Developer",
+        alt: SITE_TITLE,
       },
     ],
   },
@@ -83,27 +87,6 @@ const baseMetadata: Metadata = {
   },
 };
 
-const INDEXABLE_EXACT_PATHS = new Set(["/", "/terms-conditions"]);
-const INDEXABLE_PREFIXES = [
-  "/tools",
-  "/blogs",
-  "/blog",
-  "/weather",
-  "/custom-calculator",
-  "/github-stats",
-];
-
-function normalizePathname(pathname: string | null): string {
-  if (!pathname || !pathname.startsWith("/")) return "/";
-  if (pathname.length > 1 && pathname.endsWith("/")) return pathname.slice(0, -1);
-  return pathname;
-}
-
-function isIndexablePath(pathname: string): boolean {
-  if (INDEXABLE_EXACT_PATHS.has(pathname)) return true;
-  return INDEXABLE_PREFIXES.some((prefix) => pathname.startsWith(prefix));
-}
-
 export async function generateMetadata(): Promise<Metadata> {
   const headerStore = await headers();
   const pathname = normalizePathname(headerStore.get("x-pathname"));
@@ -119,16 +102,15 @@ export async function generateMetadata(): Promise<Metadata> {
       type: "website",
       locale: "en_US",
       url: canonicalUrl,
-      siteName: "JG",
-      title: "Jayant | Full-Stack Developer",
-      description:
-        "Full-stack developer portfolio by Jayant. Explore projects, 99+ developer tools, interactive games, and utilities built with Next.js, React, TypeScript, and Supabase.",
+      siteName: SITE_NAME,
+      title: SITE_TITLE,
+      description: SITE_DESCRIPTION,
       images: [
         {
-          url: "https://www.jayantgoyal.com/opengraph-image?v=5",
+          url: DEFAULT_OG_IMAGE,
           width: 1200,
           height: 630,
-          alt: "Jayant | Full-Stack Developer",
+          alt: SITE_TITLE,
           type: "image/png",
         },
       ],
@@ -140,11 +122,16 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const headerStore = await headers();
+  const pathname = normalizePathname(headerStore.get("x-pathname"));
+  const isHomePage = pathname === "/";
+  const isToolsPage = pathname === "/tools";
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -154,10 +141,14 @@ export default function RootLayout({
         </Script>
         <link rel="preconnect" href="https://orwfvyditlguqvxvztkw.supabase.co" />
         <link rel="dns-prefetch" href="https://orwfvyditlguqvxvztkw.supabase.co" />
-        <PersonJsonLd />
         <WebSiteJsonLd />
-        <ProfilePageJsonLd />
-        <SoftwareAppJsonLd />
+        {isHomePage && (
+          <>
+            <PersonJsonLd />
+            <ProfilePageJsonLd />
+          </>
+        )}
+        {isToolsPage && <SoftwareAppJsonLd />}
       </head>
       <body className={inter.className}>
         <ThemeProvider

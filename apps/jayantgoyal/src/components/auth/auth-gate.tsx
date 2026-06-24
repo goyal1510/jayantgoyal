@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Lock } from "lucide-react";
 import { Button } from "@repo/ui/button";
+import { matchesPathOrChild } from "@/lib/seo/config";
 
 /** Public paths that don't require auth — must match proxy PUBLIC_PAGES */
 const PUBLIC_PREFIXES = ["/tools", "/blogs", "/blog", "/weather", "/custom-calculator", "/github-stats"];
@@ -12,7 +13,7 @@ const PUBLIC_EXACT = new Set(["/", "/terms-conditions"]);
 
 function isPublicPath(pathname: string): boolean {
   if (PUBLIC_EXACT.has(pathname)) return true;
-  return PUBLIC_PREFIXES.some((p) => pathname.startsWith(p));
+  return PUBLIC_PREFIXES.some((p) => matchesPathOrChild(pathname, p));
 }
 
 export function AuthGateWrapper({

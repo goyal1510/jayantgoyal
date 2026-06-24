@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Badge } from "@repo/ui/badge";
 import { getPublishedBlogPosts } from "@/lib/blog/queries";
+import { buildPublicPageMetadata } from "@/lib/seo/config";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPublicPageMetadata({
   title: "Blog",
   description: "Blog posts by Jayant on web development, tech, and more.",
-};
+  pathname: "/blogs",
+});
 
 export default async function BlogPage() {
   const posts = await getPublishedBlogPosts();

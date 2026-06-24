@@ -1,11 +1,13 @@
+import { LAST_SIGNIFICANT_UPDATE, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/seo/config";
+
 export function PersonJsonLd() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
     name: "Jayant",
-    url: "https://www.jayantgoyal.com",
+    url: SITE_URL,
     jobTitle: "Full-Stack Developer",
-    image: "https://www.jayantgoyal.com/assets/Jayant_favicon_io/android-chrome-512x512.png",
+    image: `${SITE_URL}/assets/Jayant_favicon_io/android-chrome-512x512.png`,
     email: "goyal151002@gmail.com",
     address: {
       "@type": "PostalAddress",
@@ -34,9 +36,9 @@ export function WebSiteJsonLd() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "JG",
-    url: "https://www.jayantgoyal.com",
-    description: "Full-stack developer portfolio by Jayant with 99+ dev tools, games, and utilities.",
+    name: SITE_NAME,
+    url: SITE_URL,
+    description: SITE_DESCRIPTION,
     author: {
       "@type": "Person",
       name: "Jayant",
@@ -58,10 +60,10 @@ export function ProfilePageJsonLd() {
     mainEntity: {
       "@type": "Person",
       name: "Jayant",
-      url: "https://www.jayantgoyal.com",
+      url: SITE_URL,
       jobTitle: "Full-Stack Developer",
-      image: "https://www.jayantgoyal.com/assets/Jayant_favicon_io/android-chrome-512x512.png",
-      description: "Jayant is a full-stack developer skilled in Next.js, React, TypeScript, and Supabase. Building innovative web applications.",
+      image: `${SITE_URL}/assets/Jayant_favicon_io/android-chrome-512x512.png`,
+      description: SITE_DESCRIPTION,
       sameAs: [
         "https://github.com/goyal1510",
         "https://www.linkedin.com/in/jayant-goyal-83b0b3228/",
@@ -72,7 +74,7 @@ export function ProfilePageJsonLd() {
       ],
     },
     dateCreated: "2025-01-01T00:00:00+05:30",
-    dateModified: new Date().toISOString(),
+    dateModified: LAST_SIGNIFICANT_UPDATE,
   }
 
   return (
@@ -87,8 +89,8 @@ export function SoftwareAppJsonLd() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    name: "Developer Tools | JG",
-    url: "https://www.jayantgoyal.com/tools",
+    name: `Developer Tools | ${SITE_NAME}`,
+    url: `${SITE_URL}/tools`,
     applicationCategory: "DeveloperApplication",
     operatingSystem: "Web",
     description: "A collection of 99+ free developer tools by Jayant, including UUID generator, JSON formatter, Base64 encoder, hash generators, regex tester, and more.",
@@ -100,6 +102,7 @@ export function SoftwareAppJsonLd() {
     author: {
       "@type": "Person",
       name: "Jayant",
+      url: SITE_URL,
     },
   }
 
