@@ -9,7 +9,7 @@ export const SITE_DESCRIPTION =
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/opengraph-image?v=5`;
 export const LAST_SIGNIFICANT_UPDATE = "2026-06-24T00:00:00.000Z";
 
-export const INDEXABLE_EXACT_PATHS = ["/", "/terms-conditions"] as const;
+export const INDEXABLE_EXACT_PATHS = ["/", "/about", "/terms-conditions"] as const;
 export const INDEXABLE_PREFIXES = [
   "/tools",
   "/blogs",

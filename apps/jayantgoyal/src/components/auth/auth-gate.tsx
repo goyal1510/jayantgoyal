@@ -9,7 +9,7 @@ import { matchesPathOrChild } from "@/lib/seo/config";
 
 /** Public paths that don't require auth — must match proxy PUBLIC_PAGES */
 const PUBLIC_PREFIXES = ["/tools", "/blogs", "/blog", "/weather", "/custom-calculator", "/github-stats"];
-const PUBLIC_EXACT = new Set(["/", "/terms-conditions"]);
+const PUBLIC_EXACT = new Set(["/", "/about", "/terms-conditions"]);
 
 function isPublicPath(pathname: string): boolean {
   if (PUBLIC_EXACT.has(pathname)) return true;

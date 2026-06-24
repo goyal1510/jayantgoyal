@@ -5,6 +5,7 @@ import { LAST_SIGNIFICANT_UPDATE, SITE_URL } from "@/lib/seo/config"
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const publicPages = [
     { url: SITE_URL, lastModified: LAST_SIGNIFICANT_UPDATE, changeFrequency: "weekly" as const, priority: 1.0 },
+    { url: `${SITE_URL}/about`, lastModified: LAST_SIGNIFICANT_UPDATE, changeFrequency: "monthly" as const, priority: 0.8 },
     { url: `${SITE_URL}/tools`, lastModified: LAST_SIGNIFICANT_UPDATE, changeFrequency: "monthly" as const, priority: 0.8 },
     { url: `${SITE_URL}/blogs`, lastModified: LAST_SIGNIFICANT_UPDATE, changeFrequency: "weekly" as const, priority: 0.8 },
     { url: `${SITE_URL}/weather`, lastModified: LAST_SIGNIFICANT_UPDATE, changeFrequency: "daily" as const, priority: 0.6 },

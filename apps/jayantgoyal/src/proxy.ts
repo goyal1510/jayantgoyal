@@ -36,6 +36,7 @@ const ZERO_COST_PATHS = [
 /** Public pages — viewable without auth. Skip getUser(), use fast cookie check. */
 const PUBLIC_PAGES = [
   "/",
+  "/about",
   "/tools",
   "/blogs",
   "/blog",
@@ -59,6 +60,7 @@ const AUTH_PUBLIC_PATHS = [
 
 const EXACT_MATCH = new Set([
   "/",
+  "/about",
   "/weather",
   "/custom-calculator",
   "/terms-conditions",

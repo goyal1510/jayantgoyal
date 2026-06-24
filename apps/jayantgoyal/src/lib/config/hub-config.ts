@@ -54,7 +54,7 @@ export type AppConfig = {
 // Portfolio navigation items (scroll-based sections)
 const PORTFOLIO_NAV: NavItem[] = [
   { id: "home", label: "Home", icon: Home, color: "text-sky-600 dark:text-sky-400", url: "/#home" },
-  { id: "about", label: "About", icon: User, color: "text-emerald-600 dark:text-emerald-400", url: "/#about" },
+  { id: "about", label: "About", icon: User, color: "text-emerald-600 dark:text-emerald-400", url: "/about" },
   { id: "skills", label: "Skills", icon: BrainCog, color: "text-amber-500 dark:text-amber-400", url: "/#skills" },
   { id: "experience", label: "Experience", icon: BriefcaseBusiness, color: "text-indigo-500 dark:text-indigo-400", url: "/#experience" },
   { id: "projects", label: "Projects", icon: Code2, color: "text-rose-500 dark:text-rose-400", url: "/#projects" },
