@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const SITE_URL = "https://www.jayantgoyal.com";
-export const SITE_NAME = "JG";
 export const PERSON_NAME = "Jayant Goyal";
+export const SITE_NAME = PERSON_NAME;
 export const SITE_TITLE = `${PERSON_NAME} | Full-Stack Developer`;
 export const SITE_DESCRIPTION =
   "Full-stack developer portfolio by Jayant Goyal. Explore projects, 99+ developer tools, games, and utilities built with Next.js, React, TypeScript, and Supabase.";
