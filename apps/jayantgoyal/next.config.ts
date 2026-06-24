@@ -18,6 +18,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/tools/workspace/:path*",
+        destination: "/tools",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {
