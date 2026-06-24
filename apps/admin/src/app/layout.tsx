@@ -16,6 +16,14 @@ export const metadata: Metadata = {
     template: "%s | JG Admin",
   },
   description: "Admin panel for managing JG portfolio content and platform operations.",
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
+  },
   icons: {
     icon: [
       { url: "/assets/Jayant_favicon_io/favicon.ico" },
