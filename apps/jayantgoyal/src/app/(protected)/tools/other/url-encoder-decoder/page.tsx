@@ -1,13 +1,11 @@
 import type { Metadata } from "next"
 import { getToolByPath } from "@/lib/tools/tools"
+import { buildToolPageMetadata } from "@/lib/tools/metadata"
 import URLEncoderDecoderClient from "./client"
 
 const tool = getToolByPath("/tools/other/url-encoder-decoder")
 
-export const metadata: Metadata = {
-  title: `${tool?.title}`,
-  description: tool?.description,
-}
+export const metadata: Metadata = buildToolPageMetadata("/tools/other/url-encoder-decoder")
 
 export default function URLEncoderDecoderPage() {
   if (!tool) {

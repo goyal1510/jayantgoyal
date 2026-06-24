@@ -1,13 +1,11 @@
 import type { Metadata } from "next"
 import { getToolByPath } from "@/lib/tools/tools"
+import { buildToolPageMetadata } from "@/lib/tools/metadata"
 import Base64FileConverterClient from "./client"
 
 const tool = getToolByPath("/tools/converters/base64-file-converter")
 
-export const metadata: Metadata = {
-  title: `${tool?.title}`,
-  description: tool?.description,
-}
+export const metadata: Metadata = buildToolPageMetadata("/tools/converters/base64-file-converter")
 
 export default function Base64FileConverterPage() {
   if (!tool) {

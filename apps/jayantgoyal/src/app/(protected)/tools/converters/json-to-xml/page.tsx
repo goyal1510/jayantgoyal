@@ -1,13 +1,11 @@
 import type { Metadata } from "next"
 import { getToolByPath } from "@/lib/tools/tools"
+import { buildToolPageMetadata } from "@/lib/tools/metadata"
 import JSONToXMLClient from "./client"
 
 const tool = getToolByPath("/tools/converters/json-to-xml")
 
-export const metadata: Metadata = {
-  title: `${tool?.title}`,
-  description: tool?.description,
-}
+export const metadata: Metadata = buildToolPageMetadata("/tools/converters/json-to-xml")
 
 export default function JSONToXMLPage() {
   if (!tool) {

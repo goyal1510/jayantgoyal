@@ -1,13 +1,11 @@
 import type { Metadata } from "next"
 import { getToolByPath } from "@/lib/tools/tools"
+import { buildToolPageMetadata } from "@/lib/tools/metadata"
 import URLParserClient from "./client"
 
 const tool = getToolByPath("/tools/parsers-validators/url-parser")
 
-export const metadata: Metadata = {
-  title: `${tool?.title}`,
-  description: tool?.description,
-}
+export const metadata: Metadata = buildToolPageMetadata("/tools/parsers-validators/url-parser")
 
 export default function URLParserPage() {
   if (!tool) {
