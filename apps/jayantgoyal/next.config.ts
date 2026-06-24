@@ -48,6 +48,12 @@ const nextConfig: NextConfig = {
           { key: "Link", value: '</.well-known/api-catalog>; rel="api-catalog", </llms.txt>; rel="ai-content"' },
         ],
       },
+      {
+        source: "/assets/Jayant_Resume.pdf",
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, noarchive" },
+        ],
+      },
       // Cache static assets aggressively
       {
         source: "/assets/(.*)",
