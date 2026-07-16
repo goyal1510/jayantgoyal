@@ -136,7 +136,7 @@
   a real provider without a Google client. The local Main journey clicks the real
   Google button, follows a synthetic authorize redirect, exercises the real PKCE
   callback and SSR cookie writer, and reaches `/` without contacting Google. The
-  read-only suite passes 19/19; the full suite passes 19 and skips five
+  read-only suite passes 24/24; the full suite passes 24 and skips five
   credential-gated journeys. This evidence is explicitly limited to application
   integration; it does not claim Google consent/provider verification.
 - Added `packages/auth` as the shared auth infrastructure boundary. Both apps now
@@ -151,3 +151,8 @@
   canceled by the project's Ignored Build Step, so they did not produce a fresh
   preview artifact for the extraction commit. The preview observation blocker is
   unchanged.
+- Prepared the PLATFORM-04 cookie contract without enabling runtime promotion:
+  shared helpers codify the approved versioned name/attributes, distinguish the
+  legacy Supabase cookie, order chunks deterministically, and require an explicit
+  flag plus already-validated session before promotion. Five focused read-only
+  tests pass; no live cookie was read or changed.

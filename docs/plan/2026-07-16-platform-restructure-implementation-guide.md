@@ -463,8 +463,9 @@ If the Supabase storage format or chunking prevents safe promotion, choose one e
 
 ### Phase 4 checklist
 
-- [ ] Confirm the actual current cookie name and chunking behavior.
-- [ ] Approve the versioned production and staging cookie names.
+- [x] Confirm the actual current cookie name and chunking behavior.
+- [x] Approve the versioned production and staging cookie names.
+- [x] Codify deterministic chunk ordering, exact-name separation, and a disabled-by-default promotion predicate.
 - [ ] Add environment-specific cookie configuration.
 - [ ] Prove cookie deletion uses matching Domain and Path.
 - [ ] Prove Studio/current main and Admin read the same session.

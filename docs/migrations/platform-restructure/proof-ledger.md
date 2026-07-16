@@ -208,8 +208,8 @@ here.
   callback behavior and Admin now validates its callback and welcome return
   paths before constructing a redirect.
 - **Verification:** `pnpm check-types`, `pnpm lint`, and the complete local
-  `pnpm test:auth:read-only` suite pass (19/19). The full `pnpm test:auth`
-  command passes 19 tests and safely skips five credential-gated journeys. The
+  `pnpm test:auth:read-only` suite pass (24/24). The full `pnpm test:auth`
+  command passes 24 tests and safely skips five credential-gated journeys. The
   static SSR contract now checks the shared cookie adapter for Supabase response
   headers and checks both applications import the shared proxy adapter.
 - **Rollback:** Revert the shared package, two app dependency entries, wrapper
@@ -218,3 +218,24 @@ here.
 - **Gate status:** The local extraction is ready for same-PR review, but the phase
   remains gate-pending until PLATFORM-02 receives its required deployed Preview
   observation. No deployment or production claim is made for this slice.
+
+## PLATFORM-04 — Platform-cookie contract preflight (not enabled)
+
+- **Baseline:** The observed Supabase cookie base name and chunking behavior are
+  recorded in `auth-inventory.md`; the existing host-only cookie remains the only
+  active runtime session cookie.
+- **Approved target:** Added the distinct `__Secure-jg-session-v1` contract with
+  `Domain=jayantgoyal.com`, `Path=/`, `Secure`, `SameSite=Lax`, and the reviewed
+  max-age. The code rejects unsafe overrides and never changes the existing
+  `sb-<project>-auth-token` name.
+- **Deterministic helpers:** Shared cookie utilities now derive the legacy name,
+  sort base/chunk suffixes, rename chunks without changing opaque values, and
+  permit promotion only when the feature flag is enabled, the server has already
+  validated the session, and no platform cookie exists. No helper is enabled by
+  either app and no live cookie value was read, copied, logged, or changed.
+- **Verification:** The five new read-only platform-cookie tests pass. The full
+  workspace type-check, lint, build, and existing auth suite remain green before
+  this preflight is committed.
+- **Gate status:** This is preparation only. Environment-specific configuration,
+  real dual-read/promotion, stable subdomain SSO, logout clearing, expiry and
+  concurrent-refresh observation remain pending PLATFORM-04 staging gates.
