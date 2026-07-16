@@ -321,7 +321,7 @@ packages/
     typescript-config/
 
 supabase/
-    schema/
+    schemas/
     migrations/
 
 docs/
