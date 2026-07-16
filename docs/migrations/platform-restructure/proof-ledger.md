@@ -265,8 +265,9 @@ Ignored Build Step`, so no new preview artifact for this implementation is
   application secret, or user data was used or recorded.
 - **Boundary:** This is route and source preflight only. No Auth Vercel project,
   `auth.jayantgoyal.com` domain, Supabase redirect/provider setting, parent-domain
-  cookie promotion, or production redirect was changed. Real Google consent and
-  stable-staging cross-application SSO remain unproved.
+  cookie promotion, or production redirect was changed at the time of the
+  implementation commit. Real Google consent and stable-staging cross-application
+  SSO remain unproved.
 - **Gate status:** PLATFORM-05 remains Pending until the required deployment
   identifiers, provider matrix, stable-staging session-sharing proof, security
   review, observation window, and rollback evidence exist. Rollback is deleting
@@ -278,3 +279,43 @@ Ignored Build Step`, so no new preview artifact for this implementation is
   `5gcMKthbFYVu29Uxj8YcYzpUZuHD` Admin). They did not create fresh Ready
   application artifacts; the Ready `4f68d82` deployments remain deployment-only
   evidence behind Vercel Deployment Protection.
+
+## PLATFORM-05 — Post-merge Vercel/Auth deployment setup (DNS gate pending)
+
+- **Merge:** PR #31 merged into `main` as `381250549a5bd3cb05d2a8539209fe9dc4100bf4`
+  using the repository owner's personal GitHub identity. The former draft/permission
+  blocker is resolved.
+- **Vercel project:** Created and linked `jayantgoyal-auth` in the personal Vercel
+  team with project ID `prj_QqKDVWIDobJMiHMvKxoZBmAYhXRT`, framework Next.js,
+  `rootDirectory=apps/auth`, and repository `goyal1510/jayantgoyal`. The build
+  and install commands are declared in `apps/auth/vercel.json` to return to the
+  monorepo root and filter the Auth workspace. No service-role variable was added.
+- **Environment names:** Configured the public Supabase URL/key for development,
+  preview, and production, plus local and production Auth site URL names. Values
+  are intentionally absent from repository proof. Preview site URL remains to be
+  assigned after a Git-based preview deployment.
+- **Deployment evidence:** Direct CLI deployments proved the project can be
+  created, but the app-only and root local-upload paths returned 404. The latest
+  probe `dpl_7Qwv9qbLTDYEFeKnXZrpjBuJpUr9` reached Ready while still producing no
+  Next output because it was not a Git-root build; this is retained as a failed
+  probe, not a production claim. The Git repository is connected; the checked-in
+  `vercel.json` now uses the app-root `pnpm install --frozen-lockfile` and
+  `turbo run build --filter=auth` commands (Turbo discovers the workspace without
+  a forbidden parent-directory traversal), and only its cloned-repository build
+  can satisfy this deployment gate.
+- **Custom domain:** `auth.jayantgoyal.com` is attached to the Auth project and
+  Vercel reports `configured-correctly` after the Cloudflare change. The current
+  DNS answers are Cloudflare-proxied A records; the recommended unproxied CNAME
+  remains `auth → 872d75b6a0b9f030.vercel-dns-017.com` if proxying is removed.
+- **Gate status:** PLATFORM-05 remains Pending until the Git-based deployment is
+  Ready with a real Next output, Auth callback/provider configuration is reviewed,
+  and the stable-staging cross-application session/Google matrix passes.
+- **Cross-project regression fix:** The shared repository `.vercelignore` was
+  removing `.git`, causing Main/Admin's existing `scripts/ignore-build.sh` to
+  fail before their builds. Removing that one entry preserves the safe upload
+  exclusions while allowing all Git-connected projects to run their ignore step.
+- **Git preview verification:** Deployment `dpl_Ckb75v9wXrD7YYdyeDKgvmDKA3nd`
+  cloned commit `b62e35a`, installed all nine workspaces, detected Next.js
+  `16.1.6`, and completed `turbo run build --filter=auth`. The preview
+  `/login` response is `200`. `auth.jayantgoyal.com` still returns `404` because
+  its project production target has not yet been promoted from this branch.
