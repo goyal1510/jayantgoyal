@@ -147,3 +147,7 @@
   and the full local read-only auth suite pass after extraction. This is a local
   implementation slice in the same draft PR; no deployment or production claim is
   recorded until the PLATFORM-02 observation gate is satisfied.
+- The PR's latest Main/Admin Vercel checks completed with success status but were
+  canceled by the project's Ignored Build Step, so they did not produce a fresh
+  preview artifact for the extraction commit. The preview observation blocker is
+  unchanged.

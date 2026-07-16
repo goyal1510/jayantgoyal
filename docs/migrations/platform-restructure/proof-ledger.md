@@ -195,9 +195,10 @@ here.
   factories and cookie adapters; the apps retain their existing wrappers so
   route and UI imports do not change.
 - **Commit/deployment:** Implementation is committed as `b496649` on the existing
-  `codex/platform-restructure` branch and pushed to draft PR #31. Main and Admin
-  Vercel checks for this commit are still pending; no deployed behavior claim is
-  made yet.
+  `codex/platform-restructure` branch and pushed to draft PR #31. The subsequent
+  Main and Admin Vercel checks completed successfully but reported `Canceled by
+  Ignored Build Step`, so no new preview artifact for this implementation is
+  available and no deployed behavior claim is made.
 - **Boundary review:** The package contains no auth pages, callback routes,
   route matchers, database role query, or product permission decisions. Admin
   role lookup and both applications' route policy remain local. The service-role
