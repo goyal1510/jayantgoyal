@@ -13,6 +13,8 @@
   on `codex/platform-restructure`.
 - Baseline, merge base, and current `origin/main`:
   `8710ac83fea719c3cd35e090da3281e57a1d5344`.
+- Current implementation head: `b496649` (`feat(auth): extract shared auth
+  infrastructure`), pushed to the existing draft PR #31.
 - Protected source clone remains clean/read-only on `main`.
 - Ignored local state copied at setup: three approved environment files and six
   permitted non-secret Supabase link/version metadata files. No pooler URL,
