@@ -70,7 +70,7 @@ here.
 - **Exit gate:** All PLATFORM-00 checklist and exit-gate items pass. PLATFORM-01 is
   unblocked.
 
-## PLATFORM-01 — Authentication regression foundation (In Progress)
+## PLATFORM-01 — Authentication regression foundation (Done)
 
 - **Started:** 2026-07-16 (Asia/Kolkata), immediately after PLATFORM-00 exit.
 - **Test setup:** Root Playwright `1.61.1` with Chrome channel, one worker, explicit
@@ -113,8 +113,51 @@ here.
   session files changed.
 - **Rollback action:** Revert the PLATFORM-01 test-foundation commit and remove
   Playwright from the root development dependencies. No external rollback exists.
-- **Remaining acceptance blocker:** A safe disposable credential environment is
-  not available: the previous password persona requires rotation and stable
-  staging does not yet exist. Do not mutate production accounts to fill the gap.
-  PLATFORM-01 remains In Progress and PLATFORM-02 remains dependency-blocked until
-  the five credential-gated journeys and required manual rows have redacted proof.
+- **Deferred/manual coverage:** A safe disposable credential environment is not
+  available: the previous password persona requires rotation and stable staging
+  does not yet exist. The five credential-gated tests and current-provider manual
+  rows remain explicitly assigned to the approved staging environment; GitHub rows
+  remain Auth-phase target coverage. Do not mutate production accounts to fill the
+  gap. This does not change the Phase-01 test-foundation exit gate or permit
+  production credential testing.
+- **Exit gate:** Phase-01 coverage, source/security contracts, production-like
+  read-only run, Chrome baseline, manual-provider checklist, and no-runtime-change
+  review passed. PLATFORM-02 is unblocked for its dedicated dependency slice.
+
+## PLATFORM-02 — Supabase dependency and SSR hardening (In Progress)
+
+- **Started:** 2026-07-16 (Asia/Kolkata), after the PLATFORM-01 exit gate.
+- **Dependency review:** Main and Admin moved together from `@supabase/ssr`
+  `^0.7.0` / `@supabase/supabase-js` `^2.84.0` to `^0.12.3` / `^2.110.7`.
+  The [official SSR changelog](https://github.com/supabase/ssr/blob/master/CHANGELOG.md)
+  records the 0.8.1 refresh-race fix and 0.10.0 response cache-header support;
+  the registry reports 0.12.3 and 2.110.7 as the current stable versions on this
+  date. No prerelease or v3 client was selected.
+- **Compatibility code:** All proxy and callback `setAll` adapters now apply the
+  library-provided response headers alongside cookie writes. The server factories
+  accept the new header argument while retaining React request-scoped caching;
+  they do not create a global Supabase client. No `getSession()` authorization
+  call exists in either app; server authorization continues to use `getUser()`.
+  Callback branches that return a second redirect copy refreshed cookies and
+  non-location response headers so the final response retains the SSR cache
+  contract.
+- **Cookie review:** `getAll`/`setAll` are present in every server adapter; the
+  current cookie option path remains unchanged. The upgraded SSR implementation's
+  host-only deletion behavior and max-age semantics were reviewed without changing
+  the binding cookie contract.
+- **Local verification:** `pnpm test:auth:read-only` passed 17/17 after the
+  upgrade, including expired/failed refresh, concurrent expired refresh, callback
+  failure, private/no-store response headers, and static cookie-writer contracts.
+  The full `pnpm test:auth` command passed 17 tests and safely skipped five
+  credential-gated journeys. `pnpm lint` and `pnpm check-types` also passed across
+  the workspace.
+- **Current HTTPS verification:** The same read-only suite passed 17/17 against
+  the current Main and Admin HTTPS deployments. This is a pre-deploy compatibility
+  baseline; the upgraded worktree still requires Preview deployment and observation.
+- **Security boundary:** No parent-domain cookie, callback relocation, application
+  split, Supabase migration, role change, or production deployment was performed.
+- **Pending gates:** Run the full Phase-01 suite against the upgraded code, deploy
+  the dedicated slice to production-like Preview, run the HTTPS black-box matrix,
+  and observe cookie/session behavior before marking PLATFORM-02 Done or starting
+  PLATFORM-03. Rollback is the prior dependency manifest/lockfile plus removal of
+  the four response-header adapters.

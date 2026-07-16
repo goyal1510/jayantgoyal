@@ -56,3 +56,26 @@ test("@read-only known gap: default visible logout is explicit current-session s
   expect(mainLogout).toContain('signOut({ scope: "local" })');
   expect(adminLogout).toContain('signOut({ scope: "local" })');
 });
+
+test("@read-only SSR cookie writers propagate private cache headers", () => {
+  const files = [
+    "apps/jayantgoyal/src/proxy.ts",
+    "apps/admin/src/proxy.ts",
+    "apps/jayantgoyal/src/app/auth/callback/route.ts",
+    "apps/admin/src/app/auth/callback/route.ts",
+  ];
+
+  for (const file of files) {
+    const content = source(file);
+    expect(content).toMatch(/setAll[^\n]*headers/);
+    expect(content).toContain("Object.entries(headers)");
+    expect(content).toContain("response.headers.set(name, value)");
+  }
+
+  expect(
+    source("apps/jayantgoyal/src/app/auth/callback/route.ts"),
+  ).toContain('if (name !== "location") target.headers.set(name, value)');
+  expect(
+    source("apps/admin/src/app/auth/callback/route.ts"),
+  ).toContain('if (name !== "location") target.headers.set(name, value)');
+});

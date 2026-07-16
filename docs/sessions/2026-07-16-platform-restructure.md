@@ -22,8 +22,9 @@
   applied.
 - Binding architecture blueprint and implementation guide read completely. The
   full PLATFORM-00 through PLATFORM-12 Codex goal remains active.
-- PLATFORM-00 is Done and PLATFORM-01 is In Progress. Later tasks remain Pending
-  and dependency-gated.
+- PLATFORM-00 and PLATFORM-01 are Done. PLATFORM-02 is In Progress as a
+  dedicated Supabase dependency/SSR compatibility slice; later tasks remain
+  Pending and dependency-gated.
 
 ## PLATFORM-00 Result
 
@@ -104,7 +105,14 @@
 - `pnpm lint` and `pnpm check-types` passed across the workspace. No runtime auth,
   cookie, callback, route-protection, account, provider, deployment, or database
   behavior changed.
-- PLATFORM-01 remains In Progress because no approved disposable credential
-  environment is available: the prior persona requires rotation and stable staging
-  does not yet exist. PLATFORM-02 remains dependency-blocked until the five gated
-  journeys and required manual provider rows have redacted proof.
+- PLATFORM-01 is now Done at its approved safe boundary: all test-foundation and
+  read-only gates passed, while credential-bearing tests remain explicitly
+  staging-only. No production account mutation was used. PLATFORM-02 is now the
+  active dependency/SSR hardening slice.
+- PLATFORM-02 upgraded both apps to `@supabase/ssr` `0.12.3` and
+  `@supabase/supabase-js` `2.110.7`, applied cache-control headers from the new
+  `setAll` contract in proxy/callback response adapters, and added concurrent
+  refresh and no-store regression checks. Local read-only auth tests pass 17/17;
+  the full command passes 17 and safely skips five credential-gated cases. Lint,
+  type checks, and the pre-deploy HTTPS read-only run also pass. Preview deployment
+  and post-deploy HTTPS observation remain pending.

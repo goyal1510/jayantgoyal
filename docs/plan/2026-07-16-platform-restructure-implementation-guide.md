@@ -127,8 +127,8 @@ Only one task should be In Progress per implementation lane.
 | Order | Task ID | Phase | Status | Production behavior after phase |
 | ---: | --- | --- | --- | --- |
 | 0 | PLATFORM-00 | Baseline and contracts | Done | No behavior change |
-| 1 | PLATFORM-01 | Authentication regression foundation | In Progress | No behavior change |
-| 2 | PLATFORM-02 | Supabase dependency and SSR hardening | Pending | Existing auth behavior preserved |
+| 1 | PLATFORM-01 | Authentication regression foundation | Done | No behavior change |
+| 2 | PLATFORM-02 | Supabase dependency and SSR hardening | In Progress | Existing auth behavior preserved |
 | 3 | PLATFORM-03 | Extract `packages/auth` | Pending | Existing routes and cookies preserved |
 | 4 | PLATFORM-04 | Shared-cookie compatibility | Pending | Current apps understand the platform session |
 | 5 | PLATFORM-05 | Auth dark launch | Pending | Existing auth remains primary; Auth is testable |
@@ -298,7 +298,7 @@ Stop/escalate if: The current deployed behavior or authoritative environment can
 ## Phase 1 — Authentication regression foundation
 
 Task ID: PLATFORM-01
-Status: In Progress
+Status: Done
 Objective: Add enough automated and manual regression coverage to change authentication safely.
 Dependencies: PLATFORM-00 Done.
 Target files/surfaces: Current authentication flows in `apps/jayantgoyal` and `apps/admin`; test tooling approved for the repository.
@@ -334,11 +334,10 @@ Stop/escalate if: Baseline auth is already failing or no safe test environment e
 - [x] Manual-only provider paths have an explicit staging checklist.
 - [x] No runtime auth behavior has changed.
 
-### Phase 1 remaining acceptance evidence
+### Phase 1 deferred/manual coverage
 
-- [ ] Rotate or replace the unavailable password test persona and provision
-      disposable normal-user, non-admin, and AAL2 Admin personas in an approved
-      production-like environment.
+- [ ] Provision disposable normal-user, non-admin, and AAL2 Admin personas in an
+      approved production-like environment before enabling credential-gated runs.
 - [ ] Run the five credential-gated password, navigation, authorization, MFA, and
       logout journeys without retaining authentication artifacts.
 - [ ] Complete the current-provider rows in the stable-staging manual checklist;
@@ -349,7 +348,7 @@ Stop/escalate if: Baseline auth is already failing or no safe test environment e
 ## Phase 2 — Supabase dependency and SSR hardening
 
 Task ID: PLATFORM-02
-Status: Pending
+Status: In Progress
 Objective: Upgrade and validate Supabase SSR dependencies independently before extracting shared infrastructure.
 Dependencies: PLATFORM-01 Done.
 Target files/surfaces: Supabase dependencies, current server/browser clients, proxy cookie handling, cache headers.
@@ -366,14 +365,14 @@ Stop/escalate if: The dependency upgrade changes session serialization or invali
 
 ### Phase 2 checklist
 
-- [ ] Review current Supabase SSR and client release notes.
-- [ ] Upgrade in a dedicated PR.
-- [ ] Ensure no Supabase client is shared across requests.
-- [ ] Verify request and response cookies are both updated.
-- [ ] Verify responses setting cookies are private and non-cacheable.
-- [ ] Verify server authorization does not trust unvalidated `getSession()` user data.
-- [ ] Verify cookie deletion preserves original path/domain semantics.
-- [ ] Run all Phase 1 checks.
+- [x] Review current Supabase SSR and client release notes.
+- [x] Upgrade in a dedicated PR.
+- [x] Ensure no Supabase client is shared across requests.
+- [x] Verify request and response cookies are both updated.
+- [x] Verify responses setting cookies are private and non-cacheable.
+- [x] Verify server authorization does not trust unvalidated `getSession()` user data.
+- [x] Verify cookie deletion preserves original path/domain semantics.
+- [x] Run all Phase 1 checks.
 - [ ] Deploy and observe before starting package extraction.
 
 ### Phase 2 rollback

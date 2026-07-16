@@ -71,6 +71,7 @@ test("@read-only expired and failed refresh state recovers to the product gate",
 
   const response = await page.goto(appUrl(base.toString(), "/files"));
   expect(response?.status()).toBeLessThan(500);
+  expect(response?.headers()["cache-control"]).toContain("no-store");
   expect(new URL(page.url()).pathname).toBe("/files");
   await expect(
     page.getByRole("heading", {
@@ -78,6 +79,51 @@ test("@read-only expired and failed refresh state recovers to the product gate",
       exact: true,
     }),
   ).toBeVisible();
+});
+
+test("@read-only concurrent expired refreshes remain recoverable", async ({
+  browser,
+}) => {
+  const contexts = [await browser.newContext(), await browser.newContext()];
+  const base = new URL(authTestEnvironment.mainBaseUrl);
+
+  try {
+    for (const context of contexts) {
+      await context.addCookies([
+        {
+          name: CURRENT_COOKIE_NAME,
+          value: expiredSessionCookie(),
+          domain: base.hostname,
+          path: "/",
+          secure: base.protocol === "https:",
+        },
+      ]);
+    }
+
+    const pages = await Promise.all(
+      contexts.map((context) => context.newPage()),
+    );
+    const responses = await Promise.all(
+      pages.map((page) => page.goto(appUrl(base.toString(), "/files"))),
+    );
+
+    responses.forEach((response) => {
+      expect(response?.status()).toBeLessThan(500);
+      expect(response?.headers()["cache-control"]).toContain("no-store");
+    });
+    await Promise.all(
+      pages.map((page) =>
+        expect(
+          page.getByRole("heading", {
+            name: "Sign in to access this page",
+            exact: true,
+          }),
+        ).toBeVisible(),
+      ),
+    );
+  } finally {
+    await Promise.all(contexts.map((context) => context.close()));
+  }
 });
 
 test("@read-only Admin root sends an anonymous browser to Admin login", async ({

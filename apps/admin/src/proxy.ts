@@ -9,10 +9,7 @@ export const config = {
 };
 
 // APIs safe to call without completing MFA
-const UNRESTRICTED_APIS = [
-  "/api/account/profile",
-  "/api/account/mfa-cleanup",
-];
+const UNRESTRICTED_APIS = ["/api/account/profile", "/api/account/mfa-cleanup"];
 
 export default async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -28,11 +25,7 @@ export default async function proxy(request: NextRequest) {
   const response = NextResponse.next({ request: { headers: request.headers } });
 
   // Public paths that don't require authentication
-  const publicPaths = [
-    "/welcome",
-    "/unauthorized",
-    "/auth/callback",
-  ];
+  const publicPaths = ["/welcome", "/unauthorized", "/auth/callback"];
 
   const isPublic = publicPaths.some((path) => pathname.startsWith(path));
 
@@ -49,9 +42,12 @@ export default async function proxy(request: NextRequest) {
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll: () => request.cookies.getAll(),
-      setAll: (cookies) => {
+      setAll: (cookies, headers) => {
         cookies.forEach(({ name, value, options }) => {
           response.cookies.set(name, value, options);
+        });
+        Object.entries(headers).forEach(([name, value]) => {
+          response.headers.set(name, value);
         });
       },
     },
@@ -81,14 +77,16 @@ export default async function proxy(request: NextRequest) {
   // the MFA verify page, auth callback, and essential APIs.
   if (pathname.startsWith("/auth/callback")) return response;
 
-  const { data: aalData } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  const { data: aalData } =
+    await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
   const needsMfa =
-    aalData?.currentLevel === "aal1" &&
-    aalData?.nextLevel === "aal2";
+    aalData?.currentLevel === "aal1" && aalData?.nextLevel === "aal2";
 
   if (needsMfa) {
     const { data: factorsData } = await supabase.auth.mfa.listFactors();
-    const hasVerifiedFactor = factorsData?.totp.some((f) => f.status === "verified");
+    const hasVerifiedFactor = factorsData?.totp.some(
+      (f) => f.status === "verified",
+    );
 
     if (hasVerifiedFactor) {
       if (pathname.startsWith("/mfa-verify")) {
@@ -96,11 +94,13 @@ export default async function proxy(request: NextRequest) {
       }
 
       if (pathname.startsWith("/api/")) {
-        const isAllowed = UNRESTRICTED_APIS.some((api) => pathname.startsWith(api));
+        const isAllowed = UNRESTRICTED_APIS.some((api) =>
+          pathname.startsWith(api),
+        );
         if (!isAllowed) {
           return NextResponse.json(
             { error: "MFA verification required." },
-            { status: 403 }
+            { status: 403 },
           );
         }
         return response;
@@ -124,7 +124,11 @@ export default async function proxy(request: NextRequest) {
   }
 
   // Admin role check (skip for unauthorized page and MFA verify)
-  if (!isPublic && pathname !== "/unauthorized" && !pathname.startsWith("/mfa-verify")) {
+  if (
+    !isPublic &&
+    pathname !== "/unauthorized" &&
+    !pathname.startsWith("/mfa-verify")
+  ) {
     const { data: profile } = await supabase
       .schema("jg_account")
       .from("profiles")

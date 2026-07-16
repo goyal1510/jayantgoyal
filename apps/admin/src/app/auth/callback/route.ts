@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
+function copyResponseState(source: NextResponse, target: NextResponse) {
+  source.cookies.getAll().forEach(({ name, value, ...options }) => {
+    target.cookies.set(name, value, options);
+  });
+  source.headers.forEach((value, name) => {
+    if (name !== "location") target.headers.set(name, value);
+  });
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
@@ -21,9 +30,12 @@ export async function GET(request: NextRequest) {
       getAll() {
         return request.cookies.getAll();
       },
-      setAll(cookiesToSet) {
+      setAll(cookiesToSet, headers) {
         cookiesToSet.forEach(({ name, value, options }) => {
           response.cookies.set(name, value, options);
+        });
+        Object.entries(headers).forEach(([name, value]) => {
+          response.headers.set(name, value);
         });
       },
     },
@@ -31,7 +43,11 @@ export async function GET(request: NextRequest) {
 
   const { error } = await supabase.auth.exchangeCodeForSession(code);
   if (error) {
-    return NextResponse.redirect(new URL("/welcome?error=auth", request.url));
+    const errorResponse = NextResponse.redirect(
+      new URL("/welcome?error=auth", request.url),
+    );
+    copyResponseState(response, errorResponse);
+    return errorResponse;
   }
 
   // Always redirect through /mfa-verify after OAuth — the page checks
@@ -39,8 +55,6 @@ export async function GET(request: NextRequest) {
   const mfaUrl = new URL("/mfa-verify", request.url);
   mfaUrl.searchParams.set("redirect", next);
   const mfaResponse = NextResponse.redirect(mfaUrl);
-  response.cookies.getAll().forEach(({ name, value, ...options }) => {
-    mfaResponse.cookies.set(name, value, options);
-  });
+  copyResponseState(response, mfaResponse);
   return mfaResponse;
 }

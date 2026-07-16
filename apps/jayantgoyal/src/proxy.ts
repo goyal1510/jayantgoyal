@@ -164,9 +164,12 @@ export default async function proxy(request: NextRequest) {
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll: () => request.cookies.getAll(),
-      setAll: (cookies) => {
+      setAll: (cookies, headers) => {
         cookies.forEach(({ name, value, options }) => {
           response.cookies.set(name, value, options);
+        });
+        Object.entries(headers).forEach(([name, value]) => {
+          response.headers.set(name, value);
         });
       },
     },
