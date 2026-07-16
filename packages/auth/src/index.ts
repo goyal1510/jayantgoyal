@@ -4,13 +4,18 @@ export {
   createResponseCookieMethods,
   platformCookiePolicyForHost,
   platformizeSessionCookies,
+  promoteValidatedSessionCookies,
   normalizeSessionCookies,
   resolvePlatformSessionConfig,
 } from "./cookies";
 export { createSupabaseProxyClient } from "./proxy";
 export { createSupabaseServerClient } from "./server";
 export { isAdminRole, requiresMfaStepUp } from "./permissions";
-export { safeRedirectPath } from "./redirects";
+export {
+  PLATFORM_ALLOWED_ORIGINS,
+  safeRedirectPath,
+  safeRedirectTarget,
+} from "./redirects";
 export {
   requireSupabasePublicConfig,
   requireSupabaseServiceConfig,

@@ -11,6 +11,7 @@ import {
   platformCookieOptions,
   platformCookiePolicyForHost,
   platformizeSessionCookies,
+  promoteValidatedSessionCookies,
   renameCookieChunks,
   resolvePlatformSessionConfig,
   sessionCookieNames,
@@ -231,4 +232,61 @@ test("@read-only platform writes set the parent cookie and delete legacy chunks"
       options: { path: "/", maxAge: 600 },
     },
   ]);
+});
+
+test("@read-only validated legacy bootstrap promotes chunks and clears legacy names", () => {
+  const config = {
+    supabaseUrl: "https://orwfvyditlguqvxvztkw.supabase.co",
+    policy: LOCAL_PLATFORM_COOKIE_POLICY,
+  };
+  const names = sessionCookieNames(config.supabaseUrl, config.policy);
+
+  expect(
+    promoteValidatedSessionCookies(
+      [
+        { name: `${names.legacy}.1`, value: "chunk-one" },
+        { name: names.legacy, value: "chunk-zero" },
+        { name: "unrelated", value: "ignored" },
+      ],
+      config,
+    ),
+  ).toEqual([
+    {
+      name: names.platform,
+      value: "chunk-zero",
+      options: {
+        path: "/",
+        secure: false,
+        sameSite: "lax",
+        maxAge: config.policy.maxAge,
+      },
+    },
+    {
+      name: names.legacy,
+      value: "",
+      options: { path: "/", maxAge: 0 },
+    },
+    {
+      name: `${names.platform}.1`,
+      value: "chunk-one",
+      options: {
+        path: "/",
+        secure: false,
+        sameSite: "lax",
+        maxAge: config.policy.maxAge,
+      },
+    },
+    {
+      name: `${names.legacy}.1`,
+      value: "",
+      options: { path: "/", maxAge: 0 },
+    },
+  ]);
+
+  expect(
+    promoteValidatedSessionCookies(
+      [{ name: names.platform, value: "already-platform" }],
+      config,
+    ),
+  ).toEqual([]);
 });

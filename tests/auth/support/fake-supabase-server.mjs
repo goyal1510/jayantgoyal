@@ -2,14 +2,27 @@ import http from "node:http";
 
 const port = Number(process.env.AUTH_TEST_FAKE_SUPABASE_PORT || 54329);
 const localUserId = "00000000-0000-4000-8000-000000000001";
-const localAccessToken = "local-oauth-access-token";
+const localAccessToken = [
+  Buffer.from(JSON.stringify({ alg: "none", typ: "JWT" })).toString(
+    "base64url",
+  ),
+  Buffer.from(
+    JSON.stringify({
+      sub: localUserId,
+      aud: "authenticated",
+      role: "authenticated",
+      aal: "aal1",
+    }),
+  ).toString("base64url"),
+  "local-signature",
+].join(".");
 const localRefreshToken = "local-oauth-refresh-token";
 
 const user = {
   id: localUserId,
   aud: "authenticated",
   role: "authenticated",
-  email: "oauth-test@example.invalid",
+  email: "sso-test@example.com",
   email_confirmed_at: "2026-01-01T00:00:00.000Z",
   app_metadata: { provider: "google", providers: ["google"] },
   user_metadata: { full_name: "Local OAuth Test" },
@@ -20,6 +33,10 @@ const user = {
 
 function writeJson(response, status, body) {
   response.writeHead(status, {
+    "access-control-allow-origin": "*",
+    "access-control-allow-headers":
+      "apikey, authorization, content-type, x-client-info, x-supabase-api-version",
+    "access-control-allow-methods": "GET,POST,OPTIONS",
     "cache-control": "private, no-store",
     "content-type": "application/json",
   });
@@ -27,7 +44,13 @@ function writeJson(response, status, body) {
 }
 
 function writeEmpty(response, status = 204) {
-  response.writeHead(status, { "cache-control": "private, no-store" });
+  response.writeHead(status, {
+    "access-control-allow-origin": "*",
+    "access-control-allow-headers":
+      "apikey, authorization, content-type, x-client-info, x-supabase-api-version",
+    "access-control-allow-methods": "GET,POST,OPTIONS",
+    "cache-control": "private, no-store",
+  });
   response.end();
 }
 
@@ -71,8 +94,51 @@ function invalidCode(code) {
 const server = http.createServer(async (request, response) => {
   const url = new URL(request.url || "/", `http://127.0.0.1:${port}`);
 
+  if (request.method === "OPTIONS") {
+    response.writeHead(204, {
+      "access-control-allow-origin": "*",
+      "access-control-allow-headers":
+        "apikey, authorization, content-type, x-client-info, x-supabase-api-version",
+      "access-control-allow-methods": "GET,POST,OPTIONS",
+    });
+    return response.end();
+  }
+
   if (url.pathname === "/health") {
     return writeJson(response, 200, { status: "ok" });
+  }
+
+  if (url.pathname === "/auth/v1/settings" && request.method === "GET") {
+    return writeJson(response, 200, {
+      external: {
+        apple: false,
+        azure: false,
+        bitbucket: false,
+        discord: false,
+        facebook: false,
+        figma: false,
+        fly: false,
+        github: false,
+        gitlab: false,
+        google: false,
+        kakao: false,
+        keycloak: false,
+        linkedin: false,
+        linkedin_oidc: false,
+        notion: false,
+        spotify: false,
+        slack: false,
+        workos: false,
+        twitch: false,
+        twitter: false,
+        email: true,
+        phone: false,
+        zoom: false,
+      },
+      disable_signup: false,
+      mailer_autoconfirm: true,
+      password: { min_length: 6, hiblp: false },
+    });
   }
 
   // This loopback-only authorize endpoint stands in for Google's consent page.
@@ -100,6 +166,19 @@ const server = http.createServer(async (request, response) => {
         return writeJson(response, 400, {
           error: "invalid_grant",
           error_description: "The local OAuth code is invalid.",
+        });
+      }
+      return writeJson(response, 200, sessionResponse());
+    }
+
+    if (grantType === "password") {
+      if (
+        body.email !== "sso-test@example.com" ||
+        body.password !== "local-test-password"
+      ) {
+        return writeJson(response, 400, {
+          error: "invalid_grant",
+          error_description: "The local password is invalid.",
         });
       }
       return writeJson(response, 200, sessionResponse());
