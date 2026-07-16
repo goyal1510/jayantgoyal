@@ -2,6 +2,22 @@ import { expect, test } from "@playwright/test";
 
 import { appUrl, authTestEnvironment } from "./support/environment";
 
+test("@read-only @local-oauth Main Google callback works without a provider UI", async ({
+  page,
+}) => {
+  test.skip(
+    !authTestEnvironment.fakeSupabase,
+    "The loopback OAuth fixture is only enabled for local auth runs.",
+  );
+
+  await page.goto(appUrl(authTestEnvironment.mainBaseUrl, "/welcome"));
+  await page.getByRole("button", { name: "Continue with Google" }).click();
+
+  await expect
+    .poll(() => new URL(page.url()).pathname, { timeout: 20_000 })
+    .toBe("/");
+});
+
 test("@read-only Main callback rejects a request with no credential", async ({
   page,
 }) => {

@@ -151,6 +151,15 @@ here.
   The full `pnpm test:auth` command passed 17 tests and safely skipped five
   credential-gated journeys. `pnpm lint` and `pnpm check-types` also passed across
   the workspace.
+- **Loopback provider verification:** The existing Playwright harness now starts
+  a loopback-only fake Supabase Auth server for local runs. It implements only the
+  synthetic authorize, PKCE exchange, refresh failure, user, factor-list, logout,
+  and empty PostgREST responses needed by the read-only suite. The new Main Google
+  journey clicks the real Google button, follows the real OAuth callback, writes
+  the SSR session cookie, and reaches `/` without contacting Google or reading a
+  credential. `pnpm test:auth:read-only` passed 18/18 and the full command passed
+  18 with five credential-gated tests skipped. This is app-integration evidence,
+  not proof of Google's own consent UI or provider configuration.
 - **Current HTTPS verification:** The same read-only suite passed 17/17 against
   the current Main and Admin HTTPS deployments. This is a pre-deploy compatibility
   baseline; the upgraded worktree still requires Preview deployment and observation.

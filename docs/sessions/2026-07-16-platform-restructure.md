@@ -127,3 +127,11 @@
   ready (`MarkPullRequestReadyForReview` permission denied), so no merge or
   production deployment was attempted. The PR and branch remain unchanged; the
   existing Playwright suite is the only local auth validation path.
+- After checking the official Supabase Google documentation, added a loopback-only
+  fake Supabase Auth server to the existing Playwright harness rather than enabling
+  a real provider without a Google client. The local Main journey clicks the real
+  Google button, follows a synthetic authorize redirect, exercises the real PKCE
+  callback and SSR cookie writer, and reaches `/` without contacting Google. The
+  read-only suite passes 18/18; the full suite passes 18 and skips five
+  credential-gated journeys. This evidence is explicitly limited to application
+  integration; it does not claim Google consent/provider verification.

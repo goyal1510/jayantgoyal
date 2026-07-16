@@ -5,12 +5,29 @@ import { authTestEnvironment } from "./support/environment";
 const webServer = authTestEnvironment.external
   ? undefined
   : [
+      ...(authTestEnvironment.fakeSupabase
+        ? [
+            {
+              command: "node support/fake-supabase-server.mjs",
+              url: `${authTestEnvironment.supabaseBaseUrl}/health`,
+              reuseExistingServer: !process.env.CI,
+              timeout: 30_000,
+            },
+          ]
+        : []),
       {
         command:
           "pnpm --dir ../../apps/jayantgoyal exec next dev --webpack --port 3000",
         url: `${authTestEnvironment.mainBaseUrl}/welcome`,
         reuseExistingServer: !process.env.CI,
         timeout: 120_000,
+        env: {
+          ...process.env,
+          NEXT_PUBLIC_SUPABASE_URL: authTestEnvironment.supabaseBaseUrl,
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: authTestEnvironment.supabaseAnonKey,
+          SUPABASE_SERVICE_ROLE_KEY: authTestEnvironment.supabaseServiceRoleKey,
+          NEXT_PUBLIC_SITE_URL: authTestEnvironment.mainBaseUrl,
+        },
       },
       {
         command:
@@ -18,6 +35,13 @@ const webServer = authTestEnvironment.external
         url: `${authTestEnvironment.adminBaseUrl}/welcome`,
         reuseExistingServer: !process.env.CI,
         timeout: 120_000,
+        env: {
+          ...process.env,
+          NEXT_PUBLIC_SUPABASE_URL: authTestEnvironment.supabaseBaseUrl,
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: authTestEnvironment.supabaseAnonKey,
+          SUPABASE_SERVICE_ROLE_KEY: authTestEnvironment.supabaseServiceRoleKey,
+          NEXT_PUBLIC_SITE_URL: authTestEnvironment.adminBaseUrl,
+        },
       },
     ];
 

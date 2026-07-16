@@ -24,6 +24,7 @@
 
 | RISK-020 | PLATFORM-02 | Vercel Deployment Protection blocks unauthenticated Preview probes with an SSO redirect, preventing post-deploy black-box auth observation from the shell. | Preview deployments completed for `5f27a53`; use an approved authenticated Vercel/Chrome session or owner-provided non-secret bypass before marking PLATFORM-02 Done. No bypass token is retained. | PLATFORM-02/04 | Open — observation blocker |
 | RISK-021 | PLATFORM-02 | The connected GitHub account cannot mark draft PR #31 ready for review, so the authorized merge-and-deploy validation path cannot be completed from this session. | Keep the PR open and the branch unchanged; use the existing local regression evidence. The repository owner must mark the PR ready or merge it before post-merge deployment observation can begin. | PLATFORM-02 | Open — permission blocker |
+| RISK-022 | PLATFORM-02 | A loopback fake provider can prove the application's OAuth callback and SSR session handling but cannot prove Google's consent UI, Google client configuration, or production provider behavior. | Keep the deterministic fake-provider journey local-only and non-secret. Reserve real Google provider validation for an approved disposable stable-staging persona or an explicitly configured local Google OAuth client. | PLATFORM-02/05/06 | Open — coverage boundary |
 
 No current route, deployment, environment name, auth surface, persisted-state key,
 or table owner remains unknown. Open items above are explicit implementation,

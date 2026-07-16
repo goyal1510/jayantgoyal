@@ -4,6 +4,9 @@ import path from "node:path";
 const AUTH_TEST_KEYS = new Set([
   "AUTH_TEST_MAIN_BASE_URL",
   "AUTH_TEST_ADMIN_BASE_URL",
+  "AUTH_TEST_SUPABASE_URL",
+  "AUTH_TEST_SUPABASE_ANON_KEY",
+  "AUTH_TEST_SUPABASE_SERVICE_ROLE_KEY",
   "AUTH_TEST_ALLOW_AUTHENTICATED",
   "AUTH_TEST_CROSS_HOST",
   "AUTH_TEST_USER_EMAIL",
@@ -59,6 +62,10 @@ function normalizeBaseUrl(value: string) {
 
 const explicitMainUrl = process.env.AUTH_TEST_MAIN_BASE_URL?.trim();
 const explicitAdminUrl = process.env.AUTH_TEST_ADMIN_BASE_URL?.trim();
+const explicitSupabaseUrl = process.env.AUTH_TEST_SUPABASE_URL?.trim();
+const explicitSupabaseAnonKey = process.env.AUTH_TEST_SUPABASE_ANON_KEY?.trim();
+const explicitSupabaseServiceRoleKey =
+  process.env.AUTH_TEST_SUPABASE_SERVICE_ROLE_KEY?.trim();
 
 if (Boolean(explicitMainUrl) !== Boolean(explicitAdminUrl)) {
   throw new Error(
@@ -70,6 +77,11 @@ export const authTestEnvironment = {
   mainBaseUrl: normalizeBaseUrl(explicitMainUrl || "http://127.0.0.1:3000"),
   adminBaseUrl: normalizeBaseUrl(explicitAdminUrl || "http://127.0.0.1:3001"),
   external: Boolean(explicitMainUrl && explicitAdminUrl),
+  supabaseBaseUrl: explicitSupabaseUrl || "http://127.0.0.1:54329",
+  supabaseAnonKey: explicitSupabaseAnonKey || "local-auth-test-anon-key",
+  supabaseServiceRoleKey:
+    explicitSupabaseServiceRoleKey || "local-auth-test-service-key",
+  fakeSupabase: !explicitSupabaseUrl && !explicitMainUrl && !explicitAdminUrl,
   authenticated: process.env.AUTH_TEST_ALLOW_AUTHENTICATED === "true",
   crossHost: process.env.AUTH_TEST_CROSS_HOST === "true",
 };
