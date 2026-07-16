@@ -14,6 +14,7 @@
   - Added branch-specific Preview values for `studio.staging.jayantgoyal.com` on Main, `portfolio.staging.jayantgoyal.com` on Portfolio, and `admin.staging.jayantgoyal.com` on Admin.
   - Left generic Preview without a fixed site URL so each deployment uses its own origin.
   - Standardized Development URLs and local scripts: Portfolio `3000`, Studio `3001`, Admin `3002`; Auth remains reserved for `3003`.
+  - Added and read back Studio's cross-app `NEXT_PUBLIC_PORTFOLIO_URL` exactly once for Development, generic Preview, `staging` Preview, and Production. Local Studio targets Portfolio on `3000`, persistent staging targets Portfolio staging, and generic Preview/Production target the stable apex.
   - Confirmed the three Supabase variables cover Development, Preview, and Production on both existing projects without exposing their values.
   - Configured Portfolio's complete eleven-key runtime contract across Development, generic Preview, branch-specific `staging` Preview, and Production. The Portfolio project intentionally has no Supabase service-role key.
 - Existing e-commerce Vercel projects are intentionally outside this platform migration.
@@ -57,6 +58,7 @@
 - The Studio hostname receives Studio-specific root metadata, sidebar branding, navigation ownership, and breadcrumb labeling.
 - The existing apex/local root continues rendering the current Portfolio experience; no domain has been moved and no production host behavior has changed yet.
 - Focused verification passed: Main TypeScript, zero-warning ESLint, production build, Studio hostname browser rendering, Studio product inventory and links, current-root Portfolio compatibility, zero horizontal overflow at the default browser viewport, and zero captured browser console errors.
+- Studio's Blog, Portfolio, terms/contact, and error-navigation links now respect the split boundary. A local production black-box check confirms the Studio marker renders, Blog crosses to Portfolio, and product links remain on Studio.
 - Vercel preview deployment `dpl_7y1m635L1BoYUzBqMqmYvunsjKTB` is Ready and passed black-box checks for Studio metadata and inventory links. Because the daily deployment limit blocked promotion, the exact tested deployment is reversibly assigned to `studio.jayantgoyal.com`.
 - Public DNS resolves `studio.jayantgoyal.com` to Vercel, direct HTTPS checks return `200`, and the apex still redirects to the existing `www` Portfolio with no Studio marker.
 - `studio.staging.jayantgoyal.com` has valid public DNS/TLS, is attached to the `staging` branch, and temporarily serves the same tested immutable Studio deployment until a post-limit staging build succeeds.

@@ -33,6 +33,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+import { PORTFOLIO_URL, portfolioUrl } from "@/lib/platform/urls";
+
 export type NavItem = {
   id: string;
   label: string;
@@ -349,7 +351,17 @@ const PORTFOLIO_EXTERNAL_APP: AppConfig = {
   color: "text-emerald-500 dark:text-emerald-400",
   isPublic: true,
   navItems: [],
-  externalUrl: "https://jayantgoyal.com",
+  externalUrl: PORTFOLIO_URL,
+};
+
+const PORTFOLIO_BLOG_EXTERNAL_APP: AppConfig = {
+  id: "blog",
+  name: "Blog",
+  icon: FileText,
+  color: "text-orange-500 dark:text-orange-400",
+  isPublic: true,
+  navItems: [],
+  externalUrl: portfolioUrl("/blog"),
 };
 
 export function getSurfaceApps(surface: "legacy" | "studio"): AppConfig[] {
@@ -357,7 +369,10 @@ export function getSurfaceApps(surface: "legacy" | "studio"): AppConfig[] {
 
   return [
     STUDIO_HOME_APP,
-    ...HUB_APPS.filter((app) => app.id !== "portfolio"),
+    ...HUB_APPS.filter(
+      (app) => app.id !== "portfolio" && app.id !== "blog",
+    ),
+    PORTFOLIO_BLOG_EXTERNAL_APP,
     PORTFOLIO_EXTERNAL_APP,
   ];
 }

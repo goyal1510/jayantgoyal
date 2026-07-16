@@ -76,8 +76,9 @@ export default function Error({
             </svg>
             Try Again
           </button>
-          <a
-            href="/portfolio"
+          <button
+            type="button"
+            onClick={() => window.location.assign("/")}
             className="inline-flex items-center justify-center rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-4 py-2 text-sm font-medium text-neutral-900 dark:text-neutral-100 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors"
           >
             <svg
@@ -96,7 +97,7 @@ export default function Error({
               <polyline points="9 22 9 12 15 12 15 22" />
             </svg>
             Go Home
-          </a>
+          </button>
         </div>
       </div>
     </div>

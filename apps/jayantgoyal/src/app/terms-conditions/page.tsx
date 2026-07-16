@@ -3,6 +3,8 @@ import { Button } from "@repo/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { FileText } from "lucide-react"
 import type { Metadata } from "next"
+import Link from "next/link"
+import { portfolioUrl } from "@/lib/platform/urls"
 
 export const metadata: Metadata = {
   title: "Terms & Conditions",
@@ -37,7 +39,7 @@ export default function TermsConditionsPage() {
           <p className="text-sm text-muted-foreground">
             If you have any questions about these terms, please{" "}
             <a
-              href="/portfolio#contact"
+              href={portfolioUrl("/#contact")}
               className="text-primary underline underline-offset-4 hover:text-primary/80"
             >
               contact us
@@ -45,7 +47,7 @@ export default function TermsConditionsPage() {
             .
           </p>
           <Button asChild>
-            <a href="https://jayantgoyal.com">Continue to Site</a>
+            <Link href="/">Continue to Site</Link>
           </Button>
         </div>
       </div>

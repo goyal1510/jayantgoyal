@@ -40,6 +40,8 @@ During compatibility, the current Main application remains at `apps/jayantgoyal`
 
 `NEXT_PUBLIC_SITE_URL` is public configuration and must not be treated as a secret. All sensitive values remain server-only. The Portfolio environment inventory exists without a service-role key; Auth receives its own inventory only when that application exists.
 
+Studio uses `NEXT_PUBLIC_PORTFOLIO_URL` for links that cross the application boundary. Its Development value is `http://localhost:3000`, the `staging` Preview value is `https://portfolio.staging.jayantgoyal.com`, and generic Preview/Production use `https://jayantgoyal.com`. This keeps ephemeral Studio previews on the stable public Portfolio while giving the persistent staging branch a matched staging destination.
+
 ## Supabase Auth URL rollout
 
 The hosted Auth configuration currently contains local-only URLs. The first configuration slice changes the hosted Site URL to `https://jayantgoyal.com` and adds the current Main/Admin callbacks, local callbacks, and narrowly scoped Vercel-preview patterns. The code must then stop placing `next` in the OAuth `redirectTo` URL and preserve the validated destination server-side.

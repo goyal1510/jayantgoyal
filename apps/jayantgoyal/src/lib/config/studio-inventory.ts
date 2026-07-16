@@ -12,6 +12,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+import { portfolioUrl } from "@/lib/platform/urls";
+
 export type StudioProduct = {
   id: string;
   name: string;
@@ -68,7 +70,7 @@ export const STUDIO_PRODUCTS: StudioProduct[] = [
     name: "Blog",
     description:
       "Notes and practical write-ups about software engineering, products, and experiments.",
-    href: "/blogs",
+    href: portfolioUrl("/blog"),
     icon: FileText,
     access: "public",
     capability: "Writing",
