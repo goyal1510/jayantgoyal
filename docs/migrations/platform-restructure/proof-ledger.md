@@ -145,10 +145,10 @@ here.
   current cookie option path remains unchanged. The upgraded SSR implementation's
   host-only deletion behavior and max-age semantics were reviewed without changing
   the binding cookie contract.
-- **Local verification:** `pnpm test:auth:read-only` passed 17/17 after the
+- **Local verification:** `pnpm test:auth:read-only` passed 19/19 after the
   upgrade, including expired/failed refresh, concurrent expired refresh, callback
   failure, private/no-store response headers, and static cookie-writer contracts.
-  The full `pnpm test:auth` command passed 17 tests and safely skipped five
+  The full `pnpm test:auth` command passed 19 tests and safely skipped five
   credential-gated journeys. `pnpm lint` and `pnpm check-types` also passed across
   the workspace.
 - **Loopback provider verification:** The existing Playwright harness now starts
@@ -157,8 +157,8 @@ here.
   and empty PostgREST responses needed by the read-only suite. The new Main Google
   journey clicks the real Google button, follows the real OAuth callback, writes
   the SSR session cookie, and reaches `/` without contacting Google or reading a
-  credential. `pnpm test:auth:read-only` passed 18/18 and the full command passed
-  18 with five credential-gated tests skipped. This is app-integration evidence,
+  credential. `pnpm test:auth:read-only` passed 19/19 and the full command passed
+  19 with five credential-gated tests skipped. This is app-integration evidence,
   not proof of Google's own consent UI or provider configuration.
 - **Current HTTPS verification:** The same read-only suite passed 17/17 against
   the current Main and Admin HTTPS deployments. This is a pre-deploy compatibility
@@ -175,9 +175,9 @@ here.
   the current non-authenticated shell.
 - **Pending gates:** Run the upgraded HTTPS black-box matrix and observe
   cookie/session behavior through an approved authenticated Preview session before
-  marking PLATFORM-02 Done or starting PLATFORM-03. The production-like pre-deploy
-  baseline remains 17/17 read-only passes. Rollback is the prior dependency
-  manifest/lockfile plus removal of the four response-header adapters.
+  marking PLATFORM-02 Done. The production-like pre-deploy baseline for the
+  upgraded dependency slice is 19/19 local read-only passes. Rollback is the prior
+  dependency manifest/lockfile plus removal of the four response-header adapters.
 - **Exact access blocker:** Preview observation requires the user's Vercel-authenticated
   Chrome session or an approved non-secret Deployment Protection bypass supplied by
   the project owner. No bypass token was requested, stored, or exposed. A fresh
@@ -186,3 +186,30 @@ here.
   cookies, or account identifiers. The user declined to complete the one-time MFA
   step, so no authenticated post-MFA claim is made. Preview observation remains
   pending and the live Chrome check will not be repeated.
+
+## PLATFORM-03 — Shared auth infrastructure extraction (implementation slice; gate pending)
+
+- **Implementation:** Added `packages/auth` with explicit browser, server, proxy,
+  cookies, redirects, session, permissions, types, and server-only admin
+  subpaths. Main and Admin now consume the same browser/server/proxy/admin
+  factories and cookie adapters; the apps retain their existing wrappers so
+  route and UI imports do not change.
+- **Boundary review:** The package contains no auth pages, callback routes,
+  route matchers, database role query, or product permission decisions. Admin
+  role lookup and both applications' route policy remain local. The service-role
+  factory is only available from the explicit `@repo/auth/admin` server subpath.
+- **Redirect review:** Shared `safeRedirectPath` rejects protocol-relative,
+  foreign-origin, backslash, and malformed targets; Main keeps relative-only
+  callback behavior and Admin now validates its callback and welcome return
+  paths before constructing a redirect.
+- **Verification:** `pnpm check-types`, `pnpm lint`, and the complete local
+  `pnpm test:auth:read-only` suite pass (19/19). The full `pnpm test:auth`
+  command passes 19 tests and safely skips five credential-gated journeys. The
+  static SSR contract now checks the shared cookie adapter for Supabase response
+  headers and checks both applications import the shared proxy adapter.
+- **Rollback:** Revert the shared package, two app dependency entries, wrapper
+  imports, proxy/callback imports, and lockfile changes as one commit; no cookie,
+  route, schema, deployment, or provider setting changed in this slice.
+- **Gate status:** The local extraction is ready for same-PR review, but the phase
+  remains gate-pending until PLATFORM-02 receives its required deployed Preview
+  observation. No deployment or production claim is made for this slice.

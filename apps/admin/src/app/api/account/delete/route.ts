@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import {
+  createSupabaseAdminClient,
+  createSupabaseServerClient,
+} from "@/lib/supabase/server";
 
 export async function DELETE() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -10,7 +12,7 @@ export async function DELETE() {
   if (!supabaseUrl || !serviceRoleKey) {
     return NextResponse.json(
       { error: "Service role key is not configured." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
@@ -23,24 +25,21 @@ export async function DELETE() {
   if (authError || !user) {
     return NextResponse.json(
       { error: "You must be signed in to delete the account." },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
   // Anonymous users cannot delete their accounts (they can just sign out)
   if (user.is_anonymous === true) {
     return NextResponse.json(
-      { error: "Anonymous accounts cannot be deleted. Please sign out instead." },
-      { status: 403 }
+      {
+        error: "Anonymous accounts cannot be deleted. Please sign out instead.",
+      },
+      { status: 403 },
     );
   }
 
-  const adminClient = createClient(supabaseUrl, serviceRoleKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
+  const adminClient = createSupabaseAdminClient();
 
   const { error } = await adminClient.auth.admin.deleteUser(user.id);
 

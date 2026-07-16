@@ -1,4 +1,4 @@
-import { createBrowserClient } from "@supabase/ssr";
+import { createSupabaseBrowserClient as createSharedBrowserClient } from "@repo/auth/browser";
 
 export function createSupabaseBrowserClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -8,5 +8,5 @@ export function createSupabaseBrowserClient() {
     throw new Error("Missing Supabase environment variables.");
   }
 
-  return createBrowserClient(supabaseUrl, supabaseAnonKey);
+  return createSharedBrowserClient({ supabaseUrl, supabaseAnonKey });
 }

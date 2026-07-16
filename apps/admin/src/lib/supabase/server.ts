@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { cache } from "react";
-import { createServerClient } from "@supabase/ssr";
+import { createSupabaseServerClient as createSharedServerClient } from "@repo/auth/server";
+import { createSupabaseAdminClient as createSharedAdminClient } from "@repo/auth/admin";
 
 export const createSupabaseServerClient = cache(async () => {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -12,22 +13,10 @@ export const createSupabaseServerClient = cache(async () => {
 
   const cookieStore = await cookies();
 
-  return createServerClient(supabaseUrl, supabaseAnonKey, {
-    cookies: {
-      getAll() {
-        return cookieStore.getAll();
-      },
-      setAll(cookiesToSet, headers) {
-        void headers;
-        try {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            cookieStore.set(name, value, options);
-          });
-        } catch {
-          // The cookies API can be read-only in edge contexts; swallow errors.
-        }
-      },
-    },
+  return createSharedServerClient({
+    supabaseUrl,
+    supabaseAnonKey,
+    cookieStore,
   });
 });
 
@@ -43,12 +32,8 @@ export function createSupabaseAdminClient() {
     throw new Error("Missing Supabase admin environment variables.");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { createClient } = require("@supabase/supabase-js");
-  return createClient(supabaseUrl, supabaseServiceKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
+  return createSharedAdminClient({
+    supabaseUrl,
+    serviceRoleKey: supabaseServiceKey,
   });
 }

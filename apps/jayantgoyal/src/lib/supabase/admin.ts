@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createSupabaseAdminClient as createSharedAdminClient } from "@repo/auth/admin";
 
 /**
  * Creates a Supabase admin client using the service role key.
@@ -13,10 +13,8 @@ export function createSupabaseAdminClient() {
     throw new Error("Missing Supabase service role configuration.");
   }
 
-  return createClient(supabaseUrl, serviceRoleKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
+  return createSharedAdminClient({
+    supabaseUrl,
+    serviceRoleKey,
   });
 }

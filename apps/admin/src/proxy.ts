@@ -1,5 +1,7 @@
-import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { createSupabaseProxyClient } from "@repo/auth/proxy";
+import { isAdminRole } from "@repo/auth/permissions";
+import { safeRedirectPath } from "@repo/auth/redirects";
 
 export const config = {
   matcher: [
@@ -39,16 +41,16 @@ export default async function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-    cookies: {
+  const supabase = createSupabaseProxyClient({
+    supabaseUrl,
+    supabaseAnonKey,
+    responseStore: {
       getAll: () => request.cookies.getAll(),
-      setAll: (cookies, headers) => {
-        cookies.forEach(({ name, value, options }) => {
-          response.cookies.set(name, value, options);
-        });
-        Object.entries(headers).forEach(([name, value]) => {
-          response.headers.set(name, value);
-        });
+      setCookie: (name, value, options) => {
+        response.cookies.set(name, value, options);
+      },
+      setHeader: (name, value) => {
+        response.headers.set(name, value);
       },
     },
   });
@@ -79,15 +81,13 @@ export default async function proxy(request: NextRequest) {
 
   const { data: aalData } =
     await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-  const needsMfa =
+  const needsMfaLevel =
     aalData?.currentLevel === "aal1" && aalData?.nextLevel === "aal2";
-
-  if (needsMfa) {
+  if (needsMfaLevel) {
     const { data: factorsData } = await supabase.auth.mfa.listFactors();
     const hasVerifiedFactor = factorsData?.totp.some(
       (f) => f.status === "verified",
     );
-
     if (hasVerifiedFactor) {
       if (pathname.startsWith("/mfa-verify")) {
         return response;
@@ -117,8 +117,9 @@ export default async function proxy(request: NextRequest) {
   // Redirect authenticated users away from welcome page
   if (pathname.startsWith("/welcome")) {
     const redirectUrl = request.nextUrl.searchParams.get("redirect");
-    if (redirectUrl && redirectUrl.startsWith("/")) {
-      return NextResponse.redirect(new URL(redirectUrl, request.url));
+    const safeRedirect = safeRedirectPath(redirectUrl, "/", request.url);
+    if (safeRedirect !== "/") {
+      return NextResponse.redirect(new URL(safeRedirect, request.url));
     }
     return NextResponse.redirect(new URL("/", request.url));
   }
@@ -136,7 +137,7 @@ export default async function proxy(request: NextRequest) {
       .eq("user_id", user!.id)
       .single();
 
-    if (!profile || !["admin", "super_admin"].includes(profile.role)) {
+    if (!profile || !isAdminRole(profile.role)) {
       return NextResponse.redirect(new URL("/unauthorized", request.url));
     }
 

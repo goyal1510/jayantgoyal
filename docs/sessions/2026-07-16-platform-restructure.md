@@ -22,9 +22,11 @@
   applied.
 - Binding architecture blueprint and implementation guide read completely. The
   full PLATFORM-00 through PLATFORM-12 Codex goal remains active.
-- PLATFORM-00 and PLATFORM-01 are Done. PLATFORM-02 is In Progress as a
-  dedicated Supabase dependency/SSR compatibility slice; later tasks remain
-  Pending and dependency-gated.
+- PLATFORM-00 and PLATFORM-01 are Done. PLATFORM-02 remains In Progress because
+  its deployed Preview observation gate is open. The approved same-PR workflow
+  now contains the behavior-preserving PLATFORM-03 extraction slice; its local
+  implementation checks pass, but its exit gate remains dependency-gated until
+  PLATFORM-02 observation is complete.
 
 ## PLATFORM-00 Result
 
@@ -132,6 +134,14 @@
   a real provider without a Google client. The local Main journey clicks the real
   Google button, follows a synthetic authorize redirect, exercises the real PKCE
   callback and SSR cookie writer, and reaches `/` without contacting Google. The
-  read-only suite passes 18/18; the full suite passes 18 and skips five
+  read-only suite passes 19/19; the full suite passes 19 and skips five
   credential-gated journeys. This evidence is explicitly limited to application
   integration; it does not claim Google consent/provider verification.
+- Added `packages/auth` as the shared auth infrastructure boundary. Both apps now
+  import the same browser/server/proxy/cookie/service-role factories while keeping
+  auth UI, callback routes, route matchers, Admin role queries, and product policy
+  local. Added shared safe redirect validation and pure role/AAL predicates without
+  changing the current factorless-Admin behavior. `pnpm check-types`, `pnpm lint`,
+  and the full local read-only auth suite pass after extraction. This is a local
+  implementation slice in the same draft PR; no deployment or production claim is
+  recorded until the PLATFORM-02 observation gate is satisfied.

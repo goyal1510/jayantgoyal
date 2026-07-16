@@ -373,7 +373,10 @@ Stop/escalate if: The dependency upgrade changes session serialization or invali
 - [x] Verify server authorization does not trust unvalidated `getSession()` user data.
 - [x] Verify cookie deletion preserves original path/domain semantics.
 - [x] Run all Phase 1 checks.
-- [ ] Deploy and observe before starting package extraction.
+- [ ] Deploy and observe before marking PLATFORM-02 Done. The approved same-PR
+      workflow permits preparing the behavior-preserving PLATFORM-03 extraction
+      in this branch, but neither phase may pass its exit gate until this
+      observation is complete.
 
 ### Phase 2 rollback
 
@@ -403,23 +406,25 @@ Stop/escalate if: The package begins absorbing application policy or UI.
 
 ### Phase 3 checklist
 
-- [ ] Define package subpath exports for browser, server, proxy, cookies, redirects, session, permissions, and types.
-- [ ] Move only duplicated browser client construction.
-- [ ] Move only duplicated per-request server client construction.
-- [ ] Move only duplicated refresh/cookie adapter behavior.
-- [ ] Add safe relative/origin redirect validation.
-- [ ] Add pure AAL and role predicates only if currently duplicated.
-- [ ] Keep Admin role lookup in Admin.
-- [ ] Keep route matchers in each application.
-- [ ] Keep authentication UI in current applications until Auth exists.
-- [ ] Remove replaced local infrastructure after both consumers pass.
-- [ ] Confirm the package deletes more code than it adds conceptually.
+- [x] Define package subpath exports for browser, server, proxy, cookies, redirects, session, permissions, and types.
+- [x] Move only duplicated browser client construction.
+- [x] Move only duplicated per-request server client construction.
+- [x] Move only duplicated refresh/cookie adapter behavior.
+- [x] Add safe relative/origin redirect validation.
+- [x] Add pure AAL and role predicates without moving application policy.
+- [x] Keep Admin role lookup in Admin.
+- [x] Keep route matchers in each application.
+- [x] Keep authentication UI in current applications until Auth exists.
+- [x] Remove replaced local infrastructure after both consumers pass.
+- [x] Confirm the package deletes more code than it adds conceptually.
 
 ### Phase 3 exit gate
 
-- [ ] Main and Admin import the same auth infrastructure.
-- [ ] No user-visible flow or cookie has changed.
-- [ ] No application policy moved into the shared package.
+- [x] Main and Admin import the same auth infrastructure.
+- [x] No user-visible flow or cookie has changed in local regression coverage.
+- [x] No application policy moved into the shared package.
+- [ ] Complete the PLATFORM-02 deployment/observation gate, then repeat the
+      approved black-box matrix before marking PLATFORM-03 Done.
 
 ---
 

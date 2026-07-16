@@ -30,6 +30,25 @@ test("@read-only auth tests contain no credential or token literals", () => {
   );
 });
 
+test("@read-only browser and Admin routes do not expose service-role construction", () => {
+  expect(source("apps/jayantgoyal/src/lib/supabase/client.ts")).not.toContain(
+    '"@repo/auth/admin"',
+  );
+  expect(source("apps/admin/src/lib/supabase/client.ts")).not.toContain(
+    '"@repo/auth/admin"',
+  );
+
+  const adminRoutes = [
+    "apps/admin/src/app/api/account/delete/route.ts",
+    "apps/admin/src/app/api/users/route.ts",
+    "apps/admin/src/app/api/portfolio/[table]/helpers.ts",
+  ];
+  for (const file of adminRoutes) {
+    expect(source(file)).not.toContain('from "@supabase/supabase-js"');
+    expect(source(file)).toContain("createSupabaseAdminClient");
+  }
+});
+
 test("@read-only known gap: Admin callback rejects external return destinations", () => {
   test.fail(true, "PLATFORM-00 proved the current Admin callback is open.");
   const callback = source("apps/admin/src/app/auth/callback/route.ts");
@@ -58,24 +77,27 @@ test("@read-only known gap: default visible logout is explicit current-session s
 });
 
 test("@read-only SSR cookie writers propagate private cache headers", () => {
-  const files = [
+  const appFiles = [
     "apps/jayantgoyal/src/proxy.ts",
     "apps/admin/src/proxy.ts",
     "apps/jayantgoyal/src/app/auth/callback/route.ts",
     "apps/admin/src/app/auth/callback/route.ts",
   ];
 
-  for (const file of files) {
+  for (const file of appFiles) {
     const content = source(file);
-    expect(content).toMatch(/setAll[^\n]*headers/);
-    expect(content).toContain("Object.entries(headers)");
-    expect(content).toContain("response.headers.set(name, value)");
+    expect(content).toContain('"@repo/auth/proxy"');
   }
 
-  expect(
-    source("apps/jayantgoyal/src/app/auth/callback/route.ts"),
-  ).toContain('if (name !== "location") target.headers.set(name, value)');
-  expect(
-    source("apps/admin/src/app/auth/callback/route.ts"),
-  ).toContain('if (name !== "location") target.headers.set(name, value)');
+  const sharedCookies = source("packages/auth/src/cookies.ts");
+  expect(sharedCookies).toMatch(/setAll[^\n]*headers/);
+  expect(sharedCookies).toContain("Object.entries(headers)");
+  expect(sharedCookies).toContain("responseStore.setHeader(name, value)");
+
+  expect(source("apps/jayantgoyal/src/app/auth/callback/route.ts")).toContain(
+    'if (name !== "location") target.headers.set(name, value)',
+  );
+  expect(source("apps/admin/src/app/auth/callback/route.ts")).toContain(
+    'if (name !== "location") target.headers.set(name, value)',
+  );
 });

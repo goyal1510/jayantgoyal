@@ -1,0 +1,34 @@
+{
+  "name": "@repo/auth",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts",
+    "./browser": "./src/browser.ts",
+    "./cookies": "./src/cookies.ts",
+    "./permissions": "./src/permissions.ts",
+    "./proxy": "./src/proxy.ts",
+    "./redirects": "./src/redirects.ts",
+    "./server": "./src/server.ts",
+    "./session": "./src/session.ts",
+    "./types": "./src/types.ts",
+    "./admin": "./src/admin.ts"
+  },
+  "scripts": {
+    "build": "echo 'source package — nothing to compile'",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src --max-warnings 0"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.12.3",
+    "@supabase/supabase-js": "^2.110.7"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^22.15.30",
+    "eslint": "^9.39.1",
+    "typescript": "5.9.2"
+  }
+}

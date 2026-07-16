@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { cache } from "react";
-import { createServerClient } from "@supabase/ssr";
+
+import { createSupabaseServerClient as createSharedServerClient } from "@repo/auth/server";
 
 export const createSupabaseServerClient = cache(async () => {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -12,21 +13,9 @@ export const createSupabaseServerClient = cache(async () => {
 
   const cookieStore = await cookies();
 
-  return createServerClient(supabaseUrl, supabaseAnonKey, {
-    cookies: {
-      getAll() {
-        return cookieStore.getAll();
-      },
-      setAll(cookiesToSet, headers) {
-        void headers;
-        try {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            cookieStore.set(name, value, options);
-          });
-        } catch {
-          // The cookies API can be read-only in edge contexts; swallow errors.
-        }
-      },
-    },
+  return createSharedServerClient({
+    supabaseUrl,
+    supabaseAnonKey,
+    cookieStore,
   });
 });

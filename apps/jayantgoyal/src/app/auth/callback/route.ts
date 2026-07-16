@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
+import { createSupabaseProxyClient } from "@repo/auth/proxy";
+import { safeRedirectPath } from "@repo/auth/redirects";
 
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
@@ -37,8 +38,7 @@ export async function GET(request: NextRequest) {
   const authRedirect = request.cookies.get("auth_redirect")?.value;
   const rawNext = authRedirect || requestUrl.searchParams.get("next") || "/";
   // Prevent open redirect — only allow relative paths
-  const next =
-    rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/";
+  const next = safeRedirectPath(rawNext, "/");
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -55,18 +55,16 @@ export async function GET(request: NextRequest) {
     response.cookies.set("auth_redirect", "", { path: "/", maxAge: 0 });
   }
 
-  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-    cookies: {
-      getAll() {
-        return request.cookies.getAll();
+  const supabase = createSupabaseProxyClient({
+    supabaseUrl,
+    supabaseAnonKey,
+    responseStore: {
+      getAll: () => request.cookies.getAll(),
+      setCookie: (name, value, options) => {
+        response.cookies.set(name, value, options);
       },
-      setAll(cookiesToSet, headers) {
-        cookiesToSet.forEach(({ name, value, options }) => {
-          response.cookies.set(name, value, options);
-        });
-        Object.entries(headers).forEach(([name, value]) => {
-          response.headers.set(name, value);
-        });
+      setHeader: (name, value) => {
+        response.headers.set(name, value);
       },
     },
   });
