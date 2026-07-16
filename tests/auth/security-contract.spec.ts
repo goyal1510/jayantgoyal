@@ -101,3 +101,32 @@ test("@read-only SSR cookie writers propagate private cache headers", () => {
     'if (name !== "location") target.headers.set(name, value)',
   );
 });
+
+test("@read-only Auth dark-launch surface keeps sensitive work behind explicit handlers", () => {
+  const routes = [
+    "apps/auth/src/app/login/page.tsx",
+    "apps/auth/src/app/register/page.tsx",
+    "apps/auth/src/app/forgot-password/page.tsx",
+    "apps/auth/src/app/reset-password/page.tsx",
+    "apps/auth/src/app/verify/page.tsx",
+    "apps/auth/src/app/callback/route.ts",
+    "apps/auth/src/app/mfa/page.tsx",
+    "apps/auth/src/app/account/security/page.tsx",
+    "apps/auth/src/app/account/providers/page.tsx",
+    "apps/auth/src/app/logout/page.tsx",
+    "apps/auth/src/app/api/logout/route.ts",
+  ];
+
+  for (const file of routes) expect(source(file)).toBeTruthy();
+
+  const logout = source("apps/auth/src/app/api/logout/route.ts");
+  expect(logout).toContain('request.headers.get("origin")');
+  expect(logout).toContain("status: 403");
+  expect(logout).toContain("status: 303");
+  expect(logout).not.toContain("@repo/auth/admin");
+
+  const authUi = source("apps/auth/src/app/auth-form.tsx");
+  const mfaUi = source("apps/auth/src/app/mfa-form.tsx");
+  expect(authUi).not.toMatch(/setError\([^)]*\.message/);
+  expect(mfaUi).not.toMatch(/setError\([^)]*\.message/);
+});
