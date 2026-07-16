@@ -590,7 +590,7 @@ Acceptance checks:
 ## Phase 7 — Studio technical deployment
 
 Task ID: PLATFORM-07
-Status: Pending
+Status: In Progress
 Objective: Establish the current application as Studio’s technical lineage and deploy it independently before redesign.
 Dependencies: Independent Portfolio dark launch is runnable; existing authentication remains compatible during the technical move. PLATFORM-06 is intentionally deferred by ADR-001.
 Target files/surfaces: `apps/jayantgoyal` package/folder identity, workspace filters, Vercel Studio project, Studio domains, environment assumptions, product links.
@@ -607,6 +607,8 @@ Acceptance checks:
   Stop/escalate if: The current root application cannot remain available while Studio is introduced.
 
 ### Phase 7 recommended PR slices
+
+ADR-002 keeps these review slices as commits inside one program PR rather than separate PRs.
 
 - [ ] PR 1: Rename package/filter identifiers without folder move if useful.
 - [ ] PR 2: Move `apps/jayantgoyal` to `apps/studio` with no behavior redesign.
@@ -626,7 +628,7 @@ Acceptance checks:
 - [ ] Developer tools and usage history
 - [ ] Weather
 - [ ] Terms/account initialization still required where intended
-- [ ] Public metadata and robots behavior reviewed
+- [x] Public metadata and robots behavior reviewed
 
 ### Phase 7 exit gate
 
@@ -657,36 +659,36 @@ Acceptance checks:
 
 ### Phase 8 page checklist
 
-- [ ] Home
-- [ ] About
-- [ ] Experience
-- [ ] Skills
-- [ ] Featured Projects
-- [ ] Resume
-- [ ] Blog index
-- [ ] Blog article
-- [ ] Contact
-- [ ] Not-found and error states
-- [ ] Sitemap
-- [ ] Robots
-- [ ] Open Graph and social metadata
-- [ ] Structured data where appropriate
+- [x] Home
+- [x] About
+- [x] Experience
+- [x] Skills
+- [x] Featured Projects
+- [x] Resume
+- [x] Blog index
+- [x] Blog article
+- [x] Contact
+- [x] Not-found and error states
+- [x] Sitemap
+- [x] Robots
+- [x] Open Graph and social metadata
+- [x] Structured data where appropriate
 
 ### Phase 8 lightness checklist
 
-- [ ] No global protected layout.
-- [ ] No product sidebar.
-- [ ] No authentication proxy on static routes.
-- [ ] No product state stores.
-- [ ] No weather, files, messenger, games, tools, or activity dependencies.
-- [ ] No service-role key unless a separately reviewed server-only operation proves it necessary.
-- [ ] Shared UI use is limited to primitives.
+- [x] No global protected layout.
+- [x] No product sidebar.
+- [x] No authentication proxy on static routes.
+- [x] No product state stores.
+- [x] No weather, files, messenger, games, tools, or activity dependencies.
+- [x] No service-role key unless a separately reviewed server-only operation proves it necessary.
+- [x] Shared UI use is limited to primitives.
 
 ### Phase 8 exit gate
 
 - [ ] Portfolio is independently deployed on staging.
-- [ ] Root-domain cutover is reversible.
-- [ ] Every root route has a final owner or redirect.
+- [x] Root-domain cutover is reversible.
+- [x] Every root route has a final owner or redirect.
 
 ---
 
