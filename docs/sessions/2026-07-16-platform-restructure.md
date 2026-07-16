@@ -214,5 +214,8 @@
   mode was changed.
 - The latest direct deployment `dpl_7Qwv9qbLTDYEFeKnXZrpjBuJpUr9` reached Ready
   but `/login` returned `404` because the local-upload path did not run the
-  monorepo Next build. The Git-connected branch deployment remains the only
-  deployment suitable for merge/cutover proof.
+  monorepo Next build. The app now declares the canonical monorepo commands in
+  `apps/auth/vercel.json` (`cd ../.. && pnpm install --frozen-lockfile` and
+  `cd ../.. && turbo run build --filter=auth`) so the Git-connected deployment
+  can run the build from the repository root. No production Auth cutover or
+  Google provider setting has been changed.
