@@ -530,6 +530,48 @@ Supabase Auth via `@supabase/ssr`. Supports email/password, magic link, PKCE OAu
 
 **Schemas:** `jg_account`, `portfolio`, `jg_app` (activity tracker, calculator, file manager, game hub, messenger, blog)
 
+### Supabase Safety
+
+- The canonical remote project for this repository is `jayantgoyal`
+  (`orwfvyditlguqvxvztkw`). Verify both the project name and reference before any
+  linked remote operation.
+- Linking is machine-local state under `supabase/.temp/`; never commit that
+  directory or copy it between clones or worktrees.
+- Treat `supabase/.temp/pooler-url` as ephemeral. Never retain or copy it, and
+  never place database passwords, access tokens, connection strings, or service
+  role keys in repository files or instructions.
+- Before any remote migration apply, run `supabase migration list --linked` and
+  inspect local/remote history. Any unexplained drift blocks a blanket
+  `supabase migration up`.
+- This repository currently has known historical drift: the remote project has
+  older migration records that are absent from `supabase/migrations`. Treat that
+  state as unresolved; do not repair migration history, pull schemas, or create
+  replacement historical migrations without explicit review and approval.
+- Never apply remote migrations from the main source clone or an ordinary dirty
+  worktree. Use the global `supabase-remote-migration-apply` skill, which creates
+  a clean disposable minimal workdir containing only canonical config and the
+  reviewed migration files.
+- A disposable workdir reduces accidental migration scope; it does not make an
+  unsafe migration safe. Review the SQL and target project independently.
+- After every successfully applied migration, refresh all three canonical
+  schema snapshots from the verified linked `jayantgoyal` project before the
+  task is considered complete:
+
+  ```bash
+  tmpdir="$(mktemp -d)"
+  supabase db dump --linked --schema jg_account --file "$tmpdir/jg_account.sql"
+  supabase db dump --linked --schema jg_app --file "$tmpdir/jg_app.sql"
+  supabase db dump --linked --schema portfolio --file "$tmpdir/portfolio.sql"
+  ```
+
+  Review each generated diff, confirm the dumps contain schema only (no data or
+  secrets), then replace `supabase/schemas/jg_account.sql`,
+  `supabase/schemas/jg_app.sql`, and `supabase/schemas/portfolio.sql` with the
+  reviewed outputs. Include the refreshed schema snapshots in the same
+  migration commit or PR. Remove any regenerated `supabase/.temp/pooler-url`.
+  If the refresh or verification fails, report the migration task as incomplete;
+  do not silently leave stale schema snapshots.
+
 ### Portfolio Data System
 
 Multi-source: `PORTFOLIO_DATA_SOURCE=database` fetches from Supabase; otherwise uses hardcoded data from `jayant-portfolio-data.ts`. Served via `PortfolioDataProvider` context, consumed with `usePortfolioData()`. Icons stored as string keys, resolved via `getIconComponent()` from `ICON_MAP`.
