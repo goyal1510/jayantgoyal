@@ -23,36 +23,51 @@ const portfolioSectionRedirects = [
   ["/contact", "/#contact"],
 ] as const;
 
-const studioPageRoutes = [
-  "/activity-tracker/:path*",
-  "/calculator/:path*",
-  "/custom-calculator/:path*",
-  "/files/:path*",
-  "/games/:path*",
-  "/github-stats/:path*",
-  "/loader-preview/:path*",
-  "/messenger/:path*",
-  "/tools/:path*",
-  "/weather/:path*",
-  "/forgot-password/:path*",
-  "/mfa-verify/:path*",
-  "/reset-password/:path*",
-  "/terms-conditions/:path*",
-  "/welcome/:path*",
-  "/auth/:path*",
-  "/.well-known/:path*",
+const studioPagePrefixes = [
+  "/activity-tracker",
+  "/calculator",
+  "/custom-calculator",
+  "/files",
+  "/games",
+  "/github-stats",
+  "/loader-preview",
+  "/messenger",
+  "/tools",
+  "/weather",
+  "/forgot-password",
+  "/mfa-verify",
+  "/reset-password",
+  "/terms-conditions",
+  "/welcome",
+  "/auth",
+  "/.well-known",
 ] as const;
 
-const studioApiRoutes = [
-  "/api/account/:path*",
-  "/api/activity-tracker/:path*",
-  "/api/calculator/:path*",
-  "/api/files/:path*",
-  "/api/games/:path*",
-  "/api/messenger/:path*",
-  "/api/tools/:path*",
-  "/api/typing-test/:path*",
+const studioApiPrefixes = [
+  "/api/account",
+  "/api/activity-tracker",
+  "/api/calculator",
+  "/api/files",
+  "/api/games",
+  "/api/messenger",
+  "/api/tools",
+  "/api/typing-test",
 ] as const;
+
+function buildStudioRedirects(prefixes: readonly string[]) {
+  return prefixes.flatMap((prefix) => [
+    {
+      source: prefix,
+      destination: `${STUDIO_URL}${prefix}`,
+      permanent: false,
+    },
+    {
+      source: `${prefix}/:path*`,
+      destination: `${STUDIO_URL}${prefix}/:path*`,
+      permanent: false,
+    },
+  ]);
+}
 
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -116,16 +131,8 @@ const nextConfig: NextConfig = {
         destination: `${STUDIO_URL}/welcome`,
         permanent: false,
       },
-      ...studioPageRoutes.map((source) => ({
-        source,
-        destination: `${STUDIO_URL}${source}`,
-        permanent: false,
-      })),
-      ...studioApiRoutes.map((source) => ({
-        source,
-        destination: `${STUDIO_URL}${source}`,
-        permanent: false,
-      })),
+      ...buildStudioRedirects(studioPagePrefixes),
+      ...buildStudioRedirects(studioApiPrefixes),
     ];
   },
   async headers() {
