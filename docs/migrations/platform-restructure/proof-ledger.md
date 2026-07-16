@@ -307,9 +307,10 @@ Ignored Build Step`, so no new preview artifact for this implementation is
   Vercel reports `configured-correctly` after the Cloudflare change. The current
   DNS answers are Cloudflare-proxied A records; the recommended unproxied CNAME
   remains `auth → 872d75b6a0b9f030.vercel-dns-017.com` if proxying is removed.
-- **Gate status:** PLATFORM-05 remains Pending until the Git-based deployment is
-  Ready with a real Next output, Auth callback/provider configuration is reviewed,
-  and the stable-staging cross-application session/Google matrix passes.
+- **Gate status:** The Git-based production deployment and custom-domain probe now
+  pass. PLATFORM-05 remains Pending until Auth callback/provider configuration is
+  reviewed, the stable-staging cross-application session/Google matrix passes,
+  and the required observation/rollback window is complete.
 - **Cross-project regression fix:** The shared repository `.vercelignore` was
   removing `.git`, causing Main/Admin's existing `scripts/ignore-build.sh` to
   fail before their builds. Removing that one entry preserves the safe upload
@@ -319,3 +320,9 @@ Ignored Build Step`, so no new preview artifact for this implementation is
   `16.1.6`, and completed `turbo run build --filter=auth`. The preview
   `/login` response is `200`. `auth.jayantgoyal.com` still returns `404` because
   its project production target has not yet been promoted from this branch.
+- **Production verification:** PR #32 merged as
+  `029f083b59f881a1fa80a302da97ad8c8440b93b`. Deployment
+  `dpl_BbC5DvGuf983JCbQoFm2wPS9PL7K` is Ready with the Auth Next output and
+  aliases `auth.jayantgoyal.com`; unauthenticated `HEAD /login` returns `200`
+  from both the deployment URL and the custom domain. No Google/provider or
+  cross-application session claim is made from this routing check.

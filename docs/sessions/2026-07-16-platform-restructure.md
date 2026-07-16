@@ -230,3 +230,10 @@
   still resolves to the earlier failed production deployment and returns `404`
   until the reviewed branch is merged and promoted. No provider or cutover claim
   is made from the preview alone.
+- PR #32 merged the deployment follow-up into `main` as
+  `029f083b59f881a1fa80a302da97ad8c8440b93b`. Production Auth deployment
+  `dpl_BbC5DvGuf983JCbQoFm2wPS9PL7K` is Ready, aliases `auth.jayantgoyal.com`,
+  and returns `200` for `/login` on both the deployment URL and custom domain.
+  This proves deployment and domain routing only; Google consent, provider
+  configuration, shared-session behavior, and the remaining observation gate
+  are still open.
