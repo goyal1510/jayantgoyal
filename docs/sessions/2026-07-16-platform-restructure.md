@@ -215,7 +215,7 @@
 - The latest direct deployment `dpl_7Qwv9qbLTDYEFeKnXZrpjBuJpUr9` reached Ready
   but `/login` returned `404` because the local-upload path did not run the
   monorepo Next build. The app now declares the canonical monorepo commands in
-  `apps/auth/vercel.json` (`cd ../.. && pnpm install --frozen-lockfile` and
-  `cd ../.. && turbo run build --filter=auth`) so the Git-connected deployment
-  can run the build from the repository root. No production Auth cutover or
-  Google provider setting has been changed.
+  `apps/auth/vercel.json` (`pnpm install --frozen-lockfile` and
+  `turbo run build --filter=auth`). Turbo discovers the workspace from the
+  configured app root without a parent-directory traversal. No production Auth
+  cutover or Google provider setting has been changed.

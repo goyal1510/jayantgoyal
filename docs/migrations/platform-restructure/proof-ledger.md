@@ -299,9 +299,10 @@ Ignored Build Step`, so no new preview artifact for this implementation is
   probe `dpl_7Qwv9qbLTDYEFeKnXZrpjBuJpUr9` reached Ready while still producing no
   Next output because it was not a Git-root build; this is retained as a failed
   probe, not a production claim. The Git repository is connected; the checked-in
-  `vercel.json` now uses Vercel's documented `cd ../.. && turbo run build
---filter=auth` monorepo command, and only its cloned-repository build can
-  satisfy this deployment gate.
+  `vercel.json` now uses the app-root `pnpm install --frozen-lockfile` and
+  `turbo run build --filter=auth` commands (Turbo discovers the workspace without
+  a forbidden parent-directory traversal), and only its cloned-repository build
+  can satisfy this deployment gate.
 - **Custom domain:** `auth.jayantgoyal.com` is attached to the Auth project and
   Vercel reports `configured-correctly` after the Cloudflare change. The current
   DNS answers are Cloudflare-proxied A records; the recommended unproxied CNAME
