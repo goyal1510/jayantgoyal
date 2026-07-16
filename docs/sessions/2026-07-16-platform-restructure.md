@@ -35,6 +35,11 @@
   enhancement and is not a blocker for the email/password path, but the shared
   cookie, refresh, logout, security, observation, and rollback gates remain
   mandatory.
+- The next implementation slice adds a disabled-by-default, host-scoped
+  platform-cookie adapter to Main, Admin, and Auth. It supports the approved
+  production/staging/localhost contracts, prefers the versioned cookie on reads,
+  maps Supabase session chunks on writes, and preserves legacy deletion. No
+  deployed environment has `PLATFORM_SESSION_ENABLED=true`.
 
 ## PLATFORM-00 Result
 
@@ -255,3 +260,22 @@
   versioned-cookie compatibility, cross-subdomain email/password SSO,
   refresh/concurrency behavior, recovery, explicit logout, Admin AAL2, safe
   return paths, security review, observation, and rollback still must pass.
+
+## PLATFORM-04 continuation — feature-flagged session adapter
+
+- Added environment-aware platform-cookie policies for production,
+  `*.staging.jayantgoyal.com`, localhost, and rejected arbitrary Vercel preview
+  hosts. The rollout flag is `PLATFORM_SESSION_ENABLED` and remains false by
+  default in all app examples.
+- Main, Admin, and Auth middleware, callbacks, logout, and server Supabase
+  factories now pass the adapter configuration. Auth and Admin browser
+  email/password flows call same-origin `/api/session` bootstrap routes so the
+  server can validate the session and promote it without putting tokens in a
+  URL. The shared package aliases the platform cookie to Supabase's legacy
+  storage name for reads, maps authenticated session writes to the versioned
+  name, and clears the legacy host-only chunks.
+- Verification completed in this worktree: `pnpm test:auth:read-only` (28/28)
+  with the flag disabled and with `PLATFORM_SESSION_ENABLED=true` on localhost,
+  plus `pnpm check-types`, `pnpm lint`, and `pnpm build`. These are local proof
+  only; stable-staging email/password SSO and the observation gate are still
+  pending.

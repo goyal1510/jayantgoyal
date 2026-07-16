@@ -2,6 +2,10 @@ export { createSupabaseBrowserClient } from "./browser";
 export {
   createServerCookieMethods,
   createResponseCookieMethods,
+  platformCookiePolicyForHost,
+  platformizeSessionCookies,
+  normalizeSessionCookies,
+  resolvePlatformSessionConfig,
 } from "./cookies";
 export { createSupabaseProxyClient } from "./proxy";
 export { createSupabaseServerClient } from "./server";

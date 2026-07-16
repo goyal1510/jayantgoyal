@@ -245,6 +245,29 @@ Ignored Build Step`, so no new preview artifact for this implementation is
   expected Vercel Deployment Protection `302` to `vercel.com/sso-api`, so these
   are deployment proofs only; no authenticated application behavior is claimed.
 
+### PLATFORM-04 — Email/password SSO adapter implementation slice
+
+- **Implementation:** Added a feature-flagged shared session adapter used by
+  Main, Admin, and Auth server/proxy/callback clients, plus explicit same-origin
+  `/api/session` bootstrap routes for browser email/password sign-in. It resolves
+  only the approved production, staging, and localhost cookie contracts;
+  arbitrary Vercel preview hosts remain legacy-cookie-only. The adapter prefers
+  the versioned platform cookie on reads, maps Supabase legacy session chunks to
+  the platform name on writes, and deletes legacy host-only chunks with their
+  original path/domain semantics.
+- **Rollout safety:** `PLATFORM_SESSION_ENABLED` defaults to false in every app
+  example and no deployed environment was enabled. Google provider settings,
+  redirects, identities, and production sessions were not changed.
+- **Local proof:** Platform-cookie tests now cover host scoping, preview safety,
+  platform-over-legacy precedence, chunk mapping, and legacy deletion. The
+  read-only auth suite passes 28/28 with the flag disabled and with
+  `PLATFORM_SESSION_ENABLED=true` on localhost; workspace type-check, lint, and
+  build also pass.
+- **Gate status:** This is an implementation slice, not the PLATFORM-04 exit
+  gate. Stable-staging email/password cross-subdomain SSO, refresh races,
+  logout, expiry/revocation, Admin authorization/AAL2, cache/security review,
+  observation, and rollback evidence remain pending.
+
 ## PLATFORM-05 — Auth dark-launch implementation slice (gate pending)
 
 - **Implementation:** Added an independently deployable `apps/auth` Next.js

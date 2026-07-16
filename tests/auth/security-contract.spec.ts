@@ -110,6 +110,7 @@ test("@read-only Auth dark-launch surface keeps sensitive work behind explicit h
     "apps/auth/src/app/reset-password/page.tsx",
     "apps/auth/src/app/verify/page.tsx",
     "apps/auth/src/app/callback/route.ts",
+    "apps/auth/src/app/api/session/route.ts",
     "apps/auth/src/app/mfa/page.tsx",
     "apps/auth/src/app/account/security/page.tsx",
     "apps/auth/src/app/account/providers/page.tsx",
@@ -124,6 +125,12 @@ test("@read-only Auth dark-launch surface keeps sensitive work behind explicit h
   expect(logout).toContain("status: 403");
   expect(logout).toContain("status: 303");
   expect(logout).not.toContain("@repo/auth/admin");
+
+  const sessionBootstrap = source("apps/auth/src/app/api/session/route.ts");
+  expect(sessionBootstrap).toContain('request.headers.get("origin")');
+  expect(sessionBootstrap).toContain('"cache-control": "no-store"');
+  expect(sessionBootstrap).toContain("getUser()");
+  expect(sessionBootstrap).not.toContain("@repo/auth/admin");
 
   const authUi = source("apps/auth/src/app/auth-form.tsx");
   const mfaUi = source("apps/auth/src/app/mfa-form.tsx");

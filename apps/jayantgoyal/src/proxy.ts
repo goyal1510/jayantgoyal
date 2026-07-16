@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createSupabaseProxyClient } from "@repo/auth/proxy";
+import { resolvePlatformSessionConfig } from "@repo/auth/cookies";
 
 import { runMiddleware } from "@/proxy/runner";
 import { mfaMiddleware } from "@/proxy/mfa";
@@ -135,6 +136,12 @@ export default async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/welcome", request.url));
   }
 
+  const platformSession = resolvePlatformSessionConfig({
+    enabled: process.env.PLATFORM_SESSION_ENABLED === "true",
+    hostname: request.nextUrl.hostname,
+    supabaseUrl,
+  });
+
   const isPublicPage = matchPath(pathname, PUBLIC_PAGES);
 
   // ──────────────────────────────────────────────────────────────
@@ -164,6 +171,7 @@ export default async function proxy(request: NextRequest) {
   const supabase = createSupabaseProxyClient({
     supabaseUrl,
     supabaseAnonKey,
+    platformSession,
     responseStore: {
       getAll: () => request.cookies.getAll(),
       setCookie: (name, value, options) => {

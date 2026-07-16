@@ -2,11 +2,17 @@ import { expect, test } from "@playwright/test";
 
 import {
   DEFAULT_PLATFORM_COOKIE_POLICY,
+  LOCAL_PLATFORM_COOKIE_POLICY,
+  STAGING_PLATFORM_COOKIE_POLICY,
   collectCookieChunks,
   createPlatformCookiePolicy,
   legacySupabaseCookieName,
+  normalizeSessionCookies,
   platformCookieOptions,
+  platformCookiePolicyForHost,
+  platformizeSessionCookies,
   renameCookieChunks,
+  resolvePlatformSessionConfig,
   sessionCookieNames,
   shouldPromoteLegacySession,
 } from "../../packages/auth/src/cookies";
@@ -106,4 +112,123 @@ test("@read-only platform cookie policy rejects unsafe overrides", () => {
     createPlatformCookiePolicy({ domain: "https://jayantgoyal.com" }),
   ).toThrow();
   expect(() => createPlatformCookiePolicy({ path: "/auth" })).toThrow();
+});
+
+test("@read-only platform policy is host-scoped and preview-safe", () => {
+  expect(platformCookiePolicyForHost("auth.jayantgoyal.com")).toEqual(
+    DEFAULT_PLATFORM_COOKIE_POLICY,
+  );
+  expect(platformCookiePolicyForHost("auth.staging.jayantgoyal.com")).toEqual(
+    STAGING_PLATFORM_COOKIE_POLICY,
+  );
+  expect(platformCookiePolicyForHost("localhost")).toEqual(
+    LOCAL_PLATFORM_COOKIE_POLICY,
+  );
+  expect(
+    platformCookiePolicyForHost("jayantgoyal-git-preview.vercel.app"),
+  ).toBe(null);
+  expect(
+    resolvePlatformSessionConfig({
+      enabled: false,
+      hostname: "auth.jayantgoyal.com",
+      supabaseUrl: "https://orwfvyditlguqvxvztkw.supabase.co",
+    }),
+  ).toBeUndefined();
+  expect(
+    resolvePlatformSessionConfig({
+      enabled: true,
+      hostname: "jayantgoyal-git-preview.vercel.app",
+      supabaseUrl: "https://orwfvyditlguqvxvztkw.supabase.co",
+    }),
+  ).toBeUndefined();
+});
+
+test("@read-only platform cookies take precedence over legacy chunks", () => {
+  const names = sessionCookieNames(
+    "https://orwfvyditlguqvxvztkw.supabase.co",
+    STAGING_PLATFORM_COOKIE_POLICY,
+  );
+  expect(
+    normalizeSessionCookies(
+      [
+        { name: names.legacy, value: "legacy" },
+        { name: names.platform, value: "platform-zero" },
+        { name: `${names.platform}.1`, value: "platform-one" },
+        { name: "unrelated", value: "keep" },
+      ],
+      names,
+    ),
+  ).toEqual([
+    { name: "unrelated", value: "keep" },
+    { name: names.legacy, value: "platform-zero" },
+    { name: `${names.legacy}.1`, value: "platform-one" },
+  ]);
+});
+
+test("@read-only platform writes set the parent cookie and delete legacy chunks", () => {
+  const config = {
+    supabaseUrl: "https://orwfvyditlguqvxvztkw.supabase.co",
+    policy: STAGING_PLATFORM_COOKIE_POLICY,
+  };
+  const names = sessionCookieNames(config.supabaseUrl, config.policy);
+  expect(
+    platformizeSessionCookies(
+      [
+        {
+          name: names.legacy,
+          value: "opaque-session",
+          options: { path: "/", maxAge: 3600 },
+        },
+        {
+          name: `${names.legacy}.1`,
+          value: "opaque-session-chunk",
+          options: { path: "/", maxAge: 3600 },
+        },
+        {
+          name: "sb-orwfvyditlguqvxvztkw-auth-token-code-verifier",
+          value: "verifier",
+          options: { path: "/", maxAge: 600 },
+        },
+      ],
+      config,
+    ),
+  ).toEqual([
+    {
+      name: names.platform,
+      value: "opaque-session",
+      options: {
+        path: "/",
+        maxAge: config.policy.maxAge,
+        secure: true,
+        sameSite: "lax",
+        domain: config.policy.domain,
+      },
+    },
+    {
+      name: names.legacy,
+      value: "",
+      options: { path: "/", maxAge: 0 },
+    },
+    {
+      name: `${names.platform}.1`,
+      value: "opaque-session-chunk",
+      options: {
+        path: "/",
+        maxAge: config.policy.maxAge,
+        secure: true,
+        sameSite: "lax",
+        domain: config.policy.domain,
+      },
+    },
+    {
+      name: `${names.legacy}.1`,
+      value: "",
+      options: { path: "/", maxAge: 0 },
+    },
+    {
+      name: "sb-orwfvyditlguqvxvztkw-auth-token-code-verifier",
+      value: "verifier",
+      options: { path: "/", maxAge: 600 },
+    },
+  ]);
 });

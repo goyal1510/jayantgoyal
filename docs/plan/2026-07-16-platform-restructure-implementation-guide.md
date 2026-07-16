@@ -471,7 +471,8 @@ If the Supabase storage format or chunking prevents safe promotion, choose one e
 - [x] Confirm the actual current cookie name and chunking behavior.
 - [x] Approve the versioned production and staging cookie names.
 - [x] Codify deterministic chunk ordering, exact-name separation, and a disabled-by-default promotion predicate.
-- [ ] Add environment-specific cookie configuration.
+- [x] Add environment-specific cookie configuration behind `PLATFORM_SESSION_ENABLED`;
+      unsupported Vercel preview hosts remain legacy-cookie-only.
 - [ ] Prove cookie deletion uses matching Domain and Path.
 - [ ] Prove Studio/current main and Admin read the same session.
 - [ ] Prove Admin still rejects non-admin users.
