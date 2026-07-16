@@ -184,3 +184,17 @@
   preview artifact or authenticated behavior claim exists. The earlier Ready
   `4f68d82` previews remain deployment-only evidence behind Vercel SSO
   Deployment Protection.
+- PR #31 was then marked ready and merged as
+  `381250549a5bd3cb05d2a8539209fe9dc4100bf4` after switching `gh` to the
+  personal `goyal1510` account. A new branch `codex/platform-auth-deploy` now
+  tracks `origin/main` for deployment configuration.
+- Added the Vercel CLI as a repository-only root dev dependency (`vercel@56.2.1`)
+  and added `.vercelignore` plus the Auth-local `.gitignore`; no global Vercel
+  installation remains. Created Vercel project `jayantgoyal-auth`, linked the
+  GitHub repository, set `rootDirectory=apps/auth`, and configured the build to
+  filter the Auth workspace. The custom domain `auth.jayantgoyal.com` is attached
+  but DNS verification is pending the Cloudflare `auth` CNAME.
+- The first direct app-only deployment was a 404 probe; a corrected root probe
+  reached Ready but produced no Next output because it was not a Git-root build.
+  Git-connected deployment is now the required authoritative path. No production
+  Auth cutover or Google provider setting has been changed.

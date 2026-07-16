@@ -265,8 +265,9 @@ Ignored Build Step`, so no new preview artifact for this implementation is
   application secret, or user data was used or recorded.
 - **Boundary:** This is route and source preflight only. No Auth Vercel project,
   `auth.jayantgoyal.com` domain, Supabase redirect/provider setting, parent-domain
-  cookie promotion, or production redirect was changed. Real Google consent and
-  stable-staging cross-application SSO remain unproved.
+  cookie promotion, or production redirect was changed at the time of the
+  implementation commit. Real Google consent and stable-staging cross-application
+  SSO remain unproved.
 - **Gate status:** PLATFORM-05 remains Pending until the required deployment
   identifiers, provider matrix, stable-staging session-sharing proof, security
   review, observation window, and rollback evidence exist. Rollback is deleting
@@ -278,3 +279,31 @@ Ignored Build Step`, so no new preview artifact for this implementation is
   `5gcMKthbFYVu29Uxj8YcYzpUZuHD` Admin). They did not create fresh Ready
   application artifacts; the Ready `4f68d82` deployments remain deployment-only
   evidence behind Vercel Deployment Protection.
+
+## PLATFORM-05 — Post-merge Vercel/Auth deployment setup (DNS gate pending)
+
+- **Merge:** PR #31 merged into `main` as `381250549a5bd3cb05d2a8539209fe9dc4100bf4`
+  using the repository owner's personal GitHub identity. The former draft/permission
+  blocker is resolved.
+- **Vercel project:** Created and linked `jayantgoyal-auth` in the personal Vercel
+  team with project ID `prj_QqKDVWIDobJMiHMvKxoZBmAYhXRT`, framework Next.js,
+  `rootDirectory=apps/auth`, and repository `goyal1510/jayantgoyal`. The build
+  and install commands run from the monorepo root and filter the Auth workspace.
+  No service-role variable was added.
+- **Environment names:** Configured the public Supabase URL/key for development,
+  preview, and production, plus local and production Auth site URL names. Values
+  are intentionally absent from repository proof. Preview site URL remains to be
+  assigned after a Git-based preview deployment.
+- **Deployment evidence:** A direct CLI deployment proved the project can be
+  created, but its initial app-only/root misconfiguration returned 404. A corrected
+  root deployment reached Ready as `dpl_DvGYFY8gWZ7LysfBxj6hj4W9CETx` but still
+  produced no Next output because it was not a Git-root build; this is retained as
+  a failed probe, not a production claim. The Git repository is now connected so
+  the merged root build is the authoritative next deployment path.
+- **Custom domain:** `auth.jayantgoyal.com` is attached to the Auth project. DNS
+  is not yet valid; Cloudflare must add the unproxied CNAME `auth` pointing to
+  `872d75b6a0b9f030.vercel-dns-017.com`. The Domain Connect page is waiting for a
+  Cloudflare login/approval in Chrome.
+- **Gate status:** PLATFORM-05 remains Pending until the Git-based deployment is
+  Ready, DNS verifies, Auth callback/provider configuration is reviewed, and the
+  stable-staging cross-application session/Google matrix passes.

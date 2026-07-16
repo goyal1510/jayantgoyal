@@ -48,9 +48,9 @@ canonical URL.
 | `NEXT_PUBLIC_SITE_URL`          | Auth canonical URL         | Auth                  |
 
 The Auth slice intentionally has no service-role variable. Its `.env.example`
-contains names only; no Auth Vercel project or environment values exist yet.
-PLATFORM-05 must create and verify those targets before any dark-launch link or
-provider callback is enabled.
+contains names only. The Vercel project `jayantgoyal-auth` now exists with
+`rootDirectory=apps/auth`; its public environment names are configured without
+recording values. DNS and the Git-based Ready deployment remain PLATFORM-05 gates.
 
 ## Vercel target coverage
 
@@ -60,7 +60,7 @@ provider callback is enabled.
 | Main    | `NEXT_PUBLIC_SITE_URL`                              |     Yes     | **No**  |    Yes     | Preview gap; preview callbacks/canonical URLs cannot rely on this variable |
 | Admin   | Supabase and Vercel management variables            |     Yes     |   Yes   |    Yes     | Coverage present                                                           |
 | Admin   | `NEXT_PUBLIC_SITE_URL`                              |     Yes     | **No**  |    Yes     | Preview gap                                                                |
-| Auth    | Supabase public URL/key and `NEXT_PUBLIC_SITE_URL`  |     Local only | **No** | **No** | Dark-launch app exists in the PR; deployment is not configured             |
+| Auth    | Supabase public URL/key and `NEXT_PUBLIC_SITE_URL`  |     Yes     | **Pending** | **Pending** | Vercel project configured; Git deployment and custom DNS remain open |
 
 The main Vercel project also contains the following names that are not referenced
 by the baseline `apps/jayantgoyal` source:
