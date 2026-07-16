@@ -562,6 +562,7 @@ Supabase Auth via `@supabase/ssr`. Supports email/password, magic link, PKCE OAu
   supabase db dump --linked --schema jg_account --file "$tmpdir/jg_account.sql"
   supabase db dump --linked --schema jg_app --file "$tmpdir/jg_app.sql"
   supabase db dump --linked --schema portfolio --file "$tmpdir/portfolio.sql"
+  perl -0pi -e 's/\n+\z/\n/' "$tmpdir"/*.sql
   ```
 
   Review each generated diff, confirm the dumps contain schema only (no data or
