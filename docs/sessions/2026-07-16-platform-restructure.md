@@ -13,8 +13,8 @@
   on `codex/platform-restructure`.
 - Baseline, merge base, and current `origin/main`:
   `8710ac83fea719c3cd35e090da3281e57a1d5344`.
-- Current implementation head: `987fc92` (`feat(auth): add dark-launch
-  authentication app`), pushed to the existing draft PR #31.
+- Current implementation head: `f03f2c3` (`docs(platform): record auth
+  deployment check gate`), pushed to the existing draft PR #31.
 - Protected source clone remains clean/read-only on `main`.
 - Ignored local state copied at setup: three approved environment files and six
   permitted non-secret Supabase link/version metadata files. No pooler URL,
