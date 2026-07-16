@@ -219,3 +219,8 @@
   `turbo run build --filter=auth`). Turbo discovers the workspace from the
   configured app root without a parent-directory traversal. No production Auth
   cutover or Google provider setting has been changed.
+- Comparison with the existing Main/Admin Vercel projects found the concrete
+  preview regression: the repository `.vercelignore` removed `.git`, which made
+  their existing `scripts/ignore-build.sh` fail with “not a git repository.” The
+  `.git` entry was removed; other generated-artifact and environment exclusions
+  remain.

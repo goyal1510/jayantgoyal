@@ -310,3 +310,7 @@ Ignored Build Step`, so no new preview artifact for this implementation is
 - **Gate status:** PLATFORM-05 remains Pending until the Git-based deployment is
   Ready with a real Next output, Auth callback/provider configuration is reviewed,
   and the stable-staging cross-application session/Google matrix passes.
+- **Cross-project regression fix:** The shared repository `.vercelignore` was
+  removing `.git`, causing Main/Admin's existing `scripts/ignore-build.sh` to
+  fail before their builds. Removing that one entry preserves the safe upload
+  exclusions while allowing all Git-connected projects to run their ignore step.
