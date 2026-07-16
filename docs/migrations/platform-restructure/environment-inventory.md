@@ -39,6 +39,19 @@ the baseline Admin source does not currently read it. It remains a required targ
 capability because every extracted application needs an environment-specific
 canonical URL.
 
+### Auth (`apps/auth` dark-launch slice)
+
+| Variable name                   | Capability                 | Approved target owner |
+| ------------------------------- | -------------------------- | --------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Supabase project URL       | Auth                  |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase public key        | Auth                  |
+| `NEXT_PUBLIC_SITE_URL`          | Auth canonical URL         | Auth                  |
+
+The Auth slice intentionally has no service-role variable. Its `.env.example`
+contains names only; no Auth Vercel project or environment values exist yet.
+PLATFORM-05 must create and verify those targets before any dark-launch link or
+provider callback is enabled.
+
 ## Vercel target coverage
 
 | Project | Variable                                            | Development | Preview | Production | Finding                                                                    |
@@ -47,6 +60,7 @@ canonical URL.
 | Main    | `NEXT_PUBLIC_SITE_URL`                              |     Yes     | **No**  |    Yes     | Preview gap; preview callbacks/canonical URLs cannot rely on this variable |
 | Admin   | Supabase and Vercel management variables            |     Yes     |   Yes   |    Yes     | Coverage present                                                           |
 | Admin   | `NEXT_PUBLIC_SITE_URL`                              |     Yes     | **No**  |    Yes     | Preview gap                                                                |
+| Auth    | Supabase public URL/key and `NEXT_PUBLIC_SITE_URL`  |     Local only | **No** | **No** | Dark-launch app exists in the PR; deployment is not configured             |
 
 The main Vercel project also contains the following names that are not referenced
 by the baseline `apps/jayantgoyal` source:

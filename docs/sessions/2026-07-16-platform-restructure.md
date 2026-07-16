@@ -13,8 +13,8 @@
   on `codex/platform-restructure`.
 - Baseline, merge base, and current `origin/main`:
   `8710ac83fea719c3cd35e090da3281e57a1d5344`.
-- Current implementation head: `4f68d82` (`feat(auth): codify platform cookie
-  contract`), pushed to the existing draft PR #31.
+- Current implementation head: `987fc92` (`feat(auth): add dark-launch
+  authentication app`), pushed to the existing draft PR #31.
 - Protected source clone remains clean/read-only on `main`.
 - Ignored local state copied at setup: three approved environment files and six
   permitted non-secret Supabase link/version metadata files. No pooler URL,
@@ -160,3 +160,22 @@
   `/welcome` probes return Vercel Deployment Protection `302` responses to the
   SSO endpoint. This confirms deployment completion only; authenticated preview
   application observation remains open.
+- Added the PLATFORM-05 Auth dark-launch implementation slice in the same PR.
+  `apps/auth` is independently buildable and exposes login, registration,
+  recovery/reset, verification, callback, MFA, account security, connected
+  providers, logout, and safe callback-error/retry routes. The current Main and
+  Admin login paths remain primary; no Auth Vercel project, domain, provider
+  allowlist, redirect, cookie promotion, or production cutover was changed.
+- Auth verification is local and non-secret: its check-types, lint, and build
+  pass, and `pnpm test:auth:read-only` passes 25/25 including the route/security
+  contract. Logout is an explicit same-origin POST at `/api/logout` with a 303
+  redirect and no state-changing GET. The loopback provider remains the only
+  local Google-compatible callback proof; real Google consent/provider and
+  stable-staging cross-application SSO remain pending.
+- PLATFORM-05 stays Pending despite the route checklist being implemented. Its
+  deployment identifiers, domains, provider matrix, security review,
+  cross-application session proof, observation window, and rollback evidence
+  remain required before any dark-launch link or canonical Auth cutover.
+- Added the secret-free `apps/auth/.env.example` and recorded Auth's three
+  public environment names in `environment-inventory.md`; no Auth environment
+  values or Vercel project were created.

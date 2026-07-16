@@ -197,7 +197,7 @@ here.
 - **Commit/deployment:** Implementation is committed as `b496649` on the existing
   `codex/platform-restructure` branch and pushed to draft PR #31. The subsequent
   Main and Admin Vercel checks completed successfully but reported `Canceled by
-  Ignored Build Step`, so no new preview artifact for this implementation is
+Ignored Build Step`, so no new preview artifact for this implementation is
   available and no deployed behavior claim is made.
 - **Boundary review:** The package contains no auth pages, callback routes,
   route matchers, database role query, or product permission decisions. Admin
@@ -244,3 +244,31 @@ here.
   `3W8sS6cEQYCY3ru1YQgAHo2uprQs` (Admin). Direct `/welcome` probes receive the
   expected Vercel Deployment Protection `302` to `vercel.com/sso-api`, so these
   are deployment proofs only; no authenticated application behavior is claimed.
+
+## PLATFORM-05 — Auth dark-launch implementation slice (gate pending)
+
+- **Implementation:** Added an independently deployable `apps/auth` Next.js
+  application without changing the current Main or Admin login paths. The
+  initial route surface includes login, registration, recovery, reset, verify,
+  callback, MFA, account security, connected providers, logout, and a safe
+  callback-error/retry state.
+- **Security boundary:** Auth uses the shared public Supabase browser/server/
+  proxy factories, authorizes protected pages with `getUser()`, keeps service-role
+  construction out of the app, validates same-origin POST logout requests, uses
+  `303` after logout, rejects unsafe return paths through the shared validator,
+  and marks the account pages dynamic so builds never evaluate missing runtime
+  environment values during static generation. No state-changing GET route was
+  added.
+- **Verification:** `corepack pnpm@10.24.0 --filter auth check-types`, `lint`,
+  and `build` pass. The repository read-only auth suite passes 25/25, including
+  the static Auth route/security contract. No credential, provider token,
+  application secret, or user data was used or recorded.
+- **Boundary:** This is route and source preflight only. No Auth Vercel project,
+  `auth.jayantgoyal.com` domain, Supabase redirect/provider setting, parent-domain
+  cookie promotion, or production redirect was changed. Real Google consent and
+  stable-staging cross-application SSO remain unproved.
+- **Gate status:** PLATFORM-05 remains Pending until the required deployment
+  identifiers, provider matrix, stable-staging session-sharing proof, security
+  review, observation window, and rollback evidence exist. Rollback is deleting
+  the new app and workspace entry plus reverting its lockfile/docs commit; the
+  existing Main/Admin auth paths remain untouched.
