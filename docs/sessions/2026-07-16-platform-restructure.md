@@ -280,3 +280,12 @@
   No token enters a URL or log. The flag-enabled read-only suite passes 31/31;
   the disabled suite passes 30 with the email SSO case safely skipped. Stable-
   staging email/password SSO and the observation gate are still pending.
+
+## PLATFORM-04 local logout continuation
+
+- The follow-up local proof exercises Auth logout after the shared email/password
+  session is promoted: Auth clears the platform and legacy cookies, Main returns
+  to its sign-in gate, and Admin remains authorization-gated. Auth logout now
+  validates the same-origin host instead of comparing potentially different
+  loopback URL spellings (`localhost` versus `127.0.0.1`); the security boundary
+  remains an explicit Origin/Host match and a `303` redirect.

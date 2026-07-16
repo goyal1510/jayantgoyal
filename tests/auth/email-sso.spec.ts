@@ -54,6 +54,31 @@ test("@read-only @local-email-sso email/password bootstrap shares the local sess
     const adminPage = await context.newPage();
     await adminPage.goto(authTestEnvironment.adminBaseUrl);
     expect(new URL(adminPage.url()).pathname).toBe("/unauthorized");
+
+    await authPage.goto(appUrl(authTestEnvironment.authBaseUrl, "/logout"));
+    await authPage
+      .getByRole("button", { name: "Sign out", exact: true })
+      .click();
+    await expect.poll(() => new URL(authPage.url()).pathname).toBe("/login");
+
+    const loggedOutCookies = await context.cookies();
+    expect(
+      loggedOutCookies.some((cookie) => cookie.name === "jg-session-local-v1"),
+    ).toBe(false);
+    expect(
+      loggedOutCookies.some((cookie) =>
+        cookie.name.startsWith("sb-orwfvyditlguqvxvztkw-auth-token"),
+      ),
+    ).toBe(false);
+
+    const loggedOutMain = await context.newPage();
+    await loggedOutMain.goto(appUrl(authTestEnvironment.mainBaseUrl, "/files"));
+    await expect(
+      loggedOutMain.getByRole("heading", {
+        name: "Sign in to access this page",
+        exact: true,
+      }),
+    ).toHaveCount(1);
   } finally {
     await context.close();
   }

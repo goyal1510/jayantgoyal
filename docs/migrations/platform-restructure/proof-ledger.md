@@ -368,3 +368,33 @@ Ignored Build Step`, so no new preview artifact for this implementation is
 - No Google provider setting, production redirect, or production identity role
   was changed. The provider checklist remains recorded for the later
   enhancement rather than being silently removed from the program.
+
+### PLATFORM-04 — Local logout continuation
+
+- **Implementation:** Auth logout now validates an explicit `Origin` host against
+  the request `Host`, preserving same-origin protection while allowing the
+  approved loopback spellings used by the local browser harness. It continues
+  to use `303`, `cache-control: no-store`, and Supabase local sign-out; the
+  shared cookie adapter clears both platform and legacy session names.
+- **Local proof:** With `PLATFORM_SESSION_ENABLED=true`, the deterministic
+  email/password journey signs in through Auth, reaches Main, is denied by
+  Admin authorization, signs out through Auth, observes both cookie names
+  cleared, and returns Main to its sign-in gate. The complete read-only suite
+  passes 31/31 with the flag enabled. The flag-disabled suite remains legacy
+  compatible and safely skips the platform-only journey.
+- **Boundary:** This is local integration evidence only. Stable-staging
+  cross-subdomain logout, global logout semantics, expiry/revocation, refresh
+  races, and the observation/rollback window remain open PLATFORM-04 gates.
+
+### Post-merge deployment verification — PR #36
+
+- **Merge:** PR #36 merged as `dafa7c67189a43c92415d239afcd349ad0fbf87e`.
+- **Deployments:** Main, Admin, and Auth production deployments reached Ready
+  from the merge-triggered Vercel builds. Auth deployment
+  `dpl_26RvEv7d1wy7X4KxMsMezzEyGfsk` aliases `auth.jayantgoyal.com`; Main and
+  Admin aliases remained `www.jayantgoyal.com`/`jayantgoyal.com` and
+  `admin.jayantgoyal.com` respectively.
+- **HTTP probes:** Main `/` returned `200`, Auth `/login` returned `200`, and
+  unauthenticated Admin `/` returned the expected `307` to `/welcome?redirect=%2F`.
+  These probes prove routing and deployment health only; no production session,
+  cookie, Google consent, or cross-application SSO claim is made.
