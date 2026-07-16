@@ -115,4 +115,7 @@
   refresh and no-store regression checks. Local read-only auth tests pass 17/17;
   the full command passes 17 and safely skips five credential-gated cases. Lint,
   type checks, and the pre-deploy HTTPS read-only run also pass. Preview deployment
-  and post-deploy HTTPS observation remain pending.
+  completed for both apps from commit `5f27a53`, but Vercel Deployment Protection
+  returns SSO redirects to unauthenticated shell probes. Post-deploy HTTPS
+  observation remains pending until an approved authenticated Preview session is
+  available. No bypass token or new account action was used.

@@ -156,8 +156,21 @@ here.
   baseline; the upgraded worktree still requires Preview deployment and observation.
 - **Security boundary:** No parent-domain cookie, callback relocation, application
   split, Supabase migration, role change, or production deployment was performed.
-- **Pending gates:** Run the full Phase-01 suite against the upgraded code, deploy
-  the dedicated slice to production-like Preview, run the HTTPS black-box matrix,
-  and observe cookie/session behavior before marking PLATFORM-02 Done or starting
-  PLATFORM-03. Rollback is the prior dependency manifest/lockfile plus removal of
-  the four response-header adapters.
+- **Preview deployment:** Both Vercel Preview deployments completed successfully
+  for commit `5f27a53`. The Main preview is
+  `https://jayantgoyal-jayantgoyal-git-co-71d26a-jayants-projects-8c2f7bf9.vercel.app`
+  and the Admin preview is
+  `https://jayantgoyal-admin-git-codex-pl-98283d-jayants-projects-8c2f7bf9.vercel.app`.
+  Direct HTTPS probes receive Vercel Deployment Protection `302` responses to
+  `vercel.com/sso-api`, so the preview application is not publicly observable from
+  the current non-authenticated shell.
+- **Pending gates:** Run the upgraded HTTPS black-box matrix and observe
+  cookie/session behavior through an approved authenticated Preview session before
+  marking PLATFORM-02 Done or starting PLATFORM-03. The production-like pre-deploy
+  baseline remains 17/17 read-only passes. Rollback is the prior dependency
+  manifest/lockfile plus removal of the four response-header adapters.
+- **Exact access blocker:** Preview observation requires the user's Vercel-authenticated
+  Chrome session or an approved non-secret Deployment Protection bypass supplied by
+  the project owner. No bypass token was requested, stored, or exposed. The Chrome
+  extension connection was unavailable during this attempt, so no new Google or
+  account action was attempted.
