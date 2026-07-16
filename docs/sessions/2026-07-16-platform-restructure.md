@@ -13,8 +13,8 @@
   on `codex/platform-restructure`.
 - Baseline, merge base, and current `origin/main`:
   `8710ac83fea719c3cd35e090da3281e57a1d5344`.
-- Current implementation head: `b496649` (`feat(auth): extract shared auth
-  infrastructure`), pushed to the existing draft PR #31.
+- Current implementation head: `4f68d82` (`feat(auth): codify platform cookie
+  contract`), pushed to the existing draft PR #31.
 - Protected source clone remains clean/read-only on `main`.
 - Ignored local state copied at setup: three approved environment files and six
   permitted non-secret Supabase link/version metadata files. No pooler URL,
@@ -156,3 +156,7 @@
   legacy Supabase cookie, order chunks deterministically, and require an explicit
   flag plus already-validated session before promotion. Five focused read-only
   tests pass; no live cookie was read or changed.
+- Commit `4f68d82` produced Ready Main/Admin Preview deployments, but direct
+  `/welcome` probes return Vercel Deployment Protection `302` responses to the
+  SSO endpoint. This confirms deployment completion only; authenticated preview
+  application observation remains open.

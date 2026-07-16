@@ -239,3 +239,8 @@ here.
 - **Gate status:** This is preparation only. Environment-specific configuration,
   real dual-read/promotion, stable subdomain SSO, logout clearing, expiry and
   concurrent-refresh observation remain pending PLATFORM-04 staging gates.
+- **Preview deployment:** Follow-up commit `4f68d82` produced Ready Vercel
+  deployments `5uvYVjwbffRBHJxvJab2XRHC5RJq` (Main) and
+  `3W8sS6cEQYCY3ru1YQgAHo2uprQs` (Admin). Direct `/welcome` probes receive the
+  expected Vercel Deployment Protection `302` to `vercel.com/sso-api`, so these
+  are deployment proofs only; no authenticated application behavior is claimed.
