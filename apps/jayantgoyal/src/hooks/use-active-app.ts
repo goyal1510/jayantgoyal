@@ -1,8 +1,12 @@
-import { useMemo } from "react"
-import type { AppConfig } from "@/lib/config/hub-config"
+import { useMemo } from "react";
+import type { AppConfig } from "@/lib/config/hub-config";
 
 /** Route-to-app mapping rules */
-const ROUTE_MAP: { prefix: string; appId: string; navResolver?: (pathname: string) => string | undefined }[] = [
+const ROUTE_MAP: {
+  prefix: string;
+  appId: string;
+  navResolver?: (pathname: string) => string | undefined;
+}[] = [
   { prefix: "/games", appId: "game-hub" },
   { prefix: "/tools", appId: "tech-tools" },
   { prefix: "/messenger", appId: "messenger" },
@@ -15,9 +19,9 @@ const ROUTE_MAP: { prefix: string; appId: string; navResolver?: (pathname: strin
     prefix: "/activity-tracker",
     appId: "activity-tracker",
     navResolver: (p) => {
-      if (p.includes("/tracker")) return "tracker"
-      if (p.includes("/management")) return "management"
-      return "dashboard"
+      if (p.includes("/tracker")) return "tracker";
+      if (p.includes("/management")) return "management";
+      return "dashboard";
     },
   },
   { prefix: "/files", appId: "file-manager" },
@@ -27,43 +31,57 @@ const ROUTE_MAP: { prefix: string; appId: string; navResolver?: (pathname: strin
   { prefix: "/about", appId: "portfolio", navResolver: () => "about" },
   { prefix: "/blogs", appId: "blog" },
   { prefix: "/blog", appId: "blog" },
-]
+];
 
 /**
  * Determines the active app and nav item based on the current pathname.
  */
-export function useActiveApp(pathname: string, apps: AppConfig[]) {
+export function useActiveApp(
+  pathname: string,
+  apps: AppConfig[],
+  rootAppId = "portfolio",
+) {
   return useMemo(() => {
     // Check route map
     for (const route of ROUTE_MAP) {
-      if (pathname === route.prefix || pathname.startsWith(route.prefix + "/") || pathname.startsWith(route.prefix)) {
-        const navId = route.navResolver?.(pathname)
+      if (
+        pathname === route.prefix ||
+        pathname.startsWith(route.prefix + "/") ||
+        pathname.startsWith(route.prefix)
+      ) {
+        const navId = route.navResolver?.(pathname);
 
         // For game-hub, resolve nav from app config
         if (route.appId === "game-hub" && !navId) {
-          const gameApp = apps.find((a) => a.id === "game-hub")
-          const activeNav = gameApp?.navItems.find((n) => n.url === pathname)
-          return { activeAppId: "game-hub", activeNavId: activeNav?.id ?? "dashboard" }
+          const gameApp = apps.find((a) => a.id === "game-hub");
+          const activeNav = gameApp?.navItems.find((n) => n.url === pathname);
+          return {
+            activeAppId: "game-hub",
+            activeNavId: activeNav?.id ?? "dashboard",
+          };
         }
 
-        return { activeAppId: route.appId, activeNavId: navId }
+        return { activeAppId: route.appId, activeNavId: navId };
       }
     }
 
     // Portfolio root
     if (pathname === "/" || pathname === "") {
-      return { activeAppId: "portfolio", activeNavId: "home" }
+      return {
+        activeAppId: rootAppId,
+        activeNavId: rootAppId === "portfolio" ? "home" : undefined,
+      };
     }
 
     // Check all app nav items as fallback
     for (const app of apps) {
       for (const navItem of app.navItems) {
         if (navItem.url && pathname === navItem.url) {
-          return { activeAppId: app.id, activeNavId: navItem.id }
+          return { activeAppId: app.id, activeNavId: navItem.id };
         }
       }
     }
 
-    return { activeAppId: "portfolio", activeNavId: "home" }
-  }, [pathname, apps])
+    return { activeAppId: rootAppId, activeNavId: undefined };
+  }, [pathname, apps, rootAppId]);
 }

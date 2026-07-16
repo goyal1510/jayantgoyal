@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { DynamicBreadcrumb } from "@/components/sidebar/dynamic-breadcrumb";
@@ -19,6 +19,7 @@ import { RouteChangeProvider } from "@/components/providers/route-change-provide
 import { LazyCommandPalette } from "@/components/providers/lazy-components";
 import { AuthToast } from "@/components/auth/auth-toast";
 import { DynamicBreadcrumbJsonLd } from "@/components/seo/dynamic-breadcrumb-jsonld";
+import { resolvePlatformSurface } from "@/lib/platform/surface";
 
 export default async function ProtectedLayout({
   children,
@@ -26,6 +27,7 @@ export default async function ProtectedLayout({
   children: ReactNode;
 }) {
   const { data, profile, host, source } = await getPortfolioDataFromHeaders();
+  const surface = resolvePlatformSurface((await headers()).get("host"));
 
   const cookieStore = await cookies();
 
@@ -54,14 +56,14 @@ export default async function ProtectedLayout({
       <AuthToast />
       <DynamicBreadcrumbJsonLd />
       <SidebarProvider defaultOpen={defaultOpen} defaultWidth={defaultWidth}>
-        <AppSidebar />
+        <AppSidebar surface={surface} />
         <SidebarInset>
           <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center gap-2 border-b bg-background/95 px-4 transition-[width,height] ease-linear backdrop-blur supports-[backdrop-filter]:bg-background/80 group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 max-w-full">
             <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
               <SidebarTrigger className="-ml-1 shrink-0" />
               <Separator orientation="vertical" className="mr-2 h-4 shrink-0" />
               <div className="min-w-0 flex-1 overflow-hidden">
-                <DynamicBreadcrumb />
+                <DynamicBreadcrumb surface={surface} />
               </div>
             </div>
             <div className="flex shrink-0 items-center gap-2">

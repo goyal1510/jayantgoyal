@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { usePathname, useRouter } from "next/navigation"
-import Link from "next/link"
-import { Home } from "lucide-react"
+import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
+import { Home } from "lucide-react";
 
 import {
   Breadcrumb,
@@ -11,108 +11,154 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@repo/ui/breadcrumb"
-import { getAppById, HUB_APPS } from "@/lib/config/hub-config"
-import { toolCategories, getToolByPath } from "@/lib/tools/tools"
+} from "@repo/ui/breadcrumb";
+import { getAppById, HUB_APPS } from "@/lib/config/hub-config";
+import { toolCategories, getToolByPath } from "@/lib/tools/tools";
+import type { PlatformSurface } from "@/lib/platform/surface";
 
-export function DynamicBreadcrumb() {
-  const pathname = usePathname()
-  const router = useRouter()
+export function DynamicBreadcrumb({
+  surface = "legacy",
+}: {
+  surface?: PlatformSurface;
+}) {
+  const pathname = usePathname();
+  const router = useRouter();
 
   // Determine app and page based on pathname
   const { appName, appHref, pageName } = (() => {
     // Games routes
     if (pathname.startsWith("/games")) {
-      const gameApp = getAppById("game-hub")
+      const gameApp = getAppById("game-hub");
       if (!gameApp) {
-        return { appName: "Game Hub", appHref: "/games", pageName: "Dashboard" }
-      }
-
-      // Check for specific game
-      const segments = pathname.split("/").filter(Boolean)
-      if (segments.length > 1 && segments[1]) {
-        const gameSlug = segments[1]
-        const navItem = gameApp.navItems.find((item) => item.url === pathname)
         return {
           appName: "Game Hub",
           appHref: "/games",
-          pageName: navItem?.label ?? gameSlug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" "),
-        }
+          pageName: "Dashboard",
+        };
       }
 
-      return { appName: "Game Hub", appHref: "/games", pageName: "Dashboard" }
+      // Check for specific game
+      const segments = pathname.split("/").filter(Boolean);
+      if (segments.length > 1 && segments[1]) {
+        const gameSlug = segments[1];
+        const navItem = gameApp.navItems.find((item) => item.url === pathname);
+        return {
+          appName: "Game Hub",
+          appHref: "/games",
+          pageName:
+            navItem?.label ??
+            gameSlug
+              .split("-")
+              .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+              .join(" "),
+        };
+      }
+
+      return { appName: "Game Hub", appHref: "/games", pageName: "Dashboard" };
     }
 
     // Tech Tools routes
     if (pathname.startsWith("/tools")) {
-      const tool = getToolByPath(pathname)
+      const tool = getToolByPath(pathname);
       if (tool) {
         // Find the category this tool belongs to
         const category = toolCategories.find((cat) =>
-          cat.tools.some((t) => t.id === tool.id)
-        )
+          cat.tools.some((t) => t.id === tool.id),
+        );
         return {
           appName: "Tech Tools",
           appHref: "/tools",
           pageName: category ? `${category.title} / ${tool.title}` : tool.title,
-        }
+        };
       }
-      return { appName: "Tech Tools", appHref: "/tools", pageName: null }
+      return { appName: "Tech Tools", appHref: "/tools", pageName: null };
     }
 
     // Messenger routes
     if (pathname === "/messenger" || pathname.startsWith("/messenger/")) {
-      return { appName: "Sync Messenger", appHref: "/messenger", pageName: null }
+      return {
+        appName: "Sync Messenger",
+        appHref: "/messenger",
+        pageName: null,
+      };
     }
 
     // Currency Calculator routes
     if (pathname.startsWith("/calculator")) {
-      const pageName = pathname === "/calculator/new" ? "New" : pathname === "/calculator/history" ? "History" : null
-      return { appName: "Currency Calculator", appHref: "/calculator/new", pageName }
+      const pageName =
+        pathname === "/calculator/new"
+          ? "New"
+          : pathname === "/calculator/history"
+            ? "History"
+            : null;
+      return {
+        appName: "Currency Calculator",
+        appHref: "/calculator/new",
+        pageName,
+      };
     }
 
     // Activity Tracker routes
     if (pathname.startsWith("/activity-tracker")) {
-      let pageName: string | null = null
-      if (pathname.includes("/dashboard")) pageName = "Dashboard"
-      else if (pathname.includes("/tracker")) pageName = "Tracker"
-      else if (pathname.includes("/management")) pageName = "Management"
-      return { appName: "Activity Tracker", appHref: "/activity-tracker/dashboard", pageName }
+      let pageName: string | null = null;
+      if (pathname.includes("/dashboard")) pageName = "Dashboard";
+      else if (pathname.includes("/tracker")) pageName = "Tracker";
+      else if (pathname.includes("/management")) pageName = "Management";
+      return {
+        appName: "Activity Tracker",
+        appHref: "/activity-tracker/dashboard",
+        pageName,
+      };
     }
 
     // File Manager routes
     if (pathname === "/files" || pathname.startsWith("/files/")) {
-      return { appName: "File Manager", appHref: "/files", pageName: null }
+      return { appName: "File Manager", appHref: "/files", pageName: null };
     }
 
     // Weather route
     if (pathname === "/weather") {
-      return { appName: "Weather", appHref: "/weather", pageName: null }
+      return { appName: "Weather", appHref: "/weather", pageName: null };
     }
 
     // GitHub Stats route
     if (pathname === "/github-stats") {
-      return { appName: "GitHub Stats", appHref: "/github-stats", pageName: null }
+      return {
+        appName: "GitHub Stats",
+        appHref: "/github-stats",
+        pageName: null,
+      };
     }
 
     // Custom Calculator route
     if (pathname === "/custom-calculator") {
-      return { appName: "Custom Calculator", appHref: "/custom-calculator", pageName: null }
+      return {
+        appName: "Custom Calculator",
+        appHref: "/custom-calculator",
+        pageName: null,
+      };
     }
 
     // Blog routes
     if (pathname === "/blogs" || pathname.startsWith("/blogs/")) {
-      return { appName: "Blogs", appHref: "/blogs", pageName: null }
+      return { appName: "Blogs", appHref: "/blogs", pageName: null };
     }
     if (pathname.startsWith("/blog/")) {
-      const slug = pathname.split("/").pop() ?? ""
-      const pageName = slug.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")
-      return { appName: "Blogs", appHref: "/blogs", pageName }
+      const slug = pathname.split("/").pop() ?? "";
+      const pageName = slug
+        .split("-")
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(" ");
+      return { appName: "Blogs", appHref: "/blogs", pageName };
     }
 
     // Portfolio - just show "Portfolio" without section tracking
     if (pathname === "/" || pathname === "") {
-      return { appName: "Portfolio", appHref: "/", pageName: null }
+      return {
+        appName: surface === "studio" ? "Studio" : "Portfolio",
+        appHref: "/",
+        pageName: null,
+      };
     }
 
     // Check other apps
@@ -123,13 +169,13 @@ export function DynamicBreadcrumb() {
             appName: app.name,
             appHref: app.navItems[0]?.url ?? "/",
             pageName: navItem.label,
-          }
+          };
         }
       }
     }
 
-    return { appName: "Portfolio", appHref: "/", pageName: null }
-  })()
+    return { appName: "Portfolio", appHref: "/", pageName: null };
+  })();
 
   return (
     <Breadcrumb className="min-w-0 flex-1 max-w-full">
@@ -138,7 +184,7 @@ export function DynamicBreadcrumb() {
           <BreadcrumbLink asChild>
             <button
               onClick={() => {
-                router.push("/#home")
+                router.push(surface === "studio" ? "/" : "/#home");
               }}
               aria-label="Home"
               className="flex items-center justify-center"
@@ -151,10 +197,14 @@ export function DynamicBreadcrumb() {
         <BreadcrumbItem className="shrink-0 max-w-[200px]">
           {pageName ? (
             <BreadcrumbLink asChild>
-              <Link href={appHref} className="truncate block">{appName}</Link>
+              <Link href={appHref} className="truncate block">
+                {appName}
+              </Link>
             </BreadcrumbLink>
           ) : (
-            <BreadcrumbPage className="truncate block">{appName}</BreadcrumbPage>
+            <BreadcrumbPage className="truncate block">
+              {appName}
+            </BreadcrumbPage>
           )}
         </BreadcrumbItem>
         {pageName && (
@@ -169,5 +219,5 @@ export function DynamicBreadcrumb() {
         )}
       </BreadcrumbList>
     </Breadcrumb>
-  )
+  );
 }

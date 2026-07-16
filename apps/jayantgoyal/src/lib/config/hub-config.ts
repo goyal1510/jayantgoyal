@@ -29,70 +29,201 @@ import {
   FileText,
   Crown,
   Dice5,
+  LayoutGrid,
   type LucideIcon,
-} from "lucide-react"
+} from "lucide-react";
 
 export type NavItem = {
-  id: string
-  label: string
-  icon: LucideIcon
-  color: string
-  url?: string
-}
+  id: string;
+  label: string;
+  icon: LucideIcon;
+  color: string;
+  url?: string;
+};
 
 export type AppConfig = {
-  id: string
-  name: string
-  icon: LucideIcon
-  color: string
-  isPublic: boolean
-  navItems: NavItem[]
-  url?: string
-  externalUrl?: string
-}
+  id: string;
+  name: string;
+  icon: LucideIcon;
+  color: string;
+  isPublic: boolean;
+  navItems: NavItem[];
+  url?: string;
+  externalUrl?: string;
+};
 
 // Portfolio navigation items (scroll-based sections)
 const PORTFOLIO_NAV: NavItem[] = [
-  { id: "home", label: "Home", icon: Home, color: "text-sky-600 dark:text-sky-400", url: "/#home" },
-  { id: "about", label: "About", icon: User, color: "text-emerald-600 dark:text-emerald-400", url: "/about" },
-  { id: "skills", label: "Skills", icon: BrainCog, color: "text-amber-500 dark:text-amber-400", url: "/#skills" },
-  { id: "experience", label: "Experience", icon: BriefcaseBusiness, color: "text-indigo-500 dark:text-indigo-400", url: "/#experience" },
-  { id: "projects", label: "Projects", icon: Code2, color: "text-rose-500 dark:text-rose-400", url: "/#projects" },
-  { id: "certificates", label: "Certificates", icon: Award, color: "text-cyan-600 dark:text-cyan-400", url: "/#certificates" },
-  { id: "contact", label: "Contact", icon: Mail, color: "text-lime-600 dark:text-lime-400", url: "/#contact" },
-]
+  {
+    id: "home",
+    label: "Home",
+    icon: Home,
+    color: "text-sky-600 dark:text-sky-400",
+    url: "/#home",
+  },
+  {
+    id: "about",
+    label: "About",
+    icon: User,
+    color: "text-emerald-600 dark:text-emerald-400",
+    url: "/about",
+  },
+  {
+    id: "skills",
+    label: "Skills",
+    icon: BrainCog,
+    color: "text-amber-500 dark:text-amber-400",
+    url: "/#skills",
+  },
+  {
+    id: "experience",
+    label: "Experience",
+    icon: BriefcaseBusiness,
+    color: "text-indigo-500 dark:text-indigo-400",
+    url: "/#experience",
+  },
+  {
+    id: "projects",
+    label: "Projects",
+    icon: Code2,
+    color: "text-rose-500 dark:text-rose-400",
+    url: "/#projects",
+  },
+  {
+    id: "certificates",
+    label: "Certificates",
+    icon: Award,
+    color: "text-cyan-600 dark:text-cyan-400",
+    url: "/#certificates",
+  },
+  {
+    id: "contact",
+    label: "Contact",
+    icon: Mail,
+    color: "text-lime-600 dark:text-lime-400",
+    url: "/#contact",
+  },
+];
 
 // Game Hub navigation items
 const GAME_HUB_NAV: NavItem[] = [
-  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, color: "text-blue-500 dark:text-blue-400", url: "/games" },
-  { id: "rock-paper-scissors", label: "Rock Paper Scissors", icon: Dices, color: "text-purple-500 dark:text-purple-400", url: "/games/rock-paper-scissors" },
-  { id: "tic-tac-toe", label: "Tic Tac Toe", icon: Grid3X3, color: "text-green-500 dark:text-green-400", url: "/games/tic-tac-toe" },
-  { id: "dare-x", label: "Dare X", icon: Swords, color: "text-red-500 dark:text-red-400", url: "/games/dare-x" },
-  { id: "connect-four", label: "Connect Four", icon: Circle, color: "text-yellow-500 dark:text-yellow-400", url: "/games/connect-four" },
-  { id: "memory-match", label: "Memory Match", icon: Brain, color: "text-pink-500 dark:text-pink-400", url: "/games/memory-match" },
-  { id: "wordle", label: "Wordle", icon: Puzzle, color: "text-emerald-500 dark:text-emerald-400", url: "/games/wordle" },
-  { id: "typing-speed", label: "Typing Speed", icon: Type, color: "text-cyan-500 dark:text-cyan-400", url: "/games/typing-speed" },
-  { id: "chess", label: "Chess", icon: Crown, color: "text-stone-600 dark:text-stone-300", url: "/games/chess" },
-  { id: "ludo", label: "Ludo", icon: Dice5, color: "text-rose-500 dark:text-rose-400", url: "/games/ludo" },
-]
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+    color: "text-blue-500 dark:text-blue-400",
+    url: "/games",
+  },
+  {
+    id: "rock-paper-scissors",
+    label: "Rock Paper Scissors",
+    icon: Dices,
+    color: "text-purple-500 dark:text-purple-400",
+    url: "/games/rock-paper-scissors",
+  },
+  {
+    id: "tic-tac-toe",
+    label: "Tic Tac Toe",
+    icon: Grid3X3,
+    color: "text-green-500 dark:text-green-400",
+    url: "/games/tic-tac-toe",
+  },
+  {
+    id: "dare-x",
+    label: "Dare X",
+    icon: Swords,
+    color: "text-red-500 dark:text-red-400",
+    url: "/games/dare-x",
+  },
+  {
+    id: "connect-four",
+    label: "Connect Four",
+    icon: Circle,
+    color: "text-yellow-500 dark:text-yellow-400",
+    url: "/games/connect-four",
+  },
+  {
+    id: "memory-match",
+    label: "Memory Match",
+    icon: Brain,
+    color: "text-pink-500 dark:text-pink-400",
+    url: "/games/memory-match",
+  },
+  {
+    id: "wordle",
+    label: "Wordle",
+    icon: Puzzle,
+    color: "text-emerald-500 dark:text-emerald-400",
+    url: "/games/wordle",
+  },
+  {
+    id: "typing-speed",
+    label: "Typing Speed",
+    icon: Type,
+    color: "text-cyan-500 dark:text-cyan-400",
+    url: "/games/typing-speed",
+  },
+  {
+    id: "chess",
+    label: "Chess",
+    icon: Crown,
+    color: "text-stone-600 dark:text-stone-300",
+    url: "/games/chess",
+  },
+  {
+    id: "ludo",
+    label: "Ludo",
+    icon: Dice5,
+    color: "text-rose-500 dark:text-rose-400",
+    url: "/games/ludo",
+  },
+];
 
 // Tech Tools - uses nested navigation from lib/tools/tools.ts
 // This is just a placeholder, actual navigation is rendered from toolCategories
 
-
 // Activity Tracker navigation items
 const ACTIVITY_TRACKER_NAV: NavItem[] = [
-  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, color: "text-blue-500 dark:text-blue-400", url: "/activity-tracker/dashboard" },
-  { id: "tracker", label: "Tracker", icon: Target, color: "text-green-500 dark:text-green-400", url: "/activity-tracker/tracker" },
-  { id: "management", label: "Management", icon: Settings, color: "text-gray-500 dark:text-gray-400", url: "/activity-tracker/management" },
-]
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+    color: "text-blue-500 dark:text-blue-400",
+    url: "/activity-tracker/dashboard",
+  },
+  {
+    id: "tracker",
+    label: "Tracker",
+    icon: Target,
+    color: "text-green-500 dark:text-green-400",
+    url: "/activity-tracker/tracker",
+  },
+  {
+    id: "management",
+    label: "Management",
+    icon: Settings,
+    color: "text-gray-500 dark:text-gray-400",
+    url: "/activity-tracker/management",
+  },
+];
 
 // Currency Calculator navigation items
 const CURRENCY_CALC_NAV: NavItem[] = [
-  { id: "new", label: "New", icon: Plus, color: "text-green-500 dark:text-green-400", url: "/calculator/new" },
-  { id: "history", label: "History", icon: History, color: "text-blue-500 dark:text-blue-400", url: "/calculator/history" },
-]
-
+  {
+    id: "new",
+    label: "New",
+    icon: Plus,
+    color: "text-green-500 dark:text-green-400",
+    url: "/calculator/new",
+  },
+  {
+    id: "history",
+    label: "History",
+    icon: History,
+    color: "text-blue-500 dark:text-blue-400",
+    url: "/calculator/history",
+  },
+];
 
 // All apps configuration
 // Ordered: private apps first (dropdowns → direct links), then public apps (dropdowns → direct links)
@@ -199,13 +330,43 @@ export const HUB_APPS: AppConfig[] = [
     navItems: [],
     externalUrl: "https://ecommerce.jayantgoyal.com/",
   },
-]
+];
+
+const STUDIO_HOME_APP: AppConfig = {
+  id: "studio-home",
+  name: "Studio Home",
+  icon: LayoutGrid,
+  color: "text-blue-600 dark:text-blue-400",
+  isPublic: true,
+  navItems: [],
+  url: "/",
+};
+
+const PORTFOLIO_EXTERNAL_APP: AppConfig = {
+  id: "portfolio",
+  name: "Portfolio",
+  icon: User,
+  color: "text-emerald-500 dark:text-emerald-400",
+  isPublic: true,
+  navItems: [],
+  externalUrl: "https://jayantgoyal.com",
+};
+
+export function getSurfaceApps(surface: "legacy" | "studio"): AppConfig[] {
+  if (surface === "legacy") return HUB_APPS;
+
+  return [
+    STUDIO_HOME_APP,
+    ...HUB_APPS.filter((app) => app.id !== "portfolio"),
+    PORTFOLIO_EXTERNAL_APP,
+  ];
+}
 
 // Get private apps
-export const getPrivateApps = () => HUB_APPS.filter((app) => !app.isPublic)
+export const getPrivateApps = () => HUB_APPS.filter((app) => !app.isPublic);
 
 // Get public apps
-export const getPublicApps = () => HUB_APPS.filter((app) => app.isPublic)
+export const getPublicApps = () => HUB_APPS.filter((app) => app.isPublic);
 
 // Get app by ID
-export const getAppById = (id: string) => HUB_APPS.find((app) => app.id === id)
+export const getAppById = (id: string) => HUB_APPS.find((app) => app.id === id);
