@@ -294,16 +294,16 @@ Ignored Build Step`, so no new preview artifact for this implementation is
   preview, and production, plus local and production Auth site URL names. Values
   are intentionally absent from repository proof. Preview site URL remains to be
   assigned after a Git-based preview deployment.
-- **Deployment evidence:** A direct CLI deployment proved the project can be
-  created, but its initial app-only/root misconfiguration returned 404. A corrected
-  root deployment reached Ready as `dpl_DvGYFY8gWZ7LysfBxj6hj4W9CETx` but still
-  produced no Next output because it was not a Git-root build; this is retained as
-  a failed probe, not a production claim. The Git repository is now connected so
-  the merged root build is the authoritative next deployment path.
-- **Custom domain:** `auth.jayantgoyal.com` is attached to the Auth project. DNS
-  is not yet valid; Cloudflare must add the unproxied CNAME `auth` pointing to
-  `872d75b6a0b9f030.vercel-dns-017.com`. The Domain Connect page is waiting for a
-  Cloudflare login/approval in Chrome.
+- **Deployment evidence:** Direct CLI deployments proved the project can be
+  created, but the app-only and root local-upload paths returned 404. The latest
+  probe `dpl_7Qwv9qbLTDYEFeKnXZrpjBuJpUr9` reached Ready while still producing no
+  Next output because it was not a Git-root build; this is retained as a failed
+  probe, not a production claim. The Git repository is connected, and only its
+  cloned-repository build can satisfy this deployment gate.
+- **Custom domain:** `auth.jayantgoyal.com` is attached to the Auth project and
+  Vercel reports `configured-correctly` after the Cloudflare change. The current
+  DNS answers are Cloudflare-proxied A records; the recommended unproxied CNAME
+  remains `auth → 872d75b6a0b9f030.vercel-dns-017.com` if proxying is removed.
 - **Gate status:** PLATFORM-05 remains Pending until the Git-based deployment is
-  Ready, DNS verifies, Auth callback/provider configuration is reviewed, and the
-  stable-staging cross-application session/Google matrix passes.
+  Ready with a real Next output, Auth callback/provider configuration is reviewed,
+  and the stable-staging cross-application session/Google matrix passes.

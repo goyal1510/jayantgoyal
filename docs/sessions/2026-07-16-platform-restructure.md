@@ -10,11 +10,12 @@
 
 - Dedicated worktree:
   `/Users/jgoyal1510/Desktop/Jayant/Developer/projects/worktrees/jayantgoyal/platform-restructure`
-  on `codex/platform-restructure`.
-- Baseline, merge base, and current `origin/main`:
-  `8710ac83fea719c3cd35e090da3281e57a1d5344`.
-- Current implementation head: `f03f2c3` (`docs(platform): record auth
-  deployment check gate`), pushed to the existing draft PR #31.
+  on `codex/platform-auth-deploy`.
+- The restructure is merged into `origin/main` at
+  `381250549a5bd3cb05d2a8539209fe9dc4100bf4`; the deployment follow-up head is
+  `798b4b9` (`chore(deploy): configure repository auth deployment`).
+- The deployment follow-up branch is pushed and remains separate from `main`
+  until its Git-based Vercel build is verified and reviewed.
 - Protected source clone remains clean/read-only on `main`.
 - Ignored local state copied at setup: three approved environment files and six
   permitted non-secret Supabase link/version metadata files. No pooler URL,
@@ -193,8 +194,25 @@
   installation remains. Created Vercel project `jayantgoyal-auth`, linked the
   GitHub repository, set `rootDirectory=apps/auth`, and configured the build to
   filter the Auth workspace. The custom domain `auth.jayantgoyal.com` is attached
-  but DNS verification is pending the Cloudflare `auth` CNAME.
+  and Vercel now reports it as configured correctly after the Cloudflare change.
 - The first direct app-only deployment was a 404 probe; a corrected root probe
-  reached Ready but produced no Next output because it was not a Git-root build.
-  Git-connected deployment is now the required authoritative path. No production
-  Auth cutover or Google provider setting has been changed.
+  reached Ready but produced no Next output because it was not a Git-root build;
+  the latest manual probe remains a 404 for the same reason. A Git-connected
+  deployment from this branch is now the required authoritative path. No
+  production Auth cutover or Google provider setting has been changed.
+
+## Post-merge continuation — deployment verification
+
+- Vercel project `jayantgoyal-auth` is attached to `goyal1510/jayantgoyal` with
+  `rootDirectory=apps/auth`; the deployment protection SSO gate is disabled for
+  this Auth project only. The repository-local CLI is available as
+  `vercel@56.2.1`; no global installation is present.
+- Cloudflare DNS verification completed through Vercel's domain check:
+  `auth.jayantgoyal.com` is verified and attached to the Auth project. The
+  Cloudflare edge still returns the domain's proxied A records, so the CNAME
+  recommendation remains operational guidance rather than a claim that proxy
+  mode was changed.
+- The latest direct deployment `dpl_7Qwv9qbLTDYEFeKnXZrpjBuJpUr9` reached Ready
+  but `/login` returned `404` because the local-upload path did not run the
+  monorepo Next build. The Git-connected branch deployment remains the only
+  deployment suitable for merge/cutover proof.

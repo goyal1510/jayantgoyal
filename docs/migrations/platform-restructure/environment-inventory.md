@@ -41,26 +41,27 @@ canonical URL.
 
 ### Auth (`apps/auth` dark-launch slice)
 
-| Variable name                   | Capability                 | Approved target owner |
-| ------------------------------- | -------------------------- | --------------------- |
-| `NEXT_PUBLIC_SUPABASE_URL`      | Supabase project URL       | Auth                  |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase public key        | Auth                  |
-| `NEXT_PUBLIC_SITE_URL`          | Auth canonical URL         | Auth                  |
+| Variable name                   | Capability           | Approved target owner |
+| ------------------------------- | -------------------- | --------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Supabase project URL | Auth                  |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase public key  | Auth                  |
+| `NEXT_PUBLIC_SITE_URL`          | Auth canonical URL   | Auth                  |
 
 The Auth slice intentionally has no service-role variable. Its `.env.example`
 contains names only. The Vercel project `jayantgoyal-auth` now exists with
 `rootDirectory=apps/auth`; its public environment names are configured without
-recording values. DNS and the Git-based Ready deployment remain PLATFORM-05 gates.
+recording values. Vercel reports `auth.jayantgoyal.com` as configured correctly;
+the Git-based Ready deployment remains a PLATFORM-05 gate.
 
 ## Vercel target coverage
 
-| Project | Variable                                            | Development | Preview | Production | Finding                                                                    |
-| ------- | --------------------------------------------------- | :---------: | :-----: | :--------: | -------------------------------------------------------------------------- |
-| Main    | All runtime variables except `NEXT_PUBLIC_SITE_URL` |     Yes     |   Yes   |    Yes     | Coverage present                                                           |
-| Main    | `NEXT_PUBLIC_SITE_URL`                              |     Yes     | **No**  |    Yes     | Preview gap; preview callbacks/canonical URLs cannot rely on this variable |
-| Admin   | Supabase and Vercel management variables            |     Yes     |   Yes   |    Yes     | Coverage present                                                           |
-| Admin   | `NEXT_PUBLIC_SITE_URL`                              |     Yes     | **No**  |    Yes     | Preview gap                                                                |
-| Auth    | Supabase public URL/key and `NEXT_PUBLIC_SITE_URL`  |     Yes     | **Pending** | **Pending** | Vercel project configured; Git deployment and custom DNS remain open |
+| Project | Variable                                            | Development |   Preview   | Production  | Finding                                                                    |
+| ------- | --------------------------------------------------- | :---------: | :---------: | :---------: | -------------------------------------------------------------------------- |
+| Main    | All runtime variables except `NEXT_PUBLIC_SITE_URL` |     Yes     |     Yes     |     Yes     | Coverage present                                                           |
+| Main    | `NEXT_PUBLIC_SITE_URL`                              |     Yes     |   **No**    |     Yes     | Preview gap; preview callbacks/canonical URLs cannot rely on this variable |
+| Admin   | Supabase and Vercel management variables            |     Yes     |     Yes     |     Yes     | Coverage present                                                           |
+| Admin   | `NEXT_PUBLIC_SITE_URL`                              |     Yes     |   **No**    |     Yes     | Preview gap                                                                |
+| Auth    | Supabase public URL/key and `NEXT_PUBLIC_SITE_URL`  |     Yes     | **Pending** | **Pending** | Vercel project/domain configured; Git deployment remains open              |
 
 The main Vercel project also contains the following names that are not referenced
 by the baseline `apps/jayantgoyal` source:
