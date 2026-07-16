@@ -224,3 +224,9 @@
   their existing `scripts/ignore-build.sh` fail with “not a git repository.” The
   `.git` entry was removed; other generated-artifact and environment exclusions
   remain.
+- Git-connected Auth preview `dpl_Ckb75v9wXrD7YYdyeDKgvmDKA3nd` from commit
+  `b62e35a` now runs the full workspace install and `turbo run build
+--filter=auth`; the preview `/login` probe returns `200`. The custom domain
+  still resolves to the earlier failed production deployment and returns `404`
+  until the reviewed branch is merged and promoted. No provider or cutover claim
+  is made from the preview alone.

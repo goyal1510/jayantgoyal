@@ -314,3 +314,8 @@ Ignored Build Step`, so no new preview artifact for this implementation is
   removing `.git`, causing Main/Admin's existing `scripts/ignore-build.sh` to
   fail before their builds. Removing that one entry preserves the safe upload
   exclusions while allowing all Git-connected projects to run their ignore step.
+- **Git preview verification:** Deployment `dpl_Ckb75v9wXrD7YYdyeDKgvmDKA3nd`
+  cloned commit `b62e35a`, installed all nine workspaces, detected Next.js
+  `16.1.6`, and completed `turbo run build --filter=auth`. The preview
+  `/login` response is `200`. `auth.jayantgoyal.com` still returns `404` because
+  its project production target has not yet been promoted from this branch.
