@@ -1,14 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card"
 
-import { SITE_URL } from "@/lib/seo/config"
 import { getToolByPath } from "@/lib/tools/tools"
 import { toolSeoContentByPath } from "@/lib/tools/seo-content"
 
 type ToolSeoContentProps = {
   pathname: string
+  baseUrl: string
 }
 
-export function ToolSeoContent({ pathname }: ToolSeoContentProps) {
+export function ToolSeoContent({ pathname, baseUrl }: ToolSeoContentProps) {
   const tool = getToolByPath(pathname)
   const content = toolSeoContentByPath[pathname]
 
@@ -31,7 +31,7 @@ export function ToolSeoContent({ pathname }: ToolSeoContentProps) {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     name: tool.title,
-    url: `${SITE_URL}${tool.path}`,
+    url: `${baseUrl}${tool.path}`,
     applicationCategory: "DeveloperApplication",
     operatingSystem: "Web",
     description: tool.description,

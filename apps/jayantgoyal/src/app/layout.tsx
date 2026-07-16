@@ -9,13 +9,22 @@ import Script from "next/script";
 import { PersonJsonLd, WebSiteJsonLd, ProfilePageJsonLd, SoftwareAppJsonLd } from "@/components/seo/json-ld";
 import {
   DEFAULT_OG_IMAGE,
+  isProductionLegacyHost,
+  isProductionStudioHost,
   SITE_DESCRIPTION,
   SITE_NAME,
   SITE_TITLE,
   SITE_URL,
   isIndexablePath,
+  isStudioIndexablePath,
   normalizePathname,
+  STUDIO_DEFAULT_OG_IMAGE,
+  STUDIO_SITE_DESCRIPTION,
+  STUDIO_SITE_NAME,
+  STUDIO_SITE_TITLE,
 } from "@/lib/seo/config";
+import { isStudioHost } from "@/lib/platform/surface";
+import { PORTFOLIO_URL, STUDIO_URL } from "@/lib/platform/urls";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -90,11 +99,29 @@ const baseMetadata: Metadata = {
 export async function generateMetadata(): Promise<Metadata> {
   const headerStore = await headers();
   const pathname = normalizePathname(headerStore.get("x-pathname"));
-  const canonicalUrl = new URL(pathname, SITE_URL).toString();
-  const shouldIndex = isIndexablePath(pathname);
+  const host = headerStore.get("host");
+  const studio = isStudioHost(host);
+  const siteUrl = studio ? STUDIO_URL : SITE_URL;
+  const siteName = studio ? STUDIO_SITE_NAME : SITE_NAME;
+  const siteTitle = studio ? STUDIO_SITE_TITLE : SITE_TITLE;
+  const siteDescription = studio
+    ? STUDIO_SITE_DESCRIPTION
+    : SITE_DESCRIPTION;
+  const image = studio ? STUDIO_DEFAULT_OG_IMAGE : DEFAULT_OG_IMAGE;
+  const canonicalUrl = new URL(pathname, siteUrl).toString();
+  const shouldIndex = studio
+    ? isProductionStudioHost(host) && isStudioIndexablePath(pathname)
+    : isProductionLegacyHost(host) && isIndexablePath(pathname);
 
   return {
     ...baseMetadata,
+    metadataBase: new URL(siteUrl),
+    title: {
+      default: siteTitle,
+      template: `%s | ${siteName}`,
+    },
+    description: siteDescription,
+    authors: [{ name: "Jayant Goyal", url: PORTFOLIO_URL }],
     alternates: {
       canonical: canonicalUrl,
     },
@@ -102,18 +129,24 @@ export async function generateMetadata(): Promise<Metadata> {
       type: "website",
       locale: "en_US",
       url: canonicalUrl,
-      siteName: SITE_NAME,
-      title: SITE_TITLE,
-      description: SITE_DESCRIPTION,
+      siteName,
+      title: siteTitle,
+      description: siteDescription,
       images: [
         {
-          url: DEFAULT_OG_IMAGE,
+          url: image,
           width: 1200,
           height: 630,
-          alt: SITE_TITLE,
+          alt: siteTitle,
           type: "image/png",
         },
       ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: siteTitle,
+      description: siteDescription,
+      images: [{ url: image, width: 1200, height: 630, alt: siteTitle }],
     },
     robots: {
       index: shouldIndex,
@@ -129,6 +162,12 @@ export default async function RootLayout({
 }) {
   const headerStore = await headers();
   const pathname = normalizePathname(headerStore.get("x-pathname"));
+  const studio = isStudioHost(headerStore.get("host"));
+  const siteUrl = studio ? STUDIO_URL : SITE_URL;
+  const siteName = studio ? STUDIO_SITE_NAME : SITE_NAME;
+  const siteDescription = studio
+    ? STUDIO_SITE_DESCRIPTION
+    : SITE_DESCRIPTION;
   const isHomePage = pathname === "/";
   const isToolsPage = pathname === "/tools";
 
@@ -141,14 +180,18 @@ export default async function RootLayout({
         </Script>
         <link rel="preconnect" href="https://orwfvyditlguqvxvztkw.supabase.co" />
         <link rel="dns-prefetch" href="https://orwfvyditlguqvxvztkw.supabase.co" />
-        <WebSiteJsonLd />
-        {isHomePage && (
+        <WebSiteJsonLd
+          siteUrl={siteUrl}
+          siteName={siteName}
+          description={siteDescription}
+        />
+        {isHomePage && !studio && (
           <>
             <PersonJsonLd />
             <ProfilePageJsonLd />
           </>
         )}
-        {isToolsPage && <SoftwareAppJsonLd />}
+        {isToolsPage && <SoftwareAppJsonLd siteUrl={siteUrl} />}
       </head>
       <body className={inter.className}>
         <ThemeProvider

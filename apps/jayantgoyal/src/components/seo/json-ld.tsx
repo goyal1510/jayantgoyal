@@ -34,17 +34,25 @@ export function PersonJsonLd() {
   )
 }
 
-export function WebSiteJsonLd() {
+export function WebSiteJsonLd({
+  siteUrl = SITE_URL,
+  siteName = SITE_NAME,
+  description = SITE_DESCRIPTION,
+}: {
+  siteUrl?: string
+  siteName?: string
+  description?: string
+}) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: SITE_NAME,
-    url: SITE_URL,
-    description: SITE_DESCRIPTION,
+    name: siteName,
+    url: siteUrl,
+    description,
     author: {
       "@type": "Person",
       name: PERSON_NAME,
-      url: SITE_URL,
+      url: siteUrl,
     },
   }
 
@@ -90,12 +98,12 @@ export function ProfilePageJsonLd() {
   )
 }
 
-export function SoftwareAppJsonLd() {
+export function SoftwareAppJsonLd({ siteUrl = SITE_URL }: { siteUrl?: string }) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     name: `Developer Tools | ${SITE_NAME}`,
-    url: `${SITE_URL}/tools`,
+    url: `${siteUrl}/tools`,
     applicationCategory: "DeveloperApplication",
     operatingSystem: "Web",
     description: "A collection of 99+ free developer tools by Jayant, including UUID generator, JSON formatter, Base64 encoder, hash generators, regex tester, and more.",
@@ -107,7 +115,7 @@ export function SoftwareAppJsonLd() {
     author: {
       "@type": "Person",
       name: PERSON_NAME,
-      url: SITE_URL,
+      url: siteUrl,
     },
   }
 

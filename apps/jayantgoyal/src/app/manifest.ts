@@ -1,10 +1,20 @@
 import type { MetadataRoute } from "next"
+import { headers } from "next/headers"
 
-export default function manifest(): MetadataRoute.Manifest {
+import { isStudioHost } from "@/lib/platform/surface"
+import {
+  STUDIO_SITE_DESCRIPTION,
+  STUDIO_SITE_NAME,
+} from "@/lib/seo/config"
+
+export default async function manifest(): Promise<MetadataRoute.Manifest> {
+  const studio = isStudioHost((await headers()).get("host"))
   return {
-    name: "JG",
-    short_name: "JG",
-    description: "A unified platform by Jayant Goyal — portfolio, 99+ developer tools, games, file manager, messenger, and more. Built with Next.js, React, TypeScript, and Supabase.",
+    name: studio ? STUDIO_SITE_NAME : "JG",
+    short_name: studio ? "JG Studio" : "JG",
+    description: studio
+      ? STUDIO_SITE_DESCRIPTION
+      : "A unified platform by Jayant Goyal — portfolio, 99+ developer tools, games, file manager, messenger, and more. Built with Next.js, React, TypeScript, and Supabase.",
     start_url: "/",
     display: "standalone",
     background_color: "#0a0a0a",

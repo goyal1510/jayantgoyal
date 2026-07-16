@@ -42,6 +42,8 @@ During compatibility, the current Main application remains at `apps/jayantgoyal`
 
 Studio uses `NEXT_PUBLIC_PORTFOLIO_URL` for links that cross the application boundary. Its Development value is `http://localhost:3000`, the `staging` Preview value is `https://portfolio.staging.jayantgoyal.com`, and generic Preview/Production use `https://jayantgoyal.com`. This keeps ephemeral Studio previews on the stable public Portfolio while giving the persistent staging branch a matched staging destination.
 
+Studio uses `NEXT_PUBLIC_STUDIO_URL` for its own canonical metadata and discovery surfaces. Development uses `http://localhost:3001`, persistent `staging` Preview uses `https://studio.staging.jayantgoyal.com`, and generic Preview/Production use `https://studio.jayantgoyal.com`. Runtime hostname checks keep staging and generic preview hosts non-indexable even when they render Studio.
+
 ## Supabase Auth URL rollout
 
 The hosted Auth configuration currently contains local-only URLs. The first configuration slice changes the hosted Site URL to `https://jayantgoyal.com` and adds the current Main/Admin callbacks, local callbacks, and narrowly scoped Vercel-preview patterns. The code must then stop placing `next` in the OAuth `redirectTo` URL and preserve the validated destination server-side.

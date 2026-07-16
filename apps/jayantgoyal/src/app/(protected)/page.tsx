@@ -16,28 +16,31 @@ import {
   DEFAULT_OG_IMAGE,
   SITE_DESCRIPTION,
   SITE_TITLE,
+  STUDIO_DEFAULT_OG_IMAGE,
+  STUDIO_SITE_DESCRIPTION,
+  STUDIO_SITE_TITLE,
 } from "@/lib/seo/config";
 import { isStudioHost } from "@/lib/platform/surface";
-
-const STUDIO_TITLE = "Jayant Goyal Studio | Tools, Apps, and Experiments";
-const STUDIO_DESCRIPTION =
-  "Explore developer tools, personal workspaces, games, utilities, and experiments in Jayant Goyal Studio.";
+import { STUDIO_URL } from "@/lib/platform/urls";
 
 export async function generateMetadata(): Promise<Metadata> {
   const host = (await headers()).get("host");
   const studio = isStudioHost(host);
-  const title = studio ? STUDIO_TITLE : SITE_TITLE;
-  const description = studio ? STUDIO_DESCRIPTION : SITE_DESCRIPTION;
+  const title = studio ? STUDIO_SITE_TITLE : SITE_TITLE;
+  const description = studio ? STUDIO_SITE_DESCRIPTION : SITE_DESCRIPTION;
+  const image = studio ? STUDIO_DEFAULT_OG_IMAGE : DEFAULT_OG_IMAGE;
 
   return {
     title: { absolute: title },
     description,
+    alternates: { canonical: studio ? STUDIO_URL : "/" },
     openGraph: {
       title,
       description,
+      url: studio ? STUDIO_URL : "/",
       images: [
         {
-          url: DEFAULT_OG_IMAGE,
+          url: image,
           width: 1200,
           height: 630,
           alt: title,
@@ -51,7 +54,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description,
       images: [
         {
-          url: DEFAULT_OG_IMAGE,
+          url: image,
           width: 1200,
           height: 630,
           alt: title,
