@@ -171,7 +171,9 @@ here.
   manifest/lockfile plus removal of the four response-header adapters.
 - **Exact access blocker:** Preview observation requires the user's Vercel-authenticated
   Chrome session or an approved non-secret Deployment Protection bypass supplied by
-  the project owner. No bypass token was requested, stored, or exposed. Chrome is
-  running, but its active profile does not have the Codex extension enabled; the
-  extension is present in another local Chrome profile. No new Google or account
-  action was attempted.
+  the project owner. No bypass token was requested, stored, or exposed. A fresh
+  production Chrome check reached the real `/mfa-verify` page after Google OAuth,
+  proving the callback-to-MFA handoff without recording credentials, TOTP values,
+  cookies, or account identifiers. The user declined to complete the one-time MFA
+  step, so no authenticated post-MFA claim is made. Preview observation remains
+  pending and the live Chrome check will not be repeated.

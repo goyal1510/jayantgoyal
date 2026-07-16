@@ -118,6 +118,7 @@
   completed for both apps from commit `5f27a53`, but Vercel Deployment Protection
   returns SSO redirects to unauthenticated shell probes. Post-deploy HTTPS
   observation remains pending until an approved authenticated Preview session is
-  available. A local Chrome check found the browser running but the active profile
-  lacks the Codex extension; another local profile has it. No bypass token or new
-  account action was used.
+  available. A fresh production Chrome check reached `/mfa-verify` after Google
+  OAuth; the user declined to enter the one-time code, so no post-MFA claim is
+  recorded. No bypass token, credential, TOTP value, cookie, or account mutation
+  was used, and the live Chrome check will not be repeated.
