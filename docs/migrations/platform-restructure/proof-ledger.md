@@ -171,6 +171,7 @@ here.
   manifest/lockfile plus removal of the four response-header adapters.
 - **Exact access blocker:** Preview observation requires the user's Vercel-authenticated
   Chrome session or an approved non-secret Deployment Protection bypass supplied by
-  the project owner. No bypass token was requested, stored, or exposed. The Chrome
-  extension connection was unavailable during this attempt, so no new Google or
-  account action was attempted.
+  the project owner. No bypass token was requested, stored, or exposed. Chrome is
+  running, but its active profile does not have the Codex extension enabled; the
+  extension is present in another local Chrome profile. No new Google or account
+  action was attempted.
