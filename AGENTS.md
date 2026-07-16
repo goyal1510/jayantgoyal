@@ -352,7 +352,7 @@ export function Component({ variant, size, className }) {
 
 ### Testing
 
-No test framework configured. Quality assurance via:
+Focused platform regression tests use Vitest (`pnpm test`). Quality assurance also includes:
 - Strict TypeScript (`pnpm check-types`)
 - ESLint with zero warnings (`pnpm lint`)
 - Manual testing
@@ -478,10 +478,11 @@ pnpm dev                      # Run all apps
 pnpm build --filter jg        # Build main app
 pnpm lint                     # ESLint (zero warnings enforced: --max-warnings 0)
 pnpm check-types              # TypeScript check (runs next typegen && tsc --noEmit)
+pnpm test                     # Focused Vitest regression tests
 pnpm format                   # Prettier (ts, tsx, md files)
 ```
 
-Build ignores TS errors (`typescript.ignoreBuildErrors: true`); always run `pnpm check-types` separately. No test framework is configured.
+Build ignores TS errors (`typescript.ignoreBuildErrors: true`); always run `pnpm check-types` separately.
 
 ## Architecture
 

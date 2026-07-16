@@ -329,7 +329,7 @@ Acceptance checks:
 
 ### Phase 1 checklist
 
-- [ ] Choose the smallest sustainable browser/integration test setup.
+- [x] Choose the smallest sustainable browser/integration test setup.
 - [ ] Add a public Portfolio/current-home smoke test.
 - [ ] Add unauthenticated protected-route redirect coverage.
 - [ ] Add authenticated current-app navigation coverage.

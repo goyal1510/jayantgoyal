@@ -33,7 +33,22 @@
   - Auth Vercel environment inventory remains pending until the Auth project exists.
   - Stable Portfolio and Studio staging domains are attached to the `staging` branch and temporarily alias the tested immutable deployments while new builds are rate-limited. Portfolio's inherited Vercel Authentication was removed to match the already-public Main project; both staging hosts are publicly reachable with valid TLS.
   - Vercel rejected Studio production promotion because the free team exceeded its daily deployment limit. The tested immutable preview is assigned directly to `studio.jayantgoyal.com`; promotion remains a later cleanup step when the limit resets.
-  - Vercel subsequently rate-limited all new project builds for 24 hours. The latest single-hop redirect fix is committed and pushed but cannot replace the current Portfolio alias until the limit resets; apex cutover is blocked until that exact build passes.
+  - Vercel subsequently rate-limited all new project builds for 24 hours. The single-hop redirect fix is pushed, while the subsequent contact, URL-contract, discovery, and regression-test commits are intentionally held locally to avoid guaranteed failed deployments; apex cutover is blocked until the exact current branch build passes.
+
+## PLATFORM-01 — Test foundation prepared; Auth execution deferred
+
+- Added repository-local Vitest `4.1.10` with a single `pnpm test` command and no production dependency.
+- Twelve focused tests pass across four files: Studio hostname classification, Vercel-host recognition, cross-application URL normalization, Portfolio/Studio redirect ownership, and contact validation that exits before delivery.
+- The host tests exposed and now prevent an empty-host regression where absent Vercel variables could classify a missing Host header as Studio.
+- Test fixtures contain no credentials, tokens, session data, or real delivery request. Provider, session, role, MFA, logout, and recovery regression coverage remains deferred with the rest of Auth under ADR-001; PLATFORM-01 is not Done.
+
+## Cross-phase security gate — In Progress
+
+- The dependency audit found the deployed apps and `@repo/ui` resolving Next.js `16.1.6`, which was inside current high-severity Server Component and proxy-bypass advisory ranges. Studio, Portfolio, Admin, the UI peer resolution, and the shared Next ESLint plugin now resolve to `16.2.10`.
+- Repository-local Vercel CLI is updated to `56.3.0`; Vitest remains development-only at `4.1.10`.
+- Precise same-major overrides replace vulnerable tar, minimatch, flatted, picomatch, path-to-regexp, and ws patch levels without forcing incompatible majors.
+- `pnpm test`, full monorepo TypeScript, zero-warning lint, and full monorepo production build pass after the final dependency graph change.
+- `pnpm audit --prod` reports zero high and zero critical production-dependency advisories. The full development audit retains six high advisories exclusively through Vercel CLI's upstream `undici` major-5 dependencies; Vercel `56.3.0` is current and still ships them, so this tooling-only risk is recorded rather than hidden behind an unreviewed major override.
 
 ## PLATFORM-08 — In Progress
 

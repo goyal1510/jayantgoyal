@@ -14,12 +14,13 @@ export function normalizeHostname(host?: string | null): string {
 
 export function isStudioHost(host?: string | null): boolean {
   const hostname = normalizeHostname(host);
-  const vercelHosts = [
-    process.env.VERCEL_URL,
-    process.env.VERCEL_PROJECT_PRODUCTION_URL,
-  ].map(normalizeHostname);
+  const vercelHosts = new Set(
+    [process.env.VERCEL_URL, process.env.VERCEL_PROJECT_PRODUCTION_URL]
+      .map(normalizeHostname)
+      .filter(Boolean),
+  );
 
-  return STUDIO_HOSTS.has(hostname) || vercelHosts.includes(hostname);
+  return STUDIO_HOSTS.has(hostname) || vercelHosts.has(hostname);
 }
 
 export function resolvePlatformSurface(host?: string | null): PlatformSurface {

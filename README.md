@@ -133,6 +133,7 @@ RESEND_API_KEY=
 | `pnpm build` | Build all |
 | `pnpm lint` | Lint (zero warnings) |
 | `pnpm check-types` | Type check |
+| `pnpm test` | Run focused Vitest regression tests |
 | `pnpm format` | Format with Prettier |
 
 ---
