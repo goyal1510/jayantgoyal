@@ -5,7 +5,7 @@
 - Objective: Create a durable architecture plan and phased implementation checklist for separating Portfolio, Studio, Admin, and Auth without changing application code.
 - Scope: Documentation only. No application, package, database, migration, deployment, or configuration changes.
 - Working branch: `codex/platform-architecture-blueprint`
-- Working directory: `/Users/jgoyal1510/Desktop/Jayant/Developer/projects/worktrees/jayantgoyal/platform-architecture-blueprint`
+- Working directory: `<developer-root>/projects/worktrees/jayantgoyal/platform-architecture-blueprint`
 
 ## Current status
 
