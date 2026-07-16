@@ -122,3 +122,8 @@
   OAuth; the user declined to enter the one-time code, so no post-MFA claim is
   recorded. No bypass token, credential, TOTP value, cookie, or account mutation
   was used, and the live Chrome check will not be repeated.
+- The user authorized the merge-and-deploy route for PLATFORM-02 instead of adding
+  another test framework. The connected GitHub account could not mark draft PR #31
+  ready (`MarkPullRequestReadyForReview` permission denied), so no merge or
+  production deployment was attempted. The PR and branch remain unchanged; the
+  existing Playwright suite is the only local auth validation path.
