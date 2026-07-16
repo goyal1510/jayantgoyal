@@ -1,6 +1,8 @@
 "use client";
 
 import { Menu, Moon, Sun, X } from "lucide-react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
@@ -16,6 +18,8 @@ function scrollToSection(sectionId: string) {
 export function PortfolioHeader() {
   const { data } = usePortfolioData();
   const { resolvedTheme, setTheme } = useTheme();
+  const pathname = usePathname();
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -23,15 +27,19 @@ export function PortfolioHeader() {
 
   const handleNavigate = (sectionId: string) => {
     setMobileOpen(false);
-    scrollToSection(sectionId);
+    if (pathname === "/") {
+      scrollToSection(sectionId);
+      return;
+    }
+
+    router.push(`/#${sectionId}`);
   };
 
   return (
     <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/75">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-        <button
-          type="button"
-          onClick={() => handleNavigate("home")}
+        <Link
+          href="/#home"
           className="text-left"
           aria-label="Go to the top of the portfolio"
         >
@@ -41,7 +49,7 @@ export function PortfolioHeader() {
           <span className="block text-xs text-muted-foreground">
             Full-Stack Developer
           </span>
-        </button>
+        </Link>
 
         <nav
           className="hidden items-center gap-1 lg:flex"
@@ -58,6 +66,9 @@ export function PortfolioHeader() {
               {item.label}
             </Button>
           ))}
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/blog">Blog</Link>
+          </Button>
         </nav>
 
         <div className="flex items-center gap-2">
@@ -113,6 +124,11 @@ export function PortfolioHeader() {
             {item.label}
           </Button>
         ))}
+        <Button asChild variant="ghost" size="sm" className="justify-start">
+          <Link href="/blog" onClick={() => setMobileOpen(false)}>
+            Blog
+          </Link>
+        </Button>
       </nav>
     </header>
   );
