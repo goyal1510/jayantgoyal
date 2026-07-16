@@ -25,3 +25,16 @@
 - Consequences: a completed slice is not a stopping point, and no additional implementation PR is opened unless the user changes this decision.
 - Code or abstraction deleted/avoided: no temporary integration branches or PR chains.
 - Revisit trigger: an external provider or repository policy makes the single-PR approach impossible.
+
+## ADR-003 — Rename Studio before the apex cutover
+
+- Date: 2026-07-17
+- Status: Accepted
+- Task IDs: PLATFORM-07, PLATFORM-09, PLATFORM-11
+- Context: ADR-001 originally retained a dual Portfolio/Studio runtime until after apex cutover. The user confirmed there is no meaningful traffic or dependency requiring that compatibility layer and explicitly accepted temporary production disruption.
+- Options considered: retain hostname-selected application identity until apex cutover; create a second Studio Vercel project; or rename the existing product application and Vercel project in place before moving the apex.
+- Decision: physically rename `apps/jayantgoyal` and package/filter `jg` to `apps/studio` and `studio`; make Studio a single-purpose runtime on every host; rename and repoint the existing Vercel project in place; redirect Portfolio-owned legacy URLs to Portfolio; then move the apex and `www` to Portfolio.
+- Why this is the smallest maintainable choice: folder, package, workspace filter, Vercel project, domain, and runtime identity now describe the same application without a temporary hostname-based product mode or duplicate deployment project.
+- Consequences: the old apex may temporarily render Studio or fail between project and domain changes; that disruption is accepted. Rollback is the Git revert plus restoring the prior Vercel project root/name and aliases.
+- Code or abstraction deleted/avoided: dual-surface hostname classification, duplicated Portfolio routes/data/components in Studio, and a second Studio Vercel project.
+- Revisit trigger: deployed evidence shows an unclassified production dependency on the former combined runtime.

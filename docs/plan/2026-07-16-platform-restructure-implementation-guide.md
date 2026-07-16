@@ -58,11 +58,12 @@ When implementation convenience conflicts with the Blueprint, stop and record an
 
 The approved application responsibilities remain unchanged, but the execution order was updated on 2026-07-17 and recorded in [ADR-001](../migrations/platform-restructure/decision-log.md):
 
-1. Dark-launch the independent public Portfolio at `portfolio.jayantgoyal.com` while the current root deployment remains untouched.
-2. Add the public Studio inventory to the existing application and validate it at `studio.jayantgoyal.com`.
-3. Move `jayantgoyal.com` and `www.jayantgoyal.com` to Portfolio, then finish the Studio rename and cleanup.
-4. Complete Admin organization after the application ownership boundary is stable.
-5. Resume the shared Auth/SSO phases last.
+1. Dark-launch the independent public Portfolio at `portfolio.jayantgoyal.com`.
+2. Rename the existing product application, package, workspace filter, and Vercel project to Studio; remove duplicated Portfolio ownership and preserve legacy content URLs as redirects.
+3. Deploy and validate the exact Studio commit at `studio.jayantgoyal.com`.
+4. Move `jayantgoyal.com` and `www.jayantgoyal.com` to Portfolio and verify the cross-application redirect ledger. Temporary root disruption during this low-traffic migration is explicitly accepted.
+5. Complete Admin organization after the application ownership boundary is stable.
+6. Resume the shared Auth/SSO phases last.
 
 The task IDs keep their architectural meanings; they are not required to execute numerically when this accepted decision changes their dependencies.
 
@@ -142,7 +143,7 @@ Only one task should be In Progress per implementation lane.
 |     1 | PLATFORM-08 | Portfolio application                 | In Progress | Portfolio deploys independently before root cutover  |
 |     2 | PLATFORM-07 | Studio technical deployment           | Pending     | Existing products also run at Studio                 |
 |     3 | PLATFORM-11 | Studio product experience             | Pending     | Public discovery precedes product workspaces         |
-|     4 | PLATFORM-09 | Domain and route cutover              | Pending     | Root is Portfolio; product routes redirect to Studio |
+|     4 | PLATFORM-09 | Domain and route cutover              | In Progress | Root is Portfolio; product routes redirect to Studio |
 |     5 | PLATFORM-10 | Admin domain organization             | Pending     | Admin manages Portfolio, Studio, and System          |
 |     6 | PLATFORM-01 | Authentication regression foundation  | Pending     | No behavior change                                   |
 |     7 | PLATFORM-02 | Supabase dependency and SSR hardening | Pending     | Existing auth behavior preserved                     |
@@ -289,7 +290,7 @@ Acceptance checks:
 - [ ] Confirm all current production domains and aliases.
 - [ ] Confirm the linked Supabase project without recording secrets.
 - [ ] Inventory current auth cookie names and attributes in a real browser.
-- [ ] Inventory auth pages in `apps/jayantgoyal`.
+- [ ] Inventory auth pages in `apps/studio`.
 - [ ] Inventory auth pages in `apps/admin`.
 - [ ] Inventory server, browser, and service-role Supabase clients.
 - [ ] Inventory current proxy route classifications.
@@ -314,7 +315,7 @@ Task ID: PLATFORM-01
 Status: Pending
 Objective: Add enough automated and manual regression coverage to change authentication safely.
 Dependencies: PLATFORM-00 Done.
-Target files/surfaces: Current authentication flows in `apps/jayantgoyal` and `apps/admin`; test tooling approved for the repository.
+Target files/surfaces: Current authentication flows in `apps/studio` and `apps/admin`; test tooling approved for the repository.
 Allowed changes: Test framework configuration, test-only fixtures, browser tests, non-production diagnostics.
 Forbidden changes: Authentication behavior, cookie contract, callback locations, production route protection.
 Acceptance checks:
@@ -593,7 +594,7 @@ Task ID: PLATFORM-07
 Status: In Progress
 Objective: Establish the current application as Studio’s technical lineage and deploy it independently before redesign.
 Dependencies: Independent Portfolio dark launch is runnable; existing authentication remains compatible during the technical move. PLATFORM-06 is intentionally deferred by ADR-001.
-Target files/surfaces: `apps/jayantgoyal` package/folder identity, workspace filters, Vercel Studio project, Studio domains, environment assumptions, product links.
+Target files/surfaces: `apps/studio` package/folder identity, workspace filters, Vercel Studio project, Studio domains, environment assumptions, product links.
 Allowed changes: Behavior-preserving application rename/move and independent Studio deployment.
 Forbidden changes: Product redesign, Portfolio root cutover, database redesign, persisted-store key changes, mass feature reorganization.
 Acceptance checks:
@@ -610,11 +611,11 @@ Acceptance checks:
 
 ADR-002 keeps these review slices as commits inside one program PR rather than separate PRs.
 
-- [ ] PR 1: Rename package/filter identifiers without folder move if useful.
-- [ ] PR 2: Move `apps/jayantgoyal` to `apps/studio` with no behavior redesign.
-- [ ] PR 3: Update workspace and deployment configuration.
-- [ ] PR 4: Add Studio domain and production environment.
-- [ ] PR 5: Fix only host-sensitive behavior proven by staging validation.
+- [x] Commit slice 1: Rename the package/filter identifier to `studio`.
+- [x] Commit slice 2: Move `apps/jayantgoyal` to `apps/studio` and remove duplicated Portfolio ownership.
+- [x] Commit slice 3: Update workspace, local commands, and deployment configuration in source.
+- [x] Commit slice 4: Rename and repoint the existing Vercel project and verify its Studio environments.
+- [ ] Commit slice 5: Deploy the exact commit and fix only behavior proven by deployed validation.
 
 ### Phase 7 product validation checklist
 
@@ -632,9 +633,9 @@ ADR-002 keeps these review slices as commits inside one program PR rather than s
 
 ### Phase 7 exit gate
 
-- [ ] Studio is an independent Vercel project.
+- [x] The existing product Vercel project is renamed and dedicated to Studio.
 - [ ] Existing product behavior is stable on Studio.
-- [ ] The root domain still serves the existing application until Portfolio is ready.
+- [ ] Portfolio-owned legacy paths redirect to Portfolio and product paths remain on Studio.
 
 ---
 
@@ -695,7 +696,7 @@ Acceptance checks:
 ## Phase 9 — Domain and route cutover
 
 Task ID: PLATFORM-09
-Status: Pending
+Status: In Progress
 Objective: Make Portfolio the root-domain application and permanently route product traffic to Studio without losing historical URLs.
 Dependencies: PLATFORM-08 and PLATFORM-07 deployed and validated; Studio public discovery is available. Auth remains on the compatible existing flow under ADR-001.
 Target files/surfaces: Vercel domains, redirects, canonical metadata, sitemap, robots, navigation, compatibility callbacks, analytics.
@@ -715,37 +716,37 @@ Acceptance checks:
 
 Professional routes remain or map to Portfolio:
 
-- [ ] `/`
-- [ ] `/about`
-- [ ] `/experience`
-- [ ] `/skills`
-- [ ] `/projects`
-- [ ] `/resume`
-- [ ] `/blog`
-- [ ] `/blog/[slug]`
-- [ ] `/contact`
+- [x] `/`
+- [x] `/about`
+- [x] `/experience`
+- [x] `/skills`
+- [x] `/projects`
+- [x] `/resume`
+- [x] `/blog`
+- [x] `/blog/[slug]`
+- [x] `/contact`
 
 Product routes permanently redirect to the same path on Studio when compatible:
 
-- [ ] `/activity-tracker/**`
-- [ ] `/calculator/**`
-- [ ] `/custom-calculator/**`
-- [ ] `/files/**`
-- [ ] `/games/**`
-- [ ] `/github-stats/**`
-- [ ] `/messenger/**`
-- [ ] `/tools/**`
-- [ ] `/weather/**`
+- [x] `/activity-tracker/**`
+- [x] `/calculator/**`
+- [x] `/custom-calculator/**`
+- [x] `/files/**`
+- [x] `/games/**`
+- [x] `/github-stats/**`
+- [x] `/messenger/**`
+- [x] `/tools/**`
+- [x] `/weather/**`
 
 Auth routes use temporary redirects or compatibility handlers before retirement:
 
-- [ ] `/login`
-- [ ] `/signup` or `/register`
-- [ ] `/forgot-password`
-- [ ] `/reset-password`
-- [ ] `/mfa-verify`
-- [ ] `/auth/callback`
-- [ ] `/welcome`
+- [x] `/login`
+- [x] `/signup` or `/register`
+- [x] `/forgot-password`
+- [x] `/reset-password`
+- [x] `/mfa-verify`
+- [x] `/auth/callback`
+- [x] `/welcome`
 
 ### Phase 9 cutover sequence
 
@@ -1231,11 +1232,11 @@ Review after the migration and at least annually:
 
 ## 16. Immediate next action
 
-Continue PLATFORM-08 in the existing dedicated worktree and program branch:
+Continue PLATFORM-07 in the existing dedicated worktree and program branch:
 
-1. Complete and locally validate the independent `apps/portfolio` boundary.
-2. Create its Vercel project and copy only the environment variables the public Portfolio actually needs.
-3. Deploy and validate `portfolio.jayantgoyal.com` without moving the apex domains.
-4. Continue immediately into the Studio technical deployment and public inventory slice.
+1. Deploy and validate the exact Studio and Portfolio commits after the Vercel build limit resets.
+2. Confirm apex canonical/Open Graph metadata from that fresh Portfolio deployment.
+3. Run the deployed responsive and authenticated product matrix.
+4. Complete the rollback rehearsal and required observation gates before closing PLATFORM-07, PLATFORM-08, or PLATFORM-09.
 
 Do not create `apps/auth` or `packages/auth` until the application split and root-domain cutover are stable.
