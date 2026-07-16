@@ -1,11 +1,5 @@
+import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { createSupabaseProxyClient } from "@repo/auth/proxy";
-import {
-  DEFAULT_PLATFORM_COOKIE_POLICY,
-  platformCookiePolicyForHost,
-  resolvePlatformSessionConfig,
-  sessionCookieNames,
-} from "@repo/auth/cookies";
 
 import { runMiddleware } from "@/proxy/runner";
 import { mfaMiddleware } from "@/proxy/mfa";
@@ -84,17 +78,11 @@ function getAalFromCookie(
   request: NextRequest,
   supabaseUrl: string,
 ): string | null {
-  const policy =
-    platformCookiePolicyForHost(request.nextUrl.hostname) ??
-    DEFAULT_PLATFORM_COOKIE_POLICY;
-  const names = sessionCookieNames(supabaseUrl, policy);
-  const cookie = [names.platform, names.legacy]
-    .map(
-      (name) =>
-        request.cookies.get(name)?.value ??
-        request.cookies.get(`${name}.0`)?.value,
-    )
-    .find(Boolean);
+  const projectRef = new URL(supabaseUrl).hostname.split(".")[0];
+  const tokenName = `sb-${projectRef}-auth-token`;
+  const cookie =
+    request.cookies.get(tokenName)?.value ??
+    request.cookies.get(`${tokenName}.0`)?.value;
   if (!cookie) return null;
   try {
     const raw = cookie.startsWith("base64-") ? atob(cookie.slice(7)) : cookie;
@@ -147,12 +135,6 @@ export default async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/welcome", request.url));
   }
 
-  const platformSession = resolvePlatformSessionConfig({
-    enabled: process.env.PLATFORM_SESSION_ENABLED === "true",
-    hostname: request.nextUrl.hostname,
-    supabaseUrl,
-  });
-
   const isPublicPage = matchPath(pathname, PUBLIC_PAGES);
 
   // ──────────────────────────────────────────────────────────────
@@ -179,17 +161,13 @@ export default async function proxy(request: NextRequest) {
   // ──────────────────────────────────────────────────────────────
   // PROTECTED PAGES + AUTH PATHS — full auth check with getUser()
   // ──────────────────────────────────────────────────────────────
-  const supabase = createSupabaseProxyClient({
-    supabaseUrl,
-    supabaseAnonKey,
-    platformSession,
-    responseStore: {
+  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookies: {
       getAll: () => request.cookies.getAll(),
-      setCookie: (name, value, options) => {
-        response.cookies.set(name, value, options);
-      },
-      setHeader: (name, value) => {
-        response.headers.set(name, value);
+      setAll: (cookies) => {
+        cookies.forEach(({ name, value, options }) => {
+          response.cookies.set(name, value, options);
+        });
       },
     },
   });

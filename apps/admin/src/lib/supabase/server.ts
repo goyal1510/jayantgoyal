@@ -1,8 +1,6 @@
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import { cache } from "react";
-import { resolvePlatformSessionConfig } from "@repo/auth/cookies";
-import { createSupabaseServerClient as createSharedServerClient } from "@repo/auth/server";
-import { createSupabaseAdminClient as createSharedAdminClient } from "@repo/auth/admin";
+import { createServerClient } from "@supabase/ssr";
 
 export const createSupabaseServerClient = cache(async () => {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -13,18 +11,22 @@ export const createSupabaseServerClient = cache(async () => {
   }
 
   const cookieStore = await cookies();
-  const requestHeaders = await headers();
-  const hostname = requestHeaders.get("host")?.split(":")[0] ?? "";
 
-  return createSharedServerClient({
-    supabaseUrl,
-    supabaseAnonKey,
-    cookieStore,
-    platformSession: resolvePlatformSessionConfig({
-      enabled: process.env.PLATFORM_SESSION_ENABLED === "true",
-      hostname,
-      supabaseUrl,
-    }),
+  return createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll();
+      },
+      setAll(cookiesToSet) {
+        try {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            cookieStore.set(name, value, options);
+          });
+        } catch {
+          // The cookies API can be read-only in edge contexts; swallow errors.
+        }
+      },
+    },
   });
 });
 
@@ -40,8 +42,12 @@ export function createSupabaseAdminClient() {
     throw new Error("Missing Supabase admin environment variables.");
   }
 
-  return createSharedAdminClient({
-    supabaseUrl,
-    serviceRoleKey: supabaseServiceKey,
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { createClient } = require("@supabase/supabase-js");
+  return createClient(supabaseUrl, supabaseServiceKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
   });
 }
