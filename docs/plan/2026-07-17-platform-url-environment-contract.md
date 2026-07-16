@@ -6,12 +6,12 @@
 
 ## Application and domain ownership
 
-| Application | Repository location | Vercel lifecycle                                           | Production host          |
-| ----------- | ------------------- | ---------------------------------------------------------- | ------------------------ |
-| Portfolio   | `apps/portfolio`    | The current root project becomes Portfolio at root cutover | `jayantgoyal.com`        |
-| Studio      | `apps/studio`       | New independent Vercel project                             | `studio.jayantgoyal.com` |
-| Admin       | `apps/admin`        | Existing independent Vercel project                        | `admin.jayantgoyal.com`  |
-| Auth        | `apps/auth`         | New independent Vercel project                             | `auth.jayantgoyal.com`   |
+| Application | Repository location                | Vercel lifecycle                                                            | Production host          |
+| ----------- | ---------------------------------- | --------------------------------------------------------------------------- | ------------------------ |
+| Portfolio   | `apps/portfolio`                   | New independent project; dark-launch on `portfolio` before root cutover     | `jayantgoyal.com`        |
+| Studio      | `apps/jayantgoyal` → `apps/studio` | The existing Main project becomes Studio after the reversible root cutover | `studio.jayantgoyal.com` |
+| Admin       | `apps/admin`                       | Existing independent Vercel project                                         | `admin.jayantgoyal.com`  |
+| Auth        | `apps/auth`                        | New independent project created only in the Auth phase                       | `auth.jayantgoyal.com`   |
 
 `www.jayantgoyal.com` redirects to the apex canonical URL. The existing e-commerce Vercel projects and domains remain outside this platform restructure.
 
@@ -26,18 +26,19 @@
 
 Staging is implemented with a persistent Git branch and branch domains, not extra Vercel projects. No wildcard DNS record is permitted; each host is created only after its Vercel project supplies the required target.
 
-The persistent remote `staging` branch now exists. The existing Main and Admin Vercel projects have branch-specific Preview `NEXT_PUBLIC_SITE_URL` values for their approved staging hosts. The domains and DNS records remain intentionally unattached until the corresponding staging deployments are ready for validation.
+The persistent remote `staging` branch now exists and tracks the current program commit. Portfolio, Main/Studio, and Admin have branch-specific Preview `NEXT_PUBLIC_SITE_URL` values for their approved staging hosts. Portfolio and Studio branch domains and exact DNS records are attached; tested immutable deployments back them until Vercel permits a fresh `staging` branch build. Auth staging remains deferred to the Auth phase.
 
 ## Current-project environment policy
 
-Until the split, the current main application remains at `apps/jayantgoyal` on the root domain and Admin remains at `apps/admin`.
+During compatibility, the current Main application remains at `apps/jayantgoyal` on the root domain while also serving Studio. Portfolio is independently deployed at `portfolio.jayantgoyal.com`, and Admin remains at `apps/admin`.
 
-| Project      | Development `NEXT_PUBLIC_SITE_URL`                     | Production `NEXT_PUBLIC_SITE_URL` | Generic Preview                                            |
-| ------------ | ------------------------------------------------------ | --------------------------------- | ---------------------------------------------------------- |
-| Current main | `http://localhost:3000`                                | `https://jayantgoyal.com`         | Resolve the actual request/deployment origin; no fixed URL |
-| Admin        | `http://localhost:3001` until the final port migration | `https://admin.jayantgoyal.com`   | Resolve the actual request/deployment origin; no fixed URL |
+| Project       | Development `NEXT_PUBLIC_SITE_URL` | Current Production `NEXT_PUBLIC_SITE_URL` | `staging` Preview value                     | Generic Preview                                            |
+| ------------- | ---------------------------------- | ----------------------------------------- | ------------------------------------------- | ---------------------------------------------------------- |
+| Portfolio     | `http://localhost:3000`            | `https://portfolio.jayantgoyal.com`       | `https://portfolio.staging.jayantgoyal.com` | Resolve the actual request/deployment origin; no fixed URL |
+| Main / Studio | `http://localhost:3001`            | `https://jayantgoyal.com` until cutover   | `https://studio.staging.jayantgoyal.com`    | Resolve the actual request/deployment origin; no fixed URL |
+| Admin         | `http://localhost:3002`            | `https://admin.jayantgoyal.com`           | `https://admin.staging.jayantgoyal.com`     | Resolve the actual request/deployment origin; no fixed URL |
 
-`NEXT_PUBLIC_SITE_URL` is public configuration and must not be treated as a secret. All sensitive values remain server-only. New Auth and Studio projects receive their own environment inventories only when their applications exist.
+`NEXT_PUBLIC_SITE_URL` is public configuration and must not be treated as a secret. All sensitive values remain server-only. The Portfolio environment inventory exists without a service-role key; Auth receives its own inventory only when that application exists.
 
 ## Supabase Auth URL rollout
 
