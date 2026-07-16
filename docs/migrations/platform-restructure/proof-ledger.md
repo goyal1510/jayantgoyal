@@ -272,3 +272,9 @@ Ignored Build Step`, so no new preview artifact for this implementation is
   review, observation window, and rollback evidence exist. Rollback is deleting
   the new app and workspace entry plus reverting its lockfile/docs commit; the
   existing Main/Admin auth paths remain untouched.
+- **Current PR checks:** The follow-up Main/Admin Vercel checks for `987fc92` /
+  `3c6425e` completed with success status but were canceled by the projects'
+  Ignored Build Step (`745eXy5wy5BZJqHnhUJ7tuY4jfoQ` Main and
+  `5gcMKthbFYVu29Uxj8YcYzpUZuHD` Admin). They did not create fresh Ready
+  application artifacts; the Ready `4f68d82` deployments remain deployment-only
+  evidence behind Vercel Deployment Protection.

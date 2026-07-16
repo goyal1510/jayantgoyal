@@ -179,3 +179,8 @@
 - Added the secret-free `apps/auth/.env.example` and recorded Auth's three
   public environment names in `environment-inventory.md`; no Auth environment
   values or Vercel project were created.
+- Fresh Main/Admin Vercel checks for the Auth commits completed with success
+  status but were canceled by the existing Ignored Build Step, so no new Ready
+  preview artifact or authenticated behavior claim exists. The earlier Ready
+  `4f68d82` previews remain deployment-only evidence behind Vercel SSO
+  Deployment Protection.
