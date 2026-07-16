@@ -7,7 +7,14 @@ import { safeRedirectPath } from "@repo/auth/redirects";
 export async function POST(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const origin = request.headers.get("origin");
-  if (origin !== requestUrl.origin) {
+  let originHost: string | null = null;
+  try {
+    originHost = origin ? new URL(origin).host : null;
+  } catch {
+    originHost = null;
+  }
+  const requestHost = request.headers.get("host") ?? requestUrl.host;
+  if (!originHost || originHost !== requestHost) {
     return NextResponse.json(
       { error: "invalid_origin" },
       { status: 403, headers: { "cache-control": "no-store" } },
