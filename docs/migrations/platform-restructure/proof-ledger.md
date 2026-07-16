@@ -73,19 +73,48 @@ here.
 ## PLATFORM-01 — Authentication regression foundation (In Progress)
 
 - **Started:** 2026-07-16 (Asia/Kolkata), immediately after PLATFORM-00 exit.
-- **Dependency:** PLATFORM-00 Done with reproducible baseline and explicit
-  manual-only/mutating boundaries.
-- **Allowed change boundary:** Test framework/configuration, test-only fixtures,
-  browser/integration tests, and non-production diagnostics only; no runtime auth,
-  cookie, callback, or route-protection behavior change.
-- **Initial test requirements:** public Portfolio smoke, unauthenticated product
-  gate, authenticated navigation, Admin denial and authorized success, AAL1 to
-  AAL2, explicit logout scopes, callback invalid code, recovery compatibility,
-  provider cancellation, expired/failed refresh, and a stable-staging manual
-  provider checklist.
-- **Security constraint:** No real credential, token, cookie, OAuth parameter, or
-  production MFA secret may enter fixtures, logs, snapshots, screenshots, or
-  repository artifacts. The previously used password persona remains unavailable
-  until its password is rotated.
-- **Proof pending:** Test-tool choice, implementation, failure demonstration,
-  commands, production-like run, manual provider matrix, review gate, and exit gate.
+- **Test setup:** Root Playwright `1.61.1` with Chrome channel, one worker, explicit
+  Main/Admin ports, optional external HTTPS targets, and no screenshots, traces,
+  video, or retained failure output. Playwright-owned servers terminate after the
+  run; the only ignored result file is a pass/fail marker with no auth data.
+- **Implemented coverage:** 20 tests across public Portfolio, anonymous product
+  gate, expired/failed refresh recovery, Main/Admin invalid callbacks, invalid
+  recovery links, anonymous account/privileged endpoints, deterministic RFC 6238
+  TOTP, authenticated Main navigation/refresh, Admin denial/success, mandatory
+  AAL1-to-AAL2 step-up, visible logout, and cross-host global logout.
+- **Failure demonstration:** Three source contracts are annotated expected-fail
+  for the known Admin external-return, factorless Admin AAL1, and implicit logout
+  scope gaps. They currently fail their assertions as expected; fixing a gap
+  without updating its contract makes the suite report an unexpected pass.
+- **Local run:** `pnpm test:auth:read-only` passed 15/15 against both local apps
+  using the ignored local application environment. `pnpm test:auth` passed 15 and
+  safely skipped five credential-gated journeys because authenticated execution
+  was not enabled.
+- **Production-like run:** With external targets set to the current Main and Admin
+  HTTPS deployments, `pnpm test:auth:read-only` passed 15/15. No deployment,
+  account, role, provider, cookie contract, or runtime behavior was changed.
+- **Manual provider evidence:** Main Google OAuth/TOTP, `/files`, and refresh
+  continuity passed in the user's Chrome. Admin Google OAuth/TOTP passed before
+  correct non-admin denial. The complete redacted Google/future-GitHub,
+  registration, recovery, MFA, logout, cancellation, and stale-state matrix is in
+  `platform-01-provider-checklist.md`.
+- **Test personas:** Anonymous and deterministic fake-expired-session cases are
+  active. The Chrome identity is recorded only by authorization class. No
+  disposable password, non-admin, or AAL2 Admin values are stored. The legacy
+  password persona is deliberately ignored and remains unavailable until rotated.
+- **Coverage boundary:** Five credential-gated tests exist but are skipped unless
+  `AUTH_TEST_ALLOW_AUTHENTICATED=true` and new `AUTH_TEST_*` disposable personas
+  are provided. Cross-host global logout additionally requires
+  `AUTH_TEST_CROSS_HOST=true` on approved stable staging. GitHub is absent from the
+  baseline UI and remains target-only until the Auth phase enables it.
+- **Repository gates:** `pnpm lint` and `pnpm check-types` passed across the
+  workspace. Focused Prettier and `git diff --check` passed during implementation.
+- **User-visible result:** None. Only test/configuration, dependency, proof, and
+  session files changed.
+- **Rollback action:** Revert the PLATFORM-01 test-foundation commit and remove
+  Playwright from the root development dependencies. No external rollback exists.
+- **Remaining acceptance blocker:** A safe disposable credential environment is
+  not available: the previous password persona requires rotation and stable
+  staging does not yet exist. Do not mutate production accounts to fill the gap.
+  PLATFORM-01 remains In Progress and PLATFORM-02 remains dependency-blocked until
+  the five credential-gated journeys and required manual rows have redacted proof.

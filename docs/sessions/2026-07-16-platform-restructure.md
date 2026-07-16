@@ -87,12 +87,24 @@
 
 ## Next
 
-- Select and implement the smallest sustainable PLATFORM-01 auth regression setup
-  without changing runtime authentication behavior.
-- Add public, unauthenticated, authenticated, Admin denial/success, AAL2, logout,
-  callback, recovery, expired/failed refresh, cancellation, and stale-state
-  coverage.
-- Add a secret-free stable-staging manual checklist for Google/GitHub and other
-  provider-only cases.
-- Demonstrate that tests can catch the known baseline gaps before allowing
-  PLATFORM-02 dependency/SSR changes.
+- Selected Playwright `1.61.1` as the smallest sustainable PLATFORM-01 browser
+  setup and added root scripts, a Chrome-based configuration, read-only smoke and
+  endpoint tests, credential-gated journeys, RFC 6238 TOTP support, and static
+  security contract checks. Credential-bearing artifacts are disabled.
+- Added a secret-free stable-staging manual checklist for Google, future GitHub,
+  registration, recovery, MFA, logout scopes, cancellation, and stale-state
+  journeys. The recorded Chrome Google results are baseline evidence only; the
+  full staging matrix remains pending.
+- The automated suite loads only new `AUTH_TEST_*` names and deliberately ignores
+  the legacy `TEST_USER_*` persona whose password rotation remains required.
+- `pnpm test:auth:read-only` passed 15/15 locally and 15/15 against the current Main
+  and Admin HTTPS deployments. The full local command passed 15 and safely skipped
+  five credential-gated cases. Three expected-failure source contracts demonstrate
+  detection of the open-return, factorless-Admin, and implicit-logout gaps.
+- `pnpm lint` and `pnpm check-types` passed across the workspace. No runtime auth,
+  cookie, callback, route-protection, account, provider, deployment, or database
+  behavior changed.
+- PLATFORM-01 remains In Progress because no approved disposable credential
+  environment is available: the prior persona requires rotation and stable staging
+  does not yet exist. PLATFORM-02 remains dependency-blocked until the five gated
+  journeys and required manual provider rows have redacted proof.

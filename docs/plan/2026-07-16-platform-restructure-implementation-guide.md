@@ -315,24 +315,34 @@ Stop/escalate if: Baseline auth is already failing or no safe test environment e
 
 ### Phase 1 checklist
 
-- [ ] Choose the smallest sustainable browser/integration test setup.
-- [ ] Add a public Portfolio/current-home smoke test.
-- [ ] Add unauthenticated protected-route redirect coverage.
-- [ ] Add authenticated current-app navigation coverage.
-- [ ] Add Admin non-admin denial coverage.
-- [ ] Add Admin admin-role success coverage.
-- [ ] Add AAL1-to-AAL2 step-up coverage.
-- [ ] Add current-session logout coverage.
-- [ ] Add global logout coverage where practical.
-- [ ] Add callback invalid-code behavior coverage.
-- [ ] Add recovery-link compatibility coverage.
-- [ ] Document provider flows that remain manual.
+- [x] Choose the smallest sustainable browser/integration test setup.
+- [x] Add a public Portfolio/current-home smoke test.
+- [x] Add unauthenticated protected-route redirect coverage.
+- [x] Add authenticated current-app navigation coverage.
+- [x] Add Admin non-admin denial coverage.
+- [x] Add Admin admin-role success coverage.
+- [x] Add AAL1-to-AAL2 step-up coverage.
+- [x] Add current-session logout coverage.
+- [x] Add global logout coverage where practical.
+- [x] Add callback invalid-code behavior coverage.
+- [x] Add recovery-link compatibility coverage.
+- [x] Document provider flows that remain manual.
 
 ### Phase 1 exit gate
 
-- [ ] The current auth contract can fail a test before production is affected.
-- [ ] Manual-only provider paths have an explicit staging checklist.
-- [ ] No runtime auth behavior has changed.
+- [x] The current auth contract can fail a test before production is affected.
+- [x] Manual-only provider paths have an explicit staging checklist.
+- [x] No runtime auth behavior has changed.
+
+### Phase 1 remaining acceptance evidence
+
+- [ ] Rotate or replace the unavailable password test persona and provision
+      disposable normal-user, non-admin, and AAL2 Admin personas in an approved
+      production-like environment.
+- [ ] Run the five credential-gated password, navigation, authorization, MFA, and
+      logout journeys without retaining authentication artifacts.
+- [ ] Complete the current-provider rows in the stable-staging manual checklist;
+      complete GitHub rows only after the approved Auth phase enables GitHub.
 
 ---
 
