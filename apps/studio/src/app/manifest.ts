@@ -1,11 +1,15 @@
 import type { MetadataRoute } from "next";
 
-import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/seo/config";
+import { APP_BRANDS } from "@repo/brand";
+
+import { SITE_DESCRIPTION } from "@/lib/seo/config";
+
+const STUDIO_BRAND = APP_BRANDS.studio;
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: SITE_NAME,
-    short_name: "JG Studio",
+    name: STUDIO_BRAND.name,
+    short_name: STUDIO_BRAND.name,
     description: SITE_DESCRIPTION,
     start_url: "/",
     display: "standalone",

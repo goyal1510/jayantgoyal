@@ -1,11 +1,14 @@
 import type { MetadataRoute } from "next";
 
+import { APP_BRANDS } from "@repo/brand";
+
+const PORTFOLIO_BRAND = APP_BRANDS.portfolio;
+
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Jayant Goyal Portfolio",
-    short_name: "JG Portfolio",
-    description:
-      "Jayant Goyal's full-stack developer portfolio, experience, projects, and contact information.",
+    name: PORTFOLIO_BRAND.name,
+    short_name: PORTFOLIO_BRAND.name,
+    description: PORTFOLIO_BRAND.description,
     start_url: "/",
     display: "standalone",
     background_color: "#0a0a0a",

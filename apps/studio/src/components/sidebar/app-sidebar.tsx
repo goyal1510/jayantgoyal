@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 import { FileText, LayoutGrid, LogIn, User } from "lucide-react";
 
+import { APP_BRANDS } from "@repo/brand";
+
 import { NavApps } from "@/components/sidebar/nav-apps";
 import { TeamSwitcher } from "@/components/sidebar/team-switcher";
 import {
@@ -148,7 +150,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <TeamSwitcher
           brand={{
-            name: "JG Studio",
+            name: APP_BRANDS.studio.name,
             logo: LayoutGrid,
           }}
         />

@@ -11,6 +11,7 @@
     "check-types": "next typegen && tsc --noEmit"
   },
   "dependencies": {
+    "@repo/brand": "workspace:*",
     "@repo/ui": "workspace:*",
     "@supabase/supabase-js": "^2.84.0",
     "framer-motion": "^12.23.24",

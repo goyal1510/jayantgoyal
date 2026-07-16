@@ -6,6 +6,7 @@ import {
   LockKeyhole,
 } from "lucide-react";
 
+import { APP_BRANDS } from "@repo/brand";
 import { Badge } from "@repo/ui/badge";
 import { Button } from "@repo/ui/button";
 import {
@@ -49,7 +50,7 @@ export function StudioInventory() {
           </Badge>
           <div className="space-y-4">
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-              Jayant Goyal Studio
+              {APP_BRANDS.studio.publicName}
             </h1>
             <p className="max-w-2xl text-lg leading-8 text-muted-foreground sm:text-xl">
               A growing collection of useful tools, personal workspaces, games,

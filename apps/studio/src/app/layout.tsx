@@ -16,9 +16,11 @@ import {
   isIndexablePath,
   isProductionStudioHost,
   normalizePathname,
+  PERSON_NAME,
   SITE_DESCRIPTION,
   SITE_NAME,
   SITE_TITLE,
+  SITE_TITLE_TEMPLATE,
   SITE_URL,
 } from "@/lib/seo/config";
 
@@ -32,11 +34,11 @@ const baseMetadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: SITE_TITLE,
-    template: `%s | ${SITE_NAME}`,
+    template: SITE_TITLE_TEMPLATE,
   },
   description: SITE_DESCRIPTION,
-  authors: [{ name: "Jayant Goyal", url: PORTFOLIO_URL }],
-  creator: "Jayant Goyal",
+  authors: [{ name: PERSON_NAME, url: PORTFOLIO_URL }],
+  creator: PERSON_NAME,
   openGraph: {
     type: "website",
     locale: "en_US",

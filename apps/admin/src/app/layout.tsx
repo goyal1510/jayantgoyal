@@ -1,8 +1,11 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { APP_BRANDS } from "@repo/brand";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@repo/ui/sonner";
+
+const ADMIN_BRAND = APP_BRANDS.admin;
 
 const inter = Inter({
   subsets: ["latin"],
@@ -12,10 +15,10 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "JG Admin",
-    template: "%s | JG Admin",
+    default: ADMIN_BRAND.defaultTitle,
+    template: ADMIN_BRAND.titleTemplate,
   },
-  description: "Admin panel for managing JG portfolio content and platform operations.",
+  description: ADMIN_BRAND.description,
   robots: {
     index: false,
     follow: false,

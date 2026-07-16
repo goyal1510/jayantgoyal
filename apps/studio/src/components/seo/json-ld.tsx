@@ -1,12 +1,20 @@
-import { LAST_SIGNIFICANT_UPDATE, PERSON_NAME, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/seo/config";
+import { PERSON_BRAND } from "@repo/brand";
+
+import {
+  LAST_SIGNIFICANT_UPDATE,
+  PERSON_NAME,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_URL,
+} from "@/lib/seo/config";
 
 export function PersonJsonLd() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
     name: PERSON_NAME,
-    givenName: "Jayant",
-    familyName: "Goyal",
+    givenName: PERSON_BRAND.givenName,
+    familyName: PERSON_BRAND.familyName,
     url: SITE_URL,
     jobTitle: "Full-Stack Developer",
     image: `${SITE_URL}/assets/Jayant_favicon_io/android-chrome-512x512.png`,
@@ -21,17 +29,23 @@ export function PersonJsonLd() {
       "https://www.linkedin.com/in/jayant-goyal-83b0b3228/",
     ],
     knowsAbout: [
-      "Next.js", "React", "TypeScript", "Node.js", "Supabase",
-      "Tailwind CSS", "Full-Stack Development", "PostgreSQL",
+      "Next.js",
+      "React",
+      "TypeScript",
+      "Node.js",
+      "Supabase",
+      "Tailwind CSS",
+      "Full-Stack Development",
+      "PostgreSQL",
     ],
-  }
+  };
 
   return (
     <script
       type="application/ld+json"
       dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
     />
-  )
+  );
 }
 
 export function WebSiteJsonLd({
@@ -39,9 +53,9 @@ export function WebSiteJsonLd({
   siteName = SITE_NAME,
   description = SITE_DESCRIPTION,
 }: {
-  siteUrl?: string
-  siteName?: string
-  description?: string
+  siteUrl?: string;
+  siteName?: string;
+  description?: string;
 }) {
   const jsonLd = {
     "@context": "https://schema.org",
@@ -54,14 +68,14 @@ export function WebSiteJsonLd({
       name: PERSON_NAME,
       url: siteUrl,
     },
-  }
+  };
 
   return (
     <script
       type="application/ld+json"
       dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
     />
-  )
+  );
 }
 
 export function ProfilePageJsonLd() {
@@ -71,8 +85,8 @@ export function ProfilePageJsonLd() {
     mainEntity: {
       "@type": "Person",
       name: PERSON_NAME,
-      givenName: "Jayant",
-      familyName: "Goyal",
+      givenName: PERSON_BRAND.givenName,
+      familyName: PERSON_BRAND.familyName,
       url: SITE_URL,
       jobTitle: "Full-Stack Developer",
       image: `${SITE_URL}/assets/Jayant_favicon_io/android-chrome-512x512.png`,
@@ -82,23 +96,32 @@ export function ProfilePageJsonLd() {
         "https://www.linkedin.com/in/jayant-goyal-83b0b3228/",
       ],
       knowsAbout: [
-        "Next.js", "React", "TypeScript", "Node.js", "Supabase",
-        "Tailwind CSS", "PostgreSQL",
+        "Next.js",
+        "React",
+        "TypeScript",
+        "Node.js",
+        "Supabase",
+        "Tailwind CSS",
+        "PostgreSQL",
       ],
     },
     dateCreated: "2025-01-01T00:00:00+05:30",
     dateModified: LAST_SIGNIFICANT_UPDATE,
-  }
+  };
 
   return (
     <script
       type="application/ld+json"
       dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
     />
-  )
+  );
 }
 
-export function SoftwareAppJsonLd({ siteUrl = SITE_URL }: { siteUrl?: string }) {
+export function SoftwareAppJsonLd({
+  siteUrl = SITE_URL,
+}: {
+  siteUrl?: string;
+}) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
@@ -106,7 +129,8 @@ export function SoftwareAppJsonLd({ siteUrl = SITE_URL }: { siteUrl?: string }) 
     url: `${siteUrl}/tools`,
     applicationCategory: "DeveloperApplication",
     operatingSystem: "Web",
-    description: "A collection of 99+ free developer tools by Jayant, including UUID generator, JSON formatter, Base64 encoder, hash generators, regex tester, and more.",
+    description:
+      "A collection of 99+ free developer tools by Jayant, including UUID generator, JSON formatter, Base64 encoder, hash generators, regex tester, and more.",
     offers: {
       "@type": "Offer",
       price: "0",
@@ -117,17 +141,21 @@ export function SoftwareAppJsonLd({ siteUrl = SITE_URL }: { siteUrl?: string }) 
       name: PERSON_NAME,
       url: siteUrl,
     },
-  }
+  };
 
   return (
     <script
       type="application/ld+json"
       dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
     />
-  )
+  );
 }
 
-export function BreadcrumbJsonLd({ items }: { items: { name: string; url: string }[] }) {
+export function BreadcrumbJsonLd({
+  items,
+}: {
+  items: { name: string; url: string }[];
+}) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -137,12 +165,12 @@ export function BreadcrumbJsonLd({ items }: { items: { name: string; url: string
       name: item.name,
       item: item.url,
     })),
-  }
+  };
 
   return (
     <script
       type="application/ld+json"
       dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
     />
-  )
+  );
 }

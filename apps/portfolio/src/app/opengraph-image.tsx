@@ -3,7 +3,9 @@ import { join } from "node:path";
 
 import { ImageResponse } from "next/og";
 
-export const alt = "Jayant Goyal — Full-Stack Developer";
+import { PERSON_BRAND } from "@repo/brand";
+
+export const alt = `${PERSON_BRAND.fullName} — Full-Stack Developer`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -39,7 +41,9 @@ export default async function OpenGraphImage() {
           style={{ borderRadius: 64 }}
         />
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-          <span style={{ fontSize: 62, fontWeight: 800 }}>Jayant Goyal</span>
+          <span style={{ fontSize: 62, fontWeight: 800 }}>
+            {PERSON_BRAND.fullName}
+          </span>
           <span style={{ fontSize: 34, fontWeight: 600 }}>
             Full-Stack Developer
           </span>

@@ -19,6 +19,7 @@ import {
   SITE_DESCRIPTION,
   SITE_NAME,
   SITE_TITLE,
+  SITE_TITLE_TEMPLATE,
   SITE_URL,
 } from "@/lib/seo/config";
 
@@ -36,11 +37,11 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(SITE_URL),
     title: {
       default: SITE_TITLE,
-      template: `%s | ${SITE_NAME}`,
+      template: SITE_TITLE_TEMPLATE,
     },
     description: SITE_DESCRIPTION,
     keywords: [
-      "Jayant Goyal",
+      PERSON_NAME,
       "full-stack developer",
       "portfolio",
       "Next.js",

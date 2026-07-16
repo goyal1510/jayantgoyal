@@ -1,14 +1,18 @@
 import type { Metadata } from "next";
 
+import { APP_BRANDS, PERSON_BRAND } from "@repo/brand";
+
 import { normalizeHostname } from "@/lib/platform/surface";
 import { STUDIO_URL } from "@/lib/platform/urls";
 
+const STUDIO_BRAND = APP_BRANDS.studio;
+
 export const SITE_URL = STUDIO_URL;
-export const PERSON_NAME = "Jayant Goyal";
-export const SITE_NAME = "Jayant Goyal Studio";
-export const SITE_TITLE = "Jayant Goyal Studio | Tools, Apps, and Experiments";
-export const SITE_DESCRIPTION =
-  "Explore developer tools, personal workspaces, games, utilities, and experiments in Jayant Goyal Studio.";
+export const PERSON_NAME = PERSON_BRAND.fullName;
+export const SITE_NAME = STUDIO_BRAND.publicName;
+export const SITE_TITLE = STUDIO_BRAND.defaultTitle;
+export const SITE_TITLE_TEMPLATE = STUDIO_BRAND.titleTemplate;
+export const SITE_DESCRIPTION = STUDIO_BRAND.description;
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/opengraph-image?v=6`;
 export const LAST_SIGNIFICANT_UPDATE = "2026-07-17T00:00:00.000Z";
 
@@ -28,7 +32,10 @@ export function normalizePathname(pathname: string | null): string {
   return pathname;
 }
 
-export function matchesPathOrChild(pathname: string, basePath: string): boolean {
+export function matchesPathOrChild(
+  pathname: string,
+  basePath: string,
+): boolean {
   return pathname === basePath || pathname.startsWith(`${basePath}/`);
 }
 
