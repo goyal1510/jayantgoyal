@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { resolvePlatformSessionConfig } from "@repo/auth/cookies";
+import {
+  promoteValidatedSessionCookies,
+  resolvePlatformSessionConfig,
+} from "@repo/auth/cookies";
 import { createSupabaseProxyClient } from "@repo/auth/proxy";
 
 function noStoreHeaders() {
@@ -9,7 +12,15 @@ function noStoreHeaders() {
 
 export async function POST(request: NextRequest) {
   const requestUrl = new URL(request.url);
-  if (request.headers.get("origin") !== requestUrl.origin) {
+  const origin = request.headers.get("origin");
+  let originHost: string | null = null;
+  try {
+    originHost = origin ? new URL(origin).host : null;
+  } catch {
+    originHost = null;
+  }
+  const requestHost = request.headers.get("host") ?? requestUrl.host;
+  if (!originHost || originHost !== requestHost) {
     return NextResponse.json(
       { error: "invalid_origin" },
       { status: 403, headers: noStoreHeaders() },
@@ -29,14 +40,15 @@ export async function POST(request: NextRequest) {
     { ok: true },
     { headers: noStoreHeaders() },
   );
+  const platformSession = resolvePlatformSessionConfig({
+    enabled: process.env.PLATFORM_SESSION_ENABLED === "true",
+    hostname: requestUrl.hostname,
+    supabaseUrl,
+  });
   const supabase = createSupabaseProxyClient({
     supabaseUrl,
     supabaseAnonKey,
-    platformSession: resolvePlatformSessionConfig({
-      enabled: process.env.PLATFORM_SESSION_ENABLED === "true",
-      hostname: requestUrl.hostname,
-      supabaseUrl,
-    }),
+    platformSession,
     responseStore: {
       getAll: () => request.cookies.getAll(),
       setCookie: (name, value, options) => {
@@ -55,6 +67,15 @@ export async function POST(request: NextRequest) {
       { error: "unauthenticated" },
       { status: 401, headers: noStoreHeaders() },
     );
+  }
+
+  if (platformSession) {
+    promoteValidatedSessionCookies(
+      request.cookies.getAll(),
+      platformSession,
+    ).forEach(({ name, value, options }) => {
+      response.cookies.set(name, value, options);
+    });
   }
 
   return response;

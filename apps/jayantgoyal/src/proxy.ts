@@ -1,6 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createSupabaseProxyClient } from "@repo/auth/proxy";
-import { resolvePlatformSessionConfig } from "@repo/auth/cookies";
+import {
+  DEFAULT_PLATFORM_COOKIE_POLICY,
+  platformCookiePolicyForHost,
+  resolvePlatformSessionConfig,
+  sessionCookieNames,
+} from "@repo/auth/cookies";
 
 import { runMiddleware } from "@/proxy/runner";
 import { mfaMiddleware } from "@/proxy/mfa";
@@ -79,11 +84,17 @@ function getAalFromCookie(
   request: NextRequest,
   supabaseUrl: string,
 ): string | null {
-  const projectRef = new URL(supabaseUrl).hostname.split(".")[0];
-  const tokenName = `sb-${projectRef}-auth-token`;
-  const cookie =
-    request.cookies.get(tokenName)?.value ??
-    request.cookies.get(`${tokenName}.0`)?.value;
+  const policy =
+    platformCookiePolicyForHost(request.nextUrl.hostname) ??
+    DEFAULT_PLATFORM_COOKIE_POLICY;
+  const names = sessionCookieNames(supabaseUrl, policy);
+  const cookie = [names.platform, names.legacy]
+    .map(
+      (name) =>
+        request.cookies.get(name)?.value ??
+        request.cookies.get(`${name}.0`)?.value,
+    )
+    .find(Boolean);
   if (!cookie) return null;
   try {
     const raw = cookie.startsWith("base64-") ? atob(cookie.slice(7)) : cookie;

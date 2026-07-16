@@ -43,6 +43,19 @@ const webServer = authTestEnvironment.external
           NEXT_PUBLIC_SITE_URL: authTestEnvironment.adminBaseUrl,
         },
       },
+      {
+        command:
+          "pnpm --dir ../../apps/auth exec next dev --webpack --port 3003",
+        url: `${authTestEnvironment.authBaseUrl}/login`,
+        reuseExistingServer: !process.env.CI,
+        timeout: 120_000,
+        env: {
+          ...process.env,
+          NEXT_PUBLIC_SUPABASE_URL: authTestEnvironment.supabaseBaseUrl,
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: authTestEnvironment.supabaseAnonKey,
+          NEXT_PUBLIC_SITE_URL: authTestEnvironment.authBaseUrl,
+        },
+      },
     ];
 
 export default defineConfig({

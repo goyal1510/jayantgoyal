@@ -269,6 +269,30 @@ export function platformizeSessionCookies(
   });
 }
 
+/** Promote an already validated legacy session without exposing its value. */
+export function promoteValidatedSessionCookies(
+  cookies: readonly CookiePair[],
+  config: PlatformSessionConfig,
+): SupabaseCookie[] {
+  const names = sessionCookieNames(config.supabaseUrl, config.policy);
+  if (collectCookieChunks(cookies, names.platform).length > 0) return [];
+  const legacyChunks = collectCookieChunks(cookies, names.legacy);
+  const platformOptions = platformCookieOptions(config.policy);
+
+  return legacyChunks.flatMap((cookie) => [
+    {
+      name: renameCookieName(cookie.name, names.legacy, names.platform),
+      value: cookie.value,
+      options: platformOptions,
+    },
+    {
+      name: cookie.name,
+      value: "",
+      options: { path: "/", maxAge: 0 },
+    },
+  ]);
+}
+
 export function shouldPromoteLegacySession(input: {
   enabled: boolean;
   validatedSession: boolean;

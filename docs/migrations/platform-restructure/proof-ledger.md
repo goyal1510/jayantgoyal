@@ -259,10 +259,14 @@ Ignored Build Step`, so no new preview artifact for this implementation is
   example and no deployed environment was enabled. Google provider settings,
   redirects, identities, and production sessions were not changed.
 - **Local proof:** Platform-cookie tests now cover host scoping, preview safety,
-  platform-over-legacy precedence, chunk mapping, and legacy deletion. The
-  read-only auth suite passes 28/28 with the flag disabled and with
-  `PLATFORM_SESSION_ENABLED=true` on localhost; workspace type-check, lint, and
-  build also pass.
+  platform-over-legacy precedence, chunk mapping, validated bootstrap promotion,
+  and legacy deletion. The deterministic email/password journey crosses the
+  local Auth, Main, and Admin apps with `PLATFORM_SESSION_ENABLED=true`; the
+  bootstrap route promotes only after `getUser()` validates the legacy session,
+  and no token enters a URL or log. The flag-enabled read-only suite passes
+  31/31; the disabled suite passes 30 with the email SSO case safely skipped.
+  Workspace type-check, lint, and build remain required before shipping this
+  slice.
 - **Gate status:** This is an implementation slice, not the PLATFORM-04 exit
   gate. Stable-staging email/password cross-subdomain SSO, refresh races,
   logout, expiry/revocation, Admin authorization/AAL2, cache/security review,

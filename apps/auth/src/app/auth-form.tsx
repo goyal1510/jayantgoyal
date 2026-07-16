@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { FormEvent, useMemo, useState } from "react";
 
-import { safeRedirectPath } from "@repo/auth/redirects";
+import { safeRedirectTarget } from "@repo/auth/redirects";
 
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
@@ -30,8 +30,9 @@ export function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const next = useMemo(
-    () => safeRedirectPath(params.get("next"), "/"),
+  const returnTo = useMemo(
+    () =>
+      safeRedirectTarget(params.get("return_to") ?? params.get("next"), "/"),
     [params],
   );
   const callbackError = callbackErrorMessage(params.get("error"));
@@ -60,7 +61,7 @@ export function LoginForm() {
       setBusy(false);
       return;
     }
-    window.location.assign(next);
+    window.location.assign(returnTo);
   }
 
   async function signInWithGoogle() {
@@ -68,7 +69,7 @@ export function LoginForm() {
     setError(null);
     const supabase = createSupabaseBrowserClient();
     const callback = new URL("/callback", window.location.origin);
-    callback.searchParams.set("next", next);
+    callback.searchParams.set("return_to", returnTo);
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: callback.toString() },
@@ -126,13 +127,13 @@ export function LoginForm() {
       <div className="flex justify-between text-sm text-slate-600">
         <Link
           className="underline"
-          href={`/forgot-password?next=${encodeURIComponent(next)}`}
+          href={`/forgot-password?return_to=${encodeURIComponent(returnTo)}`}
         >
           Forgot password?
         </Link>
         <Link
           className="underline"
-          href={`/register?next=${encodeURIComponent(next)}`}
+          href={`/register?return_to=${encodeURIComponent(returnTo)}`}
         >
           Create account
         </Link>
@@ -147,8 +148,9 @@ export function RegisterForm() {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const next = useMemo(
-    () => safeRedirectPath(params.get("next"), "/"),
+  const returnTo = useMemo(
+    () =>
+      safeRedirectTarget(params.get("return_to") ?? params.get("next"), "/"),
     [params],
   );
 
@@ -158,7 +160,7 @@ export function RegisterForm() {
     setMessage(null);
     const supabase = createSupabaseBrowserClient();
     const callback = new URL("/callback", window.location.origin);
-    callback.searchParams.set("next", next);
+    callback.searchParams.set("return_to", returnTo);
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
@@ -224,7 +226,7 @@ export function RegisterForm() {
       ) : null}
       <Link
         className="block text-center text-sm text-slate-600 underline"
-        href={`/login?next=${encodeURIComponent(next)}`}
+        href={`/login?return_to=${encodeURIComponent(returnTo)}`}
       >
         Back to sign in
       </Link>

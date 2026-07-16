@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { resolvePlatformSessionConfig } from "@repo/auth/cookies";
 import { createSupabaseProxyClient } from "@repo/auth/proxy";
-import { safeRedirectPath } from "@repo/auth/redirects";
+import { safeRedirectTarget } from "@repo/auth/redirects";
 
 function copyResponseState(source: NextResponse, target: NextResponse) {
   source.cookies
@@ -17,7 +17,11 @@ function copyResponseState(source: NextResponse, target: NextResponse) {
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
-  const next = safeRedirectPath(requestUrl.searchParams.get("next"), "/");
+  const next = safeRedirectTarget(
+    requestUrl.searchParams.get("return_to") ??
+      requestUrl.searchParams.get("next"),
+    "/",
+  );
   const code = requestUrl.searchParams.get("code");
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -25,7 +29,7 @@ export async function GET(request: NextRequest) {
   if (!supabaseUrl || !supabaseAnonKey || !code) {
     return NextResponse.redirect(
       new URL(
-        `/login?error=invalid_callback&next=${encodeURIComponent(next)}`,
+        `/login?error=invalid_callback&return_to=${encodeURIComponent(next)}`,
         request.url,
       ),
     );
@@ -52,7 +56,7 @@ export async function GET(request: NextRequest) {
   if (error) {
     const errorResponse = NextResponse.redirect(
       new URL(
-        `/login?error=callback_failed&next=${encodeURIComponent(next)}`,
+        `/login?error=callback_failed&return_to=${encodeURIComponent(next)}`,
         request.url,
       ),
     );

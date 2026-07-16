@@ -274,8 +274,9 @@
   URL. The shared package aliases the platform cookie to Supabase's legacy
   storage name for reads, maps authenticated session writes to the versioned
   name, and clears the legacy host-only chunks.
-- Verification completed in this worktree: `pnpm test:auth:read-only` (28/28)
-  with the flag disabled and with `PLATFORM_SESSION_ENABLED=true` on localhost,
-  plus `pnpm check-types`, `pnpm lint`, and `pnpm build`. These are local proof
-  only; stable-staging email/password SSO and the observation gate are still
-  pending.
+- Verification completed in this worktree: the deterministic local email/password
+  SSO journey now crosses Auth (port 3003), Main (port 3000), and Admin (port 3001) with `PLATFORM_SESSION_ENABLED=true`; the bootstrap endpoint calls the
+  shared promotion helper only after `getUser()` validates the legacy session.
+  No token enters a URL or log. The flag-enabled read-only suite passes 31/31;
+  the disabled suite passes 30 with the email SSO case safely skipped. Stable-
+  staging email/password SSO and the observation gate are still pending.

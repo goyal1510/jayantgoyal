@@ -13,6 +13,7 @@ test("@read-only auth tests contain no credential or token literals", () => {
     "tests/auth/account-endpoints.spec.ts",
     "tests/auth/authenticated.spec.ts",
     "tests/auth/callbacks.spec.ts",
+    "tests/auth/email-sso.spec.ts",
     "tests/auth/public.spec.ts",
     "tests/auth/support/auth-flow.ts",
     "tests/auth/support/environment.ts",
