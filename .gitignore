@@ -7,6 +7,10 @@ node_modules
 
 # testing
 coverage
+test-results/
+playwright-report/
+blob-report/
+tests/auth/.auth/
 
 # vercel
 .vercel

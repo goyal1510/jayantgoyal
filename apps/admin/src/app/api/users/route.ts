@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import {
+  createSupabaseAdminClient,
+  createSupabaseServerClient,
+} from "@/lib/supabase/server";
 
 interface ProfileRow {
   id: number;
@@ -43,13 +45,11 @@ export async function GET() {
     if (!serviceRoleKey || !supabaseUrl) {
       return NextResponse.json(
         { error: "Server configuration error" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
-    const adminClient = createClient(supabaseUrl, serviceRoleKey, {
-      auth: { autoRefreshToken: false, persistSession: false },
-    });
+    const adminClient = createSupabaseAdminClient();
 
     // Fetch all profiles
     const { data: profiles, error: profilesError } = await adminClient
@@ -59,11 +59,15 @@ export async function GET() {
       .order("created_at", { ascending: false });
 
     if (profilesError) {
-      return NextResponse.json({ error: profilesError.message }, { status: 500 });
+      return NextResponse.json(
+        { error: profilesError.message },
+        { status: 500 },
+      );
     }
 
     // Fetch user emails from auth.users
-    const { data: authUsers, error: authError } = await adminClient.auth.admin.listUsers();
+    const { data: authUsers, error: authError } =
+      await adminClient.auth.admin.listUsers();
 
     if (authError) {
       return NextResponse.json({ error: authError.message }, { status: 500 });
@@ -84,7 +88,7 @@ export async function GET() {
 
     // Get user IDs that already have profiles
     const existingUserIds = new Set(
-      (profiles as ProfileRow[] | null)?.map((p) => p.user_id) || []
+      (profiles as ProfileRow[] | null)?.map((p) => p.user_id) || [],
     );
 
     // Get available users (those without profiles)
@@ -101,7 +105,7 @@ export async function GET() {
     console.error("Error fetching users:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -137,15 +141,12 @@ export async function POST(request: Request) {
     if (!user_id || !role) {
       return NextResponse.json(
         { error: "User and role are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!["user", "admin", "super_admin"].includes(role)) {
-      return NextResponse.json(
-        { error: "Invalid role" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid role" }, { status: 400 });
     }
 
     // Use service role
@@ -155,22 +156,18 @@ export async function POST(request: Request) {
     if (!serviceRoleKey || !supabaseUrl) {
       return NextResponse.json(
         { error: "Server configuration error" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
-    const adminClient = createClient(supabaseUrl, serviceRoleKey, {
-      auth: { autoRefreshToken: false, persistSession: false },
-    });
+    const adminClient = createSupabaseAdminClient();
 
     // Verify user exists
-    const { data: authUser, error: authError } = await adminClient.auth.admin.getUserById(user_id);
+    const { data: authUser, error: authError } =
+      await adminClient.auth.admin.getUserById(user_id);
 
     if (authError || !authUser.user) {
-      return NextResponse.json(
-        { error: "User not found." },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "User not found." }, { status: 404 });
     }
 
     const targetUser = authUser.user;
@@ -192,7 +189,10 @@ export async function POST(request: Request) {
         .eq("id", (existingProfile as { id: number; role: string }).id);
 
       if (updateError) {
-        return NextResponse.json({ error: updateError.message }, { status: 500 });
+        return NextResponse.json(
+          { error: updateError.message },
+          { status: 500 },
+        );
       }
 
       return NextResponse.json({
@@ -219,7 +219,7 @@ export async function POST(request: Request) {
     console.error("Error adding user:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

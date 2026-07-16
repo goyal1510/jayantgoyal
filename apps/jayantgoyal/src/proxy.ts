@@ -1,5 +1,5 @@
-import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { createSupabaseProxyClient } from "@repo/auth/proxy";
 
 import { runMiddleware } from "@/proxy/runner";
 import { mfaMiddleware } from "@/proxy/mfa";
@@ -161,13 +161,16 @@ export default async function proxy(request: NextRequest) {
   // ──────────────────────────────────────────────────────────────
   // PROTECTED PAGES + AUTH PATHS — full auth check with getUser()
   // ──────────────────────────────────────────────────────────────
-  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-    cookies: {
+  const supabase = createSupabaseProxyClient({
+    supabaseUrl,
+    supabaseAnonKey,
+    responseStore: {
       getAll: () => request.cookies.getAll(),
-      setAll: (cookies) => {
-        cookies.forEach(({ name, value, options }) => {
-          response.cookies.set(name, value, options);
-        });
+      setCookie: (name, value, options) => {
+        response.cookies.set(name, value, options);
+      },
+      setHeader: (name, value) => {
+        response.headers.set(name, value);
       },
     },
   });
