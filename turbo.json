@@ -20,7 +20,7 @@
     "VERCEL_PROJECT_PRODUCTION_URL",
     "VERCEL_TOKEN",
     "VERCEL_TEAM_ID",
-    "VERCEL_PROJECT_ID_JG",
+    "VERCEL_PROJECT_ID_STUDIO",
     "VERCEL_PROJECT_ID_ADMIN"
   ],
   "tasks": {
@@ -47,7 +47,7 @@
         "VERCEL_PROJECT_PRODUCTION_URL",
         "VERCEL_TOKEN",
         "VERCEL_TEAM_ID",
-        "VERCEL_PROJECT_ID_JG",
+        "VERCEL_PROJECT_ID_STUDIO",
         "VERCEL_PROJECT_ID_ADMIN"
       ],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],

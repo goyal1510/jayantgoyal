@@ -249,7 +249,7 @@ const PROJECTS = [
     imageDark: "/assets/ProjectImages/Dark/calculator.png",
     tags: ["Next.js", "Supabase", "CSS", "CRUD Operations"],
     githubLink:
-      "https://github.com/goyal1510/jayantgoyal/tree/main/apps/jayantgoyal",
+      "https://github.com/goyal1510/jayantgoyal/tree/main/apps/studio",
     liveLink: "https://www.jayantgoyal.com/calculator/new",
   },
   {
@@ -262,7 +262,7 @@ const PROJECTS = [
     imageDark: "/assets/ProjectImages/Dark/custom-calculator.png",
     tags: ["Next.js", "Tailwind CSS", "Drag & Drop"],
     githubLink:
-      "https://github.com/goyal1510/jayantgoyal/tree/main/apps/jayantgoyal",
+      "https://github.com/goyal1510/jayantgoyal/tree/main/apps/studio",
     liveLink: "https://www.jayantgoyal.com/custom-calculator",
   },
   {
@@ -293,7 +293,7 @@ const PROJECTS = [
       "AI Opponents",
     ],
     githubLink:
-      "https://github.com/goyal1510/jayantgoyal/tree/main/apps/jayantgoyal",
+      "https://github.com/goyal1510/jayantgoyal/tree/main/apps/studio",
     liveLink: "https://www.jayantgoyal.com/games",
   },
   {
@@ -312,7 +312,7 @@ const PROJECTS = [
       "Geolocation",
     ],
     githubLink:
-      "https://github.com/goyal1510/jayantgoyal/tree/main/apps/jayantgoyal",
+      "https://github.com/goyal1510/jayantgoyal/tree/main/apps/studio",
     liveLink: "https://www.jayantgoyal.com/weather",
   },
   {
@@ -325,7 +325,7 @@ const PROJECTS = [
     imageDark: "/assets/ProjectImages/Dark/activity-tracker.png",
     tags: ["Next.js", "TypeScript", "Supabase", "Dashboard", "Analytics"],
     githubLink:
-      "https://github.com/goyal1510/jayantgoyal/tree/main/apps/jayantgoyal",
+      "https://github.com/goyal1510/jayantgoyal/tree/main/apps/studio",
     liveLink: "https://www.jayantgoyal.com/activity-tracker/dashboard",
   },
   {
@@ -338,7 +338,7 @@ const PROJECTS = [
     imageDark: "/assets/ProjectImages/Dark/tools.png",
     tags: ["Next.js", "TypeScript", "React", "Developer Tools", "Utilities"],
     githubLink:
-      "https://github.com/goyal1510/jayantgoyal/tree/main/apps/jayantgoyal",
+      "https://github.com/goyal1510/jayantgoyal/tree/main/apps/studio",
     liveLink: "https://www.jayantgoyal.com/tools",
   },
   {
@@ -351,7 +351,7 @@ const PROJECTS = [
     imageDark: "/assets/ProjectImages/Dark/files.png",
     tags: ["Next.js", "TypeScript", "Supabase", "File Storage", "Database"],
     githubLink:
-      "https://github.com/goyal1510/jayantgoyal/tree/main/apps/jayantgoyal",
+      "https://github.com/goyal1510/jayantgoyal/tree/main/apps/studio",
     liveLink: "https://www.jayantgoyal.com/files",
   },
   {
@@ -364,7 +364,7 @@ const PROJECTS = [
     imageDark: "/assets/ProjectImages/Dark/messenger.png",
     tags: ["Next.js", "TypeScript", "Supabase", "Real-time", "Messaging"],
     githubLink:
-      "https://github.com/goyal1510/jayantgoyal/tree/main/apps/jayantgoyal",
+      "https://github.com/goyal1510/jayantgoyal/tree/main/apps/studio",
     liveLink: "https://www.jayantgoyal.com/messenger",
   },
 ] as const;

@@ -11,7 +11,7 @@ export function getTeamId(): string | undefined {
 }
 
 export function getProjectId(project: VercelProjectKey): string | undefined {
-  if (project === "jg") return process.env.VERCEL_PROJECT_ID_JG;
+  if (project === "studio") return process.env.VERCEL_PROJECT_ID_STUDIO;
   if (project === "admin") return process.env.VERCEL_PROJECT_ID_ADMIN;
   return undefined;
 }

@@ -4,8 +4,9 @@
 # Vercel Ignored Build Step — exits 0 to skip, 1 to build
 #
 # Set in Vercel: Project Settings → Git → Ignored Build Step
-#   jayantgoyal: bash ../../scripts/ignore-build.sh apps/jayantgoyal
-#   admin:       bash ../../scripts/ignore-build.sh apps/admin
+#   portfolio: bash ../../scripts/ignore-build.sh apps/portfolio
+#   studio:    bash ../../scripts/ignore-build.sh apps/studio
+#   admin:     bash ../../scripts/ignore-build.sh apps/admin
 
 APP_DIR="${1:?Usage: ignore-build.sh <app-directory>}"
 

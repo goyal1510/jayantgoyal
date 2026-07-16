@@ -23,7 +23,8 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 ```
 jayantgoyal/
 ├── apps/
-│   ├── jayantgoyal/        # Main portfolio & tools app
+│   ├── portfolio/          # Public portfolio, blog, resume, contact
+│   ├── studio/             # Product discovery, tools, games, workspaces
 │   └── admin/              # Admin panel for content management
 │
 ├── packages/
@@ -43,10 +44,10 @@ jayantgoyal/
 
 ## Apps
 
-### Main App (`apps/jayantgoyal`)
+### Studio App (`apps/studio`)
 
 **Features:**
-- **Portfolio** - Hero, About, Skills, Experience, Projects, Certificates, Contact
+- **Product Inventory** - Public discovery and launch paths
 - **Messenger** - Real-time chat with Supabase Realtime
 - **File Manager** - Cloud storage with folders, upload, soft delete
 - **Activity Tracker** - Daily tracking with analytics dashboard
@@ -58,7 +59,7 @@ jayantgoyal/
 
 **Key Routes:**
 - `(protected)/` - Authenticated routes with sidebar layout
-- `/` - Portfolio landing page
+- `/` - Studio product inventory
 - `/games/*` - Game routes
 - `/tools/*` - Developer tools
 - `/activity-tracker/*` - Activity tracking
@@ -144,8 +145,8 @@ pnpm install
 # Run all apps
 pnpm dev
 
-# Run main app only
-pnpm dev --filter jg
+# Run Studio only
+pnpm dev --filter studio
 
 # Run admin app only
 pnpm dev --filter admin
@@ -158,7 +159,7 @@ pnpm dev --filter admin
 pnpm build
 
 # Build specific app
-pnpm build --filter jg
+pnpm build --filter studio
 pnpm build --filter admin
 ```
 
@@ -178,8 +179,8 @@ pnpm format
 ### Start Production
 
 ```bash
-# Start main app
-pnpm start --filter jg
+# Start Studio
+pnpm start --filter studio
 
 # Start admin app
 pnpm start --filter admin
@@ -189,15 +190,16 @@ pnpm start --filter admin
 
 Configure in `.env.local` files per app. See `.env.example` in each app for the full list.
 
-**All env vars are identical across development, preview, and production** — no per-environment configs. Only exception: `NEXT_PUBLIC_SITE_URL` (`http://localhost:3000` for dev, `https://www.jayantgoyal.com` for prod). When adding new vars to Vercel, always add to all three environments at once.
+Most secret/provider values are shared across Vercel targets, but application URL variables are environment-specific. Development uses local ports, the persistent `staging` Preview branch uses stable staging hosts, generic Preview resolves the request/deployment origin, and Production uses each application's canonical host. Add every new variable only to the applications and targets that consume it.
 
-**Vercel CLI setup** — both apps are linked. To sync envs locally:
+**Vercel CLI setup** — the deployed apps are linked. To sync envs locally:
 ```bash
-cd apps/jayantgoyal && vercel env pull .env.local
+cd apps/portfolio && vercel env pull .env.local
+cd apps/studio && vercel env pull .env.local
 cd apps/admin && vercel env pull .env.local
 ```
 
-### Main App (`apps/jayantgoyal/.env.local`)
+### Studio App (`apps/studio/.env.local`)
 
 ```env
 # Supabase
@@ -206,19 +208,19 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 
 # Site URL
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
-
-# Email (contact form)
-RESEND_API_KEY=
-RESEND_FROM_EMAIL=
+NEXT_PUBLIC_SITE_URL=http://localhost:3002
+NEXT_PUBLIC_PORTFOLIO_URL=http://localhost:3000
+NEXT_PUBLIC_STUDIO_URL=http://localhost:3001
 
 # External APIs
 NEXT_PUBLIC_OPENWEATHER_API_KEY=     # Weather app
-GITHUB_TOKEN=                        # GitHub Stats + portfolio Code Stats
-
-# Portfolio data source
-PORTFOLIO_DATA_SOURCE=database       # or omit for hardcoded
+GITHUB_TOKEN=                        # GitHub Stats
 ```
+
+### Portfolio App (`apps/portfolio/.env.local`)
+
+Portfolio owns public content, Blog, Resume, Contact, and its public API
+integration variables. It intentionally has no Supabase service-role key.
 
 ### Admin App (`apps/admin/.env.local`)
 
@@ -231,7 +233,7 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3001
 # Vercel (deployment management)
 VERCEL_TOKEN=
 VERCEL_TEAM_ID=
-VERCEL_PROJECT_ID_JG=
+VERCEL_PROJECT_ID_STUDIO=
 VERCEL_PROJECT_ID_ADMIN=
 ```
 
@@ -269,7 +271,7 @@ export default function ClientComponent() { ... }
 
 Next.js 16 uses `src/proxy.ts` instead of `middleware.ts`:
 
-**Main app proxy:**
+**Studio app proxy:**
 - Checks Supabase auth
 - Enforces public/protected route split
 - Redirects unauthenticated users to `/login`
@@ -299,9 +301,10 @@ export const useStore = create(
 
 **Manual hydration** required to avoid SSR mismatch.
 
-### Portfolio Data System
+### Portfolio Data System (`apps/portfolio`)
 
-**Multi-tenant by hostname** - different hosts show different portfolio profiles.
+Portfolio content is loaded inside the dedicated Portfolio application and is
+not part of the Studio application shell.
 
 **Data flow:**
 1. Server fetches via `getPortfolioDataFromHeaders()`
@@ -377,9 +380,9 @@ Focused platform regression tests use Vitest (`pnpm test`). Quality assurance al
 
 ### Add New Feature
 
-1. Create route in `apps/jayantgoyal/src/app/`
-2. Add API endpoint in `apps/jayantgoyal/src/app/api/`
-3. Create components in `apps/jayantgoyal/src/components/`
+1. Create route in `apps/studio/src/app/`
+2. Add API endpoint in `apps/studio/src/app/api/`
+3. Create components in `apps/studio/src/components/`
 4. Update Supabase schema if needed
 5. **SEO & discoverability (mandatory):**
    - Export `metadata` (title, description) in every `page.tsx`
@@ -427,10 +430,10 @@ Focused platform regression tests use Vitest (`pnpm test`). Quality assurance al
 
 ### Deploy
 
-Main app deploys to Vercel automatically on push to `main`. Ensure:
+Studio deploys independently to Vercel. Ensure:
 - Environment variables set in Vercel dashboard
-- Build command: `pnpm build --filter jg`
-- Output directory: `apps/jayantgoyal/.next`
+- Build command: `pnpm build --filter studio`
+- Output directory: `apps/studio/.next`
 
 ## Troubleshooting
 
@@ -472,10 +475,10 @@ pnpm ls --recursive
 - **GitHub:** [goyal1510/jayantgoyal](https://github.com/goyal1510/jayantgoyal)
 
 ```bash
-pnpm dev --filter jg          # Run main app only
+pnpm dev --filter studio          # Run Studio only
 pnpm dev --filter admin       # Run admin app only
 pnpm dev                      # Run all apps
-pnpm build --filter jg        # Build main app
+pnpm build --filter studio        # Build Studio
 pnpm lint                     # ESLint (zero warnings enforced: --max-warnings 0)
 pnpm check-types              # TypeScript check (runs next typegen && tsc --noEmit)
 pnpm test                     # Focused Vitest regression tests
@@ -490,7 +493,8 @@ Build ignores TS errors (`typescript.ignoreBuildErrors: true`); always run `pnpm
 
 ### Apps
 
-- **`apps/jayantgoyal`** (filter name: `jg`) — Main portfolio & tools app
+- **`apps/portfolio`** (filter name: `portfolio`) — Public professional content
+- **`apps/studio`** (filter name: `studio`) — Product discovery and workspaces
 - **`apps/admin`** (filter name: `admin`) — Portfolio content management, role-gated (admin/super_admin)
 
 ### Shared Packages
@@ -612,4 +616,4 @@ See `.env.example` in each app for the full list. Key vars per app documented in
 
 ## Deployment
 
-Vercel, auto-deploy on push to `main`. Build: `pnpm build --filter jg`. Admin app is a separate Vercel project.
+Vercel, auto-deploy on push to `main`. Build: `pnpm build --filter studio`. Admin app is a separate Vercel project.
