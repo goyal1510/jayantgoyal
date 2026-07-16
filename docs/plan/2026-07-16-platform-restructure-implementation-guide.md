@@ -126,8 +126,8 @@ Only one task should be In Progress per implementation lane.
 
 | Order | Task ID | Phase | Status | Production behavior after phase |
 | ---: | --- | --- | --- | --- |
-| 0 | PLATFORM-00 | Baseline and contracts | Pending | No behavior change |
-| 1 | PLATFORM-01 | Authentication regression foundation | Pending | No behavior change |
+| 0 | PLATFORM-00 | Baseline and contracts | Done | No behavior change |
+| 1 | PLATFORM-01 | Authentication regression foundation | In Progress | No behavior change |
 | 2 | PLATFORM-02 | Supabase dependency and SSR hardening | Pending | Existing auth behavior preserved |
 | 3 | PLATFORM-03 | Extract `packages/auth` | Pending | Existing routes and cookies preserved |
 | 4 | PLATFORM-04 | Shared-cookie compatibility | Pending | Current apps understand the platform session |
@@ -253,7 +253,7 @@ Recommended maximum conceptual scope:
 ## Phase 0 — Baseline and contracts
 
 Task ID: PLATFORM-00
-Status: Pending
+Status: Done
 Objective: Establish a verified source-of-truth inventory and freeze the migration contracts before implementation.
 Dependencies: None.
 Target files/surfaces: Architecture docs, route inventory, auth surface inventory, environment inventory, deployment inventory, database schema inventory.
@@ -270,35 +270,35 @@ Stop/escalate if: The current deployed behavior or authoritative environment can
 
 ### Phase 0 checklist
 
-- [ ] Refresh `origin/main` and record the baseline commit.
-- [ ] Confirm the production Vercel project for the current main app.
-- [ ] Confirm the production Vercel project for Admin.
-- [ ] Confirm all current production domains and aliases.
-- [ ] Confirm the linked Supabase project without recording secrets.
-- [ ] Inventory current auth cookie names and attributes in a real browser.
-- [ ] Inventory auth pages in `apps/jayantgoyal`.
-- [ ] Inventory auth pages in `apps/admin`.
-- [ ] Inventory server, browser, and service-role Supabase clients.
-- [ ] Inventory current proxy route classifications.
-- [ ] Inventory all current routes into Portfolio, Studio, Auth, Admin, compatibility, or undecided.
-- [ ] Inventory persisted browser storage keys.
-- [ ] Inventory database tables by schema and owning feature.
-- [ ] Inventory current environment-variable names by application.
-- [ ] Record existing behavior that must be preserved.
-- [ ] Resolve every undecided route before PLATFORM-07.
+- [x] Refresh `origin/main` and record the baseline commit.
+- [x] Confirm the production Vercel project for the current main app.
+- [x] Confirm the production Vercel project for Admin.
+- [x] Confirm all current production domains and aliases.
+- [x] Confirm the linked Supabase project without recording secrets.
+- [x] Inventory current auth cookie names and attributes in a real browser.
+- [x] Inventory auth pages in `apps/jayantgoyal`.
+- [x] Inventory auth pages in `apps/admin`.
+- [x] Inventory server, browser, and service-role Supabase clients.
+- [x] Inventory current proxy route classifications.
+- [x] Inventory all current routes into Portfolio, Studio, Auth, Admin, compatibility, or undecided.
+- [x] Inventory persisted browser storage keys.
+- [x] Inventory database tables by schema and owning feature.
+- [x] Inventory current environment-variable names by application.
+- [x] Record existing behavior that must be preserved.
+- [x] Resolve every undecided route before PLATFORM-07.
 
 ### Phase 0 exit gate
 
-- [ ] No route, environment, deployment, auth surface, or schema ownership remains unknown.
-- [ ] Baseline production journeys are reproducible.
-- [ ] No production behavior has changed.
+- [x] No route, environment, deployment, auth surface, or schema ownership remains unknown.
+- [x] Baseline production journeys are reproducible.
+- [x] No production behavior has changed.
 
 ---
 
 ## Phase 1 — Authentication regression foundation
 
 Task ID: PLATFORM-01
-Status: Pending
+Status: In Progress
 Objective: Add enough automated and manual regression coverage to change authentication safely.
 Dependencies: PLATFORM-00 Done.
 Target files/surfaces: Current authentication flows in `apps/jayantgoyal` and `apps/admin`; test tooling approved for the repository.
