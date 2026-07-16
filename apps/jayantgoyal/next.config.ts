@@ -5,7 +5,7 @@ const noindexHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@repo/ui", "@repo/auth"],
+  transpilePackages: ["@repo/ui"],
   typescript: {
     ignoreBuildErrors: true,
   },

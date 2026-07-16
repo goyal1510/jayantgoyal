@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createSupabaseProxyClient } from "@repo/auth/proxy";
-import { resolvePlatformSessionConfig } from "@repo/auth/cookies";
-import { safeRedirectPath } from "@repo/auth/redirects";
+import { createServerClient } from "@supabase/ssr";
 
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
@@ -9,25 +7,14 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 async function userHasMfa(userId: string): Promise<boolean> {
   try {
     const adminClient = createSupabaseAdminClient();
-    const { data, error } = await adminClient.auth.admin.mfa.listFactors({
-      userId,
-    });
+    const { data, error } = await adminClient.auth.admin.mfa.listFactors({ userId });
     if (error || !data) return false;
     return data.factors.some(
-      (factor) => factor.factor_type === "totp" && factor.status === "verified",
+      (factor) => factor.factor_type === "totp" && factor.status === "verified"
     );
   } catch {
     return false;
   }
-}
-
-function copyResponseState(source: NextResponse, target: NextResponse) {
-  source.cookies.getAll().forEach(({ name, value, ...options }) => {
-    target.cookies.set(name, value, options);
-  });
-  source.headers.forEach((value, name) => {
-    if (name !== "location") target.headers.set(name, value);
-  });
 }
 
 export async function GET(request: NextRequest) {
@@ -39,7 +26,7 @@ export async function GET(request: NextRequest) {
   const authRedirect = request.cookies.get("auth_redirect")?.value;
   const rawNext = authRedirect || requestUrl.searchParams.get("next") || "/";
   // Prevent open redirect — only allow relative paths
-  const next = safeRedirectPath(rawNext, "/");
+  const next = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/";
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -56,21 +43,15 @@ export async function GET(request: NextRequest) {
     response.cookies.set("auth_redirect", "", { path: "/", maxAge: 0 });
   }
 
-  const supabase = createSupabaseProxyClient({
-    supabaseUrl,
-    supabaseAnonKey,
-    platformSession: resolvePlatformSessionConfig({
-      enabled: process.env.PLATFORM_SESSION_ENABLED === "true",
-      hostname: requestUrl.hostname,
-      supabaseUrl,
-    }),
-    responseStore: {
-      getAll: () => request.cookies.getAll(),
-      setCookie: (name, value, options) => {
-        response.cookies.set(name, value, options);
+  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
       },
-      setHeader: (name, value) => {
-        response.headers.set(name, value);
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) => {
+          response.cookies.set(name, value, options);
+        });
       },
     },
   });
@@ -80,14 +61,7 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     if (error) {
       console.error("Auth callback error (code):", error.message);
-      const errorResponse = NextResponse.redirect(
-        new URL(
-          `/welcome?error=${encodeURIComponent(error.message)}`,
-          request.url,
-        ),
-      );
-      copyResponseState(response, errorResponse);
-      return errorResponse;
+      return NextResponse.redirect(new URL(`/welcome?error=${encodeURIComponent(error.message)}`, request.url));
     }
 
     // For OAuth users signing in for the first time, populate profile with name from provider
@@ -100,10 +74,7 @@ export async function GET(request: NextRequest) {
         .single();
 
       if (existingProfile && !existingProfile.first_name) {
-        const metadata = (data.user.user_metadata ?? {}) as Record<
-          string,
-          unknown
-        >;
+        const metadata = (data.user.user_metadata ?? {}) as Record<string, unknown>;
         const fullName = String(metadata.full_name || metadata.name || "");
         const [firstName = "", ...rest] = fullName.split(" ");
         const lastName = rest.join(" ");
@@ -123,7 +94,9 @@ export async function GET(request: NextRequest) {
         const mfaUrl = new URL("/mfa-verify", request.url);
         mfaUrl.searchParams.set("redirect", next);
         const mfaResponse = NextResponse.redirect(mfaUrl);
-        copyResponseState(response, mfaResponse);
+        response.cookies.getAll().forEach(({ name, value, ...options }) => {
+          mfaResponse.cookies.set(name, value, options);
+        });
         return mfaResponse;
       }
     }
@@ -144,28 +117,17 @@ export async function GET(request: NextRequest) {
       const friendlyMessage = isRecovery
         ? "This password reset link is invalid or has expired. Please request a new one."
         : error.message;
-      const errorResponse = NextResponse.redirect(
-        new URL(
-          `/welcome?error=${encodeURIComponent(friendlyMessage)}`,
-          request.url,
-        ),
-      );
-      copyResponseState(response, errorResponse);
-      return errorResponse;
+      return NextResponse.redirect(new URL(`/welcome?error=${encodeURIComponent(friendlyMessage)}`, request.url));
     }
 
     if (isRecovery) {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       const hasMfa = user ? await userHasMfa(user.id) : false;
-      const recoveryTarget = hasMfa
-        ? "/mfa-verify?redirect=/reset-password"
-        : "/reset-password";
-      const recoveryResponse = NextResponse.redirect(
-        new URL(recoveryTarget, request.url),
-      );
-      copyResponseState(response, recoveryResponse);
+      const recoveryTarget = hasMfa ? "/mfa-verify?redirect=/reset-password" : "/reset-password";
+      const recoveryResponse = NextResponse.redirect(new URL(recoveryTarget, request.url));
+      response.cookies.getAll().forEach(({ name, value, ...options }) => {
+        recoveryResponse.cookies.set(name, value, options);
+      });
       recoveryResponse.cookies.set("recovery_mode", "true", {
         path: "/",
         maxAge: 3600,
@@ -177,9 +139,5 @@ export async function GET(request: NextRequest) {
     return response;
   }
 
-  const invalidResponse = NextResponse.redirect(
-    new URL("/welcome?error=invalid_token", request.url),
-  );
-  copyResponseState(response, invalidResponse);
-  return invalidResponse;
+  return NextResponse.redirect(new URL("/welcome?error=invalid_token", request.url));
 }

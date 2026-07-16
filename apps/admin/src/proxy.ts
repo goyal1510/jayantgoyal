@@ -1,8 +1,5 @@
+import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { createSupabaseProxyClient } from "@repo/auth/proxy";
-import { resolvePlatformSessionConfig } from "@repo/auth/cookies";
-import { isAdminRole } from "@repo/auth/permissions";
-import { safeRedirectPath } from "@repo/auth/redirects";
 
 export const config = {
   matcher: [
@@ -12,7 +9,10 @@ export const config = {
 };
 
 // APIs safe to call without completing MFA
-const UNRESTRICTED_APIS = ["/api/account/profile", "/api/account/mfa-cleanup"];
+const UNRESTRICTED_APIS = [
+  "/api/account/profile",
+  "/api/account/mfa-cleanup",
+];
 
 export default async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -28,7 +28,11 @@ export default async function proxy(request: NextRequest) {
   const response = NextResponse.next({ request: { headers: request.headers } });
 
   // Public paths that don't require authentication
-  const publicPaths = ["/welcome", "/unauthorized", "/auth/callback"];
+  const publicPaths = [
+    "/welcome",
+    "/unauthorized",
+    "/auth/callback",
+  ];
 
   const isPublic = publicPaths.some((path) => pathname.startsWith(path));
 
@@ -42,21 +46,13 @@ export default async function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  const supabase = createSupabaseProxyClient({
-    supabaseUrl,
-    supabaseAnonKey,
-    platformSession: resolvePlatformSessionConfig({
-      enabled: process.env.PLATFORM_SESSION_ENABLED === "true",
-      hostname: request.nextUrl.hostname,
-      supabaseUrl,
-    }),
-    responseStore: {
+  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookies: {
       getAll: () => request.cookies.getAll(),
-      setCookie: (name, value, options) => {
-        response.cookies.set(name, value, options);
-      },
-      setHeader: (name, value) => {
-        response.headers.set(name, value);
+      setAll: (cookies) => {
+        cookies.forEach(({ name, value, options }) => {
+          response.cookies.set(name, value, options);
+        });
       },
     },
   });
@@ -85,28 +81,26 @@ export default async function proxy(request: NextRequest) {
   // the MFA verify page, auth callback, and essential APIs.
   if (pathname.startsWith("/auth/callback")) return response;
 
-  const { data: aalData } =
-    await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-  const needsMfaLevel =
-    aalData?.currentLevel === "aal1" && aalData?.nextLevel === "aal2";
-  if (needsMfaLevel) {
+  const { data: aalData } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  const needsMfa =
+    aalData?.currentLevel === "aal1" &&
+    aalData?.nextLevel === "aal2";
+
+  if (needsMfa) {
     const { data: factorsData } = await supabase.auth.mfa.listFactors();
-    const hasVerifiedFactor = factorsData?.totp.some(
-      (f) => f.status === "verified",
-    );
+    const hasVerifiedFactor = factorsData?.totp.some((f) => f.status === "verified");
+
     if (hasVerifiedFactor) {
       if (pathname.startsWith("/mfa-verify")) {
         return response;
       }
 
       if (pathname.startsWith("/api/")) {
-        const isAllowed = UNRESTRICTED_APIS.some((api) =>
-          pathname.startsWith(api),
-        );
+        const isAllowed = UNRESTRICTED_APIS.some((api) => pathname.startsWith(api));
         if (!isAllowed) {
           return NextResponse.json(
             { error: "MFA verification required." },
-            { status: 403 },
+            { status: 403 }
           );
         }
         return response;
@@ -123,19 +117,14 @@ export default async function proxy(request: NextRequest) {
   // Redirect authenticated users away from welcome page
   if (pathname.startsWith("/welcome")) {
     const redirectUrl = request.nextUrl.searchParams.get("redirect");
-    const safeRedirect = safeRedirectPath(redirectUrl, "/", request.url);
-    if (safeRedirect !== "/") {
-      return NextResponse.redirect(new URL(safeRedirect, request.url));
+    if (redirectUrl && redirectUrl.startsWith("/")) {
+      return NextResponse.redirect(new URL(redirectUrl, request.url));
     }
     return NextResponse.redirect(new URL("/", request.url));
   }
 
   // Admin role check (skip for unauthorized page and MFA verify)
-  if (
-    !isPublic &&
-    pathname !== "/unauthorized" &&
-    !pathname.startsWith("/mfa-verify")
-  ) {
+  if (!isPublic && pathname !== "/unauthorized" && !pathname.startsWith("/mfa-verify")) {
     const { data: profile } = await supabase
       .schema("jg_account")
       .from("profiles")
@@ -143,7 +132,7 @@ export default async function proxy(request: NextRequest) {
       .eq("user_id", user!.id)
       .single();
 
-    if (!profile || !isAdminRole(profile.role)) {
+    if (!profile || !["admin", "super_admin"].includes(profile.role)) {
       return NextResponse.redirect(new URL("/unauthorized", request.url));
     }
 

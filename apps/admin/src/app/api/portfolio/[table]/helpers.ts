@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
-import {
-  createSupabaseAdminClient,
-  createSupabaseServerClient,
-} from "@/lib/supabase/server";
+import { createClient } from "@supabase/supabase-js";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const ALLOWED_TABLES = [
   "hero",
@@ -62,7 +60,9 @@ export function getAdminClient() {
     return null;
   }
 
-  return createSupabaseAdminClient();
+  return createClient(supabaseUrl, serviceRoleKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
 }
 
 export function validateTable(table: string) {
@@ -78,7 +78,7 @@ export async function authorizeAndGetClient() {
     return {
       error: NextResponse.json(
         { error: authCheck.error },
-        { status: authCheck.status },
+        { status: authCheck.status }
       ),
     };
   }
@@ -88,7 +88,7 @@ export async function authorizeAndGetClient() {
     return {
       error: NextResponse.json(
         { error: "Server configuration error" },
-        { status: 500 },
+        { status: 500 }
       ),
     };
   }

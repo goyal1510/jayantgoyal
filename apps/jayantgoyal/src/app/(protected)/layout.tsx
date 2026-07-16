@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { DynamicBreadcrumb } from "@/components/sidebar/dynamic-breadcrumb";
@@ -19,10 +19,6 @@ import { RouteChangeProvider } from "@/components/providers/route-change-provide
 import { LazyCommandPalette } from "@/components/providers/lazy-components";
 import { AuthToast } from "@/components/auth/auth-toast";
 import { DynamicBreadcrumbJsonLd } from "@/components/seo/dynamic-breadcrumb-jsonld";
-import {
-  resolvePlatformSessionConfig,
-  sessionCookieNames,
-} from "@repo/auth/cookies";
 
 export default async function ProtectedLayout({
   children,
@@ -32,7 +28,6 @@ export default async function ProtectedLayout({
   const { data, profile, host, source } = await getPortfolioDataFromHeaders();
 
   const cookieStore = await cookies();
-  const requestHeaders = await headers();
 
   // Check auth via cookie — zero network cost (no getUser() call)
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
@@ -40,22 +35,9 @@ export default async function ProtectedLayout({
     ? new URL(supabaseUrl).hostname.split(".")[0]
     : "";
   const tokenName = `sb-${projectRef}-auth-token`;
-  const platformSession = supabaseUrl
-    ? resolvePlatformSessionConfig({
-        enabled: process.env.PLATFORM_SESSION_ENABLED === "true",
-        hostname: requestHeaders.get("host")?.split(":")[0] ?? "",
-        supabaseUrl,
-      })
-    : undefined;
-  const sessionNames = platformSession
-    ? sessionCookieNames(supabaseUrl, platformSession.policy)
-    : { legacy: tokenName, platform: "" };
   const isAuthenticated = Boolean(
-    (platformSession &&
-      (cookieStore.get(sessionNames.platform)?.value ??
-        cookieStore.get(`${sessionNames.platform}.0`)?.value)) ||
-      cookieStore.get(sessionNames.legacy)?.value ||
-      cookieStore.get(`${sessionNames.legacy}.0`)?.value,
+    cookieStore.get(tokenName)?.value ??
+      cookieStore.get(`${tokenName}.0`)?.value,
   );
   const defaultOpen = cookieStore.get("sidebar_state")?.value !== "false";
   const defaultWidth =

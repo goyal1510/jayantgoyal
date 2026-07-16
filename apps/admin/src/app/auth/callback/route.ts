@@ -1,21 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createSupabaseProxyClient } from "@repo/auth/proxy";
-import { resolvePlatformSessionConfig } from "@repo/auth/cookies";
-import { safeRedirectPath } from "@repo/auth/redirects";
-
-function copyResponseState(source: NextResponse, target: NextResponse) {
-  source.cookies.getAll().forEach(({ name, value, ...options }) => {
-    target.cookies.set(name, value, options);
-  });
-  source.headers.forEach((value, name) => {
-    if (name !== "location") target.headers.set(name, value);
-  });
-}
+import { createServerClient } from "@supabase/ssr";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = safeRedirectPath(searchParams.get("next"), "/", request.url);
+  const next = searchParams.get("next") ?? "/";
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -27,32 +16,22 @@ export async function GET(request: NextRequest) {
   const redirectUrl = new URL(next, request.url);
   const response = NextResponse.redirect(redirectUrl);
 
-  const supabase = createSupabaseProxyClient({
-    supabaseUrl,
-    supabaseAnonKey,
-    platformSession: resolvePlatformSessionConfig({
-      enabled: process.env.PLATFORM_SESSION_ENABLED === "true",
-      hostname: new URL(request.url).hostname,
-      supabaseUrl,
-    }),
-    responseStore: {
-      getAll: () => request.cookies.getAll(),
-      setCookie: (name, value, options) => {
-        response.cookies.set(name, value, options);
+  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
       },
-      setHeader: (name, value) => {
-        response.headers.set(name, value);
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) => {
+          response.cookies.set(name, value, options);
+        });
       },
     },
   });
 
   const { error } = await supabase.auth.exchangeCodeForSession(code);
   if (error) {
-    const errorResponse = NextResponse.redirect(
-      new URL("/welcome?error=auth", request.url),
-    );
-    copyResponseState(response, errorResponse);
-    return errorResponse;
+    return NextResponse.redirect(new URL("/welcome?error=auth", request.url));
   }
 
   // Always redirect through /mfa-verify after OAuth — the page checks
@@ -60,6 +39,8 @@ export async function GET(request: NextRequest) {
   const mfaUrl = new URL("/mfa-verify", request.url);
   mfaUrl.searchParams.set("redirect", next);
   const mfaResponse = NextResponse.redirect(mfaUrl);
-  copyResponseState(response, mfaResponse);
+  response.cookies.getAll().forEach(({ name, value, ...options }) => {
+    mfaResponse.cookies.set(name, value, options);
+  });
   return mfaResponse;
 }
