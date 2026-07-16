@@ -8,15 +8,15 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 
 ### Tech Stack
 
-| Category | Technologies |
-|----------|-------------|
-| **Framework** | Next.js 16, React 19, TypeScript 5.9 |
-| **Styling** | Tailwind CSS v4, Radix UI, CVA variants |
-| **Backend** | Supabase (Auth, Database, Realtime, Storage) |
-| **Monorepo** | Turborepo, pnpm workspaces |
-| **State** | Zustand (persisted stores) |
-| **UI/UX** | Framer Motion, Lucide Icons, Sonner toasts |
-| **Email** | Resend API |
+| Category      | Technologies                                 |
+| ------------- | -------------------------------------------- |
+| **Framework** | Next.js 16, React 19, TypeScript 5.9         |
+| **Styling**   | Tailwind CSS v4, Radix UI, CVA variants      |
+| **Backend**   | Supabase (Auth, Database, Realtime, Storage) |
+| **Monorepo**  | Turborepo, pnpm workspaces                   |
+| **State**     | Zustand (persisted stores)                   |
+| **UI/UX**     | Framer Motion, Lucide Icons, Sonner toasts   |
+| **Email**     | Resend API                                   |
 
 ### Monorepo Structure
 
@@ -47,6 +47,7 @@ jayantgoyal/
 ### Studio App (`apps/studio`)
 
 **Features:**
+
 - **Product Inventory** - Public discovery and launch paths
 - **Messenger** - Real-time chat with Supabase Realtime
 - **File Manager** - Cloud storage with folders, upload, soft delete
@@ -58,6 +59,7 @@ jayantgoyal/
 - **Custom Calculator** - Drag & drop calculator builder
 
 **Key Routes:**
+
 - `(protected)/` - Authenticated routes with sidebar layout
 - `/` - Studio product inventory
 - `/games/*` - Game routes
@@ -74,11 +76,13 @@ jayantgoyal/
 **Purpose:** Content management system for portfolio data
 
 **Features:**
+
 - Portfolio data CRUD (hero, about, skills, experience, projects, certificates)
 - User management
 - Role-based access control (admin, super_admin)
 
 **Key Routes:**
+
 - `/portfolio/*` - Portfolio content management
 - `/users` - User management
 
@@ -87,11 +91,13 @@ jayantgoyal/
 ### `@repo/ui`
 
 Component library exporting:
+
 - **Components:** Button, Card, Dialog, Input, Select, etc.
 - **Hooks:** `use-mobile`
 - **Utils:** `cn()` (class merger), CVA variants
 
 **Exports pattern:**
+
 ```json
 {
   "./lib/utils": "./src/lib/utils.ts",
@@ -100,9 +106,17 @@ Component library exporting:
 }
 ```
 
+### `@repo/brand`
+
+Dependency-free source of truth for public identity, app names, canonical
+domains, default metadata, title templates, and manifest labels. Portfolio,
+Studio, and Admin must consume these constants instead of introducing new
+branding literals.
+
 ### `@repo/tailwind-config`
 
 Tailwind CSS v4 config with custom theme variables:
+
 - `--color-blue-1000`
 - `--color-purple-1000`
 - `--color-red-1000`
@@ -110,6 +124,7 @@ Tailwind CSS v4 config with custom theme variables:
 ### `@repo/eslint-config`
 
 Flat ESLint configurations:
+
 - `base` - Base config
 - `next-js` - Next.js specific rules
 - `react` - React specific rules
@@ -117,6 +132,7 @@ Flat ESLint configurations:
 ### `@repo/typescript-config`
 
 TypeScript configurations:
+
 - `base` - Base strict config
 - `nextjs` - Next.js project config
 - `react-library` - React library config
@@ -193,6 +209,7 @@ Configure in `.env.local` files per app. See `.env.example` in each app for the 
 Most secret/provider values are shared across Vercel targets, but application URL variables are environment-specific. Development uses local ports, the persistent `staging` Preview branch uses stable staging hosts, generic Preview resolves the request/deployment origin, and Production uses each application's canonical host. Add every new variable only to the applications and targets that consume it.
 
 **Vercel CLI setup** — the deployed apps are linked. To sync envs locally:
+
 ```bash
 cd apps/portfolio && vercel env pull .env.local
 cd apps/studio && vercel env pull .env.local
@@ -262,6 +279,7 @@ export default function ClientComponent() { ... }
 - **Server client:** `src/lib/supabase/server.ts` (wrapped in React `cache()`)
 
 **Auth flows:**
+
 - Email/password
 - Magic link
 - PKCE OAuth
@@ -272,12 +290,14 @@ export default function ClientComponent() { ... }
 Next.js 16 uses `src/proxy.ts` instead of `middleware.ts`:
 
 **Studio app proxy:**
+
 - Checks Supabase auth
 - Enforces public/protected route split
 - Redirects unauthenticated users to `/login`
 - Sets `x-auth-status` / `x-terms-accepted` headers
 
 **Admin app proxy:**
+
 - Checks Supabase auth
 - Verifies admin/super_admin role via `jg_account.profiles`
 - Redirects unauthorized to `/unauthorized`
@@ -307,6 +327,7 @@ Portfolio content is loaded inside the dedicated Portfolio application and is
 not part of the Studio application shell.
 
 **Data flow:**
+
 1. Server fetches via `getPortfolioDataFromHeaders()`
 2. Falls back to hardcoded data if DB unavailable
 3. Distributed via React Context (`PortfolioDataProvider`)
@@ -338,24 +359,25 @@ Unified loading with `<PageSpinner />` component:
 ### Component Structure
 
 ```tsx
-import { cn } from "@repo/ui/lib/utils"
-import { cva } from "class-variance-authority"
+import { cn } from "@repo/ui/lib/utils";
+import { cva } from "class-variance-authority";
 
 const variants = cva("base-class", {
   variants: {
     variant: { default: "...", secondary: "..." },
-    size: { sm: "...", lg: "..." }
-  }
-})
+    size: { sm: "...", lg: "..." },
+  },
+});
 
 export function Component({ variant, size, className }) {
-  return <div className={cn(variants({ variant, size, className }))} />
+  return <div className={cn(variants({ variant, size, className }))} />;
 }
 ```
 
 ### Testing
 
 Focused platform regression tests use Vitest (`pnpm test`). Quality assurance also includes:
+
 - Strict TypeScript (`pnpm check-types`)
 - ESLint with zero warnings (`pnpm lint`)
 - Manual testing
@@ -368,13 +390,13 @@ Focused platform regression tests use Vitest (`pnpm test`). Quality assurance al
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `turbo.json` | Turborepo pipeline configuration |
-| `pnpm-workspace.yaml` | Workspace package definitions |
-| `apps/*/src/proxy.ts` | Auth middleware/proxy |
-| `apps/*/src/app/layout.tsx` | Root layouts |
-| `packages/ui/src/components/*` | Shared UI components |
+| File                           | Purpose                          |
+| ------------------------------ | -------------------------------- |
+| `turbo.json`                   | Turborepo pipeline configuration |
+| `pnpm-workspace.yaml`          | Workspace package definitions    |
+| `apps/*/src/proxy.ts`          | Auth middleware/proxy            |
+| `apps/*/src/app/layout.tsx`    | Root layouts                     |
+| `packages/ui/src/components/*` | Shared UI components             |
 
 ## Common Tasks
 
@@ -431,6 +453,7 @@ Focused platform regression tests use Vitest (`pnpm test`). Quality assurance al
 ### Deploy
 
 Studio deploys independently to Vercel. Ensure:
+
 - Environment variables set in Vercel dashboard
 - Build command: `pnpm build --filter studio`
 - Output directory: `apps/studio/.next`
