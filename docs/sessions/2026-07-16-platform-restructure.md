@@ -30,6 +30,11 @@
   now contains the behavior-preserving PLATFORM-03 extraction slice; its local
   implementation checks pass, but its exit gate remains dependency-gated until
   PLATFORM-02 observation is complete.
+- Immediate execution focus is email/password-first shared-session SSO for the
+  restructure. Google consent/provider validation is a user-approved later
+  enhancement and is not a blocker for the email/password path, but the shared
+  cookie, refresh, logout, security, observation, and rollback gates remain
+  mandatory.
 
 ## PLATFORM-00 Result
 
@@ -237,3 +242,16 @@
   This proves deployment and domain routing only; Google consent, provider
   configuration, shared-session behavior, and the remaining observation gate
   are still open.
+
+## Scope decision — email/password-first SSO
+
+- The user approved email/password identity and shared-session SSO as the
+  immediate path for the restructure so work can continue without waiting on
+  Google consent/provider validation.
+- Real Google consent, Google client/provider configuration, and provider-
+  specific cutover checks are deferred to a later enhancement. No Google
+  provider setting, production redirect, or production role was changed.
+- This is a prioritization decision, not a waiver of the binding Auth gates:
+  versioned-cookie compatibility, cross-subdomain email/password SSO,
+  refresh/concurrency behavior, recovery, explicit logout, Admin AAL2, safe
+  return paths, security review, observation, and rollback still must pass.

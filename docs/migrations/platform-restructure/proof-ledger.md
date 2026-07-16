@@ -326,3 +326,18 @@ Ignored Build Step`, so no new preview artifact for this implementation is
   aliases `auth.jayantgoyal.com`; unauthenticated `HEAD /login` returns `200`
   from both the deployment URL and the custom domain. No Google/provider or
   cross-application session claim is made from this routing check.
+
+### Scope decision — email/password-first SSO
+
+- The active restructure path is email/password identity with the shared Auth
+  session. Google consent, Google client/provider configuration, and provider-
+  specific cutover validation are explicitly deferred as a later enhancement;
+  they are not being claimed from the loopback harness or deployment probes.
+- This scope decision does not waive the binding session and security work. The
+  immediate gates still require versioned-cookie compatibility, stable-staging
+  cross-application email/password SSO, refresh/concurrency behavior, explicit
+  local/global logout, recovery, Admin AAL2, safe return paths, security review,
+  observation, and rollback evidence.
+- No Google provider setting, production redirect, or production identity role
+  was changed. The provider checklist remains recorded for the later
+  enhancement rather than being silently removed from the program.
