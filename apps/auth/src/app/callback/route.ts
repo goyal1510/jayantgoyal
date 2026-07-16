@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { resolvePlatformSessionConfig } from "@repo/auth/cookies";
 import { createSupabaseProxyClient } from "@repo/auth/proxy";
 import { safeRedirectPath } from "@repo/auth/redirects";
 
@@ -34,6 +35,11 @@ export async function GET(request: NextRequest) {
   const supabase = createSupabaseProxyClient({
     supabaseUrl,
     supabaseAnonKey,
+    platformSession: resolvePlatformSessionConfig({
+      enabled: process.env.PLATFORM_SESSION_ENABLED === "true",
+      hostname: requestUrl.hostname,
+      supabaseUrl,
+    }),
     responseStore: {
       getAll: () => request.cookies.getAll(),
       setCookie: (name, value, options) => {

@@ -2,32 +2,33 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { resolvePlatformSessionConfig } from "@repo/auth/cookies";
 import { createSupabaseProxyClient } from "@repo/auth/proxy";
-import { safeRedirectPath } from "@repo/auth/redirects";
+
+function noStoreHeaders() {
+  return { "cache-control": "no-store" };
+}
 
 export async function POST(request: NextRequest) {
   const requestUrl = new URL(request.url);
-  const origin = request.headers.get("origin");
-  if (origin !== requestUrl.origin) {
+  if (request.headers.get("origin") !== requestUrl.origin) {
     return NextResponse.json(
       { error: "invalid_origin" },
-      { status: 403, headers: { "cache-control": "no-store" } },
+      { status: 403, headers: noStoreHeaders() },
     );
   }
 
-  const next = safeRedirectPath(requestUrl.searchParams.get("next"), "/login");
-  const response = NextResponse.redirect(new URL(next, request.url), {
-    status: 303,
-  });
-  response.headers.set("cache-control", "no-store");
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
   if (!supabaseUrl || !supabaseAnonKey) {
-    return NextResponse.redirect(new URL("/login?error=config", request.url), {
-      status: 303,
-    });
+    return NextResponse.json(
+      { error: "config" },
+      { status: 503, headers: noStoreHeaders() },
+    );
   }
 
+  const response = NextResponse.json(
+    { ok: true },
+    { headers: noStoreHeaders() },
+  );
   const supabase = createSupabaseProxyClient({
     supabaseUrl,
     supabaseAnonKey,
@@ -44,6 +45,17 @@ export async function POST(request: NextRequest) {
       setHeader: (name, value) => response.headers.set(name, value),
     },
   });
-  await supabase.auth.signOut({ scope: "local" });
+
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+  if (error || !user) {
+    return NextResponse.json(
+      { error: "unauthenticated" },
+      { status: 401, headers: noStoreHeaders() },
+    );
+  }
+
   return response;
 }

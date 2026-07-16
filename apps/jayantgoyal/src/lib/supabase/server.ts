@@ -1,6 +1,7 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { cache } from "react";
 
+import { resolvePlatformSessionConfig } from "@repo/auth/cookies";
 import { createSupabaseServerClient as createSharedServerClient } from "@repo/auth/server";
 
 export const createSupabaseServerClient = cache(async () => {
@@ -12,10 +13,17 @@ export const createSupabaseServerClient = cache(async () => {
   }
 
   const cookieStore = await cookies();
+  const requestHeaders = await headers();
+  const hostname = requestHeaders.get("host")?.split(":")[0] ?? "";
 
   return createSharedServerClient({
     supabaseUrl,
     supabaseAnonKey,
     cookieStore,
+    platformSession: resolvePlatformSessionConfig({
+      enabled: process.env.PLATFORM_SESSION_ENABLED === "true",
+      hostname,
+      supabaseUrl,
+    }),
   });
 });

@@ -8,7 +8,8 @@ import { safeRedirectPath } from "@repo/auth/redirects";
 
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
-const AUTH_RETRY_MESSAGE = "We could not complete that request. Please try again.";
+const AUTH_RETRY_MESSAGE =
+  "We could not complete that request. Please try again.";
 
 function callbackErrorMessage(code: string | null) {
   switch (code) {
@@ -45,6 +46,16 @@ export function LoginForm() {
       password,
     });
     if (signInError) {
+      setError(AUTH_RETRY_MESSAGE);
+      setBusy(false);
+      return;
+    }
+
+    const sessionResponse = await fetch("/api/session", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+    });
+    if (!sessionResponse.ok) {
       setError(AUTH_RETRY_MESSAGE);
       setBusy(false);
       return;
@@ -157,11 +168,19 @@ export function RegisterForm() {
       setError(AUTH_RETRY_MESSAGE);
       return;
     }
-    setMessage(
-      data.session
-        ? "Your account is ready."
-        : "Check your email to verify your account.",
-    );
+    if (data.session) {
+      const sessionResponse = await fetch("/api/session", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+      });
+      if (!sessionResponse.ok) {
+        setError(AUTH_RETRY_MESSAGE);
+        return;
+      }
+      setMessage("Your account is ready.");
+    } else {
+      setMessage("Check your email to verify your account.");
+    }
   }
 
   return (

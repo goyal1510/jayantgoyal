@@ -3,6 +3,12 @@
 This inventory records names, Vercel target coverage, and capability ownership
 only. It intentionally contains no values.
 
+### Shared auth rollout
+
+| Variable name              | Capability                                | Approved target owner                        |
+| -------------------------- | ----------------------------------------- | -------------------------------------------- |
+| `PLATFORM_SESSION_ENABLED` | Feature-flagged platform-cookie promotion | Main, Admin, and Auth; staging-first rollout |
+
 ## Current runtime reads
 
 ### Combined main application (`apps/jayantgoyal`)
@@ -63,6 +69,7 @@ the production deployment is Ready and the custom-domain `/login` probe returns
 | Admin   | Supabase and Vercel management variables            |     Yes     |     Yes     |    Yes     | Coverage present                                                                  |
 | Admin   | `NEXT_PUBLIC_SITE_URL`                              |     Yes     |   **No**    |    Yes     | Preview gap                                                                       |
 | Auth    | Supabase public URL/key and `NEXT_PUBLIC_SITE_URL`  |     Yes     | **Pending** |    Yes     | Production deployment/domain verified; Preview callback and provider gates remain |
+| All     | `PLATFORM_SESSION_ENABLED`                          |     No      |     No      |     No     | Local examples default false; enable only on approved staging after the SSO gate  |
 
 The main Vercel project also contains the following names that are not referenced
 by the baseline `apps/jayantgoyal` source:
