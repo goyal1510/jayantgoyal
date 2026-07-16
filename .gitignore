@@ -37,10 +37,6 @@ yarn-error.log*
 # config.toml, migrations/, schemas/, seed.sql, and functions/ source.
 # Machine-local CLI state and secrets are handled by supabase/.gitignore.
 
-# claude code
-.agents/settings.local.json
-CLAUDE.local.md
-
 # turbo
 .turbo
 

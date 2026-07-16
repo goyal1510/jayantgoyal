@@ -530,6 +530,14 @@ Supabase Auth via `@supabase/ssr`. Supports email/password, magic link, PKCE OAu
 
 **Schemas:** `jg_account`, `portfolio`, `jg_app` (activity tracker, calculator, file manager, game hub, messenger, blog)
 
+Database conventions:
+
+- Use `jg_app.uuid_v7()` as the default for new UUID primary keys.
+- Use `jg_app.update_updated_at()` for standard `updated_at` triggers.
+- Always select the intended schema explicitly for Supabase queries.
+- Never expose or use the Supabase service-role key in client-side code.
+- Check and handle the error returned by every Supabase query.
+
 ### Supabase Safety
 
 - The canonical remote project for this repository is `jayantgoyal`
