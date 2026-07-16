@@ -398,3 +398,18 @@ Ignored Build Step`, so no new preview artifact for this implementation is
   unauthenticated Admin `/` returned the expected `307` to `/welcome?redirect=%2F`.
   These probes prove routing and deployment health only; no production session,
   cookie, Google consent, or cross-application SSO claim is made.
+
+### Vercel project-settings cleanup
+
+- **Configuration:** Removed `apps/auth/vercel.json` so framework, install,
+  build, and ignored-build behavior are sourced from the `jayantgoyal-auth`
+  Vercel project settings rather than a repository deployment override.
+- **Verified settings:** Auth remains configured as Next.js with
+  `pnpm install --frozen-lockfile`, `turbo run build --filter=auth`, and
+  `bash ../../scripts/ignore-build.sh apps/auth`; Main and Admin retain their
+  existing project-level settings.
+- **Deployment proof:** The repaired Auth production deployment
+  `dpl_Htc7qMLNBawnjmj9CiodpkCrsrxc` and preview deployment
+  `dpl_5rnpRYJng9kFN72yxKhvqqoBXGTo` are Ready and report the same settings.
+  Historical deployments retain immutable snapshots and are not current
+  domain targets.

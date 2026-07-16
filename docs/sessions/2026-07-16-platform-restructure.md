@@ -289,3 +289,17 @@
   validates the same-origin host instead of comparing potentially different
   loopback URL spellings (`localhost` versus `127.0.0.1`); the security boundary
   remains an explicit Origin/Host match and a `303` redirect.
+
+## Vercel project-settings cleanup
+
+- Removed the tracked `apps/auth/vercel.json`, which was supplying deployment-
+  time framework, install, and build overrides. Auth now relies on the Vercel
+  project settings as the sole source of those values, matching the Main and
+  Admin projects' configuration model.
+- Verified the Auth project settings remain `nextjs`, `pnpm install
+  --frozen-lockfile`, `turbo run build --filter=auth`, and the repository
+  ignored-build command `bash ../../scripts/ignore-build.sh apps/auth`.
+- Current production and preview deployments created after the settings repair
+  inherit those values and are Ready. Older deployment records retain their
+  historical snapshot and cannot be edited; they are not used as the current
+  domain target.
