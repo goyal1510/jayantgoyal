@@ -10,16 +10,23 @@
   - `jayantgoyal-portfolio` (`prj_EBZwXQASK4Abaw6Nc9ZG17j8cF7G`) → `apps/portfolio` → `jayantgoyal.com`, `www.jayantgoyal.com`
 - Vercel environment foundation applied and verified:
   - ADR-006 defines exactly three contexts: localhost Development, Vercel-managed Preview, and final-domain Production.
-  - Set Production `NEXT_PUBLIC_SITE_URL` to the canonical Portfolio, Studio, and Admin hosts after the apex cutover.
+  - Set Production `NEXT_PUBLIC_SITE_URL` to the canonical Portfolio and Studio hosts after the apex cutover. Admin does not consume this variable and uses the current browser origin for its callback.
   - Left Preview without a fixed site URL so each deployment uses its actual Vercel origin.
   - Standardized Development URLs and local scripts: Portfolio `3000`, Studio `3001`, Admin `3002`; Auth remains reserved for `3003`.
   - Read back Studio's cross-app `NEXT_PUBLIC_PORTFOLIO_URL` for Development, Preview, and Production. Local Studio targets Portfolio on `3000`; Preview and Production target the stable apex.
   - Read back Studio's canonical `NEXT_PUBLIC_STUDIO_URL` for the same three targets. Development uses `3001`; Preview and Production use the canonical Studio host.
   - Confirmed the three Supabase variables cover Development, Preview, and Production on both existing projects without exposing their values.
   - Configured Portfolio's complete eleven-key runtime contract across Development, Preview, and Production. The Portfolio project intentionally has no Supabase service-role key.
-  - Verified every public URL value through Vercel's read API without printing secret/provider values. Preview has no fixed `NEXT_PUBLIC_SITE_URL`; Development uses exact localhost origins; Production uses each canonical host.
+  - Verified every consumed public URL value through Vercel's read API without printing secret/provider values. Preview has no fixed `NEXT_PUBLIC_SITE_URL`; Portfolio and Studio use exact localhost Development origins and canonical Production hosts; Admin has no unused site-URL entry.
   - Removed thirteen Portfolio/Resume/Commerce-only variables from Studio after a source inventory proved no Studio consumer remains. Admin now uses `VERCEL_PROJECT_ID_STUDIO` in all three targets and no longer has `VERCEL_PROJECT_ID_JG`.
 - Existing e-commerce Vercel projects are intentionally outside this platform migration.
+- A post-merge provider audit found zero branch-scoped or staging-named variables
+  across Portfolio, Studio, and Admin, and no staging Vercel domains. The unused
+  Admin `NEXT_PUBLIC_SITE_URL` entries were removed from Development and
+  Production; all remaining Admin variables have active source consumers.
+  Admin's project build command now matches its package exactly:
+  `pnpm --filter admin build`. Portfolio, Studio, Admin, apex, and `www` retain
+  only their intended Production domain assignments.
 - Cloudflare stale Vercel records for `accounts`, `admin-employee`, `auth`, and `employee` were removed on the user's explicit instruction before implementation began. The later ADR-006 cleanup removed every `*.staging.jayantgoyal.com` record and the orphaned `portfolio.jayantgoyal.com` CNAME after Vercel confirmed it had no project assignment. Final Portfolio/Studio/Admin, apex, `www`, commerce, and mail records were not changed by that cleanup.
 - Live Supabase Auth baseline before remediation: Site URL and redirect allowlist were local-only; Google and email providers were enabled; GitHub and TOTP MFA were disabled.
 - Expedited hosted Auth remediation approved by the user and applied through a scoped Supabase Management API patch:

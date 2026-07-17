@@ -225,7 +225,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 
 # Site URL
-NEXT_PUBLIC_SITE_URL=http://localhost:3002
+NEXT_PUBLIC_SITE_URL=http://localhost:3001
 NEXT_PUBLIC_PORTFOLIO_URL=http://localhost:3000
 NEXT_PUBLIC_STUDIO_URL=http://localhost:3001
 
@@ -245,7 +245,6 @@ integration variables. It intentionally has no Supabase service-role key.
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
-NEXT_PUBLIC_SITE_URL=http://localhost:3001
 
 # Vercel (deployment management)
 VERCEL_TOKEN=
