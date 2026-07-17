@@ -148,7 +148,7 @@ Only one task should be In Progress per implementation lane.
 |     6 | PLATFORM-01 | Authentication regression foundation  | In Progress | No behavior change                                   |
 |     7 | PLATFORM-02 | Supabase dependency and SSR hardening | In Progress | Existing auth behavior preserved                     |
 |     8 | PLATFORM-03 | Extract `packages/auth`               | In Progress | Existing routes and cookies preserved                |
-|     9 | PLATFORM-04 | Shared-cookie compatibility           | Pending     | Current apps understand the platform session         |
+|     9 | PLATFORM-04 | Shared-cookie compatibility           | In Progress | Current apps understand the platform session         |
 |    10 | PLATFORM-05 | Auth dark launch                      | Pending     | Existing auth remains primary; Auth is testable      |
 |    11 | PLATFORM-06 | Canonical Auth cutover                | Pending     | New login/security flows use Auth                    |
 |    12 | PLATFORM-12 | Legacy cleanup and hardening          | Pending     | Compatibility code removed with evidence             |
@@ -340,8 +340,8 @@ Acceptance checks:
 - [x] Add Admin non-admin denial coverage.
 - [x] Add Admin admin-role success coverage.
 - [x] Add AAL1-to-AAL2 step-up coverage.
-- [ ] Add current-session logout coverage.
-- [ ] Add global logout coverage where practical.
+- [x] Add current-session logout coverage.
+- [x] Add global logout coverage where practical.
 - [x] Add callback invalid-code behavior coverage.
 - [x] Add recovery-link compatibility coverage.
 - [x] Document provider and deployed flows that remain manual under ADR-008.
@@ -437,7 +437,7 @@ Acceptance checks:
 ## Phase 4 — Shared-cookie compatibility
 
 Task ID: PLATFORM-04
-Status: Pending
+Status: In Progress
 Objective: Introduce a versioned parent-domain session contract while preserving or safely transitioning existing sessions.
 Dependencies: PLATFORM-03 Done and stable in production.
 Target files/surfaces: Shared cookie policy, current Studio and Admin session adapters, compatibility/promotion logic, production domain contracts.
@@ -470,19 +470,19 @@ If the Supabase storage format or chunking prevents safe promotion, choose one e
 
 ### Phase 4 checklist
 
-- [ ] Confirm the actual current cookie name and chunking behavior.
-- [ ] Approve the versioned production cookie name.
-- [ ] Add environment-specific cookie configuration.
-- [ ] Prove cookie deletion uses matching Domain and Path.
+- [x] Confirm the actual current cookie name and chunking behavior.
+- [x] Approve the versioned production cookie name.
+- [x] Add environment-specific cookie configuration.
+- [x] Prove cookie deletion uses matching Domain and Path.
 - [ ] Prove Studio/current main and Admin read the same session.
-- [ ] Prove Admin still rejects non-admin users.
-- [ ] Prove Admin still requires AAL2.
+- [x] Prove Admin still rejects non-admin users locally.
+- [x] Prove Admin still requires AAL2 locally.
 - [ ] Prove logout clears shared browser state.
 - [ ] Prove access-token expiry behavior is understood.
 - [ ] Test simultaneous refresh requests from two applications.
-- [ ] Test local ports with host-only localhost cookies.
+- [x] Test local ports with host-only localhost cookies.
 - [ ] Test application-local auth on generated Vercel Preview URLs.
-- [ ] Record that unrelated Vercel Preview hosts do not support full cross-subdomain SSO.
+- [x] Record that unrelated Vercel Preview hosts do not support full cross-subdomain SSO.
 - [ ] Complete controlled Production cross-subdomain validation with rollback ready.
 
 ### Phase 4 rollback

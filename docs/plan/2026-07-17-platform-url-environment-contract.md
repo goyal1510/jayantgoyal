@@ -57,3 +57,18 @@ Do not run a blanket `supabase config push` from an ordinary worktree: the repos
 ## Cookie contract timing
 
 The existing host-only Supabase session remains untouched through PLATFORM-03. The versioned parent-domain production cookie is introduced only in PLATFORM-04 after the shared `@repo/auth` package and application-local Preview checks pass. Cross-subdomain behavior then uses a controlled, reversible Production rollout because Vercel preview hosts cannot prove the parent-domain cookie contract.
+
+`NEXT_PUBLIC_AUTH_SESSION_MODE` is the non-sensitive build-time rollout control
+for Studio, Admin, and later Auth:
+
+| Value | Behavior |
+| ----- | -------- |
+| `legacy` | Current Supabase cookie behavior; default and immediate rollback |
+| `compatibility` | Prefer the versioned cookie and promote a server-validated legacy session |
+| `platform` | Versioned cookie only after the compatibility observation gate |
+
+Studio and Admin currently define one unscoped Vercel variable covering
+Development, Preview, and Production, set to `legacy`. Preview cookies remain
+host-only. Production receives the parent Domain only after the explicit mode
+switch; localhost uses an unprefixed host-only name without Secure so ports
+`3001` through `3003` can share it without violating `__Secure-` prefix rules.

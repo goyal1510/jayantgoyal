@@ -103,3 +103,16 @@
 - Consequences: a local-green slice may merge while its deployed/manual acceptance remains pending. Phase statuses and proof records must distinguish implementation completion from user-owned deployed acceptance; no phase that still requires a blueprint deployment or observation gate is marked Done solely from local proof.
 - Code or abstraction deleted/avoided: no browser harness, stored browser credentials, deployment-wait loop, or repeated formatting/build cycle is added merely to satisfy Codex-side observation.
 - Revisit trigger: the user reports a deployed blocker, asks Codex to resume browser validation, or a change cannot be validated meaningfully with local deterministic tests.
+
+## ADR-009 — Versioned shared-session rollout modes
+
+- Date: 2026-07-17
+- Status: Accepted
+- Task IDs: PLATFORM-01, PLATFORM-04, PLATFORM-05, PLATFORM-06, PLATFORM-12
+- Context: Studio and Admin currently use Supabase's host-only `sb-<project-ref>-auth-token` storage key, including numeric chunks. The Production contract requires a new, unambiguous parent-domain name, while generated Vercel Preview hosts cannot share a cookie and HTTP localhost cannot use a `__Secure-` name without the Secure attribute.
+- Options considered: change the Domain on the existing name; require every user to reauthenticate; copy unvalidated token data; or introduce an explicit versioned name with validated server-side promotion and rollback modes.
+- Decision: use `legacy`, `compatibility`, and `platform` modes controlled by the public, non-sensitive `NEXT_PUBLIC_AUTH_SESSION_MODE` build input. `legacy` is the default and rollback state. `compatibility` prefers `__Secure-jg-session-v1`, validates a legacy session with `getUser()`, transfers credentials only in server memory through `setSession()`, then validates the promoted user again. `platform` removes legacy fallback in the cleanup phase. Trusted Production hosts use Domain `jayantgoyal.com`, Path `/`, Secure, and SameSite Lax. Generated Previews use the secure name host-only. Localhost uses host-only `jg-session-v1` without Secure or Domain so all local ports share it without violating cookie-prefix rules.
+- Why this is the smallest maintainable choice: one shared policy drives browser, Server Component, callback, and Proxy clients; no tokens enter URLs, logs, database tables, or application policy; and one flag restores the current storage behavior.
+- Consequences: when both names exist, the platform name wins and legacy state cannot resurrect an invalid platform session. Failed promotion can serve the already validated legacy client for that request, while invalid legacy state is ignored. Ordinary logout is explicitly local; global logout requires an explicit action. Cross-subdomain proof remains user-owned Production validation under ADR-008.
+- Code or abstraction deleted/avoided: no same-name Domain ambiguity, preview token broker, custom session registry, real-time logout bus, or fourth environment.
+- Revisit trigger: Supabase changes its SSR storage/chunk contract, a controlled rollout exposes refresh races, or a trusted application host is added or removed.
