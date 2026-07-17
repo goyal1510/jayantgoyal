@@ -64,3 +64,16 @@
 - Consequences: ADR-002 remains the historical record for PR #39 but no longer constrains future work to its merged branch. The program goal and phase gates remain unchanged.
 - Code or abstraction deleted/avoided: no history rewrite, forced push, or direct unreviewed implementation on `main`.
 - Revisit trigger: the user explicitly changes the shipping strategy again.
+
+## ADR-006 — Use exactly Development, Preview, and Production
+
+- Date: 2026-07-17
+- Status: Accepted
+- Task IDs: PLATFORM-00, PLATFORM-01, PLATFORM-04, PLATFORM-05, PLATFORM-06, PLATFORM-07, PLATFORM-08, PLATFORM-09, PLATFORM-12
+- Context: The four-context plan added a persistent `staging` branch, custom staging domains, branch-scoped Vercel variables, DNS records, Auth callbacks, and a second parent-cookie contract. The user explicitly rejected that operational layer and chose localhost Development, Vercel-managed Preview, and final-domain Production only.
+- Options considered: keep stable staging for cross-subdomain SSO; replace it with Vercel custom environments; or use generated Preview URLs for application-local checks and reserve cross-subdomain proof for a controlled Production rollout.
+- Decision: remove the persistent staging branch and every staging-only DNS, Vercel domain, environment-variable, Supabase callback, cookie, and documentation contract. Preview remains provider-managed and proves build, route, UI, and same-application auth behavior. Production is the only environment that proves parent-domain cookies and cross-subdomain SSO.
+- Why this is the smallest maintainable choice: it matches the three environments actually used, removes duplicated provider state, and avoids maintaining a production-like domain and cookie topology solely for tests.
+- Consequences: unrelated Vercel preview hosts cannot prove shared-cookie SSO. PLATFORM-04 through PLATFORM-06 therefore require strong local/application-local Preview coverage, an explicit production rollout flag or reversible deployment boundary, controlled test personas, immediate rollback readiness, and production observation. Current Studio/Admin Vercel preview hostname families remain narrowly allowlisted for same-application OAuth callbacks.
+- Code or abstraction deleted/avoided: four stable staging hosts, one long-lived branch, six branch-only environment values, a staging cookie namespace, and a custom preview token broker.
+- Revisit trigger: production auth risk cannot be reduced to an acceptable controlled rollout without a production-like environment, or Vercel introduces a materially simpler first-class cross-project Preview domain/cookie contract.

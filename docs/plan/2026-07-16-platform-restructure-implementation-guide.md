@@ -161,12 +161,12 @@ The technical move and visual redesign are intentionally separate. Studio may te
 
 ### 5.1 Application URLs
 
-| Application | Production URL                   | Local URL               | Stable staging URL                          |
-| ----------- | -------------------------------- | ----------------------- | ------------------------------------------- |
-| Portfolio   | `https://jayantgoyal.com`        | `http://localhost:3000` | `https://portfolio.staging.jayantgoyal.com` |
-| Studio      | `https://studio.jayantgoyal.com` | `http://localhost:3001` | `https://studio.staging.jayantgoyal.com`    |
-| Admin       | `https://admin.jayantgoyal.com`  | `http://localhost:3002` | `https://admin.staging.jayantgoyal.com`     |
-| Auth        | `https://auth.jayantgoyal.com`   | `http://localhost:3003` | `https://auth.staging.jayantgoyal.com`      |
+| Application | Production URL                   | Local URL               | Preview URL model                          |
+| ----------- | -------------------------------- | ----------------------- | ------------------------------------------ |
+| Portfolio   | `https://jayantgoyal.com`        | `http://localhost:3000` | Vercel-generated deployment URL            |
+| Studio      | `https://studio.jayantgoyal.com` | `http://localhost:3001` | Vercel-generated deployment URL            |
+| Admin       | `https://admin.jayantgoyal.com`  | `http://localhost:3002` | Vercel-generated deployment URL            |
+| Auth        | `https://auth.jayantgoyal.com`   | `http://localhost:3003` | Vercel-generated URL after Auth is created |
 
 ### 5.2 Identity contract
 
@@ -188,7 +188,7 @@ Secure:   true
 SameSite: Lax
 ```
 
-Staging uses a distinct name and `Domain=staging.jayantgoyal.com`. Local development omits Domain and Secure.
+Local development omits Domain and Secure. Vercel previews retain application-local host cookies; they do not attempt to share a parent cookie across unrelated preview hosts.
 
 Cookie removal must use the same Domain and Path used when setting the cookie.
 
@@ -349,7 +349,7 @@ Acceptance checks:
 ### Phase 1 exit gate
 
 - [ ] The current auth contract can fail a test before production is affected.
-- [ ] Manual-only provider paths have an explicit staging checklist.
+- [ ] Manual-only provider paths have an explicit Preview and controlled-Production checklist.
 - [ ] No runtime auth behavior has changed.
 
 ---
@@ -440,8 +440,8 @@ Task ID: PLATFORM-04
 Status: Pending
 Objective: Introduce a versioned parent-domain session contract while preserving or safely transitioning existing sessions.
 Dependencies: PLATFORM-03 Done and stable in production.
-Target files/surfaces: Shared cookie policy, current main and Admin session adapters, compatibility/promotion logic, staging domains.
-Allowed changes: Versioned platform cookie, dual-read or validated server-side promotion, feature flags, staging-only rollout first.
+Target files/surfaces: Shared cookie policy, current Studio and Admin session adapters, compatibility/promotion logic, production domain contracts.
+Allowed changes: Versioned platform cookie, dual-read or validated server-side promotion, feature flags, application-local Preview checks, and a controlled Production rollout.
 Forbidden changes: Same-name host/domain cookie ambiguity, tokens in URLs, removing legacy cookies immediately, Auth cutover.
 Acceptance checks:
 
@@ -449,8 +449,8 @@ Acceptance checks:
 - native/client: A user authenticated in one app can open the other without credential login, subject to authorization.
 - offline/retry: Concurrent refresh, stale cookie, expired access token, and revoked session recover correctly.
 - source/security scan: Domain, Path, Secure, SameSite, Max-Age, deletion, CSP, cache headers, and subdomain threat model reviewed.
-- black-box: Cross-subdomain SSO, step-up MFA, local logout, global logout, and open-tab behavior verified on stable staging.
-  Proof note required: Cookie names and attributes without values, staging journeys, compatibility behavior, and residual risk.
+- black-box: Application-local auth behavior passes on Vercel previews, then cross-subdomain SSO, step-up MFA, local logout, global logout, and open-tab behavior pass in a controlled Production rollout.
+  Proof note required: Cookie names and attributes without values, preview and production journeys, compatibility behavior, rollback state, and residual risk.
   Stop/escalate if: Legacy and platform cookies cannot be selected unambiguously or safe promotion cannot be proven.
 
 ### Phase 4 migration strategy
@@ -471,7 +471,7 @@ If the Supabase storage format or chunking prevents safe promotion, choose one e
 ### Phase 4 checklist
 
 - [ ] Confirm the actual current cookie name and chunking behavior.
-- [ ] Approve the versioned production and staging cookie names.
+- [ ] Approve the versioned production cookie name.
 - [ ] Add environment-specific cookie configuration.
 - [ ] Prove cookie deletion uses matching Domain and Path.
 - [ ] Prove Studio/current main and Admin read the same session.
@@ -481,8 +481,9 @@ If the Supabase storage format or chunking prevents safe promotion, choose one e
 - [ ] Prove access-token expiry behavior is understood.
 - [ ] Test simultaneous refresh requests from two applications.
 - [ ] Test local ports with host-only localhost cookies.
-- [ ] Test stable staging subdomains.
-- [ ] Record that arbitrary Vercel previews do not support full SSO.
+- [ ] Test application-local auth on generated Vercel Preview URLs.
+- [ ] Record that unrelated Vercel Preview hosts do not support full cross-subdomain SSO.
+- [ ] Complete controlled Production cross-subdomain validation with rollback ready.
 
 ### Phase 4 rollback
 
@@ -498,8 +499,8 @@ If the Supabase storage format or chunking prevents safe promotion, choose one e
 Task ID: PLATFORM-05
 Status: Pending
 Objective: Create and deploy the Auth application without making it the default production login path.
-Dependencies: PLATFORM-04 Done on stable staging.
-Target files/surfaces: `apps/auth`, Auth Vercel project, `auth.jayantgoyal.com`, staging Auth domain, Supabase redirect allowlist, provider callback configuration.
+Dependencies: PLATFORM-04 Done with application-local Preview evidence and controlled Production cross-subdomain proof.
+Target files/surfaces: `apps/auth`, Auth Vercel project, `auth.jayantgoyal.com`, generated Preview deployments, Supabase redirect allowlist, provider callback configuration.
 Allowed changes: New independently deployable Auth application and test-only/manual entry links.
 Forbidden changes: Removing current auth routes, permanent production redirects, passkeys, SAML, API tokens, full session-device UI.
 Acceptance checks:
@@ -508,7 +509,7 @@ Acceptance checks:
 - native/client: Login, registration, recovery, MFA enrollment/challenge, connected provider, and account-security journeys pass.
 - offline/retry: Provider cancellation, expired code, invalid callback, refresh failure, and Auth downtime produce recoverable states.
 - source/security scan: CSP, CSRF, Origin validation, open redirects, service-role isolation, cache headers, and secret exposure reviewed.
-- black-box: A session created on Auth is recognized by current main and Admin on stable staging.
+- black-box: Auth passes application-local flows on its generated Preview URL, then a session created on Auth is recognized by Studio and Admin during a controlled Production dark launch.
   Proof note required: Deployment identifiers, domains, provider matrix, cookie observations, security findings, and rollback path.
   Stop/escalate if: Auth-created sessions are interpreted differently by another application.
 
@@ -551,7 +552,7 @@ Acceptance checks:
 Task ID: PLATFORM-06
 Status: Pending
 Objective: Make Auth the owner of new login and account-security flows while preserving legacy compatibility.
-Dependencies: PLATFORM-05 Done and observed in production-like staging.
+Dependencies: PLATFORM-05 Done and observed through generated Preview checks plus a controlled Production dark launch.
 Target files/surfaces: Current login, registration, callback, recovery, MFA, account-security, and logout routes in main and Admin; navigation links; Auth return flow.
 Allowed changes: Feature-flagged redirects, compatibility callbacks, navigation changes, removal of duplicated UI only after replacement is active.
 Forbidden changes: Blind callback redirects, immediate legacy route deletion, product-route moves, Studio redesign.
@@ -649,7 +650,7 @@ Task ID: PLATFORM-08
 Status: In Progress
 Objective: Build and deploy a focused Portfolio without copying Studio infrastructure.
 Dependencies: Portfolio content ownership and the URL/environment contract are recorded in PLATFORM-00. Studio deployment is not required before this additive dark launch.
-Target files/surfaces: `apps/portfolio`, Portfolio Vercel project, staging domain, `portfolio` schema reads, contact and resume flows.
+Target files/surfaces: `apps/portfolio`, Portfolio Vercel project and generated Preview deployments, `portfolio` schema reads, contact and resume flows.
 Allowed changes: New focused Portfolio application and selective reuse of proven presentation primitives/content access.
 Forbidden changes: Studio product routes, authenticated workspace shell, service-role exposure, product navigation, broad shared content package.
 Acceptance checks:
@@ -691,7 +692,7 @@ Acceptance checks:
 
 ### Phase 8 exit gate
 
-- [ ] Portfolio is independently deployed on staging.
+- [x] Portfolio is independently deployed through Vercel Preview and Production.
 - [x] Root-domain cutover is reversible.
 - [x] Every root route has a final owner or redirect.
 
@@ -978,24 +979,24 @@ Build success does not replace type checking because repository build configurat
 
 ### 10.2 Authentication integration matrix
 
-| Journey                            |      Local      | Stable staging |        Production smoke         |
-| ---------------------------------- | :-------------: | :------------: | :-----------------------------: |
-| Password login                     |    Required     |    Required    | Required after approved rollout |
-| Google login                       | Manual/optional |    Required    | Required after approved rollout |
-| GitHub login                       | Manual/optional |    Required    | Required after approved rollout |
-| Registration and verification      |    Required     |    Required    |        Controlled smoke         |
-| Forgot/reset password              |    Required     |    Required    |        Controlled smoke         |
-| MFA enrollment                     |    Required     |    Required    |        Controlled smoke         |
-| AAL1 → AAL2 Admin step-up          |    Required     |    Required    |            Required             |
-| Non-admin Admin denial             |    Required     |    Required    |            Required             |
-| Studio session recognized by Admin |    Required     |    Required    |            Required             |
-| Auth session recognized by Studio  |    Required     |    Required    |            Required             |
-| Current-session logout             |    Required     |    Required    |            Required             |
-| Global logout                      |    Required     |    Required    |        Controlled smoke         |
-| Expired access token refresh       |    Required     |    Required    |             Observe             |
-| Revoked session behavior           |    Required     |    Required    |             Observe             |
-| Provider cancellation              |    Required     |    Required    |          Not required           |
-| Invalid return URL rejection       |    Required     |    Required    |          Not required           |
+| Journey                            |      Local      |       Vercel Preview       |        Production smoke         |
+| ---------------------------------- | :-------------: | :------------------------: | :-----------------------------: |
+| Password login                     |    Required     |  Required, app-local only  | Required after approved rollout |
+| Google login                       | Manual/optional |  Required, app-local only  | Required after approved rollout |
+| GitHub login                       | Manual/optional |  Required, app-local only  | Required after approved rollout |
+| Registration and verification      |    Required     |  Required, app-local only  |        Controlled smoke         |
+| Forgot/reset password              |    Required     |  Required, app-local only  |        Controlled smoke         |
+| MFA enrollment                     |    Required     |  Required, app-local only  |        Controlled smoke         |
+| AAL1 → AAL2 Admin step-up          |    Required     |  Required, app-local only  |            Required             |
+| Non-admin Admin denial             |    Required     |          Required          |            Required             |
+| Studio session recognized by Admin |    Required     | Not supported across hosts |            Required             |
+| Auth session recognized by Studio  |    Required     | Not supported across hosts |            Required             |
+| Current-session logout             |    Required     |          Required          |            Required             |
+| Global logout                      |    Required     |     Application-local      |        Controlled smoke         |
+| Expired access token refresh       |    Required     |          Required          |             Observe             |
+| Revoked session behavior           |    Required     |          Required          |             Observe             |
+| Provider cancellation              |    Required     |          Required          |          Not required           |
+| Invalid return URL rejection       |    Required     |          Required          |          Not required           |
 
 ### 10.3 Application black-box matrix
 
@@ -1240,9 +1241,8 @@ Review after the migration and at least annually:
 
 After shipping the post-merge shared-foundation slice:
 
-1. Restore the missing `admin.staging.jayantgoyal.com` DNS/deployment contract before claiming the complete stable-staging matrix.
-2. Run the deployed responsive and authenticated product matrix and complete the rollback rehearsal and observation gates before closing PLATFORM-07, PLATFORM-08, or PLATFORM-09.
-3. Design and separately approve the `jg_app` Studio catalog contract before exposing Studio management in Admin.
-4. Retire or redesign the legacy Admin environment-manager route so infrastructure secrets remain provider-owned.
+1. Run the deployed responsive and authenticated product matrix across localhost, generated Vercel previews, and the final production domains; complete the rollback rehearsal and observation gates before closing PLATFORM-07, PLATFORM-08, or PLATFORM-09.
+2. Design and separately approve the `jg_app` Studio catalog contract before exposing Studio management in Admin.
+3. Retire or redesign the legacy Admin environment-manager route so infrastructure secrets remain provider-owned.
 
 Do not create `apps/auth` or `packages/auth` until the application split and root-domain cutover are stable.

@@ -7,25 +7,24 @@
 - Current Vercel platform projects verified:
   - `jayantgoyal-studio` (`prj_i9cXy9kUNTtLcewSSmO90d9hmYdl`) → `apps/studio` → `studio.jayantgoyal.com`
   - `jayantgoyal-admin` → `apps/admin` → `admin.jayantgoyal.com`
-  - `jayantgoyal-portfolio` (`prj_EBZwXQASK4Abaw6Nc9ZG17j8cF7G`) → `apps/portfolio` → `jayantgoyal.com`, `www.jayantgoyal.com`, `portfolio.jayantgoyal.com`
+  - `jayantgoyal-portfolio` (`prj_EBZwXQASK4Abaw6Nc9ZG17j8cF7G`) → `apps/portfolio` → `jayantgoyal.com`, `www.jayantgoyal.com`
 - Vercel environment foundation applied and verified:
-  - Created the persistent remote `staging` branch from the verified `origin/main` baseline.
+  - ADR-006 defines exactly three contexts: localhost Development, Vercel-managed Preview, and final-domain Production.
   - Set Production `NEXT_PUBLIC_SITE_URL` to the canonical Portfolio, Studio, and Admin hosts after the apex cutover.
-  - Added branch-specific Preview values for `studio.staging.jayantgoyal.com` on Studio, `portfolio.staging.jayantgoyal.com` on Portfolio, and `admin.staging.jayantgoyal.com` on Admin.
-  - Left generic Preview without a fixed site URL so each deployment uses its own origin.
+  - Left Preview without a fixed site URL so each deployment uses its actual Vercel origin.
   - Standardized Development URLs and local scripts: Portfolio `3000`, Studio `3001`, Admin `3002`; Auth remains reserved for `3003`.
-  - Added and read back Studio's cross-app `NEXT_PUBLIC_PORTFOLIO_URL` exactly once for Development, generic Preview, `staging` Preview, and Production. Local Studio targets Portfolio on `3000`, persistent staging targets Portfolio staging, and generic Preview/Production target the stable apex.
-  - Added and read back Studio's canonical `NEXT_PUBLIC_STUDIO_URL` exactly once for the same four scopes. Development uses `3001`, persistent staging uses the Studio staging host, and generic Preview/Production use the stable Studio host.
+  - Read back Studio's cross-app `NEXT_PUBLIC_PORTFOLIO_URL` for Development, Preview, and Production. Local Studio targets Portfolio on `3000`; Preview and Production target the stable apex.
+  - Read back Studio's canonical `NEXT_PUBLIC_STUDIO_URL` for the same three targets. Development uses `3001`; Preview and Production use the canonical Studio host.
   - Confirmed the three Supabase variables cover Development, Preview, and Production on both existing projects without exposing their values.
-  - Configured Portfolio's complete eleven-key runtime contract across Development, generic Preview, branch-specific `staging` Preview, and Production. The Portfolio project intentionally has no Supabase service-role key.
-  - Verified every public URL value through Vercel's read API without printing secret/provider values. Generic Preview has no fixed `NEXT_PUBLIC_SITE_URL`; Development and `staging` use their exact local/staging hosts; Production uses each canonical host.
+  - Configured Portfolio's complete eleven-key runtime contract across Development, Preview, and Production. The Portfolio project intentionally has no Supabase service-role key.
+  - Verified every public URL value through Vercel's read API without printing secret/provider values. Preview has no fixed `NEXT_PUBLIC_SITE_URL`; Development uses exact localhost origins; Production uses each canonical host.
   - Removed thirteen Portfolio/Resume/Commerce-only variables from Studio after a source inventory proved no Studio consumer remains. Admin now uses `VERCEL_PROJECT_ID_STUDIO` in all three targets and no longer has `VERCEL_PROJECT_ID_JG`.
 - Existing e-commerce Vercel projects are intentionally outside this platform migration.
-- Cloudflare stale Vercel records for `accounts`, `admin-employee`, `auth`, and `employee` were removed on the user's explicit instruction before implementation began. Additive DNS-only CNAME records now route `portfolio`, `studio`, `portfolio.staging`, and `studio.staging` to their exact Vercel-recommended targets; apex, `www`, Admin, commerce, and mail records were not changed.
+- Cloudflare stale Vercel records for `accounts`, `admin-employee`, `auth`, and `employee` were removed on the user's explicit instruction before implementation began. The later ADR-006 cleanup removed every `*.staging.jayantgoyal.com` record and the orphaned `portfolio.jayantgoyal.com` CNAME after Vercel confirmed it had no project assignment. Final Portfolio/Studio/Admin, apex, `www`, commerce, and mail records were not changed by that cleanup.
 - Live Supabase Auth baseline before remediation: Site URL and redirect allowlist were local-only; Google and email providers were enabled; GitHub and TOTP MFA were disabled.
 - Expedited hosted Auth remediation approved by the user and applied through a scoped Supabase Management API patch:
   - Site URL is now `https://jayantgoyal.com`.
-  - The allowlist covers current Main/Admin, planned Portfolio/Studio/Admin/Auth production and staging hosts, local ports `3000` through `3003`, and only the current Main/Admin Vercel preview hostname families.
+  - The allowlist covers the production platform hosts, local ports `3000` through `3003`, and only the current Studio/Admin Vercel preview hostname families. The pre-rename Studio wildcard and every staging callback were removed.
   - The recovery template was subsequently corrected to use `{{ .RedirectTo }}` rather than `{{ .SiteURL }}`. This preserves the existing template and makes every password-recovery link use the exact callback requested by the application.
   - A read-after-write verification confirmed the exact URL settings, the recovery-template placeholder, and that Google/email providers remain enabled.
   - A non-user request to the hosted recovery endpoint confirmed that Supabase accepts `https://jayantgoyal.com/auth/callback` with HTTP `200`; no message was sent to a user.
@@ -33,15 +32,15 @@
   - The existing Google flow places `next` in `redirectTo`; the temporary same-origin wildcard paths preserve compatibility, but a tested server-side destination handoff is still required before narrowing production callbacks.
   - Parent-domain cookies and cross-subdomain SSO are deferred until PLATFORM-04.
   - Auth Vercel environment inventory remains pending until the Auth project exists.
-  - Portfolio and Studio stable staging hosts resolve publicly and return `200`. `admin.staging.jayantgoyal.com` did not resolve during the 2026-07-17 post-merge check, so the complete stable-staging contract remains open.
+  - Unrelated Vercel preview hosts cannot prove parent-domain cookies or cross-subdomain SSO; those journeys require a controlled, reversible Production rollout under ADR-006.
   - Deployed authenticated product journeys, rollback rehearsal, and the required observation window remain incomplete even though public production smoke checks pass.
 
 ## Post-merge deployment reconciliation
 
 - PR #39 merged to `main` as `4703e7c83d0b92935dc8dd10a3535a2f7d51a426`; the Portfolio, Studio, and Admin production deployment checks passed for the merged boundary.
 - Post-merge public checks on 2026-07-17 returned `200` for `https://jayantgoyal.com/` and `https://studio.jayantgoyal.com/`. Admin completed its expected single redirect from `/` to `/welcome?redirect=%2F` and returned `200`.
-- Portfolio and Studio stable staging roots returned `200`. Admin staging DNS did not resolve and remains a required environment repair, not an application-code failure.
-- The previous build-rate-limit and pre-cutover canonical blockers are resolved. The open gates are authenticated product coverage, deployed responsive/browser evidence, Admin staging, rollback rehearsal, and observation.
+- ADR-006 superseded the persistent staging model. Cloudflare and Vercel read-backs confirm that the Portfolio, Studio, and Admin staging domains are absent; six branch-scoped Vercel variables were deleted; Supabase contains no staging callback; and the redundant remote branch was deleted only after it matched `origin/main` and had no open PR.
+- The previous build-rate-limit and pre-cutover canonical blockers are resolved. The open gates are authenticated product coverage, deployed responsive/browser evidence, controlled Production auth proof, rollback rehearsal, and observation.
 
 ## PLATFORM-01 — Test foundation prepared; Auth execution deferred
 
@@ -91,17 +90,17 @@
 - The rejected centralized navigation-policy shell was reverted with Git. After the three app-owned adapters independently proved the same mechanics, only the behavior-neutral frame/header/breadcrumb renderers moved to `@repo/ui`; Portfolio still owns its navigation inventory and does not import Studio product logic.
 - Local Portfolio browser proof covers the expanded structure, icon collapse, section scrolling and active state, mobile drawer, Blog navigation/title, automatic drawer close, and zero captured console errors. The full repository test, type, lint, and production-build gates pass after the app-local replacement.
 - Portfolio's shared top-header renderer mirrors Studio's responsive shell contract while its breadcrumb model remains local: browser measurement confirms its `64px` expanded to `48px` collapsed transition, it preserves the trigger/separator/actions layout, and it renders route-aware breadcrumbs for Portfolio, Blog, article, and Resume surfaces with no captured console errors.
-- Portfolio was first validated additively at `portfolio.jayantgoyal.com`; the apex and `www` were later moved to the same Portfolio project after route checks passed.
+- Portfolio was first validated additively at the now-retired compatibility hostname; the apex and `www` were later moved to the Portfolio project after route checks passed.
 - Product links shown in Portfolio are resolved to the future canonical Studio origin so the later apex cutover does not strand product routes.
 - Focused verification passed: Portfolio TypeScript, zero-warning ESLint, production build, desktop browser rendering, mobile navigation, all seven section anchors, project modal behavior, Studio link rewriting, zero horizontal overflow, and zero captured browser console errors.
 - Portfolio now owns the public Blog index/articles, Resume landing/download, sitemap article discovery, `llms.txt`, not-found, and error surfaces without importing Studio authentication or product infrastructure.
 - Local production smoke confirmed Portfolio content routes return `200`, unknown routes return `404`, known content aliases return `308`, and product/Auth/API families return one-hop method-preserving `307` redirects to Studio with query strings intact.
 - The extracted Portfolio now preserves the historical `POST /api/contact` contract through the same server-only delivery service as the UI Server Action. Portfolio TypeScript, zero-warning lint, and production build pass; local black-box checks confirm malformed JSON, missing fields, invalid email, and unsupported methods fail without attempting delivery.
 - Vercel project `jayantgoyal-portfolio` was created with root `apps/portfolio`, GitHub integration, and the corrected project-level build command `pnpm --filter portfolio build`.
-- Preview deployment `dpl_7CiJsCTyFZfZGUb6Euro6etDAK3L` is Ready and reversibly assigned to `portfolio.jayantgoyal.com`; Cloudflare/Vercel both confirm the exact CNAME configuration.
+- Preview deployment `dpl_7CiJsCTyFZfZGUb6Euro6etDAK3L` was used for the initial compatibility validation before that custom hostname was retired. Portfolio diagnosis now uses generated immutable Vercel URLs, while the apex and `www` remain canonical.
 - A fresh 90-day Vercel certificate was issued. Explicitly assigning the tested deployment replaced the stale edge mapping: HTTP/1.1 and HTTP/2 checks across both resolved edge addresses now present the fresh certificate, ten consecutive HTTPS checks returned `200`, and root, robots, sitemap, manifest, Open Graph, GitHub proxy, GitHub LOC, and resume routes return `200`.
 - Deployed Chrome validation could not start because the installed extension connection was unavailable; local browser proof and deployed black-box HTTP proof are recorded, but the deployed visual gate and final rollback proof remain pending. PLATFORM-08 is not Done.
-- `portfolio.staging.jayantgoyal.com` is public with valid TLS and serves the tested Portfolio deployment. The `staging` branch is fast-forwarded to the current PR head; its exact build remains pending the Vercel limit reset.
+- Portfolio is independently available through generated Vercel previews and its canonical Production domains; no stable Preview domain is retained.
 
 ## PLATFORM-07 / PLATFORM-11 — Studio rename and deployment in progress
 
@@ -112,15 +111,15 @@
 - Duplicated Portfolio components, data access, Blog/Resume/Contact routes, and assets were removed from Studio. Legacy Portfolio page routes use permanent cross-application redirects, while compatibility API routes use temporary method-preserving redirects.
 - Focused verification passed: Main TypeScript, zero-warning ESLint, production build, Studio hostname browser rendering, Studio product inventory and links, current-root Portfolio compatibility, zero horizontal overflow at the default browser viewport, and zero captured browser console errors.
 - Studio's Blog, Portfolio, terms/contact, and error-navigation links now respect the split boundary. A local production black-box check confirms the Studio marker renders, Blog crosses to Portfolio, and product links remain on Studio.
-- Studio identity is fixed; hostname awareness is retained only for preview/staging indexability.
+- Studio identity is fixed; hostname awareness is retained only for generated-Preview indexability.
 - Vercel preview deployment `dpl_7y1m635L1BoYUzBqMqmYvunsjKTB` is Ready and passed black-box checks for Studio metadata and inventory links. Because the daily deployment limit blocked promotion, the exact tested deployment is reversibly assigned to `studio.jayantgoyal.com`.
 - Public DNS resolves `studio.jayantgoyal.com` to Vercel, direct HTTPS checks return `200`, and the apex still redirects to the existing `www` Portfolio with no Studio marker.
-- `studio.staging.jayantgoyal.com` has valid public DNS/TLS, is attached to the `staging` branch, and temporarily serves the same tested immutable Studio deployment until a post-limit staging build succeeds.
+- Studio is independently available through generated Vercel previews and `studio.jayantgoyal.com`; no stable Preview domain is retained.
 - Local verification after the physical rename passes: 11 focused Vitest tests, Studio TypeScript, zero-warning ESLint, and the Studio production build. The merged boundary is deployed; PLATFORM-07 and PLATFORM-11 remain open until responsive/auth-gated product transitions and the rollback/observation gates are verified.
 
 ## PLATFORM-09 — Domain cutover in progress
 
-- Vercel moved `jayantgoyal.com` and `www.jayantgoyal.com` from the renamed Studio project to the Portfolio project. Studio retains only `studio.jayantgoyal.com` and `studio.staging.jayantgoyal.com`.
+- Vercel moved `jayantgoyal.com` and `www.jayantgoyal.com` from the renamed Studio project to the Portfolio project. Studio retains `studio.jayantgoyal.com` as its only platform custom domain.
 - The canonical domain direction is now apex-first: `www.jayantgoyal.com` returns permanent `308` to `https://jayantgoyal.com/`; the apex does not redirect.
 - The apex is assigned to the Portfolio project, and the merged PR #39 production deployment completed successfully.
 - Live black-box checks pass for Portfolio root, Blog, Resume, robots, sitemap, and manifest. Historical professional aliases return `308` to Portfolio sections; all classified product families and current Auth paths return method-preserving `307` handoffs to Studio; Studio and the Portfolio compatibility subdomain return `200`.

@@ -88,6 +88,6 @@ These families use temporary `307` redirects to the same Studio path:
 
 1. Reassign `jayantgoyal.com` and `www.jayantgoyal.com` to the last verified Main production deployment.
 2. Restore Main as the current production domain owner in Vercel.
-3. Keep `portfolio.jayantgoyal.com` and `studio.jayantgoyal.com` assigned to their tested immutable deployments for diagnosis.
-4. Restore Portfolio Production `NEXT_PUBLIC_SITE_URL` to `https://portfolio.jayantgoyal.com` before its next build.
+3. Keep `studio.jayantgoyal.com` assigned to its tested immutable deployment and use Portfolio's generated immutable Vercel URL for diagnosis; do not recreate a compatibility custom domain.
+4. Leave Portfolio Production `NEXT_PUBLIC_SITE_URL` canonical at `https://jayantgoyal.com` so the next approved production build is ready for reassignment.
 5. Verify root Portfolio, Studio login, recovery, and `/auth/callback` before ending rollback.

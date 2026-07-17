@@ -438,13 +438,13 @@ API tokens do not belong in Auth. They belong to the product or future developer
 
 ### 7.1 Approved packages
 
-| Package | Consumers | Immediate value | Decision |
-| --- | --- | --- | --- |
-| `@repo/ui` | Applications as needed | Existing shared primitives | Keep |
-| `@repo/auth` | Auth, Studio, Admin; optional Portfolio | Removes current Supabase client, callback-support, cookie, refresh, and claims duplication | Add |
-| `@repo/eslint-config` | All workspaces | Existing shared lint policy | Keep |
-| `@repo/typescript-config` | All workspaces | Existing compiler policy | Keep |
-| `@repo/tailwind-config` | UI applications | Existing shared styling foundation | Keep while used by multiple apps |
+| Package                   | Consumers                               | Immediate value                                                                            | Decision                         |
+| ------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------ | -------------------------------- |
+| `@repo/ui`                | Applications as needed                  | Existing shared primitives                                                                 | Keep                             |
+| `@repo/auth`              | Auth, Studio, Admin; optional Portfolio | Removes current Supabase client, callback-support, cookie, refresh, and claims duplication | Add                              |
+| `@repo/eslint-config`     | All workspaces                          | Existing shared lint policy                                                                | Keep                             |
+| `@repo/typescript-config` | All workspaces                          | Existing compiler policy                                                                   | Keep                             |
+| `@repo/tailwind-config`   | UI applications                         | Existing shared styling foundation                                                         | Keep while used by multiple apps |
 
 ### 7.2 Rejected or deferred packages
 
@@ -637,12 +637,12 @@ Rules:
 
 Four Vercel projects:
 
-| Application | Domain | Independent deployment |
-| --- | --- | --- |
-| Portfolio | `jayantgoyal.com` and `www.jayantgoyal.com` | Yes |
-| Studio | `studio.jayantgoyal.com` | Yes |
-| Admin | `admin.jayantgoyal.com` | Yes |
-| Auth | `auth.jayantgoyal.com` | Yes |
+| Application | Domain                                      | Independent deployment |
+| ----------- | ------------------------------------------- | ---------------------- |
+| Portfolio   | `jayantgoyal.com` and `www.jayantgoyal.com` | Yes                    |
+| Studio      | `studio.jayantgoyal.com`                    | Yes                    |
+| Admin       | `admin.jayantgoyal.com`                     | Yes                    |
+| Auth        | `auth.jayantgoyal.com`                      | Yes                    |
 
 All use the same Supabase project. Service-role credentials are provided only to applications with a proven server-side need and are never exposed to browser bundles.
 
@@ -657,27 +657,17 @@ auth:      localhost:3003
 
 Local cookies omit Domain and Secure. Cookies are shared across localhost ports because cookies are host-scoped, not port-scoped.
 
-### 12.3 Stable staging
-
-Use stable subdomains for cross-application authentication validation:
-
-```text
-portfolio.staging.jayantgoyal.com
-studio.staging.jayantgoyal.com
-admin.staging.jayantgoyal.com
-auth.staging.jayantgoyal.com
-```
-
-Use a staging-specific cookie name and `Domain=staging.jayantgoyal.com`.
-
-### 12.4 Vercel previews
+### 12.3 Vercel previews
 
 Arbitrary sibling Vercel preview domains cannot share a parent cookie. Therefore:
 
 - Use previews for builds, public routes, and application-local validation.
-- Use stable staging for real cross-subdomain SSO.
+- Resolve preview identity from the actual request/deployment origin instead of a fixed custom host.
+- Validate same-application password and OAuth flows on allowlisted Vercel preview hostname families.
+- Validate real cross-subdomain SSO only through a controlled production rollout after the involved deployments are ready and individually verified.
 - Do not build a custom preview token broker.
 - Do not add an unsafe authentication bypass.
+- Do not create a persistent preview branch, preview custom domain, or fourth environment layer.
 
 ---
 

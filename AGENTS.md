@@ -206,7 +206,7 @@ pnpm start --filter admin
 
 Configure in `.env.local` files per app. See `.env.example` in each app for the full list.
 
-Most secret/provider values are shared across Vercel targets, but application URL variables are environment-specific. Development uses local ports, the persistent `staging` Preview branch uses stable staging hosts, generic Preview resolves the request/deployment origin, and Production uses each application's canonical host. Add every new variable only to the applications and targets that consume it.
+Most secret/provider values are shared across Vercel targets, but application URL variables are environment-specific. Development uses local ports, Preview uses Vercel-generated deployment origins, and Production uses each application's canonical host. There is no persistent staging branch, staging domain, or branch-scoped environment layer. Add every new variable only to the applications and targets that consume it.
 
 **Vercel CLI setup** — the deployed apps are linked. To sync envs locally:
 
