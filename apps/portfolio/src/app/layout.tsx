@@ -1,13 +1,15 @@
 import "./globals.css";
 
 import type { Metadata } from "next";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { Inter } from "next/font/google";
 import Script from "next/script";
 
 import { Toaster } from "@repo/ui/sonner";
+import { SidebarInset, SidebarProvider } from "@repo/ui/sidebar";
 
-import { PortfolioHeader } from "@/components/portfolio-header";
+import { PortfolioSidebar } from "@/components/portfolio-sidebar";
+import { PortfolioTopbar } from "@/components/portfolio-topbar";
 import { LazyMotionProvider } from "@/components/providers/lazy-motion-provider";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { getPortfolioDataFromHeaders } from "@/lib/portfolio/server";
@@ -101,6 +103,10 @@ export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const { data, profile, host, source } = await getPortfolioDataFromHeaders();
+  const cookieStore = await cookies();
+  const defaultOpen = cookieStore.get("sidebar_state")?.value !== "false";
+  const defaultWidth =
+    Number(cookieStore.get("sidebar_width")?.value) || undefined;
   const personJsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
@@ -139,10 +145,20 @@ export default async function RootLayout({
             host={host}
             source={source}
           >
-            <LazyMotionProvider>
-              <PortfolioHeader />
-              <main className="mx-auto w-full max-w-7xl py-4">{children}</main>
-            </LazyMotionProvider>
+            <SidebarProvider
+              defaultOpen={defaultOpen}
+              defaultWidth={defaultWidth}
+            >
+              <PortfolioSidebar />
+              <SidebarInset>
+                <PortfolioTopbar />
+                <LazyMotionProvider>
+                  <div className="mx-auto w-full max-w-7xl py-4">
+                    {children}
+                  </div>
+                </LazyMotionProvider>
+              </SidebarInset>
+            </SidebarProvider>
           </PortfolioDataProvider>
           <Toaster />
         </ThemeProvider>

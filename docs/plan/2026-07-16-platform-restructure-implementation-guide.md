@@ -90,7 +90,9 @@ Deferred items may be reactivated only by a real product requirement and a separ
 - No database redesign is bundled with an application split.
 - No visual redesign is bundled with the initial technical Studio move.
 - No legacy code is removed until traffic and compatibility evidence show it is safe.
-- New packages require at least two current consumers.
+- New packages require at least two current consumers. Shared application-shell
+  components must remain configuration-driven and contain no app-specific
+  product, authorization, or content logic.
 
 ### 2.5 Stop conditions
 
@@ -683,7 +685,8 @@ Acceptance checks:
 - [x] No product state stores.
 - [x] No weather, files, messenger, games, tools, or activity dependencies.
 - [x] No service-role key unless a separately reviewed server-only operation proves it necessary.
-- [x] Shared UI use is limited to primitives.
+- [x] Shared UI use is limited to primitives and approved configuration-driven
+      application-shell presentation components.
 
 ### Phase 8 exit gate
 
