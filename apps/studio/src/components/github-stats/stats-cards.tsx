@@ -1,12 +1,18 @@
-"use client"
+"use client";
 
-import { Star, GitFork, BookOpen, Code2, TrendingUp, Calendar } from "lucide-react"
-import { m } from "framer-motion"
-import { Card, CardContent } from "@repo/ui/card"
-import type { GitHubStats } from "@/lib/github-stats/types"
+import {
+  Star,
+  GitFork,
+  BookOpen,
+  Code2,
+  TrendingUp,
+  Calendar,
+} from "lucide-react";
+import { m } from "framer-motion";
+import type { GitHubStats } from "@/lib/github-stats/types";
 
 interface StatsCardsProps {
-  stats: GitHubStats
+  stats: GitHubStats;
 }
 
 export function StatsCards({ stats }: StatsCardsProps) {
@@ -47,26 +53,27 @@ export function StatsCards({ stats }: StatsCardsProps) {
       icon: Calendar,
       color: "text-cyan-500",
     },
-  ]
+  ];
 
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+    <div className="overflow-hidden rounded-[1.5rem] border border-border/80 bg-card sm:grid sm:grid-cols-3 lg:grid-cols-6">
       {cards.map((card, i) => (
         <m.div
           key={card.label}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: i * 0.05 }}
+          className="border-b border-border/70 p-4 last:border-b-0 sm:border-b-0 sm:border-r sm:[&:nth-child(3)]:border-r-0 lg:[&:nth-child(3)]:border-r lg:last:border-r-0"
         >
-          <Card className="h-full">
-            <CardContent className="flex flex-col items-center gap-2 p-4 text-center">
-              <card.icon className={`size-6 ${card.color}`} />
-              <p className="text-lg font-bold">{card.value}</p>
-              <p className="text-xs text-muted-foreground">{card.label}</p>
-            </CardContent>
-          </Card>
+          <card.icon className={`mb-5 size-5 ${card.color}`} />
+          <p className="text-2xl font-semibold tracking-[-0.035em]">
+            {card.value}
+          </p>
+          <p className="mt-1 font-[family-name:var(--font-ibm-plex-mono)] text-[0.65rem] uppercase tracking-[0.12em] text-muted-foreground">
+            {card.label}
+          </p>
         </m.div>
       ))}
     </div>
-  )
+  );
 }

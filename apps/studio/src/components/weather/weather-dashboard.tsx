@@ -1,16 +1,20 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { ChevronDown, ChevronUp, MapPin, Search } from "lucide-react"
+import * as React from "react";
+import { CloudSun, Droplets, LocateFixed, Search, Wind } from "lucide-react";
 
-import { useWeather } from "./use-weather"
+import { Button } from "@repo/ui/button";
+import { Input } from "@repo/ui/input";
+import { cn } from "@repo/ui/lib/utils";
+
+import { StudioWorkspaceHeader } from "@/components/studio/studio-workspace-header";
+
+import { useWeather } from "./use-weather";
 import {
   formatDate,
-  getWeatherBgColor,
   getForecastCardStyle,
-  getForecastTextColor,
-  getForecastDetailColor,
-} from "./weather-utils"
+  getWeatherBgColor,
+} from "./weather-utils";
 
 export function WeatherDashboard() {
   const {
@@ -19,193 +23,247 @@ export function WeatherDashboard() {
     currentWeather,
     forecast,
     recentCities,
-    showDropdown,
-    setShowDropdown,
     loading,
     error,
     handleSearch,
     handleCurrentLocation,
     handleRecentCityClick,
-  } = useWeather()
+  } = useWeather();
 
   const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
-      event.preventDefault()
-      void handleSearch()
+      event.preventDefault();
+      void handleSearch();
     }
-  }
+  };
+
+  const currentDescription =
+    currentWeather?.weather[0]?.description ?? "Weather conditions";
 
   return (
-    <div className="flex-1 rounded-lg">
-      <div className="container mx-auto px-4 py-6 text-gray-900 dark:text-white">
-        {error ? (
-          <div className="mx-auto mb-6 max-w-3xl rounded-md border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-400/60 dark:bg-red-500/20 dark:text-red-50">
-            {error}
+    <div className="mx-auto w-full max-w-[1280px] space-y-5">
+      <StudioWorkspaceHeader
+        icon={CloudSun}
+        title="Weather"
+        description="Check current conditions and the next five days for any city or your current location."
+        tone="blue"
+      >
+        <div className="flex flex-col gap-2 lg:flex-row">
+          <div className="relative min-w-0 flex-1">
+            <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 opacity-60" />
+            <Input
+              type="text"
+              aria-label="City"
+              placeholder="Search a city"
+              value={cityInput}
+              onChange={(event) => setCityInput(event.target.value)}
+              onKeyDown={handleInputKeyDown}
+              className="h-12 rounded-xl border-current/20 bg-white/65 pl-11 text-[#211512] shadow-none placeholder:text-[#211512]/55 focus-visible:ring-[#211512]/40 dark:bg-black/15 dark:text-[#fff8ef] dark:placeholder:text-[#fff8ef]/55"
+            />
+          </div>
+          <Button
+            type="button"
+            onClick={() => void handleSearch()}
+            disabled={loading}
+            className="h-12 rounded-xl bg-[#211512] px-6 text-[#fff8ef] shadow-none hover:bg-[#211512]/90 dark:bg-[#fff8ef] dark:text-[#211512] dark:hover:bg-[#fff8ef]/90"
+          >
+            <Search className="size-4" />
+            {loading ? "Checking weather" : "Search"}
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={handleCurrentLocation}
+            disabled={loading}
+            className="h-12 rounded-xl border border-current/20 bg-white/20 px-5 text-current shadow-none hover:bg-white/35 hover:text-current dark:bg-black/10 dark:hover:bg-black/20"
+          >
+            <LocateFixed className="size-4" />
+            Current location
+          </Button>
+        </div>
+
+        {recentCities.length > 0 ? (
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <span className="mr-1 text-xs font-medium opacity-70">Recent</span>
+            {recentCities.map((city) => (
+              <Button
+                key={city}
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => void handleRecentCityClick(city)}
+                disabled={loading}
+                className="h-8 rounded-full border border-current/15 bg-white/15 px-3 text-current shadow-none hover:bg-white/30 hover:text-current dark:bg-black/10 dark:hover:bg-black/20"
+              >
+                {city}
+              </Button>
+            ))}
           </div>
         ) : null}
+      </StudioWorkspaceHeader>
 
-        <div className="flex flex-col gap-4 md:flex-row">
-          <div className="flex w-full flex-col gap-4 rounded-md border border-gray-200 bg-white/60 p-6 backdrop-blur-md dark:border-white/10 dark:bg-gray-800/50 md:w-1/4">
-            <div className="flex flex-col gap-2">
-              <span className="text-lg font-semibold">Enter the city:</span>
-              <input
-                type="text"
-                placeholder="Enter a city"
-                value={cityInput}
-                onChange={(event) => setCityInput(event.target.value)}
-                onKeyDown={handleInputKeyDown}
-                className="mt-2 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-500 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-transparent"
-              />
-              <button
-                onClick={() => void handleSearch()}
-                disabled={loading}
-                className="mt-2 flex h-10 w-full cursor-pointer items-center justify-center rounded-md bg-blue-500 px-2 text-white transition hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {loading ? (
-                  "Loading..."
-                ) : (
-                  <>
-                    <Search className="mr-2 h-4 w-4" />
-                    Search
-                  </>
-                )}
-              </button>
-            </div>
-
-            <div className="text-center text-lg font-semibold text-gray-400 dark:text-white/80">or</div>
-
-            <div className="flex flex-col gap-2">
-              <button
-                onClick={handleCurrentLocation}
-                disabled={loading}
-                className="flex w-full cursor-pointer items-center justify-center rounded-md bg-gray-200 px-4 py-2 text-gray-700 transition hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-700"
-              >
-                <MapPin className="mr-2 h-4 w-4" />
-                Current Location
-              </button>
-
-              {recentCities.length > 0 ? (
-                <div className="relative">
-                  <button
-                    onClick={() => setShowDropdown((open) => !open)}
-                    className="mt-1 flex w-full cursor-pointer items-center justify-between rounded-md bg-gray-200 px-4 py-2 text-gray-700 transition hover:bg-gray-300 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-700"
-                  >
-                    <span>Recent Searches</span>
-                    {showDropdown ? (
-                      <ChevronUp className="ml-2 h-4 w-4" />
-                    ) : (
-                      <ChevronDown className="ml-2 h-4 w-4" />
-                    )}
-                  </button>
-                  {showDropdown ? (
-                    <div className="absolute mt-1 max-h-32 w-full overflow-y-auto rounded-md bg-white shadow-lg dark:bg-gray-700 dark:text-white">
-                      <ul className="py-1">
-                        {recentCities.map((city) => (
-                          <li key={city}>
-                            <button
-                              onClick={() => void handleRecentCityClick(city)}
-                              className="w-full cursor-pointer px-4 py-2 text-left transition hover:bg-gray-100 dark:hover:bg-gray-600"
-                            >
-                              {city}
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ) : null}
-                </div>
-              ) : null}
-            </div>
-          </div>
-
-          <div className="flex w-full flex-col rounded-md border border-gray-200 bg-white/60 p-4 backdrop-blur-md dark:border-white/10 dark:bg-gray-800/50 md:w-3/4">
-            {currentWeather ? (
-              <div
-                className={`${getWeatherBgColor(
-                  currentWeather.weather[0]?.description ?? ""
-                )} mb-4 rounded-md p-4 text-white transition duration-300 hover:scale-y-105 hover:shadow-lg`}
-              >
-                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                  <div className="space-y-2">
-                    <h2 className="text-2xl font-bold md:text-3xl">
-                      {currentWeather.name}
-                    </h2>
-                    <p className="text-sm md:text-base">{formatDate(new Date())}</p>
-                    <p className="text-sm md:text-lg">
-                      Wind: {currentWeather.wind.speed} m/s
-                    </p>
-                    <p className="text-sm md:text-lg">
-                      Humidity: {currentWeather.main.humidity}%
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-3xl font-semibold md:text-4xl">
-                      {Math.round(currentWeather.main.temp)}°C
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={`https://openweathermap.org/img/wn/${currentWeather.weather[0]?.icon}@2x.png`}
-                      alt={currentWeather.weather[0]?.description ?? "Weather icon"}
-                      width={96}
-                      height={96}
-                      className="mx-auto h-12 w-12 md:h-24 md:w-24"
-                    />
-                    <p className="text-sm capitalize md:text-lg">
-                      {currentWeather.weather[0]?.description ?? ""}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="mb-4 rounded-md border border-dashed border-gray-300 bg-gray-50 p-6 text-center text-sm text-gray-500 dark:border-white/20 dark:bg-white/5 dark:text-white/80">
-                Search for a city or use your current location to see today&apos;s weather.
-              </div>
-            )}
-
-            {forecast.length > 0 ? (
-              <>
-                <h2 className="mb-4 text-center text-xl font-semibold text-gray-900 dark:text-white">
-                  5-Day Forecast
-                </h2>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
-                  {forecast.map((item) => (
-                    <div key={item.date.toISOString()} className={getForecastCardStyle(item.description)}>
-                      <h3 className={`mb-2 text-sm font-semibold ${getForecastTextColor(item.description)}`}>
-                        {item.date.toLocaleDateString("en-US", { weekday: "short" })}
-                      </h3>
-                      <p className={`mb-3 text-xs ${getForecastDetailColor(item.description)}`}>
-                        {item.date.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                      </p>
-                      <div className="mb-3">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={`https://openweathermap.org/img/wn/${item.icon}@2x.png`}
-                          alt={item.description}
-                          width={64}
-                          height={64}
-                          className="mx-auto mb-2 h-12 w-12"
-                        />
-                      </div>
-                      <p className="mb-2 text-lg font-bold text-white">{Math.round(item.temp)}°C</p>
-                      <p className={`mb-2 text-xs capitalize ${getForecastTextColor(item.description)}`}>
-                        {item.description}
-                      </p>
-                      <div className={`space-y-1 text-xs ${getForecastDetailColor(item.description)}`}>
-                        <p>Wind: {item.windSpeed} m/s</p>
-                        <p>Humidity: {item.humidity}%</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            ) : null}
-          </div>
+      {error ? (
+        <div
+          role="alert"
+          className="rounded-2xl border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-red-700 dark:text-red-300"
+        >
+          {error}
         </div>
-      </div>
+      ) : null}
+
+      {currentWeather ? (
+        <>
+          <section
+            className={cn(
+              "overflow-hidden rounded-[1.75rem] border p-5 sm:p-6",
+              getWeatherBgColor(currentDescription),
+            )}
+          >
+            <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto_auto] md:items-center">
+              <div>
+                <h2 className="text-4xl font-semibold leading-none tracking-[-0.05em]">
+                  {currentWeather.name}
+                </h2>
+                <p className="mt-3 text-sm opacity-75 sm:text-base">
+                  {formatDate(new Date())}
+                </p>
+              </div>
+
+              <p className="text-5xl font-semibold tracking-[-0.065em] sm:text-6xl">
+                {Math.round(currentWeather.main.temp)}°
+              </p>
+
+              <div className="flex items-center gap-3 md:flex-col md:gap-1 md:text-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={`https://openweathermap.org/img/wn/${currentWeather.weather[0]?.icon}@2x.png`}
+                  alt={currentDescription}
+                  width={96}
+                  height={96}
+                  className="size-16 object-contain md:size-20"
+                />
+                <p className="text-base font-medium capitalize">
+                  {currentDescription}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-4 grid gap-3 border-t border-current/15 pt-4 sm:grid-cols-2">
+              <div className="flex items-center gap-3">
+                <span className="grid size-10 place-items-center rounded-xl border border-current/15 bg-white/15 dark:bg-black/10">
+                  <Wind className="size-5" />
+                </span>
+                <div>
+                  <p className="text-xs opacity-65">Wind</p>
+                  <p className="font-semibold">
+                    {currentWeather.wind.speed} m/s
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="grid size-10 place-items-center rounded-xl border border-current/15 bg-white/15 dark:bg-black/10">
+                  <Droplets className="size-5" />
+                </span>
+                <div>
+                  <p className="text-xs opacity-65">Humidity</p>
+                  <p className="font-semibold">
+                    {currentWeather.main.humidity}%
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {forecast.length > 0 ? (
+            <section className="space-y-4">
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <h2 className="text-3xl font-semibold tracking-[-0.04em]">
+                    Five-day forecast
+                  </h2>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Daily conditions at approximately midday.
+                  </p>
+                </div>
+                <p className="font-[family-name:var(--font-ibm-plex-mono)] text-[0.66rem] uppercase tracking-[0.13em] text-muted-foreground">
+                  Metric units
+                </p>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+                {forecast.map((item) => (
+                  <article
+                    key={item.date.toISOString()}
+                    className={cn(
+                      "rounded-[1.5rem] border p-5",
+                      getForecastCardStyle(item.description),
+                    )}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <h3 className="text-xl font-semibold tracking-[-0.03em]">
+                          {item.date.toLocaleDateString("en-US", {
+                            weekday: "short",
+                          })}
+                        </h3>
+                        <p className="mt-1 text-xs opacity-65">
+                          {item.date.toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </p>
+                      </div>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={`https://openweathermap.org/img/wn/${item.icon}@2x.png`}
+                        alt={item.description}
+                        width={64}
+                        height={64}
+                        className="size-14 object-contain"
+                      />
+                    </div>
+
+                    <p className="mt-5 text-4xl font-semibold tracking-[-0.055em]">
+                      {Math.round(item.temp)}°
+                    </p>
+                    <p className="mt-2 min-h-10 text-sm font-medium capitalize">
+                      {item.description}
+                    </p>
+
+                    <div className="mt-5 space-y-2 border-t border-current/15 pt-4 text-xs opacity-75">
+                      <p className="flex items-center gap-2">
+                        <Wind className="size-3.5" />
+                        {item.windSpeed} m/s
+                      </p>
+                      <p className="flex items-center gap-2">
+                        <Droplets className="size-3.5" />
+                        {item.humidity}% humidity
+                      </p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+          ) : null}
+        </>
+      ) : (
+        <section className="grid min-h-[300px] place-items-center rounded-[1.75rem] border border-dashed border-border/80 bg-muted/15 px-6 py-12 text-center">
+          <div className="max-w-md">
+            <span className="mx-auto grid size-14 place-items-center rounded-2xl border border-[#a8c3e7] bg-[#dce9f8] text-[#211512] dark:border-[#40536b] dark:bg-[#243142] dark:text-[#fff8ef]">
+              <CloudSun className="size-7" />
+            </span>
+            <h2 className="mt-5 text-2xl font-semibold tracking-[-0.035em]">
+              Start with a city
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              Search above or use your current location to load live conditions
+              and the five-day outlook.
+            </p>
+          </div>
+        </section>
+      )}
     </div>
-  )
+  );
 }
 
-export default WeatherDashboard
+export default WeatherDashboard;

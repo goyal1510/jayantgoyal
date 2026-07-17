@@ -1,18 +1,26 @@
-"use client"
+"use client";
 
-import { m } from "framer-motion"
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts"
-import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card"
-import type { GitHubRepo } from "@/lib/github-stats/types"
+import { m } from "framer-motion";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+} from "recharts";
+import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card";
+import type { GitHubRepo } from "@/lib/github-stats/types";
 
 interface TopReposBarChartProps {
-  repos: GitHubRepo[]
+  repos: GitHubRepo[];
 }
 
 export function TopReposBarChart({ repos }: TopReposBarChartProps) {
   if (repos.length === 0) {
     return (
-      <Card className="h-full">
+      <Card className="h-full rounded-[1.75rem] border-border/80 shadow-none">
         <CardHeader>
           <CardTitle>Top Repos by Stars</CardTitle>
         </CardHeader>
@@ -20,25 +28,38 @@ export function TopReposBarChart({ repos }: TopReposBarChartProps) {
           No repository data available
         </CardContent>
       </Card>
-    )
+    );
   }
 
   const chartData = repos.map((r) => ({
     name: r.name.length > 15 ? r.name.slice(0, 15) + "..." : r.name,
     stars: r.stargazers_count,
     forks: r.forks_count,
-  }))
+  }));
 
   return (
-    <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }} className="h-full">
-      <Card className="h-full">
-        <CardHeader>
-          <CardTitle>Top Repos by Stars</CardTitle>
+    <m.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.2 }}
+      className="h-full"
+    >
+      <Card className="h-full rounded-[1.75rem] border-border/80 shadow-none">
+        <CardHeader className="border-b border-border/70 p-5 sm:p-6">
+          <CardTitle className="text-2xl tracking-[-0.035em]">
+            Top Repos by Stars
+          </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-5 sm:p-6">
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 60 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+            <BarChart
+              data={chartData}
+              margin={{ top: 5, right: 20, left: 0, bottom: 60 }}
+            >
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="hsl(var(--border))"
+              />
               <XAxis
                 dataKey="name"
                 angle={-45}
@@ -46,7 +67,9 @@ export function TopReposBarChart({ repos }: TopReposBarChartProps) {
                 height={80}
                 tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
               />
-              <YAxis tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
+              <YAxis
+                tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+              />
               <Tooltip
                 contentStyle={{
                   backgroundColor: "hsl(var(--card))",
@@ -55,12 +78,20 @@ export function TopReposBarChart({ repos }: TopReposBarChartProps) {
                   color: "hsl(var(--card-foreground))",
                 }}
               />
-              <Bar dataKey="stars" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="forks" fill="hsl(var(--muted-foreground))" radius={[4, 4, 0, 0]} />
+              <Bar
+                dataKey="stars"
+                fill="hsl(var(--primary))"
+                radius={[4, 4, 0, 0]}
+              />
+              <Bar
+                dataKey="forks"
+                fill="hsl(var(--muted-foreground))"
+                radius={[4, 4, 0, 0]}
+              />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
       </Card>
     </m.div>
-  )
+  );
 }

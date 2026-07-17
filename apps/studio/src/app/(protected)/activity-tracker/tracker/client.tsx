@@ -1,32 +1,44 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { ActivityTracker } from "@/components/activity-tracker/activity-tracker"
-import { MonthNavigator } from "@/components/activity-tracker/month-navigator"
-import { getCurrentMonth, getPreviousMonth, getNextMonth } from "@/lib/activity-tracker/date"
+import * as React from "react";
+import { ActivityTracker } from "@/components/activity-tracker/activity-tracker";
+import { MonthNavigator } from "@/components/activity-tracker/month-navigator";
+import {
+  getCurrentMonth,
+  getPreviousMonth,
+  getNextMonth,
+} from "@/lib/activity-tracker/date";
+import { CalendarCheck2 } from "lucide-react";
+import { StudioWorkspaceHeader } from "@/components/studio/studio-workspace-header";
 
 export default function TrackerClient() {
-  const [currentMonth, setCurrentMonth] = React.useState<string>(getCurrentMonth())
+  const [currentMonth, setCurrentMonth] =
+    React.useState<string>(getCurrentMonth());
 
   const handlePreviousMonth = () => {
-    setCurrentMonth(getPreviousMonth(currentMonth))
-  }
+    setCurrentMonth(getPreviousMonth(currentMonth));
+  };
 
   const handleNextMonth = () => {
-    setCurrentMonth(getNextMonth(currentMonth))
-  }
+    setCurrentMonth(getNextMonth(currentMonth));
+  };
 
   return (
-    <div className="flex flex-col gap-4 sm:gap-6">
-      <div className="flex items-center justify-between gap-2">
-        <h1 className="text-lg font-bold tracking-tight sm:text-2xl md:text-3xl">Tracker</h1>
-        <MonthNavigator
-          currentMonth={currentMonth}
-          onPreviousMonth={handlePreviousMonth}
-          onNextMonth={handleNextMonth}
-        />
-      </div>
+    <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-5">
+      <StudioWorkspaceHeader
+        icon={CalendarCheck2}
+        title="Monthly tracker"
+        description="Check off today and the previous two days while keeping the full month visible for context."
+        tone="sage"
+        actions={
+          <MonthNavigator
+            currentMonth={currentMonth}
+            onPreviousMonth={handlePreviousMonth}
+            onNextMonth={handleNextMonth}
+          />
+        }
+      />
       <ActivityTracker currentMonth={currentMonth} />
     </div>
-  )
+  );
 }

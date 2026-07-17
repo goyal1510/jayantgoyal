@@ -6,7 +6,14 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { vs } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { useTheme } from "next-themes";
-import { ChevronDown, ChevronUp, Code2, MessageSquare, Copy, Check } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Code2,
+  MessageSquare,
+  Copy,
+  Check,
+} from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
@@ -51,9 +58,7 @@ export function MessageItem({ message }: MessageItemProps) {
 
   const preview = getPreview();
 
-  const handleToggleRead = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleToggleRead = async (e: React.ChangeEvent<HTMLInputElement>) => {
     e.stopPropagation();
     if (isUpdating) return;
 
@@ -91,13 +96,20 @@ export function MessageItem({ message }: MessageItemProps) {
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
       <Card
         className={cn(
-          "p-3",
-          message.is_read && "opacity-60"
+          "rounded-2xl border-border/80 p-3 shadow-none transition-colors sm:p-4",
+          message.is_read
+            ? "bg-card text-foreground/70"
+            : "border-[#cfc0e4] bg-[#e8dcf5]/45 dark:border-[#5c5068] dark:bg-[#2f2938]/70",
         )}
       >
         <div className="flex items-start gap-3">
           <input
             type="checkbox"
+            aria-label={
+              message.is_read
+                ? "Mark message as unread"
+                : "Mark message as read"
+            }
             className="mt-1 h-4 w-4 cursor-pointer accent-primary"
             checked={!!message.is_read}
             onChange={handleToggleRead}
@@ -107,10 +119,15 @@ export function MessageItem({ message }: MessageItemProps) {
 
           <div className="flex-1 min-w-0">
             <CollapsibleTrigger asChild>
-              <div className="flex w-full cursor-pointer items-start justify-between gap-2 hover:bg-muted/50 rounded-md p-2 -m-2 transition-colors">
+              <div className="-m-2 flex w-full cursor-pointer items-start justify-between gap-2 rounded-xl p-2 transition-colors hover:bg-background/45">
                 <div className="flex-1 min-w-0">
                   <div className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">
                     <span>{formatDate(message.created_at)}</span>
+                    {!message.is_read && (
+                      <span className="font-medium text-foreground">
+                        Unread
+                      </span>
+                    )}
                     {message.message_type === "code" && message.language && (
                       <span className="rounded bg-muted px-2 py-0.5 text-xs font-mono">
                         {message.language}
@@ -126,12 +143,7 @@ export function MessageItem({ message }: MessageItemProps) {
                     </span>
                   </div>
                   {!isOpen && (
-                    <div
-                      className={cn(
-                        "text-sm",
-                        message.is_read && "line-through"
-                      )}
-                    >
+                    <div className="text-sm">
                       {message.message_type === "code" ? (
                         <pre className="whitespace-pre-wrap break-words text-muted-foreground line-clamp-1">
                           {preview}
@@ -146,8 +158,10 @@ export function MessageItem({ message }: MessageItemProps) {
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <button
+                    type="button"
+                    aria-label="Copy message"
                     onClick={handleCopy}
-                    className="cursor-pointer p-1 rounded hover:bg-muted transition-colors"
+                    className="cursor-pointer rounded-lg p-1.5 transition-colors hover:bg-background/60"
                     title="Copy message"
                   >
                     {isCopied ? (
@@ -166,12 +180,7 @@ export function MessageItem({ message }: MessageItemProps) {
             </CollapsibleTrigger>
 
             <CollapsibleContent>
-              <div
-                className={cn(
-                  "mt-2 pt-2 border-t",
-                  message.is_read && "line-through"
-                )}
-              >
+              <div className="mt-3 border-t border-border/70 pt-3">
                 {message.message_type === "code" ? (
                   <div className="overflow-x-auto rounded-md">
                     <SyntaxHighlighter
