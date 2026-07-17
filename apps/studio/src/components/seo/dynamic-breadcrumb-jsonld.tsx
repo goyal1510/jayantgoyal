@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { getToolByPath, toolCategories } from "@/lib/tools/tools";
 import { getAppById } from "@/lib/config/hub-config";
 import { getStudioProduct } from "@/lib/config/studio-inventory";
+import { getStudioSurface } from "@/lib/config/studio-surfaces";
 import { SITE_URL } from "@/lib/seo/config";
 
 function getBreadcrumbItems(pathname: string): { name: string; url: string }[] {
@@ -14,7 +15,8 @@ function getBreadcrumbItems(pathname: string): { name: string; url: string }[] {
   if (pathname === "/" || pathname === "") return items;
 
   if (pathname.startsWith("/products")) {
-    items.push({ name: "Products", url: `${SITE_URL}/products` });
+    const surface = getStudioSurface("studio-products");
+    items.push({ name: surface.name, url: `${SITE_URL}${surface.href}` });
     const slug = pathname.split("/").filter(Boolean)[1];
     if (slug) {
       items.push({
@@ -27,7 +29,8 @@ function getBreadcrumbItems(pathname: string): { name: string; url: string }[] {
 
   // Tools routes
   if (pathname.startsWith("/tools")) {
-    items.push({ name: "Tools", url: `${SITE_URL}/tools` });
+    const surface = getStudioSurface("tech-tools");
+    items.push({ name: surface.name, url: `${SITE_URL}${surface.href}` });
     const tool = getToolByPath(pathname);
     if (tool) {
       const category = toolCategories.find((cat) =>
@@ -43,7 +46,8 @@ function getBreadcrumbItems(pathname: string): { name: string; url: string }[] {
 
   // Games routes
   if (pathname.startsWith("/games")) {
-    items.push({ name: "Games", url: `${SITE_URL}/games` });
+    const surface = getStudioSurface("game-hub");
+    items.push({ name: surface.name, url: `${SITE_URL}${surface.href}` });
     const segments = pathname.split("/").filter(Boolean);
     if (segments.length > 1 && segments[1]) {
       const gameApp = getAppById("game-hub");
@@ -89,11 +93,11 @@ function getBreadcrumbItems(pathname: string): { name: string; url: string }[] {
 
   // Simple single-level pages
   const simplePages: Record<string, string> = {
-    "/messenger": "Messenger",
-    "/files": "File Manager",
-    "/weather": "Weather",
-    "/github-stats": "GitHub Stats",
-    "/custom-calculator": "Custom Calculator",
+    "/messenger": getStudioSurface("messenger").name,
+    "/files": getStudioSurface("file-manager").name,
+    "/weather": getStudioSurface("weather").name,
+    "/github-stats": getStudioSurface("github-stats").name,
+    "/custom-calculator": getStudioSurface("custom-calculator").name,
     "/terms-conditions": "Terms & Conditions",
   };
 

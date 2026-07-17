@@ -1,178 +1,27 @@
-import type { Metadata } from "next"
-import Link from "next/link"
-import type { ComponentType } from "react"
-import { ArrowRight, Grid3X3, HandHeart, Scissors, Layers, Brain, Puzzle, Type, Crown, Dice5 } from "lucide-react"
+import type { Metadata } from "next";
 
-import { GAME_META } from "@/lib/games/config"
-import { cn } from "@repo/ui/lib/utils"
+import { GamesClient } from "./games-client";
+
+import { GAME_PLAY_FILTERS, type GamePlayFilter } from "@/lib/games/catalog";
 
 export const metadata: Metadata = {
-  title: "Games",
+  title: "Game Hub",
   description:
     "Play interactive games — Tic Tac Toe, Connect Four, Memory Match, Wordle, Chess, Ludo, and more.",
-}
+};
 
-const CARD_THEMES: Record<
-  keyof typeof GAME_META,
-  {
-    gradient: string
-    icon: ComponentType<{ className?: string }>
-    accent: string
-    accentText: string
-    border: string
-  }
-> = {
-  "tic-tac-toe": {
-    gradient:
-      "from-blue-200/50 via-slate-50 to-white dark:from-blue-500/25 dark:via-slate-900 dark:to-slate-950",
-    icon: Grid3X3,
-    accent: "bg-blue-100/80 border-blue-200/70 dark:bg-blue-500/10 dark:border-blue-500/30",
-    accentText: "text-blue-800 dark:text-blue-50",
-    border: "border-slate-200/60 dark:border-slate-800",
-  },
-  "rock-paper-scissors": {
-    gradient:
-      "from-purple-200/50 via-slate-50 to-white dark:from-purple-500/25 dark:via-slate-900 dark:to-slate-950",
-    icon: Scissors,
-    accent:
-      "bg-purple-100/80 border-purple-200/70 dark:bg-purple-500/10 dark:border-purple-500/30",
-    accentText: "text-purple-800 dark:text-purple-50",
-    border: "border-slate-200/60 dark:border-slate-800",
-  },
-  "dare-x": {
-    gradient:
-      "from-emerald-200/50 via-slate-50 to-white dark:from-emerald-500/25 dark:via-slate-900 dark:to-slate-950",
-    icon: HandHeart,
-    accent:
-      "bg-emerald-100/80 border-emerald-200/70 dark:bg-emerald-500/10 dark:border-emerald-500/30",
-    accentText: "text-emerald-800 dark:text-emerald-50",
-    border: "border-slate-200/60 dark:border-slate-800",
-  },
-  "connect-four": {
-    gradient:
-      "from-orange-200/50 via-slate-50 to-white dark:from-orange-500/25 dark:via-slate-900 dark:to-slate-950",
-    icon: Layers,
-    accent:
-      "bg-orange-100/80 border-orange-200/70 dark:bg-orange-500/10 dark:border-orange-500/30",
-    accentText: "text-orange-800 dark:text-orange-50",
-    border: "border-slate-200/60 dark:border-slate-800",
-  },
-  "memory-match": {
-    gradient:
-      "from-pink-200/50 via-slate-50 to-white dark:from-pink-500/25 dark:via-slate-900 dark:to-slate-950",
-    icon: Brain,
-    accent:
-      "bg-pink-100/80 border-pink-200/70 dark:bg-pink-500/10 dark:border-pink-500/30",
-    accentText: "text-pink-800 dark:text-pink-50",
-    border: "border-slate-200/60 dark:border-slate-800",
-  },
-  "wordle": {
-    gradient:
-      "from-emerald-200/50 via-slate-50 to-white dark:from-emerald-500/25 dark:via-slate-900 dark:to-slate-950",
-    icon: Puzzle,
-    accent:
-      "bg-emerald-100/80 border-emerald-200/70 dark:bg-emerald-500/10 dark:border-emerald-500/30",
-    accentText: "text-emerald-800 dark:text-emerald-50",
-    border: "border-slate-200/60 dark:border-slate-800",
-  },
-  "typing-speed": {
-    gradient:
-      "from-cyan-200/50 via-slate-50 to-white dark:from-cyan-500/25 dark:via-slate-900 dark:to-slate-950",
-    icon: Type,
-    accent:
-      "bg-cyan-100/80 border-cyan-200/70 dark:bg-cyan-500/10 dark:border-cyan-500/30",
-    accentText: "text-cyan-800 dark:text-cyan-50",
-    border: "border-slate-200/60 dark:border-slate-800",
-  },
-  chess: {
-    gradient:
-      "from-stone-300/70 via-amber-50 to-white dark:from-stone-500/25 dark:via-zinc-950 dark:to-black",
-    icon: Crown,
-    accent:
-      "bg-stone-100/90 border-stone-300/80 dark:bg-stone-500/10 dark:border-stone-400/30",
-    accentText: "text-stone-900 dark:text-stone-50",
-    border: "border-stone-300/70 dark:border-stone-800",
-  },
-  ludo: {
-    gradient:
-      "from-rose-200/60 via-orange-50 to-white dark:from-rose-500/25 dark:via-zinc-950 dark:to-black",
-    icon: Dice5,
-    accent:
-      "bg-rose-100/90 border-rose-300/80 dark:bg-rose-500/10 dark:border-rose-400/30",
-    accentText: "text-rose-900 dark:text-rose-50",
-    border: "border-rose-300/70 dark:border-rose-800",
-  },
-}
+type GamesPageProps = {
+  searchParams: Promise<{ play?: string | string[] }>;
+};
 
-export default function GamesPage() {
-  const cards = Object.entries(GAME_META).map(([slug, meta]) => {
-    const theme = CARD_THEMES[slug as keyof typeof GAME_META]
-    const modesLabel =
-      meta.modes.length === 2
-        ? "PvP • Computer"
-        : meta.modes[0] === "local_pvp"
-          ? "Local PvP"
-          : "Computer"
-    return {
-      slug,
-      name: meta.name,
-      description: meta.description,
-      modesLabel,
-      theme,
-    }
-  })
-
-  return (
-    <div className="p-4 space-y-6">
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {cards.map((card) => {
-          const Icon = card.theme.icon
-          return (
-            <Link
-              key={card.slug}
-              href={`/games/${card.slug}`}
-              className={cn(
-                "group relative overflow-hidden rounded-2xl border p-5 transition hover:shadow-md",
-                "bg-gradient-to-br",
-                card.theme.gradient,
-                card.theme.border
-              )}
-            >
-              <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.08),transparent_25%),radial-gradient(circle_at_80%_0%,rgba(255,255,255,0.04),transparent_25%)]" />
-              <div className="relative flex flex-col gap-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <div className="inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-xs text-slate-700 dark:text-muted-foreground/90">
-                      <span className="font-medium">{card.modesLabel}</span>
-                    </div>
-                    <div className="text-xl font-semibold text-slate-900 dark:text-white drop-shadow-sm">
-                      {card.name}
-                    </div>
-                    <div className="text-xs text-slate-700 dark:text-slate-200/80">
-                      {card.description}
-                    </div>
-                  </div>
-                  <div
-                    className={cn(
-                      "rounded-full border p-3 text-white/90 shadow-lg",
-                      card.theme.accent,
-                      card.theme.accentText
-                    )}
-                  >
-                    <Icon className="h-5 w-5" />
-                  </div>
-                </div>
-                <div className="flex items-center justify-between text-sm text-slate-800 dark:text-slate-200/80">
-                  <span className="inline-flex items-center gap-2 rounded-lg border px-3 py-1 text-xs bg-white/70 text-slate-800 dark:bg-black/20 dark:text-slate-200">
-                    Ready to play
-                  </span>
-                  <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
-                </div>
-              </div>
-            </Link>
-          )
-        })}
-      </div>
-    </div>
+export default async function GamesPage({ searchParams }: GamesPageProps) {
+  const { play } = await searchParams;
+  const requestedFilter = Array.isArray(play) ? play[0] : play;
+  const initialFilter = GAME_PLAY_FILTERS.includes(
+    requestedFilter as GamePlayFilter,
   )
+    ? (requestedFilter as GamePlayFilter)
+    : "all";
+
+  return <GamesClient initialFilter={initialFilter} />;
 }

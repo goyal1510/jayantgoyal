@@ -16,7 +16,7 @@ function getRandomText(): string {
 export function useTypingSpeedTest() {
   const [tab, setTab] = React.useState<Tab>("test")
 
-  const [text, setText] = React.useState(() => getRandomText())
+  const [text, setText] = React.useState(TYPING_TEXTS[0]!)
   const [typed, setTyped] = React.useState("")
   const [started, setStarted] = React.useState(false)
   const [finished, setFinished] = React.useState(false)

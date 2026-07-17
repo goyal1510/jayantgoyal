@@ -1,65 +1,70 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
-import dynamic from "next/dynamic";
-import { FileText, LayoutGrid, LogIn, User } from "lucide-react";
+import { LayoutGrid } from "lucide-react";
 
 import { APP_BRANDS } from "@repo/brand";
-import { ApplicationSidebarFrame } from "@repo/ui/application-shell";
+import { ApplicationBrandHeader } from "@repo/ui/application-shell";
+import { cn } from "@repo/ui/lib/utils";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarHeader,
+  SidebarRail,
+} from "@repo/ui/sidebar";
 
+import { useActiveApp } from "@/hooks/use-active-app";
+import { getSurfaceApps, type AppConfig } from "@/lib/config/hub-config";
 import { NavApps } from "@/components/sidebar/nav-apps";
 import {
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-} from "@repo/ui/sidebar";
-import { Skeleton } from "@repo/ui/skeleton";
-import { getSurfaceApps } from "@/lib/config/hub-config";
-import { useActiveApp } from "@/hooks/use-active-app";
+  SidebarCollapsedExpandButton,
+  SidebarHeaderCollapseButton,
+} from "@/components/header/studio-sidebar-toggle";
 
-// Lazy-load heavy components — not needed for initial sidebar render
-const NavUser = dynamic(
-  () =>
-    import("@/components/sidebar/nav-user").then((m) => ({
-      default: m.NavUser,
-    })),
-  { ssr: false },
-);
-const TermsDialog = dynamic(
-  () =>
-    import("@/components/auth/terms-dialog").then((m) => ({
-      default: m.TermsDialog,
-    })),
-  { ssr: false },
-);
+const DISCOVERY_IDS = [
+  "studio-home",
+  "studio-products",
+  "tech-tools",
+  "weather",
+  "github-stats",
+];
+const WORKSPACE_IDS = ["activity-tracker", "file-manager", "messenger"];
+const EXPERIMENT_IDS = ["game-hub", "custom-calculator"];
 
-type SidebarUser = { name: string; email: string };
+function selectApps(apps: AppConfig[], ids: string[]) {
+  return ids.flatMap((id) => {
+    const app = apps.find((candidate) => candidate.id === id);
+    return app ? [app] : [];
+  });
+}
 
-const fallbackUser: SidebarUser = { name: "User", email: "user@example.com" };
+type AppSidebarProps = Omit<React.ComponentProps<typeof Sidebar>, "children">;
 
-// Module-level cache to avoid re-fetching on every navigation
-let cachedUser: SidebarUser | null | undefined = undefined;
-
-type AppSidebarProps = Omit<
-  React.ComponentProps<typeof ApplicationSidebarFrame>,
-  "brand" | "children" | "footer"
->;
-
-export function AppSidebar(props: AppSidebarProps) {
+export function AppSidebar({
+  className,
+  collapsible = "icon",
+  ...props
+}: AppSidebarProps) {
   const pathname = usePathname();
-  const apps = React.useMemo(() => getSurfaceApps(), []);
-  const publicApps = React.useMemo(
-    () => apps.filter((app) => app.isPublic && !app.externalUrl),
+  const apps = React.useMemo(
+    () =>
+      getSurfaceApps().map((app) => ({
+        ...app,
+        name: app.navLabel ?? app.name,
+      })),
+    [],
+  );
+  const discoveryApps = React.useMemo(
+    () => selectApps(apps, DISCOVERY_IDS),
     [apps],
   );
-  const privateApps = React.useMemo(
-    () => apps.filter((app) => !app.isPublic && !app.externalUrl),
+  const workspaceApps = React.useMemo(
+    () => selectApps(apps, WORKSPACE_IDS),
     [apps],
   );
-  const externalApps = React.useMemo(
-    () => apps.filter((app) => app.externalUrl),
+  const experimentApps = React.useMemo(
+    () => selectApps(apps, EXPERIMENT_IDS),
     [apps],
   );
   const { activeAppId, activeNavId } = useActiveApp(
@@ -68,147 +73,55 @@ export function AppSidebar(props: AppSidebarProps) {
     "studio-home",
   );
 
-  // User state
-  const [user, setUser] = React.useState<SidebarUser | null>(
-    cachedUser ?? null,
-  );
-  const [isUserLoading, setIsUserLoading] = React.useState(
-    cachedUser === undefined,
-  );
-
-  const loadUser = React.useCallback(async (silent = false, retries = 2) => {
-    try {
-      if (!silent) setIsUserLoading(true);
-      const response = await fetch("/api/account/init", { cache: "no-store" });
-
-      if (!response.ok) throw new Error("Failed to load user.");
-
-      const payload = (await response.json()) as
-        | { user?: { name?: string; email?: string } }
-        | undefined;
-      if (!payload?.user) {
-        setUser(null);
-        return;
-      }
-
-      const userData: SidebarUser = {
-        name: payload.user.name?.trim() || fallbackUser.name,
-        email: payload.user.email?.trim() || fallbackUser.email,
-      };
-      cachedUser = userData;
-      setUser(userData);
-    } catch {
-      if (retries > 0) {
-        await new Promise((r) => setTimeout(r, 500));
-        return loadUser(true, retries - 1);
-      }
-      cachedUser = null;
-      setUser(null);
-    } finally {
-      setIsUserLoading(false);
-    }
-  }, []);
-
-  // Defer auth listener setup — don't block first paint with Supabase client init
-  React.useEffect(() => {
-    if (cachedUser === undefined) void loadUser();
-
-    // Lazy-import Supabase client only when needed (after first paint)
-    let unsubscribe: (() => void) | undefined;
-    void import("@/lib/supabase/client").then(
-      ({ createSupabaseBrowserClient }) => {
-        const supabase = createSupabaseBrowserClient();
-        const {
-          data: { subscription },
-        } = supabase.auth.onAuthStateChange((event) => {
-          if (event === "SIGNED_OUT") {
-            cachedUser = undefined;
-            setUser(null);
-            setIsUserLoading(false);
-          } else if (event === "INITIAL_SESSION") {
-            if (!cachedUser) void loadUser();
-          } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
-            cachedUser = undefined;
-            void loadUser();
-            if (event === "SIGNED_IN") {
-              void fetch("/api/account/mfa-cleanup", { method: "POST" });
-            }
-          }
-        });
-        unsubscribe = () => subscription.unsubscribe();
-      },
-    );
-
-    return () => {
-      unsubscribe?.();
-    };
-  }, [loadUser]);
-
   return (
-    <ApplicationSidebarFrame
-      brand={{
-        name: APP_BRANDS.studio.name,
-        href: "/",
-        icon: LayoutGrid,
-      }}
-      footer={
-        <>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <TermsDialog>
-                <SidebarMenuButton className="w-full">
-                  <FileText className="size-4" />
-                  <span>Terms & Conditions</span>
-                </SidebarMenuButton>
-              </TermsDialog>
-            </SidebarMenuItem>
-          </SidebarMenu>
-          {isUserLoading ? (
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton aria-disabled data-loading="true">
-                  <Skeleton className="size-4 rounded" />
-                  <Skeleton className="h-4 w-24" />
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          ) : user ? (
-            <NavUser user={user} />
-          ) : (
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild className="group/login">
-                  <Link href="/welcome">
-                    <User className="size-4" />
-                    <span>Login</span>
-                    <LogIn className="ml-auto size-4 text-green-600 transition-transform duration-200 group-hover/login:translate-x-0.5 dark:text-green-500" />
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          )}
-        </>
-      }
+    <Sidebar
+      collapsible={collapsible}
+      className={cn(
+        "border-sidebar-border/80",
+        "[&_[data-sidebar=group]]:px-2 [&_[data-sidebar=group]]:py-3",
+        "[&_[data-sidebar=group-label]]:h-9 [&_[data-sidebar=group-label]]:font-[family-name:var(--font-ibm-plex-mono)] [&_[data-sidebar=group-label]]:text-[0.68rem] [&_[data-sidebar=group-label]]:font-medium [&_[data-sidebar=group-label]]:uppercase [&_[data-sidebar=group-label]]:tracking-[0.2em]",
+        "[&_[data-sidebar=menu]]:gap-1.5",
+        "[&_[data-sidebar=menu-button]]:rounded-lg",
+        className,
+      )}
       {...props}
     >
-      <NavApps
-        apps={publicApps}
-        activeAppId={activeAppId}
-        activeNavId={activeNavId}
-        label="Explore"
-      />
-      <NavApps
-        apps={privateApps}
-        activeAppId={activeAppId}
-        activeNavId={activeNavId}
-        label="Apps"
-      />
-      <NavApps
-        apps={externalApps}
-        activeAppId={activeAppId}
-        activeNavId={activeNavId}
-        label="External"
-      />
-    </ApplicationSidebarFrame>
+      <SidebarHeader className="p-2">
+        <div className="flex items-center gap-1">
+          <div className="group/studio-brand relative min-w-0 flex-1">
+            <ApplicationBrandHeader
+              brand={{
+                name: APP_BRANDS.studio.name,
+                href: "/",
+                icon: LayoutGrid,
+              }}
+            />
+            <SidebarCollapsedExpandButton />
+          </div>
+          <SidebarHeaderCollapseButton />
+        </div>
+      </SidebarHeader>
+      <SidebarContent className="gap-0">
+        <NavApps
+          apps={discoveryApps}
+          activeAppId={activeAppId}
+          activeNavId={activeNavId}
+          label="Discover"
+        />
+        <NavApps
+          apps={workspaceApps}
+          activeAppId={activeAppId}
+          activeNavId={activeNavId}
+          label="Workspaces"
+        />
+        <NavApps
+          apps={experimentApps}
+          activeAppId={activeAppId}
+          activeNavId={activeNavId}
+          label="Experiments"
+        />
+      </SidebarContent>
+      <SidebarRail />
+    </Sidebar>
   );
 }

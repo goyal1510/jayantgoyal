@@ -19,7 +19,7 @@ const Calculator: React.FC = () => {
         const calculation = `${input} = ${result}`;
         setHistory(prev => [calculation, ...prev.slice(0, 4)]);
         setInput(result.toString());
-      } 
+      }
       else if (label === "C") {
         setInput('');
         setHistory([]);
@@ -79,7 +79,7 @@ const Calculator: React.FC = () => {
       <CardContent className="flex flex-1 flex-col">
         <div className="flex flex-1 flex-col space-y-4">
           <Display value={input} className="flex-shrink-0" />
-          
+
           {components.length === 0 ? (
             <div className="flex flex-1 items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/25 bg-muted/50">
               <div className="text-center text-muted-foreground">

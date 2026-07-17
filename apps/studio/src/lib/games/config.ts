@@ -12,13 +12,14 @@ export const GAME_META: Record<
   "rock-paper-scissors": {
     name: "Rock Paper Scissors",
     description: "Fast rounds against the computer or an online player.",
-    modes: ["local_pvp", "vs_computer"],
+    modes: ["vs_computer"],
     onlineReady: true,
   },
   "tic-tac-toe": {
     name: "Tic Tac Toe",
-    description: "3x3 grid, play locally or versus computer.",
+    description: "3x3 grid, play locally, online, or versus computer.",
     modes: ["local_pvp", "vs_computer"],
+    onlineReady: true,
   },
   "dare-x": {
     name: "Dare X",
@@ -58,7 +59,7 @@ export const GAME_META: Record<
   ludo: {
     name: "Ludo",
     description: "Roll, race, capture, and bring every token home in an online room.",
-    modes: ["local_pvp"],
+    modes: [],
     onlineReady: true,
   },
 }

@@ -180,7 +180,7 @@ export function MessagesPage() {
           <MessageList messages={messages} />
         )}
       </div>
-      
+
       {/* Floating Plus Button */}
       <div className="absolute bottom-6 right-6">
         <MessageInputDialog onSend={handleSendMessage} />

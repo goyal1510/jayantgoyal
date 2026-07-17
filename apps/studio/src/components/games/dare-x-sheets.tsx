@@ -1,63 +1,66 @@
-"use client"
+"use client";
 
-import type { ChangeEvent, RefObject } from "react"
-import {
-  Download,
-  Loader2,
-  Upload,
-  X,
-} from "lucide-react"
+import type { ChangeEvent, RefObject } from "react";
+import { Download, Globe2, Loader2, Upload, Users, X } from "lucide-react";
 
-import { Button } from "@repo/ui/button"
-import { Input } from "@repo/ui/input"
-import { Label } from "@repo/ui/label"
-import { Separator } from "@repo/ui/separator"
+import { Button } from "@repo/ui/button";
+import { Input } from "@repo/ui/input";
+import { Label } from "@repo/ui/label";
+import { Separator } from "@repo/ui/separator";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@repo/ui/select"
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@repo/ui/sheet"
-import { cn } from "@repo/ui/lib/utils"
+} from "@repo/ui/select";
+import { cn } from "@repo/ui/lib/utils";
 
+import {
+  GameSetupPathPicker,
+  GameSetupSheet,
+  type GameSetupPath,
+} from "@/components/games/game-setup-sheet";
 import type {
   Attempt,
   CustomDare,
   DareSource,
   Player,
-} from "@/components/games/use-dare-x"
-import { MIN_PLAYERS, MAX_PLAYERS } from "@/components/games/use-dare-x"
+} from "@/components/games/use-dare-x";
+import { MIN_PLAYERS, MAX_PLAYERS } from "@/components/games/use-dare-x";
 
 interface SetupSheetProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  playerCount: number
-  handleCountChange: (value: number) => void
-  configLocked: boolean
-  players: Player[]
-  setPlayers: React.Dispatch<React.SetStateAction<Player[]>>
-  dareSource: DareSource
-  setDareSource: (source: DareSource) => void
-  customDares: CustomDare[]
-  handleExport: () => void
-  isImporting: boolean
-  fileInputRef: RefObject<HTMLInputElement | null>
-  handleImport: (event: ChangeEvent<HTMLInputElement>) => void
-  newCustomDare: string
-  setNewCustomDare: (value: string) => void
-  addCustomDare: (value: string) => void
-  setShowCustomListSheet: (show: boolean) => void
-  handleStartGame: () => void
-  isSpinning: boolean
-  resetSession: (unlock?: boolean) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  playerCount: number;
+  handleCountChange: (value: number) => void;
+  configLocked: boolean;
+  players: Player[];
+  setPlayers: React.Dispatch<React.SetStateAction<Player[]>>;
+  dareSource: DareSource;
+  setDareSource: (source: DareSource) => void;
+  customDares: CustomDare[];
+  handleExport: () => void;
+  isImporting: boolean;
+  fileInputRef: RefObject<HTMLInputElement | null>;
+  handleImport: (event: ChangeEvent<HTMLInputElement>) => void;
+  newCustomDare: string;
+  setNewCustomDare: (value: string) => void;
+  addCustomDare: (value: string) => void;
+  setShowCustomListSheet: (show: boolean) => void;
+  handleStartGame: () => void;
+  isSpinning: boolean;
+  resetSession: (unlock?: boolean) => void;
+  setupPath: GameSetupPath;
+  setSetupPath: (path: GameSetupPath) => void;
+  onlineName: string;
+  setOnlineName: (name: string) => void;
+  joinCode: string;
+  setJoinCode: (code: string) => void;
+  creatingRoom: boolean;
+  createOnlineRoom: () => void;
+  joinOnlineRoom: () => void;
+  canCreateOnlineRoom: boolean;
 }
 
 export function DareXSetupSheet({
@@ -82,202 +85,308 @@ export function DareXSetupSheet({
   handleStartGame,
   isSpinning,
   resetSession,
+  setupPath,
+  setSetupPath,
+  onlineName,
+  setOnlineName,
+  joinCode,
+  setJoinCode,
+  creatingRoom,
+  createOnlineRoom,
+  joinOnlineRoom,
+  canCreateOnlineRoom,
 }: SetupSheetProps) {
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="sm:max-w-lg">
-        <SheetHeader className="pb-2">
-          <SheetTitle>Setup Dare X</SheetTitle>
-          <SheetDescription>
-            Choose players and dare source. Once started, dares are locked for the session.
-          </SheetDescription>
-        </SheetHeader>
+    <GameSetupSheet
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Set up Dare X"
+      description="Choose local or online play, then configure the players and dare deck for that session."
+      footer={
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            className="flex-1"
+          >
+            Cancel
+          </Button>
+          <Button
+            type="button"
+            onClick={
+              setupPath === "online" ? createOnlineRoom : handleStartGame
+            }
+            disabled={
+              isSpinning ||
+              creatingRoom ||
+              (setupPath === "online" && !canCreateOnlineRoom)
+            }
+            className="flex-[1.35]"
+          >
+            {creatingRoom ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : setupPath === "online" ? (
+              "Create room"
+            ) : configLocked ? (
+              "Restart local game"
+            ) : (
+              "Start local game"
+            )}
+          </Button>
+        </div>
+      }
+    >
+      <div className="space-y-7">
+        <section className="space-y-3">
+          <Label className="text-sm font-semibold">
+            How do you want to play?
+          </Label>
+          <GameSetupPathPicker
+            value={setupPath}
+            onValueChange={setSetupPath}
+            options={[
+              {
+                value: "local",
+                label: "Local",
+                description: "Pass one device around.",
+                icon: <Users className="size-4" />,
+              },
+              {
+                value: "online",
+                label: "Online",
+                description: "Create or join a room.",
+                icon: <Globe2 className="size-4" />,
+              },
+            ]}
+          />
+        </section>
 
-        <div className="space-y-4 p-4">
-          <div className="space-y-2">
-            <Label className="text-sm font-medium">Players ({MIN_PLAYERS}-{MAX_PLAYERS})</Label>
-            <Select
-              value={String(playerCount)}
-              onValueChange={(value) => handleCountChange(Number(value))}
-              disabled={configLocked}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select players" />
-              </SelectTrigger>
-              <SelectContent>
-                {[2, 3, 4, 5].map((count) => (
-                  <SelectItem key={count} value={String(count)}>
-                    {count} player{count === 1 ? "" : "s"}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        {setupPath === "online" ? (
+          <section className="space-y-5 rounded-2xl border border-border/70 bg-muted/25 p-4">
             <div className="space-y-2">
-              {players.map((player, idx) => {
-                const isActive = idx < playerCount
-                return (
-                  <div
-                    key={player.id}
-                    className="flex items-center gap-3 text-sm"
-                  >
-                    <span className="w-24 text-xs text-muted-foreground">
-                      Player {idx + 1}:
-                    </span>
-                    <Input
-                      value={player.name}
-                      onChange={(event) => {
-                        const value = event.target.value
-                        setPlayers((prev) =>
-                          prev.map((p) =>
-                            p.id === player.id ? { ...p, name: value } : p
-                          )
-                        )
-                      }}
-                      disabled={configLocked || !isActive}
-                      className={!isActive ? "opacity-70" : undefined}
-                    />
-                  </div>
-                )
-              })}
+              <Label htmlFor="dare-online-name">Your display name</Label>
+              <Input
+                id="dare-online-name"
+                value={onlineName}
+                onChange={(event) => setOnlineName(event.target.value)}
+              />
             </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label className="text-sm font-medium">Dare source</Label>
-            <div className="grid gap-2 sm:grid-cols-3" role="radiogroup">
-              {[
-                { value: "built-in", label: "Built-in", disabled: false },
-                { value: "custom", label: "Custom", disabled: customDares.length === 0 },
-                { value: "mixed", label: "Custom + Built-in", disabled: customDares.length === 0 },
-              ].map((option) => (
-                <label
-                  key={option.value}
-                  className={cn(
-                    "flex cursor-pointer items-center gap-2 rounded-md border p-2 text-sm",
-                    dareSource === option.value && "border-primary",
-                    (configLocked || option.disabled) && "cursor-not-allowed opacity-70"
-                  )}
+            <div className="space-y-2 border-t border-border/70 pt-4">
+              <Label htmlFor="dare-room-code">Already have a room?</Label>
+              <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+                <Input
+                  id="dare-room-code"
+                  value={joinCode}
+                  onChange={(event) =>
+                    setJoinCode(event.target.value.toUpperCase())
+                  }
+                  placeholder="Room code"
+                  maxLength={10}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={joinOnlineRoom}
                 >
-                  <input
-                    type="radio"
-                    className="h-4 w-4 border"
-                    checked={dareSource === option.value}
-                    onChange={() => {
-                      if (configLocked || option.disabled) return
-                      setDareSource(option.value as DareSource)
-                    }}
-                  />
-                  {option.label}
-                </label>
-              ))}
+                  Join room
+                </Button>
+              </div>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Dares lock after you start. Add custom dares before starting.
+          </section>
+        ) : null}
+
+        <section className="space-y-3">
+          <div>
+            <Label className="text-sm font-semibold">
+              Players ({MIN_PLAYERS}-{MAX_PLAYERS})
+            </Label>
+            <p className="mt-1 text-sm leading-6 text-muted-foreground">
+              {setupPath === "online"
+                ? "Set the room capacity and the local display names used to seed it."
+                : "Only active player fields are shown."}
             </p>
           </div>
-
-          <Separator />
-
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="text-sm font-medium">Custom dares</div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="gap-2"
-                  onClick={handleExport}
-                  disabled={!customDares.length}
-                  title="Download custom dares (built-in cannot be downloaded)"
-                >
-                  <Download className="h-4 w-4" />
-                  Download
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="gap-2"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isImporting || configLocked}
-                >
-                  {isImporting ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Upload className="h-4 w-4" />
-                  )}
-                  Import
-                </Button>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".json,application/json"
-                  className="hidden"
-                  onChange={handleImport}
+          <Select
+            value={String(playerCount)}
+            onValueChange={(value) => handleCountChange(Number(value))}
+            disabled={configLocked}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select players" />
+            </SelectTrigger>
+            <SelectContent>
+              {[2, 3, 4, 5].map((count) => (
+                <SelectItem key={count} value={String(count)}>
+                  {count} player{count === 1 ? "" : "s"}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {players.slice(0, playerCount).map((player, idx) => (
+              <div key={player.id} className="space-y-2">
+                <Label htmlFor={`dare-player-${player.id}`}>
+                  Player {idx + 1}
+                </Label>
+                <Input
+                  id={`dare-player-${player.id}`}
+                  value={player.name}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    setPlayers((prev) =>
+                      prev.map((p) =>
+                        p.id === player.id ? { ...p, name: value } : p,
+                      ),
+                    );
+                  }}
+                  disabled={configLocked}
                 />
               </div>
-            </div>
+            ))}
+          </div>
+        </section>
 
-            <div className="flex gap-2">
-              <Input
-                placeholder="Add a custom dare..."
-                value={newCustomDare}
-                onChange={(event) => setNewCustomDare(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    event.preventDefault()
-                    addCustomDare(newCustomDare)
-                  }
-                }}
-                disabled={configLocked}
-              />
-              <Button
-                variant="secondary"
-                onClick={() => addCustomDare(newCustomDare)}
-                disabled={configLocked}
+        <section className="space-y-3">
+          <Label className="text-sm font-semibold">Dare source</Label>
+          <div className="grid gap-2 sm:grid-cols-3" role="radiogroup">
+            {[
+              { value: "built-in", label: "Built-in", disabled: false },
+              {
+                value: "custom",
+                label: "Custom",
+                disabled: customDares.length === 0,
+              },
+              {
+                value: "mixed",
+                label: "Custom + Built-in",
+                disabled: customDares.length === 0,
+              },
+            ].map((option) => (
+              <button
+                type="button"
+                key={option.value}
+                role="radio"
+                aria-checked={dareSource === option.value}
+                disabled={configLocked || option.disabled}
+                onClick={() => setDareSource(option.value as DareSource)}
+                className={cn(
+                  "min-h-12 rounded-xl border p-3 text-left text-sm font-medium transition",
+                  dareSource === option.value
+                    ? "border-primary bg-primary/40"
+                    : "border-border/80 bg-background hover:bg-muted/50",
+                  (configLocked || option.disabled) &&
+                    "cursor-not-allowed opacity-60",
+                )}
               >
-                Add
-              </Button>
-            </div>
+                {option.label}
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Dares lock after you start. Add custom dares before starting.
+          </p>
+        </section>
+
+        <Separator />
+
+        <section className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="text-sm font-medium">Custom dares</div>
             <div className="flex items-center gap-2">
-              <div className="text-xs text-muted-foreground">
-                {customDares.length} custom dare{customDares.length === 1 ? "" : "s"}
-              </div>
               <Button
                 variant="outline"
                 size="sm"
                 className="gap-2"
-                onClick={() => setShowCustomListSheet(true)}
+                onClick={handleExport}
+                disabled={!customDares.length}
+                title="Download custom dares (built-in cannot be downloaded)"
               >
-                View custom dares
+                <Download className="h-4 w-4" />
+                Download
               </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isImporting || configLocked}
+              >
+                {isImporting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Upload className="h-4 w-4" />
+                )}
+                Import
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json,application/json"
+                className="hidden"
+                onChange={handleImport}
+              />
             </div>
           </div>
-        </div>
 
-        <div className="mt-4 flex flex-col gap-2 p-4">
-          <Button onClick={handleStartGame} disabled={isSpinning}>
-            {configLocked ? "Restart game" : "Start game"}
-          </Button>
+          <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+            <Input
+              placeholder="Add a custom dare..."
+              value={newCustomDare}
+              onChange={(event) => setNewCustomDare(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  addCustomDare(newCustomDare);
+                }
+              }}
+              disabled={configLocked}
+            />
+            <Button
+              variant="secondary"
+              onClick={() => addCustomDare(newCustomDare)}
+              disabled={configLocked}
+            >
+              Add
+            </Button>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="text-xs text-muted-foreground">
+              {customDares.length} custom dare
+              {customDares.length === 1 ? "" : "s"}
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => setShowCustomListSheet(true)}
+            >
+              View custom dares
+            </Button>
+          </div>
+        </section>
+
+        {configLocked ? (
           <Button
+            type="button"
             variant="outline"
-            onClick={() => {
-              resetSession(true)
-            }}
+            onClick={() => resetSession(true)}
+            className="w-full"
           >
-            New session (unlock)
+            Unlock and clear this session
           </Button>
-        </div>
-      </SheetContent>
-    </Sheet>
-  )
+        ) : null}
+      </div>
+    </GameSetupSheet>
+  );
 }
 
 interface CustomListSheetProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  customDares: CustomDare[]
-  deleteCustomDare: (id: string) => void
-  configLocked: boolean
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  customDares: CustomDare[];
+  deleteCustomDare: (id: string) => void;
+  configLocked: boolean;
 }
 
 export function DareXCustomListSheet({
@@ -288,54 +397,51 @@ export function DareXCustomListSheet({
   configLocked,
 }: CustomListSheetProps) {
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="sm:max-w-lg">
-        <SheetHeader className="pb-2">
-          <SheetTitle>Custom dares</SheetTitle>
-          <SheetDescription>
-            Manage your custom dares. Built-in dares are not shown here.
-          </SheetDescription>
-        </SheetHeader>
-        <div className="space-y-3 p-4">
-          <div className="rounded-lg border bg-muted/30 p-3 max-h-[480px] overflow-y-auto space-y-2 text-sm">
-            {customDares.length === 0 ? (
-              <div className="text-muted-foreground text-xs">
-                No custom dares yet.
-              </div>
-            ) : (
-              customDares.map((dare) => (
-                <div
-                  key={dare.id}
-                  className="flex items-center justify-between gap-2 rounded-md bg-background p-2"
-                >
-                  <span className="text-sm">{dare.text}</span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => deleteCustomDare(dare.id)}
-                    disabled={configLocked}
-                  >
-                    <X className="h-4 w-4 text-muted-foreground" />
-                  </Button>
-                </div>
-              ))
-            )}
+    <GameSetupSheet
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Custom dares"
+      description="Manage the custom prompts available to Dare X. Built-in dares are not shown here."
+      className="sm:max-w-lg"
+    >
+      <div className="space-y-2 text-sm">
+        {customDares.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-border/80 bg-muted/20 p-8 text-center text-sm text-muted-foreground">
+            No custom dares yet. Add one from the setup sheet.
           </div>
-        </div>
-      </SheetContent>
-    </Sheet>
-  )
+        ) : (
+          customDares.map((dare) => (
+            <div
+              key={dare.id}
+              className="flex items-center justify-between gap-3 rounded-xl border border-border/70 bg-background p-3"
+            >
+              <span className="text-sm leading-6">{dare.text}</span>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => deleteCustomDare(dare.id)}
+                disabled={configLocked}
+              >
+                <span className="sr-only">Delete dare</span>
+                <X className="h-4 w-4 text-muted-foreground" />
+              </Button>
+            </div>
+          ))
+        )}
+      </div>
+    </GameSetupSheet>
+  );
 }
 
 interface HistorySheetProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  historyPlayerId: string | null
-  setHistoryPlayerId: (id: string) => void
-  players: Player[]
-  selectedHistoryPlayer: Player | undefined
-  completed: Record<string, { done: string[]; skipped: string[] }>
-  history: Attempt[]
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  historyPlayerId: string | null;
+  setHistoryPlayerId: (id: string) => void;
+  players: Player[];
+  selectedHistoryPlayer: Player | undefined;
+  completed: Record<string, { done: string[]; skipped: string[] }>;
+  history: Attempt[];
 }
 
 export function DareXHistorySheet({
@@ -348,92 +454,101 @@ export function DareXHistorySheet({
   completed,
   history,
 }: HistorySheetProps) {
+  const completedAttempts = history.filter(
+    (attempt) =>
+      attempt.playerId === selectedHistoryPlayer?.id &&
+      attempt.status === "done",
+  );
+  const skippedAttempts = history.filter(
+    (attempt) =>
+      attempt.playerId === selectedHistoryPlayer?.id &&
+      attempt.status === "not_done",
+  );
+
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="sm:max-w-xl">
-        <SheetHeader className="pb-2">
-          <SheetTitle>Detailed history</SheetTitle>
-          <SheetDescription>
-            Review completed and skipped dares per player.
-          </SheetDescription>
-        </SheetHeader>
-        <div className="space-y-4 p-4">
-          <div className="space-y-2">
-            <Label className="text-sm font-medium">Player</Label>
-            <Select
-              value={historyPlayerId ?? undefined}
-              onValueChange={(value) => setHistoryPlayerId(value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select player" />
-              </SelectTrigger>
-              <SelectContent>
-                {players.map((player) => (
-                  <SelectItem key={player.id} value={player.id}>
-                    {player.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+    <GameSetupSheet
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Dare history"
+      description="Review completed and skipped dares for each active player."
+    >
+      <div className="space-y-5">
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Player</Label>
+          <Select
+            value={historyPlayerId ?? undefined}
+            onValueChange={(value) => setHistoryPlayerId(value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select player" />
+            </SelectTrigger>
+            <SelectContent>
+              {players.map((player) => (
+                <SelectItem key={player.id} value={player.id}>
+                  {player.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="rounded-2xl border border-border/70 bg-muted/25 p-4">
+            <div className="flex items-center justify-between text-sm font-medium">
+              <span>Done</span>
+              <span className="text-xs text-muted-foreground">
+                {completed[selectedHistoryPlayer?.id ?? ""]?.done.length ?? 0}
+              </span>
+            </div>
+            <div className="mt-2 space-y-2 max-h-[320px] overflow-y-auto text-sm">
+              {completedAttempts.map((attempt) => (
+                <div
+                  key={attempt.id}
+                  className="rounded-md border bg-background p-2"
+                >
+                  <div className="text-xs text-muted-foreground">
+                    {new Date(attempt.createdAt).toLocaleString()}
+                  </div>
+                  <div className="font-medium">{attempt.dare}</div>
+                </div>
+              ))}
+              {completedAttempts.length === 0 ? (
+                <div className="text-xs text-muted-foreground">
+                  No done dares yet.
+                </div>
+              ) : null}
+            </div>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-lg border bg-muted/30 p-3">
-              <div className="flex items-center justify-between text-sm font-medium">
-                <span>Done</span>
-                <span className="text-xs text-muted-foreground">
-                  {completed[selectedHistoryPlayer?.id ?? ""]?.done.length ?? 0}
-                </span>
-              </div>
-              <div className="mt-2 space-y-2 max-h-[320px] overflow-y-auto text-sm">
-                {(history
-                  .filter((h) => h.playerId === selectedHistoryPlayer?.id && h.status === "done")
-                  .map((attempt) => (
-                    <div
-                      key={attempt.id}
-                      className="rounded-md border bg-background p-2"
-                    >
-                      <div className="text-xs text-muted-foreground">
-                        {new Date(attempt.createdAt).toLocaleString()}
-                      </div>
-                      <div className="font-medium">{attempt.dare}</div>
-                    </div>
-                  ))).slice(0, Number.POSITIVE_INFINITY)}
-                {history.filter((h) => h.playerId === selectedHistoryPlayer?.id && h.status === "done").length === 0 ? (
-                  <div className="text-xs text-muted-foreground">No done dares yet.</div>
-                ) : null}
-              </div>
+          <div className="rounded-2xl border border-border/70 bg-muted/25 p-4">
+            <div className="flex items-center justify-between text-sm font-medium">
+              <span>Skipped</span>
+              <span className="text-xs text-muted-foreground">
+                {completed[selectedHistoryPlayer?.id ?? ""]?.skipped.length ??
+                  0}
+              </span>
             </div>
-
-            <div className="rounded-lg border bg-muted/30 p-3">
-              <div className="flex items-center justify-between text-sm font-medium">
-                <span>Skipped</span>
-                <span className="text-xs text-muted-foreground">
-                  {completed[selectedHistoryPlayer?.id ?? ""]?.skipped.length ?? 0}
-                </span>
-              </div>
-              <div className="mt-2 space-y-2 max-h-[320px] overflow-y-auto text-sm">
-                {(history
-                  .filter((h) => h.playerId === selectedHistoryPlayer?.id && h.status === "not_done")
-                  .map((attempt) => (
-                    <div
-                      key={attempt.id}
-                      className="rounded-md border bg-background p-2"
-                    >
-                      <div className="text-xs text-muted-foreground">
-                        {new Date(attempt.createdAt).toLocaleString()}
-                      </div>
-                      <div className="font-medium">{attempt.dare}</div>
-                    </div>
-                  ))).slice(0, Number.POSITIVE_INFINITY)}
-                {history.filter((h) => h.playerId === selectedHistoryPlayer?.id && h.status === "not_done").length === 0 ? (
-                  <div className="text-xs text-muted-foreground">No skipped dares yet.</div>
-                ) : null}
-              </div>
+            <div className="mt-2 space-y-2 max-h-[320px] overflow-y-auto text-sm">
+              {skippedAttempts.map((attempt) => (
+                <div
+                  key={attempt.id}
+                  className="rounded-md border bg-background p-2"
+                >
+                  <div className="text-xs text-muted-foreground">
+                    {new Date(attempt.createdAt).toLocaleString()}
+                  </div>
+                  <div className="font-medium">{attempt.dare}</div>
+                </div>
+              ))}
+              {skippedAttempts.length === 0 ? (
+                <div className="text-xs text-muted-foreground">
+                  No skipped dares yet.
+                </div>
+              ) : null}
             </div>
           </div>
         </div>
-      </SheetContent>
-    </Sheet>
-  )
+      </div>
+    </GameSetupSheet>
+  );
 }

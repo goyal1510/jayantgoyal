@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { GAME_META } from "@/lib/games/config"
 import { TypingSpeedTest } from "@/components/games/TypingSpeedTest"
+import { GamePageFrame } from "@/components/games/game-page-frame"
 
 export const metadata: Metadata = {
   title: `${GAME_META["typing-speed"].name}`,
@@ -9,8 +10,8 @@ export const metadata: Metadata = {
 
 export default function TypingSpeedPage() {
   return (
-    <div className="p-4">
+    <GamePageFrame game="typing-speed">
       <TypingSpeedTest />
-    </div>
+    </GamePageFrame>
   )
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 
 import { Ludo } from "@/components/games/Ludo"
+import { GamePageFrame } from "@/components/games/game-page-frame"
 import { GAME_META } from "@/lib/games/config"
 
 export const metadata: Metadata = {
@@ -10,8 +11,8 @@ export const metadata: Metadata = {
 
 export default function LudoPage() {
   return (
-    <div className="p-4">
+    <GamePageFrame game="ludo">
       <Ludo />
-    </div>
+    </GamePageFrame>
   )
 }

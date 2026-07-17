@@ -71,7 +71,7 @@ const ComponentLibrary: React.FC = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
               </button>
-              
+
               {expandedSections[section.group] && (
                 <div className="px-3 pb-3">
                   <div className="grid grid-cols-5 gap-2">

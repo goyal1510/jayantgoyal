@@ -1,41 +1,37 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
 import {
   Check,
-  Globe2,
   Loader2,
   RefreshCcw,
   Settings,
   Users,
   X,
   Zap,
-} from "lucide-react"
-import { useRouter } from "next/navigation"
-import { toast } from "sonner"
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
-import { Button } from "@repo/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card"
-import { Input } from "@repo/ui/input"
-import { Label } from "@repo/ui/label"
-import { Separator } from "@repo/ui/separator"
+import { Button } from "@repo/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card";
 
-import { useDareX } from "@/components/games/use-dare-x"
+import type { GameSetupPath } from "@/components/games/game-setup-sheet";
+import { useDareX } from "@/components/games/use-dare-x";
 import {
   DareXSetupSheet,
   DareXCustomListSheet,
   DareXHistorySheet,
-} from "@/components/games/dare-x-sheets"
-import { createDareXState } from "@/lib/games/dare-x"
+} from "@/components/games/dare-x-sheets";
+import { createDareXState } from "@/lib/games/dare-x";
 
 export function DareX() {
-  const router = useRouter()
+  const router = useRouter();
   const {
     fileInputRef,
     customDares,
     dareSource,
     setDareSource,
-    players,
     setPlayers,
     playerCount,
     currentPlayer,
@@ -67,13 +63,14 @@ export function DareX() {
     handleImport,
     handleExport,
     handleCountChange,
-  } = useDareX()
-  const [onlineName, setOnlineName] = useState("Player 1")
-  const [joinCode, setJoinCode] = useState("")
-  const [creatingRoom, setCreatingRoom] = useState(false)
+  } = useDareX();
+  const [setupPath, setSetupPath] = useState<GameSetupPath>("local");
+  const [onlineName, setOnlineName] = useState("Player 1");
+  const [joinCode, setJoinCode] = useState("");
+  const [creatingRoom, setCreatingRoom] = useState(false);
 
   const createOnlineRoom = async () => {
-    setCreatingRoom(true)
+    setCreatingRoom(true);
     const response = await fetch("/api/games/sessions", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -89,46 +86,55 @@ export function DareX() {
           }),
         },
       }),
-    })
-    setCreatingRoom(false)
+    });
+    setCreatingRoom(false);
 
     if (!response.ok) {
-      const data = await response.json().catch(() => ({}))
-      toast.error(data.error ?? "Unable to create Dare X room")
-      return
+      const data = await response.json().catch(() => ({}));
+      toast.error(data.error ?? "Unable to create Dare X room");
+      return;
     }
 
-    const data = await response.json()
-    const roomCode = data?.session?.session?.room_code
+    const data = await response.json();
+    const roomCode = data?.session?.session?.room_code;
     if (typeof roomCode !== "string") {
-      toast.error("Room created, but no room code was returned")
-      return
+      toast.error("Room created, but no room code was returned");
+      return;
     }
 
-    router.push(`/games/dare-x/room/${roomCode}`)
-  }
+    router.push(`/games/dare-x/room/${roomCode}`);
+  };
 
   const joinOnlineRoom = () => {
-    const roomCode = joinCode.trim().toUpperCase()
+    const roomCode = joinCode.trim().toUpperCase();
     if (!/^[A-Z0-9]{6,10}$/.test(roomCode)) {
-      toast.error("Enter a valid room code")
-      return
+      toast.error("Enter a valid room code");
+      return;
     }
-    router.push(`/games/dare-x/room/${roomCode}`)
-  }
+    router.push(`/games/dare-x/room/${roomCode}`);
+  };
 
   return (
     <>
-      <Card className="bg-card">
-        <CardHeader className="flex flex-col gap-2">
+      <Card className="overflow-hidden rounded-[1.75rem] border-border/80 bg-card shadow-none">
+        <CardHeader className="flex flex-col gap-3 border-b border-border/70 p-5 sm:p-6">
           <div className="flex items-center justify-between gap-3">
-            <CardTitle className="text-xl">Dare X</CardTitle>
+            <div>
+              <p className="font-[family-name:var(--font-ibm-plex-mono)] text-[0.7rem] uppercase tracking-[0.15em] text-muted-foreground">
+                Current session
+              </p>
+              <CardTitle className="mt-1 text-2xl tracking-[-0.035em]">
+                {configLocked
+                  ? (currentPlayer?.name ?? "In progress")
+                  : "Ready to configure"}
+              </CardTitle>
+            </div>
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  setShowSetupSheet(true)
+                  setShowSetupSheet(true);
                 }}
               >
                 <Settings className="mr-2 h-4 w-4" />
@@ -140,57 +146,47 @@ export function DareX() {
                 onClick={() => resetSession(true)}
                 title="New setup"
               >
+                <span className="sr-only">Start a new setup</span>
                 <RefreshCcw className="h-4 w-4" />
               </Button>
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-            <span className="inline-flex items-center gap-1 rounded-md border px-2 py-1">
-              <Users className="h-3.5 w-3.5" />
-              {playerCount} player{playerCount === 1 ? "" : "s"}
-            </span>
-            <span className="rounded-md border px-2 py-1">
-              Source: {dareSource === "mixed" ? "Custom + Built-in" : dareSource}
-            </span>
-            {configLocked ? (
-              <span className="rounded-md border border-green-500/50 bg-green-500/5 px-2 py-1 text-green-500">
-                Locked for this session
-              </span>
-            ) : (
-              <span className="rounded-md border px-2 py-1">
-                Configure then start
-              </span>
-            )}
-          </div>
+          <p className="flex flex-wrap items-center gap-2 font-[family-name:var(--font-ibm-plex-mono)] text-[0.7rem] uppercase tracking-[0.13em] text-muted-foreground">
+            <Users className="size-3.5" />
+            {playerCount} players · {activeDares.length} dares ·{" "}
+            {dareSource === "mixed" ? "Custom + built-in" : dareSource}
+          </p>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="rounded-lg border bg-muted/30 p-4">
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>Current player</span>
-              <span>
-                {playerCount} player{playerCount === 1 ? "" : "s"} •{" "}
-                {activeDares.length} dares
-              </span>
+        <CardContent className="space-y-5 p-5 sm:p-6">
+          <div className="grid gap-4 lg:grid-cols-[0.65fr_1.35fr]">
+            <div className="rounded-[1.5rem] border border-border/70 bg-muted/25 p-5">
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>Current player</span>
+                <span>
+                  {playerCount} player{playerCount === 1 ? "" : "s"} •{" "}
+                  {activeDares.length} dares
+                </span>
+              </div>
+              <div className="mt-3 text-2xl font-semibold tracking-[-0.03em]">
+                {currentPlayer?.name ?? "—"}
+              </div>
             </div>
-            <div className="mt-2 text-lg font-semibold">
-              {currentPlayer?.name ?? "—"}
-            </div>
-          </div>
 
-          <div className="rounded-lg border bg-muted/30 p-4">
-            <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
-              <span>Current dare</span>
-              <span>Dares locked after start</span>
-            </div>
-            <div className="mt-2 min-h-[80px] text-base font-medium leading-relaxed">
-              {isSpinning ? (
-                <div className="flex items-center gap-3 text-muted-foreground">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Generating new dare...
-                </div>
-              ) : (
-                currentDare
-              )}
+            <div className="rounded-[1.5rem] border border-[#cfc0e4] bg-[#e8dcf5] p-5 text-[#211512] dark:border-[#5c5068] dark:bg-[#2f2938] dark:text-[#fff8ef]">
+              <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
+                <span>Current dare</span>
+                <span>Dares locked after start</span>
+              </div>
+              <div className="mt-3 min-h-[72px] text-xl font-semibold leading-8 tracking-[-0.02em]">
+                {isSpinning ? (
+                  <div className="flex items-center gap-3 text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Generating new dare...
+                  </div>
+                ) : (
+                  currentDare
+                )}
+              </div>
             </div>
           </div>
 
@@ -223,42 +219,7 @@ export function DareX() {
             </Button>
           </div>
 
-          <Separator />
-
-          <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
-            <div className="flex items-center gap-2 text-sm font-medium">
-              <Globe2 className="h-4 w-4" />
-              Online room
-            </div>
-            <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
-              <div className="space-y-2">
-                <Label htmlFor="dare-online-name">Your display name</Label>
-                <Input
-                  id="dare-online-name"
-                  value={onlineName}
-                  onChange={(event) => setOnlineName(event.target.value)}
-                />
-              </div>
-              <div className="flex items-end">
-                <Button onClick={createOnlineRoom} disabled={creatingRoom || activeDares.length === 0} className="w-full">
-                  {creatingRoom ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create online room"}
-                </Button>
-              </div>
-            </div>
-            <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
-              <Input
-                value={joinCode}
-                onChange={(event) => setJoinCode(event.target.value.toUpperCase())}
-                placeholder="Room code"
-                maxLength={10}
-              />
-              <Button variant="outline" onClick={joinOnlineRoom}>
-                Join
-              </Button>
-            </div>
-          </div>
-
-          <div className="rounded-lg border bg-muted/30 p-4">
+          <div className="rounded-[1.5rem] border border-border/70 bg-muted/25 p-4">
             <div className="flex items-center justify-between gap-3">
               <div>
                 <div className="text-sm font-medium">History</div>
@@ -277,12 +238,12 @@ export function DareX() {
             </div>
             <div className="mt-3 space-y-2">
               {activePlayers.map((player) => {
-                const doneCount = completed[player.id]?.done.length ?? 0
-                const skippedCount = completed[player.id]?.skipped.length ?? 0
+                const doneCount = completed[player.id]?.done.length ?? 0;
+                const skippedCount = completed[player.id]?.skipped.length ?? 0;
                 return (
                   <div
                     key={player.id}
-                    className="flex items-center justify-between rounded-md border bg-background p-3 text-sm"
+                    className="flex items-center justify-between rounded-xl border border-border/70 bg-background p-3 text-sm"
                   >
                     <div className="font-medium">{player.name}</div>
                     <div className="flex items-center gap-3 text-xs text-muted-foreground">
@@ -296,7 +257,7 @@ export function DareX() {
                       </span>
                     </div>
                   </div>
-                )
+                );
               })}
               {activePlayers.length === 0 ? (
                 <div className="text-xs text-muted-foreground">
@@ -314,7 +275,7 @@ export function DareX() {
         playerCount={playerCount}
         handleCountChange={handleCountChange}
         configLocked={configLocked}
-        players={players}
+        players={activePlayers}
         setPlayers={setPlayers}
         dareSource={dareSource}
         setDareSource={setDareSource}
@@ -330,6 +291,16 @@ export function DareX() {
         handleStartGame={handleStartGame}
         isSpinning={isSpinning}
         resetSession={resetSession}
+        setupPath={setupPath}
+        setSetupPath={setSetupPath}
+        onlineName={onlineName}
+        setOnlineName={setOnlineName}
+        joinCode={joinCode}
+        setJoinCode={setJoinCode}
+        creatingRoom={creatingRoom}
+        createOnlineRoom={createOnlineRoom}
+        joinOnlineRoom={joinOnlineRoom}
+        canCreateOnlineRoom={activeDares.length > 0}
       />
 
       <DareXCustomListSheet
@@ -345,11 +316,11 @@ export function DareX() {
         onOpenChange={setShowHistorySheet}
         historyPlayerId={historyPlayerId}
         setHistoryPlayerId={setHistoryPlayerId}
-        players={players}
+        players={activePlayers}
         selectedHistoryPlayer={selectedHistoryPlayer}
         completed={completed}
         history={history}
       />
     </>
-  )
+  );
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { GAME_META } from "@/lib/games/config"
 import { MemoryMatch } from "@/components/games/MemoryMatch"
+import { GamePageFrame } from "@/components/games/game-page-frame"
 
 export const metadata: Metadata = {
   title: `${GAME_META["memory-match"].name}`,
@@ -9,8 +10,8 @@ export const metadata: Metadata = {
 
 export default function MemoryMatchPage() {
   return (
-    <div className="p-4">
+    <GamePageFrame game="memory-match">
       <MemoryMatch />
-    </div>
+    </GamePageFrame>
   )
 }

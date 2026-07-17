@@ -43,12 +43,12 @@ function DragDropContainer() {
         </CardDescription>
       </CardHeader>
       <CardContent className="flex min-h-0 flex-1 flex-col">
-        <div 
-          ref={drop as unknown as React.RefObject<HTMLDivElement>} 
+        <div
+          ref={drop as unknown as React.RefObject<HTMLDivElement>}
           className={cn(
             "flex-1 border-2 border-dashed rounded-lg transition-all duration-200 flex flex-col min-h-0",
-            isOver 
-              ? "border-primary bg-primary/5 shadow-lg" 
+            isOver
+              ? "border-primary bg-primary/5 shadow-lg"
               : "border-muted-foreground/25 bg-muted/50"
           )}
         >
@@ -77,8 +77,8 @@ function DragDropContainer() {
             <div className="flex min-h-0 flex-1 flex-col p-4">
               <div className="flex-1 space-y-2 overflow-y-auto">
                 {components.map((component, index) => (
-                  <div 
-                    key={index} 
+                  <div
+                    key={index}
                     className="flex flex-shrink-0 items-center justify-between rounded-lg border border-white/10 bg-card/80 p-3 shadow-sm animate-fade-in"
                   >
                     <span className="font-medium">{component.label}</span>
@@ -111,8 +111,8 @@ function DragDropContainer() {
 
         {components.length > 0 && (
           <div className="mt-4 flex justify-center flex-shrink-0">
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               size="sm"
               onClick={clearComponents}
               className="transition-all duration-200"

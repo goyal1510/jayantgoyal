@@ -1,165 +1,160 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 import {
   BreadcrumbTrail,
   type BreadcrumbTrailItem,
 } from "@repo/ui/application-shell";
+
 import { getAppById, HUB_APPS } from "@/lib/config/hub-config";
 import { getStudioProduct } from "@/lib/config/studio-inventory";
-import { toolCategories, getToolByPath } from "@/lib/tools/tools";
+import {
+  getStudioSurface,
+  type StudioSurfaceId,
+} from "@/lib/config/studio-surfaces";
+import { getToolByPath, toolCategories } from "@/lib/tools/tools";
+
+function getSurfaceBreadcrumb(id: StudioSurfaceId) {
+  const surface = getStudioSurface(id);
+  return { appName: surface.name, appHref: surface.href, pageName: null };
+}
+
+function withSearchParams(
+  pathname: string,
+  searchParams: URLSearchParams,
+  keys: string[],
+) {
+  const params = new URLSearchParams();
+
+  for (const key of keys) {
+    const value = searchParams.get(key);
+    if (value) params.set(key, value);
+  }
+
+  const query = params.toString();
+  return query ? `${pathname}?${query}` : pathname;
+}
 
 export function DynamicBreadcrumb() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  // Determine app and page based on pathname
   const { appName, appHref, pageName } = (() => {
     if (pathname.startsWith("/products")) {
+      const surface = getStudioSurface("studio-products");
       const slug = pathname.split("/").filter(Boolean)[1];
+
       return {
-        appName: "Products",
-        appHref: "/products",
+        appName: surface.name,
+        appHref: withSearchParams(surface.href, searchParams, ["type"]),
         pageName: slug ? (getStudioProduct(slug)?.name ?? "Product") : null,
       };
     }
 
-    // Games routes
     if (pathname.startsWith("/games")) {
+      const surface = getStudioSurface("game-hub");
       const gameApp = getAppById("game-hub");
-      if (!gameApp) {
-        return {
-          appName: "Game Hub",
-          appHref: "/games",
-          pageName: "Dashboard",
-        };
-      }
-
-      // Check for specific game
       const segments = pathname.split("/").filter(Boolean);
+
       if (segments.length > 1 && segments[1]) {
-        const gameSlug = segments[1];
-        const navItem = gameApp.navItems.find((item) => item.url === pathname);
+        const navItem = gameApp?.navItems.find((item) => item.url === pathname);
         return {
-          appName: "Game Hub",
-          appHref: "/games",
+          appName: surface.name,
+          appHref: surface.href,
           pageName:
             navItem?.label ??
-            gameSlug
+            segments[1]
               .split("-")
-              .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
               .join(" "),
         };
       }
 
-      return { appName: "Game Hub", appHref: "/games", pageName: "Dashboard" };
+      return getSurfaceBreadcrumb("game-hub");
     }
 
-    // Tech Tools routes
     if (pathname.startsWith("/tools")) {
+      const surface = getStudioSurface("tech-tools");
       const tool = getToolByPath(pathname);
+
       if (tool) {
-        // Find the category this tool belongs to
-        const category = toolCategories.find((cat) =>
-          cat.tools.some((t) => t.id === tool.id),
+        const category = toolCategories.find((candidate) =>
+          candidate.tools.some((candidateTool) => candidateTool.id === tool.id),
         );
+
         return {
-          appName: "Tech Tools",
-          appHref: "/tools",
+          appName: surface.name,
+          appHref: withSearchParams(surface.href, searchParams, [
+            "category",
+            "q",
+          ]),
           pageName: category ? `${category.title} / ${tool.title}` : tool.title,
         };
       }
-      return { appName: "Tech Tools", appHref: "/tools", pageName: null };
+
+      return getSurfaceBreadcrumb("tech-tools");
     }
 
-    // Messenger routes
     if (pathname === "/messenger" || pathname.startsWith("/messenger/")) {
-      return {
-        appName: "Sync Messenger",
-        appHref: "/messenger",
-        pageName: null,
-      };
+      return getSurfaceBreadcrumb("messenger");
     }
 
-    // Currency Calculator routes
     if (pathname.startsWith("/calculator")) {
+      const surface = getStudioSurface("currency-calculator");
       const pageName =
         pathname === "/calculator/new"
           ? "New"
           : pathname === "/calculator/history"
             ? "History"
             : null;
-      return {
-        appName: "Currency Calculator",
-        appHref: "/calculator/new",
-        pageName,
-      };
+      return { appName: surface.name, appHref: surface.href, pageName };
     }
 
-    // Activity Tracker routes
     if (pathname.startsWith("/activity-tracker")) {
+      const surface = getStudioSurface("activity-tracker");
       let pageName: string | null = null;
+
       if (pathname.includes("/dashboard")) pageName = "Dashboard";
       else if (pathname.includes("/tracker")) pageName = "Tracker";
       else if (pathname.includes("/management")) pageName = "Management";
-      return {
-        appName: "Activity Tracker",
-        appHref: "/activity-tracker/dashboard",
-        pageName,
-      };
+
+      return { appName: surface.name, appHref: surface.href, pageName };
     }
 
-    // File Manager routes
     if (pathname === "/files" || pathname.startsWith("/files/")) {
-      return { appName: "File Manager", appHref: "/files", pageName: null };
+      return getSurfaceBreadcrumb("file-manager");
     }
 
-    // Weather route
     if (pathname === "/weather") {
-      return { appName: "Weather", appHref: "/weather", pageName: null };
+      return getSurfaceBreadcrumb("weather");
     }
 
-    // GitHub Stats route
     if (pathname === "/github-stats") {
-      return {
-        appName: "GitHub Stats",
-        appHref: "/github-stats",
-        pageName: null,
-      };
+      return getSurfaceBreadcrumb("github-stats");
     }
 
-    // Custom Calculator route
     if (pathname === "/custom-calculator") {
-      return {
-        appName: "Custom Calculator",
-        appHref: "/custom-calculator",
-        pageName: null,
-      };
+      return getSurfaceBreadcrumb("custom-calculator");
     }
 
-    // Studio home
     if (pathname === "/" || pathname === "") {
-      return {
-        appName: "Studio",
-        appHref: "/",
-        pageName: null,
-      };
+      return getSurfaceBreadcrumb("studio-home");
     }
 
-    // Check other apps
     for (const app of HUB_APPS) {
       for (const navItem of app.navItems) {
         if (navItem.url && pathname === navItem.url) {
           return {
             appName: app.name,
-            appHref: app.navItems[0]?.url ?? "/",
+            appHref: app.url ?? app.navItems[0]?.url ?? "/",
             pageName: navItem.label,
           };
         }
       }
     }
 
-    return { appName: "Studio", appHref: "/", pageName: null };
+    return getSurfaceBreadcrumb("studio-home");
   })();
 
   const items: BreadcrumbTrailItem[] = pageName

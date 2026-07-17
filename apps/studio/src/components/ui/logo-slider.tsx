@@ -5,7 +5,7 @@ import { cn } from "@repo/ui/lib/utils";
 
 /* =============================================================================
    LogoSlider Component
-   
+
    A smooth, infinite marquee/slider component for displaying logos.
    Uses Tailwind CSS where possible, raw CSS only for animations/masks.
 ============================================================================= */

@@ -1,22 +1,22 @@
-"use client"
+"use client";
 
-import { History } from "lucide-react"
+import { History } from "lucide-react";
 
-import { Button } from "@repo/ui/button"
-import { Card, CardContent } from "@repo/ui/card"
-import { PageSpinner } from "@repo/ui/page-spinner"
-import type { TypingTestResult } from "@/lib/typing-test/database"
+import { Button } from "@repo/ui/button";
+import { Card, CardContent } from "@repo/ui/card";
+import { PageSpinner } from "@repo/ui/page-spinner";
+import type { TypingTestResult } from "@/lib/typing-test/database";
 
 interface TypingSpeedHistoryProps {
-  results: TypingTestResult[]
-  historyLoading: boolean
-  historyLoaded: boolean
-  historyPage: number
-  totalPages: number
-  bestWPM: number
-  avgWPM: number
-  avgAccuracy: number
-  loadHistory: (page: number) => void
+  results: TypingTestResult[];
+  historyLoading: boolean;
+  historyLoaded: boolean;
+  historyPage: number;
+  totalPages: number;
+  bestWPM: number;
+  avgWPM: number;
+  avgAccuracy: number;
+  loadHistory: (page: number) => void;
 }
 
 export function TypingSpeedHistory({
@@ -31,7 +31,7 @@ export function TypingSpeedHistory({
   loadHistory,
 }: TypingSpeedHistoryProps) {
   if (historyLoading && !historyLoaded) {
-    return <PageSpinner />
+    return <PageSpinner />;
   }
 
   if (results.length === 0) {
@@ -40,10 +40,12 @@ export function TypingSpeedHistory({
         <CardContent className="py-10 text-center text-muted-foreground">
           <History className="mx-auto mb-4 h-12 w-12 opacity-60" />
           <p className="text-base font-medium">No results yet</p>
-          <p className="text-sm">Complete a typing test to see your history here.</p>
+          <p className="text-sm">
+            Complete a typing test to see your history here.
+          </p>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -84,7 +86,10 @@ export function TypingSpeedHistory({
               </thead>
               <tbody>
                 {results.map((r) => (
-                  <tr key={r.id} className="border-b transition hover:bg-muted/40">
+                  <tr
+                    key={r.id}
+                    className="border-b transition hover:bg-muted/40"
+                  >
                     <td className="whitespace-nowrap px-4 py-2.5 text-muted-foreground">
                       {r.created_at
                         ? new Date(r.created_at).toLocaleDateString("en-IN", {
@@ -100,7 +105,9 @@ export function TypingSpeedHistory({
                       {r.wpm}
                     </td>
                     <td className="px-4 py-2.5 text-center">{r.accuracy}%</td>
-                    <td className="px-4 py-2.5 text-center">{r.duration_seconds}s</td>
+                    <td className="px-4 py-2.5 text-center">
+                      {r.duration_seconds}s
+                    </td>
                     <td className="px-4 py-2.5 text-center text-muted-foreground">
                       {r.correct_characters}/{r.total_characters}
                     </td>
@@ -136,5 +143,5 @@ export function TypingSpeedHistory({
         </div>
       )}
     </>
-  )
+  );
 }
