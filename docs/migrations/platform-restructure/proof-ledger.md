@@ -70,6 +70,12 @@
 - Automated proof: eight Vitest files and twenty-three tests pass, including new platform URL/host and shared SEO/path contracts. Full monorepo TypeScript, zero-warning ESLint, and production builds for Portfolio, Studio, and Admin pass.
 - Browser proof at `1280x720`: all three applications measure `256px` sidebars and `64px` headers expanded, then `48px` sidebars and `48px` headers collapsed. Portfolio Blog, Studio Weather, and Admin Hero/Users breadcrumbs render from their app-owned adapters; Admin collapse state persists across route navigation; Studio and Admin expose the same Settings/Log out presentation; Studio's password visibility control toggles `password` → `text` → `password`; and no browser console warnings or errors were captured. The authenticated Admin guard redirected `/welcome` to `/portfolio/hero`, so Admin welcome rendering is covered by TypeScript/lint/build rather than disturbing the signed-in session.
 
+## Cross-application deployment-selection proof
+
+- The Vercel ignored-build script compares `VERCEL_GIT_PREVIOUS_SHA` with `VERCEL_GIT_COMMIT_SHA` rather than only comparing the final commit with its parent. This prevents a final documentation-only commit from hiding application or shared-package changes earlier in the same deployment push.
+- The watched contract includes the selected application, all shared packages, the detector script itself, root `package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`, and `turbo.json`.
+- Missing or shallow-cloned deployment SHAs fail open and trigger a build. Focused temporary-repository tests cover app isolation, multi-commit shared changes, documentation-only skips, every shared root configuration input, and both missing-SHA paths.
+
 ## PLATFORM-08 — In Progress
 
 - Execution order changed by accepted ADR-001: Portfolio and Studio boundaries precede shared Auth/SSO.
