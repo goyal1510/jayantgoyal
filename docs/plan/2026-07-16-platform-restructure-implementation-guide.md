@@ -335,15 +335,15 @@ Acceptance checks:
 
 - [x] Choose the smallest sustainable browser/integration test setup.
 - [ ] Add a public Portfolio/current-home smoke test.
-- [ ] Add unauthenticated protected-route redirect coverage.
+- [x] Add unauthenticated protected-route redirect coverage.
 - [ ] Add authenticated current-app navigation coverage.
-- [ ] Add Admin non-admin denial coverage.
-- [ ] Add Admin admin-role success coverage.
-- [ ] Add AAL1-to-AAL2 step-up coverage.
+- [x] Add Admin non-admin denial coverage.
+- [x] Add Admin admin-role success coverage.
+- [x] Add AAL1-to-AAL2 step-up coverage.
 - [ ] Add current-session logout coverage.
 - [ ] Add global logout coverage where practical.
-- [ ] Add callback invalid-code behavior coverage.
-- [ ] Add recovery-link compatibility coverage.
+- [x] Add callback invalid-code behavior coverage.
+- [x] Add recovery-link compatibility coverage.
 - [x] Document provider and deployed flows that remain manual under ADR-008.
 
 ### Phase 1 exit gate
