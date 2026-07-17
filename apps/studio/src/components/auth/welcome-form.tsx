@@ -7,6 +7,7 @@ import { useFormStatus } from "react-dom";
 import Link from "next/link";
 import { Home } from "lucide-react";
 
+import { safeReturnPath } from "@repo/auth/redirects";
 import { authenticate } from "@/app/welcome/actions";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import {
@@ -42,7 +43,7 @@ export function WelcomeForm({
   ...props
 }: React.ComponentProps<"div">) {
   const searchParams = useSearchParams();
-  const redirectUrl = searchParams.get("redirect") ?? "/";
+  const redirectUrl = safeReturnPath(searchParams.get("redirect"));
   const errorParam = searchParams.get("error");
   const messageParam = searchParams.get("message");
   const signedOut = searchParams.get("signed_out");

@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
+
+import { safeReturnPath } from "@repo/auth/redirects";
+import {
+  copyAuthCacheHeaders,
+  createSupabaseRequestClient,
+} from "@repo/auth/server";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/";
+  const next = safeReturnPath(searchParams.get("next"));
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -16,22 +21,24 @@ export async function GET(request: NextRequest) {
   const redirectUrl = new URL(next, request.url);
   const response = NextResponse.redirect(redirectUrl);
 
-  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-    cookies: {
-      getAll() {
-        return request.cookies.getAll();
-      },
-      setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value, options }) => {
-          response.cookies.set(name, value, options);
-        });
-      },
-    },
+  const supabase = createSupabaseRequestClient({
+    supabaseUrl,
+    supabaseAnonKey,
+    requestCookies: request.cookies,
+    responseCookies: response.cookies,
+    responseHeaders: response.headers,
   });
 
   const { error } = await supabase.auth.exchangeCodeForSession(code);
   if (error) {
-    return NextResponse.redirect(new URL("/welcome?error=auth", request.url));
+    const errorResponse = NextResponse.redirect(
+      new URL("/welcome?error=auth", request.url),
+    );
+    copyAuthCacheHeaders(response.headers, errorResponse.headers);
+    response.cookies.getAll().forEach(({ name, value, ...options }) => {
+      errorResponse.cookies.set(name, value, options);
+    });
+    return errorResponse;
   }
 
   // Always redirect through /mfa-verify after OAuth — the page checks
@@ -42,5 +49,6 @@ export async function GET(request: NextRequest) {
   response.cookies.getAll().forEach(({ name, value, ...options }) => {
     mfaResponse.cookies.set(name, value, options);
   });
+  copyAuthCacheHeaders(response.headers, mfaResponse.headers);
   return mfaResponse;
 }

@@ -102,7 +102,7 @@ Five games with polished UI and AI opponents:
 git clone https://github.com/goyal1510/jayantgoyal.git
 cd jayantgoyal
 
-# Install (requires pnpm 10.24+, Node 18+)
+# Install (requires pnpm 10.24+, Node 22+)
 pnpm install
 
 # Set up the application environments

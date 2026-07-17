@@ -141,7 +141,7 @@ TypeScript configurations:
 
 ### Prerequisites
 
-- **Node.js:** 18+
+- **Node.js:** 22+
 - **pnpm:** 10.24+
 
 ### Installation

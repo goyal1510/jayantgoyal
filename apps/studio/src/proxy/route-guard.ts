@@ -1,4 +1,7 @@
 import { NextResponse } from "next/server";
+
+import { safeReturnPath } from "@repo/auth/redirects";
+
 import type { ProxyContext } from "./types";
 
 /**
@@ -6,7 +9,9 @@ import type { ProxyContext } from "./types";
  * - Redirect unauthenticated users to /welcome on protected routes.
  * - Redirect authenticated users away from /welcome.
  */
-export async function routeGuardMiddleware(ctx: ProxyContext): Promise<NextResponse | null> {
+export async function routeGuardMiddleware(
+  ctx: ProxyContext,
+): Promise<NextResponse | null> {
   // Unauthenticated on protected route → redirect to welcome
   if (!ctx.isAuthed && !ctx.isPublic) {
     const loginUrl = new URL("/welcome", ctx.request.url);
@@ -15,13 +20,13 @@ export async function routeGuardMiddleware(ctx: ProxyContext): Promise<NextRespo
   }
 
   // Authenticated on welcome page → redirect away
-  const isRecoveryMode = ctx.request.cookies.get("recovery_mode")?.value === "true";
+  const isRecoveryMode =
+    ctx.request.cookies.get("recovery_mode")?.value === "true";
   if (ctx.isAuthed && !isRecoveryMode && ctx.pathname.startsWith("/welcome")) {
-    const redirectUrl = ctx.request.nextUrl.searchParams.get("redirect");
-    if (redirectUrl && redirectUrl.startsWith("/")) {
-      return NextResponse.redirect(new URL(redirectUrl, ctx.request.url));
-    }
-    return NextResponse.redirect(new URL("/", ctx.request.url));
+    const redirectUrl = safeReturnPath(
+      ctx.request.nextUrl.searchParams.get("redirect"),
+    );
+    return NextResponse.redirect(new URL(redirectUrl, ctx.request.url));
   }
 
   return null;

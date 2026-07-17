@@ -1,4 +1,7 @@
 import type { NextResponse } from "next/server";
+
+import { copyAuthCacheHeaders } from "@repo/auth/server";
+
 import type { ProxyContext, ProxyMiddleware } from "./types";
 
 /**
@@ -11,7 +14,13 @@ export async function runMiddleware(
 ): Promise<NextResponse> {
   for (const middleware of middlewares) {
     const result = await middleware(ctx);
-    if (result) return result;
+    if (result) {
+      ctx.response.cookies.getAll().forEach(({ name, value, ...options }) => {
+        result.cookies.set(name, value, options);
+      });
+      copyAuthCacheHeaders(ctx.response.headers, result.headers);
+      return result;
+    }
   }
   return ctx.response;
 }
