@@ -16,9 +16,11 @@
 - Added the minimum public Auth environment inventory across Development,
   Preview, and Production. Preview deliberately has no fixed Site URL; no
   service-role or unrelated secret was copied.
-- Assigned `auth.jayantgoyal.com` to the Auth project. The required Cloudflare
-  DNS record is not present, and the available Wrangler OAuth grant has zone
-  read but not DNS-record write permission.
+- Assigned `auth.jayantgoyal.com` to the Auth project. Cloudflare now has the
+  required DNS-only `A` record to `76.76.21.21`, and public DNS resolves to that
+  address. Wrangler is authenticated to the correct account, but its OAuth
+  grant exposes zone read rather than DNS-record write and Wrangler 4 has no DNS
+  record mutation command, so the authenticated Cloudflare UI was used.
 - Verified all nine existing app/environment public Supabase inventories point
   to `jayantgoyal` (`orwfvyditlguqvxvztkw`) and match exactly.
 - Applied a scoped hosted Supabase Auth patch: add the Auth generated Preview
@@ -38,6 +40,6 @@
 - Verified the project-level ignored-build command for all four platform
   projects. Portfolio and Auth now join the existing Studio/Admin setup, using
   the same detector with their own exact app directories.
-- Remaining: Cloudflare DNS, first Git deployment status, user-owned Auth flow
+- Remaining: first Git deployment status, user-owned Auth flow
   acceptance, controlled Production dark launch, rollback capture, and
   observation.

@@ -81,6 +81,8 @@ beforeEach(() => {
   vi.clearAllMocks();
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://test-project.supabase.co");
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "synthetic-anon-key");
+  vi.stubEnv("NEXT_PUBLIC_AUTH_FLOW_OWNER", "legacy");
+  vi.stubEnv("NEXT_PUBLIC_AUTH_URL", "https://auth.jayantgoyal.com");
 });
 
 afterAll(() => {
@@ -88,6 +90,21 @@ afterAll(() => {
 });
 
 describe("Admin Proxy authentication contract", () => {
+  it("routes login entry to Auth only when the cutover flag is enabled", async () => {
+    vi.stubEnv("NEXT_PUBLIC_AUTH_FLOW_OWNER", "auth");
+
+    const response = await adminProxy(
+      new NextRequest(
+        "https://admin.jayantgoyal.com/welcome?redirect=%2Fdeployments",
+      ),
+    );
+
+    expect(response.headers.get("location")).toBe(
+      "https://auth.jayantgoyal.com/login?return_to=https%3A%2F%2Fadmin.jayantgoyal.com%2Fdeployments",
+    );
+    expect(createRequestClientMock).not.toHaveBeenCalled();
+  });
+
   it("redirects an anonymous protected request and keeps refresh state", async () => {
     useSupabaseScenario({ user: null });
 

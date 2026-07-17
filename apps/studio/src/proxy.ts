@@ -5,6 +5,7 @@ import {
   hasAuthSessionCookie,
   resolveAuthSessionMode,
 } from "@repo/auth/cookies";
+import { buildAuthLoginUrl, resolveAuthFlowOwner } from "@repo/auth/entry";
 
 import { runMiddleware } from "@/proxy/runner";
 import { mfaMiddleware } from "@/proxy/mfa";
@@ -81,6 +82,15 @@ function matchPath(pathname: string, paths: string[]): boolean {
 
 export default async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+
+  if (pathname === "/welcome" && resolveAuthFlowOwner() === "auth") {
+    return NextResponse.redirect(
+      buildAuthLoginUrl({
+        requestUrl: request.url,
+        returnPath: request.nextUrl.searchParams.get("redirect"),
+      }),
+    );
+  }
 
   // Static assets — skip entirely
   if (/\.(?:svg|png|jpg|jpeg|gif|webp|webmanifest|pdf|ico)$/i.test(pathname)) {

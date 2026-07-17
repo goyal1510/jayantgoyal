@@ -140,3 +140,26 @@
 - Consequences: provider infrastructure can be deployed and tested manually without making Auth canonical. Missing Cloudflare DNS prevents accidental Production traffic. Generated Preview and Production acceptance remain user-owned under ADR-008.
 - Rollback: remove the Auth project-domain assignment and Preview callback family, disable TOTP/manual linking only if they cause a verified regression, and leave the existing Site URL and Studio/Admin auth routes untouched.
 - Revisit trigger: the first Git deployment is ready, Cloudflare DNS authority is available, or manual acceptance reports a provider/session mismatch.
+
+## ADR-012 — Separate Auth entry ownership from session migration
+
+- Date: 2026-07-17
+- Status: Accepted
+- Task IDs: PLATFORM-04, PLATFORM-05, PLATFORM-06
+- Context: Auth DNS can be prepared before Vercel's deployment quota resets,
+  but making Auth the login owner and changing the shared-cookie mode are two
+  distinct rollout risks that need independent rollback controls.
+- Decision: use `NEXT_PUBLIC_AUTH_FLOW_OWNER=legacy|auth` for only the new login
+  entry handoff. Keep `legacy` as the default. The shared URL builder accepts
+  only canonical Auth or local port `3003`, constructs an exact absolute return
+  destination from the requesting application, and rejects external paths.
+  `NEXT_PUBLIC_AUTH_SESSION_MODE` continues to control cookie compatibility
+  independently. Legacy callback, recovery, MFA, and logout routes remain.
+- Consequences: Studio and Admin can ship the adapter without changing live
+  traffic. After Auth deployment/manual acceptance and shared-session readiness,
+  the owner can be enabled separately and rolled back without revoking sessions.
+- Code or abstraction deleted/avoided: no coupled mega-flag, open redirect,
+  immediate callback deletion, or requirement to deploy during the provider
+  quota window.
+- Revisit trigger: the first Auth deployment is accepted, a controlled owner
+  rollout starts, or return/session behavior differs from the local contracts.

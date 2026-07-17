@@ -107,8 +107,9 @@
 - Provider-readiness target is the exact Vercel project `jayantgoyal-auth`
   (`prj_aioHlnbOo2PcCbTjjDHUwQon2iDD`) linked to `goyal1510/jayantgoyal`, root
   `apps/auth`, build `pnpm --filter auth build`, install `pnpm install`, and
-  Node.js 24.x. `auth.jayantgoyal.com` is assigned to this project; Cloudflare
-  DNS remains absent.
+  Node.js 24.x. `auth.jayantgoyal.com` is assigned to this project. Cloudflare
+  now has a DNS-only `A` record to Vercel at `76.76.21.21`, and public DNS
+  resolves to that exact address.
 - Auth's hosted inventory contains only the public Supabase URL/anon key,
   `legacy` session mode, and environment-specific public application URLs.
   Development uses ports 3000 through 3003, Preview has no fixed Auth Site URL,
@@ -138,7 +139,17 @@
   operational limit, not an application build failure. Portfolio, Studio,
   Admin, and Auth now all use their exact `scripts/ignore-build.sh` project
   settings to avoid consuming future capacity on unrelated changes.
-- Remaining gates: Cloudflare DNS, first Git deployment, user-owned generated
+- A default-off canonical-entry adapter is prepared in Studio and Admin.
+  `NEXT_PUBLIC_AUTH_FLOW_OWNER` defaults to `legacy`; only the exact `auth`
+  value redirects `/welcome` to canonical Auth. The shared builder preserves an
+  exact application return target, rejects external paths and lookalike Auth
+  origins, and falls back to canonical Auth for invalid configuration. Session
+  migration remains independently controlled by `NEXT_PUBLIC_AUTH_SESSION_MODE`.
+  Legacy callback, recovery, MFA, and logout code is retained.
+- Focused readiness proof passes 14 tests across the shared Auth entry contract
+  and the Studio/Admin adapters. Auth, Studio, and Admin zero-warning lint and
+  TypeScript pass after one nullable annotation caught by the first type gate.
+- Remaining gates: first Git deployment, user-owned generated
   Preview application-local flows, controlled Production dark launch, manual
   browser acceptance, deployment/rollback identifiers, and observation.
   PLATFORM-05 is not Done.
