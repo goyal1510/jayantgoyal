@@ -71,7 +71,15 @@
 - Ordinary Studio/Admin logout, terms rejection, and recovery cleanup explicitly use local scope. Global sign-out is reserved for an explicit password-reset choice or account deletion. Admin role denial no longer destroys the shared identity session.
 - Turborepo treats `NEXT_PUBLIC_AUTH_SESSION_MODE` as a build input and no longer lists obsolete guest credentials. Vercel Studio and Admin each have exactly one unscoped, non-sensitive rollout entry covering Development, Preview, and Production; both are set to `legacy`, so current deployed behavior remains unchanged.
 - Local proof covers cookie attributes, chunk selection, platform preference, validated promotion/failure/mismatch, logout scopes, Admin denial/AAL2, callbacks, recovery, terms, and response propagation. The first final-suite attempt caught bracketed IPv6 localhost receiving the secure policy; the corrected focused file passes 23 tests. The final full suite passes 110 tests across 21 files, all eight zero-warning lint and typecheck tasks pass, and the complete Portfolio/Studio/Admin build passes. No hosted Supabase or database change was made.
-- Remaining gates: simultaneous expired-token refresh, user manual same-app Preview acceptance, controlled cross-subdomain Production validation, open-tab behavior, and rollback observation. PLATFORM-04 is not Done.
+- A deterministic two-request regression starts Studio and Admin legacy
+  promotion concurrently and simulates one refresh-token transfer collision.
+  The successful request adopts the platform client while the affected request
+  retains its already validated legacy client; client state is not shared
+  across the two factories. Hosted refresh-token timing is still a manual
+  Production observation rather than a claim made by the synthetic test.
+- Remaining gates: user manual same-app Preview acceptance, controlled
+  cross-subdomain Production validation (including actual expired-token and
+  open-tab behavior), and rollback observation. PLATFORM-04 is not Done.
 
 ## Cross-phase security gate — In Progress
 
