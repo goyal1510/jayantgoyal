@@ -38,3 +38,16 @@
 - Consequences: the old apex may temporarily render Studio or fail between project and domain changes; that disruption is accepted. Rollback is the Git revert plus restoring the prior Vercel project root/name and aliases.
 - Code or abstraction deleted/avoided: dual-surface hostname classification, duplicated Portfolio routes/data/components in Studio, and a second Studio Vercel project.
 - Revisit trigger: deployed evidence shows an unclassified production dependency on the former combined runtime.
+
+## ADR-004 — Centralize proven infrastructure without centralizing application policy
+
+- Date: 2026-07-17
+- Status: Accepted
+- Task IDs: PLATFORM-00, PLATFORM-07, PLATFORM-08, PLATFORM-10, PLATFORM-11
+- Context: Portfolio, Studio, and Admin independently proved the same sidebar frame, responsive header, breadcrumb renderer, theme/motion providers, loading indicators, user-menu presentation, and welcome-form controls. Keeping those copies app-local created visual drift, while the earlier attempt to centralize all sidebar configuration also centralized route meaning, authorization, and product-specific navigation that must remain independent.
+- Options considered: keep every implementation duplicated; centralize the entire application shell and all navigation/configuration; or centralize only proven behavior-neutral contracts and renderers while retaining app-owned adapters.
+- Decision: `@repo/brand` owns names and title templates; `@repo/platform` owns canonical application hosts and URL construction; `@repo/seo` owns reusable public metadata/path rules; and `@repo/ui` owns shared shell, breadcrumb, provider, loading, user-menu, and authentication-presentation components. Each application still owns its navigation inventory, route-to-breadcrumb meaning, Portfolio scroll behavior, Studio product/session state, Admin role gating, Supabase clients, cookies, callbacks, MFA, redirects, and authorization.
+- Why this is the smallest maintainable choice: common mechanics have one implementation, but no shared package needs to know product routes, user roles, Supabase state, or application-specific behavior.
+- Consequences: a visual or accessibility correction to common chrome can be applied once. Shared components accept data and callbacks; they do not fetch sessions, infer roles, or decide destinations. `packages/auth` remains deferred until the shared-session phases.
+- Code or abstraction deleted/avoided: duplicated theme/motion/loading providers, duplicated sidebar/header/breadcrumb renderers, duplicated login-card controls, and the rejected global navigation-policy object.
+- Revisit trigger: a second application independently proves an additional behavior-neutral pattern, or a shared component begins accumulating application-specific conditionals.

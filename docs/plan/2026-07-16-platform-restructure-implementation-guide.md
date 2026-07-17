@@ -683,7 +683,7 @@ Acceptance checks:
 - [x] No product state stores.
 - [x] No weather, files, messenger, games, tools, or activity dependencies.
 - [x] No service-role key unless a separately reviewed server-only operation proves it necessary.
-- [x] Shared UI use is limited to primitives.
+- [x] Shared UI use is limited to presentation primitives and behavior-neutral shell renderers; Portfolio navigation and product policy remain app-owned.
 
 ### Phase 8 exit gate
 
