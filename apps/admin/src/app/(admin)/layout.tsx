@@ -6,9 +6,14 @@ import { DynamicBreadcrumb } from "@/components/sidebar/dynamic-breadcrumb";
 import ThemeToggle from "@/components/theme/theme-toggle";
 import { ApplicationHeader } from "@repo/ui/application-shell";
 import { LazyMotionProvider } from "@repo/ui/lazy-motion-provider";
+import {
+  SIDEBAR_STATE_COOKIE_NAME,
+  SIDEBAR_WIDTH_COOKIE_NAME,
+  parseSidebarPreferences,
+} from "@repo/ui/lib/sidebar-preferences";
+import { RouteChangeProvider } from "@repo/ui/route-change-provider";
 import { SidebarInset, SidebarProvider } from "@repo/ui/sidebar";
 import type { UserRole } from "@/lib/types";
-import { RouteChangeProvider } from "@/components/providers/route-change-provider";
 
 export default async function AdminLayout({
   children,
@@ -17,9 +22,10 @@ export default async function AdminLayout({
 }) {
   const supabase = await createSupabaseServerClient();
   const cookieStore = await cookies();
-  const defaultOpen = cookieStore.get("sidebar_state")?.value !== "false";
-  const defaultWidth =
-    Number(cookieStore.get("sidebar_width")?.value) || undefined;
+  const sidebarPreferences = parseSidebarPreferences({
+    state: cookieStore.get(SIDEBAR_STATE_COOKIE_NAME)?.value,
+    width: cookieStore.get(SIDEBAR_WIDTH_COOKIE_NAME)?.value,
+  });
 
   const {
     data: { user },
@@ -53,7 +59,7 @@ export default async function AdminLayout({
   };
 
   return (
-    <SidebarProvider defaultOpen={defaultOpen} defaultWidth={defaultWidth}>
+    <SidebarProvider {...sidebarPreferences}>
       <AppSidebar user={authUser} />
       <SidebarInset>
         <ApplicationHeader

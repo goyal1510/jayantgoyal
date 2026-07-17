@@ -6,10 +6,15 @@ import { DynamicBreadcrumb } from "@/components/sidebar/dynamic-breadcrumb";
 import ThemeToogle from "@/components/theme/theme-toogle";
 import { ApplicationHeader } from "@repo/ui/application-shell";
 import { LazyMotionProvider } from "@repo/ui/lazy-motion-provider";
+import {
+  SIDEBAR_STATE_COOKIE_NAME,
+  SIDEBAR_WIDTH_COOKIE_NAME,
+  parseSidebarPreferences,
+} from "@repo/ui/lib/sidebar-preferences";
+import { RouteChangeProvider } from "@repo/ui/route-change-provider";
 import { SidebarInset, SidebarProvider } from "@repo/ui/sidebar";
 import { TermsAcceptanceCheck } from "@/components/auth/terms-acceptance-check";
 import { AuthGateWrapper } from "@/components/auth/auth-gate";
-import { RouteChangeProvider } from "@/components/providers/route-change-provider";
 import { LazyCommandPalette } from "@/components/providers/lazy-components";
 import { AuthToast } from "@/components/auth/auth-toast";
 import { DynamicBreadcrumbJsonLd } from "@/components/seo/dynamic-breadcrumb-jsonld";
@@ -31,16 +36,17 @@ export default async function ProtectedLayout({
     cookieStore.get(tokenName)?.value ??
       cookieStore.get(`${tokenName}.0`)?.value,
   );
-  const defaultOpen = cookieStore.get("sidebar_state")?.value !== "false";
-  const defaultWidth =
-    Number(cookieStore.get("sidebar_width")?.value) || undefined;
+  const sidebarPreferences = parseSidebarPreferences({
+    state: cookieStore.get(SIDEBAR_STATE_COOKIE_NAME)?.value,
+    width: cookieStore.get(SIDEBAR_WIDTH_COOKIE_NAME)?.value,
+  });
 
   return (
     <>
       {isAuthenticated && <TermsAcceptanceCheck />}
       <AuthToast />
       <DynamicBreadcrumbJsonLd />
-      <SidebarProvider defaultOpen={defaultOpen} defaultWidth={defaultWidth}>
+      <SidebarProvider {...sidebarPreferences}>
         <AppSidebar />
         <SidebarInset>
           <ApplicationHeader

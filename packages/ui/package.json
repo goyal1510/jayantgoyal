@@ -3,6 +3,8 @@
   "version": "0.0.0",
   "exports": {
     "./lib/utils": "./src/lib/utils.ts",
+    "./lib/route-change": "./src/lib/route-change.ts",
+    "./lib/sidebar-preferences": "./src/lib/sidebar-preferences.ts",
     "./hooks/use-mobile": "./src/hooks/use-mobile.ts",
     "./*": "./src/components/*.tsx"
   },
