@@ -7,6 +7,7 @@ import {
   type BreadcrumbTrailItem,
 } from "@repo/ui/application-shell";
 import { getAppById, HUB_APPS } from "@/lib/config/hub-config";
+import { getStudioProduct } from "@/lib/config/studio-inventory";
 import { toolCategories, getToolByPath } from "@/lib/tools/tools";
 
 export function DynamicBreadcrumb() {
@@ -14,6 +15,15 @@ export function DynamicBreadcrumb() {
 
   // Determine app and page based on pathname
   const { appName, appHref, pageName } = (() => {
+    if (pathname.startsWith("/products")) {
+      const slug = pathname.split("/").filter(Boolean)[1];
+      return {
+        appName: "Products",
+        appHref: "/products",
+        pageName: slug ? (getStudioProduct(slug)?.name ?? "Product") : null,
+      };
+    }
+
     // Games routes
     if (pathname.startsWith("/games")) {
       const gameApp = getAppById("game-hub");

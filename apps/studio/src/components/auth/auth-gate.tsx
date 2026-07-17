@@ -8,7 +8,15 @@ import { Button } from "@repo/ui/button";
 import { matchesPathOrChild } from "@/lib/seo/config";
 
 /** Public paths that don't require auth — must match proxy PUBLIC_PAGES */
-const PUBLIC_PREFIXES = ["/tools", "/blogs", "/blog", "/weather", "/custom-calculator", "/github-stats"];
+const PUBLIC_PREFIXES = [
+  "/products",
+  "/tools",
+  "/blogs",
+  "/blog",
+  "/weather",
+  "/custom-calculator",
+  "/github-stats",
+];
 const PUBLIC_EXACT = new Set(["/", "/about", "/terms-conditions"]);
 
 function isPublicPath(pathname: string): boolean {

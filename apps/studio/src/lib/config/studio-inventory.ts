@@ -1,7 +1,6 @@
 import {
   Calculator,
   Cloud,
-  FileText,
   FolderOpen,
   Gamepad2,
   Github,
@@ -12,7 +11,16 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-import { portfolioUrl } from "@/lib/platform/urls";
+export const STUDIO_PRODUCT_TYPES = [
+  "app",
+  "game",
+  "tool",
+  "experiment",
+] as const;
+
+export type StudioProductType = (typeof STUDIO_PRODUCT_TYPES)[number];
+export type StudioProductAccess = "public" | "account" | "external";
+export type StudioProductStatus = "available" | "beta";
 
 export type StudioProduct = {
   id: string;
@@ -20,11 +28,15 @@ export type StudioProduct = {
   description: string;
   href: string;
   icon: LucideIcon;
-  access: "public" | "account" | "external";
+  access: StudioProductAccess;
+  type: StudioProductType;
+  status: StudioProductStatus;
   capability: string;
+  highlights: readonly string[];
+  featured: boolean;
 };
 
-export const STUDIO_PRODUCTS: StudioProduct[] = [
+export const STUDIO_PRODUCTS: readonly StudioProduct[] = [
   {
     id: "tech-tools",
     name: "Tech Tools",
@@ -33,7 +45,15 @@ export const STUDIO_PRODUCTS: StudioProduct[] = [
     href: "/tools",
     icon: Wrench,
     access: "public",
+    type: "tool",
+    status: "available",
     capability: "99+ utilities",
+    highlights: [
+      "Generators and converters",
+      "Formatters and validators",
+      "Text, network, media, and developer utilities",
+    ],
+    featured: true,
   },
   {
     id: "weather",
@@ -43,7 +63,15 @@ export const STUDIO_PRODUCTS: StudioProduct[] = [
     href: "/weather",
     icon: Cloud,
     access: "public",
+    type: "app",
+    status: "available",
     capability: "Forecasting",
+    highlights: [
+      "City and location search",
+      "Current conditions",
+      "Five-day forecast",
+    ],
+    featured: false,
   },
   {
     id: "github-stats",
@@ -53,7 +81,15 @@ export const STUDIO_PRODUCTS: StudioProduct[] = [
     href: "/github-stats",
     icon: Github,
     access: "public",
+    type: "tool",
+    status: "available",
     capability: "Developer insights",
+    highlights: [
+      "Public profile lookup",
+      "Repository and language summaries",
+      "Contribution-oriented insights",
+    ],
+    featured: false,
   },
   {
     id: "custom-calculator",
@@ -63,17 +99,15 @@ export const STUDIO_PRODUCTS: StudioProduct[] = [
     href: "/custom-calculator",
     icon: Calculator,
     access: "public",
+    type: "tool",
+    status: "beta",
     capability: "Visual builder",
-  },
-  {
-    id: "blog",
-    name: "Blog",
-    description:
-      "Notes and practical write-ups about software engineering, products, and experiments.",
-    href: portfolioUrl("/blog"),
-    icon: FileText,
-    access: "public",
-    capability: "Writing",
+    highlights: [
+      "Composable inputs and operations",
+      "Reusable calculator layouts",
+      "Immediate result previews",
+    ],
+    featured: false,
   },
   {
     id: "game-hub",
@@ -83,7 +117,15 @@ export const STUDIO_PRODUCTS: StudioProduct[] = [
     href: "/games",
     icon: Gamepad2,
     access: "account",
+    type: "game",
+    status: "available",
     capability: "10 games",
+    highlights: [
+      "Single-player and multiplayer modes",
+      "Room-based sessions",
+      "Chess, Wordle, Connect Four, and more",
+    ],
+    featured: true,
   },
   {
     id: "activity-tracker",
@@ -93,7 +135,15 @@ export const STUDIO_PRODUCTS: StudioProduct[] = [
     href: "/activity-tracker/dashboard",
     icon: Target,
     access: "account",
+    type: "app",
+    status: "available",
     capability: "Personal analytics",
+    highlights: [
+      "Daily activity tracking",
+      "Personal dashboards",
+      "Completion and trend analysis",
+    ],
+    featured: true,
   },
   {
     id: "currency-calculator",
@@ -103,7 +153,15 @@ export const STUDIO_PRODUCTS: StudioProduct[] = [
     href: "/calculator/new",
     icon: Calculator,
     access: "account",
+    type: "tool",
+    status: "available",
     capability: "Saved calculations",
+    highlights: [
+      "Cash denomination totals",
+      "Dated calculation history",
+      "Saved notes and records",
+    ],
+    featured: false,
   },
   {
     id: "file-manager",
@@ -113,7 +171,15 @@ export const STUDIO_PRODUCTS: StudioProduct[] = [
     href: "/files",
     icon: FolderOpen,
     access: "account",
+    type: "app",
+    status: "available",
     capability: "Private storage",
+    highlights: [
+      "Private file and folder organization",
+      "Cloud upload and download",
+      "Soft-delete and recovery workflows",
+    ],
+    featured: false,
   },
   {
     id: "messenger",
@@ -123,7 +189,15 @@ export const STUDIO_PRODUCTS: StudioProduct[] = [
     href: "/messenger",
     icon: MessageSquare,
     access: "account",
+    type: "app",
+    status: "beta",
     capability: "Realtime",
+    highlights: [
+      "Realtime message delivery",
+      "Text and code messages",
+      "Account-backed conversation history",
+    ],
+    featured: false,
   },
   {
     id: "ecommerce",
@@ -133,6 +207,28 @@ export const STUDIO_PRODUCTS: StudioProduct[] = [
     href: "https://ecommerce.jayantgoyal.com/",
     icon: ShoppingCart,
     access: "external",
+    type: "experiment",
+    status: "beta",
     capability: "Separate application",
+    highlights: [
+      "Product browsing",
+      "Cart and checkout flows",
+      "Independent deployment lifecycle",
+    ],
+    featured: false,
   },
 ];
+
+export const FEATURED_STUDIO_PRODUCTS = STUDIO_PRODUCTS.filter(
+  (product) => product.featured,
+);
+
+export function getStudioProduct(id: string): StudioProduct | undefined {
+  return STUDIO_PRODUCTS.find((product) => product.id === id);
+}
+
+export function studioProductDetailHref(
+  product: Pick<StudioProduct, "id">,
+): string {
+  return `/products/${product.id}`;
+}

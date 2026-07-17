@@ -1,66 +1,61 @@
 import Link from "next/link";
-import {
-  ArrowRight,
-  ExternalLink,
-  LayoutGrid,
-  LockKeyhole,
-} from "lucide-react";
+import { ArrowRight, LayoutGrid, LockKeyhole, Sparkles } from "lucide-react";
 
 import { APP_BRANDS } from "@repo/brand";
 import { Badge } from "@repo/ui/badge";
 import { Button } from "@repo/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@repo/ui/card";
-import { cn } from "@repo/ui/lib/utils";
+import { Card, CardDescription, CardHeader, CardTitle } from "@repo/ui/card";
 
+import { StudioProductCard } from "@/components/studio/studio-product-card";
 import {
+  FEATURED_STUDIO_PRODUCTS,
   STUDIO_PRODUCTS,
-  type StudioProduct,
 } from "@/lib/config/studio-inventory";
 
-const accessLabels: Record<StudioProduct["access"], string> = {
-  public: "Public",
-  account: "Account",
-  external: "External",
-};
+const accessSummaries = [
+  {
+    access: "public",
+    title: "Use without an account",
+    description: "Open tools and apps you can explore immediately.",
+    icon: Sparkles,
+  },
+  {
+    access: "account",
+    title: "Personal workspaces",
+    description:
+      "Private data and collaboration features tied to your account.",
+    icon: LockKeyhole,
+  },
+  {
+    access: "external",
+    title: "Independent applications",
+    description: "Related products with their own deployment and experience.",
+    icon: LayoutGrid,
+  },
+] as const;
 
 export function StudioInventory() {
-  const publicProducts = STUDIO_PRODUCTS.filter(
-    (product) => product.access === "public",
-  );
-  const personalProducts = STUDIO_PRODUCTS.filter(
-    (product) => product.access === "account",
-  );
-  const externalProducts = STUDIO_PRODUCTS.filter(
-    (product) => product.access === "external",
-  );
-
   return (
     <div className="mx-auto w-full max-w-7xl space-y-14 py-8 sm:py-12">
       <section className="overflow-hidden rounded-3xl border bg-gradient-to-br from-card via-card to-primary/10 px-6 py-12 sm:px-10 lg:px-14">
         <div className="max-w-3xl space-y-6">
           <Badge variant="secondary" className="gap-2">
             <LayoutGrid className="size-3.5" />
-            Product inventory
+            Product studio
           </Badge>
           <div className="space-y-4">
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
               {APP_BRANDS.studio.publicName}
             </h1>
             <p className="max-w-2xl text-lg leading-8 text-muted-foreground sm:text-xl">
-              A growing collection of useful tools, personal workspaces, games,
-              and experiments—organized by what you can use right now.
+              Discover practical tools, personal workspaces, games, and
+              experiments—then launch each product from one clear catalog.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Button asChild size="lg">
-              <Link href="/tools">
-                Explore Tech Tools
+              <Link href="/products">
+                Explore products
                 <ArrowRight className="size-4" />
               </Link>
             </Button>
@@ -71,102 +66,58 @@ export function StudioInventory() {
         </div>
       </section>
 
-      <InventoryGroup
-        title="Use without an account"
-        description="Open workspaces you can explore immediately."
-        products={publicProducts}
-      />
-      <InventoryGroup
-        title="Personal workspaces"
-        description="Private data and collaboration features that require an account."
-        products={personalProducts}
-      />
-      <InventoryGroup
-        title="Independent applications"
-        description="Related applications with their own deployment and experience."
-        products={externalProducts}
-      />
-    </div>
-  );
-}
-
-function InventoryGroup({
-  title,
-  description,
-  products,
-}: {
-  title: string;
-  description: string;
-  products: StudioProduct[];
-}) {
-  const headingId = `${title.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-")}-heading`;
-
-  return (
-    <section className="space-y-6" aria-labelledby={headingId}>
-      <div className="space-y-2">
-        <h2
-          id={headingId}
-          className="text-2xl font-semibold tracking-tight sm:text-3xl"
-        >
-          {title}
-        </h2>
-        <p className="text-muted-foreground">{description}</p>
-      </div>
-      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-        {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function ProductCard({ product }: { product: StudioProduct }) {
-  const isExternal = product.access === "external";
-
-  return (
-    <Card className="group h-full transition-all hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg">
-      <CardHeader className="gap-4">
-        <div className="flex items-start justify-between gap-4">
-          <span className="inline-flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <product.icon className="size-5" />
-          </span>
-          <Badge
-            variant="outline"
-            className={cn(product.access === "account" && "gap-1.5")}
-          >
-            {product.access === "account" ? (
-              <LockKeyhole className="size-3" />
-            ) : null}
-            {accessLabels[product.access]}
-          </Badge>
-        </div>
-        <div className="space-y-2">
-          <CardTitle>{product.name}</CardTitle>
-          <CardDescription className="leading-6">
-            {product.description}
-          </CardDescription>
-        </div>
-      </CardHeader>
-      <CardContent className="mt-auto flex items-center justify-between gap-4">
-        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          {product.capability}
-        </span>
-        <Button asChild variant="ghost" size="sm">
-          <Link
-            href={product.href}
-            target={isExternal ? "_blank" : undefined}
-            rel={isExternal ? "noreferrer" : undefined}
-          >
-            Open
-            {isExternal ? (
-              <ExternalLink className="size-4" />
-            ) : (
+      <section className="space-y-6" aria-labelledby="featured-products">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div className="space-y-2">
+            <h2
+              id="featured-products"
+              className="text-2xl font-semibold tracking-tight sm:text-3xl"
+            >
+              Featured products
+            </h2>
+            <p className="text-muted-foreground">
+              A focused starting point across tools, games, and personal apps.
+            </p>
+          </div>
+          <Button asChild variant="ghost">
+            <Link href="/products">
+              Browse all {STUDIO_PRODUCTS.length}
               <ArrowRight className="size-4" />
-            )}
-          </Link>
-        </Button>
-      </CardContent>
-    </Card>
+            </Link>
+          </Button>
+        </div>
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {FEATURED_STUDIO_PRODUCTS.map((product) => (
+            <StudioProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      </section>
+
+      <section
+        className="grid gap-5 md:grid-cols-3"
+        aria-label="Product access"
+      >
+        {accessSummaries.map((summary) => {
+          const count = STUDIO_PRODUCTS.filter(
+            (product) => product.access === summary.access,
+          ).length;
+
+          return (
+            <Card key={summary.access}>
+              <CardHeader>
+                <span className="inline-flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <summary.icon className="size-5" />
+                </span>
+                <CardTitle>{summary.title}</CardTitle>
+                <CardDescription>{summary.description}</CardDescription>
+                <p className="pt-2 text-sm font-medium">
+                  {count} {count === 1 ? "product" : "products"}
+                </p>
+              </CardHeader>
+            </Card>
+          );
+        })}
+      </section>
+    </div>
   );
 }
