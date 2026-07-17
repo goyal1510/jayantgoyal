@@ -14,7 +14,6 @@ export type LegacyPortfolioData =
   (typeof PORTFOLIO_PROFILES)[PortfolioProfileKey];
 
 const HOSTNAME_MAP: Record<string, PortfolioProfileKey> = {
-  "portfolio.jayantgoyal.com": "jayant",
   "jayantgoyal.com": "jayant",
 } as const;
 
