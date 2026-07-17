@@ -17,6 +17,8 @@
     "@radix-ui/react-progress": "^1.1.8",
     "@radix-ui/react-scroll-area": "^1.2.10",
     "@repo/brand": "workspace:*",
+    "@repo/platform": "workspace:*",
+    "@repo/seo": "workspace:*",
     "@repo/ui": "workspace:*",
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.84.0",

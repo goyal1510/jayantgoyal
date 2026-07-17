@@ -5,7 +5,7 @@ export default defineConfig({
     environment: "node",
     include: [
       "apps/{portfolio,studio}/**/*.test.ts",
-      "packages/brand/**/*.test.ts",
+      "packages/{brand,platform,seo}/**/*.test.ts",
     ],
   },
 });

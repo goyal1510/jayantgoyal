@@ -135,6 +135,12 @@ importers:
       '@repo/brand':
         specifier: workspace:*
         version: link:../../packages/brand
+      '@repo/platform':
+        specifier: workspace:*
+        version: link:../../packages/platform
+      '@repo/seo':
+        specifier: workspace:*
+        version: link:../../packages/seo
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -241,6 +247,12 @@ importers:
       '@repo/brand':
         specifier: workspace:*
         version: link:../../packages/brand
+      '@repo/platform':
+        specifier: workspace:*
+        version: link:../../packages/platform
+      '@repo/seo':
+        specifier: workspace:*
+        version: link:../../packages/seo
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -411,6 +423,56 @@ importers:
         specifier: ^8.39.0
         version: 8.46.2(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.2)
 
+  packages/platform:
+    dependencies:
+      '@repo/brand':
+        specifier: workspace:*
+        version: link:../brand
+    devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      eslint:
+        specifier: ^9.39.1
+        version: 9.39.1(jiti@2.6.1)
+      typescript:
+        specifier: 5.9.2
+        version: 5.9.2
+      vitest:
+        specifier: ^4.1.10
+        version: 4.1.10(@edge-runtime/vm@3.2.0)(@types/node@22.18.12)(vite@8.1.5(@types/node@22.18.12)(esbuild@0.28.1)(jiti@2.6.1)(tsx@4.21.0))
+
+  packages/seo:
+    dependencies:
+      '@repo/brand':
+        specifier: workspace:*
+        version: link:../brand
+      '@repo/platform':
+        specifier: workspace:*
+        version: link:../platform
+    devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      eslint:
+        specifier: ^9.39.1
+        version: 9.39.1(jiti@2.6.1)
+      next:
+        specifier: ^16.2.10
+        version: 16.2.10(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
+      typescript:
+        specifier: 5.9.2
+        version: 5.9.2
+      vitest:
+        specifier: ^4.1.10
+        version: 4.1.10(@edge-runtime/vm@3.2.0)(@types/node@22.18.12)(vite@8.1.5(@types/node@22.18.12)(esbuild@0.28.1)(jiti@2.6.1)(tsx@4.21.0))
+
   packages/tailwind-config:
     devDependencies:
       postcss:
@@ -500,6 +562,9 @@ importers:
       eslint:
         specifier: ^9.39.1
         version: 9.39.1(jiti@2.6.1)
+      framer-motion:
+        specifier: ^12.23.24
+        version: 12.23.24(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       typescript:
         specifier: 5.9.2
         version: 5.9.2
@@ -592,9 +657,6 @@ packages:
 
   '@emnapi/runtime@1.11.1':
     resolution: {integrity: sha512-vgj7R3y3Wgx24IQaGPA/R6YFXLHVMOZ0uVEyIQPaWs+rd1AzfEMXlAC22FYwO1XkKR6NPsq7mUandH8oIRdZFw==}
-
-  '@emnapi/runtime@1.7.0':
-    resolution: {integrity: sha512-oAYoQnCYaQZKVS53Fq23ceWMRxq5EhQsE0x0RdQ55jT7wagMu5k+fS39v1fiSLrtrLQlXwVINenqhLMtTrV/1Q==}
 
   '@emnapi/wasi-threads@1.2.2':
     resolution: {integrity: sha512-c95qOXkHdydNKhscBTebqEC1CVAZpyqOfVfBzQ1qgzyl3gfeldUjIggDbIZgDKsHLgnsM+igH7TJ/eAasaVuMA==}
@@ -5550,11 +5612,6 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
-  '@emnapi/runtime@1.7.0':
-    dependencies:
-      tslib: 2.8.1
-    optional: true
-
   '@emnapi/wasi-threads@1.2.2':
     dependencies:
       tslib: 2.8.1
@@ -5886,7 +5943,7 @@ snapshots:
 
   '@img/sharp-wasm32@0.34.5':
     dependencies:
-      '@emnapi/runtime': 1.7.0
+      '@emnapi/runtime': 1.11.1
     optional: true
 
   '@img/sharp-win32-arm64@0.34.5':
