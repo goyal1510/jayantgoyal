@@ -9,6 +9,7 @@ import {
   isCookieFamily,
   legacyCookieNameForSupabaseUrl,
   resolveAuthSessionMode,
+  resolveLocalDevelopmentCookieDomain,
   resolveSessionCookieOptions,
   selectRequestSessionSource,
 } from "./cookies";
@@ -30,6 +31,20 @@ describe("auth session mode", () => {
 });
 
 describe("session cookie policy", () => {
+  it("accepts only reserved local development parent domains", () => {
+    expect(resolveLocalDevelopmentCookieDomain(".jayantgoyal.test")).toBe(
+      "jayantgoyal.test",
+    );
+    expect(resolveLocalDevelopmentCookieDomain("jayantgoyal.localhost")).toBe(
+      "jayantgoyal.localhost",
+    );
+    expect(resolveLocalDevelopmentCookieDomain("jayantgoyal.com")).toBeNull();
+    expect(resolveLocalDevelopmentCookieDomain("localhost")).toBeNull();
+    expect(
+      resolveLocalDevelopmentCookieDomain("jayantgoyal.test.evil.example"),
+    ).toBeNull();
+  });
+
   it("does not override the current cookie in legacy mode", () => {
     expect(
       resolveSessionCookieOptions({
@@ -93,6 +108,48 @@ describe("session cookie policy", () => {
     });
   });
 
+  it("uses a secure shared cookie on the configured local test domain", () => {
+    expect(
+      resolveSessionCookieOptions({
+        hostname: "auth.jayantgoyal.test",
+        mode: "compatibility",
+        cookieDomain: "jayantgoyal.test",
+      }),
+    ).toEqual({
+      name: PLATFORM_SESSION_COOKIE_NAME,
+      domain: "jayantgoyal.test",
+      path: "/",
+      sameSite: "lax",
+      secure: true,
+    });
+  });
+
+  it("uses an unprefixed shared cookie across localhost subdomains", () => {
+    expect(
+      resolveSessionCookieOptions({
+        hostname: "studio.jayantgoyal.localhost",
+        mode: "compatibility",
+        cookieDomain: "jayantgoyal.localhost",
+      }),
+    ).toEqual({
+      name: LOCAL_SESSION_COOKIE_NAME,
+      domain: "jayantgoyal.localhost",
+      path: "/",
+      sameSite: "lax",
+      secure: false,
+    });
+  });
+
+  it("does not grant an unrelated test hostname the configured parent cookie", () => {
+    expect(
+      resolveSessionCookieOptions({
+        hostname: "auth.other.test",
+        mode: "compatibility",
+        cookieDomain: "jayantgoyal.test",
+      }),
+    ).not.toHaveProperty("domain");
+  });
+
   it("does not grant an unknown platform subdomain the parent cookie", () => {
     expect(
       resolveSessionCookieOptions({
@@ -125,7 +182,10 @@ describe("legacy cookie discovery and selection", () => {
 
   it("finds chunked cookies without inspecting their values", () => {
     expect(
-      hasCookieFamily([{ name: `${legacyName}.0`, value: "synthetic" }], legacyName),
+      hasCookieFamily(
+        [{ name: `${legacyName}.0`, value: "synthetic" }],
+        legacyName,
+      ),
     ).toBe(true);
   });
 

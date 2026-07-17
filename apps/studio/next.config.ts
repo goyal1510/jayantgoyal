@@ -1,6 +1,13 @@
 import type { NextConfig } from "next";
 import { applicationOrigin } from "@repo/platform";
 
+const localCookieDomain = process.env.NEXT_PUBLIC_AUTH_COOKIE_DOMAIN?.trim()
+  .toLowerCase()
+  .replace(/^\.+/, "");
+const allowedDevOrigins = localCookieDomain?.endsWith(".localhost")
+  ? [`studio.${localCookieDomain}`]
+  : [];
+
 const PORTFOLIO_URL = applicationOrigin(
   "portfolio",
   process.env.NEXT_PUBLIC_PORTFOLIO_URL,
@@ -21,6 +28,7 @@ const noindexHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins,
   transpilePackages: ["@repo/platform", "@repo/seo", "@repo/ui"],
   typescript: {
     ignoreBuildErrors: true,

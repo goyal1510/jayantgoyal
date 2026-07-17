@@ -1,5 +1,12 @@
 import type { NextConfig } from "next";
 
+const localCookieDomain = process.env.NEXT_PUBLIC_AUTH_COOKIE_DOMAIN?.trim()
+  .toLowerCase()
+  .replace(/^\.+/, "");
+const allowedDevOrigins = localCookieDomain?.endsWith(".localhost")
+  ? [`auth.${localCookieDomain}`]
+  : [];
+
 const securityHeaders = [
   { key: "Cache-Control", value: "private, no-store, max-age=0" },
   { key: "Pragma", value: "no-cache" },
@@ -34,6 +41,7 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins,
   transpilePackages: [
     "@repo/auth",
     "@repo/brand",

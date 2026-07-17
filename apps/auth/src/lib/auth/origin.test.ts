@@ -28,6 +28,15 @@ describe("Auth mutation origin policy", () => {
     ).toBe("http://localhost:3003");
   });
 
+  it("treats a localhost subdomain as HTTP when no forwarded protocol exists", () => {
+    expect(
+      requestOriginFromHeaders(
+        headers({ host: "auth.jayantgoyal.localhost:3003" }),
+        "https://auth.jayantgoyal.com",
+      ),
+    ).toBe("http://auth.jayantgoyal.localhost:3003");
+  });
+
   it("requires exact same-origin mutations", () => {
     expect(
       isTrustedMutationOrigin({

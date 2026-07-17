@@ -6,8 +6,13 @@ import {
   buildAuthLoginUrl,
   buildAuthLogoutUrl,
   resolveAuthApplicationOrigin,
+  resolveExternalRequestUrl,
   resolveAuthFlowOwner,
 } from "./entry";
+
+function headers(values: Record<string, string | null>) {
+  return { get: (name: string) => values[name] ?? null };
+}
 
 afterAll(() => {
   vi.unstubAllEnvs();
@@ -33,8 +38,42 @@ describe("canonical Auth entry ownership", () => {
       CANONICAL_AUTH_ORIGIN,
     );
     expect(
+      resolveAuthApplicationOrigin("https://auth.jayantgoyal.com.evil.example"),
+    ).toBe(CANONICAL_AUTH_ORIGIN);
+  });
+
+  it("accepts only the exact Auth host under the configured local test domain", () => {
+    expect(
       resolveAuthApplicationOrigin(
-        "https://auth.jayantgoyal.com.evil.example",
+        "https://auth.jayantgoyal.test",
+        "jayantgoyal.test",
+      ),
+    ).toBe("https://auth.jayantgoyal.test");
+    expect(
+      resolveAuthApplicationOrigin(
+        "https://auth.jayantgoyal.test.evil.example",
+        "jayantgoyal.test",
+      ),
+    ).toBe(CANONICAL_AUTH_ORIGIN);
+    expect(
+      resolveAuthApplicationOrigin(
+        "https://auth.jayantgoyal.com",
+        "jayantgoyal.com",
+      ),
+    ).toBe(CANONICAL_AUTH_ORIGIN);
+  });
+
+  it("accepts the exact Auth port under a configured localhost parent", () => {
+    expect(
+      resolveAuthApplicationOrigin(
+        "http://auth.jayantgoyal.localhost:3003",
+        "jayantgoyal.localhost",
+      ),
+    ).toBe("http://auth.jayantgoyal.localhost:3003");
+    expect(
+      resolveAuthApplicationOrigin(
+        "http://auth.jayantgoyal.localhost:4000",
+        "jayantgoyal.localhost",
       ),
     ).toBe(CANONICAL_AUTH_ORIGIN);
   });
@@ -49,6 +88,36 @@ describe("canonical Auth entry ownership", () => {
     expect(login.pathname).toBe("/login");
     expect(login.searchParams.get("return_to")).toBe(
       "https://studio.jayantgoyal.com/files?folder=one",
+    );
+  });
+
+  it("preserves the browser-facing host when Next development normalizes the request URL", () => {
+    const requestUrl = resolveExternalRequestUrl({
+      requestUrl: "http://localhost:3001/welcome?redirect=%2Ffiles",
+      requestHeaders: headers({
+        host: "studio.jayantgoyal.localhost:3001",
+        "x-forwarded-proto": "http",
+      }),
+    });
+
+    expect(requestUrl.toString()).toBe(
+      "http://studio.jayantgoyal.localhost:3001/welcome?redirect=%2Ffiles",
+    );
+  });
+
+  it("uses the browser-facing host in a local Auth return destination", () => {
+    const login = buildAuthLoginUrl({
+      requestUrl: "http://localhost:3002/welcome?redirect=%2Fusers",
+      requestHeaders: headers({
+        "x-forwarded-host": "admin.jayantgoyal.localhost:3002",
+        "x-forwarded-proto": "http",
+      }),
+      returnPath: "/users",
+      authOrigin: "http://auth.jayantgoyal.localhost:3003",
+    });
+
+    expect(login.searchParams.get("return_to")).toBe(
+      "http://admin.jayantgoyal.localhost:3002/users",
     );
   });
 
