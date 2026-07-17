@@ -141,10 +141,10 @@ Only one task should be In Progress per implementation lane.
 | ----: | ----------- | ------------------------------------- | ----------- | ---------------------------------------------------- |
 |     0 | PLATFORM-00 | Baseline and contracts                | In Progress | No behavior change                                   |
 |     1 | PLATFORM-08 | Portfolio application                 | In Progress | Portfolio deploys independently before root cutover  |
-|     2 | PLATFORM-07 | Studio technical deployment           | Pending     | Existing products also run at Studio                 |
+|     2 | PLATFORM-07 | Studio technical deployment           | In Progress | Existing products also run at Studio                 |
 |     3 | PLATFORM-11 | Studio product experience             | Pending     | Public discovery precedes product workspaces         |
 |     4 | PLATFORM-09 | Domain and route cutover              | In Progress | Root is Portfolio; product routes redirect to Studio |
-|     5 | PLATFORM-10 | Admin domain organization             | Pending     | Admin manages Portfolio, Studio, and System          |
+|     5 | PLATFORM-10 | Admin domain organization             | In Progress | Admin manages Portfolio, Studio, and System          |
 |     6 | PLATFORM-01 | Authentication regression foundation  | Pending     | No behavior change                                   |
 |     7 | PLATFORM-02 | Supabase dependency and SSR hardening | Pending     | Existing auth behavior preserved                     |
 |     8 | PLATFORM-03 | Extract `packages/auth`               | Pending     | Existing routes and cookies preserved                |
@@ -241,7 +241,10 @@ Allowed destinations are relative paths or exact allowlisted platform origins. A
 
 ## 6. PR discipline
 
-Per [ADR-002](../migrations/platform-restructure/decision-log.md), this program uses one PR with small, reviewable, deployable commits. Each commit or deployment slice should:
+ADR-002 governed the initial application split through merged PR #39. Per
+[ADR-005](../migrations/platform-restructure/decision-log.md), post-merge work now
+uses focused PRs because the original rollback surface is immutable. Each commit
+or deployment slice should:
 
 - Have one behavioral purpose.
 - Avoid mixing folder moves, dependency upgrades, design changes, and database changes.
@@ -609,13 +612,14 @@ Acceptance checks:
 
 ### Phase 7 recommended PR slices
 
-ADR-002 keeps these review slices as commits inside one program PR rather than separate PRs.
+The first five review slices shipped together in PR #39. Any remaining Phase 7
+correction must be a focused post-merge commit under ADR-005.
 
 - [x] Commit slice 1: Rename the package/filter identifier to `studio`.
 - [x] Commit slice 2: Move `apps/jayantgoyal` to `apps/studio` and remove duplicated Portfolio ownership.
 - [x] Commit slice 3: Update workspace, local commands, and deployment configuration in source.
 - [x] Commit slice 4: Rename and repoint the existing Vercel project and verify its Studio environments.
-- [ ] Commit slice 5: Deploy the exact commit and fix only behavior proven by deployed validation.
+- [x] Commit slice 5: Deploy the exact commit and fix only behavior proven by deployed validation.
 
 ### Phase 7 product validation checklist
 
@@ -635,7 +639,7 @@ ADR-002 keeps these review slices as commits inside one program PR rather than s
 
 - [x] The existing product Vercel project is renamed and dedicated to Studio.
 - [ ] Existing product behavior is stable on Studio.
-- [ ] Portfolio-owned legacy paths redirect to Portfolio and product paths remain on Studio.
+- [x] Portfolio-owned legacy paths redirect to Portfolio and product paths remain on Studio.
 
 ---
 
@@ -764,7 +768,7 @@ Auth routes use temporary redirects or compatibility handlers before retirement:
 ## Phase 10 — Admin domain organization
 
 Task ID: PLATFORM-10
-Status: Pending
+Status: In Progress
 Objective: Organize Admin around Portfolio, Studio, and System while preserving current operations.
 Dependencies: PLATFORM-09 Done or final content ownership stable.
 Target files/surfaces: Admin navigation, route grouping, Portfolio CMS, Studio catalog management, users/access, deployments, terms/policies.
@@ -780,18 +784,20 @@ Acceptance checks:
   Proof note required: Navigation map, authorization matrix, mutations tested, audit gaps, and deployment result.
   Stop/escalate if: Admin requires direct dependency on another application’s implementation.
 
+Current slice: the app-owned domain contract and existing-route grouping are implemented. Portfolio and System are visible because they have real operations. Studio remains explicit in the contract but is not rendered as an empty group; its catalog requires a separately approved `jg_app` data contract. The legacy environment-manager route remains reachable for compatibility but is no longer linked from navigation because infrastructure secrets belong in provider configuration.
+
 ### Phase 10 checklist
 
 Portfolio:
 
-- [ ] Profile/Hero
-- [ ] About
-- [ ] Experience
-- [ ] Skills
-- [ ] Projects
+- [x] Profile/Hero
+- [x] About
+- [x] Experience
+- [x] Skills
+- [x] Projects
 - [ ] Resume
-- [ ] Blog
-- [ ] Contact
+- [x] Blog
+- [x] Contact
 
 Studio:
 
@@ -804,8 +810,8 @@ Studio:
 
 System:
 
-- [ ] Users and roles
-- [ ] Deployments
+- [x] Users and roles
+- [x] Deployments
 - [ ] Terms and policies
 - [ ] Operational settings
 - [ ] Audit activity deferred or separately scoped
@@ -814,7 +820,7 @@ Security:
 
 - [ ] Admin does not own login UI.
 - [ ] Admin does not expose provider secrets.
-- [ ] Admin does not display or modify user credentials.
+- [x] Admin does not display or modify user credentials.
 - [ ] Self-service account security links to Auth.
 - [ ] Operator-level revocation remains explicitly authorized and audited where possible.
 
@@ -1232,11 +1238,11 @@ Review after the migration and at least annually:
 
 ## 16. Immediate next action
 
-Continue PLATFORM-07 in the existing dedicated worktree and program branch:
+After shipping the post-merge shared-foundation slice:
 
-1. Deploy and validate the exact Studio and Portfolio commits after the Vercel build limit resets.
-2. Confirm apex canonical/Open Graph metadata from that fresh Portfolio deployment.
-3. Run the deployed responsive and authenticated product matrix.
-4. Complete the rollback rehearsal and required observation gates before closing PLATFORM-07, PLATFORM-08, or PLATFORM-09.
+1. Restore the missing `admin.staging.jayantgoyal.com` DNS/deployment contract before claiming the complete stable-staging matrix.
+2. Run the deployed responsive and authenticated product matrix and complete the rollback rehearsal and observation gates before closing PLATFORM-07, PLATFORM-08, or PLATFORM-09.
+3. Design and separately approve the `jg_app` Studio catalog contract before exposing Studio management in Admin.
+4. Retire or redesign the legacy Admin environment-manager route so infrastructure secrets remain provider-owned.
 
 Do not create `apps/auth` or `packages/auth` until the application split and root-domain cutover are stable.
