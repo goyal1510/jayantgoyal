@@ -39,16 +39,13 @@ describe("Admin navigation domains", () => {
     expect(getAdminNavigationContext("/blog")?.domain.id).toBe("portfolio");
     expect(getAdminNavigationContext("/deployments")?.domain.id).toBe("system");
     expect(getAdminNavigationContext("/users")?.domain.id).toBe("system");
-    expect(getAdminNavigationContext("/deployments/env")).toMatchObject({
-      pageLabel: "Environment",
-      domain: { id: "system" },
-    });
+    expect(getAdminNavigationContext("/deployments/env")).toBeNull();
     expect(getAdminNavigationContext("/deployments/example")?.pageLabel).toBe(
       "Deployment Detail",
     );
   });
 
-  it("keeps deployment detail active without shadowing Environment", () => {
+  it("keeps deployment detail active without reviving the retired environment manager", () => {
     const system = adminNavigationDomains.find(
       (domain) => domain.id === "system",
     );
@@ -65,8 +62,8 @@ describe("Admin navigation domains", () => {
       deployments &&
         isAdminNavigationItemActive("/deployments/env", deployments),
     ).toBe(false);
-    expect(
-      system?.items.some((item) => item.href === "/deployments/env"),
-    ).toBe(false);
+    expect(system?.items.some((item) => item.href === "/deployments/env")).toBe(
+      false,
+    );
   });
 });

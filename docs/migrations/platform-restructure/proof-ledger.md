@@ -129,8 +129,13 @@
 
 - Admin now has one app-owned navigation-domain contract for Portfolio, Studio, and System. The generic `@repo/ui` renderer remains unaware of routes and roles.
 - Portfolio includes the existing profile/content managers and Blog. System includes Users and Deployments. Studio is retained as an explicit domain but is not rendered empty and has no invented route; a managed catalog remains blocked on a separately approved `jg_app` contract.
-- The legacy Vercel environment-manager route remains reachable for compatibility and keeps a System breadcrumb, but its navigation link was removed because the binding blueprint keeps infrastructure secrets in provider configuration rather than Admin.
+- The browser-facing Vercel environment manager, value-reveal UI, client helpers,
+  and read/write API routes are removed. The old `/deployments/env` URL now
+  temporarily redirects to Deployments so bookmarks fail safely while provider
+  secrets remain in Vercel configuration.
 - Role visibility is unchanged: ordinary admins see Portfolio operations; super admins additionally see the current System operations. No authorization, service-role, session, callback, or database behavior changed.
 - Focused proof now passes across twelve Vitest files and forty-nine tests, including sidebar preference restoration, route intent, Admin domain visibility, active routes, deployment details, and legacy environment-route classification. Full monorepo TypeScript, zero-warning lint, and Portfolio/Studio/Admin production builds passed for the shared-foundation tree; the final Admin-only correction also passes focused TypeScript, lint, tests, and build.
 - Authenticated local browser proof confirmed the Admin routes render, active navigation and breadcrumbs update, and the shared collapse state survives reload with the `48px` collapsed header. Existing development warnings around Supabase session access and Next.js smooth scrolling remain recorded; Auth/session work is still deferred under ADR-001.
-- PLATFORM-10 remains In Progress: Studio catalog operations, Resume ownership, terms/policies, provider-secret removal from the legacy route, AAL2 mutation proof, and the complete authorization/rollback/deployment gates are not done.
+- PLATFORM-10 remains In Progress: Studio catalog operations, Resume ownership,
+  terms/policies, AAL2 mutation proof, and the complete
+  authorization/rollback/deployment gates are not done.
