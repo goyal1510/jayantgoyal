@@ -3,6 +3,10 @@ import type { CookieOptions } from "@supabase/ssr";
 export const PLATFORM_SESSION_COOKIE_NAME = "__Secure-jg-session-v1";
 export const LOCAL_SESSION_COOKIE_NAME = "jg-session-v1";
 export const PLATFORM_SESSION_COOKIE_DOMAIN = "jayantgoyal.com";
+export const LOCAL_DEVELOPMENT_COOKIE_DOMAIN_SUFFIXES = [
+  ".test",
+  ".localhost",
+] as const;
 
 export type AuthSessionMode = "legacy" | "compatibility" | "platform";
 export type SessionCookieOptions = CookieOptions & { name: string };
@@ -32,10 +36,29 @@ function normalizeHostname(hostname: string | null | undefined): string {
 
 function isLocalHostname(hostname: string): boolean {
   return (
-    hostname === "localhost" ||
-    hostname === "127.0.0.1" ||
-    hostname === "::1"
+    hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1"
   );
+}
+
+export function resolveLocalDevelopmentCookieDomain(
+  value = process.env.NEXT_PUBLIC_AUTH_COOKIE_DOMAIN,
+): string | null {
+  const candidate = value?.trim().toLowerCase().replace(/^\.+/, "") ?? "";
+  if (
+    !LOCAL_DEVELOPMENT_COOKIE_DOMAIN_SUFFIXES.some((suffix) =>
+      candidate.endsWith(suffix),
+    ) ||
+    !/^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+(?:test|localhost)$/.test(
+      candidate,
+    )
+  ) {
+    return null;
+  }
+  return candidate;
+}
+
+function isHostnameWithinDomain(hostname: string, domain: string): boolean {
+  return hostname === domain || hostname.endsWith(`.${domain}`);
 }
 
 export function resolveAuthSessionMode(
@@ -68,9 +91,11 @@ export function hasCookieFamily(
 export function resolveSessionCookieOptions({
   hostname,
   mode = resolveAuthSessionMode(),
+  cookieDomain = process.env.NEXT_PUBLIC_AUTH_COOKIE_DOMAIN,
 }: {
   hostname?: string | null;
   mode?: AuthSessionMode;
+  cookieDomain?: string | null;
 }): SessionCookieOptions | undefined {
   if (mode === "legacy") return undefined;
 
@@ -84,6 +109,22 @@ export function resolveSessionCookieOptions({
     };
   }
 
+  const localDevelopmentDomain = resolveLocalDevelopmentCookieDomain(
+    cookieDomain ?? undefined,
+  );
+  if (
+    localDevelopmentDomain?.endsWith(".localhost") &&
+    isHostnameWithinDomain(normalizedHostname, localDevelopmentDomain)
+  ) {
+    return {
+      name: LOCAL_SESSION_COOKIE_NAME,
+      domain: localDevelopmentDomain,
+      path: "/",
+      sameSite: "lax",
+      secure: false,
+    };
+  }
+
   const options: SessionCookieOptions = {
     name: PLATFORM_SESSION_COOKIE_NAME,
     path: "/",
@@ -91,7 +132,12 @@ export function resolveSessionCookieOptions({
     secure: true,
   };
 
-  if (TRUSTED_PLATFORM_HOSTS.has(normalizedHostname)) {
+  if (
+    localDevelopmentDomain &&
+    isHostnameWithinDomain(normalizedHostname, localDevelopmentDomain)
+  ) {
+    options.domain = localDevelopmentDomain;
+  } else if (TRUSTED_PLATFORM_HOSTS.has(normalizedHostname)) {
     options.domain = PLATFORM_SESSION_COOKIE_DOMAIN;
   }
 

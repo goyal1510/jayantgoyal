@@ -87,6 +87,7 @@ export default async function proxy(request: NextRequest) {
     return NextResponse.redirect(
       buildAuthLoginUrl({
         requestUrl: request.url,
+        requestHeaders: request.headers,
         returnPath: request.nextUrl.searchParams.get("redirect"),
       }),
     );

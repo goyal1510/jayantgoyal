@@ -27,7 +27,9 @@ export function requestOriginFromHeaders(
     firstForwardedValue(headerStore.get("host"));
   const protocol =
     firstForwardedValue(headerStore.get("x-forwarded-proto")) ??
-    (host?.startsWith("localhost") || host?.startsWith("127.0.0.1")
+    (host?.startsWith("localhost") ||
+    host?.startsWith("127.0.0.1") ||
+    host?.split(":")[0]?.endsWith(".localhost")
       ? "http"
       : "https");
   const requestOrigin = host ? normalizeOrigin(`${protocol}://${host}`) : null;
