@@ -348,7 +348,20 @@ apps/studio-copy/src/lib/config/studio-inventory.test.ts` passed the complete
 - The standalone Studio Copy and its local design proof are being shipped in a
   dedicated PR; no current application is replaced or repointed by that PR.
 - Vercel's current Portfolio, Studio, Admin, and Auth Production deployments
-  were inspected read-only and are all Ready. Hosted auth flags will follow the
-  approved compatibility-first sequence: `compatibility` before final
-  `platform`, with Auth entry ownership changed separately only on the projects
-  that consume it. No environment value is recorded in this repository.
+  were inspected and were Ready before rollout. Portfolio remained untouched.
+- Studio, Admin, and Auth now use the shared-session compatibility mode across
+  Development, Preview, and Production. Studio and Admin also hand new login
+  entry traffic to canonical Auth across those three targets. Read-back checks
+  passed for all nine project/target combinations and confirmed the optional
+  local cookie-domain override is absent from hosted environments.
+- Same-SHA redeploy attempts were canceled by the approved ignored-build rule,
+  so fresh forced builds were uploaded from a clean detached worktree pinned to
+  the exact current `origin/main` commit. Auth, Studio, and Admin all reached
+  Ready and their canonical domains were assigned to the new deployments.
+- Anonymous HTTP checks verified Auth redirects its root to `/login`, Studio
+  preserves `/games` in its Auth `return_to`, and Admin preserves `/users`.
+  Credential login, cross-subdomain session promotion, Admin authorization,
+  and logout remain manual controlled-production acceptance checks.
+- Immediate rollback remains changing Studio/Admin/Auth session mode to the
+  legacy setting and Studio/Admin entry ownership to the legacy owner, followed
+  by fresh deployments. No secret or environment-file content is recorded.
