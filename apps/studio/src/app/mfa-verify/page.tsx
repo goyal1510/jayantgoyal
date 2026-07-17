@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+
+import { safeReturnPath } from "@repo/auth/redirects";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { MfaVerifyStep } from "@/components/auth/mfa-verify-step";
 import { Card, CardContent } from "@repo/ui/card";
@@ -11,7 +13,8 @@ interface PageProps {
 export const metadata: Metadata = { title: "Verify MFA" };
 
 export default async function MfaVerifyPage({ searchParams }: PageProps) {
-  const { redirect: redirectUrl = "/" } = await searchParams;
+  const { redirect: rawRedirectUrl } = await searchParams;
+  const redirectUrl = safeReturnPath(rawRedirectUrl);
   const supabase = await createSupabaseServerClient();
 
   // Check auth — if not signed in, go to welcome

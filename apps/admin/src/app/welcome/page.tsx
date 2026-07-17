@@ -5,6 +5,8 @@ import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Shield } from "lucide-react";
 import { toast } from "sonner";
+
+import { safeReturnPath } from "@repo/auth/redirects";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import {
   AuthCard,
@@ -20,7 +22,7 @@ import { Label } from "@repo/ui/label";
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectUrl = searchParams.get("redirect") ?? "/";
+  const redirectUrl = safeReturnPath(searchParams.get("redirect"));
 
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");

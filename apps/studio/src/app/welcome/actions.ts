@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { safeReturnPath } from "@repo/auth/redirects";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { STUDIO_URL } from "@/lib/platform/urls";
 
@@ -17,7 +18,7 @@ type AuthFormState = {
  */
 export async function authenticate(
   _prevState: AuthFormState,
-  formData: FormData
+  formData: FormData,
 ): Promise<AuthFormState> {
   const email = formData.get("email");
   const password = formData.get("password");
@@ -36,22 +37,20 @@ export async function authenticate(
   });
 
   if (!loginError) {
-    const targetUrl =
-      redirectUrl && String(redirectUrl).startsWith("/")
-        ? String(redirectUrl)
-        : "/";
+    const targetUrl = safeReturnPath(redirectUrl ? String(redirectUrl) : null);
 
     // Check if user has MFA enrolled — redirect to /mfa-verify directly.
     // Proxy redirects don't work reliably for server action soft navigations.
     const { data: factorsData } = await supabase.auth.mfa.listFactors();
     const hasVerifiedFactor = factorsData?.totp.some(
-      (f) => f.status === "verified"
+      (f) => f.status === "verified",
     );
 
     if (hasVerifiedFactor) {
-      const mfaUrl = targetUrl !== "/"
-        ? `/mfa-verify?redirect=${encodeURIComponent(targetUrl)}`
-        : "/mfa-verify";
+      const mfaUrl =
+        targetUrl !== "/"
+          ? `/mfa-verify?redirect=${encodeURIComponent(targetUrl)}`
+          : "/mfa-verify";
       redirect(mfaUrl);
     }
 
@@ -78,8 +77,7 @@ export async function authenticate(
 
   if (!signupError) {
     return {
-      success:
-        "Account created! Check your email for the verification link.",
+      success: "Account created! Check your email for the verification link.",
     };
   }
 

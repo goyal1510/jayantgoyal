@@ -90,3 +90,16 @@
 - Consequences: the Phase 11 layout gate measures separation of discovery content from workspace content rather than absence of the shared sidebar. Shared UI remains route-agnostic; Studio continues to own inventory, breadcrumbs, access labels, and launch destinations.
 - Code or abstraction deleted/avoided: no second marketing shell, duplicated responsive header, or global product-navigation policy.
 - Revisit trigger: public discovery performance or usability evidence shows the shared shell materially harms visitors, or another application proves a reusable marketing-shell contract.
+
+## ADR-008 — Freeze UI and use local automated implementation proof
+
+- Date: 2026-07-17
+- Status: Accepted
+- Task IDs: PLATFORM-01 through PLATFORM-12
+- Context: The application split and shared shell are usable enough to continue, while repeated browser and post-deployment checks were consuming disproportionate time and tokens. The user explicitly paused further UI refinement and asked Codex to validate implementation locally, leaving deployed acceptance to the user's manual pass.
+- Options considered: continue automated browser/deployment validation after every slice; remove all validation; or use focused Vitest regression files plus one local type/lint/build gate per slice and reserve deployed checks for the user.
+- Decision: freeze Portfolio, Studio, Admin, and `/products` UI unless the user reports a blocker. Codex uses focused local tests while implementing and one non-repeated local quality pass before shipping. Codex does not perform browser, Preview, Production, or observation-window validation; the user manually validates deployments and reports blockers for focused correction.
+- Why this is the smallest maintainable choice: it keeps deterministic safety checks close to the code without turning every infrastructure slice into a long interactive deployment exercise.
+- Consequences: a local-green slice may merge while its deployed/manual acceptance remains pending. Phase statuses and proof records must distinguish implementation completion from user-owned deployed acceptance; no phase that still requires a blueprint deployment or observation gate is marked Done solely from local proof.
+- Code or abstraction deleted/avoided: no browser harness, stored browser credentials, deployment-wait loop, or repeated formatting/build cycle is added merely to satisfy Codex-side observation.
+- Revisit trigger: the user reports a deployed blocker, asks Codex to resume browser validation, or a change cannot be validated meaningfully with local deterministic tests.
