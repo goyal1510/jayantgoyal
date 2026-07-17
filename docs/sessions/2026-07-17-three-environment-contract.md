@@ -86,3 +86,14 @@
   Admin and Studio projects before their ignore-build scripts could run; those
   provider checks are unrelated to this Portfolio-only source cleanup and are
   recorded rather than hidden.
+- A later provider audit re-read all three Vercel inventories by project name.
+  Each has zero branch-scoped variables and zero staging-named variables; the
+  assigned domains are only the final Portfolio, Studio, and Admin hosts plus
+  provider-generated URLs. Authoritative public DNS returns no record for
+  `portfolio.jayantgoyal.com` or any former staging hostname.
+- Admin did not consume its Development or Production
+  `NEXT_PUBLIC_SITE_URL` entries. Both were removed, the tracked example and
+  contract were corrected, and the remaining seven Admin variables were traced
+  to Supabase or deployment-management consumers. Admin's project build command
+  was also aligned to `pnpm --filter admin build`; its ignored-build override
+  remains absent.

@@ -33,9 +33,14 @@ Studio is a single-purpose application at `apps/studio`; it no longer renders Po
 | --------- | ---------------------------------- | ---------------------------------------------------------- | --------------------------------- |
 | Portfolio | `http://localhost:3000`            | Resolve the actual request/deployment origin; no fixed URL | `https://jayantgoyal.com`         |
 | Studio    | `http://localhost:3001`            | Resolve the actual request/deployment origin; no fixed URL | `https://studio.jayantgoyal.com`  |
-| Admin     | `http://localhost:3002`            | Resolve the actual request/deployment origin; no fixed URL | `https://admin.jayantgoyal.com`   |
+| Admin     | Not configured                     | Resolve the actual browser origin                          | Not configured                    |
 
 `NEXT_PUBLIC_SITE_URL` is public configuration and must not be treated as a secret. All sensitive values remain server-only. The Portfolio environment inventory exists without a service-role key; Auth receives its own inventory only when that application exists.
+
+Admin does not consume `NEXT_PUBLIC_SITE_URL`: its browser OAuth callback uses
+`window.location.origin`, and canonical application identity comes from the
+shared brand/platform contract. The unused Admin Development and Production
+entries were therefore removed rather than adding a meaningless Preview entry.
 
 Studio uses `NEXT_PUBLIC_PORTFOLIO_URL` for links that cross the application boundary. Development uses `http://localhost:3000`; Preview and Production use `https://jayantgoyal.com`. This keeps ephemeral Studio previews linked to the stable public Portfolio without introducing a custom preview domain.
 
