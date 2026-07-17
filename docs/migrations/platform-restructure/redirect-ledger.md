@@ -62,6 +62,28 @@ Shared Auth/SSO remains intentionally last. Until that cutover, the existing Stu
 
 `/auth/callback` query parameters are preserved by the `307`. Fresh flows initiated on Studio return directly to Studio. A PKCE flow initiated on the apex immediately before cutover may still depend on an apex-host cookie, so the apex must not move until the callback smoke test and rollback operator are both ready.
 
+## Auth dark-launch ownership
+
+`apps/auth` now owns these routes in source without receiving default traffic:
+
+- `/login`
+- `/register`
+- `/forgot-password`
+- `/reset-password`
+- `/verify`
+- `/callback`
+- `/mfa`
+- `/account/security`
+- `/account/providers`
+- `/logout`
+- `/error`
+
+No Portfolio, Studio, or Admin redirect points to Auth during this local slice.
+The existing Studio compatibility routes above remain authoritative until the
+PLATFORM-06 cutover flag is approved. Auth accepts only relative destinations,
+canonical platform origins, local ports, and explicitly configured exact
+Preview origins; it does not accept wildcard return hosts.
+
 ## Studio API redirects
 
 These families use temporary `307` redirects to the same Studio path:

@@ -81,6 +81,49 @@
   cross-subdomain Production validation (including actual expired-token and
   open-tab behavior), and rollback observation. PLATFORM-04 is not Done.
 
+## PLATFORM-05 — Standalone Auth local dark launch in progress
+
+- `apps/auth` is an independently buildable Next.js application named `auth`
+  on local port `3003`. It consumes `@repo/auth`, `@repo/brand`,
+  `@repo/platform`, and behavior-neutral `@repo/ui` presentation primitives.
+- The initial route inventory exists: login, registration, forgot/reset,
+  verification, callback, MFA, account security, connected providers, logout,
+  and a safe error/retry surface. Portfolio, Studio, and Admin do not redirect
+  to these routes, so existing authentication remains primary.
+- Exact return-target validation supports relative destinations, canonical
+  platform origins, local application ports, and explicitly configured exact
+  Preview origins. Lookalikes, protocol-relative URLs, credentials, unsupported
+  schemes, and unconfigured Preview hosts fall back safely.
+- Password login, Google initiation, registration, recovery, provider linking,
+  identity unlinking, current/global logout, password reauthentication, MFA
+  enrollment/challenge/disable, and callback exchange use shared Supabase SSR
+  clients. User-triggered mutations verify the exact request Origin. Logout is
+  POST-only; callback GET is limited to provider/OTP protocol completion.
+- Auth requests are no-index and no-store. Its CSP omits Studio analytics and
+  unrelated API hosts. Callback errors are mapped to stable user-safe codes;
+  authorization codes, tokens, and provider error messages are not logged.
+- Auth has no service-role environment variable or admin client. Existing
+  Studio/Admin service-role operations were not copied.
+- Source/provider boundary: no Auth Vercel project link, hosted variables, DNS
+  record, custom domain, Supabase Site URL change, redirect allowlist change,
+  or default application cutover is included in this local slice.
+- Final local proof passes 153 tests across 26 files, all nine zero-warning lint
+  tasks, all nine TypeScript tasks, and the complete Portfolio, Studio, Admin,
+  Auth, and shared-package production build. Auth's build manifest contains the
+  entire approved route inventory and Proxy. The build emitted only the
+  existing Portfolio missing-local-public-Supabase fallbacks and source-package
+  output warnings.
+- The subsequent security-review corrections pass focused Auth TypeScript,
+  zero-warning lint, and all eight Auth contract tests. Mutation actions were
+  then split by entry, recovery, account, MFA, and logout responsibility; all
+  35 targeted Auth tests across five files, Auth TypeScript, and zero-warning
+  Auth lint pass after the split. The complete expensive gate was not repeated
+  after these narrowly scoped corrections under ADR-008.
+- Remaining gates: provider linking, generated Preview application-local flows,
+  hosted environment inventory, scoped Supabase URL update, controlled
+  Production dark launch, user-owned browser acceptance, deployment/rollback
+  identifiers, and observation. PLATFORM-05 is not Done.
+
 ## Cross-phase security gate — In Progress
 
 - The dependency audit found the deployed apps and `@repo/ui` resolving Next.js `16.1.6`, which was inside current high-severity Server Component and proxy-bypass advisory ranges. Studio, Portfolio, Admin, the UI peer resolution, and the shared Next ESLint plugin now resolve to `16.2.10`.

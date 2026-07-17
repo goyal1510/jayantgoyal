@@ -149,7 +149,7 @@ Only one task should be In Progress per implementation lane.
 |     7 | PLATFORM-02 | Supabase dependency and SSR hardening | In Progress | Existing auth behavior preserved                     |
 |     8 | PLATFORM-03 | Extract `packages/auth`               | In Progress | Existing routes and cookies preserved                |
 |     9 | PLATFORM-04 | Shared-cookie compatibility           | In Progress | Current apps understand the platform session         |
-|    10 | PLATFORM-05 | Auth dark launch                      | Pending     | Existing auth remains primary; Auth is testable      |
+|    10 | PLATFORM-05 | Auth dark launch                      | In Progress | Existing auth remains primary; Auth is testable      |
 |    11 | PLATFORM-06 | Canonical Auth cutover                | Pending     | New login/security flows use Auth                    |
 |    12 | PLATFORM-12 | Legacy cleanup and hardening          | Pending     | Compatibility code removed with evidence             |
 
@@ -497,7 +497,7 @@ If the Supabase storage format or chunking prevents safe promotion, choose one e
 ## Phase 5 — Auth dark launch
 
 Task ID: PLATFORM-05
-Status: Pending
+Status: In Progress
 Objective: Create and deploy the Auth application without making it the default production login path.
 Dependencies: PLATFORM-04 Done with application-local Preview evidence and controlled Production cross-subdomain proof.
 Target files/surfaces: `apps/auth`, Auth Vercel project, `auth.jayantgoyal.com`, generated Preview deployments, Supabase redirect allowlist, provider callback configuration.
@@ -515,35 +515,35 @@ Acceptance checks:
 
 ### Phase 5 initial route checklist
 
-- [ ] `/login`
-- [ ] `/register`
-- [ ] `/forgot-password`
-- [ ] `/reset-password`
-- [ ] `/verify`
-- [ ] `/callback`
-- [ ] `/mfa`
-- [ ] `/account/security`
-- [ ] `/account/providers`
-- [ ] `/logout`
-- [ ] Safe Auth error and retry route
+- [x] `/login`
+- [x] `/register`
+- [x] `/forgot-password`
+- [x] `/reset-password`
+- [x] `/verify`
+- [x] `/callback`
+- [x] `/mfa`
+- [x] `/account/security`
+- [x] `/account/providers`
+- [x] `/logout`
+- [x] Safe Auth error and retry route
 
 ### Phase 5 security checklist
 
-- [ ] No state change through GET.
-- [ ] Sensitive mutations verify Origin.
-- [ ] High-risk changes require recent authentication or AAL2.
-- [ ] `return_to` is relative or allowlisted.
-- [ ] Provider and Supabase errors are user-safe.
-- [ ] Tokens and authorization codes are absent from application logs.
-- [ ] Auth responses with `Set-Cookie` are non-cacheable.
-- [ ] Auth has a stricter third-party-script policy than Studio.
-- [ ] Service-role access is absent unless a documented server-only operation requires it.
+- [x] No user-triggered state change through GET; OAuth/OTP callback GET is limited to protocol completion under ADR-010.
+- [x] Sensitive application mutations verify Origin.
+- [x] High-risk changes require password reauthentication or AAL2 when enrolled.
+- [x] `return_to` is relative or exactly allowlisted.
+- [x] Provider and Supabase errors are user-safe.
+- [x] Tokens and authorization codes are absent from application logs.
+- [x] Auth responses with `Set-Cookie` are non-cacheable.
+- [x] Auth has a stricter third-party-script policy than Studio.
+- [x] Service-role access is absent.
 
 ### Phase 5 exit gate
 
-- [ ] Auth is independently deployable.
+- [x] Auth is independently buildable/deployable from its isolated workspace boundary.
 - [ ] Dark-launch users can complete all initial flows.
-- [ ] Existing main and Admin auth remain available.
+- [x] Existing Studio and Admin auth remain primary and unchanged.
 
 ---
 

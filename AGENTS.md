@@ -25,9 +25,14 @@ jayantgoyal/
 ├── apps/
 │   ├── portfolio/          # Public portfolio, blog, resume, contact
 │   ├── studio/             # Product discovery, tools, games, workspaces
-│   └── admin/              # Admin panel for content management
+│   ├── admin/              # Admin panel for content management
+│   └── auth/               # Authentication and account-security app
 │
 ├── packages/
+│   ├── auth/               # Shared Supabase SSR/session contracts
+│   ├── brand/              # Shared app identity and metadata
+│   ├── platform/           # Canonical app hosts and URL construction
+│   ├── seo/                # Shared public metadata helpers
 │   ├── ui/                 # Shared component library (@repo/ui)
 │   ├── tailwind-config/    # Shared Tailwind config
 │   ├── eslint-config/      # Flat ESLint configs
@@ -86,6 +91,20 @@ jayantgoyal/
 - `/portfolio/*` - Portfolio content management
 - `/users` - User management
 
+### Auth App (`apps/auth`)
+
+**Purpose:** Standalone sign-in and account-security owner. During dark launch,
+Studio and Admin retain their current entry routes and no application redirects
+to Auth by default.
+
+**Key Routes:**
+
+- `/login`, `/register` - Password and Google entry flows
+- `/forgot-password`, `/reset-password`, `/verify`, `/callback` - Recovery and verification
+- `/mfa` - Authenticator challenge
+- `/account/security`, `/account/providers` - Password, MFA, and connected identities
+- `/logout` - Explicit current-session or global sign-out through POST actions
+
 ## Shared Packages
 
 ### `@repo/ui`
@@ -106,11 +125,17 @@ Component library exporting:
 }
 ```
 
+### `@repo/auth`
+
+Shared browser/server Supabase SSR clients, safe-return validation, versioned
+cookie/session modes, response propagation, and explicit logout scopes. Apps
+retain authorization policy and route ownership.
+
 ### `@repo/brand`
 
 Dependency-free source of truth for public identity, app names, canonical
 domains, default metadata, title templates, and manifest labels. Portfolio,
-Studio, and Admin must consume these constants instead of introducing new
+Studio, Admin, and Auth must consume these constants instead of introducing new
 branding literals.
 
 ### `@repo/tailwind-config`
@@ -166,6 +191,9 @@ pnpm dev --filter studio
 
 # Run admin app only
 pnpm dev --filter admin
+
+# Run Auth only
+pnpm dev --filter auth
 ```
 
 ### Build
@@ -177,6 +205,7 @@ pnpm build
 # Build specific app
 pnpm build --filter studio
 pnpm build --filter admin
+pnpm build --filter auth
 ```
 
 ### Linting & Type Checking
@@ -200,6 +229,9 @@ pnpm start --filter studio
 
 # Start admin app
 pnpm start --filter admin
+
+# Start Auth
+pnpm start --filter auth
 ```
 
 ## Environment Variables
@@ -215,6 +247,9 @@ cd apps/portfolio && vercel env pull .env.local
 cd apps/studio && vercel env pull .env.local
 cd apps/admin && vercel env pull .env.local
 ```
+
+Auth remains intentionally unlinked during its local dark-launch slice. Add an
+Auth Vercel link only in the reviewed PLATFORM-05 provider step.
 
 ### Studio App (`apps/studio/.env.local`)
 
@@ -252,6 +287,21 @@ VERCEL_TEAM_ID=
 VERCEL_PROJECT_ID_STUDIO=
 VERCEL_PROJECT_ID_ADMIN=
 ```
+
+### Auth App (`apps/auth/.env.local`)
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+NEXT_PUBLIC_AUTH_SESSION_MODE=legacy
+NEXT_PUBLIC_SITE_URL=http://localhost:3003
+NEXT_PUBLIC_PORTFOLIO_URL=http://localhost:3000
+NEXT_PUBLIC_STUDIO_URL=http://localhost:3001
+NEXT_PUBLIC_ADMIN_URL=http://localhost:3002
+NEXT_PUBLIC_AUTH_RETURN_ORIGINS=
+```
+
+Auth intentionally has no Supabase service-role key.
 
 ## Architecture Patterns
 
@@ -493,14 +543,17 @@ pnpm ls --recursive
 ## Resources
 
 - **Portfolio:** [jayantgoyal.com](https://jayantgoyal.com)
+- **Studio:** [studio.jayantgoyal.com](https://studio.jayantgoyal.com)
 - **Admin:** [admin.jayantgoyal.com](https://admin.jayantgoyal.com)
 - **GitHub:** [goyal1510/jayantgoyal](https://github.com/goyal1510/jayantgoyal)
 
 ```bash
 pnpm dev --filter studio          # Run Studio only
 pnpm dev --filter admin       # Run admin app only
+pnpm dev --filter auth        # Run Auth only
 pnpm dev                      # Run all apps
 pnpm build --filter studio        # Build Studio
+pnpm build --filter auth          # Build Auth
 pnpm lint                     # ESLint (zero warnings enforced: --max-warnings 0)
 pnpm check-types              # TypeScript check (runs next typegen && tsc --noEmit)
 pnpm test                     # Focused Vitest regression tests
@@ -518,10 +571,15 @@ Build ignores TS errors (`typescript.ignoreBuildErrors: true`); always run `pnpm
 - **`apps/portfolio`** (filter name: `portfolio`) — Public professional content
 - **`apps/studio`** (filter name: `studio`) — Product discovery and workspaces
 - **`apps/admin`** (filter name: `admin`) — Portfolio content management, role-gated (admin/super_admin)
+- **`apps/auth`** (filter name: `auth`) — Sign-in, recovery, MFA, providers, and account security
 
 ### Shared Packages
 
 - **`@repo/ui`** — shadcn/ui-based component library. Import as `@repo/ui/button`, `@repo/ui/lib/utils`, `@repo/ui/hooks/use-mobile`
+- **`@repo/auth`** — Shared Supabase SSR, session-cookie, safe-return, and logout contracts
+- **`@repo/brand`** — Shared person/application naming and metadata identity
+- **`@repo/platform`** — Canonical application hosts and URL construction
+- **`@repo/seo`** — Reusable public metadata and indexability contracts
 - **`@repo/tailwind-config`** — Shared Tailwind styles
 - **`@repo/eslint-config`** — Flat ESLint configs (base, next-js, react)
 - **`@repo/typescript-config`** — Strict TS base configs
