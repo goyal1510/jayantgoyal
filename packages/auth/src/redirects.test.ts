@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { safeReturnPath } from "./redirects";
+import { safeReturnPath, safeReturnTarget } from "./redirects";
 
 describe("safeReturnPath", () => {
   it("preserves same-origin paths, queries, and fragments", () => {
@@ -25,5 +25,44 @@ describe("safeReturnPath", () => {
       "/welcome?reason=auth",
     );
     expect(safeReturnPath(null, "https://example.com")).toBe("/");
+  });
+});
+
+describe("safeReturnTarget", () => {
+  const options = {
+    requestOrigin: "https://auth.jayantgoyal.com",
+    allowedOrigins: [
+      "https://studio.jayantgoyal.com",
+      "https://admin.jayantgoyal.com",
+    ],
+  } as const;
+
+  it("keeps application-local destinations relative", () => {
+    expect(
+      safeReturnTarget(
+        "https://auth.jayantgoyal.com/account/security?changed=true",
+        options,
+      ),
+    ).toBe("/account/security?changed=true");
+  });
+
+  it("allows exact platform origins", () => {
+    expect(
+      safeReturnTarget(
+        "https://studio.jayantgoyal.com/files?folder=one#recent",
+        options,
+      ),
+    ).toBe("https://studio.jayantgoyal.com/files?folder=one#recent");
+  });
+
+  it.each([
+    "https://evil.example/phish",
+    "https://studio.jayantgoyal.com.evil.example/phish",
+    "https://user@studio.jayantgoyal.com/phish",
+    "javascript:alert(1)",
+    "//evil.example/phish",
+    "/\\evil.example/phish",
+  ])("rejects unsafe destination %s", (value) => {
+    expect(safeReturnTarget(value, options)).toBe("/");
   });
 });

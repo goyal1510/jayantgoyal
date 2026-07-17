@@ -116,3 +116,16 @@
 - Consequences: when both names exist, the platform name wins and legacy state cannot resurrect an invalid platform session. Failed promotion can serve the already validated legacy client for that request, while invalid legacy state is ignored. Ordinary logout is explicitly local; global logout requires an explicit action. Cross-subdomain proof remains user-owned Production validation under ADR-008.
 - Code or abstraction deleted/avoided: no same-name Domain ambiguity, preview token broker, custom session registry, real-time logout bus, or fourth environment.
 - Revisit trigger: Supabase changes its SSR storage/chunk contract, a controlled rollout exposes refresh races, or a trusted application host is added or removed.
+
+## ADR-010 — Build Auth locally before provider linking and cutover
+
+- Date: 2026-07-17
+- Status: Accepted
+- Task IDs: PLATFORM-05, PLATFORM-06
+- Context: PLATFORM-04's local compatibility implementation is complete, while Preview/Production acceptance remains user-owned under ADR-008. The user asked to stop UI refinement and continue setup work without Codex browser or deployed testing.
+- Options considered: pause all Auth work until deployed compatibility observation; create and link an empty provider project; or build the complete independently deployable Auth boundary locally while leaving every provider, domain, redirect, and rollout flag untouched.
+- Decision: add `apps/auth` at port `3003` with the approved initial routes and security controls, but do not create/link a Vercel project, attach `auth.jayantgoyal.com`, change hosted Supabase URLs, or redirect Studio/Admin. Auth uses the existing shared session modes with `legacy` as its source default. OAuth/callback GET is limited to standards-required protocol completion; logout and account mutations remain same-origin POST actions.
+- Why this is the smallest maintainable choice: the final application boundary and deterministic security behavior can be reviewed now without exposing users to a partial cutover or inventing a fourth environment.
+- Consequences: PLATFORM-05 becomes In Progress but cannot be Done until the user completes generated-Preview and controlled Production dark-launch acceptance. Existing Studio/Admin auth remains the rollback path and default owner.
+- Code or abstraction deleted/avoided: no placeholder Vercel project, DNS record, broad Preview wildcard, service-role dependency, GET logout, duplicated session registry, or default redirect to an unverified app.
+- Revisit trigger: local Auth contracts fail, shared-session Production proof contradicts the Auth assumptions, or the user authorizes the provider-linking and manual acceptance step.

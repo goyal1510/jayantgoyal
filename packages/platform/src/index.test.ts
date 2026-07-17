@@ -21,6 +21,7 @@ describe("platform application URLs", () => {
 
   it("resolves application origins and paths", () => {
     expect(applicationOrigin("studio")).toBe("https://studio.jayantgoyal.com");
+    expect(applicationOrigin("auth")).toBe("https://auth.jayantgoyal.com");
     expect(applicationUrl("portfolio", "/blog?tag=nextjs")).toBe(
       "https://jayantgoyal.com/blog?tag=nextjs",
     );
@@ -33,6 +34,7 @@ describe("platform application URLs", () => {
     expect(isApplicationHost("portfolio", "www.jayantgoyal.com")).toBe(true);
     expect(isApplicationHost("portfolio", "jayantgoyal.com:443")).toBe(true);
     expect(isApplicationHost("studio", "studio.jayantgoyal.com")).toBe(true);
+    expect(isApplicationHost("auth", "auth.jayantgoyal.com")).toBe(true);
   });
 
   it("rewrites only URLs owned by the declared source applications", () => {

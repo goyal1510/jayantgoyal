@@ -11,7 +11,7 @@
 | Portfolio   | `apps/portfolio`    | Independent project; apex cutover completed after dark-launch validation | `jayantgoyal.com`        |
 | Studio      | `apps/studio`       | Existing product project renamed and repointed to Studio immediately     | `studio.jayantgoyal.com` |
 | Admin       | `apps/admin`        | Existing independent Vercel project                                      | `admin.jayantgoyal.com`  |
-| Auth        | `apps/auth`         | New independent project created only in the Auth phase                   | `auth.jayantgoyal.com`   |
+| Auth        | `apps/auth`         | Local dark-launch app exists; Vercel project/domain remain unlinked      | `auth.jayantgoyal.com`   |
 
 `www.jayantgoyal.com` redirects to the apex canonical URL. The existing e-commerce Vercel projects and domains remain outside this platform restructure.
 
@@ -34,8 +34,15 @@ Studio is a single-purpose application at `apps/studio`; it no longer renders Po
 | Portfolio | `http://localhost:3000`            | Resolve the actual request/deployment origin; no fixed URL | `https://jayantgoyal.com`         |
 | Studio    | `http://localhost:3001`            | Resolve the actual request/deployment origin; no fixed URL | `https://studio.jayantgoyal.com`  |
 | Admin     | Not configured                     | Resolve the actual browser origin                          | Not configured                    |
+| Auth      | `http://localhost:3003`            | Generated origin after provider linking                    | `https://auth.jayantgoyal.com`    |
 
-`NEXT_PUBLIC_SITE_URL` is public configuration and must not be treated as a secret. All sensitive values remain server-only. The Portfolio environment inventory exists without a service-role key; Auth receives its own inventory only when that application exists.
+`NEXT_PUBLIC_SITE_URL` is public configuration and must not be treated as a secret. All sensitive values remain server-only. Portfolio and Auth environment inventories intentionally omit a service-role key. Auth's source inventory exists now; hosted values are not created until the reviewed provider-linking step.
+
+Auth additionally consumes exact public cross-application origins and an
+optional comma-separated `NEXT_PUBLIC_AUTH_RETURN_ORIGINS` list for generated
+Preview destinations. Every entry is parsed as an exact origin; wildcard and
+lookalike hosts are rejected. The local inventory maps Portfolio `3000`, Studio
+`3001`, Admin `3002`, and Auth `3003`.
 
 Admin does not consume `NEXT_PUBLIC_SITE_URL`: its browser OAuth callback uses
 `window.location.origin`, and canonical application identity comes from the
@@ -61,11 +68,11 @@ The existing host-only Supabase session remains untouched through PLATFORM-03. T
 `NEXT_PUBLIC_AUTH_SESSION_MODE` is the non-sensitive build-time rollout control
 for Studio, Admin, and later Auth:
 
-| Value | Behavior |
-| ----- | -------- |
-| `legacy` | Current Supabase cookie behavior; default and immediate rollback |
+| Value           | Behavior                                                                  |
+| --------------- | ------------------------------------------------------------------------- |
+| `legacy`        | Current Supabase cookie behavior; default and immediate rollback          |
 | `compatibility` | Prefer the versioned cookie and promote a server-validated legacy session |
-| `platform` | Versioned cookie only after the compatibility observation gate |
+| `platform`      | Versioned cookie only after the compatibility observation gate            |
 
 Studio and Admin currently define one unscoped Vercel variable covering
 Development, Preview, and Production, set to `legacy`. Preview cookies remain

@@ -40,6 +40,7 @@ function createRepository() {
   for (const directory of [
     "apps/studio",
     "apps/admin",
+    "apps/auth",
     "packages/ui",
     "scripts",
     "docs",
@@ -50,6 +51,7 @@ function createRepository() {
   const files = {
     "apps/studio/app.ts": "studio\n",
     "apps/admin/app.ts": "admin\n",
+    "apps/auth/app.ts": "auth\n",
     "packages/ui/index.ts": "ui\n",
     "scripts/ignore-build.sh": "detector\n",
     "docs/readme.md": "docs\n",
@@ -102,6 +104,7 @@ describe("Vercel ignored build detection", () => {
 
     expect(runDetector(repository, "apps/studio", base, head).status).toBe(1);
     expect(runDetector(repository, "apps/admin", base, head).status).toBe(0);
+    expect(runDetector(repository, "apps/auth", base, head).status).toBe(0);
   });
 
   it("detects shared changes hidden behind a final documentation commit", () => {

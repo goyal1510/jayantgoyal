@@ -34,6 +34,15 @@ export const APP_BRANDS = {
     titleTemplate: "%s | Admin",
     description: `Private administration for ${PERSON_BRAND.fullName}'s portfolio content and platform operations.`,
   },
+  auth: {
+    id: "auth",
+    name: "Auth",
+    publicName: `Auth by ${PERSON_BRAND.fullName}`,
+    canonicalUrl: "https://auth.jayantgoyal.com",
+    defaultTitle: `Auth by ${PERSON_BRAND.fullName}`,
+    titleTemplate: "%s | Auth",
+    description: `Secure sign-in and account security for ${PERSON_BRAND.fullName}'s applications.`,
+  },
 } as const;
 
 export type AppBrandId = keyof typeof APP_BRANDS;
