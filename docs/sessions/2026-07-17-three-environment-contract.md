@@ -81,3 +81,8 @@
   branch-scoped entries. Authoritative DNS returns no record for the retired
   Portfolio or staging hosts. Production smoke returns `200` for Portfolio and
   Studio; Admin performs its expected one redirect and then returns `200`.
+- PR #41's Portfolio Preview completed at commit `e509bb2` and returns `200`
+  with `Jayant Goyal | Full-Stack Developer`. Vercel rate-limited the unchanged
+  Admin and Studio projects before their ignore-build scripts could run; those
+  provider checks are unrelated to this Portfolio-only source cleanup and are
+  recorded rather than hidden.
