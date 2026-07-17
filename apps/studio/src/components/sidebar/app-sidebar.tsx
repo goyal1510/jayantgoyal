@@ -1,8 +1,9 @@
 "use client";
 
 import * as React from "react";
+import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
-import { LayoutGrid } from "lucide-react";
+import { FileText, LayoutGrid } from "lucide-react";
 
 import { APP_BRANDS } from "@repo/brand";
 import { ApplicationBrandHeader } from "@repo/ui/application-shell";
@@ -10,7 +11,11 @@ import { cn } from "@repo/ui/lib/utils";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
   SidebarRail,
 } from "@repo/ui/sidebar";
 
@@ -22,6 +27,14 @@ import {
   SidebarHeaderCollapseButton,
 } from "@/components/header/studio-sidebar-toggle";
 
+const TermsDialog = dynamic(
+  () =>
+    import("@/components/auth/terms-dialog").then((module) => ({
+      default: module.TermsDialog,
+    })),
+  { ssr: false },
+);
+
 const DISCOVERY_IDS = [
   "studio-home",
   "studio-products",
@@ -29,7 +42,12 @@ const DISCOVERY_IDS = [
   "weather",
   "github-stats",
 ];
-const WORKSPACE_IDS = ["activity-tracker", "file-manager", "messenger"];
+const WORKSPACE_IDS = [
+  "activity-tracker",
+  "currency-calculator",
+  "file-manager",
+  "messenger",
+];
 const EXPERIMENT_IDS = ["game-hub", "custom-calculator"];
 
 function selectApps(apps: AppConfig[], ids: string[]) {
@@ -121,6 +139,22 @@ export function AppSidebar({
           label="Experiments"
         />
       </SidebarContent>
+      <SidebarFooter className="border-t border-sidebar-border/80">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <TermsDialog>
+              <SidebarMenuButton
+                type="button"
+                tooltip="Terms & Conditions"
+                className="w-full"
+              >
+                <FileText />
+                <span>Terms & Conditions</span>
+              </SidebarMenuButton>
+            </TermsDialog>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );

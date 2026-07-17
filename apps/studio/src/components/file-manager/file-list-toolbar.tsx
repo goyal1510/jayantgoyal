@@ -1,57 +1,65 @@
-"use client"
+"use client";
 
-import { Button } from "@repo/ui/button"
+import { Button } from "@repo/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@repo/ui/dropdown-menu"
+} from "@repo/ui/dropdown-menu";
 import {
   Breadcrumb,
   BreadcrumbItem,
-
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@repo/ui/breadcrumb"
-import { Grid3x3, List, ArrowUpDown, ArrowUp, ArrowDown, FolderPlus, Upload, Plus, Ellipsis } from "lucide-react"
+} from "@repo/ui/breadcrumb";
+import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  Ellipsis,
+  FolderPlus,
+  Grid3x3,
+  List,
+  Upload,
+} from "lucide-react";
 
-type SortField = "name" | "date" | "size" | "type"
-type SortOrder = "asc" | "desc"
-type ViewMode = "grid" | "list"
+type SortField = "name" | "date" | "size" | "type";
+type SortOrder = "asc" | "desc";
+type ViewMode = "grid" | "list";
 
 interface FileListToolbarProps {
-  currentPath: string
-  sortField: SortField
-  sortOrder: SortOrder
-  viewMode: ViewMode
-  onSortFieldChange: (field: SortField) => void
-  onSortOrderToggle: () => void
-  onViewModeChange: (mode: ViewMode) => void
-  onUploadClick: () => void
-  onCreateFolderClick: () => void
-  onBreadcrumbClick: (path: string) => void
+  currentPath: string;
+  sortField: SortField;
+  sortOrder: SortOrder;
+  viewMode: ViewMode;
+  onSortFieldChange: (field: SortField) => void;
+  onSortOrderToggle: () => void;
+  onViewModeChange: (mode: ViewMode) => void;
+  onUploadClick: () => void;
+  onCreateFolderClick: () => void;
+  onBreadcrumbClick: (path: string) => void;
 }
 
 function getBreadcrumbSegments(path: string) {
   if (path === "/") {
-    return [{ name: "Home", path: "/" }]
+    return [{ name: "Home", path: "/" }];
   }
 
-  const segments = path.split("/").filter(Boolean)
-  const breadcrumbs = [{ name: "Home", path: "/" }]
+  const segments = path.split("/").filter(Boolean);
+  const breadcrumbs = [{ name: "Home", path: "/" }];
 
-  let currentPath = ""
+  let currentPath = "";
   for (const segment of segments) {
-    currentPath += `/${segment}`
+    currentPath += `/${segment}`;
     breadcrumbs.push({
       name: segment,
       path: currentPath + "/",
-    })
+    });
   }
 
-  return breadcrumbs
+  return breadcrumbs;
 }
 
 export function FileListToolbar({
@@ -71,25 +79,25 @@ export function FileListToolbar({
       <ArrowUp className="h-4 w-4" />
     ) : (
       <ArrowDown className="h-4 w-4" />
-    )
-  }
+    );
+  };
 
   const handleSortClick = (field: SortField) => {
     if (sortField === field) {
-      onSortOrderToggle()
+      onSortOrderToggle();
     } else {
-      onSortFieldChange(field)
+      onSortFieldChange(field);
     }
-  }
+  };
 
   return (
-    <div className="flex items-center justify-between gap-2">
+    <div className="flex flex-col gap-3 rounded-2xl border border-border/80 bg-card p-3 shadow-none sm:flex-row sm:items-center sm:justify-between">
       <Breadcrumb className="min-w-0 flex-1">
         <BreadcrumbList>
           {(() => {
-            const segments = getBreadcrumbSegments(currentPath)
-            const currentSegment = segments[segments.length - 1]
-            const parentSegments = segments.slice(0, -1)
+            const segments = getBreadcrumbSegments(currentPath);
+            const currentSegment = segments[segments.length - 1];
+            const parentSegments = segments.slice(0, -1);
 
             if (parentSegments.length > 0) {
               return (
@@ -97,7 +105,11 @@ export function FileListToolbar({
                   <BreadcrumbItem>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="h-auto p-1 gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-auto p-1 gap-1"
+                        >
                           <Ellipsis className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
@@ -121,37 +133,38 @@ export function FileListToolbar({
                     </BreadcrumbPage>
                   </BreadcrumbItem>
                 </>
-              )
+              );
             }
 
             return (
               <BreadcrumbItem>
                 <BreadcrumbPage>{currentSegment?.name}</BreadcrumbPage>
               </BreadcrumbItem>
-            )
+            );
           })()}
         </BreadcrumbList>
       </Breadcrumb>
 
-      <div className="flex items-center gap-2">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="default" size="sm" className="gap-1">
-              <Plus className="h-4 w-4" />
-              <span className="hidden xs:inline">New</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={onUploadClick} className="cursor-pointer">
-              <Upload className="h-4 w-4 mr-2" />
-              Upload File
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={onCreateFolderClick} className="cursor-pointer">
-              <FolderPlus className="h-4 w-4 mr-2" />
-              New Folder
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+      <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+        <Button
+          type="button"
+          size="sm"
+          onClick={onUploadClick}
+          className="h-9 rounded-lg px-4 shadow-none"
+        >
+          <Upload className="size-4" />
+          Upload files
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={onCreateFolderClick}
+          className="h-9 rounded-lg px-4 shadow-none"
+        >
+          <FolderPlus className="size-4" />
+          New folder
+        </Button>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -197,5 +210,5 @@ export function FileListToolbar({
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,14 +1,15 @@
-'use client';
+"use client";
 
 import { useDrop } from "react-dnd";
 import { useCalculatorStore } from "@/lib/custom-calculator/useCalculatorStore";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card";
 import { Button } from "@repo/ui/button";
 import { CalculatorComponent } from "@/lib/custom-calculator/types";
 import { cn } from "@repo/ui/lib/utils";
+import { GripVertical, MousePointerClick, Trash2, X } from "lucide-react";
 
 function DragDropContainer() {
-  const { components, addComponent, removeComponent, clearComponents } = useCalculatorStore();
+  const { components, addComponent, removeComponent, clearComponents } =
+    useCalculatorStore();
 
   const [{ isOver }, drop] = useDrop(() => ({
     accept: "COMPONENT",
@@ -19,88 +20,69 @@ function DragDropContainer() {
   }));
 
   return (
-    <Card className="flex min-h-[440px] flex-col border-white/10 bg-background/70 shadow-xl shadow-primary/5 backdrop-blur lg:h-[520px]">
-      <CardHeader className="flex-shrink-0">
-        <CardTitle className="flex items-center space-x-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="h-5 w-5"
+    <section className="flex min-h-[440px] flex-col overflow-hidden rounded-[1.75rem] border border-border/80 bg-card xl:h-[620px]">
+      <div className="flex items-start justify-between gap-3 border-b border-border/70 p-5">
+        <div>
+          <h2 className="flex items-center gap-2 text-xl font-semibold tracking-[-0.03em]">
+            <MousePointerClick className="size-5" />
+            Selected keys
+          </h2>
+          <p className="mt-1 text-sm leading-5 text-muted-foreground">
+            {components.length
+              ? `${components.length} keys in the layout`
+              : "Build your key set here"}
+          </p>
+        </div>
+        {components.length > 0 && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={clearComponents}
+            aria-label="Clear selected keys"
+            className="size-9 rounded-lg text-muted-foreground hover:text-destructive"
           >
-            <path d="M8 2v4l-3 3h18l-3-3V2Z" />
-            <path d="M8 6h8" />
-            <path d="M8 10h8" />
-          </svg>
-          <span>Your Components</span>
-        </CardTitle>
-        <CardDescription>
-          Components you&apos;ve selected will appear here
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="flex min-h-0 flex-1 flex-col">
+            <Trash2 className="size-4" />
+          </Button>
+        )}
+      </div>
+      <div className="flex min-h-0 flex-1 flex-col p-4">
         <div
           ref={drop as unknown as React.RefObject<HTMLDivElement>}
           className={cn(
-            "flex-1 border-2 border-dashed rounded-lg transition-all duration-200 flex flex-col min-h-0",
+            "flex min-h-0 flex-1 flex-col rounded-2xl border border-dashed transition-colors",
             isOver
-              ? "border-primary bg-primary/5 shadow-lg"
-              : "border-muted-foreground/25 bg-muted/50"
+              ? "border-primary bg-primary/10"
+              : "border-border bg-muted/20",
           )}
         >
           {components.length === 0 ? (
             <div className="flex-1 flex items-center justify-center p-4">
               <div className="text-center text-muted-foreground">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="h-12 w-12 mx-auto mb-2 opacity-50"
-                >
-                  <path d="M8 2v4l-3 3h18l-3-3V2Z" />
-                  <path d="M8 6h8" />
-                  <path d="M8 10h8" />
-                </svg>
+                <MousePointerClick className="mx-auto mb-3 size-10 opacity-40" />
                 <p className="text-sm">Drop components here</p>
                 <p className="text-xs">or click them to add</p>
               </div>
             </div>
           ) : (
             <div className="flex min-h-0 flex-1 flex-col p-4">
-              <div className="flex-1 space-y-2 overflow-y-auto">
+              <div className="grid flex-1 auto-rows-min grid-cols-1 gap-2 overflow-y-auto sm:grid-cols-2 xl:grid-cols-1">
                 {components.map((component, index) => (
                   <div
-                    key={index}
-                    className="flex flex-shrink-0 items-center justify-between rounded-lg border border-white/10 bg-card/80 p-3 shadow-sm animate-fade-in"
+                    key={`${component.label}-${index}`}
+                    className="flex flex-shrink-0 items-center justify-between rounded-xl border border-border/70 bg-background p-3 animate-fade-in"
                   >
-                    <span className="font-medium">{component.label}</span>
+                    <span className="flex items-center gap-2 font-medium">
+                      <GripVertical className="size-4 text-muted-foreground" />
+                      {component.label}
+                    </span>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => removeComponent(index)}
+                      aria-label={`Remove ${component.label}`}
                       className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="h-4 w-4"
-                      >
-                        <path d="M18 6 6 18" />
-                        <path d="m6 6 12 12" />
-                      </svg>
+                      <X className="size-4" />
                     </Button>
                   </div>
                 ))}
@@ -108,35 +90,8 @@ function DragDropContainer() {
             </div>
           )}
         </div>
-
-        {components.length > 0 && (
-          <div className="mt-4 flex justify-center flex-shrink-0">
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={clearComponents}
-              className="transition-all duration-200"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-4 w-4 mr-2"
-              >
-                <path d="M3 6h18" />
-                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-              </svg>
-              Clear All
-            </Button>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   );
 }
 

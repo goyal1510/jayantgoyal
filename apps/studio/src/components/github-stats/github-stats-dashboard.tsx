@@ -1,24 +1,32 @@
-"use client"
+"use client";
 
-import { useState, useCallback, useEffect, useMemo, useRef } from "react"
-import dynamic from "next/dynamic"
-import { Search, X } from "lucide-react"
-import { m } from "framer-motion"
-import { Input } from "@repo/ui/input"
-import { Button } from "@repo/ui/button"
-import { Skeleton } from "@repo/ui/skeleton"
-import { Card, CardContent } from "@repo/ui/card"
-import { PageSpinner } from "@repo/ui/page-spinner"
-import { fetchGitHubUser, fetchGitHubRepos } from "@/lib/github-stats/api"
-import { computeStats, computeLanguageDistribution, getTopReposByStars } from "@/lib/github-stats/compute"
-import type { GitHubUser, GitHubRepo } from "@/lib/github-stats/types"
-import { ProfileCard } from "./profile-card"
-import { StatsCards } from "./stats-cards"
-import { ContributionCalendar } from "./contribution-calendar"
-import { RepositoryTable } from "./repository-table"
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
+import dynamic from "next/dynamic";
+import { Github, Search, X } from "lucide-react";
+import { m } from "framer-motion";
+import { Input } from "@repo/ui/input";
+import { Button } from "@repo/ui/button";
+import { Skeleton } from "@repo/ui/skeleton";
+import { Card, CardContent } from "@repo/ui/card";
+import { PageSpinner } from "@repo/ui/page-spinner";
+import { fetchGitHubUser, fetchGitHubRepos } from "@/lib/github-stats/api";
+import {
+  computeStats,
+  computeLanguageDistribution,
+  getTopReposByStars,
+} from "@/lib/github-stats/compute";
+import type { GitHubUser, GitHubRepo } from "@/lib/github-stats/types";
+import { ProfileCard } from "./profile-card";
+import { StatsCards } from "./stats-cards";
+import { ContributionCalendar } from "./contribution-calendar";
+import { RepositoryTable } from "./repository-table";
+import { StudioWorkspaceHeader } from "@/components/studio/studio-workspace-header";
 
 const LanguagePieChart = dynamic(
-  () => import("./language-pie-chart").then((mod) => ({ default: mod.LanguagePieChart })),
+  () =>
+    import("./language-pie-chart").then((mod) => ({
+      default: mod.LanguagePieChart,
+    })),
   {
     ssr: false,
     loading: () => (
@@ -28,11 +36,14 @@ const LanguagePieChart = dynamic(
         </CardContent>
       </Card>
     ),
-  }
-)
+  },
+);
 
 const TopReposBarChart = dynamic(
-  () => import("./top-repos-bar-chart").then((mod) => ({ default: mod.TopReposBarChart })),
+  () =>
+    import("./top-repos-bar-chart").then((mod) => ({
+      default: mod.TopReposBarChart,
+    })),
   {
     ssr: false,
     loading: () => (
@@ -42,111 +53,116 @@ const TopReposBarChart = dynamic(
         </CardContent>
       </Card>
     ),
-  }
-)
+  },
+);
 
-const DEFAULT_USERNAME = "goyal1510"
+const DEFAULT_USERNAME = "goyal1510";
 
 export default function GitHubStatsDashboard() {
-  const [input, setInput] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [user, setUser] = useState<GitHubUser | null>(null)
-  const [repos, setRepos] = useState<GitHubRepo[]>([])
-  const hasLoaded = useRef(false)
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [user, setUser] = useState<GitHubUser | null>(null);
+  const [repos, setRepos] = useState<GitHubRepo[]>([]);
+  const hasLoaded = useRef(false);
 
   const handleSearch = useCallback(
     async (username?: string) => {
-      const query = (username ?? input).trim()
+      const query = (username ?? input).trim();
       if (!query) {
-        setError("Please enter a GitHub username.")
-        return
+        setError("Please enter a GitHub username.");
+        return;
       }
 
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
       try {
         const [userData, repoData] = await Promise.all([
           fetchGitHubUser(query),
           fetchGitHubRepos(query),
-        ])
-        setUser(userData)
-        setRepos(repoData)
-        setInput(userData.login)
+        ]);
+        setUser(userData);
+        setRepos(repoData);
+        setInput(userData.login);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "An unexpected error occurred.")
-        setUser(null)
-        setRepos([])
+        setError(
+          err instanceof Error ? err.message : "An unexpected error occurred.",
+        );
+        setUser(null);
+        setRepos([]);
       } finally {
-        setLoading(false)
-        hasLoaded.current = true
+        setLoading(false);
+        hasLoaded.current = true;
       }
     },
-    [input]
-  )
+    [input],
+  );
 
   // Load default user on mount
   useEffect(() => {
-    void handleSearch(DEFAULT_USERNAME)
+    void handleSearch(DEFAULT_USERNAME);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, []);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      e.preventDefault()
-      void handleSearch()
+      e.preventDefault();
+      void handleSearch();
     }
-  }
+  };
 
   const stats = useMemo(
-    () => (user && repos.length > 0 ? computeStats(repos, user.created_at) : null),
-    [user, repos]
-  )
+    () =>
+      user && repos.length > 0 ? computeStats(repos, user.created_at) : null,
+    [user, repos],
+  );
 
-  const languageData = useMemo(() => computeLanguageDistribution(repos), [repos])
-  const topRepos = useMemo(() => getTopReposByStars(repos), [repos])
+  const languageData = useMemo(
+    () => computeLanguageDistribution(repos),
+    [repos],
+  );
+  const topRepos = useMemo(() => getTopReposByStars(repos), [repos]);
 
   return (
-    <div className="container mx-auto max-w-7xl space-y-6 px-4 py-6">
-      {/* Header
-      <div className="flex items-center gap-3">
-        <Github className="size-8 text-primary" />
-        <div>
-          <h1 className="text-2xl font-bold">GitHub Stats</h1>
-          <p className="text-sm text-muted-foreground">
-            Explore any GitHub profile with stats, charts, and contribution data
-          </p>
-        </div>
-      </div> */}
-
-      {/* Search */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <Input
-                placeholder="Enter a GitHub username..."
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                className="pr-8"
-              />
-              {input && (
-                <button
-                  onClick={() => setInput("")}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground hover:text-foreground"
-                >
-                  <X className="size-4" />
-                </button>
-              )}
-            </div>
-            <Button onClick={() => void handleSearch()} disabled={loading}>
-              {loading ? "Loading..." : <><Search className="mr-2 size-4" /> Search</>}
-            </Button>
+    <div className="mx-auto w-full max-w-[1280px] space-y-6">
+      <StudioWorkspaceHeader
+        icon={Github}
+        title="GitHub Stats"
+        description="Explore a public profile, understand its repository footprint, and compare contribution patterns at a glance."
+        tone="blue"
+      >
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <div className="relative min-w-0 flex-1">
+            <Input
+              aria-label="GitHub username"
+              placeholder="Enter a GitHub username"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="h-12 rounded-xl border-current/20 bg-white/65 pr-10 text-[#211512] shadow-none placeholder:text-[#211512]/55 focus-visible:ring-[#211512]/40 dark:bg-black/15 dark:text-[#fff8ef] dark:placeholder:text-[#fff8ef]/55"
+            />
+            {input && (
+              <button
+                type="button"
+                aria-label="Clear GitHub username"
+                onClick={() => setInput("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer opacity-60 transition-opacity hover:opacity-100"
+              >
+                <X className="size-4" />
+              </button>
+            )}
           </div>
-        </CardContent>
-      </Card>
+          <Button
+            onClick={() => void handleSearch()}
+            disabled={loading}
+            className="h-12 rounded-xl bg-[#211512] px-6 text-[#fff8ef] shadow-none hover:bg-[#211512]/90 dark:bg-[#fff8ef] dark:text-[#211512] dark:hover:bg-[#fff8ef]/90"
+          >
+            <Search className="size-4" />
+            {loading ? "Loading profile" : "Explore profile"}
+          </Button>
+        </div>
+      </StudioWorkspaceHeader>
 
       {/* Error */}
       {error && (
@@ -158,9 +174,9 @@ export default function GitHubStatsDashboard() {
       {/* Loading */}
       {loading && !hasLoaded.current && <PageSpinner />}
       {loading && hasLoaded.current && (
-        <div className="space-y-6">
-          <Card>
-            <CardContent className="flex gap-6 p-6">
+        <div className="space-y-5">
+          <Card className="rounded-[1.75rem] shadow-none">
+            <CardContent className="flex gap-6 p-6 sm:p-7">
               <Skeleton className="size-[120px] rounded-full" />
               <div className="flex-1 space-y-3">
                 <Skeleton className="h-8 w-48" />
@@ -169,18 +185,21 @@ export default function GitHubStatsDashboard() {
               </div>
             </CardContent>
           </Card>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+          <div className="overflow-hidden rounded-[1.5rem] border border-border/80 bg-card sm:grid sm:grid-cols-3 lg:grid-cols-6">
             {Array.from({ length: 6 }).map((_, i) => (
-              <Card key={i}>
-                <CardContent className="flex flex-col items-center gap-2 p-4">
+              <div
+                key={i}
+                className="border-b border-border/70 p-4 sm:border-b-0 sm:border-r last:border-0"
+              >
+                <div className="flex flex-col gap-2">
                   <Skeleton className="size-6 rounded" />
                   <Skeleton className="h-6 w-16" />
                   <Skeleton className="h-3 w-20" />
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
-          <Skeleton className="h-64 w-full rounded-lg" />
+          <Skeleton className="h-64 w-full rounded-[1.75rem]" />
         </div>
       )}
 
@@ -190,7 +209,7 @@ export default function GitHubStatsDashboard() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
-          className="space-y-6"
+          className="space-y-5"
         >
           <ProfileCard user={user} />
 
@@ -207,5 +226,5 @@ export default function GitHubStatsDashboard() {
         </m.div>
       )}
     </div>
-  )
+  );
 }

@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
 import { useState } from "react";
 import { useCalculatorStore } from "@/lib/custom-calculator/useCalculatorStore";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card";
 import { Button } from "@repo/ui/button";
 import Display from "./Display";
+import { Calculator as CalculatorIcon, History } from "lucide-react";
 
 const Calculator: React.FC = () => {
   const { components } = useCalculatorStore();
@@ -17,27 +17,22 @@ const Calculator: React.FC = () => {
         // Basic calculation
         const result = Function(`"use strict"; return (${input})`)();
         const calculation = `${input} = ${result}`;
-        setHistory(prev => [calculation, ...prev.slice(0, 4)]);
+        setHistory((prev) => [calculation, ...prev.slice(0, 4)]);
         setInput(result.toString());
-      }
-      else if (label === "C") {
-        setInput('');
+      } else if (label === "C") {
+        setInput("");
         setHistory([]);
-      }
-      else if (label === "CE") {
-        setInput('');
-      }
-      else if (label === "<") {
-        setInput(prev => prev.slice(0, -1));
-      }
-      else if (label === "±") {
-        setInput(prev => {
-          if (prev === '' || prev === '0') return '0';
-          if (prev.startsWith('-')) return prev.slice(1);
-          return '-' + prev;
+      } else if (label === "CE") {
+        setInput("");
+      } else if (label === "<") {
+        setInput((prev) => prev.slice(0, -1));
+      } else if (label === "±") {
+        setInput((prev) => {
+          if (prev === "" || prev === "0") return "0";
+          if (prev.startsWith("-")) return prev.slice(1);
+          return "-" + prev;
         });
-      }
-      else {
+      } else {
         setInput((prev) => prev + label);
       }
     } catch {
@@ -54,48 +49,24 @@ const Calculator: React.FC = () => {
   };
 
   return (
-    <Card className="flex min-h-[440px] flex-col border-white/10 bg-background/70 shadow-xl shadow-primary/5 backdrop-blur lg:h-[520px]">
-      <CardHeader className="flex-shrink-0">
-        <CardTitle className="flex items-center space-x-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="h-5 w-5"
-          >
-            <rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
-            <path d="M12 18h.01" />
-          </svg>
-          <span>Your Calculator</span>
-        </CardTitle>
-        <CardDescription>
-          Your custom calculator will appear here
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-1 flex-col">
-        <div className="flex flex-1 flex-col space-y-4">
+    <section className="flex min-h-[440px] flex-col overflow-hidden rounded-[1.75rem] border border-border/80 bg-card xl:h-[620px]">
+      <div className="border-b border-border/70 p-5">
+        <h2 className="flex items-center gap-2 text-xl font-semibold tracking-[-0.03em]">
+          <CalculatorIcon className="size-5" />
+          Live calculator
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          The preview updates with your selected keys.
+        </p>
+      </div>
+      <div className="flex flex-1 flex-col p-4 sm:p-5">
+        <div className="flex flex-1 flex-col space-y-4 rounded-[2rem] border border-[#211512] bg-[#211512] p-4 text-[#fff8ef] shadow-lg shadow-black/10 sm:p-5">
           <Display value={input} className="flex-shrink-0" />
 
           {components.length === 0 ? (
-            <div className="flex flex-1 items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/25 bg-muted/50">
-              <div className="text-center text-muted-foreground">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="h-12 w-12 mx-auto mb-2 opacity-50"
-                >
-                  <rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
-                  <path d="M12 18h.01" />
-                </svg>
+            <div className="flex flex-1 items-center justify-center rounded-2xl border border-dashed border-[#fff8ef]/25 bg-[#fff8ef]/5">
+              <div className="text-center text-[#fff8ef]/60">
+                <CalculatorIcon className="mx-auto mb-3 size-10 opacity-60" />
                 <p className="text-sm">Add components to build</p>
                 <p className="text-xs">your calculator</p>
               </div>
@@ -108,7 +79,7 @@ const Calculator: React.FC = () => {
                     key={index}
                     variant={getButtonVariant(component.label)}
                     size="lg"
-                    className="h-12 text-lg font-medium transition-all duration-200 hover:scale-105 active:scale-95"
+                    className="h-12 rounded-xl text-lg font-medium transition-transform hover:-translate-y-0.5"
                     onClick={() => handleClick(component.label)}
                   >
                     {component.label}
@@ -120,10 +91,16 @@ const Calculator: React.FC = () => {
 
           {history.length > 0 && (
             <div className="flex-shrink-0">
-              <h4 className="text-sm font-medium text-muted-foreground mb-2">Recent Calculations</h4>
+              <h4 className="mb-2 flex items-center gap-2 text-sm font-medium text-[#fff8ef]/70">
+                <History className="size-4" />
+                Recent calculations
+              </h4>
               <div className="space-y-1 max-h-20 overflow-y-auto">
                 {history.map((calc, index) => (
-                  <div key={index} className="text-xs text-muted-foreground font-mono bg-muted/50 p-1 rounded">
+                  <div
+                    key={index}
+                    className="rounded-lg bg-[#fff8ef]/10 p-2 font-mono text-xs text-[#fff8ef]/75"
+                  >
                     {calc}
                   </div>
                 ))}
@@ -131,8 +108,8 @@ const Calculator: React.FC = () => {
             </div>
           )}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   );
 };
 

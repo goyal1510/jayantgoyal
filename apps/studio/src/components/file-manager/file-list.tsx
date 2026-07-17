@@ -1,22 +1,25 @@
-"use client"
+"use client";
 
-import { Spinner } from "@repo/ui/spinner"
-import { PageSpinner } from "@repo/ui/page-spinner"
-import { Card } from "@repo/ui/card"
-import { CreateFolderDialog } from "@/components/file-manager/create-folder-dialog"
-import { RenameDialog } from "@/components/file-manager/rename-dialog"
-import { DeleteDialog } from "@/components/file-manager/delete-dialog"
-import { UploadDialog } from "@/components/file-manager/upload-dialog"
-import { FileViewer } from "@/components/file-manager/file-viewer"
-import { MoveDialog } from "@/components/file-manager/move-dialog"
-import { CopyDialog } from "@/components/file-manager/copy-dialog"
-import { FileListToolbar } from "@/components/file-manager/file-list-toolbar"
-import { FileGridView } from "@/components/file-manager/file-grid-view"
-import { FileListView } from "@/components/file-manager/file-list-view"
-import { useFileList } from "@/components/file-manager/use-file-list"
+import { FolderOpen } from "lucide-react";
+
+import { Spinner } from "@repo/ui/spinner";
+import { PageSpinner } from "@repo/ui/page-spinner";
+import { Card } from "@repo/ui/card";
+import { StudioWorkspaceHeader } from "@/components/studio/studio-workspace-header";
+import { CreateFolderDialog } from "@/components/file-manager/create-folder-dialog";
+import { RenameDialog } from "@/components/file-manager/rename-dialog";
+import { DeleteDialog } from "@/components/file-manager/delete-dialog";
+import { UploadDialog } from "@/components/file-manager/upload-dialog";
+import { FileViewer } from "@/components/file-manager/file-viewer";
+import { MoveDialog } from "@/components/file-manager/move-dialog";
+import { CopyDialog } from "@/components/file-manager/copy-dialog";
+import { FileListToolbar } from "@/components/file-manager/file-list-toolbar";
+import { FileGridView } from "@/components/file-manager/file-grid-view";
+import { FileListView } from "@/components/file-manager/file-list-view";
+import { useFileList } from "@/components/file-manager/use-file-list";
 
 interface FileListProps {
-  initialPath?: string
+  initialPath?: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -55,10 +58,17 @@ export function FileList({ initialPath = "/" }: FileListProps) {
     handleSortFieldChange,
     handleSortOrderToggle,
     navigateToPath,
-  } = useFileList()
+  } = useFileList();
 
   return (
     <div className="space-y-4">
+      <StudioWorkspaceHeader
+        icon={FolderOpen}
+        title="File Manager"
+        description="Organize private files and folders, switch views, and keep uploads easy to find."
+        tone="blue"
+      />
+
       <FileListToolbar
         currentPath={currentPath}
         sortField={sortField}
@@ -161,5 +171,5 @@ export function FileList({ initialPath = "/" }: FileListProps) {
         onFileChange={setSelectedFile}
       />
     </div>
-  )
+  );
 }

@@ -12,7 +12,7 @@ interface MessageListProps {
 
 export function MessageList({ messages }: MessageListProps) {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2.5">
       {messages.map((message) => (
         <MessageItem key={message.id} message={message} />
       ))}

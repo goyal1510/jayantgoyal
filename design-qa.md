@@ -118,4 +118,63 @@
 - [ ] Tablet and mobile visual matrix (deferred to the full-Studio responsive
       pass; no desktop blocker remains)
 
+## Studio Header Consolidation QA
+
+### Evidence
+
+- Source visual truth:
+  - `/var/folders/l7/mp0zsy4n02ncdj88glz5fwy80000gn/T/TemporaryItems/NSIRD_screencaptureui_w8nB1Q/Screenshot 2026-07-17 at 10.27.47 PM.png`
+  - `/var/folders/l7/mp0zsy4n02ncdj88glz5fwy80000gn/T/TemporaryItems/NSIRD_screencaptureui_KPnfuC/Screenshot 2026-07-17 at 10.28.29 PM.png`
+- Browser-rendered implementation:
+  - `/tmp/studio-header-consolidation-2026-07-17/token-generator.png`
+  - `/tmp/studio-header-consolidation-2026-07-17/calculator-builder.png`
+  - `/tmp/studio-header-consolidation-2026-07-17/file-manager.png`
+  - `/tmp/studio-header-consolidation-2026-07-17/weather.png`
+- Viewport: 1280 × 720, desktop, dark theme, authenticated local Studio.
+- Full-view comparison evidence: the accepted Tech Tools source crop,
+  Calculator Builder implementation, and File Manager implementation were
+  opened together in one visual comparison input. The source itself is a
+  focused header crop, so a separate focused-region crop was not needed.
+
+### Findings
+
+- No actionable P0, P1, or P2 differences remain. The shared implementation
+  matches the accepted editorial hierarchy: icon first, large display title,
+  readable description, generous internal spacing, and lower-edge actions.
+- Fonts and typography retain Studio's existing font families and accepted
+  display sizing. Calculator Builder, File Manager, Weather, Tech Tools, and
+  individual Games now receive the same title scale and line-height contract.
+- Spacing, radius, borders, and tone classes match the accepted Tool header.
+  Each module retains its own semantic tone instead of receiving one fixed
+  color.
+- Existing Lucide icons are preserved at one shared size and stroke treatment;
+  no generated, placeholder, handcrafted SVG, or CSS-drawn assets were added.
+- Copy remains module-specific. Tool favorites, Game play-mode labels, embedded
+  Weather/GitHub controls, and other module actions remain available through
+  the shared component slots.
+- File Manager now has the previously missing header. Upload Files and New
+  Folder are primary header actions; breadcrumb, sorting, and view controls sit
+  below the divider. Opening and closing the New Folder dialog was verified
+  without creating remote data.
+- Calculator Builder, Token Generator, File Manager, and Weather produced no
+  browser warnings or errors during the final local review.
+
+### Comparison History
+
+1. The initial state had an accepted large Tool header, a compact shared
+   workspace header, a separate Game header implementation, and no File Manager
+   identity header.
+2. The shared header was changed to the accepted Tool hierarchy, and the Tool
+   and Game-specific markup was replaced with that component.
+3. File Manager was added to the shared contract, with its creation actions and
+   folder controls placed in the component's existing action/content slots.
+4. Final browser captures confirmed the same hierarchy across no-action,
+   action, and embedded-control variants without visible overflow or console
+   errors.
+
+### Follow-up Polish
+
+- A dedicated mobile and tablet header matrix remains part of the broader
+  responsive Studio pass; no desktop blocker remains.
+
 final result: passed

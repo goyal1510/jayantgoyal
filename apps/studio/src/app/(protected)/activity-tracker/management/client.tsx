@@ -1,9 +1,8 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent } from "@repo/ui/card"
-import { Button } from "@repo/ui/button"
-import { PageSpinner } from "@repo/ui/page-spinner"
+import * as React from "react";
+import { Button } from "@repo/ui/button";
+import { PageSpinner } from "@repo/ui/page-spinner";
 import {
   Table,
   TableBody,
@@ -11,54 +10,65 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Switch } from "@repo/ui/switch"
-import { Activity } from "@/lib/activity-tracker/database"
-import { toast } from "sonner"
-import { Pencil } from "lucide-react"
+} from "@/components/ui/table";
+import { Switch } from "@repo/ui/switch";
+import { Activity } from "@/lib/activity-tracker/database";
+import { toast } from "sonner";
+import { ListChecks, Pencil } from "lucide-react";
 
-import { EditActivityDialog } from "./edit-activity-dialog"
+import { EditActivityDialog } from "./edit-activity-dialog";
+import { StudioWorkspaceHeader } from "@/components/studio/studio-workspace-header";
 
 interface ActivitiesResponse {
-  activities: Activity[]
+  activities: Activity[];
 }
 
 export default function ManagementClient() {
-  const [activities, setActivities] = React.useState<Activity[]>([])
-  const [isLoading, setIsLoading] = React.useState(true)
-  const [updatingActivities, setUpdatingActivities] = React.useState<Set<string>>(new Set())
-  const [editingActivity, setEditingActivity] = React.useState<Activity | null>(null)
-  const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false)
+  const [activities, setActivities] = React.useState<Activity[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [updatingActivities, setUpdatingActivities] = React.useState<
+    Set<string>
+  >(new Set());
+  const [editingActivity, setEditingActivity] = React.useState<Activity | null>(
+    null,
+  );
+  const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
 
   const loadActivities = React.useCallback(async () => {
     try {
-      setIsLoading(true)
-      const response = await fetch("/api/activity-tracker?include_inactive=true", {
-        cache: "no-store",
-      })
+      setIsLoading(true);
+      const response = await fetch(
+        "/api/activity-tracker?include_inactive=true",
+        {
+          cache: "no-store",
+        },
+      );
 
       if (!response.ok) {
-        throw new Error("Failed to load activities.")
+        throw new Error("Failed to load activities.");
       }
 
-      const data = (await response.json()) as ActivitiesResponse
-      setActivities(data.activities || [])
+      const data = (await response.json()) as ActivitiesResponse;
+      setActivities(data.activities || []);
     } catch {
-      toast.error("Unable to load activities.")
+      toast.error("Unable to load activities.");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }, [])
+  }, []);
 
   React.useEffect(() => {
-    void loadActivities()
-  }, [loadActivities])
+    void loadActivities();
+  }, [loadActivities]);
 
-  const handleToggleActive = async (activityId: string, currentIsActive: boolean) => {
-    if (updatingActivities.has(activityId)) return
+  const handleToggleActive = async (
+    activityId: string,
+    currentIsActive: boolean,
+  ) => {
+    if (updatingActivities.has(activityId)) return;
 
     try {
-      setUpdatingActivities((prev) => new Set(prev).add(activityId))
+      setUpdatingActivities((prev) => new Set(prev).add(activityId));
 
       const response = await fetch(`/api/activity-tracker/${activityId}`, {
         method: "PATCH",
@@ -68,83 +78,110 @@ export default function ManagementClient() {
         body: JSON.stringify({
           is_active: !currentIsActive,
         }),
-      })
+      });
 
       if (!response.ok) {
-        throw new Error("Failed to update activity.")
+        throw new Error("Failed to update activity.");
       }
 
       toast.success(
-        `Activity ${!currentIsActive ? "activated" : "deactivated"} successfully!`
-      )
+        `Activity ${!currentIsActive ? "activated" : "deactivated"} successfully!`,
+      );
 
       setActivities((prev) =>
         prev.map((activity) =>
           activity.id === activityId
             ? { ...activity, is_active: !currentIsActive }
-            : activity
-        )
-      )
+            : activity,
+        ),
+      );
     } catch {
-      toast.error("Unable to update activity.")
+      toast.error("Unable to update activity.");
     } finally {
       setUpdatingActivities((prev) => {
-        const newSet = new Set(prev)
-        newSet.delete(activityId)
-        return newSet
-      })
+        const newSet = new Set(prev);
+        newSet.delete(activityId);
+        return newSet;
+      });
     }
-  }
+  };
 
   const handleOpenEditDialog = (activity: Activity) => {
-    setEditingActivity(activity)
-    setIsEditDialogOpen(true)
-  }
+    setEditingActivity(activity);
+    setIsEditDialogOpen(true);
+  };
 
   const handleActivitySaved = (updatedActivity: Activity) => {
     setActivities((prev) =>
       prev.map((activity) =>
-        activity.id === updatedActivity.id ? updatedActivity : activity
-      )
-    )
-  }
+        activity.id === updatedActivity.id ? updatedActivity : activity,
+      ),
+    );
+  };
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-4 sm:gap-6">
-        <h1 className="text-lg font-bold tracking-tight sm:text-2xl md:text-3xl">Management</h1>
+      <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-5">
+        <StudioWorkspaceHeader
+          icon={ListChecks}
+          title="Manage activities"
+          description="Rename routines and control which activities appear in your monthly tracker."
+          tone="sage"
+        />
         <PageSpinner />
       </div>
-    )
+    );
   }
 
   return (
-    <div className="flex flex-col gap-4 sm:gap-6">
-      <h1 className="text-lg font-bold tracking-tight sm:text-2xl md:text-3xl">Management</h1>
-      <Card>
-        <CardContent className="p-4 sm:p-6">
+    <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-5">
+      <StudioWorkspaceHeader
+        icon={ListChecks}
+        title="Manage activities"
+        description="Rename routines and control which activities appear in your monthly tracker."
+        tone="sage"
+      />
+      <section className="overflow-hidden rounded-[1.75rem] border border-border/80 bg-card">
+        <div className="border-b border-border/70 p-5 sm:p-6">
+          <h2 className="text-2xl font-semibold tracking-[-0.035em]">
+            Activity library
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {activities.length}{" "}
+            {activities.length === 1 ? "activity" : "activities"} ·{" "}
+            {activities.filter((activity) => activity.is_active).length} active
+          </p>
+        </div>
+        <div className="p-4 sm:p-6">
           {activities.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12">
               <p className="text-muted-foreground text-center">
-                No activities yet. Create activities using the &ldquo;Add Activity&rdquo; button on the Dashboard page.
+                No activities yet. Create activities using the &ldquo;Add
+                Activity&rdquo; button on the Dashboard page.
               </p>
             </div>
           ) : (
             <div className="-mx-4 overflow-x-auto sm:mx-0">
               <div className="inline-block min-w-full align-middle">
-                <div className="rounded-md border sm:rounded-lg">
+                <div className="overflow-hidden rounded-xl border border-border/80">
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="min-w-[120px] sm:w-[200px]">Activity</TableHead>
+                        <TableHead className="min-w-[120px] sm:w-[200px]">
+                          Activity
+                        </TableHead>
                         <TableHead className="min-w-[80px]">Status</TableHead>
-                        <TableHead className="min-w-[100px] text-right">Actions</TableHead>
+                        <TableHead className="min-w-[100px] text-right">
+                          Actions
+                        </TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {activities.map((activity) => (
                         <TableRow key={activity.id}>
-                          <TableCell className="font-medium text-sm">{activity.name}</TableCell>
+                          <TableCell className="font-medium text-sm">
+                            {activity.name}
+                          </TableCell>
                           <TableCell>
                             <span
                               className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
@@ -161,7 +198,10 @@ export default function ManagementClient() {
                               <Switch
                                 checked={activity.is_active}
                                 onCheckedChange={() =>
-                                  handleToggleActive(activity.id, activity.is_active)
+                                  handleToggleActive(
+                                    activity.id,
+                                    activity.is_active,
+                                  )
                                 }
                                 disabled={updatingActivities.has(activity.id)}
                               />
@@ -183,8 +223,8 @@ export default function ManagementClient() {
               </div>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
       <EditActivityDialog
         activity={editingActivity}
@@ -193,5 +233,5 @@ export default function ManagementClient() {
         onSaved={handleActivitySaved}
       />
     </div>
-  )
+  );
 }

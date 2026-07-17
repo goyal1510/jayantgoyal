@@ -163,7 +163,10 @@ export function TopbarUserMenu() {
 
   if (isUserLoading) {
     return (
-      <div className="flex h-9 items-center gap-2 px-1" aria-label="Loading user">
+      <div
+        className="flex h-9 items-center gap-2 px-1"
+        aria-label="Loading user"
+      >
         <Skeleton className="size-8 rounded-full" />
         <Skeleton className="hidden h-4 w-20 sm:block" />
       </div>
@@ -202,8 +205,7 @@ export function TopbarUserMenu() {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="min-w-64 rounded-lg">
           <DropdownMenuLabel className="font-normal">
-            <span className="block truncate font-medium">{displayName}</span>
-            <span className="mt-0.5 block truncate text-xs text-muted-foreground">
+            <span className="block truncate text-sm text-muted-foreground">
               {user.email}
             </span>
           </DropdownMenuLabel>

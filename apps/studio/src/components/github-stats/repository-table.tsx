@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import { useState, useMemo } from "react"
-import { ArrowUpDown, Star, GitFork, ExternalLink } from "lucide-react"
-import { m } from "framer-motion"
-import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card"
-import { Button } from "@repo/ui/button"
-import { Badge } from "@repo/ui/badge"
+import { useState, useMemo } from "react";
+import { ArrowUpDown, Star, GitFork, ExternalLink } from "lucide-react";
+import { m } from "framer-motion";
+import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card";
+import { Button } from "@repo/ui/button";
+import { Badge } from "@repo/ui/badge";
 import {
   Table,
   TableBody,
@@ -13,52 +13,58 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import type { GitHubRepo } from "@/lib/github-stats/types"
+} from "@/components/ui/table";
+import type { GitHubRepo } from "@/lib/github-stats/types";
 
-type SortKey = "name" | "stargazers_count" | "forks_count" | "updated_at" | "language"
-type SortDir = "asc" | "desc"
+type SortKey =
+  | "name"
+  | "stargazers_count"
+  | "forks_count"
+  | "updated_at"
+  | "language";
+type SortDir = "asc" | "desc";
 
 interface RepositoryTableProps {
-  repos: GitHubRepo[]
+  repos: GitHubRepo[];
 }
 
 export function RepositoryTable({ repos }: RepositoryTableProps) {
-  const [sortKey, setSortKey] = useState<SortKey>("stargazers_count")
-  const [sortDir, setSortDir] = useState<SortDir>("desc")
+  const [sortKey, setSortKey] = useState<SortKey>("stargazers_count");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
 
   const sorted = useMemo(() => {
     return [...repos].sort((a, b) => {
-      let cmp = 0
+      let cmp = 0;
       switch (sortKey) {
         case "name":
-          cmp = a.name.localeCompare(b.name)
-          break
+          cmp = a.name.localeCompare(b.name);
+          break;
         case "stargazers_count":
-          cmp = a.stargazers_count - b.stargazers_count
-          break
+          cmp = a.stargazers_count - b.stargazers_count;
+          break;
         case "forks_count":
-          cmp = a.forks_count - b.forks_count
-          break
+          cmp = a.forks_count - b.forks_count;
+          break;
         case "updated_at":
-          cmp = new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime()
-          break
+          cmp =
+            new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime();
+          break;
         case "language":
-          cmp = (a.language ?? "").localeCompare(b.language ?? "")
-          break
+          cmp = (a.language ?? "").localeCompare(b.language ?? "");
+          break;
       }
-      return sortDir === "asc" ? cmp : -cmp
-    })
-  }, [repos, sortKey, sortDir])
+      return sortDir === "asc" ? cmp : -cmp;
+    });
+  }, [repos, sortKey, sortDir]);
 
   const toggleSort = (key: SortKey) => {
     if (sortKey === key) {
-      setSortDir((d) => (d === "asc" ? "desc" : "asc"))
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     } else {
-      setSortKey(key)
-      setSortDir("desc")
+      setSortKey(key);
+      setSortDir("desc");
     }
-  }
+  };
 
   const SortButton = ({ label, field }: { label: string; field: SortKey }) => (
     <Button
@@ -70,24 +76,42 @@ export function RepositoryTable({ repos }: RepositoryTableProps) {
       {label}
       <ArrowUpDown className="size-3" />
     </Button>
-  )
+  );
 
   return (
-    <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.25 }}>
-      <Card>
-        <CardHeader>
-          <CardTitle>All Repositories ({repos.length})</CardTitle>
+    <m.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.25 }}
+    >
+      <Card className="rounded-[1.75rem] border-border/80 shadow-none">
+        <CardHeader className="border-b border-border/70 p-5 sm:p-6">
+          <CardTitle className="text-2xl tracking-[-0.035em]">
+            All Repositories ({repos.length})
+          </CardTitle>
         </CardHeader>
-        <CardContent className="overflow-x-auto">
+        <CardContent className="overflow-x-auto p-5 sm:p-6">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead><SortButton label="Name" field="name" /></TableHead>
-                <TableHead className="hidden md:table-cell">Description</TableHead>
-                <TableHead><SortButton label="Language" field="language" /></TableHead>
-                <TableHead><SortButton label="Stars" field="stargazers_count" /></TableHead>
-                <TableHead><SortButton label="Forks" field="forks_count" /></TableHead>
-                <TableHead><SortButton label="Updated" field="updated_at" /></TableHead>
+                <TableHead>
+                  <SortButton label="Name" field="name" />
+                </TableHead>
+                <TableHead className="hidden md:table-cell">
+                  Description
+                </TableHead>
+                <TableHead>
+                  <SortButton label="Language" field="language" />
+                </TableHead>
+                <TableHead>
+                  <SortButton label="Stars" field="stargazers_count" />
+                </TableHead>
+                <TableHead>
+                  <SortButton label="Forks" field="forks_count" />
+                </TableHead>
+                <TableHead>
+                  <SortButton label="Updated" field="updated_at" />
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -136,5 +160,5 @@ export function RepositoryTable({ repos }: RepositoryTableProps) {
         </CardContent>
       </Card>
     </m.div>
-  )
+  );
 }
