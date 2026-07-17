@@ -75,6 +75,7 @@
 - The Vercel ignored-build script compares `VERCEL_GIT_PREVIOUS_SHA` with `VERCEL_GIT_COMMIT_SHA` rather than only comparing the final commit with its parent. This prevents a final documentation-only commit from hiding application or shared-package changes earlier in the same deployment push.
 - The watched contract includes the selected application, all shared packages, the detector script itself, root `package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`, and `turbo.json`.
 - Missing or shallow-cloned deployment SHAs fail open and trigger a build. Focused temporary-repository tests cover app isolation, multi-commit shared changes, documentation-only skips, every shared root configuration input, and both missing-SHA paths.
+- Commit `63321b1139ad27199108e0d552d28bb23d577d0c` triggered real Portfolio, Studio, and Admin Vercel builds; all three deployment checks passed, proving the shared-root change was not skipped. Immutable preview smoke checks returned Portfolio `200` with `Jayant Goyal | Full-Stack Developer`, Studio `200` with `Studio by Jayant Goyal | Apps, Tools, and Experiments`, and the expected Admin `/` → `/welcome` redirect followed by `200` with `Welcome | Admin`.
 
 ## PLATFORM-08 — In Progress
 
