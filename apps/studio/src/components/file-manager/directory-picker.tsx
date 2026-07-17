@@ -4,7 +4,7 @@ import * as React from "react"
 import { ChevronRight, Folder, FolderOpen, Home } from "lucide-react"
 import { cn } from "@repo/ui/lib/utils"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Spinner } from "@/components/ui/spinner"
+import { Spinner } from "@repo/ui/spinner"
 import type { DirectoryTreeItem } from "@/lib/file-manager/types"
 
 interface DirectoryPickerProps {

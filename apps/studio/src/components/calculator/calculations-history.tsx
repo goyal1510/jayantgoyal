@@ -8,7 +8,7 @@ import type { CalculationWithDenominations } from "@/lib/calculator/database"
 import { Button } from "@repo/ui/button"
 import { Card, CardContent } from "@repo/ui/card"
 import { Input } from "@repo/ui/input"
-import { PageSpinner } from "@/components/ui/page-spinner"
+import { PageSpinner } from "@repo/ui/page-spinner"
 
 import { CalculationDetailSheet } from "./calculation-detail-sheet"
 import { CalculationsTable } from "./calculations-table"

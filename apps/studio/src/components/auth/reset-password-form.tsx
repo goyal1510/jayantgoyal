@@ -12,7 +12,7 @@ import { Label } from "@repo/ui/label"
 import { Switch } from "@repo/ui/switch"
 import { cn } from "@repo/ui/lib/utils"
 import { toast } from "sonner"
-import { Spinner } from "@/components/ui/spinner"
+import { Spinner } from "@repo/ui/spinner"
 
 type SessionState = "loading" | "none" | "ready"
 

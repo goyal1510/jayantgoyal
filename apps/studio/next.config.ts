@@ -1,18 +1,10 @@
 import type { NextConfig } from "next";
+import { applicationOrigin } from "@repo/platform";
 
-const DEFAULT_PORTFOLIO_URL = "https://jayantgoyal.com";
-
-function getPortfolioUrl(): string {
-  try {
-    return new URL(
-      process.env.NEXT_PUBLIC_PORTFOLIO_URL ?? DEFAULT_PORTFOLIO_URL,
-    ).origin;
-  } catch {
-    return DEFAULT_PORTFOLIO_URL;
-  }
-}
-
-const PORTFOLIO_URL = getPortfolioUrl();
+const PORTFOLIO_URL = applicationOrigin(
+  "portfolio",
+  process.env.NEXT_PUBLIC_PORTFOLIO_URL,
+);
 
 const portfolioSectionRedirects = [
   ["/home", "/#home"],
@@ -29,7 +21,7 @@ const noindexHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@repo/ui"],
+  transpilePackages: ["@repo/platform", "@repo/seo", "@repo/ui"],
   typescript: {
     ignoreBuildErrors: true,
   },

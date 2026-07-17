@@ -3,7 +3,7 @@
 import * as React from "react"
 import { FileFolderIcon } from "@/components/file-manager/file-icons"
 import { cn } from "@repo/ui/lib/utils"
-import { Spinner } from "@/components/ui/spinner"
+import { Spinner } from "@repo/ui/spinner"
 import type { DirectoryListingItem } from "@/lib/file-manager/types"
 
 interface FileThumbnailProps {

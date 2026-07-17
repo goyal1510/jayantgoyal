@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation"
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react"
-import { Spinner } from "@/components/ui/spinner"
+import { Spinner } from "@repo/ui/spinner"
 
 export function RouteChangeProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname()

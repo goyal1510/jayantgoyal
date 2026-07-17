@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@repo/ui/dialog"
 import { Button } from "@repo/ui/button"
-import { Spinner } from "@/components/ui/spinner"
+import { Spinner } from "@repo/ui/spinner"
 import { AlertCircle, ChevronLeft, ChevronRight, Download } from "lucide-react"
 import type { DirectoryListingItem } from "@/lib/file-manager/types"
 import { FilePreview } from "@/components/file-manager/file-preview"

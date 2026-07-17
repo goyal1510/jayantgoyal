@@ -1,16 +1,13 @@
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { DynamicBreadcrumb } from "@/components/sidebar/dynamic-breadcrumb";
-import { Separator } from "@repo/ui/separator";
 import ThemeToggle from "@/components/theme/theme-toggle";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@repo/ui/sidebar";
+import { ApplicationHeader } from "@repo/ui/application-shell";
+import { LazyMotionProvider } from "@repo/ui/lazy-motion-provider";
+import { SidebarInset, SidebarProvider } from "@repo/ui/sidebar";
 import type { UserRole } from "@/lib/types";
-import { LazyMotionProvider } from "@/components/providers/lazy-motion-provider";
 import { RouteChangeProvider } from "@/components/providers/route-change-provider";
 
 export default async function AdminLayout({
@@ -19,6 +16,10 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   const supabase = await createSupabaseServerClient();
+  const cookieStore = await cookies();
+  const defaultOpen = cookieStore.get("sidebar_state")?.value !== "false";
+  const defaultWidth =
+    Number(cookieStore.get("sidebar_width")?.value) || undefined;
 
   const {
     data: { user },
@@ -39,7 +40,10 @@ export default async function AdminLayout({
     redirect("/unauthorized");
   }
 
-  const fullName = `${profile.first_name || ""} ${profile.last_name || ""}`.trim() || user.email?.split("@")[0] || "User";
+  const fullName =
+    `${profile.first_name || ""} ${profile.last_name || ""}`.trim() ||
+    user.email?.split("@")[0] ||
+    "User";
 
   const authUser = {
     id: user.id,
@@ -49,21 +53,13 @@ export default async function AdminLayout({
   };
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={defaultOpen} defaultWidth={defaultWidth}>
       <AppSidebar user={authUser} />
       <SidebarInset>
-        <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center gap-2 border-b bg-background/95 px-4 transition-[width,height] ease-linear backdrop-blur supports-[backdrop-filter]:bg-background/80 group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 max-w-full">
-          <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
-            <SidebarTrigger className="-ml-1 shrink-0" />
-            <Separator orientation="vertical" className="mr-2 h-4 shrink-0" />
-            <div className="min-w-0 flex-1 overflow-hidden">
-              <DynamicBreadcrumb />
-            </div>
-          </div>
-          <div className="shrink-0">
-            <ThemeToggle />
-          </div>
-        </header>
+        <ApplicationHeader
+          breadcrumb={<DynamicBreadcrumb />}
+          actions={<ThemeToggle />}
+        />
         <LazyMotionProvider>
           <div className="flex flex-1 flex-col gap-4 p-4 min-w-0">
             <RouteChangeProvider>{children}</RouteChangeProvider>

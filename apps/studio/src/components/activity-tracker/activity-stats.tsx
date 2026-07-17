@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Card, CardContent } from "@repo/ui/card"
-import { PageSpinner } from "@/components/ui/page-spinner"
+import { PageSpinner } from "@repo/ui/page-spinner"
 import {
   Table,
   TableBody,

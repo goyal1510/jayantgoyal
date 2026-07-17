@@ -1,8 +1,14 @@
 import type { Metadata } from "next";
 
-import { APP_BRANDS, formatAppPageTitle, PERSON_BRAND } from "@repo/brand";
+import { APP_BRANDS, PERSON_BRAND } from "@repo/brand";
+import {
+  buildPublicPageMetadata as buildSharedPageMetadata,
+  isCanonicalApplicationHost,
+  isIndexablePath as isSharedIndexablePath,
+  matchesPathOrChild,
+  normalizePathname,
+} from "@repo/seo";
 
-import { normalizeHostname } from "@/lib/platform/surface";
 import { STUDIO_URL } from "@/lib/platform/urls";
 
 const STUDIO_BRAND = APP_BRANDS.studio;
@@ -24,36 +30,18 @@ export const INDEXABLE_PREFIXES = [
   "/github-stats",
 ] as const;
 
-export function normalizePathname(pathname: string | null): string {
-  if (!pathname || !pathname.startsWith("/")) return "/";
-  if (pathname.length > 1 && pathname.endsWith("/")) {
-    return pathname.slice(0, -1);
-  }
-  return pathname;
-}
-
-export function matchesPathOrChild(
-  pathname: string,
-  basePath: string,
-): boolean {
-  return pathname === basePath || pathname.startsWith(`${basePath}/`);
-}
+export { matchesPathOrChild, normalizePathname };
 
 export function isIndexablePath(pathname: string): boolean {
-  if (
-    INDEXABLE_EXACT_PATHS.includes(
-      pathname as (typeof INDEXABLE_EXACT_PATHS)[number],
-    )
-  ) {
-    return true;
-  }
-  return INDEXABLE_PREFIXES.some((prefix) =>
-    matchesPathOrChild(pathname, prefix),
+  return isSharedIndexablePath(
+    pathname,
+    INDEXABLE_EXACT_PATHS,
+    INDEXABLE_PREFIXES,
   );
 }
 
 export function isProductionStudioHost(host: string | null): boolean {
-  return normalizeHostname(host) === "studio.jayantgoyal.com";
+  return isCanonicalApplicationHost("studio", host);
 }
 
 export function buildAbsoluteUrl(pathname: string): string {
@@ -69,33 +57,17 @@ export function buildPublicPageMetadata({
   description: string;
   pathname: string;
 }): Metadata {
-  const canonical = buildAbsoluteUrl(pathname);
-  const socialTitle = formatAppPageTitle("studio", title);
-
-  return {
+  return buildSharedPageMetadata({
+    appId: "studio",
+    siteUrl: SITE_URL,
     title,
     description,
-    alternates: { canonical },
-    openGraph: {
-      type: "website",
-      title: socialTitle,
-      description,
-      url: canonical,
-      images: [
-        {
-          url: DEFAULT_OG_IMAGE,
-          width: 1200,
-          height: 630,
-          alt: socialTitle,
-          type: "image/png",
-        },
-      ],
+    pathname,
+    image: DEFAULT_OG_IMAGE,
+    imageMetadata: {
+      width: 1200,
+      height: 630,
+      type: "image/png",
     },
-    twitter: {
-      card: "summary_large_image",
-      title: socialTitle,
-      description,
-      images: [DEFAULT_OG_IMAGE],
-    },
-  };
+  });
 }

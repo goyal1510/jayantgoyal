@@ -2,7 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { APP_BRANDS } from "@repo/brand";
-import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeProvider } from "@repo/ui/theme-provider";
 import { Toaster } from "@repo/ui/sonner";
 
 const ADMIN_BRAND = APP_BRANDS.admin;

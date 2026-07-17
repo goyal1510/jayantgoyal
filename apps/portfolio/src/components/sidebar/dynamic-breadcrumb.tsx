@@ -1,18 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home } from "lucide-react";
 
 import { APP_BRANDS } from "@repo/brand";
 import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@repo/ui/breadcrumb";
+  BreadcrumbTrail,
+  type BreadcrumbTrailItem,
+} from "@repo/ui/application-shell";
 
 function titleFromSlug(slug: string): string {
   return slug
@@ -25,78 +19,31 @@ function titleFromSlug(slug: string): string {
 export function DynamicBreadcrumb() {
   const pathname = usePathname();
 
-  const { appName, appHref, pageName } = (() => {
+  const items: BreadcrumbTrailItem[] = (() => {
     if (pathname === "/blog") {
-      return {
-        appName: APP_BRANDS.portfolio.name,
-        appHref: "/",
-        pageName: "Blog",
-      };
+      return [
+        { id: "portfolio", label: APP_BRANDS.portfolio.name, href: "/" },
+        { id: "blog", label: "Blog" },
+      ];
     }
 
     if (pathname.startsWith("/blog/")) {
       const slug = pathname.split("/").filter(Boolean).at(-1) ?? "Article";
-      return {
-        appName: "Blog",
-        appHref: "/blog",
-        pageName: titleFromSlug(slug),
-      };
+      return [
+        { id: "blog", label: "Blog", href: "/blog" },
+        { id: "article", label: titleFromSlug(slug) },
+      ];
     }
 
     if (pathname.startsWith("/resume")) {
-      return {
-        appName: APP_BRANDS.portfolio.name,
-        appHref: "/",
-        pageName: "Resume",
-      };
+      return [
+        { id: "portfolio", label: APP_BRANDS.portfolio.name, href: "/" },
+        { id: "resume", label: "Resume" },
+      ];
     }
 
-    return {
-      appName: APP_BRANDS.portfolio.name,
-      appHref: "/",
-      pageName: null,
-    };
+    return [{ id: "portfolio", label: APP_BRANDS.portfolio.name }];
   })();
 
-  return (
-    <Breadcrumb className="min-w-0 flex-1 max-w-full">
-      <BreadcrumbList className="flex-nowrap overflow-hidden">
-        <BreadcrumbItem className="shrink-0">
-          <BreadcrumbLink asChild>
-            <Link
-              href="/"
-              aria-label="Home"
-              className="flex items-center justify-center"
-            >
-              <Home className="size-4" />
-            </Link>
-          </BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator className="shrink-0" />
-        <BreadcrumbItem className="shrink-0 max-w-[200px]">
-          {pageName ? (
-            <BreadcrumbLink asChild>
-              <Link href={appHref} className="truncate block">
-                {appName}
-              </Link>
-            </BreadcrumbLink>
-          ) : (
-            <BreadcrumbPage className="truncate block">
-              {appName}
-            </BreadcrumbPage>
-          )}
-        </BreadcrumbItem>
-        {pageName && (
-          <>
-            <BreadcrumbSeparator className="shrink-0" />
-            <BreadcrumbItem className="min-w-0 flex-1">
-              <BreadcrumbPage className="block truncate">
-                {pageName}
-              </BreadcrumbPage>
-            </BreadcrumbItem>
-          </>
-        )}
-      </BreadcrumbList>
-    </Breadcrumb>
-  );
+  return <BreadcrumbTrail homeHref="/" items={items} />;
 }

@@ -1,7 +1,7 @@
 "use client"
 
-import { Spinner } from "@/components/ui/spinner"
-import { PageSpinner } from "@/components/ui/page-spinner"
+import { Spinner } from "@repo/ui/spinner"
+import { PageSpinner } from "@repo/ui/page-spinner"
 import { Card } from "@repo/ui/card"
 import { CreateFolderDialog } from "@/components/file-manager/create-folder-dialog"
 import { RenameDialog } from "@/components/file-manager/rename-dialog"

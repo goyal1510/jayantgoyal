@@ -6,10 +6,10 @@ import { Inter } from "next/font/google";
 import Script from "next/script";
 
 import { Toaster } from "@repo/ui/sonner";
+import { ThemeProvider } from "@repo/ui/theme-provider";
 
 import { SoftwareAppJsonLd, WebSiteJsonLd } from "@/components/seo/json-ld";
 import { ToastSoundProvider } from "@/components/providers/toast-sound-provider";
-import { ThemeProvider } from "@/components/theme/theme-provider";
 import { PORTFOLIO_URL } from "@/lib/platform/urls";
 import {
   DEFAULT_OG_IMAGE,

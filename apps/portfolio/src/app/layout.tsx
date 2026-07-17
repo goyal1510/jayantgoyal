@@ -6,12 +6,12 @@ import { Inter } from "next/font/google";
 import Script from "next/script";
 
 import { Toaster } from "@repo/ui/sonner";
+import { LazyMotionProvider } from "@repo/ui/lazy-motion-provider";
 import { SidebarInset, SidebarProvider } from "@repo/ui/sidebar";
+import { ThemeProvider } from "@repo/ui/theme-provider";
 
 import { PortfolioSidebar } from "@/components/portfolio-sidebar";
 import { PortfolioTopbar } from "@/components/portfolio-topbar";
-import { LazyMotionProvider } from "@/components/providers/lazy-motion-provider";
-import { ThemeProvider } from "@/components/theme/theme-provider";
 import { getPortfolioDataFromHeaders } from "@/lib/portfolio/server";
 import { PortfolioDataProvider } from "@/lib/portfolio/use-portfolio-data";
 import {

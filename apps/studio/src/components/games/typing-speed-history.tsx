@@ -4,7 +4,7 @@ import { History } from "lucide-react"
 
 import { Button } from "@repo/ui/button"
 import { Card, CardContent } from "@repo/ui/card"
-import { PageSpinner } from "@/components/ui/page-spinner"
+import { PageSpinner } from "@repo/ui/page-spinner"
 import type { TypingTestResult } from "@/lib/typing-test/database"
 
 interface TypingSpeedHistoryProps {

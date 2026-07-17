@@ -1,17 +1,10 @@
 import type { NextConfig } from "next";
+import { applicationOrigin } from "@repo/platform";
 
-const DEFAULT_STUDIO_URL = "https://studio.jayantgoyal.com";
-
-function getStudioUrl(): string {
-  try {
-    return new URL(process.env.NEXT_PUBLIC_STUDIO_URL ?? DEFAULT_STUDIO_URL)
-      .origin;
-  } catch {
-    return DEFAULT_STUDIO_URL;
-  }
-}
-
-const STUDIO_URL = getStudioUrl();
+const STUDIO_URL = applicationOrigin(
+  "studio",
+  process.env.NEXT_PUBLIC_STUDIO_URL,
+);
 
 const portfolioSectionRedirects = [
   ["/home", "/#home"],
@@ -100,7 +93,7 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@repo/ui"],
+  transpilePackages: ["@repo/platform", "@repo/seo", "@repo/ui"],
   images: {
     remotePatterns: [
       {

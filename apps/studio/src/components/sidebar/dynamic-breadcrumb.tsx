@@ -1,23 +1,16 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
-import Link from "next/link";
-import { Home } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@repo/ui/breadcrumb";
+  BreadcrumbTrail,
+  type BreadcrumbTrailItem,
+} from "@repo/ui/application-shell";
 import { getAppById, HUB_APPS } from "@/lib/config/hub-config";
 import { toolCategories, getToolByPath } from "@/lib/tools/tools";
 
 export function DynamicBreadcrumb() {
   const pathname = usePathname();
-  const router = useRouter();
 
   // Determine app and page based on pathname
   const { appName, appHref, pageName } = (() => {
@@ -159,47 +152,12 @@ export function DynamicBreadcrumb() {
     return { appName: "Studio", appHref: "/", pageName: null };
   })();
 
-  return (
-    <Breadcrumb className="min-w-0 flex-1 max-w-full">
-      <BreadcrumbList className="flex-nowrap overflow-hidden">
-        <BreadcrumbItem className="shrink-0">
-          <BreadcrumbLink asChild>
-            <button
-              onClick={() => {
-                router.push("/");
-              }}
-              aria-label="Home"
-              className="flex items-center justify-center"
-            >
-              <Home className="size-4" />
-            </button>
-          </BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator className="shrink-0" />
-        <BreadcrumbItem className="shrink-0 max-w-[200px]">
-          {pageName ? (
-            <BreadcrumbLink asChild>
-              <Link href={appHref} className="truncate block">
-                {appName}
-              </Link>
-            </BreadcrumbLink>
-          ) : (
-            <BreadcrumbPage className="truncate block">
-              {appName}
-            </BreadcrumbPage>
-          )}
-        </BreadcrumbItem>
-        {pageName && (
-          <>
-            <BreadcrumbSeparator className="shrink-0" />
-            <BreadcrumbItem className="min-w-0 flex-1">
-              <BreadcrumbPage className="block truncate">
-                {pageName}
-              </BreadcrumbPage>
-            </BreadcrumbItem>
-          </>
-        )}
-      </BreadcrumbList>
-    </Breadcrumb>
-  );
+  const items: BreadcrumbTrailItem[] = pageName
+    ? [
+        { id: "application", label: appName, href: appHref },
+        { id: "page", label: pageName },
+      ]
+    : [{ id: "application", label: appName }];
+
+  return <BreadcrumbTrail homeHref="/" items={items} />;
 }

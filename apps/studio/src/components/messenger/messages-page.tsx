@@ -4,7 +4,7 @@ import * as React from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { MessageList } from "@/components/messenger/message-list";
 import { MessageInputDialog } from "@/components/messenger/message-input-dialog";
-import { PageSpinner } from "@/components/ui/page-spinner";
+import { PageSpinner } from "@repo/ui/page-spinner";
 import type { Database } from "@/lib/messenger/database.types";
 
 type Message = Database["messenger"]["Tables"]["messages"]["Row"];

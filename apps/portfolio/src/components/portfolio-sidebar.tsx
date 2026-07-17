@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, type ComponentProps, type MouseEvent } from "react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   BookOpenText,
@@ -12,49 +11,41 @@ import {
 } from "lucide-react";
 
 import { APP_BRANDS } from "@repo/brand";
-import { Separator } from "@repo/ui/separator";
+import { applicationOrigin } from "@repo/platform";
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarRail,
-  useSidebar,
-} from "@repo/ui/sidebar";
+  ApplicationSidebarFrame,
+  ApplicationSidebarMenu,
+  ApplicationSidebarSection,
+  type ApplicationNavigationSection,
+} from "@repo/ui/application-shell";
 
-import { TeamSwitcher } from "@/components/sidebar/team-switcher";
 import { useScrollTracking } from "@/hooks/use-scroll-tracking";
 import { getIconComponentWithFallback } from "@/lib/portfolio/icons";
 import { usePortfolioData } from "@/lib/portfolio/use-portfolio-data";
 
-const STUDIO_URL =
-  process.env.NEXT_PUBLIC_STUDIO_URL ?? APP_BRANDS.studio.canonicalUrl;
+const STUDIO_URL = applicationOrigin(
+  "studio",
+  process.env.NEXT_PUBLIC_STUDIO_URL,
+);
 
-export function PortfolioSidebar(props: ComponentProps<typeof Sidebar>) {
+type PortfolioSidebarProps = Omit<
+  ComponentProps<typeof ApplicationSidebarFrame>,
+  "brand" | "children" | "footer"
+>;
+
+export function PortfolioSidebar(props: PortfolioSidebarProps) {
   const pathname = usePathname();
   const { data } = usePortfolioData();
-  const { isMobile, setOpenMobile } = useSidebar();
   const sectionIds = useMemo(
     () => data.NAV_ITEMS.map((item) => item.id),
     [data.NAV_ITEMS],
   );
   const activeSection = useScrollTracking(sectionIds, pathname === "/");
 
-  const closeMobileSidebar = () => {
-    if (isMobile) setOpenMobile(false);
-  };
-
   const handleSectionNavigation = (
     event: MouseEvent<HTMLAnchorElement>,
     sectionId: string,
   ) => {
-    closeMobileSidebar();
     if (pathname !== "/") return;
 
     const section = document.getElementById(sectionId);
@@ -65,94 +56,67 @@ export function PortfolioSidebar(props: ComponentProps<typeof Sidebar>) {
     window.history.replaceState(null, "", `/#${sectionId}`);
   };
 
+  const portfolioSection: ApplicationNavigationSection = {
+    id: "portfolio",
+    label: "Portfolio",
+    items: data.NAV_ITEMS.map((item) => ({
+      id: item.id,
+      label: item.label,
+      href: `/#${item.id}`,
+      icon: getIconComponentWithFallback(item.icon_key, Code2),
+      iconClassName: item.color,
+      isActive: pathname === "/" && activeSection === item.id,
+      onSelect: (event) => handleSectionNavigation(event, item.id),
+    })),
+  };
+  const moreSection: ApplicationNavigationSection = {
+    id: "more",
+    label: "More",
+    items: [
+      {
+        id: "blog",
+        label: "Blog",
+        href: "/blog",
+        icon: BookOpenText,
+        iconClassName: "text-violet-500",
+        isActive: pathname.startsWith("/blog"),
+      },
+      {
+        id: "resume",
+        label: "Resume",
+        href: "/resume",
+        icon: FileText,
+        iconClassName: "text-blue-500",
+        isActive: pathname.startsWith("/resume"),
+      },
+    ],
+  };
+
   return (
-    <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
-        <TeamSwitcher
-          brand={{
-            name: APP_BRANDS.portfolio.name,
-            logo: BriefcaseBusiness,
-          }}
+    <ApplicationSidebarFrame
+      brand={{
+        name: APP_BRANDS.portfolio.name,
+        href: "/",
+        icon: BriefcaseBusiness,
+      }}
+      footer={
+        <ApplicationSidebarMenu
+          items={[
+            {
+              id: "studio",
+              label: APP_BRANDS.studio.name,
+              href: STUDIO_URL,
+              icon: LayoutGrid,
+              iconClassName: "text-cyan-500",
+              external: true,
+            },
+          ]}
         />
-      </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Portfolio</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {data.NAV_ITEMS.map((item) => {
-                const Icon = getIconComponentWithFallback(item.icon_key, Code2);
-
-                return (
-                  <SidebarMenuItem key={item.id}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={pathname === "/" && activeSection === item.id}
-                      tooltip={item.label}
-                    >
-                      <Link
-                        href={`/#${item.id}`}
-                        onClick={(event) =>
-                          handleSectionNavigation(event, item.id)
-                        }
-                      >
-                        <Icon className={item.color} />
-                        <span>{item.label}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup>
-          <SidebarGroupLabel>More</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  isActive={pathname.startsWith("/blog")}
-                  tooltip="Blog"
-                >
-                  <Link href="/blog" onClick={closeMobileSidebar}>
-                    <BookOpenText className="text-violet-500" />
-                    <span>Blog</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  isActive={pathname.startsWith("/resume")}
-                  tooltip="Resume"
-                >
-                  <Link href="/resume" onClick={closeMobileSidebar}>
-                    <FileText className="text-blue-500" />
-                    <span>Resume</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-      <Separator />
-      <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip={APP_BRANDS.studio.name}>
-              <a href={STUDIO_URL} onClick={closeMobileSidebar}>
-                <LayoutGrid className="text-cyan-500" />
-                <span>{APP_BRANDS.studio.name}</span>
-              </a>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
-      <SidebarRail />
-    </Sidebar>
+      }
+      {...props}
+    >
+      <ApplicationSidebarSection section={portfolioSection} />
+      <ApplicationSidebarSection section={moreSection} />
+    </ApplicationSidebarFrame>
   );
 }
