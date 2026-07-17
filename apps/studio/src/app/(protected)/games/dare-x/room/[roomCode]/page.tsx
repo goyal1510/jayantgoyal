@@ -15,7 +15,7 @@ export default async function DareXRoomPage({
   const { roomCode } = await params
 
   return (
-    <div className="p-4">
+    <div className="mx-auto w-full max-w-[1280px]">
       <OnlineDareXRoom roomCode={roomCode.toUpperCase()} />
     </div>
   )

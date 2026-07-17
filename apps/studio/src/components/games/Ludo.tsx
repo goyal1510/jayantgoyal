@@ -1,109 +1,97 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Dice5, Loader2, Users } from "lucide-react"
-import { useRouter } from "next/navigation"
-import { toast } from "sonner"
+import { useState } from "react";
+import { Loader2, Users } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
-import { Button } from "@repo/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card"
-import { Input } from "@repo/ui/input"
-import { Label } from "@repo/ui/label"
+import { Button } from "@repo/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card";
+import { Input } from "@repo/ui/input";
+import { Label } from "@repo/ui/label";
+import { cn } from "@repo/ui/lib/utils";
 
-import { createLudoState } from "@/lib/games/ludo"
+import { createLudoState } from "@/lib/games/ludo";
 
 export function Ludo() {
-  const router = useRouter()
-  const [roomCode, setRoomCode] = useState("")
-  const [playerCount, setPlayerCount] = useState(2)
-  const [targetTokens, setTargetTokens] = useState(4)
-  const [creating, setCreating] = useState(false)
-  const [joining, setJoining] = useState(false)
+  const router = useRouter();
+  const [roomCode, setRoomCode] = useState("");
+  const [onlineName, setOnlineName] = useState("Ludo Player");
+  const [playerCount, setPlayerCount] = useState(2);
+  const [targetTokens, setTargetTokens] = useState(4);
+  const [creating, setCreating] = useState(false);
+  const [joining, setJoining] = useState(false);
 
   const createRoom = async () => {
-    setCreating(true)
+    setCreating(true);
     const response = await fetch("/api/games/sessions", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         gameSlug: "ludo",
-        displayName: "Ludo P1",
+        displayName: onlineName,
         settings: {
           maxPlayers: playerCount,
           targetTokens,
           initialState: createLudoState(playerCount, targetTokens),
         },
       }),
-    })
-    setCreating(false)
+    });
+    setCreating(false);
 
     if (!response.ok) {
-      const data = await response.json().catch(() => ({}))
-      toast.error(data.error ?? "Unable to create Ludo room")
-      return
+      const data = await response.json().catch(() => ({}));
+      toast.error(data.error ?? "Unable to create Ludo room");
+      return;
     }
 
-    const data = await response.json()
-    const nextRoomCode = data.session?.session?.room_code
+    const data = await response.json();
+    const nextRoomCode = data.session?.session?.room_code;
     if (typeof nextRoomCode === "string") {
-      router.push(`/games/ludo/room/${nextRoomCode}`)
+      router.push(`/games/ludo/room/${nextRoomCode}`);
     }
-  }
+  };
 
   const joinRoom = () => {
-    const normalized = roomCode.trim().toUpperCase()
+    const normalized = roomCode.trim().toUpperCase();
     if (!normalized) {
-      toast.error("Enter a room code")
-      return
+      toast.error("Enter a room code");
+      return;
     }
 
-    setJoining(true)
-    router.push(`/games/ludo/room/${normalized}`)
-  }
+    setJoining(true);
+    router.push(`/games/ludo/room/${normalized}`);
+  };
 
   return (
-    <div className="mx-auto grid max-w-4xl gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
-      <Card className="overflow-hidden border-rose-200 bg-[radial-gradient(circle_at_top_left,#ffe4e6,transparent_36%),linear-gradient(135deg,#fff7ed,#fff1f2)] dark:border-rose-900/70 dark:bg-[linear-gradient(135deg,#111827,#4c0519)]">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Dice5 className="h-5 w-5 text-rose-600" />
-            Ludo
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-5">
-          <div className="grid aspect-square max-h-[560px] w-full max-w-[560px] grid-cols-2 gap-3 rounded-[2rem] border bg-background/70 p-4 shadow-inner">
-            <div className="rounded-[1.5rem] border-4 border-red-400 bg-red-100 p-5 dark:bg-red-950/50">
-              <div className="grid h-full grid-cols-2 gap-3 rounded-2xl bg-white/70 p-4 dark:bg-black/20">
-                {Array.from({ length: 4 }, (_, index) => <div key={index} className="rounded-full bg-red-500 shadow" />)}
-              </div>
-            </div>
-            <div className="rounded-[1.5rem] border-4 border-emerald-400 bg-emerald-100 p-5 dark:bg-emerald-950/50">
-              <div className="grid h-full grid-cols-2 gap-3 rounded-2xl bg-white/70 p-4 dark:bg-black/20">
-                {Array.from({ length: 4 }, (_, index) => <div key={index} className="rounded-full bg-emerald-500 shadow" />)}
-              </div>
-            </div>
-            <div className="rounded-[1.5rem] border-4 border-sky-400 bg-sky-100 p-5 dark:bg-sky-950/50">
-              <div className="grid h-full grid-cols-2 gap-3 rounded-2xl bg-white/70 p-4 dark:bg-black/20">
-                {Array.from({ length: 4 }, (_, index) => <div key={index} className="rounded-full bg-sky-500 shadow" />)}
-              </div>
-            </div>
-            <div className="rounded-[1.5rem] border-4 border-amber-400 bg-amber-100 p-5 dark:bg-amber-950/50">
-              <div className="grid h-full grid-cols-2 gap-3 rounded-2xl bg-white/70 p-4 dark:bg-black/20">
-                {Array.from({ length: 4 }, (_, index) => <div key={index} className="rounded-full bg-amber-400 shadow" />)}
-              </div>
-            </div>
+    <Card className="mx-auto w-full max-w-5xl overflow-hidden rounded-[1.75rem] border-border/80 bg-card shadow-none">
+      <CardHeader className="border-b border-border/70 p-5 sm:p-6">
+        <p className="font-[family-name:var(--font-ibm-plex-mono)] text-[0.7rem] uppercase tracking-[0.15em] text-muted-foreground">
+          Online only
+        </p>
+        <CardTitle className="text-2xl tracking-[-0.035em]">
+          Create a race or join your friends.
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="grid gap-5 p-5 sm:p-6 lg:grid-cols-[1.2fr_0.8fr]">
+        <section className="space-y-5 rounded-[1.5rem] border border-[#d93328] bg-[#ff5a4f] p-5 text-[#211512] sm:p-6">
+          <div>
+            <h2 className="text-2xl font-semibold tracking-[-0.035em]">
+              New room
+            </h2>
+            <p className="mt-2 text-sm leading-6 opacity-80">
+              Choose the race size before sharing the room code.
+            </p>
           </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Users className="h-4 w-4" />
-            Online room
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="ludo-online-name">Your display name</Label>
+            <Input
+              id="ludo-online-name"
+              value={onlineName}
+              onChange={(event) => setOnlineName(event.target.value)}
+              className="border-black/20 bg-white/55 text-[#211512] placeholder:text-[#211512]/55"
+            />
+          </div>
           <div className="space-y-2">
             <Label>Players</Label>
             <div className="grid grid-cols-3 gap-2">
@@ -113,6 +101,10 @@ export function Ludo() {
                   type="button"
                   variant={playerCount === count ? "secondary" : "outline"}
                   onClick={() => setPlayerCount(count)}
+                  className={cn(
+                    "border-black/20 text-[#211512] hover:bg-white/65",
+                    playerCount === count ? "bg-white/80" : "bg-white/35",
+                  )}
                 >
                   {count}
                 </Button>
@@ -126,34 +118,77 @@ export function Ludo() {
                 type="button"
                 variant={targetTokens === 1 ? "secondary" : "outline"}
                 onClick={() => setTargetTokens(1)}
+                className={cn(
+                  "border-black/20 text-[#211512] hover:bg-white/65",
+                  targetTokens === 1 ? "bg-white/80" : "bg-white/35",
+                )}
               >
-                Quick
+                Quick · 1 token
               </Button>
               <Button
                 type="button"
                 variant={targetTokens === 4 ? "secondary" : "outline"}
                 onClick={() => setTargetTokens(4)}
+                className={cn(
+                  "border-black/20 text-[#211512] hover:bg-white/65",
+                  targetTokens === 4 ? "bg-white/80" : "bg-white/35",
+                )}
               >
-                Classic
+                Classic · 4 tokens
               </Button>
             </div>
           </div>
-          <Button onClick={() => void createRoom()} disabled={creating} className="w-full">
-            {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create Ludo room"}
+          <Button
+            onClick={() => void createRoom()}
+            disabled={creating}
+            className="w-full bg-[#211512] text-[#fff8ef] hover:bg-[#211512]/90"
+          >
+            {creating ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              "Create Ludo room"
+            )}
           </Button>
-          <div className="flex gap-2">
+        </section>
+
+        <section className="flex flex-col justify-between gap-6 rounded-[1.5rem] border border-border/70 bg-muted/25 p-5 sm:p-6">
+          <div>
+            <span className="grid size-11 place-items-center rounded-xl border border-border/70 bg-background">
+              <Users className="size-5" />
+            </span>
+            <h2 className="mt-5 text-2xl font-semibold tracking-[-0.035em]">
+              Join a room
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              Enter the code shared by the room creator.
+            </p>
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="ludo-room-code">Room code</Label>
             <Input
+              id="ludo-room-code"
               value={roomCode}
-              onChange={(event) => setRoomCode(event.target.value)}
+              onChange={(event) =>
+                setRoomCode(event.target.value.toUpperCase())
+              }
               placeholder="Room code"
               className="uppercase"
             />
-            <Button variant="outline" onClick={joinRoom} disabled={joining}>
-              {joining ? <Loader2 className="h-4 w-4 animate-spin" /> : "Join"}
+            <Button
+              variant="outline"
+              onClick={joinRoom}
+              disabled={joining}
+              className="w-full"
+            >
+              {joining ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "Join room"
+              )}
             </Button>
           </div>
-        </CardContent>
-      </Card>
-    </div>
-  )
+        </section>
+      </CardContent>
+    </Card>
+  );
 }

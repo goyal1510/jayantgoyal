@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { GAME_META } from "@/lib/games/config"
 import { ConnectFour } from "@/components/games/ConnectFour"
+import { GamePageFrame } from "@/components/games/game-page-frame"
 
 export const metadata: Metadata = {
   title: `${GAME_META["connect-four"].name}`,
@@ -9,8 +10,8 @@ export const metadata: Metadata = {
 
 export default function ConnectFourPage() {
   return (
-    <div className="p-4">
+    <GamePageFrame game="connect-four">
       <ConnectFour />
-    </div>
+    </GamePageFrame>
   )
 }

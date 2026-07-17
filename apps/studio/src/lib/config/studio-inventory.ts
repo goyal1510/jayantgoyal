@@ -1,15 +1,8 @@
-import {
-  Calculator,
-  Cloud,
-  FolderOpen,
-  Gamepad2,
-  Github,
-  MessageSquare,
-  ShoppingCart,
-  Target,
-  Wrench,
-  type LucideIcon,
-} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+
+import { STUDIO_SURFACES } from "@/lib/config/studio-surfaces";
+import { GAME_META } from "@/lib/games/config";
+import { allTools } from "@/lib/tools/tools";
 
 export const STUDIO_PRODUCT_TYPES = [
   "app",
@@ -39,15 +32,15 @@ export type StudioProduct = {
 export const STUDIO_PRODUCTS: readonly StudioProduct[] = [
   {
     id: "tech-tools",
-    name: "Tech Tools",
+    name: STUDIO_SURFACES["tech-tools"].name,
     description:
       "Generators, converters, formatters, parsers, validators, and everyday developer utilities.",
-    href: "/tools",
-    icon: Wrench,
+    href: STUDIO_SURFACES["tech-tools"].href,
+    icon: STUDIO_SURFACES["tech-tools"].icon,
     access: "public",
     type: "tool",
     status: "available",
-    capability: "99+ utilities",
+    capability: `${allTools.length} utilities`,
     highlights: [
       "Generators and converters",
       "Formatters and validators",
@@ -57,11 +50,11 @@ export const STUDIO_PRODUCTS: readonly StudioProduct[] = [
   },
   {
     id: "weather",
-    name: "Weather",
+    name: STUDIO_SURFACES.weather.name,
     description:
       "Current conditions, location search, and a five-day forecast in one focused workspace.",
-    href: "/weather",
-    icon: Cloud,
+    href: STUDIO_SURFACES.weather.href,
+    icon: STUDIO_SURFACES.weather.icon,
     access: "public",
     type: "app",
     status: "available",
@@ -75,11 +68,11 @@ export const STUDIO_PRODUCTS: readonly StudioProduct[] = [
   },
   {
     id: "github-stats",
-    name: "GitHub Stats",
+    name: STUDIO_SURFACES["github-stats"].name,
     description:
       "Explore repository activity, language distribution, and coding statistics for any public profile.",
-    href: "/github-stats",
-    icon: Github,
+    href: STUDIO_SURFACES["github-stats"].href,
+    icon: STUDIO_SURFACES["github-stats"].icon,
     access: "public",
     type: "tool",
     status: "available",
@@ -93,11 +86,11 @@ export const STUDIO_PRODUCTS: readonly StudioProduct[] = [
   },
   {
     id: "custom-calculator",
-    name: "Custom Calculator",
+    name: STUDIO_SURFACES["custom-calculator"].name,
     description:
       "Build reusable calculators by arranging inputs, operations, and outputs visually.",
-    href: "/custom-calculator",
-    icon: Calculator,
+    href: STUDIO_SURFACES["custom-calculator"].href,
+    icon: STUDIO_SURFACES["custom-calculator"].icon,
     access: "public",
     type: "tool",
     status: "beta",
@@ -111,15 +104,15 @@ export const STUDIO_PRODUCTS: readonly StudioProduct[] = [
   },
   {
     id: "game-hub",
-    name: "Game Hub",
+    name: STUDIO_SURFACES["game-hub"].name,
     description:
       "A collection of single-player and multiplayer games, including Chess, Wordle, and Connect Four.",
-    href: "/games",
-    icon: Gamepad2,
+    href: STUDIO_SURFACES["game-hub"].href,
+    icon: STUDIO_SURFACES["game-hub"].icon,
     access: "account",
     type: "game",
     status: "available",
-    capability: "10 games",
+    capability: `${Object.keys(GAME_META).length} games`,
     highlights: [
       "Single-player and multiplayer modes",
       "Room-based sessions",
@@ -129,11 +122,11 @@ export const STUDIO_PRODUCTS: readonly StudioProduct[] = [
   },
   {
     id: "activity-tracker",
-    name: "Activity Tracker",
+    name: STUDIO_SURFACES["activity-tracker"].name,
     description:
       "Record daily activities and review performance trends through personal dashboards.",
-    href: "/activity-tracker/dashboard",
-    icon: Target,
+    href: STUDIO_SURFACES["activity-tracker"].href,
+    icon: STUDIO_SURFACES["activity-tracker"].icon,
     access: "account",
     type: "app",
     status: "available",
@@ -147,11 +140,11 @@ export const STUDIO_PRODUCTS: readonly StudioProduct[] = [
   },
   {
     id: "currency-calculator",
-    name: "Currency Calculator",
+    name: STUDIO_SURFACES["currency-calculator"].name,
     description:
       "Count cash denominations, save calculations by date, and keep a searchable history.",
-    href: "/calculator/new",
-    icon: Calculator,
+    href: STUDIO_SURFACES["currency-calculator"].href,
+    icon: STUDIO_SURFACES["currency-calculator"].icon,
     access: "account",
     type: "tool",
     status: "available",
@@ -165,11 +158,11 @@ export const STUDIO_PRODUCTS: readonly StudioProduct[] = [
   },
   {
     id: "file-manager",
-    name: "File Manager",
+    name: STUDIO_SURFACES["file-manager"].name,
     description:
       "Organize private files and folders with cloud storage, upload, and recovery workflows.",
-    href: "/files",
-    icon: FolderOpen,
+    href: STUDIO_SURFACES["file-manager"].href,
+    icon: STUDIO_SURFACES["file-manager"].icon,
     access: "account",
     type: "app",
     status: "available",
@@ -183,11 +176,11 @@ export const STUDIO_PRODUCTS: readonly StudioProduct[] = [
   },
   {
     id: "messenger",
-    name: "Messenger",
+    name: STUDIO_SURFACES.messenger.name,
     description:
       "Send and receive real-time messages through a synchronized personal workspace.",
-    href: "/messenger",
-    icon: MessageSquare,
+    href: STUDIO_SURFACES.messenger.href,
+    icon: STUDIO_SURFACES.messenger.icon,
     access: "account",
     type: "app",
     status: "beta",
@@ -201,11 +194,11 @@ export const STUDIO_PRODUCTS: readonly StudioProduct[] = [
   },
   {
     id: "ecommerce",
-    name: "E-commerce",
+    name: STUDIO_SURFACES.ecommerce.name,
     description:
       "A separate storefront experiment with product browsing, cart, and transaction flows.",
-    href: "https://ecommerce.jayantgoyal.com/",
-    icon: ShoppingCart,
+    href: STUDIO_SURFACES.ecommerce.href,
+    icon: STUDIO_SURFACES.ecommerce.icon,
     access: "external",
     type: "experiment",
     status: "beta",

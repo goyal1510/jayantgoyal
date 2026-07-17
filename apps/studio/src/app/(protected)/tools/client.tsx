@@ -1,227 +1,301 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { Clock, Search, Star, Trash2 } from "lucide-react"
-import { Badge } from "@repo/ui/badge"
-import { Button } from "@repo/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card"
-import { Input } from "@repo/ui/input"
-import { cn } from "@repo/ui/lib/utils"
+import * as React from "react";
+import Link from "next/link";
+import { ArrowUpRight, Search, Star } from "lucide-react";
+
+import { Button } from "@repo/ui/button";
+import { Card } from "@repo/ui/card";
+import { Input } from "@repo/ui/input";
+import { cn } from "@repo/ui/lib/utils";
+
+import { ToolFavoriteButton } from "@/components/tools/tool-favorite-button";
 import {
-  allTools,
-  getToolCategoryByToolId,
   toolCategories,
   type Tool,
-} from "@/lib/tools/tools"
+  type ToolCategory,
+} from "@/lib/tools/tools";
+import { getToolToneIndex, TOOL_TONES } from "@/lib/tools/tool-tones";
 import {
   useToolsUsageHydration,
   useToolsUsageStore,
-} from "@/lib/tools/use-tools-usage-store"
-import { ToolFavoriteButton } from "@/components/tools/tool-favorite-button"
+} from "@/lib/tools/use-tools-usage-store";
 
-const toolById = new Map(allTools.map((tool) => [tool.id, tool]))
+const ALL_FILTER = "all";
+const FAVORITES_FILTER = "favorites";
 
-function ToolCard({ tool, compact = false }: { tool: Tool; compact?: boolean }) {
-  const category = getToolCategoryByToolId(tool.id)
-  const Icon = tool.icon
+type CatalogTool = {
+  tool: Tool;
+  category: ToolCategory;
+  toneIndex: number;
+};
+
+const catalogTools: CatalogTool[] = toolCategories
+  .flatMap((category) => category.tools.map((tool) => ({ tool, category })))
+  .map((entry, index) => ({
+    ...entry,
+    toneIndex: getToolToneIndex(entry.tool.id, index),
+  }));
+
+function ToolCard({
+  tool,
+  category,
+  toneIndex,
+  showCategory,
+  href,
+}: CatalogTool & { showCategory: boolean; href: string }) {
+  const Icon = tool.icon;
 
   return (
-    <Card className="group relative h-full transition-colors hover:bg-accent">
+    <Card
+      className={cn(
+        "group relative h-full min-h-[11.5rem] overflow-hidden rounded-[1.35rem] shadow-none transition-transform duration-300 hover:-translate-y-0.5",
+        TOOL_TONES[toneIndex],
+      )}
+    >
+      <Link
+        href={href}
+        onClick={() => window.scrollTo({ top: 0, behavior: "auto" })}
+        className="flex h-full min-h-[11.5rem] flex-col p-5 pr-16 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+      >
+        <span className="inline-flex size-12 items-center justify-center rounded-xl border border-current/15 bg-white/15 dark:bg-black/10">
+          <Icon className="size-5" />
+        </span>
+
+        <span className="mt-5 block text-lg font-semibold leading-tight tracking-[-0.025em]">
+          {tool.title}
+        </span>
+        <span className="mt-2 line-clamp-2 text-sm leading-6 opacity-85">
+          {tool.description}
+        </span>
+
+        <span className="mt-auto flex items-end justify-between gap-3 pt-5">
+          {showCategory ? (
+            <span className="font-[family-name:var(--font-ibm-plex-mono)] text-[0.65rem] font-medium uppercase tracking-[0.13em] opacity-85">
+              {category.title}
+            </span>
+          ) : (
+            <span aria-hidden="true" />
+          )}
+          <ArrowUpRight
+            className="size-4 shrink-0 opacity-65 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100"
+            aria-hidden="true"
+          />
+        </span>
+      </Link>
+
       <ToolFavoriteButton
         toolId={tool.id}
         size="icon"
         variant="ghost"
-        className="absolute right-2 top-2 z-10"
+        className="absolute right-4 top-4 z-10 size-10 rounded-full border border-current/20 bg-white/20 p-0 text-current shadow-none hover:bg-white/35 dark:bg-black/10 dark:hover:bg-black/20"
       />
-      <Link href={tool.path} className="block h-full pr-9">
-        <CardHeader className={cn(compact && "space-y-1 p-4")}>
-          <div className="flex items-start gap-3">
-            <div className="bg-background grid size-9 shrink-0 place-items-center rounded-md border">
-              <Icon className={cn("size-4", category?.color ?? "text-muted-foreground")} />
-            </div>
-            <div className="min-w-0 space-y-1">
-              <CardTitle className="text-base leading-tight">{tool.title}</CardTitle>
-              {category && (
-                <Badge variant="secondary" className="text-[11px]">
-                  {category.title}
-                </Badge>
-              )}
-            </div>
-          </div>
-        </CardHeader>
-        {!compact && (
-          <CardContent>
-            <CardDescription>{tool.description}</CardDescription>
-          </CardContent>
-        )}
-      </Link>
     </Card>
-  )
+  );
 }
 
 function EmptyState({
-  icon: Icon,
-  title,
-  description,
+  favorites,
+  hasQuery,
 }: {
-  icon: React.ComponentType<{ className?: string }>
-  title: string
-  description: string
+  favorites: boolean;
+  hasQuery: boolean;
 }) {
+  const Icon = favorites ? Star : Search;
+  const title = favorites
+    ? hasQuery
+      ? "No favorite tools found"
+      : "No favorite tools yet"
+    : "No tools found";
+  const description = favorites
+    ? hasQuery
+      ? "Try another search or return to all tools."
+      : "Use the star on any tool to keep it in this filter."
+    : "Try another search or choose a different category.";
+
   return (
-    <div className="border-border/70 bg-muted/30 flex items-center gap-3 rounded-lg border border-dashed p-4">
-      <Icon className="text-muted-foreground size-5 shrink-0" />
-      <div>
-        <p className="text-sm font-medium">{title}</p>
-        <p className="text-muted-foreground text-sm">{description}</p>
+    <div className="flex min-h-56 flex-col items-center justify-center gap-3 px-6 py-12 text-center">
+      <span className="inline-flex size-12 items-center justify-center rounded-full bg-muted">
+        <Icon className="size-5 text-muted-foreground" aria-hidden="true" />
+      </span>
+      <div className="space-y-1">
+        <p className="font-medium">{title}</p>
+        <p className="text-sm text-muted-foreground">{description}</p>
       </div>
     </div>
-  )
+  );
 }
 
-export default function ToolsClient() {
-  const [query, setQuery] = React.useState("")
-  const hasHydrated = useToolsUsageHydration()
-  const favoriteToolIds = useToolsUsageStore((state) => state.favoriteToolIds)
-  const history = useToolsUsageStore((state) => state.history)
-  const clearHistory = useToolsUsageStore((state) => state.clearHistory)
+export default function ToolsClient({
+  initialQuery = "",
+  initialCategory = ALL_FILTER,
+}: {
+  initialQuery?: string;
+  initialCategory?: string;
+}) {
+  const [query, setQuery] = React.useState(initialQuery);
+  const [selectedFilter, setSelectedFilter] = React.useState(initialCategory);
+  const hasHydrated = useToolsUsageHydration();
+  const favoriteToolIds = useToolsUsageStore((state) => state.favoriteToolIds);
+  const normalizedQuery = query.trim().toLowerCase();
 
-  const normalizedQuery = query.trim().toLowerCase()
-  const filteredCategories = React.useMemo(() => {
-    if (!normalizedQuery) return toolCategories
+  const filteredTools = React.useMemo(() => {
+    return catalogTools.filter(({ tool, category }) => {
+      const matchesFilter =
+        selectedFilter === ALL_FILTER ||
+        (selectedFilter === FAVORITES_FILTER &&
+          favoriteToolIds.includes(tool.id)) ||
+        selectedFilter === category.id;
 
-    return toolCategories
-      .map((category) => ({
-        ...category,
-        tools: category.tools.filter((tool) => {
-          const haystack = `${tool.title} ${tool.description} ${category.title}`.toLowerCase()
-          return haystack.includes(normalizedQuery)
-        }),
-      }))
-      .filter((category) => category.tools.length > 0)
-  }, [normalizedQuery])
+      if (!matchesFilter) return false;
+      if (!normalizedQuery) return true;
 
-  const favoriteTools = hasHydrated
-    ? favoriteToolIds
-        .map((toolId) => toolById.get(toolId))
-        .filter((tool): tool is Tool => Boolean(tool))
-    : []
-  const historyTools = hasHydrated
-    ? history
-        .map((entry) => toolById.get(entry.toolId))
-        .filter((tool): tool is Tool => Boolean(tool))
-    : []
+      return `${tool.title} ${tool.description} ${category.title}`
+        .toLowerCase()
+        .includes(normalizedQuery);
+    });
+  }, [favoriteToolIds, normalizedQuery, selectedFilter]);
+
+  const showCategory =
+    selectedFilter === ALL_FILTER || selectedFilter === FAVORITES_FILTER;
+
+  const catalogQuery = React.useMemo(() => {
+    const params = new URLSearchParams();
+    if (selectedFilter !== ALL_FILTER) {
+      params.set("category", selectedFilter);
+    }
+    if (query.trim()) params.set("q", query.trim());
+    return params.toString();
+  }, [query, selectedFilter]);
+
+  const syncCatalogUrl = React.useCallback(
+    (nextFilter: string, nextQuery: string) => {
+      const params = new URLSearchParams();
+      if (nextFilter !== ALL_FILTER) params.set("category", nextFilter);
+      if (nextQuery.trim()) params.set("q", nextQuery.trim());
+      const serialized = params.toString();
+      window.history.replaceState(
+        null,
+        "",
+        serialized ? `/tools?${serialized}` : "/tools",
+      );
+    },
+    [],
+  );
+
+  const selectFilter = (filter: string) => {
+    setSelectedFilter(filter);
+    syncCatalogUrl(filter, query);
+  };
+
+  const updateQuery = (nextQuery: string) => {
+    setQuery(nextQuery);
+    syncCatalogUrl(selectedFilter, nextQuery);
+  };
 
   return (
-    <div className="space-y-8">
-      <section className="space-y-4">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div className="space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">Tech Tools</h1>
-            <p className="text-muted-foreground max-w-2xl">
-              Search the tool library, pin favorites, and jump back into recently used tools.
-            </p>
-          </div>
-          <div className="relative w-full lg:max-w-md">
-            <Search className="text-muted-foreground absolute left-3 top-1/2 size-4 -translate-y-1/2" />
-            <Input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search tools..."
-              className="pl-9"
-            />
-          </div>
+    <div className="mx-auto w-full max-w-[1440px] space-y-6">
+      <header className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+        <div className="max-w-3xl space-y-3">
+          <h1 className="text-balance text-4xl font-semibold leading-none tracking-[-0.045em] sm:text-5xl">
+            Tech Tools
+          </h1>
+          <p className="text-base leading-7 text-muted-foreground">
+            Search, filter, and save focused utilities in one catalog.
+          </p>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-3">
-          <div className="rounded-lg border bg-card p-4">
-            <p className="text-muted-foreground text-sm">Tools</p>
-            <p className="text-2xl font-semibold">{allTools.length}</p>
-          </div>
-          <div className="rounded-lg border bg-card p-4">
-            <p className="text-muted-foreground text-sm">Favorites</p>
-            <p className="text-2xl font-semibold">{hasHydrated ? favoriteTools.length : "-"}</p>
-          </div>
-          <div className="rounded-lg border bg-card p-4">
-            <p className="text-muted-foreground text-sm">History</p>
-            <p className="text-2xl font-semibold">{hasHydrated ? historyTools.length : "-"}</p>
-          </div>
-        </div>
-      </section>
-
-      <section className="space-y-3">
-        <div className="flex items-center gap-2">
-          <Star className="size-5 text-yellow-500" />
-          <h2 className="text-xl font-semibold tracking-tight">Favorites</h2>
-        </div>
-        {favoriteTools.length > 0 ? (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {favoriteTools.map((tool) => (
-              <ToolCard key={tool.id} tool={tool} compact />
-            ))}
-          </div>
-        ) : (
-          <EmptyState
-            icon={Star}
-            title="No favorites yet"
-            description="Use the star button on any tool to keep it here."
+        <div className="relative w-full xl:max-w-md">
+          <label htmlFor="tool-catalog-search" className="sr-only">
+            Search tools
+          </label>
+          <Search
+            className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+            aria-hidden="true"
           />
-        )}
-      </section>
+          <Input
+            id="tool-catalog-search"
+            type="search"
+            value={query}
+            onChange={(event) => updateQuery(event.target.value)}
+            placeholder="Search tools..."
+            className="h-11 rounded-full pl-11 pr-4 shadow-none"
+          />
+        </div>
+      </header>
 
-      <section className="space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <Clock className="size-5 text-blue-500" />
-            <h2 className="text-xl font-semibold tracking-tight">History</h2>
-          </div>
-          {historyTools.length > 0 && (
-            <Button variant="outline" size="sm" onClick={clearHistory}>
-              <Trash2 className="mr-2 size-4" />
-              Clear
+      <section className="space-y-4" aria-labelledby="tool-results">
+        <div className="flex flex-col gap-3 border-b border-border/80 pb-4 xl:flex-row xl:items-end xl:justify-between">
+          <div
+            className="flex flex-wrap gap-2"
+            aria-label="Filter tools by category"
+          >
+            <Button
+              type="button"
+              variant={selectedFilter === ALL_FILTER ? "default" : "outline"}
+              aria-pressed={selectedFilter === ALL_FILTER}
+              className="h-11 rounded-full px-5 shadow-none sm:h-9"
+              onClick={() => selectFilter(ALL_FILTER)}
+            >
+              All
             </Button>
-          )}
+            <Button
+              type="button"
+              variant={
+                selectedFilter === FAVORITES_FILTER ? "default" : "outline"
+              }
+              aria-pressed={selectedFilter === FAVORITES_FILTER}
+              disabled={!hasHydrated}
+              className="h-11 rounded-full px-5 shadow-none sm:h-9"
+              onClick={() => selectFilter(FAVORITES_FILTER)}
+            >
+              <Star className="size-4" aria-hidden="true" />
+              Favorites
+            </Button>
+            {toolCategories.map((category) => (
+              <Button
+                key={category.id}
+                type="button"
+                variant={selectedFilter === category.id ? "default" : "outline"}
+                aria-pressed={selectedFilter === category.id}
+                className="h-11 rounded-full px-5 shadow-none sm:h-9"
+                onClick={() => selectFilter(category.id)}
+              >
+                {category.title}
+              </Button>
+            ))}
+          </div>
+
+          <p
+            id="tool-results"
+            className="shrink-0 font-[family-name:var(--font-ibm-plex-mono)] text-xs uppercase tracking-[0.14em] text-muted-foreground"
+            aria-live="polite"
+          >
+            {filteredTools.length}{" "}
+            {filteredTools.length === 1 ? "tool" : "tools"}
+          </p>
         </div>
-        {historyTools.length > 0 ? (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {historyTools.slice(0, 8).map((tool) => (
-              <ToolCard key={tool.id} tool={tool} compact />
+
+        {filteredTools.length > 0 ? (
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {filteredTools.map(({ tool, category, toneIndex }) => (
+              <ToolCard
+                key={tool.id}
+                tool={tool}
+                category={category}
+                toneIndex={toneIndex}
+                showCategory={showCategory}
+                href={`${tool.path}${catalogQuery ? `?${catalogQuery}` : ""}`}
+              />
             ))}
           </div>
         ) : (
           <EmptyState
-            icon={Clock}
-            title="No history yet"
-            description="Open a tool and it will appear here automatically."
-          />
-        )}
-      </section>
-
-      <section className="space-y-6">
-        {filteredCategories.map((category) => (
-          <div key={category.id} className="space-y-3">
-            <div className="flex items-center gap-2">
-              <category.icon className={cn("size-5", category.color)} />
-              <h2 className="text-xl font-semibold tracking-tight">{category.title}</h2>
-              <Badge variant="secondary">{category.tools.length}</Badge>
-            </div>
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {category.tools.map((tool) => (
-                <ToolCard key={tool.id} tool={tool} />
-              ))}
-            </div>
-          </div>
-        ))}
-
-        {filteredCategories.length === 0 && (
-          <EmptyState
-            icon={Search}
-            title="No tools found"
-            description="Try another search term."
+            favorites={selectedFilter === FAVORITES_FILTER}
+            hasQuery={Boolean(normalizedQuery)}
           />
         )}
       </section>
     </div>
-  )
+  );
 }

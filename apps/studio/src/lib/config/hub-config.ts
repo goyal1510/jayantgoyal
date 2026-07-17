@@ -6,35 +6,27 @@ import {
   Code2,
   Award,
   Mail,
-  Gamepad2,
   Dices,
   Grid3X3,
   Swords,
   Circle,
   Brain,
-  Wrench,
-  Calculator,
-  FolderOpen,
   LayoutDashboard,
   Target,
   Settings,
   Plus,
   History,
-  MessageSquare,
-  Cloud,
-  ShoppingCart,
-  Github,
   Type,
   Puzzle,
-  FileText,
   Crown,
   Dice5,
-  LayoutGrid,
-  Boxes,
   type LucideIcon,
 } from "lucide-react";
 
-import { PORTFOLIO_URL, portfolioUrl } from "@/lib/platform/urls";
+import {
+  getStudioSurface,
+  type StudioSurfaceId,
+} from "@/lib/config/studio-surfaces";
 
 export type NavItem = {
   id: string;
@@ -47,6 +39,7 @@ export type NavItem = {
 export type AppConfig = {
   id: string;
   name: string;
+  navLabel?: string;
   icon: LucideIcon;
   color: string;
   isPublic: boolean;
@@ -54,6 +47,26 @@ export type AppConfig = {
   url?: string;
   externalUrl?: string;
 };
+
+function createSurfaceApp(
+  id: StudioSurfaceId,
+  navItems: NavItem[] = [],
+): AppConfig {
+  const surface = getStudioSurface(id);
+
+  return {
+    id: surface.id,
+    name: surface.name,
+    navLabel: surface.navLabel,
+    icon: surface.icon,
+    color: surface.color,
+    isPublic: surface.isPublic,
+    navItems,
+    ...(surface.external
+      ? { externalUrl: surface.href }
+      : { url: surface.href }),
+  };
+}
 
 // Portfolio navigation items (scroll-based sections)
 const PORTFOLIO_NAV: NavItem[] = [
@@ -112,7 +125,7 @@ const PORTFOLIO_NAV: NavItem[] = [
 const GAME_HUB_NAV: NavItem[] = [
   {
     id: "dashboard",
-    label: "Dashboard",
+    label: "All Games",
     icon: LayoutDashboard,
     color: "text-blue-500 dark:text-blue-400",
     url: "/games",
@@ -232,148 +245,25 @@ const CURRENCY_CALC_NAV: NavItem[] = [
 // Ordered: private apps first (dropdowns → direct links), then public apps (dropdowns → direct links)
 export const HUB_APPS: AppConfig[] = [
   // --- Private apps (dropdowns first) ---
-  {
-    id: "game-hub",
-    name: "Game Hub",
-    icon: Gamepad2,
-    color: "text-purple-500 dark:text-purple-400",
-    isPublic: false,
-    navItems: GAME_HUB_NAV,
-  },
-  {
-    id: "activity-tracker",
-    name: "Activity Tracker",
-    icon: Target,
-    color: "text-green-500 dark:text-green-400",
-    isPublic: false,
-    navItems: ACTIVITY_TRACKER_NAV,
-  },
-  {
-    id: "currency-calculator",
-    name: "Currency Calculator",
-    icon: Calculator,
-    color: "text-amber-500 dark:text-amber-400",
-    isPublic: false,
-    navItems: CURRENCY_CALC_NAV,
-  },
-  {
-    id: "file-manager",
-    name: "File Manager",
-    icon: FolderOpen,
-    color: "text-blue-500 dark:text-blue-400",
-    isPublic: false,
-    navItems: [],
-    url: "/files",
-  },
-  {
-    id: "messenger",
-    name: "Messenger",
-    icon: MessageSquare,
-    color: "text-blue-500 dark:text-blue-400",
-    isPublic: false,
-    navItems: [],
-    url: "/messenger",
-  },
+  createSurfaceApp("game-hub", GAME_HUB_NAV),
+  createSurfaceApp("activity-tracker", ACTIVITY_TRACKER_NAV),
+  createSurfaceApp("currency-calculator", CURRENCY_CALC_NAV),
+  createSurfaceApp("file-manager"),
+  createSurfaceApp("messenger"),
   // --- Public apps (dropdowns first) ---
-  {
-    id: "portfolio",
-    name: "Portfolio",
-    icon: User,
-    color: "text-emerald-500 dark:text-emerald-400",
-    isPublic: true,
-    navItems: PORTFOLIO_NAV,
-  },
-  {
-    id: "tech-tools",
-    name: "Tech Tools",
-    icon: Wrench,
-    color: "text-orange-500 dark:text-orange-400",
-    isPublic: true,
-    navItems: [], // Uses nested navigation from lib/tools/tools.ts
-  },
-  {
-    id: "blog",
-    name: "Blog",
-    icon: FileText,
-    color: "text-orange-500 dark:text-orange-400",
-    isPublic: true,
-    navItems: [],
-    url: "/blogs",
-  },
-  {
-    id: "weather",
-    name: "Weather",
-    icon: Cloud,
-    color: "text-sky-500 dark:text-sky-400",
-    isPublic: true,
-    navItems: [],
-  },
-  {
-    id: "custom-calculator",
-    name: "Custom Calculator",
-    icon: Calculator,
-    color: "text-violet-500 dark:text-violet-400",
-    isPublic: true,
-    navItems: [],
-  },
-  {
-    id: "github-stats",
-    name: "GitHub Stats",
-    icon: Github,
-    color: "text-gray-700 dark:text-gray-300",
-    isPublic: true,
-    navItems: [],
-  },
-  {
-    id: "ecommerce",
-    name: "E-commerce",
-    icon: ShoppingCart,
-    color: "text-pink-500 dark:text-pink-400",
-    isPublic: true,
-    navItems: [],
-    externalUrl: "https://ecommerce.jayantgoyal.com/",
-  },
+  createSurfaceApp("portfolio", PORTFOLIO_NAV),
+  createSurfaceApp("tech-tools"),
+  createSurfaceApp("blog"),
+  createSurfaceApp("weather"),
+  createSurfaceApp("custom-calculator"),
+  createSurfaceApp("github-stats"),
+  createSurfaceApp("ecommerce"),
 ];
 
-const STUDIO_HOME_APP: AppConfig = {
-  id: "studio-home",
-  name: "Studio Home",
-  icon: LayoutGrid,
-  color: "text-blue-600 dark:text-blue-400",
-  isPublic: true,
-  navItems: [],
-  url: "/",
-};
-
-const STUDIO_PRODUCTS_APP: AppConfig = {
-  id: "studio-products",
-  name: "Products",
-  icon: Boxes,
-  color: "text-violet-500 dark:text-violet-400",
-  isPublic: true,
-  navItems: [],
-  url: "/products",
-};
-
-const PORTFOLIO_EXTERNAL_APP: AppConfig = {
-  id: "portfolio",
-  name: "Portfolio",
-  icon: User,
-  color: "text-emerald-500 dark:text-emerald-400",
-  isPublic: true,
-  navItems: [],
-  externalUrl: PORTFOLIO_URL,
-};
-
-const PORTFOLIO_BLOG_EXTERNAL_APP: AppConfig = {
-  id: "blog",
-  name: "Blog",
-  icon: FileText,
-  color: "text-orange-500 dark:text-orange-400",
-  isPublic: true,
-  navItems: [],
-  externalUrl: portfolioUrl("/blog"),
-};
+const STUDIO_HOME_APP = createSurfaceApp("studio-home");
+const STUDIO_PRODUCTS_APP = createSurfaceApp("studio-products");
+const PORTFOLIO_EXTERNAL_APP = createSurfaceApp("portfolio");
+const PORTFOLIO_BLOG_EXTERNAL_APP = createSurfaceApp("blog");
 
 export function getSurfaceApps(): AppConfig[] {
   return [

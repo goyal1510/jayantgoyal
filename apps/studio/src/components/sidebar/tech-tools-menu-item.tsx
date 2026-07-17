@@ -23,7 +23,6 @@ import {
 
 import { CollapsedFlyout } from "./collapsed-flyout"
 import { FlyoutItem } from "./flyout-items"
-import { ToolQuickLinks } from "./tool-quick-links"
 import { getToolColor } from "./tool-colors"
 
 function TechToolsFlyoutContent({
@@ -61,7 +60,6 @@ function TechToolsFlyoutContent({
         isActive={pathname === "/tools"}
         onClick={onNavigate}
       />
-      <ToolQuickLinks pathname={pathname} onNavigate={onNavigate} />
       {toolCategories.map((category: ToolCategory) => {
         const isExpanded = expandedCategories.has(category.id)
         return (
@@ -175,12 +173,6 @@ export function TechToolsMenuItem({
                   <span>All Tools</span>
                 </Link>
               </SidebarMenuSubButton>
-            </SidebarMenuSubItem>
-            <SidebarMenuSubItem>
-              <ToolQuickLinks
-                pathname={pathname}
-                onNavigate={closeMobileSidebar}
-              />
             </SidebarMenuSubItem>
             {toolCategories.map((category) => {
               const isCategoryActive = activeCategoryId === category.id

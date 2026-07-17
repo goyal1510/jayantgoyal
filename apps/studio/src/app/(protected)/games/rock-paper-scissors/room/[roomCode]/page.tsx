@@ -15,7 +15,7 @@ export default async function RockPaperScissorsRoomPage({
   const { roomCode } = await params
 
   return (
-    <div className="p-4">
+    <div className="mx-auto w-full max-w-[1280px]">
       <OnlineRockPaperScissorsRoom roomCode={roomCode.toUpperCase()} />
     </div>
   )

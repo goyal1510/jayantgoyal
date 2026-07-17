@@ -2,7 +2,7 @@ import "./globals.css";
 
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { Inter } from "next/font/google";
+import { IBM_Plex_Mono, Manrope } from "next/font/google";
 import Script from "next/script";
 
 import { Toaster } from "@repo/ui/sonner";
@@ -24,10 +24,17 @@ import {
   SITE_URL,
 } from "@/lib/seo/config";
 
-const inter = Inter({
+const manrope = Manrope({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-inter",
+  variable: "--font-manrope",
+});
+
+const ibmPlexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-ibm-plex-mono",
+  weight: ["400", "500"],
 });
 
 const baseMetadata: Metadata = {
@@ -135,7 +142,7 @@ export default async function RootLayout({
         />
         {pathname === "/tools" && <SoftwareAppJsonLd siteUrl={SITE_URL} />}
       </head>
-      <body className={inter.className}>
+      <body className={`${manrope.variable} ${ibmPlexMono.variable}`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

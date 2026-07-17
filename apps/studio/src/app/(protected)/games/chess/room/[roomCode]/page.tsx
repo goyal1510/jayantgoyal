@@ -15,7 +15,7 @@ export default async function ChessRoomPage({
   const { roomCode } = await params
 
   return (
-    <div className="p-4">
+    <div className="mx-auto w-full max-w-[1280px]">
       <OnlineChessRoom roomCode={roomCode.toUpperCase()} />
     </div>
   )

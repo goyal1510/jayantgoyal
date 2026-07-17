@@ -1,15 +1,66 @@
-# Studio Copy Option 3
+# Studio Redesign and Promotion
 
 ## Scope
 
 - Remove the rejected standalone `apps/studio-V2` prototype and its generated
   implementation artifacts.
 - Create `apps/studio-copy` from the tracked existing `apps/studio` application
-  inside this monorepo.
+  as a temporary review surface inside this monorepo.
 - Preserve Studio's existing sidebar, application header, route inventory, and
   shared-package integration in the copy.
 - Apply the approved Option 3 visual direction only within `apps/studio-copy`.
-- Leave `apps/studio`, `apps/portfolio`, and `apps/admin` unchanged.
+- Leave `apps/studio`, `apps/portfolio`, and `apps/admin` unchanged until the
+  redesign is approved for promotion.
+
+## Promotion scope
+
+- After local review and production SSO verification, promote the approved
+  `apps/studio-copy` application changes into the real `apps/studio` app in the
+  same branch and PR.
+- Preserve the production Studio identity: package/filter name `studio`, local
+  port, environment contract, Vercel project linkage, and canonical
+  `studio.jayantgoyal.com` deployment target must not inherit prototype values.
+- Remove the temporary `apps/studio-copy` after promotion verification so the
+  repository continues to maintain exactly one Studio application.
+- Validate the promoted app locally with focused tests, lint, and TypeScript.
+  Do not repeat hosted browser testing or deployment checks in this slice.
+
+## Studio promotion implementation
+
+- Promoted every reviewed, tracked Studio Copy source change into
+  `apps/studio`, including the approved shell, navigation, Home, Products,
+  Tech Tools, Game Hub, individual games, setup sheets, online-room headers,
+  canonical registries, and focused registry tests.
+- Added the Studio-local Vitest command and configuration so its focused tests
+  resolve `@/` against `apps/studio` rather than another workspace app.
+- Removed the obsolete Studio `tool-quick-links` component, matching the
+  approved catalog-first navigation in Studio Copy.
+- Preserved the real application's `studio` package identity, port `3001`,
+  README, ignored local environment, and machine-local Vercel linkage; no
+  prototype `studio-copy` or port `3004` values were promoted.
+- Removed the temporary `apps/studio-copy` application and its pnpm lockfile
+  importer after the promoted Studio passed local verification. The final
+  repository state contains only `apps/studio`.
+
+## Studio promotion verification
+
+- A normalized tracked-file comparison found no remaining source differences
+  between Studio and Studio Copy after excluding their intentional README and
+  package identity differences.
+- Confirmed `apps/studio` contains no `studio-copy` or port `3004` references.
+- `pnpm --filter studio test` passed 9 test files and 28 tests.
+- `pnpm --filter studio lint` passed with zero warnings.
+- `pnpm --filter studio check-types` generated Studio route types and passed.
+- `pnpm --filter studio build` compiled the production Studio application and
+  generated all 156 routes successfully.
+- The pre-commit cleanup/security pass found no tracked environment, Vercel,
+  build, credential, screenshot, or recording artifacts and no added high-risk
+  secret literals. The existing game engines and room components remain large;
+  splitting their working realtime/gameplay internals is intentionally deferred
+  from this presentation promotion to avoid an unrelated behavioral refactor.
+- Hosted deployment/browser testing was intentionally not repeated; Studio
+  Copy already passed its local design QA and the user separately confirmed the
+  current production SSO and Google login flow.
 
 ## Implementation
 
@@ -272,10 +323,10 @@
 
 ## Boundaries
 
-- This is a local design prototype and does not change production deployment,
-  DNS, Supabase, authentication, or environment configuration.
-- The copy may continue using the same shared packages as Studio because the
-  requested baseline is the real Studio application's existing behavior.
+- The tracked redesign now targets the real Studio application, but this
+  promotion does not itself change DNS, Supabase, authentication, or hosted
+  environment configuration.
+- Studio continues using its existing shared packages and application identity.
 - Validation remains local-only: static checks, HTTP smoke checks, and focused
   browser QA against the local Studio copy. No deployment or remote environment
   validation is part of this prototype slice.
@@ -340,13 +391,14 @@ apps/studio-copy/src/lib/config/studio-inventory.test.ts` passed the complete
 
 ## Rollback
 
-- Delete `apps/studio-copy`, remove its lockfile importer, and remove this
-  session entry. Existing applications remain unaffected.
+- Revert the Studio promotion commit to restore the legacy Studio sources. No
+  separate Studio Copy application or lockfile importer remains to clean up.
 
 ## Shipping and hosted rollout
 
-- The standalone Studio Copy and its local design proof are being shipped in a
-  dedicated PR; no current application is replaced or repointed by that PR.
+- The approved redesign and its local design proof are being shipped by
+  updating the real Studio application in the existing PR; the temporary copy
+  is removed before merge.
 - Vercel's current Portfolio, Studio, Admin, and Auth Production deployments
   were inspected and were Ready before rollout. Portfolio remained untouched.
 - Studio, Admin, and Auth now use the shared-session compatibility mode across

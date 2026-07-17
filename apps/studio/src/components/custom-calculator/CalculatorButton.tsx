@@ -38,7 +38,7 @@ function CalculatorButton({
       }
       return;
     }
-    
+
     addComponent({ type: "button", label });
   };
 
