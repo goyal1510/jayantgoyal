@@ -90,3 +90,17 @@
 - `git diff --check` passes.
 - No browser, Preview, Production, Google login, or deployment observation was
   run. The Vercel rollout flag remains `legacy` for all three targets.
+
+## Concurrency follow-up
+
+- Added a deterministic two-request regression that starts Studio and Admin
+  legacy promotion concurrently. It proves each request uses its own clients
+  and that a synthetic refresh-token transfer collision keeps the already
+  validated legacy client for the affected request instead of signing the user
+  out.
+- This local simulation covers application fallback behavior only. The actual
+  hosted refresh-token reuse window remains part of the user-owned controlled
+  Production acceptance gate.
+- The focused factory file passes all five tests; `@repo/auth` TypeScript and
+  zero-warning lint checks also pass. No build or formatter run was repeated
+  because the follow-up changes only tests and proof records.
