@@ -1241,7 +1241,11 @@ Review after the migration and at least annually:
 
 After shipping the post-merge shared-foundation slice:
 
-1. Run the deployed responsive and authenticated product matrix across localhost, generated Vercel previews, and the final production domains; complete the rollback rehearsal and observation gates before closing PLATFORM-07, PLATFORM-08, or PLATFORM-09.
+1. Complete the deployed product matrix: localhost and final-domain Production
+   responsive/authenticated coverage pass; obtain same-commit Portfolio,
+   Studio, and Admin generated Vercel Previews after the provider build-rate
+   window recovers. Then complete the rollback rehearsal and observation gates
+   before closing PLATFORM-07, PLATFORM-08, or PLATFORM-09.
 2. Design and separately approve the `jg_app` Studio catalog contract before exposing Studio management in Admin.
 3. Retire or redesign the legacy Admin environment-manager route so infrastructure secrets remain provider-owned.
 
