@@ -257,7 +257,7 @@ export interface VercelEnvVar {
   updatedAt?: number;
 }
 
-export type VercelProjectKey = "jg" | "admin";
+export type VercelProjectKey = "studio" | "admin";
 
 /**
  * Blog Types

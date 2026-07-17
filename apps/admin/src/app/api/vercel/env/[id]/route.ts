@@ -109,7 +109,7 @@ export async function DELETE(
     const { searchParams } = new URL(request.url);
     const project = searchParams.get("project") as VercelProjectKey;
 
-    if (!project || !["jg", "admin"].includes(project)) {
+    if (!project || !["studio", "admin"].includes(project)) {
       return NextResponse.json(
         { error: "Invalid project" },
         { status: 400 }

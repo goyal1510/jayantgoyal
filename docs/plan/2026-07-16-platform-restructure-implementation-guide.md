@@ -1,7 +1,7 @@
 # Platform Restructure — Phased Implementation Guide and Checklist
 
 **Date:** 2026-07-16
-**Status:** Planning complete; implementation not started
+**Status:** Implementation in progress; application-boundary split active
 **Architecture source:** [Platform Architecture Blueprint](./2026-07-16-platform-architecture-blueprint.md)
 **Scope:** Resumable, phase-wise implementation plan for Portfolio, Studio, Admin, Auth, shared SSO, deployments, redirects, and cleanup
 
@@ -53,6 +53,19 @@ When implementation convenience conflicts with the Blueprint, stop and record an
 - Expand Admin navigation and content ownership to Portfolio, Studio, and System.
 - Redesign Studio discovery separately from the technical move.
 - Remove legacy auth and combined-shell duplication after an observation window.
+
+### 2.2.1 User-approved execution sequence
+
+The approved application responsibilities remain unchanged, but the execution order was updated on 2026-07-17 and recorded in [ADR-001](../migrations/platform-restructure/decision-log.md):
+
+1. Dark-launch the independent public Portfolio at `portfolio.jayantgoyal.com`.
+2. Rename the existing product application, package, workspace filter, and Vercel project to Studio; remove duplicated Portfolio ownership and preserve legacy content URLs as redirects.
+3. Deploy and validate the exact Studio commit at `studio.jayantgoyal.com`.
+4. Move `jayantgoyal.com` and `www.jayantgoyal.com` to Portfolio and verify the cross-application redirect ledger. Temporary root disruption during this low-traffic migration is explicitly accepted.
+5. Complete Admin organization after the application ownership boundary is stable.
+6. Resume the shared Auth/SSO phases last.
+
+The task IDs keep their architectural meanings; they are not required to execute numerically when this accepted decision changes their dependencies.
 
 ### 2.3 Deferred scope
 
@@ -110,13 +123,13 @@ Each task also updates the relevant `docs/sessions/` entry according to reposito
 
 ## 3. Status rules
 
-| Status | Meaning |
-| --- | --- |
-| Pending | Scoped and ready when dependencies are satisfied |
-| In Progress | Actively being implemented or verified |
-| Blocked | Cannot proceed without a named decision, credential, or external change |
-| Done | Implementation, verification, review gates, deployment/exit gate, and proof note are complete |
-| Deferred | Explicitly outside current scope with a reactivation trigger |
+| Status      | Meaning                                                                                       |
+| ----------- | --------------------------------------------------------------------------------------------- |
+| Pending     | Scoped and ready when dependencies are satisfied                                              |
+| In Progress | Actively being implemented or verified                                                        |
+| Blocked     | Cannot proceed without a named decision, credential, or external change                       |
+| Done        | Implementation, verification, review gates, deployment/exit gate, and proof note are complete |
+| Deferred    | Explicitly outside current scope with a reactivation trigger                                  |
 
 Only one task should be In Progress per implementation lane.
 
@@ -124,21 +137,21 @@ Only one task should be In Progress per implementation lane.
 
 ## 4. Phase and task summary
 
-| Order | Task ID | Phase | Status | Production behavior after phase |
-| ---: | --- | --- | --- | --- |
-| 0 | PLATFORM-00 | Baseline and contracts | Pending | No behavior change |
-| 1 | PLATFORM-01 | Authentication regression foundation | Pending | No behavior change |
-| 2 | PLATFORM-02 | Supabase dependency and SSR hardening | Pending | Existing auth behavior preserved |
-| 3 | PLATFORM-03 | Extract `packages/auth` | Pending | Existing routes and cookies preserved |
-| 4 | PLATFORM-04 | Shared-cookie compatibility | Pending | Current apps understand the platform session |
-| 5 | PLATFORM-05 | Auth dark launch | Pending | Existing auth remains primary; Auth is testable |
-| 6 | PLATFORM-06 | Canonical Auth cutover | Pending | New login/security flows use Auth |
-| 7 | PLATFORM-07 | Studio technical deployment | Pending | Existing products also run at Studio |
-| 8 | PLATFORM-08 | Portfolio application | Pending | Portfolio deploys independently before root cutover |
-| 9 | PLATFORM-09 | Domain and route cutover | Pending | Root is Portfolio; product routes redirect to Studio |
-| 10 | PLATFORM-10 | Admin domain organization | Pending | Admin manages Portfolio, Studio, and System |
-| 11 | PLATFORM-11 | Studio product experience | Pending | Public discovery precedes product workspaces |
-| 12 | PLATFORM-12 | Legacy cleanup and hardening | Pending | Compatibility code removed with evidence |
+| Order | Task ID     | Phase                                 | Status      | Production behavior after phase                      |
+| ----: | ----------- | ------------------------------------- | ----------- | ---------------------------------------------------- |
+|     0 | PLATFORM-00 | Baseline and contracts                | In Progress | No behavior change                                   |
+|     1 | PLATFORM-08 | Portfolio application                 | In Progress | Portfolio deploys independently before root cutover  |
+|     2 | PLATFORM-07 | Studio technical deployment           | Pending     | Existing products also run at Studio                 |
+|     3 | PLATFORM-11 | Studio product experience             | Pending     | Public discovery precedes product workspaces         |
+|     4 | PLATFORM-09 | Domain and route cutover              | In Progress | Root is Portfolio; product routes redirect to Studio |
+|     5 | PLATFORM-10 | Admin domain organization             | Pending     | Admin manages Portfolio, Studio, and System          |
+|     6 | PLATFORM-01 | Authentication regression foundation  | Pending     | No behavior change                                   |
+|     7 | PLATFORM-02 | Supabase dependency and SSR hardening | Pending     | Existing auth behavior preserved                     |
+|     8 | PLATFORM-03 | Extract `packages/auth`               | Pending     | Existing routes and cookies preserved                |
+|     9 | PLATFORM-04 | Shared-cookie compatibility           | Pending     | Current apps understand the platform session         |
+|    10 | PLATFORM-05 | Auth dark launch                      | Pending     | Existing auth remains primary; Auth is testable      |
+|    11 | PLATFORM-06 | Canonical Auth cutover                | Pending     | New login/security flows use Auth                    |
+|    12 | PLATFORM-12 | Legacy cleanup and hardening          | Pending     | Compatibility code removed with evidence             |
 
 The technical move and visual redesign are intentionally separate. Studio may temporarily serve the existing product shell before the new discovery experience is released.
 
@@ -148,12 +161,12 @@ The technical move and visual redesign are intentionally separate. Studio may te
 
 ### 5.1 Application URLs
 
-| Application | Production URL | Local URL | Stable staging URL |
-| --- | --- | --- | --- |
-| Portfolio | `https://jayantgoyal.com` | `http://localhost:3000` | `https://portfolio.staging.jayantgoyal.com` |
-| Studio | `https://studio.jayantgoyal.com` | `http://localhost:3001` | `https://studio.staging.jayantgoyal.com` |
-| Admin | `https://admin.jayantgoyal.com` | `http://localhost:3002` | `https://admin.staging.jayantgoyal.com` |
-| Auth | `https://auth.jayantgoyal.com` | `http://localhost:3003` | `https://auth.staging.jayantgoyal.com` |
+| Application | Production URL                   | Local URL               | Stable staging URL                          |
+| ----------- | -------------------------------- | ----------------------- | ------------------------------------------- |
+| Portfolio   | `https://jayantgoyal.com`        | `http://localhost:3000` | `https://portfolio.staging.jayantgoyal.com` |
+| Studio      | `https://studio.jayantgoyal.com` | `http://localhost:3001` | `https://studio.staging.jayantgoyal.com`    |
+| Admin       | `https://admin.jayantgoyal.com`  | `http://localhost:3002` | `https://admin.staging.jayantgoyal.com`     |
+| Auth        | `https://auth.jayantgoyal.com`   | `http://localhost:3003` | `https://auth.staging.jayantgoyal.com`      |
 
 ### 5.2 Identity contract
 
@@ -191,21 +204,21 @@ Allowed destinations are relative paths or exact allowlisted platform origins. A
 
 ### 5.5 Authorization contract
 
-| Application | Policy owner | Required checks |
-| --- | --- | --- |
-| Portfolio | Portfolio | None for normal public content |
-| Studio | Owning product | Valid identity only where product data requires it; product-local permissions |
-| Admin | Admin | Valid identity, current database-backed role, AAL2 |
-| Auth | Auth | Valid identity for account pages; recent auth/AAL2 for sensitive changes |
+| Application | Policy owner   | Required checks                                                               |
+| ----------- | -------------- | ----------------------------------------------------------------------------- |
+| Portfolio   | Portfolio      | None for normal public content                                                |
+| Studio      | Owning product | Valid identity only where product data requires it; product-local permissions |
+| Admin       | Admin          | Valid identity, current database-backed role, AAL2                            |
+| Auth        | Auth           | Valid identity for account pages; recent auth/AAL2 for sensitive changes      |
 
 ### 5.6 Data ownership contract
 
-| Schema | Owner semantics | Consumers |
-| --- | --- | --- |
-| `auth` | Supabase identities and sessions | Auth infrastructure; validated identity in applications |
-| `jg_account` | Profiles, roles, terms, account-level state | Auth, Admin, and authorized product checks |
-| `portfolio` | Professional content | Portfolio reads; Admin manages |
-| `jg_app` | Studio product data | Studio reads/writes by product; Admin manages approved metadata |
+| Schema       | Owner semantics                             | Consumers                                                       |
+| ------------ | ------------------------------------------- | --------------------------------------------------------------- |
+| `auth`       | Supabase identities and sessions            | Auth infrastructure; validated identity in applications         |
+| `jg_account` | Profiles, roles, terms, account-level state | Auth, Admin, and authorized product checks                      |
+| `portfolio`  | Professional content                        | Portfolio reads; Admin manages                                  |
+| `jg_app`     | Studio product data                         | Studio reads/writes by product; Admin manages approved metadata |
 
 ### 5.7 Error and retry contract
 
@@ -228,7 +241,7 @@ Allowed destinations are relative paths or exact allowlisted platform origins. A
 
 ## 6. PR discipline
 
-Each task may require multiple small PRs. A preferred PR should:
+Per [ADR-002](../migrations/platform-restructure/decision-log.md), this program uses one PR with small, reviewable, deployable commits. Each commit or deployment slice should:
 
 - Have one behavioral purpose.
 - Avoid mixing folder moves, dependency upgrades, design changes, and database changes.
@@ -253,20 +266,21 @@ Recommended maximum conceptual scope:
 ## Phase 0 — Baseline and contracts
 
 Task ID: PLATFORM-00
-Status: Pending
+Status: In Progress
 Objective: Establish a verified source-of-truth inventory and freeze the migration contracts before implementation.
 Dependencies: None.
 Target files/surfaces: Architecture docs, route inventory, auth surface inventory, environment inventory, deployment inventory, database schema inventory.
 Allowed changes: Documentation, tests that do not affect production behavior, read-only diagnostics.
 Forbidden changes: Runtime behavior, dependencies, cookies, DNS, Vercel projects, Supabase configuration, database migrations.
 Acceptance checks:
+
 - API/BFF: Catalogue every current API route, auth callback, recovery route, and privileged endpoint with target owner.
 - native/client: Catalogue every current page, protected route, persisted store key, and user-facing navigation destination.
 - offline/retry: Record current refresh, logout, recovery, and failed-provider behavior.
 - source/security scan: Record service-role usage, duplicated clients, MFA surfaces, route guards, cookie names, and caching behavior.
 - black-box: Capture the current login, signup, recovery, MFA, product access, Portfolio, and Admin journeys.
-Proof note required: Current commit, deployed projects/domains, environment names, route inventory location, and known baseline failures.
-Stop/escalate if: The current deployed behavior or authoritative environment cannot be identified.
+  Proof note required: Current commit, deployed projects/domains, environment names, route inventory location, and known baseline failures.
+  Stop/escalate if: The current deployed behavior or authoritative environment cannot be identified.
 
 ### Phase 0 checklist
 
@@ -276,7 +290,7 @@ Stop/escalate if: The current deployed behavior or authoritative environment can
 - [ ] Confirm all current production domains and aliases.
 - [ ] Confirm the linked Supabase project without recording secrets.
 - [ ] Inventory current auth cookie names and attributes in a real browser.
-- [ ] Inventory auth pages in `apps/jayantgoyal`.
+- [ ] Inventory auth pages in `apps/studio`.
 - [ ] Inventory auth pages in `apps/admin`.
 - [ ] Inventory server, browser, and service-role Supabase clients.
 - [ ] Inventory current proxy route classifications.
@@ -301,21 +315,22 @@ Task ID: PLATFORM-01
 Status: Pending
 Objective: Add enough automated and manual regression coverage to change authentication safely.
 Dependencies: PLATFORM-00 Done.
-Target files/surfaces: Current authentication flows in `apps/jayantgoyal` and `apps/admin`; test tooling approved for the repository.
+Target files/surfaces: Current authentication flows in `apps/studio` and `apps/admin`; test tooling approved for the repository.
 Allowed changes: Test framework configuration, test-only fixtures, browser tests, non-production diagnostics.
 Forbidden changes: Authentication behavior, cookie contract, callback locations, production route protection.
 Acceptance checks:
+
 - API/BFF: Cover callback success/failure, session refresh, role denial, account endpoints, and logout scopes.
 - native/client: Cover password login, Google/GitHub paths where safely testable, recovery, MFA challenge, Studio-product access, and Admin access.
 - offline/retry: Cover expired session, failed refresh, provider cancellation, and stale browser state.
 - source/security scan: Confirm test fixtures contain no real credentials or tokens.
 - black-box: Run baseline journeys against a production-like environment and record pass/fail.
-Proof note required: Test commands, environment, test personas, coverage boundaries, and known manual-only paths.
-Stop/escalate if: Baseline auth is already failing or no safe test environment exists.
+  Proof note required: Test commands, environment, test personas, coverage boundaries, and known manual-only paths.
+  Stop/escalate if: Baseline auth is already failing or no safe test environment exists.
 
 ### Phase 1 checklist
 
-- [ ] Choose the smallest sustainable browser/integration test setup.
+- [x] Choose the smallest sustainable browser/integration test setup.
 - [ ] Add a public Portfolio/current-home smoke test.
 - [ ] Add unauthenticated protected-route redirect coverage.
 - [ ] Add authenticated current-app navigation coverage.
@@ -346,13 +361,14 @@ Target files/surfaces: Supabase dependencies, current server/browser clients, pr
 Allowed changes: One reviewed dependency upgrade and compatibility fixes required by that upgrade.
 Forbidden changes: New Auth app, parent-domain cookie, callback relocation, application split.
 Acceptance checks:
+
 - API/BFF: Current callback, refresh, role, and account endpoints pass after upgrade.
 - native/client: Current login, recovery, MFA, logout, and protected navigation pass.
 - offline/retry: Stale-refresh and concurrent-refresh scenarios remain recoverable.
 - source/security scan: Per-request clients, `getAll`/`setAll`, validation method, cookie deletion, and cache headers reviewed.
 - black-box: Existing production-equivalent journeys pass with current cookie behavior.
-Proof note required: Old/new versions, changelog risks, commands, browser results, and rollback version.
-Stop/escalate if: The dependency upgrade changes session serialization or invalidates existing sessions without a compatibility plan.
+  Proof note required: Old/new versions, changelog risks, commands, browser results, and rollback version.
+  Stop/escalate if: The dependency upgrade changes session serialization or invalidates existing sessions without a compatibility plan.
 
 ### Phase 2 checklist
 
@@ -384,13 +400,14 @@ Target files/surfaces: `packages/auth`, current main and Admin browser/server cl
 Allowed changes: Behavior-preserving extraction used immediately by both applications.
 Forbidden changes: Auth pages in the package, callback relocation, new cookie name/domain, role-query abstraction, product permissions.
 Acceptance checks:
+
 - API/BFF: Existing callbacks and protected endpoints behave identically.
 - native/client: Existing sessions, login, MFA, recovery, and logout remain valid.
 - offline/retry: Existing refresh behavior and retry outcomes remain unchanged.
 - source/security scan: Browser/server exports are isolated; no secret or service-role utility is exposed to browser imports.
 - black-box: Current main and Admin flows pass before and after extraction.
-Proof note required: Removed duplication, package consumers, unchanged interfaces, commands, and rollback path.
-Stop/escalate if: The package begins absorbing application policy or UI.
+  Proof note required: Removed duplication, package consumers, unchanged interfaces, commands, and rollback path.
+  Stop/escalate if: The package begins absorbing application policy or UI.
 
 ### Phase 3 checklist
 
@@ -424,13 +441,14 @@ Target files/surfaces: Shared cookie policy, current main and Admin session adap
 Allowed changes: Versioned platform cookie, dual-read or validated server-side promotion, feature flags, staging-only rollout first.
 Forbidden changes: Same-name host/domain cookie ambiguity, tokens in URLs, removing legacy cookies immediately, Auth cutover.
 Acceptance checks:
+
 - API/BFF: Both current apps validate and refresh the platform cookie consistently.
 - native/client: A user authenticated in one app can open the other without credential login, subject to authorization.
 - offline/retry: Concurrent refresh, stale cookie, expired access token, and revoked session recover correctly.
 - source/security scan: Domain, Path, Secure, SameSite, Max-Age, deletion, CSP, cache headers, and subdomain threat model reviewed.
 - black-box: Cross-subdomain SSO, step-up MFA, local logout, global logout, and open-tab behavior verified on stable staging.
-Proof note required: Cookie names and attributes without values, staging journeys, compatibility behavior, and residual risk.
-Stop/escalate if: Legacy and platform cookies cannot be selected unambiguously or safe promotion cannot be proven.
+  Proof note required: Cookie names and attributes without values, staging journeys, compatibility behavior, and residual risk.
+  Stop/escalate if: Legacy and platform cookies cannot be selected unambiguously or safe promotion cannot be proven.
 
 ### Phase 4 migration strategy
 
@@ -482,13 +500,14 @@ Target files/surfaces: `apps/auth`, Auth Vercel project, `auth.jayantgoyal.com`,
 Allowed changes: New independently deployable Auth application and test-only/manual entry links.
 Forbidden changes: Removing current auth routes, permanent production redirects, passkeys, SAML, API tokens, full session-device UI.
 Acceptance checks:
+
 - API/BFF: Callback exchange, verification, recovery, logout, and safe-return validation pass.
 - native/client: Login, registration, recovery, MFA enrollment/challenge, connected provider, and account-security journeys pass.
 - offline/retry: Provider cancellation, expired code, invalid callback, refresh failure, and Auth downtime produce recoverable states.
 - source/security scan: CSP, CSRF, Origin validation, open redirects, service-role isolation, cache headers, and secret exposure reviewed.
 - black-box: A session created on Auth is recognized by current main and Admin on stable staging.
-Proof note required: Deployment identifiers, domains, provider matrix, cookie observations, security findings, and rollback path.
-Stop/escalate if: Auth-created sessions are interpreted differently by another application.
+  Proof note required: Deployment identifiers, domains, provider matrix, cookie observations, security findings, and rollback path.
+  Stop/escalate if: Auth-created sessions are interpreted differently by another application.
 
 ### Phase 5 initial route checklist
 
@@ -534,13 +553,14 @@ Target files/surfaces: Current login, registration, callback, recovery, MFA, acc
 Allowed changes: Feature-flagged redirects, compatibility callbacks, navigation changes, removal of duplicated UI only after replacement is active.
 Forbidden changes: Blind callback redirects, immediate legacy route deletion, product-route moves, Studio redesign.
 Acceptance checks:
+
 - API/BFF: Previously issued recovery/verification links remain valid through the compatibility window.
 - native/client: Users entering from main/current Studio and Admin return to their original safe destination.
 - offline/retry: Interrupted OAuth and stale login pages restart safely through Auth.
 - source/security scan: Auth is the sole owner of new-flow UI; no open redirects or duplicate callback ambiguity remain.
 - black-box: Login once, navigate between main/current Studio, Admin, Auth, and the public root without another credential prompt.
-Proof note required: Cutover flag state, route compatibility matrix, old-link results, duplicate code removed, and residual traffic.
-Stop/escalate if: An old recovery or callback URL cannot be handled safely.
+  Proof note required: Cutover flag state, route compatibility matrix, old-link results, duplicate code removed, and residual traffic.
+  Stop/escalate if: An old recovery or callback URL cannot be handled safely.
 
 ### Phase 6 rollout checklist
 
@@ -571,28 +591,31 @@ Stop/escalate if: An old recovery or callback URL cannot be handled safely.
 ## Phase 7 — Studio technical deployment
 
 Task ID: PLATFORM-07
-Status: Pending
+Status: In Progress
 Objective: Establish the current application as Studio’s technical lineage and deploy it independently before redesign.
-Dependencies: PLATFORM-06 Done or Auth cutover explicitly stable enough for application moves.
-Target files/surfaces: `apps/jayantgoyal` package/folder identity, workspace filters, Vercel Studio project, Studio domains, environment assumptions, product links.
+Dependencies: Independent Portfolio dark launch is runnable; existing authentication remains compatible during the technical move. PLATFORM-06 is intentionally deferred by ADR-001.
+Target files/surfaces: `apps/studio` package/folder identity, workspace filters, Vercel Studio project, Studio domains, environment assumptions, product links.
 Allowed changes: Behavior-preserving application rename/move and independent Studio deployment.
 Forbidden changes: Product redesign, Portfolio root cutover, database redesign, persisted-store key changes, mass feature reorganization.
 Acceptance checks:
+
 - API/BFF: Existing product APIs behave identically on Studio.
 - native/client: Existing products, navigation, uploads, realtime features, and persisted state function on Studio.
 - offline/retry: Existing client persistence and recovery behavior remain readable after the host move.
 - source/security scan: Hardcoded root-domain, cookie, callback, CORS, sitemap, metadata, and environment assumptions are inventoried and fixed only where necessary.
 - black-box: Every classified Studio route works on the Studio deployment.
-Proof note required: Deployment commit, Vercel project, domain, route matrix, persisted-state results, and rollback mapping.
-Stop/escalate if: The current root application cannot remain available while Studio is introduced.
+  Proof note required: Deployment commit, Vercel project, domain, route matrix, persisted-state results, and rollback mapping.
+  Stop/escalate if: The current root application cannot remain available while Studio is introduced.
 
 ### Phase 7 recommended PR slices
 
-- [ ] PR 1: Rename package/filter identifiers without folder move if useful.
-- [ ] PR 2: Move `apps/jayantgoyal` to `apps/studio` with no behavior redesign.
-- [ ] PR 3: Update workspace and deployment configuration.
-- [ ] PR 4: Add Studio domain and production environment.
-- [ ] PR 5: Fix only host-sensitive behavior proven by staging validation.
+ADR-002 keeps these review slices as commits inside one program PR rather than separate PRs.
+
+- [x] Commit slice 1: Rename the package/filter identifier to `studio`.
+- [x] Commit slice 2: Move `apps/jayantgoyal` to `apps/studio` and remove duplicated Portfolio ownership.
+- [x] Commit slice 3: Update workspace, local commands, and deployment configuration in source.
+- [x] Commit slice 4: Rename and repoint the existing Vercel project and verify its Studio environments.
+- [ ] Commit slice 5: Deploy the exact commit and fix only behavior proven by deployed validation.
 
 ### Phase 7 product validation checklist
 
@@ -606,122 +629,124 @@ Stop/escalate if: The current root application cannot remain available while Stu
 - [ ] Developer tools and usage history
 - [ ] Weather
 - [ ] Terms/account initialization still required where intended
-- [ ] Public metadata and robots behavior reviewed
+- [x] Public metadata and robots behavior reviewed
 
 ### Phase 7 exit gate
 
-- [ ] Studio is an independent Vercel project.
+- [x] The existing product Vercel project is renamed and dedicated to Studio.
 - [ ] Existing product behavior is stable on Studio.
-- [ ] The root domain still serves the existing application until Portfolio is ready.
+- [ ] Portfolio-owned legacy paths redirect to Portfolio and product paths remain on Studio.
 
 ---
 
 ## Phase 8 — Portfolio application
 
 Task ID: PLATFORM-08
-Status: Pending
+Status: In Progress
 Objective: Build and deploy a focused Portfolio without copying Studio infrastructure.
-Dependencies: PLATFORM-07 Done; Portfolio content ownership confirmed in PLATFORM-00.
+Dependencies: Portfolio content ownership and the URL/environment contract are recorded in PLATFORM-00. Studio deployment is not required before this additive dark launch.
 Target files/surfaces: `apps/portfolio`, Portfolio Vercel project, staging domain, `portfolio` schema reads, contact and resume flows.
 Allowed changes: New focused Portfolio application and selective reuse of proven presentation primitives/content access.
 Forbidden changes: Studio product routes, authenticated workspace shell, service-role exposure, product navigation, broad shared content package.
 Acceptance checks:
+
 - API/BFF: Contact, resume, blog, and portfolio data paths work with least privilege.
 - native/client: Home, About, Experience, Skills, Projects, Resume, Blog, and Contact are responsive and accessible.
 - offline/retry: Public content has an approved fallback or failure state when Supabase/content is unavailable.
 - source/security scan: No Studio product logic, protected shell, unnecessary auth refresh, or privileged key is included.
 - black-box: A first-time visitor can answer “Who is Jayant?” without encountering authentication or product-dashboard UI.
-Proof note required: Page matrix, SEO/canonical validation, data-source behavior, accessibility results, and deployment identifier.
-Stop/escalate if: Portfolio requires copying a large Studio subsystem or a route remains unclassified.
+  Proof note required: Page matrix, SEO/canonical validation, data-source behavior, accessibility results, and deployment identifier.
+  Stop/escalate if: Portfolio requires copying a large Studio subsystem or a route remains unclassified.
 
 ### Phase 8 page checklist
 
-- [ ] Home
-- [ ] About
-- [ ] Experience
-- [ ] Skills
-- [ ] Featured Projects
-- [ ] Resume
-- [ ] Blog index
-- [ ] Blog article
-- [ ] Contact
-- [ ] Not-found and error states
-- [ ] Sitemap
-- [ ] Robots
-- [ ] Open Graph and social metadata
-- [ ] Structured data where appropriate
+- [x] Home
+- [x] About
+- [x] Experience
+- [x] Skills
+- [x] Featured Projects
+- [x] Resume
+- [x] Blog index
+- [x] Blog article
+- [x] Contact
+- [x] Not-found and error states
+- [x] Sitemap
+- [x] Robots
+- [x] Open Graph and social metadata
+- [x] Structured data where appropriate
 
 ### Phase 8 lightness checklist
 
-- [ ] No global protected layout.
-- [ ] No product sidebar.
-- [ ] No authentication proxy on static routes.
-- [ ] No product state stores.
-- [ ] No weather, files, messenger, games, tools, or activity dependencies.
-- [ ] No service-role key unless a separately reviewed server-only operation proves it necessary.
-- [ ] Shared UI use is limited to primitives.
+- [x] No global protected layout.
+- [x] No product sidebar.
+- [x] No authentication proxy on static routes.
+- [x] No product state stores.
+- [x] No weather, files, messenger, games, tools, or activity dependencies.
+- [x] No service-role key unless a separately reviewed server-only operation proves it necessary.
+- [x] Shared UI use is limited to presentation primitives and behavior-neutral shell renderers; Portfolio navigation and product policy remain app-owned.
 
 ### Phase 8 exit gate
 
 - [ ] Portfolio is independently deployed on staging.
-- [ ] Root-domain cutover is reversible.
-- [ ] Every root route has a final owner or redirect.
+- [x] Root-domain cutover is reversible.
+- [x] Every root route has a final owner or redirect.
 
 ---
 
 ## Phase 9 — Domain and route cutover
 
 Task ID: PLATFORM-09
-Status: Pending
+Status: In Progress
 Objective: Make Portfolio the root-domain application and permanently route product traffic to Studio without losing historical URLs.
-Dependencies: PLATFORM-08 Done; Studio and Auth stable in production.
+Dependencies: PLATFORM-08 and PLATFORM-07 deployed and validated; Studio public discovery is available. Auth remains on the compatible existing flow under ADR-001.
 Target files/surfaces: Vercel domains, redirects, canonical metadata, sitemap, robots, navigation, compatibility callbacks, analytics.
 Allowed changes: Reversible domain assignment, tested redirects, canonical URL updates, navigation changes.
 Forbidden changes: Unclassified route deletion, blind permanent callback redirect, simultaneous Studio redesign, database changes.
 Acceptance checks:
+
 - API/BFF: Historical APIs and callbacks are preserved, versioned, or explicitly retired with evidence.
 - native/client: Old bookmarks and internal links reach the correct final application without loops.
 - offline/retry: Auth return destinations survive redirects and failures.
 - source/security scan: Redirect allowlists, canonical URLs, callback handling, CORS, CSP, sitemap, and robots reviewed.
 - black-box: Root Portfolio, Studio products, Auth round trips, and Admin access pass from historical and canonical URLs.
-Proof note required: Final redirect ledger, DNS/domain changes, rollback sequence, analytics observation, and unresolved legacy traffic.
-Stop/escalate if: Any path has unclear ownership or an in-flight callback cannot be handled safely.
+  Proof note required: Final redirect ledger, DNS/domain changes, rollback sequence, analytics observation, and unresolved legacy traffic.
+  Stop/escalate if: Any path has unclear ownership or an in-flight callback cannot be handled safely.
 
 ### Phase 9 redirect checklist
 
 Professional routes remain or map to Portfolio:
 
-- [ ] `/`
-- [ ] `/about`
-- [ ] `/experience`
-- [ ] `/skills`
-- [ ] `/projects`
-- [ ] `/resume`
-- [ ] `/blog`
-- [ ] `/blog/[slug]`
-- [ ] `/contact`
+- [x] `/`
+- [x] `/about`
+- [x] `/experience`
+- [x] `/skills`
+- [x] `/projects`
+- [x] `/resume`
+- [x] `/blog`
+- [x] `/blog/[slug]`
+- [x] `/contact`
 
 Product routes permanently redirect to the same path on Studio when compatible:
 
-- [ ] `/activity-tracker/**`
-- [ ] `/calculator/**`
-- [ ] `/custom-calculator/**`
-- [ ] `/files/**`
-- [ ] `/games/**`
-- [ ] `/github-stats/**`
-- [ ] `/messenger/**`
-- [ ] `/tools/**`
-- [ ] `/weather/**`
+- [x] `/activity-tracker/**`
+- [x] `/calculator/**`
+- [x] `/custom-calculator/**`
+- [x] `/files/**`
+- [x] `/games/**`
+- [x] `/github-stats/**`
+- [x] `/messenger/**`
+- [x] `/tools/**`
+- [x] `/weather/**`
 
 Auth routes use temporary redirects or compatibility handlers before retirement:
 
-- [ ] `/login`
-- [ ] `/signup` or `/register`
-- [ ] `/forgot-password`
-- [ ] `/reset-password`
-- [ ] `/mfa-verify`
-- [ ] `/auth/callback`
-- [ ] `/welcome`
+- [x] `/login`
+- [x] `/signup` or `/register`
+- [x] `/forgot-password`
+- [x] `/reset-password`
+- [x] `/mfa-verify`
+- [x] `/auth/callback`
+- [x] `/welcome`
 
 ### Phase 9 cutover sequence
 
@@ -746,13 +771,14 @@ Target files/surfaces: Admin navigation, route grouping, Portfolio CMS, Studio c
 Allowed changes: Navigation reorganization, additive Studio metadata management, removal of duplicated self-service auth UI.
 Forbidden changes: Editing infrastructure secrets in Admin, replacing product implementation, a generic CMS framework, new schemas without separate approval.
 Acceptance checks:
+
 - API/BFF: Existing portfolio, user, deployment, and approved Studio metadata operations retain authorization and validation.
 - native/client: Admin navigation clearly groups Portfolio, Studio, and System.
 - offline/retry: Failed operations report recoverable errors without partial silent state.
 - source/security scan: Every mutation checks current role; privileged actions require AAL2; service-role boundaries are server-only.
 - black-box: Admin and super_admin personas can perform approved operations; non-admin users cannot.
-Proof note required: Navigation map, authorization matrix, mutations tested, audit gaps, and deployment result.
-Stop/escalate if: Admin requires direct dependency on another application’s implementation.
+  Proof note required: Navigation map, authorization matrix, mutations tested, audit gaps, and deployment result.
+  Stop/escalate if: Admin requires direct dependency on another application’s implementation.
 
 ### Phase 10 checklist
 
@@ -804,13 +830,14 @@ Target files/surfaces: Studio marketing layout, product catalog, product detail 
 Allowed changes: Studio UX, information architecture, selective feature-first organization, product catalog integration.
 Forbidden changes: Portfolio identity content, Auth UI, Admin operations, feature framework, mass rewrite of working product domains.
 Acceptance checks:
+
 - API/BFF: Product metadata and launch requirements are represented without changing unrelated product APIs.
 - native/client: Visitors can discover products without authentication and enter account-backed products through a clear launch flow.
 - offline/retry: Public catalog failure and authenticated-product failure are distinct and recoverable.
 - source/security scan: Public/private boundaries, metadata exposure, product route permissions, and shared-shell imports reviewed.
 - black-box: Studio Home → Products → Product Detail → Launch → Auth if required → Workspace passes.
-Proof note required: Information architecture, product matrix, public/auth boundaries, accessibility, performance, and deployment result.
-Stop/escalate if: The redesign requires rewriting product behavior before the discovery shell can launch.
+  Proof note required: Information architecture, product matrix, public/auth boundaries, accessibility, performance, and deployment result.
+  Stop/escalate if: The redesign requires rewriting product behavior before the discovery shell can launch.
 
 ### Phase 11 navigation checklist
 
@@ -855,13 +882,14 @@ Target files/surfaces: Legacy cookies, callbacks, login UI, redirects, combined 
 Allowed changes: Evidence-backed deletion, security hardening, documentation finalization.
 Forbidden changes: Removing unexplained traffic paths, bundling unrelated refactors, deleting rollback evidence.
 Acceptance checks:
+
 - API/BFF: No valid legacy callback, recovery, or API traffic remains unexplained.
 - native/client: Canonical application journeys pass with compatibility code disabled.
 - offline/retry: Expired sessions, old bookmarks, and provider failures resolve safely.
 - source/security scan: Dead auth code, duplicate clients, stale secrets, abandoned domains, caching, CSP, CSRF, and authorization reviewed.
 - black-box: Full Portfolio → Studio → Auth → Admin journeys pass from clean and previously authenticated browsers.
-Proof note required: Deleted surfaces, traffic evidence, security review, final route map, and residual risks.
-Stop/escalate if: Any legacy route or cookie still receives valid unexplained traffic.
+  Proof note required: Deleted surfaces, traffic evidence, security review, final route map, and residual risks.
+  Stop/escalate if: Any legacy route or cookie still receives valid unexplained traffic.
 
 ### Phase 12 checklist
 
@@ -898,12 +926,12 @@ Stop/escalate if: Any legacy route or cookie still receives valid unexplained tr
 
 Populate this during PLATFORM-00 and keep it current through PLATFORM-12.
 
-| Old host/path | Final host/path | Behavior during migration | Final behavior | Query preserved? | Owner | Status | Evidence |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| `jayantgoyal.com/games/**` | `studio.jayantgoyal.com/games/**` | Existing route until Studio stable | 308 | Yes | Studio | Pending | — |
-| `jayantgoyal.com/tools/**` | `studio.jayantgoyal.com/tools/**` | Existing route until Studio stable | 308 | Yes | Studio | Pending | — |
-| `jayantgoyal.com/auth/callback` | `auth.jayantgoyal.com/callback` | Compatibility handler | Retire after window | Required auth params only | Auth | Pending | — |
-| `admin.jayantgoyal.com/auth/callback` | `auth.jayantgoyal.com/callback` | Compatibility handler | Retire after window | Required auth params only | Auth | Pending | — |
+| Old host/path                         | Final host/path                   | Behavior during migration          | Final behavior      | Query preserved?          | Owner  | Status  | Evidence |
+| ------------------------------------- | --------------------------------- | ---------------------------------- | ------------------- | ------------------------- | ------ | ------- | -------- |
+| `jayantgoyal.com/games/**`            | `studio.jayantgoyal.com/games/**` | Existing route until Studio stable | 308                 | Yes                       | Studio | Pending | —        |
+| `jayantgoyal.com/tools/**`            | `studio.jayantgoyal.com/tools/**` | Existing route until Studio stable | 308                 | Yes                       | Studio | Pending | —        |
+| `jayantgoyal.com/auth/callback`       | `auth.jayantgoyal.com/callback`   | Compatibility handler              | Retire after window | Required auth params only | Auth   | Pending | —        |
+| `admin.jayantgoyal.com/auth/callback` | `auth.jayantgoyal.com/callback`   | Compatibility handler              | Retire after window | Required auth params only | Auth   | Pending | —        |
 
 Never place token values or real authorization codes in this ledger.
 
@@ -913,16 +941,16 @@ Never place token values or real authorization codes in this ledger.
 
 Populate exact names during PLATFORM-00. The target principle is least privilege.
 
-| Variable capability | Portfolio | Studio | Admin | Auth | Notes |
-| --- | :---: | :---: | :---: | :---: | --- |
-| Supabase public URL/key | If content needs it | Yes | Yes | Yes | Same project |
-| Supabase service role | Prefer no | Only proven server need | Yes where required | Prefer no; only approved admin operation | Never browser-exposed |
-| Site URL | Yes | Yes | Yes | Yes | Environment-specific |
-| Auth application URL | Link only | Yes | Yes | Self | Environment-specific |
-| Cookie domain/name | Optional awareness | Yes | Yes | Yes | Shared contract |
-| Resend/email | Contact only if owned | Product-specific only | Operational only | Identity email normally configured in Supabase | Avoid duplication |
-| Weather/GitHub APIs | No | Yes where product needs | No unless operational | No | Studio-owned |
-| Vercel management | No | No | Yes | No | Server-only |
+| Variable capability     |       Portfolio       |         Studio          |         Admin         |                      Auth                      | Notes                 |
+| ----------------------- | :-------------------: | :---------------------: | :-------------------: | :--------------------------------------------: | --------------------- |
+| Supabase public URL/key |  If content needs it  |           Yes           |          Yes          |                      Yes                       | Same project          |
+| Supabase service role   |       Prefer no       | Only proven server need |  Yes where required   |    Prefer no; only approved admin operation    | Never browser-exposed |
+| Site URL                |          Yes          |           Yes           |          Yes          |                      Yes                       | Environment-specific  |
+| Auth application URL    |       Link only       |           Yes           |          Yes          |                      Self                      | Environment-specific  |
+| Cookie domain/name      |  Optional awareness   |           Yes           |          Yes          |                      Yes                       | Shared contract       |
+| Resend/email            | Contact only if owned |  Product-specific only  |   Operational only    | Identity email normally configured in Supabase | Avoid duplication     |
+| Weather/GitHub APIs     |          No           | Yes where product needs | No unless operational |                       No                       | Studio-owned          |
+| Vercel management       |          No           |           No            |          Yes          |                       No                       | Server-only           |
 
 Environment changes are introduced in the same PR/phase as the first real consumer, not in anticipation.
 
@@ -944,24 +972,24 @@ Build success does not replace type checking because repository build configurat
 
 ### 10.2 Authentication integration matrix
 
-| Journey | Local | Stable staging | Production smoke |
-| --- | :---: | :---: | :---: |
-| Password login | Required | Required | Required after approved rollout |
-| Google login | Manual/optional | Required | Required after approved rollout |
-| GitHub login | Manual/optional | Required | Required after approved rollout |
-| Registration and verification | Required | Required | Controlled smoke |
-| Forgot/reset password | Required | Required | Controlled smoke |
-| MFA enrollment | Required | Required | Controlled smoke |
-| AAL1 → AAL2 Admin step-up | Required | Required | Required |
-| Non-admin Admin denial | Required | Required | Required |
-| Studio session recognized by Admin | Required | Required | Required |
-| Auth session recognized by Studio | Required | Required | Required |
-| Current-session logout | Required | Required | Required |
-| Global logout | Required | Required | Controlled smoke |
-| Expired access token refresh | Required | Required | Observe |
-| Revoked session behavior | Required | Required | Observe |
-| Provider cancellation | Required | Required | Not required |
-| Invalid return URL rejection | Required | Required | Not required |
+| Journey                            |      Local      | Stable staging |        Production smoke         |
+| ---------------------------------- | :-------------: | :------------: | :-----------------------------: |
+| Password login                     |    Required     |    Required    | Required after approved rollout |
+| Google login                       | Manual/optional |    Required    | Required after approved rollout |
+| GitHub login                       | Manual/optional |    Required    | Required after approved rollout |
+| Registration and verification      |    Required     |    Required    |        Controlled smoke         |
+| Forgot/reset password              |    Required     |    Required    |        Controlled smoke         |
+| MFA enrollment                     |    Required     |    Required    |        Controlled smoke         |
+| AAL1 → AAL2 Admin step-up          |    Required     |    Required    |            Required             |
+| Non-admin Admin denial             |    Required     |    Required    |            Required             |
+| Studio session recognized by Admin |    Required     |    Required    |            Required             |
+| Auth session recognized by Studio  |    Required     |    Required    |            Required             |
+| Current-session logout             |    Required     |    Required    |            Required             |
+| Global logout                      |    Required     |    Required    |        Controlled smoke         |
+| Expired access token refresh       |    Required     |    Required    |             Observe             |
+| Revoked session behavior           |    Required     |    Required    |             Observe             |
+| Provider cancellation              |    Required     |    Required    |          Not required           |
+| Invalid return URL rejection       |    Required     |    Required    |          Not required           |
 
 ### 10.3 Application black-box matrix
 
@@ -1202,10 +1230,13 @@ Review after the migration and at least annually:
 
 ---
 
-## 16. Immediate next action when implementation is authorized
+## 16. Immediate next action
 
-Start only with PLATFORM-00.
+Continue PLATFORM-07 in the existing dedicated worktree and program branch:
 
-Do not create `apps/auth`, `apps/portfolio`, `apps/studio`, or `packages/auth` until the baseline inventory, current production journey proof, route ownership ledger, environment inventory, and auth-cookie observations are complete.
+1. Deploy and validate the exact Studio and Portfolio commits after the Vercel build limit resets.
+2. Confirm apex canonical/Open Graph metadata from that fresh Portfolio deployment.
+3. Run the deployed responsive and authenticated product matrix.
+4. Complete the rollback rehearsal and required observation gates before closing PLATFORM-07, PLATFORM-08, or PLATFORM-09.
 
-The first implementation PR should contain documentation and test foundations only. It should not change production behavior.
+Do not create `apps/auth` or `packages/auth` until the application split and root-domain cutover are stable.

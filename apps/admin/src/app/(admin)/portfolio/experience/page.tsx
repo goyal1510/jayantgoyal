@@ -1,5 +1,9 @@
+import type { Metadata } from "next";
+
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { ExperienceList } from "./experience-list";
+
+export const metadata: Metadata = { title: "Experience" };
 
 export default async function ExperiencePage() {
   const supabase = await createSupabaseServerClient();

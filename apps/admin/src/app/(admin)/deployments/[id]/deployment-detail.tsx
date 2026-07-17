@@ -94,7 +94,9 @@ export function DeploymentDetail({ deploymentId }: DeploymentDetailProps) {
     if (!deployment || !confirmAction) return;
     setActionLoading(true);
     try {
-      const project = deployment.name?.includes("admin") ? "admin" as const : "jg" as const;
+      const project = deployment.name?.includes("admin")
+        ? ("admin" as const)
+        : ("studio" as const);
       if (confirmAction === "redeploy") {
         await redeployDeployment(deployment.uid, project, deployment.target || "production");
         toast.success("Redeploy triggered");

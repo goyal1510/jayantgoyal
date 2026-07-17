@@ -1,26 +1,31 @@
-import { redirect } from "next/navigation"
-import { createSupabaseServerClient } from "@/lib/supabase/server"
-import { MfaVerifyStep } from "@/components/auth/mfa-verify-step"
-import { Card, CardContent } from "@repo/ui/card"
+import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { MfaVerifyStep } from "@/components/auth/mfa-verify-step";
+import { Card, CardContent } from "@repo/ui/card";
 
 interface PageProps {
-  searchParams: Promise<{ redirect?: string }>
+  searchParams: Promise<{ redirect?: string }>;
 }
 
-export default async function MfaVerifyPage({ searchParams }: PageProps) {
-  const { redirect: redirectUrl = "/" } = await searchParams
-  const supabase = await createSupabaseServerClient()
+export const metadata: Metadata = { title: "Verify MFA" };
 
-  const { data: { user } } = await supabase.auth.getUser()
+export default async function MfaVerifyPage({ searchParams }: PageProps) {
+  const { redirect: redirectUrl = "/" } = await searchParams;
+  const supabase = await createSupabaseServerClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
-    redirect("/welcome")
+    redirect("/welcome");
   }
 
-  const { data: factors } = await supabase.auth.mfa.listFactors()
-  const hasVerifiedFactor = factors?.totp.some((f) => f.status === "verified")
+  const { data: factors } = await supabase.auth.mfa.listFactors();
+  const hasVerifiedFactor = factors?.totp.some((f) => f.status === "verified");
 
   if (!hasVerifiedFactor) {
-    redirect(redirectUrl)
+    redirect(redirectUrl);
   }
 
   return (
@@ -33,5 +38,5 @@ export default async function MfaVerifyPage({ searchParams }: PageProps) {
         </Card>
       </div>
     </div>
-  )
+  );
 }

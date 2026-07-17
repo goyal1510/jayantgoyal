@@ -1,6 +1,6 @@
-# JG
+# Jayant Goyal Platform
 
-Portfolio, tools, games, and productivity apps by **Jayant**.
+Independent Portfolio, Studio, and Admin applications by **Jayant Goyal**.
 
 [![Portfolio](https://img.shields.io/badge/Portfolio-jayantgoyal.com-000?style=for-the-badge&logo=vercel)](https://jayantgoyal.com)
 [![GitHub](https://img.shields.io/badge/GitHub-goyal1510-181717?style=for-the-badge&logo=github)](https://github.com/goyal1510)
@@ -12,14 +12,14 @@ Portfolio, tools, games, and productivity apps by **Jayant**.
 
 | Project | Description | Tech Highlights |
 |---------|-------------|-----------------|
-| [**Messenger**](https://jayantgoyal.com/messenger) | Real-time chat with instant sync | Supabase Realtime, Subscriptions |
-| [**File Manager**](https://jayantgoyal.com/files) | Cloud storage with folders, upload, soft delete | Supabase Storage, Hierarchical data |
-| [**Activity Tracker**](https://jayantgoyal.com/activity-tracker) | Daily tracking with analytics dashboard | Recharts, Data visualization |
-| [**Weather**](https://jayantgoyal.com/weather) | City search, geolocation, 5-day forecast | OpenWeather API, Geolocation |
-| [**Games**](https://jayantgoyal.com/games) | 5 games with AI opponents | Game logic, State machines |
-| [**Calculator**](https://jayantgoyal.com/calculator) | Cash denomination with history | CRUD, Zustand persistence |
-| [**Custom Calculator**](https://jayantgoyal.com/custom-calculator) | Drag & drop calculator builder | React DnD, Dynamic layouts |
-| [**Dev Tools**](https://jayantgoyal.com/tools) | 99+ utilities (UUID, hash, encode, format) | Crypto APIs, Converters |
+| [**Messenger**](https://studio.jayantgoyal.com/messenger) | Real-time chat with instant sync | Supabase Realtime, Subscriptions |
+| [**File Manager**](https://studio.jayantgoyal.com/files) | Cloud storage with folders, upload, soft delete | Supabase Storage, Hierarchical data |
+| [**Activity Tracker**](https://studio.jayantgoyal.com/activity-tracker) | Daily tracking with analytics dashboard | Recharts, Data visualization |
+| [**Weather**](https://studio.jayantgoyal.com/weather) | City search, geolocation, 5-day forecast | OpenWeather API, Geolocation |
+| [**Games**](https://studio.jayantgoyal.com/games) | 5 games with AI opponents | Game logic, State machines |
+| [**Calculator**](https://studio.jayantgoyal.com/calculator) | Cash denomination with history | CRUD, Zustand persistence |
+| [**Custom Calculator**](https://studio.jayantgoyal.com/custom-calculator) | Drag & drop calculator builder | React DnD, Dynamic layouts |
+| [**Dev Tools**](https://studio.jayantgoyal.com/tools) | 99+ utilities (UUID, hash, encode, format) | Crypto APIs, Converters |
 | [**Admin Panel**](https://admin.jayantgoyal.com) | Manage portfolio data | Protected routes, RBAC |
 
 ---
@@ -41,8 +41,9 @@ State        Zustand (persisted stores)
 ```
 jayantgoyal/
 ├── apps/
-│   ├── jayantgoyal/        # Main app - all features above
-│   └── admin/              # Admin panel
+│   ├── portfolio/          # Public portfolio, blog, resume, contact
+│   ├── studio/             # Products, tools, games, and workspaces
+│   └── admin/              # Administration and content operations
 │
 ├── packages/
 │   ├── ui/                 # Shared component library (React 19 + Tailwind v4)
@@ -104,12 +105,13 @@ cd jayantgoyal
 # Install (requires pnpm 10.24+, Node 18+)
 pnpm install
 
-# Set up environment
-cp apps/jayantgoyal/.env.example apps/jayantgoyal/.env.local
-# Edit .env.local with your Supabase keys
+# Set up the application environments
+cp apps/portfolio/.env.example apps/portfolio/.env.local
+cp apps/studio/.env.example apps/studio/.env.local
+cp apps/admin/.env.example apps/admin/.env.local
 
-# Run
-pnpm dev --filter jg
+# Run Studio
+pnpm --filter studio dev
 ```
 
 ### Environment Variables
@@ -129,10 +131,13 @@ RESEND_API_KEY=
 | Command | Description |
 |---------|-------------|
 | `pnpm dev` | Run all apps |
-| `pnpm dev --filter jg` | Run main app only |
+| `pnpm --filter portfolio dev` | Run Portfolio on port 3000 |
+| `pnpm --filter studio dev` | Run Studio on port 3001 |
+| `pnpm --filter admin dev` | Run Admin on port 3002 |
 | `pnpm build` | Build all |
 | `pnpm lint` | Lint (zero warnings) |
 | `pnpm check-types` | Type check |
+| `pnpm test` | Run focused Vitest regression tests |
 | `pnpm format` | Format with Prettier |
 
 ---
@@ -143,7 +148,7 @@ RESEND_API_KEY=
 - **Auth**: Supabase SSR with email/password, magic link, OAuth, guest login
 - **State**: Zustand stores with `persist` middleware + manual hydration
 - **Styling**: Tailwind v4 + CVA for variants + `cn()` for class merging
-- **Multi-tenant**: Portfolio data fetched by hostname
+- **Application boundaries**: Portfolio content, Studio products, and Admin operations deploy independently
 
 ---
 

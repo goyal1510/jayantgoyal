@@ -1,148 +1,86 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { Shield } from "lucide-react"
+import * as React from "react";
+import { usePathname } from "next/navigation";
+import { Shield } from "lucide-react";
 
+import { APP_BRANDS } from "@repo/brand";
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarRail,
-  SidebarSeparator,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupContent,
-} from "@repo/ui/sidebar"
-import { TeamSwitcher } from "@/components/sidebar/team-switcher"
-import { NavUser } from "@/components/sidebar/nav-user"
-import { portfolioNavItems, blogNavItems, adminNavItems, deploymentNavItems } from "@/lib/config/nav-config"
-import type { AuthUser } from "@/lib/types"
+  ApplicationSidebarFrame,
+  ApplicationSidebarSection,
+  type ApplicationNavigationItem,
+  type ApplicationNavigationSection,
+} from "@repo/ui/application-shell";
+
+import { NavUser } from "@/components/sidebar/nav-user";
+import {
+  portfolioNavItems,
+  blogNavItems,
+  adminNavItems,
+  deploymentNavItems,
+} from "@/lib/config/nav-config";
+import type { NavItem } from "@/lib/config/nav-config";
+import type { AuthUser } from "@/lib/types";
 
 const adminBrand = {
-  name: "Admin",
-  logo: Shield,
-}
+  name: APP_BRANDS.admin.name,
+  href: "/portfolio/hero",
+  icon: Shield,
+};
 
-interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-  user: AuthUser
+interface AppSidebarProps
+  extends Omit<
+    React.ComponentProps<typeof ApplicationSidebarFrame>,
+    "brand" | "children" | "footer"
+  > {
+  user: AuthUser;
 }
 
 export function AppSidebar({ user, ...props }: AppSidebarProps) {
-  const pathname = usePathname()
+  const pathname = usePathname();
+  const navigationItem = (item: NavItem): ApplicationNavigationItem => ({
+    id: item.href,
+    label: item.label,
+    href: item.href,
+    icon: item.icon,
+    isActive: pathname === item.href,
+  });
+  const sections: ApplicationNavigationSection[] = [
+    {
+      id: "portfolio",
+      label: "Portfolio",
+      items: portfolioNavItems.map(navigationItem),
+    },
+    {
+      id: "blog",
+      label: "Blog",
+      items: blogNavItems.map(navigationItem),
+    },
+    ...(user.role === "super_admin"
+      ? [
+          {
+            id: "deployments",
+            label: "Deployments",
+            items: deploymentNavItems.map(navigationItem),
+          },
+          {
+            id: "administration",
+            label: "Administration",
+            items: adminNavItems.map(navigationItem),
+          },
+        ]
+      : []),
+  ];
 
   return (
-    <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
-        <TeamSwitcher brand={adminBrand} />
-      </SidebarHeader>
-      <SidebarContent>
-        {/* Portfolio Management */}
-        <SidebarGroup>
-          <SidebarGroupLabel>Portfolio</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {portfolioNavItems.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={pathname === item.href}
-                    tooltip={item.label}
-                  >
-                    <Link href={item.href}>
-                      <item.icon />
-                      <span>{item.label}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        {/* Blog Management */}
-        <SidebarGroup>
-          <SidebarGroupLabel>Blog</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {blogNavItems.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={pathname === item.href}
-                    tooltip={item.label}
-                  >
-                    <Link href={item.href}>
-                      <item.icon />
-                      <span>{item.label}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        {/* Deployments (super_admin only) */}
-        {user.role === "super_admin" && (
-          <SidebarGroup>
-            <SidebarGroupLabel>Deployments</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {deploymentNavItems.map((item) => (
-                  <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={pathname === item.href}
-                      tooltip={item.label}
-                    >
-                      <Link href={item.href}>
-                        <item.icon />
-                        <span>{item.label}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
-
-        {/* Administration (super_admin only) */}
-        {user.role === "super_admin" && (
-          <SidebarGroup>
-            <SidebarGroupLabel>Administration</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {adminNavItems.map((item) => (
-                  <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={pathname === item.href}
-                      tooltip={item.label}
-                    >
-                      <Link href={item.href}>
-                        <item.icon />
-                        <span>{item.label}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
-      </SidebarContent>
-      <SidebarSeparator />
-      <SidebarFooter>
-        <NavUser user={{ email: user.email, name: user.name }} />
-      </SidebarFooter>
-      <SidebarRail />
-    </Sidebar>
-  )
+    <ApplicationSidebarFrame
+      brand={adminBrand}
+      footer={<NavUser user={{ email: user.email, name: user.name }} />}
+      {...props}
+    >
+      {sections.map((section) => (
+        <ApplicationSidebarSection key={section.id} section={section} />
+      ))}
+    </ApplicationSidebarFrame>
+  );
 }

@@ -42,7 +42,7 @@ export async function GET(request: Request) {
     const project = searchParams.get("project") as VercelProjectKey;
     const limit = searchParams.get("limit") || "20";
 
-    if (!project || !["jg", "admin"].includes(project)) {
+    if (!project || !["studio", "admin"].includes(project)) {
       return NextResponse.json(
         { error: "Invalid project" },
         { status: 400 }
@@ -117,7 +117,7 @@ export async function POST(request: Request) {
       const res = await vercelFetch("/v13/deployments", {
         method: "POST",
         body: JSON.stringify({
-          name: project === "jg" ? "jayantgoyal" : "admin",
+          name: project === "studio" ? "studio" : "admin",
           deploymentId,
           target: target || "production",
         }),

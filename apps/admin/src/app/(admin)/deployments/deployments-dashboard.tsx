@@ -31,7 +31,7 @@ import { DeploymentsTable } from "./deployments-table";
 import { ConfirmActionDialog } from "./confirm-action-dialog";
 
 export function DeploymentsDashboard() {
-  const [project, setProject] = useState<VercelProjectKey>("jg");
+  const [project, setProject] = useState<VercelProjectKey>("studio");
   const [deployments, setDeployments] = useState<VercelDeployment[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -98,7 +98,7 @@ export function DeploymentsDashboard() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="jg">Main App</SelectItem>
+                <SelectItem value="studio">Studio</SelectItem>
                 <SelectItem value="admin">Admin App</SelectItem>
               </SelectContent>
             </Select>

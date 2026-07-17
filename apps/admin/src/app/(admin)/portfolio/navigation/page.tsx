@@ -1,5 +1,9 @@
+import type { Metadata } from "next";
+
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { NavigationList } from "./navigation-list";
+
+export const metadata: Metadata = { title: "Navigation" };
 
 export default async function NavigationPage() {
   const supabase = await createSupabaseServerClient();

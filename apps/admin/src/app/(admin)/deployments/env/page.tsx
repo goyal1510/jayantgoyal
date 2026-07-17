@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { EnvVarsManager } from "./env-vars-manager";
+
+export const metadata: Metadata = { title: "Environment Variables" };
 
 export default async function EnvVarsPage() {
   const supabase = await createSupabaseServerClient();

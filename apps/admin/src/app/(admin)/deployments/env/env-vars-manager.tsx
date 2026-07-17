@@ -33,7 +33,7 @@ import { AddEnvVarDialog, EditEnvVarDialog } from "./env-var-dialogs";
 import { EnvVarsTable } from "./env-vars-table";
 
 export function EnvVarsManager() {
-  const [project, setProject] = useState<VercelProjectKey>("jg");
+  const [project, setProject] = useState<VercelProjectKey>("studio");
   const [envVars, setEnvVars] = useState<VercelEnvVar[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -163,7 +163,7 @@ export function EnvVarsManager() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="jg">Main App</SelectItem>
+                <SelectItem value="studio">Studio</SelectItem>
                 <SelectItem value="admin">Admin App</SelectItem>
               </SelectContent>
             </Select>
@@ -203,7 +203,7 @@ export function EnvVarsManager() {
       <AddEnvVarDialog
         open={addOpen}
         onOpenChange={setAddOpen}
-        projectLabel={project === "jg" ? "Main" : "Admin"}
+        projectLabel={project === "studio" ? "Studio" : "Admin"}
         newKey={newKey}
         setNewKey={setNewKey}
         newValue={newValue}

@@ -1,5 +1,9 @@
+import type { Metadata } from "next";
+
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { HeroForm } from "./hero-form";
+
+export const metadata: Metadata = { title: "Hero" };
 
 export default async function HeroPage() {
   const supabase = await createSupabaseServerClient();
