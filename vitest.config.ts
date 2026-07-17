@@ -11,7 +11,7 @@ export default defineConfig({
   test: {
     environment: "node",
     include: [
-      "apps/{admin,portfolio,studio}/**/*.test.ts",
+      "apps/{admin,auth,portfolio,studio}/**/*.test.ts",
       "packages/{auth,brand,platform,seo,ui}/**/*.test.ts",
     ],
   },

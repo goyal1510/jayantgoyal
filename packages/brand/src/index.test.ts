@@ -7,14 +7,17 @@ describe("canonical platform branding", () => {
     expect(APP_BRANDS.portfolio.defaultTitle).toContain(PERSON_BRAND.fullName);
     expect(APP_BRANDS.studio.defaultTitle).toContain(PERSON_BRAND.fullName);
     expect(APP_BRANDS.admin.defaultTitle).toContain(PERSON_BRAND.fullName);
+    expect(APP_BRANDS.auth.defaultTitle).toContain(PERSON_BRAND.fullName);
     expect(APP_BRANDS.studio.publicName).toBe("Studio by Jayant Goyal");
     expect(APP_BRANDS.admin.publicName).toBe("Admin by Jayant Goyal");
+    expect(APP_BRANDS.auth.publicName).toBe("Auth by Jayant Goyal");
   });
 
   it("keeps application names independent from public SEO names", () => {
     expect(APP_BRANDS.portfolio.name).toBe("Portfolio");
     expect(APP_BRANDS.studio.name).toBe("Studio");
     expect(APP_BRANDS.admin.name).toBe("Admin");
+    expect(APP_BRANDS.auth.name).toBe("Auth");
   });
 
   it("does not use the monogram as written application branding", () => {
@@ -35,6 +38,7 @@ describe("canonical platform branding", () => {
   it("keeps ownership wording out of repeated page-title suffixes", () => {
     expect(APP_BRANDS.studio.titleTemplate).toBe("%s | Studio");
     expect(APP_BRANDS.admin.titleTemplate).toBe("%s | Admin");
+    expect(APP_BRANDS.auth.titleTemplate).toBe("%s | Auth");
     expect(formatAppPageTitle("studio", "Weather")).not.toContain(" by ");
     expect(formatAppPageTitle("admin", "Deployments")).not.toContain(" by ");
   });

@@ -6,6 +6,7 @@ const APPLICATION_HOSTS: Record<ApplicationId, readonly string[]> = {
   portfolio: ["jayantgoyal.com", "www.jayantgoyal.com"],
   studio: ["studio.jayantgoyal.com"],
   admin: ["admin.jayantgoyal.com"],
+  auth: ["auth.jayantgoyal.com"],
 };
 
 export function normalizeHostname(host: string | null | undefined): string {

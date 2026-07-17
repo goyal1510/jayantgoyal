@@ -7,6 +7,7 @@
 #   portfolio: bash ../../scripts/ignore-build.sh apps/portfolio
 #   studio:    bash ../../scripts/ignore-build.sh apps/studio
 #   admin:     bash ../../scripts/ignore-build.sh apps/admin
+#   auth:      bash ../../scripts/ignore-build.sh apps/auth
 
 APP_DIR="${1:?Usage: ignore-build.sh <app-directory>}"
 
