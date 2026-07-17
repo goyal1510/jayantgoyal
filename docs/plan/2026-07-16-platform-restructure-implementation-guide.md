@@ -145,9 +145,9 @@ Only one task should be In Progress per implementation lane.
 |     3 | PLATFORM-11 | Studio product experience             | In Progress | Public discovery precedes product workspaces         |
 |     4 | PLATFORM-09 | Domain and route cutover              | In Progress | Root is Portfolio; product routes redirect to Studio |
 |     5 | PLATFORM-10 | Admin domain organization             | In Progress | Admin manages Portfolio, Studio, and System          |
-|     6 | PLATFORM-01 | Authentication regression foundation  | Pending     | No behavior change                                   |
-|     7 | PLATFORM-02 | Supabase dependency and SSR hardening | Pending     | Existing auth behavior preserved                     |
-|     8 | PLATFORM-03 | Extract `packages/auth`               | Pending     | Existing routes and cookies preserved                |
+|     6 | PLATFORM-01 | Authentication regression foundation  | In Progress | No behavior change                                   |
+|     7 | PLATFORM-02 | Supabase dependency and SSR hardening | In Progress | Existing auth behavior preserved                     |
+|     8 | PLATFORM-03 | Extract `packages/auth`               | In Progress | Existing routes and cookies preserved                |
 |     9 | PLATFORM-04 | Shared-cookie compatibility           | Pending     | Current apps understand the platform session         |
 |    10 | PLATFORM-05 | Auth dark launch                      | Pending     | Existing auth remains primary; Auth is testable      |
 |    11 | PLATFORM-06 | Canonical Auth cutover                | Pending     | New login/security flows use Auth                    |
@@ -315,7 +315,7 @@ Acceptance checks:
 ## Phase 1 — Authentication regression foundation
 
 Task ID: PLATFORM-01
-Status: Pending
+Status: In Progress
 Objective: Add enough automated and manual regression coverage to change authentication safely.
 Dependencies: PLATFORM-00 Done.
 Target files/surfaces: Current authentication flows in `apps/studio` and `apps/admin`; test tooling approved for the repository.
@@ -344,7 +344,7 @@ Acceptance checks:
 - [ ] Add global logout coverage where practical.
 - [ ] Add callback invalid-code behavior coverage.
 - [ ] Add recovery-link compatibility coverage.
-- [ ] Document provider flows that remain manual.
+- [x] Document provider and deployed flows that remain manual under ADR-008.
 
 ### Phase 1 exit gate
 
@@ -357,7 +357,7 @@ Acceptance checks:
 ## Phase 2 — Supabase dependency and SSR hardening
 
 Task ID: PLATFORM-02
-Status: Pending
+Status: In Progress
 Objective: Upgrade and validate Supabase SSR dependencies independently before extracting shared infrastructure.
 Dependencies: PLATFORM-01 Done.
 Target files/surfaces: Supabase dependencies, current server/browser clients, proxy cookie handling, cache headers.
@@ -375,13 +375,13 @@ Acceptance checks:
 
 ### Phase 2 checklist
 
-- [ ] Review current Supabase SSR and client release notes.
-- [ ] Upgrade in a dedicated PR.
-- [ ] Ensure no Supabase client is shared across requests.
-- [ ] Verify request and response cookies are both updated.
-- [ ] Verify responses setting cookies are private and non-cacheable.
-- [ ] Verify server authorization does not trust unvalidated `getSession()` user data.
-- [ ] Verify cookie deletion preserves original path/domain semantics.
+- [x] Review current Supabase SSR and client release notes.
+- [x] Upgrade in a dedicated Auth-foundation PR.
+- [x] Ensure no Supabase client is shared across requests.
+- [x] Verify request and response cookies are both updated.
+- [x] Verify responses setting cookies are private and non-cacheable.
+- [x] Verify server authorization does not trust unvalidated `getSession()` user data.
+- [x] Verify cookie deletion preserves original path/domain semantics.
 - [ ] Run all Phase 1 checks.
 - [ ] Deploy and observe before starting package extraction.
 
@@ -396,7 +396,7 @@ Acceptance checks:
 ## Phase 3 — Extract `packages/auth`
 
 Task ID: PLATFORM-03
-Status: Pending
+Status: In Progress
 Objective: Replace duplicated authentication infrastructure with a small shared package without changing routes, UI, or cookie behavior.
 Dependencies: PLATFORM-02 Done.
 Target files/surfaces: `packages/auth`, current main and Admin browser/server clients, proxy refresh helpers, claims and redirect utilities.
@@ -414,17 +414,17 @@ Acceptance checks:
 
 ### Phase 3 checklist
 
-- [ ] Define package subpath exports for browser, server, proxy, cookies, redirects, session, permissions, and types.
-- [ ] Move only duplicated browser client construction.
-- [ ] Move only duplicated per-request server client construction.
-- [ ] Move only duplicated refresh/cookie adapter behavior.
-- [ ] Add safe relative/origin redirect validation.
-- [ ] Add pure AAL and role predicates only if currently duplicated.
-- [ ] Keep Admin role lookup in Admin.
-- [ ] Keep route matchers in each application.
-- [ ] Keep authentication UI in current applications until Auth exists.
-- [ ] Remove replaced local infrastructure after both consumers pass.
-- [ ] Confirm the package deletes more code than it adds conceptually.
+- [x] Define only the proven `browser`, `server`, and `redirects` subpath exports; defer empty policy abstractions.
+- [x] Move only duplicated browser client construction.
+- [x] Move only duplicated per-request server client construction.
+- [x] Move only duplicated refresh/cookie adapter behavior.
+- [x] Add safe relative/origin redirect validation.
+- [x] Defer AAL and role predicates because they are not yet neutral duplication.
+- [x] Keep Admin role lookup in Admin.
+- [x] Keep route matchers in each application.
+- [x] Keep authentication UI in current applications until Auth exists.
+- [x] Remove replaced local infrastructure after both consumers pass locally.
+- [x] Confirm the package replaces duplicated infrastructure without absorbing application policy.
 
 ### Phase 3 exit gate
 

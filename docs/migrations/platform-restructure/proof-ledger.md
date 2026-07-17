@@ -49,12 +49,17 @@
 - ADR-006 superseded the persistent staging model. Cloudflare and Vercel read-backs confirm that the Portfolio, Studio, and Admin staging domains are absent; six branch-scoped Vercel variables were deleted; Supabase contains no staging callback; and the redundant remote branch was deleted only after it matched `origin/main` and had no open PR.
 - The previous build-rate-limit and pre-cutover canonical blockers are resolved. The open gates are authenticated product coverage, deployed responsive/browser evidence, controlled Production auth proof, rollback rehearsal, and observation.
 
-## PLATFORM-01 — Test foundation prepared; Auth execution deferred
+## PLATFORM-01 / PLATFORM-02 / PLATFORM-03 — Auth foundation in progress
 
 - Added repository-local Vitest `4.1.10` with a single `pnpm test` command and no production dependency.
 - Twelve focused tests pass across four files: Studio hostname classification, Vercel-host recognition, cross-application URL normalization, Portfolio/Studio redirect ownership, and contact validation that exits before delivery.
 - The host tests exposed and now prevent an empty-host regression where absent Vercel variables could classify a missing Host header as Studio.
-- Test fixtures contain no credentials, tokens, session data, or real delivery request. Provider, session, role, MFA, logout, and recovery regression coverage remains deferred with the rest of Auth under ADR-001; PLATFORM-01 is not Done.
+- Test fixtures contain no credentials, tokens, session data, or real delivery request. Provider, session, role, MFA, logout, and recovery regression coverage remains incomplete; PLATFORM-01 is not Done.
+- The Auth-foundation slice upgrades `@supabase/ssr` from `0.7.0` to `0.12.3` and `@supabase/supabase-js` from `2.84.0` to `2.110.7` after reviewing current official SSR client, cookie, and authorization guidance. The supported runtime floor is now Node.js 22.
+- `@repo/auth` owns only the neutral browser client, per-request/server client, refreshed-cookie/cache-header adapter, and safe same-origin return-path policy. Admin retains role/AAL2 enforcement; Studio retains terms, profile, product-access, and destination policy; privileged service-role clients remain application-local.
+- Studio and Admin callbacks, Proxies, welcome flows, and MFA continuations now reject external redirect destinations. Replacement MFA/recovery/error redirects retain refreshed cookies and Supabase's private/no-cache headers without copying the old `Location` header.
+- Focused tests cover malicious return paths, refreshed cookie/header writes, and cache-header propagation; the final focused pass completed 10 tests across two files. The full pre-review local pass completed 61 tests across 15 files, all eight zero-warning lint and typecheck tasks, and the full Portfolio/Studio/Admin monorepo build. Targeted Auth, Studio, and Admin typechecks and zero-warning lint passed again after the final response-propagation correction; the expensive full suite was not repeated. The production-dependency audit reports no known vulnerabilities.
+- ADR-008 freezes UI work and assigns browser, Preview, Production, and observation checks to the user's manual deployment pass. These phases remain In Progress until their remaining automated contract coverage and required manual acceptance are recorded.
 
 ## Cross-phase security gate — In Progress
 
