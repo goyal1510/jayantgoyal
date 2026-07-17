@@ -11,7 +11,7 @@
 | Portfolio   | `apps/portfolio`    | Independent project; apex cutover completed after dark-launch validation | `jayantgoyal.com`        |
 | Studio      | `apps/studio`       | Existing product project renamed and repointed to Studio immediately     | `studio.jayantgoyal.com` |
 | Admin       | `apps/admin`        | Existing independent Vercel project                                      | `admin.jayantgoyal.com`  |
-| Auth        | `apps/auth`         | Independent Vercel project linked; custom domain awaits Cloudflare DNS   | `auth.jayantgoyal.com`   |
+| Auth        | `apps/auth`         | Independent project linked; domain and DNS ready; first deployment waits on provider quota | `auth.jayantgoyal.com`   |
 
 `www.jayantgoyal.com` redirects to the apex canonical URL. The existing e-commerce Vercel projects and domains remain outside this platform restructure.
 
@@ -89,3 +89,18 @@ Development, Preview, and Production, set to `legacy`. Preview cookies remain
 host-only. Production receives the parent Domain only after the explicit mode
 switch; localhost uses an unprefixed host-only name without Secure so ports
 `3001` through `3003` can share it without violating `__Secure-` prefix rules.
+
+## Auth entry ownership timing
+
+`NEXT_PUBLIC_AUTH_FLOW_OWNER` is a separate non-sensitive build-time switch for
+new login entry traffic. `legacy` is the default and rollback value; `auth`
+hands Studio/Admin `/welcome` entry requests to canonical Auth while preserving
+an exact validated absolute return destination. `NEXT_PUBLIC_AUTH_URL` is
+restricted in code to `https://auth.jayantgoyal.com` or local Auth port `3003`;
+invalid and lookalike values fall back to canonical Production Auth.
+
+The entry-owner flag and the session-mode flag are intentionally independent.
+No environment may enable the Auth owner until the Auth deployment is ready and
+the compatible shared-session mode for that environment has passed its required
+acceptance. Reverting the owner to `legacy` restores the existing Studio/Admin
+login entry without deleting sessions or compatibility routes.

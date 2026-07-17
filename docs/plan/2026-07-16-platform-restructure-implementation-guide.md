@@ -550,7 +550,7 @@ Acceptance checks:
 - [x] Exact Auth Vercel project, monorepo root, Git repository, and build/install settings verified.
 - [x] Minimal Development, Preview, and Production public environment inventory created without a service-role key.
 - [x] `auth.jayantgoyal.com` assigned to the Auth Vercel project.
-- [ ] Cloudflare DNS routes `auth.jayantgoyal.com` to Vercel.
+- [x] Cloudflare DNS routes `auth.jayantgoyal.com` to Vercel.
 - [x] Auth Preview callback family added to the hosted Supabase redirect allowlist without changing the Site URL.
 - [x] TOTP enrollment/verification and authenticated manual identity linking enabled.
 - [ ] First Git production deployment reaches a terminal ready state.
@@ -579,6 +579,8 @@ Acceptance checks:
 
 ### Phase 6 rollout checklist
 
+- [x] Add a default-off Auth owner switch with an immediate `legacy` rollback.
+- [x] Preserve exact Studio/Admin return destinations at the Auth handoff.
 - [ ] Add Auth links while current auth remains active.
 - [ ] Enable Auth redirects for a controlled cohort/environment.
 - [ ] Validate password login.

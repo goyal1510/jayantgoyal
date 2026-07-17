@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { safeReturnPath } from "@repo/auth/redirects";
+import { buildAuthLoginUrl, resolveAuthFlowOwner } from "@repo/auth/entry";
 import {
   copyAuthCacheHeaders,
   createSupabaseRequestClient,
@@ -26,6 +27,15 @@ function withAuthState(source: NextResponse, target: NextResponse) {
 
 export default async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+
+  if (pathname === "/welcome" && resolveAuthFlowOwner() === "auth") {
+    return NextResponse.redirect(
+      buildAuthLoginUrl({
+        requestUrl: request.url,
+        returnPath: request.nextUrl.searchParams.get("redirect"),
+      }),
+    );
+  }
 
   // Skip proxy for static asset files (matcher regex may not catch all cases)
   if (/\.(?:svg|png|jpg|jpeg|gif|webp|webmanifest|pdf|ico)$/i.test(pathname)) {
