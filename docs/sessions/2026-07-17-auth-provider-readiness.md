@@ -31,9 +31,13 @@
   displaying secret values.
 - Hosted Supabase settings were read back and confirm the intended four fields;
   Google and email recovery configuration were already valid.
-- A direct Git-source deployment request was rejected by Vercel's daily API
-  deployment quota before creation. The first Git deployment is expected from
-  this setup change reaching `main`.
+- A direct Git-source deployment request and the PR's Git Preview check were
+  both rejected by Vercel's account-wide daily deployment/build rate limit
+  before an Auth deployment was created. Vercel reports retry in 24 hours; no
+  application failure or deployment identifier exists yet.
+- Verified the project-level ignored-build command for all four platform
+  projects. Portfolio and Auth now join the existing Studio/Admin setup, using
+  the same detector with their own exact app directories.
 - Remaining: Cloudflare DNS, first Git deployment status, user-owned Auth flow
   acceptance, controlled Production dark launch, rollback capture, and
   observation.

@@ -132,10 +132,12 @@
   35 targeted Auth tests across five files, Auth TypeScript, and zero-warning
   Auth lint pass after the split. The complete expensive gate was not repeated
   after these narrowly scoped corrections under ADR-008.
-- A direct deployment API request was rejected by Vercel's account-level daily
-  API deployment quota before any deployment was created. The Git integration
-  remains available for the first deployment after this setup commit reaches
-  `main`; this is an operational limit, not an application failure.
+- A direct deployment API request and the subsequent Git Preview check were
+  rejected by Vercel's account-wide daily deployment/build rate limit before an
+  Auth deployment was created. Vercel reports retry in 24 hours; this is an
+  operational limit, not an application build failure. Portfolio, Studio,
+  Admin, and Auth now all use their exact `scripts/ignore-build.sh` project
+  settings to avoid consuming future capacity on unrelated changes.
 - Remaining gates: Cloudflare DNS, first Git deployment, user-owned generated
   Preview application-local flows, controlled Production dark launch, manual
   browser acceptance, deployment/rollback identifiers, and observation.
