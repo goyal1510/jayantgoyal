@@ -78,11 +78,17 @@ Shared Auth/SSO remains intentionally last. Until that cutover, the existing Stu
 - `/logout`
 - `/error`
 
-No Portfolio, Studio, or Admin redirect points to Auth during this local slice.
-The existing Studio compatibility routes above remain authoritative until the
-PLATFORM-06 cutover flag is approved. Auth accepts only relative destinations,
-canonical platform origins, local ports, and explicitly configured exact
-Preview origins; it does not accept wildcard return hosts.
+No Portfolio, Studio, or Admin redirect points to Auth during provider
+readiness. The existing Studio compatibility routes above remain authoritative
+until the PLATFORM-06 cutover flag is approved. Auth accepts only relative
+destinations, canonical platform origins, local ports, and explicitly
+configured exact Preview origins; it does not accept wildcard return hosts.
+
+The hosted Supabase redirect allowlist separately includes the generated Auth
+Preview family required for provider callbacks. This provider-side wildcard is
+not trusted as an application `return_to` destination. The Auth production
+domain is assigned in Vercel but cannot receive traffic until its Cloudflare DNS
+record exists.
 
 ## Studio API redirects
 

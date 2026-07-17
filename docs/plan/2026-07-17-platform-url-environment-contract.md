@@ -11,7 +11,7 @@
 | Portfolio   | `apps/portfolio`    | Independent project; apex cutover completed after dark-launch validation | `jayantgoyal.com`        |
 | Studio      | `apps/studio`       | Existing product project renamed and repointed to Studio immediately     | `studio.jayantgoyal.com` |
 | Admin       | `apps/admin`        | Existing independent Vercel project                                      | `admin.jayantgoyal.com`  |
-| Auth        | `apps/auth`         | Local dark-launch app exists; Vercel project/domain remain unlinked      | `auth.jayantgoyal.com`   |
+| Auth        | `apps/auth`         | Independent Vercel project linked; custom domain awaits Cloudflare DNS   | `auth.jayantgoyal.com`   |
 
 `www.jayantgoyal.com` redirects to the apex canonical URL. The existing e-commerce Vercel projects and domains remain outside this platform restructure.
 
@@ -36,7 +36,11 @@ Studio is a single-purpose application at `apps/studio`; it no longer renders Po
 | Admin     | Not configured                     | Resolve the actual browser origin                          | Not configured                    |
 | Auth      | `http://localhost:3003`            | Generated origin after provider linking                    | `https://auth.jayantgoyal.com`    |
 
-`NEXT_PUBLIC_SITE_URL` is public configuration and must not be treated as a secret. All sensitive values remain server-only. Portfolio and Auth environment inventories intentionally omit a service-role key. Auth's source inventory exists now; hosted values are not created until the reviewed provider-linking step.
+`NEXT_PUBLIC_SITE_URL` is public configuration and must not be treated as a
+secret. All sensitive values remain server-only. Portfolio and Auth environment
+inventories intentionally omit a service-role key. Auth now has the minimum
+hosted public inventory across Development, Preview, and Production; Preview
+intentionally omits a fixed `NEXT_PUBLIC_SITE_URL`.
 
 Auth additionally consumes exact public cross-application origins and an
 optional comma-separated `NEXT_PUBLIC_AUTH_RETURN_ORIGINS` list for generated
@@ -58,6 +62,12 @@ Studio uses `NEXT_PUBLIC_STUDIO_URL` for its own canonical metadata and discover
 The hosted Auth Site URL is `https://jayantgoyal.com`. Its allowlist contains the production platform origins, local ports, and narrowly scoped current Studio/Admin Vercel preview hostname families. Obsolete pre-rename and staging callback families are not retained. The code must still stop placing `next` in the OAuth `redirectTo` URL and preserve the validated destination server-side before the compatibility wildcards can be narrowed further.
 
 When Auth is dark-launched, the Site URL moves to `https://auth.jayantgoyal.com`. Auth callback URLs become canonical while legacy Main, Studio, and Admin callbacks remain allowlisted for the defined compatibility window.
+
+Provider-readiness now includes the exact generated Auth Preview family,
+`https://jayantgoyal-auth-*-jayants-projects-8c2f7bf9.vercel.app/**`, in the
+hosted Supabase redirect allowlist. TOTP enrollment/verification and manual
+identity linking are enabled. The hosted Site URL deliberately remains
+`https://jayantgoyal.com` until the controlled Production dark launch.
 
 Do not run a blanket `supabase config push` from an ordinary worktree: the repository `supabase/config.toml` describes local development and must not overwrite hosted Auth configuration. Hosted Auth changes use a reviewed Management API patch containing only the intended fields, followed by a read-only verification.
 

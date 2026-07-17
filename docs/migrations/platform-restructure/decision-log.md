@@ -129,3 +129,14 @@
 - Consequences: PLATFORM-05 becomes In Progress but cannot be Done until the user completes generated-Preview and controlled Production dark-launch acceptance. Existing Studio/Admin auth remains the rollback path and default owner.
 - Code or abstraction deleted/avoided: no placeholder Vercel project, DNS record, broad Preview wildcard, service-role dependency, GET logout, duplicated session registry, or default redirect to an unverified app.
 - Revisit trigger: local Auth contracts fail, shared-session Production proof contradicts the Auth assumptions, or the user authorizes the provider-linking and manual acceptance step.
+
+## ADR-011 — Link Auth providers without changing the live auth owner
+
+- Date: 2026-07-17
+- Status: Accepted
+- Task IDs: PLATFORM-05, PLATFORM-06
+- Context: The reviewed Auth boundary is merged, while the user wants setup work to continue without Codex browser or post-deployment functional testing.
+- Decision: create and Git-link the exact `jayantgoyal-auth` Vercel project at `apps/auth`, add only its public environment contract, assign `auth.jayantgoyal.com`, and apply a scoped hosted Supabase patch for the Auth Preview callback family, TOTP, and manual identity linking. Keep the hosted Supabase Site URL on Portfolio and leave Studio/Admin routes and `legacy` session mode unchanged.
+- Consequences: provider infrastructure can be deployed and tested manually without making Auth canonical. Missing Cloudflare DNS prevents accidental Production traffic. Generated Preview and Production acceptance remain user-owned under ADR-008.
+- Rollback: remove the Auth project-domain assignment and Preview callback family, disable TOTP/manual linking only if they cause a verified regression, and leave the existing Site URL and Studio/Admin auth routes untouched.
+- Revisit trigger: the first Git deployment is ready, Cloudflare DNS authority is available, or manual acceptance reports a provider/session mismatch.

@@ -240,16 +240,19 @@ Configure in `.env.local` files per app. See `.env.example` in each app for the 
 
 Most secret/provider values are shared across Vercel targets, but application URL variables are environment-specific. Development uses local ports, Preview uses Vercel-generated deployment origins, and Production uses each application's canonical host. There is no persistent staging branch, staging domain, or branch-scoped environment layer. Add every new variable only to the applications and targets that consume it.
 
-**Vercel CLI setup** — the deployed apps are linked. To sync envs locally:
+**Vercel CLI setup** — use the repository-local CLI. Link the exact project in
+the task worktree before pulling its local environment:
 
 ```bash
-cd apps/portfolio && vercel env pull .env.local
-cd apps/studio && vercel env pull .env.local
-cd apps/admin && vercel env pull .env.local
+cd apps/portfolio && pnpm exec vercel link --yes --project jayantgoyal-portfolio && pnpm exec vercel env pull .env.local
+cd apps/studio && pnpm exec vercel link --yes --project jayantgoyal-studio && pnpm exec vercel env pull .env.local
+cd apps/admin && pnpm exec vercel link --yes --project jayantgoyal-admin && pnpm exec vercel env pull .env.local
+cd apps/auth && pnpm exec vercel link --yes --project jayantgoyal-auth && pnpm exec vercel env pull .env.local
 ```
 
-Auth remains intentionally unlinked during its local dark-launch slice. Add an
-Auth Vercel link only in the reviewed PLATFORM-05 provider step.
+Auth is provider-linked but not canonical. Its Production domain still depends
+on Cloudflare DNS, and Studio/Admin remain the live auth owners until the
+PLATFORM-06 cutover gate.
 
 ### Studio App (`apps/studio/.env.local`)
 
