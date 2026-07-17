@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { resolveAuthReturnTarget } from "./returns";
+import { buildSignedOutLoginUrl, resolveAuthReturnTarget } from "./returns";
 
 describe("Auth return targets", () => {
   it("accepts canonical platform destinations", () => {
@@ -34,5 +34,25 @@ describe("Auth return targets", () => {
         "https://auth.jayantgoyal.com",
       ),
     ).toBe("/account/security");
+  });
+
+  it("keeps a validated application destination through canonical logout", () => {
+    expect(
+      buildSignedOutLoginUrl({
+        value: "https://admin.jayantgoyal.com/users",
+        requestOrigin: "https://auth.jayantgoyal.com",
+      }),
+    ).toBe(
+      "https://auth.jayantgoyal.com/login?signed_out=true&return_to=https%3A%2F%2Fadmin.jayantgoyal.com%2Fusers",
+    );
+  });
+
+  it("drops an unsafe logout destination", () => {
+    expect(
+      buildSignedOutLoginUrl({
+        value: "https://evil.example/phish",
+        requestOrigin: "https://auth.jayantgoyal.com",
+      }),
+    ).toBe("https://auth.jayantgoyal.com/login?signed_out=true");
   });
 });

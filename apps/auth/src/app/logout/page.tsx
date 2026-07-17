@@ -1,12 +1,19 @@
 import type { Metadata } from "next";
 
 import { logoutAction } from "@/app/actions/logout";
+import { resolveAuthReturnTarget } from "@/lib/auth/returns";
 import { AuthCard, AuthPageShell } from "@repo/ui/auth-presentation";
 import { Button } from "@repo/ui/button";
 
 export const metadata: Metadata = { title: "Sign out" };
 
-export default function LogoutPage() {
+export default async function LogoutPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ return_to?: string }>;
+}) {
+  const { return_to: returnTo } = await searchParams;
+  const safeReturnTo = resolveAuthReturnTarget(returnTo, undefined, "/login");
   return (
     <AuthPageShell>
       <AuthCard>
@@ -17,12 +24,14 @@ export default function LogoutPage() {
           </p>
           <form action={logoutAction}>
             <input type="hidden" name="scope" value="local" />
+            <input type="hidden" name="return_to" value={safeReturnTo} />
             <Button type="submit" className="w-full">
               Sign out this session
             </Button>
           </form>
           <form action={logoutAction}>
             <input type="hidden" name="scope" value="global" />
+            <input type="hidden" name="return_to" value={safeReturnTo} />
             <Button type="submit" variant="destructive" className="w-full">
               Sign out everywhere
             </Button>

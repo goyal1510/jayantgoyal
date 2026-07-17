@@ -2,7 +2,9 @@ import { afterAll, describe, expect, it, vi } from "vitest";
 
 import {
   CANONICAL_AUTH_ORIGIN,
+  buildAuthAccountSecurityUrl,
   buildAuthLoginUrl,
+  buildAuthLogoutUrl,
   resolveAuthApplicationOrigin,
   resolveAuthFlowOwner,
 } from "./entry";
@@ -58,6 +60,27 @@ describe("canonical Auth entry ownership", () => {
 
     expect(login.searchParams.get("return_to")).toBe(
       "https://admin.jayantgoyal.com/",
+    );
+  });
+
+  it("preserves the exact application context for account security", () => {
+    const settings = buildAuthAccountSecurityUrl({
+      requestUrl: "https://admin.jayantgoyal.com/users?role=admin#active",
+    });
+
+    expect(settings.toString()).toBe(
+      "https://auth.jayantgoyal.com/account/security?return_to=https%3A%2F%2Fadmin.jayantgoyal.com%2Fusers%3Frole%3Dadmin%23active",
+    );
+  });
+
+  it("preserves the exact application context for canonical logout", () => {
+    const logout = buildAuthLogoutUrl({
+      requestUrl: "http://localhost:3001/files?folder=one",
+      authOrigin: "http://localhost:3003",
+    });
+
+    expect(logout.toString()).toBe(
+      "http://localhost:3003/logout?return_to=http%3A%2F%2Flocalhost%3A3001%2Ffiles%3Ffolder%3Done",
     );
   });
 });

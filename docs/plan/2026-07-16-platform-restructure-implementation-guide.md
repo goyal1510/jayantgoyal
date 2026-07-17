@@ -583,7 +583,8 @@ Acceptance checks:
 
 - [x] Add a default-off Auth owner switch with an immediate `legacy` rollback.
 - [x] Preserve exact Studio/Admin return destinations at the Auth handoff.
-- [ ] Add Auth links while current auth remains active.
+- [x] Add default-off Auth login, account-security, and logout destinations
+      while current auth remains active.
 - [ ] Enable Auth redirects for a controlled cohort/environment.
 - [ ] Validate password login.
 - [ ] Validate Google login.
