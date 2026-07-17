@@ -116,6 +116,20 @@
 - Public DNS resolves `studio.jayantgoyal.com` to Vercel, direct HTTPS checks return `200`, and the apex still redirects to the existing `www` Portfolio with no Studio marker.
 - Studio is independently available through generated Vercel previews and `studio.jayantgoyal.com`; no stable Preview domain is retained.
 - Local verification after the physical rename passes: 11 focused Vitest tests, Studio TypeScript, zero-warning ESLint, and the Studio production build. The merged boundary is deployed; PLATFORM-07 and PLATFORM-11 remain open until responsive/auth-gated product transitions and the rollback/observation gates are verified.
+- PLATFORM-11 discovery now separates the intentional featured set on Studio
+  Home from a public `/products` catalog and static product-detail pages. Each
+  product declares type, status, access requirement, capability, highlights,
+  and launch destination before opening its existing public, account-backed, or
+  external experience. Blog remains a Portfolio-owned navigation link rather
+  than a Studio product. ADR-007 preserves the user-approved shared Studio shell
+  on discovery pages without moving product permissions or workspace data into
+  the shared UI package.
+- The discovery slice passes 13 Vitest files and 52 tests, Studio zero-warning
+  lint, TypeScript, and a production build. Chrome production-mode checks cover
+  desktop and mobile discovery, type filtering, public/account/external details,
+  canonical product JSON-LD, and the account launch gate; the final browser log
+  contains no warnings or errors. Preview/Production deployment and observation
+  proof remain pending, so PLATFORM-11 remains In Progress.
 
 ## PLATFORM-09 — Domain cutover in progress
 
