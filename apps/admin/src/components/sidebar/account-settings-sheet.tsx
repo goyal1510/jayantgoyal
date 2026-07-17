@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Trash2, Eye, EyeOff, Info } from "lucide-react"
 
 import { Button } from "@repo/ui/button"
+import { signOutSession } from "@repo/auth/logout"
 import { Input } from "@repo/ui/input"
 import { Label } from "@repo/ui/label"
 import {
@@ -145,7 +146,7 @@ export function AccountSettingsSheet({
         }
 
         const supabase = createSupabaseBrowserClient()
-        await supabase.auth.signOut()
+        await signOutSession(supabase, "global")
         toast.success("Account deleted.")
         onClose()
         router.push("/")

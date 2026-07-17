@@ -49,12 +49,13 @@ export async function GET(request: NextRequest) {
     response.cookies.set("auth_redirect", "", { path: "/", maxAge: 0 });
   }
 
-  const supabase = createSupabaseRequestClient({
+  const supabase = await createSupabaseRequestClient({
     supabaseUrl,
     supabaseAnonKey,
     requestCookies: request.cookies,
     responseCookies: response.cookies,
     responseHeaders: response.headers,
+    hostname: request.nextUrl.hostname,
   });
 
   // Handle PKCE flow (code-based) — used by Google OAuth and email verification

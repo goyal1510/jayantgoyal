@@ -52,12 +52,13 @@ export default async function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  const supabase = createSupabaseRequestClient({
+  const supabase = await createSupabaseRequestClient({
     supabaseUrl,
     supabaseAnonKey,
     requestCookies: request.cookies,
     responseCookies: response.cookies,
     responseHeaders: response.headers,
+    hostname: request.nextUrl.hostname,
   });
 
   const {
