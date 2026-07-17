@@ -474,6 +474,8 @@ If the Supabase storage format or chunking prevents safe promotion, choose one e
 - [x] Approve the versioned production cookie name.
 - [x] Add environment-specific cookie configuration.
 - [x] Prove cookie deletion uses matching Domain and Path.
+- [x] Prove Proxy, fast-path layout, and Server Component consumers select the
+      rollout-mode cookie family consistently in local deterministic tests.
 - [ ] Prove Studio/current main and Admin read the same session.
 - [x] Prove Admin still rejects non-admin users locally.
 - [x] Prove Admin still requires AAL2 locally.

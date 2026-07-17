@@ -1,5 +1,10 @@
 import type { ReactNode } from "react";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
+
+import {
+  hasAuthSessionCookie,
+  resolveAuthSessionMode,
+} from "@repo/auth/cookies";
 
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { DynamicBreadcrumb } from "@/components/sidebar/dynamic-breadcrumb";
@@ -24,18 +29,18 @@ export default async function ProtectedLayout({
 }: {
   children: ReactNode;
 }) {
-  const cookieStore = await cookies();
+  const [cookieStore, headerStore] = await Promise.all([cookies(), headers()]);
 
   // Check auth via cookie — zero network cost (no getUser() call)
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-  const projectRef = supabaseUrl
-    ? new URL(supabaseUrl).hostname.split(".")[0]
-    : "";
-  const tokenName = `sb-${projectRef}-auth-token`;
-  const isAuthenticated = Boolean(
-    cookieStore.get(tokenName)?.value ??
-      cookieStore.get(`${tokenName}.0`)?.value,
-  );
+  const isAuthenticated = supabaseUrl
+    ? hasAuthSessionCookie({
+        supabaseUrl,
+        hostname: headerStore.get("host"),
+        mode: resolveAuthSessionMode(),
+        cookies: cookieStore.getAll(),
+      })
+    : false;
   const sidebarPreferences = parseSidebarPreferences({
     state: cookieStore.get(SIDEBAR_STATE_COOKIE_NAME)?.value,
     width: cookieStore.get(SIDEBAR_WIDTH_COOKIE_NAME)?.value,

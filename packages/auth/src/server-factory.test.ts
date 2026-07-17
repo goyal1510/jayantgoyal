@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   PLATFORM_SESSION_COOKIE_DOMAIN,
@@ -13,7 +13,10 @@ vi.mock("@supabase/ssr", () => ({
   createServerClient: createServerClientMock,
 }));
 
-import { createSupabaseRequestClient } from "./server";
+import {
+  createSupabaseRequestClient,
+  createSupabaseServerComponentClient,
+} from "./server";
 
 function createClient({
   userId = "test-user",
@@ -45,6 +48,12 @@ const responseHeaders = { set: vi.fn() };
 
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://project-ref.supabase.co");
+  vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "synthetic-anon-key");
+});
+
+afterAll(() => {
+  vi.unstubAllEnvs();
 });
 
 describe("createSupabaseRequestClient session selection", () => {
@@ -206,5 +215,74 @@ describe("createSupabaseRequestClient session selection", () => {
     expect(adminResult).toBe(adminLegacyClient);
     expect(studioPlatformClient.auth.getUser).toHaveBeenCalledOnce();
     expect(adminPlatformClient.auth.getUser).not.toHaveBeenCalled();
+  });
+});
+
+describe("createSupabaseServerComponentClient session selection", () => {
+  it("reads the legacy session on the first compatibility request", () => {
+    const legacyClient = createClient();
+    createServerClientMock.mockReturnValue(legacyClient);
+
+    const result = createSupabaseServerComponentClient(
+      {
+        getAll: () => [
+          { name: "sb-project-ref-auth-token.0", value: "synthetic" },
+        ],
+        set: vi.fn(),
+      },
+      { hostname: "admin.jayantgoyal.com", sessionMode: "compatibility" },
+    );
+
+    expect(result).toBe(legacyClient);
+    expect(createServerClientMock.mock.calls[0]?.[2]?.cookieOptions).toEqual({
+      name: "sb-project-ref-auth-token",
+    });
+  });
+
+  it("prefers the platform session when both cookie families exist", () => {
+    const platformClient = createClient();
+    createServerClientMock.mockReturnValue(platformClient);
+
+    createSupabaseServerComponentClient(
+      {
+        getAll: () => [
+          { name: "sb-project-ref-auth-token", value: "legacy" },
+          { name: PLATFORM_SESSION_COOKIE_NAME, value: "platform" },
+        ],
+        set: vi.fn(),
+      },
+      { hostname: "studio.jayantgoyal.com", sessionMode: "compatibility" },
+    );
+
+    expect(createServerClientMock.mock.calls[0]?.[2]?.cookieOptions).toEqual({
+      name: PLATFORM_SESSION_COOKIE_NAME,
+      domain: PLATFORM_SESSION_COOKIE_DOMAIN,
+      path: "/",
+      sameSite: "lax",
+      secure: true,
+    });
+  });
+
+  it("does not fall back to legacy state in platform mode", () => {
+    const platformClient = createClient();
+    createServerClientMock.mockReturnValue(platformClient);
+
+    createSupabaseServerComponentClient(
+      {
+        getAll: () => [
+          { name: "sb-project-ref-auth-token", value: "legacy" },
+        ],
+        set: vi.fn(),
+      },
+      { hostname: "auth.jayantgoyal.com", sessionMode: "platform" },
+    );
+
+    expect(createServerClientMock.mock.calls[0]?.[2]?.cookieOptions).toEqual({
+      name: PLATFORM_SESSION_COOKIE_NAME,
+      domain: PLATFORM_SESSION_COOKIE_DOMAIN,
+      path: "/",
+      sameSite: "lax",
+      secure: true,
+    });
   });
 });

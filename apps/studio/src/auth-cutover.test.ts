@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { readFileSync } from "node:fs";
 import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 import studioProxy from "./proxy";
@@ -15,6 +16,17 @@ afterAll(() => {
 });
 
 describe("Studio Auth entry cutover", () => {
+  it("keeps the protected layout on the shared session-cookie contract", () => {
+    const layout = readFileSync(
+      new URL("./app/(protected)/layout.tsx", import.meta.url),
+      "utf8",
+    );
+
+    expect(layout).toContain("hasAuthSessionCookie");
+    expect(layout).toContain("resolveAuthSessionMode");
+    expect(layout).not.toContain("sb-${projectRef}-auth-token");
+  });
+
   it("keeps the local welcome route in rollback mode", async () => {
     const response = await studioProxy(
       new NextRequest("https://studio.jayantgoyal.com/welcome?redirect=%2Ffiles"),
