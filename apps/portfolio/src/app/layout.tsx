@@ -7,6 +7,11 @@ import Script from "next/script";
 
 import { Toaster } from "@repo/ui/sonner";
 import { LazyMotionProvider } from "@repo/ui/lazy-motion-provider";
+import {
+  SIDEBAR_STATE_COOKIE_NAME,
+  SIDEBAR_WIDTH_COOKIE_NAME,
+  parseSidebarPreferences,
+} from "@repo/ui/lib/sidebar-preferences";
 import { SidebarInset, SidebarProvider } from "@repo/ui/sidebar";
 import { ThemeProvider } from "@repo/ui/theme-provider";
 
@@ -104,9 +109,10 @@ export default async function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   const { data, profile, host, source } = await getPortfolioDataFromHeaders();
   const cookieStore = await cookies();
-  const defaultOpen = cookieStore.get("sidebar_state")?.value !== "false";
-  const defaultWidth =
-    Number(cookieStore.get("sidebar_width")?.value) || undefined;
+  const sidebarPreferences = parseSidebarPreferences({
+    state: cookieStore.get(SIDEBAR_STATE_COOKIE_NAME)?.value,
+    width: cookieStore.get(SIDEBAR_WIDTH_COOKIE_NAME)?.value,
+  });
   const personJsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
@@ -145,10 +151,7 @@ export default async function RootLayout({
             host={host}
             source={source}
           >
-            <SidebarProvider
-              defaultOpen={defaultOpen}
-              defaultWidth={defaultWidth}
-            >
+            <SidebarProvider {...sidebarPreferences}>
               <PortfolioSidebar />
               <SidebarInset>
                 <PortfolioTopbar />

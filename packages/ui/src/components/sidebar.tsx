@@ -6,6 +6,12 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { PanelLeftIcon } from "lucide-react"
 
 import { useIsMobile } from "../hooks/use-mobile"
+import {
+  SIDEBAR_DEFAULT_WIDTH,
+  SIDEBAR_STATE_COOKIE_NAME,
+  SIDEBAR_WIDTH_COOKIE_NAME,
+  clampSidebarWidth,
+} from "../lib/sidebar-preferences"
 import { cn } from "../lib/utils"
 import { Button } from "./button"
 import { Input } from "./input"
@@ -25,15 +31,10 @@ import {
   TooltipTrigger,
 } from "./tooltip"
 
-const SIDEBAR_COOKIE_NAME = "sidebar_state"
-const SIDEBAR_WIDTH_COOKIE_NAME = "sidebar_width"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 const SIDEBAR_WIDTH_MOBILE = "18rem"
 const SIDEBAR_WIDTH_ICON = "3rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
-const SIDEBAR_MIN_WIDTH = 200
-const SIDEBAR_MAX_WIDTH = 480
-const SIDEBAR_DEFAULT_WIDTH = 256
 
 type SidebarContextProps = {
   state: "expanded" | "collapsed"
@@ -80,11 +81,11 @@ function SidebarProvider({
   const [isResizing, setIsResizing] = React.useState(false)
 
   const [sidebarWidth, _setSidebarWidth] = React.useState(
-    Math.max(SIDEBAR_MIN_WIDTH, Math.min(SIDEBAR_MAX_WIDTH, defaultWidth))
+    clampSidebarWidth(defaultWidth)
   )
 
   const setSidebarWidth = React.useCallback((width: number) => {
-    const clamped = Math.max(SIDEBAR_MIN_WIDTH, Math.min(SIDEBAR_MAX_WIDTH, width))
+    const clamped = clampSidebarWidth(width)
     _setSidebarWidth(clamped)
   }, [])
 
@@ -102,7 +103,7 @@ function SidebarProvider({
       }
 
       // This sets the cookie to keep the sidebar state.
-      document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
+      document.cookie = `${SIDEBAR_STATE_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
     },
     [setOpenProp, open]
   )
@@ -341,7 +342,7 @@ function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
           newWidth = window.innerWidth - moveEvent.clientX
         }
 
-        newWidth = Math.max(SIDEBAR_MIN_WIDTH, Math.min(SIDEBAR_MAX_WIDTH, newWidth))
+        newWidth = clampSidebarWidth(newWidth)
         setSidebarWidth(newWidth)
 
         // Update CSS variable directly for smooth performance
@@ -365,7 +366,7 @@ function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
           } else {
             finalWidth = window.innerWidth - upEvent.clientX
           }
-          finalWidth = Math.max(SIDEBAR_MIN_WIDTH, Math.min(SIDEBAR_MAX_WIDTH, finalWidth))
+          finalWidth = clampSidebarWidth(finalWidth)
           setSidebarWidth(finalWidth)
           document.cookie = `${SIDEBAR_WIDTH_COOKIE_NAME}=${finalWidth}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
         } else {

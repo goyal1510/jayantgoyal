@@ -14,10 +14,8 @@ import {
 
 import { NavUser } from "@/components/sidebar/nav-user";
 import {
-  portfolioNavItems,
-  blogNavItems,
-  adminNavItems,
-  deploymentNavItems,
+  getVisibleAdminNavigationDomains,
+  isAdminNavigationItemActive,
 } from "@/lib/config/nav-config";
 import type { NavItem } from "@/lib/config/nav-config";
 import type { AuthUser } from "@/lib/types";
@@ -43,34 +41,14 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
     label: item.label,
     href: item.href,
     icon: item.icon,
-    isActive: pathname === item.href,
+    isActive: isAdminNavigationItemActive(pathname, item),
   });
-  const sections: ApplicationNavigationSection[] = [
-    {
-      id: "portfolio",
-      label: "Portfolio",
-      items: portfolioNavItems.map(navigationItem),
-    },
-    {
-      id: "blog",
-      label: "Blog",
-      items: blogNavItems.map(navigationItem),
-    },
-    ...(user.role === "super_admin"
-      ? [
-          {
-            id: "deployments",
-            label: "Deployments",
-            items: deploymentNavItems.map(navigationItem),
-          },
-          {
-            id: "administration",
-            label: "Administration",
-            items: adminNavItems.map(navigationItem),
-          },
-        ]
-      : []),
-  ];
+  const sections: ApplicationNavigationSection[] =
+    getVisibleAdminNavigationDomains(user.role).map((domain) => ({
+      id: domain.id,
+      label: domain.label,
+      items: domain.items.map(navigationItem),
+    }));
 
   return (
     <ApplicationSidebarFrame

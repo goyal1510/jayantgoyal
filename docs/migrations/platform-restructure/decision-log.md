@@ -51,3 +51,16 @@
 - Consequences: a visual or accessibility correction to common chrome can be applied once. Shared components accept data and callbacks; they do not fetch sessions, infer roles, or decide destinations. `packages/auth` remains deferred until the shared-session phases.
 - Code or abstraction deleted/avoided: duplicated theme/motion/loading providers, duplicated sidebar/header/breadcrumb renderers, duplicated login-card controls, and the rejected global navigation-policy object.
 - Revisit trigger: a second application independently proves an additional behavior-neutral pattern, or a shared component begins accumulating application-specific conditionals.
+
+## ADR-005 — Continue post-merge work in focused PRs
+
+- Date: 2026-07-17
+- Status: Accepted
+- Task IDs: PLATFORM-07 through PLATFORM-12
+- Context: The user explicitly requested that the completed application split be merged. PR #39 is now merged as commit `4703e7c83d0b92935dc8dd10a3535a2f7d51a426`, so ADR-002's single open-PR rollback surface no longer exists.
+- Options considered: reopen or rewrite the merged history; continue directly on `main`; or preserve the merged boundary and use focused post-merge PRs for the remaining program work.
+- Decision: preserve PR #39 and continue from current `origin/main` in focused, phase-sized PRs with reviewable commits, proof updates, and explicit rollback notes. Avoid PR-per-file churn; one coherent shared-foundation or phase slice remains the preferred unit.
+- Why this is the smallest maintainable choice: it respects the accepted merge, keeps `main` history intact, and gives every remaining change a reversible review boundary.
+- Consequences: ADR-002 remains the historical record for PR #39 but no longer constrains future work to its merged branch. The program goal and phase gates remain unchanged.
+- Code or abstraction deleted/avoided: no history rewrite, forced push, or direct unreviewed implementation on `main`.
+- Revisit trigger: the user explicitly changes the shipping strategy again.

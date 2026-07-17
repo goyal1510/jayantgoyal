@@ -33,9 +33,15 @@
   - The existing Google flow places `next` in `redirectTo`; the temporary same-origin wildcard paths preserve compatibility, but a tested server-side destination handoff is still required before narrowing production callbacks.
   - Parent-domain cookies and cross-subdomain SSO are deferred until PLATFORM-04.
   - Auth Vercel environment inventory remains pending until the Auth project exists.
-  - Stable Portfolio and Studio staging domains are attached to the `staging` branch and temporarily alias the tested immutable deployments while new builds are rate-limited. Portfolio's inherited Vercel Authentication was removed to match the already-public product project; both staging hosts are publicly reachable with valid TLS.
-  - Vercel rejected Studio production promotion because the free team exceeded its daily deployment limit. The tested immutable preview is assigned directly to `studio.jayantgoyal.com`; promotion remains a later cleanup step when the limit resets.
-  - Vercel subsequently rate-limited all new project builds for 24 hours. The single-hop redirect fix is pushed, while the subsequent contact, URL-contract, discovery, and regression-test commits are intentionally held locally to avoid guaranteed failed deployments; apex cutover is blocked until the exact current branch build passes.
+  - Portfolio and Studio stable staging hosts resolve publicly and return `200`. `admin.staging.jayantgoyal.com` did not resolve during the 2026-07-17 post-merge check, so the complete stable-staging contract remains open.
+  - Deployed authenticated product journeys, rollback rehearsal, and the required observation window remain incomplete even though public production smoke checks pass.
+
+## Post-merge deployment reconciliation
+
+- PR #39 merged to `main` as `4703e7c83d0b92935dc8dd10a3535a2f7d51a426`; the Portfolio, Studio, and Admin production deployment checks passed for the merged boundary.
+- Post-merge public checks on 2026-07-17 returned `200` for `https://jayantgoyal.com/` and `https://studio.jayantgoyal.com/`. Admin completed its expected single redirect from `/` to `/welcome?redirect=%2F` and returned `200`.
+- Portfolio and Studio stable staging roots returned `200`. Admin staging DNS did not resolve and remains a required environment repair, not an application-code failure.
+- The previous build-rate-limit and pre-cutover canonical blockers are resolved. The open gates are authenticated product coverage, deployed responsive/browser evidence, Admin staging, rollback rehearsal, and observation.
 
 ## PLATFORM-01 — Test foundation prepared; Auth execution deferred
 
@@ -110,12 +116,22 @@
 - Vercel preview deployment `dpl_7y1m635L1BoYUzBqMqmYvunsjKTB` is Ready and passed black-box checks for Studio metadata and inventory links. Because the daily deployment limit blocked promotion, the exact tested deployment is reversibly assigned to `studio.jayantgoyal.com`.
 - Public DNS resolves `studio.jayantgoyal.com` to Vercel, direct HTTPS checks return `200`, and the apex still redirects to the existing `www` Portfolio with no Studio marker.
 - `studio.staging.jayantgoyal.com` has valid public DNS/TLS, is attached to the `staging` branch, and temporarily serves the same tested immutable Studio deployment until a post-limit staging build succeeds.
-- Local verification after the physical rename passes: 11 focused Vitest tests, Studio TypeScript, zero-warning ESLint, and the Studio production build. PLATFORM-07 and PLATFORM-11 remain open until the exact commit is deployed, responsive/auth-gated product transitions pass, and the rollback/observation gates are verified.
+- Local verification after the physical rename passes: 11 focused Vitest tests, Studio TypeScript, zero-warning ESLint, and the Studio production build. The merged boundary is deployed; PLATFORM-07 and PLATFORM-11 remain open until responsive/auth-gated product transitions and the rollback/observation gates are verified.
 
 ## PLATFORM-09 — Domain cutover in progress
 
 - Vercel moved `jayantgoyal.com` and `www.jayantgoyal.com` from the renamed Studio project to the Portfolio project. Studio retains only `studio.jayantgoyal.com` and `studio.staging.jayantgoyal.com`.
 - The canonical domain direction is now apex-first: `www.jayantgoyal.com` returns permanent `308` to `https://jayantgoyal.com/`; the apex does not redirect.
-- The apex is reversibly assigned to tested Portfolio deployment `dpl_21MRG8eNBm913FjVNPtSdnf5kbkL` while fresh builds remain rate-limited.
+- The apex is assigned to the Portfolio project, and the merged PR #39 production deployment completed successfully.
 - Live black-box checks pass for Portfolio root, Blog, Resume, robots, sitemap, and manifest. Historical professional aliases return `308` to Portfolio sections; all classified product families and current Auth paths return method-preserving `307` handoffs to Studio; Studio and the Portfolio compatibility subdomain return `200`.
-- The current immutable deployment still emits `portfolio.jayantgoyal.com` in canonical/Open Graph metadata because it predates the cutover. Portfolio Production `NEXT_PUBLIC_SITE_URL` now reads back exactly as `https://jayantgoyal.com`; the metadata fix requires the next fresh deployment and remains an explicit PLATFORM-09 blocker.
+- The post-merge Portfolio deployment emits the apex canonical contract and public root checks pass. PLATFORM-09 remains open for the deployed browser matrix, rollback rehearsal, observation window, and residual callback compatibility review.
+
+## PLATFORM-10 — Admin domain organization in progress
+
+- Admin now has one app-owned navigation-domain contract for Portfolio, Studio, and System. The generic `@repo/ui` renderer remains unaware of routes and roles.
+- Portfolio includes the existing profile/content managers and Blog. System includes Users and Deployments. Studio is retained as an explicit domain but is not rendered empty and has no invented route; a managed catalog remains blocked on a separately approved `jg_app` contract.
+- The legacy Vercel environment-manager route remains reachable for compatibility and keeps a System breadcrumb, but its navigation link was removed because the binding blueprint keeps infrastructure secrets in provider configuration rather than Admin.
+- Role visibility is unchanged: ordinary admins see Portfolio operations; super admins additionally see the current System operations. No authorization, service-role, session, callback, or database behavior changed.
+- Focused proof now passes across twelve Vitest files and forty-nine tests, including sidebar preference restoration, route intent, Admin domain visibility, active routes, deployment details, and legacy environment-route classification. Full monorepo TypeScript, zero-warning lint, and Portfolio/Studio/Admin production builds passed for the shared-foundation tree; the final Admin-only correction also passes focused TypeScript, lint, tests, and build.
+- Authenticated local browser proof confirmed the Admin routes render, active navigation and breadcrumbs update, and the shared collapse state survives reload with the `48px` collapsed header. Existing development warnings around Supabase session access and Next.js smooth scrolling remain recorded; Auth/session work is still deferred under ADR-001.
+- PLATFORM-10 remains In Progress: Studio catalog operations, Resume ownership, terms/policies, provider-secret removal from the legacy route, AAL2 mutation proof, and the complete authorization/rollback/deployment gates are not done.
