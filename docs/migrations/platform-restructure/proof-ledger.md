@@ -68,8 +68,20 @@
 - `@repo/auth/cookies` defines three explicit modes: rollback/default `legacy`, validated dual-read `compatibility`, and post-observation `platform`. Trusted Production hosts use `__Secure-jg-session-v1` with Domain `jayantgoyal.com`, Path `/`, Secure, and SameSite Lax. Generated Previews use that name host-only; localhost uses host-only `jg-session-v1` without Secure/Domain.
 - Compatibility mode prefers any platform cookie. With legacy state only, the request client authenticates it through `getUser()`, transfers only in-memory access/refresh credentials through `setSession()`, and validates the platform user again. Invalid state is never authorized, tokens never enter URLs/logs, and Studio/Admin policy remains application-local.
 - Studio's fast path now detects the cookie families allowed by the active mode instead of manually decoding only the first legacy chunk. AAL comes from the Supabase client after the authenticated path is entered.
+- The Studio protected layout now uses that same shared detector with the
+  request hostname, so legacy, compatibility, platform, localhost, Preview, and
+  trusted Production names cannot disagree with the Proxy. Shared Server
+  Components select the legacy family only for the original legacy-only request
+  being promoted, prefer platform when both exist, and never fall back in final
+  platform mode. This closes the first-request gap where the Proxy wrote the new
+  cookie to the response but the rendered component could see only the original
+  request snapshot.
 - Ordinary Studio/Admin logout, terms rejection, and recovery cleanup explicitly use local scope. Global sign-out is reserved for an explicit password-reset choice or account deletion. Admin role denial no longer destroys the shared identity session.
 - Turborepo treats `NEXT_PUBLIC_AUTH_SESSION_MODE` as a build input and no longer lists obsolete guest credentials. Vercel Studio and Admin each have exactly one unscoped, non-sensitive rollout entry covering Development, Preview, and Production; both are set to `legacy`, so current deployed behavior remains unchanged.
+- Vercel Studio and Admin also have the non-sensitive Auth entry owner set to
+  `legacy` for Development, Preview, and Production. Their Auth URL is local
+  port `3003` in Development and canonical Auth in Preview/Production; the URL
+  remains inert while the owner is `legacy`.
 - Local proof covers cookie attributes, chunk selection, platform preference, validated promotion/failure/mismatch, logout scopes, Admin denial/AAL2, callbacks, recovery, terms, and response propagation. The first final-suite attempt caught bracketed IPv6 localhost receiving the secure policy; the corrected focused file passes 23 tests. The final full suite passes 110 tests across 21 files, all eight zero-warning lint and typecheck tasks pass, and the complete Portfolio/Studio/Admin build passes. No hosted Supabase or database change was made.
 - A deterministic two-request regression starts Studio and Admin legacy
   promotion concurrently and simulates one refresh-token transfer collision.
@@ -77,6 +89,10 @@
   retains its already validated legacy client; client state is not shared
   across the two factories. Hosted refresh-token timing is still a manual
   Production observation rather than a claim made by the synthetic test.
+- The follow-up consumer audit passes 34 focused cookie/factory/Studio tests and
+  15 focused Admin/Auth regression contracts. Auth, Studio, Admin, and the
+  shared Auth package pass TypeScript and zero-warning lint. The audit search
+  finds no remaining application-side manual Supabase session-cookie detector.
 - Remaining gates: user manual same-app Preview acceptance, controlled
   cross-subdomain Production validation (including actual expired-token and
   open-tab behavior), and rollback observation. PLATFORM-04 is not Done.

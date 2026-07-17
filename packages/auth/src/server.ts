@@ -16,6 +16,10 @@ type ReadableCookieStore = {
   getAll(): Promise<CookieValue[] | null> | CookieValue[] | null;
 };
 
+type ServerComponentCookieStore = {
+  getAll(): CookieValue[] | null;
+};
+
 type WritableCookieStore = {
   set(name: string, value: string, options?: CookieOptions): unknown;
 };
@@ -235,7 +239,7 @@ export async function createSupabaseRequestClient({
 }
 
 export function createSupabaseServerComponentClient(
-  cookieStore: ReadableCookieStore & WritableCookieStore,
+  cookieStore: ServerComponentCookieStore & WritableCookieStore,
   {
     hostname,
     sessionMode,
@@ -249,12 +253,31 @@ export function createSupabaseServerComponentClient(
   }
 
   const mode = resolveAuthSessionMode(sessionMode);
-  const cookieOptions = resolveSessionCookieOptions({ hostname, mode });
+  const cookieValues = cookieStore.getAll() ?? [];
+  const platformCookieOptions = resolveSessionCookieOptions({ hostname, mode });
+  let cookieOptions = platformCookieOptions;
+
+  if (platformCookieOptions) {
+    const legacyCookieName = legacyCookieNameForSupabaseUrl(supabaseUrl);
+    const sessionSource = selectRequestSessionSource({
+      mode,
+      cookies: cookieValues,
+      legacyCookieName,
+      platformCookieName: platformCookieOptions.name,
+    });
+    if (sessionSource === "promote") {
+      // Proxy performs the validated promotion and writes the platform cookie.
+      // Server Components on that same request must still be able to read the
+      // already validated legacy session because response cookies are not part
+      // of the original request snapshot.
+      cookieOptions = { name: legacyCookieName };
+    }
+  }
 
   return createServerClient(supabaseUrl, supabaseAnonKey, {
     ...(cookieOptions ? { cookieOptions } : {}),
     cookies: {
-      getAll: () => cookieStore.getAll(),
+      getAll: () => cookieValues,
       setAll(cookies) {
         try {
           cookies.forEach(({ name, value, options }) => {
