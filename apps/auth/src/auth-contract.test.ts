@@ -39,6 +39,8 @@ describe("standalone Auth application contract", () => {
     const actions = readActions();
     expect(page).toContain("action={logoutAction}");
     expect(actions).toContain("export async function logoutAction");
+    expect(page).toContain('name="return_to"');
+    expect(actions).toContain("buildSignedOutLoginUrl");
     expect(existsSync(`${sourceRoot}/app/logout/route.ts`)).toBe(false);
   });
 

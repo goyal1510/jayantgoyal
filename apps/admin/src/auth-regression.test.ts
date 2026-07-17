@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { readFileSync } from "node:fs";
 import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 const { createRequestClientMock } = vi.hoisted(() => ({
@@ -90,6 +91,18 @@ afterAll(() => {
 });
 
 describe("Admin Proxy authentication contract", () => {
+  it("switches account navigation through the shared owner contract", () => {
+    const navUser = readFileSync(
+      new URL("./components/sidebar/nav-user.tsx", import.meta.url),
+      "utf8",
+    );
+
+    expect(navUser).toContain("resolveAuthFlowOwner");
+    expect(navUser).toContain("buildAuthAccountSecurityUrl");
+    expect(navUser).toContain("buildAuthLogoutUrl");
+    expect(navUser).toMatch(/authOwnsNavigation\s*\?\s*undefined/);
+  });
+
   it("routes login entry to Auth only when the cutover flag is enabled", async () => {
     vi.stubEnv("NEXT_PUBLIC_AUTH_FLOW_OWNER", "auth");
 

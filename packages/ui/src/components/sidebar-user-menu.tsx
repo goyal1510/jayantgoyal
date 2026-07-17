@@ -30,10 +30,12 @@ export interface SidebarUserSettingsRenderProps {
 
 export function SidebarUserMenu({
   user,
+  onSettings,
   onSignOut,
   renderSettings,
 }: {
   user: { name: string; email: string };
+  onSettings?: () => void;
   onSignOut: () => void | Promise<void>;
   renderSettings?: (props: SidebarUserSettingsRenderProps) => ReactNode;
 }) {
@@ -76,18 +78,31 @@ export function SidebarUserMenu({
                   </div>
                 </div>
               </DropdownMenuLabel>
-              {renderSettings && (
+              {(onSettings || renderSettings) && (
                 <>
                   <DropdownMenuSeparator />
-                  <SheetTrigger asChild>
+                  {onSettings ? (
                     <DropdownMenuItem
-                      onSelect={(event) => event.preventDefault()}
+                      onSelect={(event) => {
+                        event.preventDefault();
+                        onSettings();
+                      }}
                       className="gap-2"
                     >
                       <Settings className="size-4" />
                       Settings
                     </DropdownMenuItem>
-                  </SheetTrigger>
+                  ) : (
+                    <SheetTrigger asChild>
+                      <DropdownMenuItem
+                        onSelect={(event) => event.preventDefault()}
+                        className="gap-2"
+                      >
+                        <Settings className="size-4" />
+                        Settings
+                      </DropdownMenuItem>
+                    </SheetTrigger>
+                  )}
                 </>
               )}
               <DropdownMenuSeparator />

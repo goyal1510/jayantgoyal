@@ -16,6 +16,18 @@ afterAll(() => {
 });
 
 describe("Studio Auth entry cutover", () => {
+  it("switches account navigation through the shared owner contract", () => {
+    const navUser = readFileSync(
+      new URL("./components/sidebar/nav-user.tsx", import.meta.url),
+      "utf8",
+    );
+
+    expect(navUser).toContain("resolveAuthFlowOwner");
+    expect(navUser).toContain("buildAuthAccountSecurityUrl");
+    expect(navUser).toContain("buildAuthLogoutUrl");
+    expect(navUser).toMatch(/authOwnsNavigation\s*\?\s*undefined/);
+  });
+
   it("keeps the protected layout on the shared session-cookie contract", () => {
     const layout = readFileSync(
       new URL("./app/(protected)/layout.tsx", import.meta.url),

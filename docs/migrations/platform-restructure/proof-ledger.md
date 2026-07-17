@@ -162,9 +162,21 @@
   origins, and falls back to canonical Auth for invalid configuration. Session
   migration remains independently controlled by `NEXT_PUBLIC_AUTH_SESSION_MODE`.
   Legacy callback, recovery, MFA, and logout code is retained.
+- The same owner contract now covers the signed-in menu. Studio/Admin Settings
+  use canonical Auth account security and Log out uses canonical Auth logout
+  only when the owner is exactly `auth`; `legacy` retains the current settings
+  sheet and local sign-out callback. Both canonical destinations preserve the
+  exact application URL. Auth logout validates that destination through the
+  existing exact-origin policy, stays POST-only, and returns to Auth login with
+  safe context for a later sign-in. Unsafe destinations reduce to Auth login.
 - Focused readiness proof passes 14 tests across the shared Auth entry contract
   and the Studio/Admin adapters. Auth, Studio, and Admin zero-warning lint and
   TypeScript pass after one nullable annotation caught by the first type gate.
+- The navigation follow-up passes 30 focused shared/Auth/application contracts,
+  followed by 12 Studio/Admin contracts after their final source assertions.
+  Shared Auth/UI, Studio, Admin, and Auth TypeScript and zero-warning lint pass;
+  the final assertions are formatting-independent. No UI, browser, deployment,
+  or provider state was activated.
 - Remaining gates: first Git deployment, user-owned generated
   Preview application-local flows, controlled Production dark launch, manual
   browser acceptance, deployment/rollback identifiers, and observation.

@@ -58,3 +58,35 @@ export function buildAuthLoginUrl({
   loginUrl.searchParams.set("return_to", returnTarget.toString());
   return loginUrl;
 }
+
+function buildAuthOwnedUrl({
+  pathname,
+  requestUrl,
+  authOrigin,
+}: {
+  pathname: "/account/security" | "/logout";
+  requestUrl: string;
+  authOrigin?: string | null;
+}): URL {
+  const request = new URL(requestUrl);
+  const destination = new URL(
+    pathname,
+    `${resolveAuthApplicationOrigin(authOrigin)}/`,
+  );
+  destination.searchParams.set("return_to", request.toString());
+  return destination;
+}
+
+export function buildAuthAccountSecurityUrl(options: {
+  requestUrl: string;
+  authOrigin?: string | null;
+}): URL {
+  return buildAuthOwnedUrl({ pathname: "/account/security", ...options });
+}
+
+export function buildAuthLogoutUrl(options: {
+  requestUrl: string;
+  authOrigin?: string | null;
+}): URL {
+  return buildAuthOwnedUrl({ pathname: "/logout", ...options });
+}

@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { signOutSession, type SignOutScope } from "@repo/auth/logout";
 
 import { actionContext, stringField } from "@/lib/auth/action-support";
+import { buildSignedOutLoginUrl } from "@/lib/auth/returns";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function logoutAction(formData: FormData): Promise<void> {
@@ -14,5 +15,10 @@ export async function logoutAction(formData: FormData): Promise<void> {
   const scope: SignOutScope = requestedScope === "global" ? "global" : "local";
   const supabase = await createSupabaseServerClient();
   await signOutSession(supabase, scope);
-  redirect("/login?signed_out=true");
+  redirect(
+    buildSignedOutLoginUrl({
+      value: stringField(formData, "return_to"),
+      requestOrigin: context.requestOrigin,
+    }),
+  );
 }

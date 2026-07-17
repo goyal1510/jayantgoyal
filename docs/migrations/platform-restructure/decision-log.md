@@ -150,11 +150,15 @@
   but making Auth the login owner and changing the shared-cookie mode are two
   distinct rollout risks that need independent rollback controls.
 - Decision: use `NEXT_PUBLIC_AUTH_FLOW_OWNER=legacy|auth` for only the new login
-  entry handoff. Keep `legacy` as the default. The shared URL builder accepts
+  entry and signed-in account-navigation handoff. Keep `legacy` as the default.
+  The shared URL builder accepts
   only canonical Auth or local port `3003`, constructs an exact absolute return
   destination from the requesting application, and rejects external paths.
   `NEXT_PUBLIC_AUTH_SESSION_MODE` continues to control cookie compatibility
-  independently. Legacy callback, recovery, MFA, and logout routes remain.
+  independently. With Auth ownership, Settings and Log out use canonical Auth
+  routes with exact application context; with legacy ownership, the existing
+  app-local sheet and sign-out callback remain. Legacy callback, recovery, MFA,
+  and logout routes remain.
 - Consequences: Studio and Admin can ship the adapter without changing live
   traffic. After Auth deployment/manual acceptance and shared-session readiness,
   the owner can be enabled separately and rolled back without revoking sessions.

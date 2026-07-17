@@ -46,3 +46,17 @@ export function resolveAuthReturnTarget(
     fallback,
   });
 }
+
+export function buildSignedOutLoginUrl({
+  value,
+  requestOrigin = AUTH_ORIGIN,
+}: {
+  value: string | null | undefined;
+  requestOrigin?: string;
+}): string {
+  const returnTo = resolveAuthReturnTarget(value, requestOrigin, "/login");
+  const login = new URL("/login", `${requestOrigin}/`);
+  login.searchParams.set("signed_out", "true");
+  if (returnTo !== "/login") login.searchParams.set("return_to", returnTo);
+  return login.toString();
+}
