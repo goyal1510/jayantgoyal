@@ -11,15 +11,24 @@ import {
   MonitorSmartphone,
   Palette,
   Rocket,
-  KeyRound,
   FileText,
-} from "lucide-react"
-import type { LucideIcon } from "lucide-react"
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+
+import type { UserRole } from "@/lib/types";
 
 export interface NavItem {
-  label: string
-  href: string
-  icon: LucideIcon
+  label: string;
+  href: string;
+  icon: LucideIcon;
+}
+
+export interface AdminNavigationDomain {
+  id: "portfolio" | "studio" | "system";
+  label: "Portfolio" | "Studio" | "System";
+  homeHref: string | null;
+  items: readonly NavItem[];
+  roles: readonly UserRole[];
 }
 
 export const portfolioNavItems: NavItem[] = [
@@ -33,17 +42,91 @@ export const portfolioNavItems: NavItem[] = [
   { label: "Certificates", href: "/portfolio/certificates", icon: Award },
   { label: "Contact", href: "/portfolio/contact", icon: Mail },
   { label: "Navigation", href: "/portfolio/navigation", icon: Navigation },
-]
+];
 
 export const blogNavItems: NavItem[] = [
-  { label: "Blog Posts", href: "/blog", icon: FileText },
-]
+  { label: "Blog", href: "/blog", icon: FileText },
+];
 
-export const adminNavItems: NavItem[] = [
-  { label: "User Management", href: "/users", icon: Users },
-]
+export const systemNavItems: NavItem[] = [
+  { label: "Users", href: "/users", icon: Users },
+];
 
 export const deploymentNavItems: NavItem[] = [
   { label: "Deployments", href: "/deployments", icon: Rocket },
-  { label: "Env Variables", href: "/deployments/env", icon: KeyRound },
-]
+];
+
+export const adminNavigationDomains: readonly AdminNavigationDomain[] = [
+  {
+    id: "portfolio",
+    label: "Portfolio",
+    homeHref: "/portfolio/hero",
+    items: [...portfolioNavItems, ...blogNavItems],
+    roles: ["admin", "super_admin"],
+  },
+  {
+    id: "studio",
+    label: "Studio",
+    homeHref: null,
+    items: [],
+    roles: ["super_admin"],
+  },
+  {
+    id: "system",
+    label: "System",
+    homeHref: "/users",
+    items: [...systemNavItems, ...deploymentNavItems],
+    roles: ["super_admin"],
+  },
+];
+
+export function getVisibleAdminNavigationDomains(
+  role: UserRole,
+): readonly AdminNavigationDomain[] {
+  return adminNavigationDomains.filter(
+    (domain) => domain.roles.includes(role) && domain.items.length > 0,
+  );
+}
+
+export function isAdminNavigationItemActive(
+  pathname: string,
+  item: NavItem,
+): boolean {
+  if (pathname === item.href) return true;
+
+  return (
+    item.href === "/deployments" &&
+    /^\/deployments\/[^/]+$/.test(pathname) &&
+    pathname !== "/deployments/env"
+  );
+}
+
+export interface AdminNavigationContext {
+  domain: AdminNavigationDomain;
+  pageLabel: string | null;
+}
+
+export function getAdminNavigationContext(
+  pathname: string,
+): AdminNavigationContext | null {
+  for (const domain of adminNavigationDomains) {
+    const item = domain.items.find((candidate) => candidate.href === pathname);
+    if (item) return { domain, pageLabel: item.label };
+  }
+
+  if (pathname === "/deployments/env") {
+    const system = adminNavigationDomains.find(
+      (domain) => domain.id === "system",
+    );
+    return system ? { domain: system, pageLabel: "Environment" } : null;
+  }
+
+  if (/^\/deployments\/[^/]+$/.test(pathname)) {
+    const system = adminNavigationDomains.find(
+      (domain) => domain.id === "system",
+    );
+    return system ? { domain: system, pageLabel: "Deployment Detail" } : null;
+  }
+
+  return null;
+}
