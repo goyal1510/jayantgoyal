@@ -1,6 +1,7 @@
 "use client";
 
 import { SidebarUserMenu } from "@repo/ui/sidebar-user-menu";
+import { signOutSession } from "@repo/auth/logout";
 
 import { AccountSettingsSheet } from "@/components/sidebar/account-settings-sheet";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
@@ -20,7 +21,7 @@ export function NavUser({
       onSignOut={async () => {
         try {
           const supabase = createSupabaseBrowserClient();
-          const { error } = await supabase.auth.signOut();
+          const { error } = await signOutSession(supabase);
           if (error) {
             toast.error(error.message);
             return;

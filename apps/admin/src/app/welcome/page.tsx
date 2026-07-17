@@ -61,13 +61,13 @@ function LoginForm() {
 
       if (profileError || !profile) {
         toast.error("Profile not found. Contact administrator.");
-        await supabase.auth.signOut();
+        router.push("/unauthorized");
         return;
       }
 
       if (!["admin", "super_admin"].includes(profile.role)) {
         toast.error("You do not have admin access.");
-        await supabase.auth.signOut();
+        router.push("/unauthorized");
         return;
       }
 

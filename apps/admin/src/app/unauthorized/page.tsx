@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { ShieldX, ArrowLeft } from "lucide-react";
+import { signOutSession } from "@repo/auth/logout";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { Button } from "@repo/ui/button";
 import {
@@ -17,7 +18,7 @@ export default function UnauthorizedPage() {
 
   async function handleLogout() {
     const supabase = createSupabaseBrowserClient();
-    await supabase.auth.signOut();
+    await signOutSession(supabase);
     router.push("/welcome");
   }
 

@@ -21,12 +21,13 @@ export async function GET(request: NextRequest) {
   const redirectUrl = new URL(next, request.url);
   const response = NextResponse.redirect(redirectUrl);
 
-  const supabase = createSupabaseRequestClient({
+  const supabase = await createSupabaseRequestClient({
     supabaseUrl,
     supabaseAnonKey,
     requestCookies: request.cookies,
     responseCookies: response.cookies,
     responseHeaders: response.headers,
+    hostname: request.nextUrl.hostname,
   });
 
   const { error } = await supabase.auth.exchangeCodeForSession(code);

@@ -5,6 +5,7 @@ import Link from "next/link"
 import { Eye, EyeOff, LogIn, AlertCircle, Timer } from "lucide-react"
 
 import { createSupabaseBrowserClient } from "@/lib/supabase/client"
+import { signOutSession } from "@repo/auth/logout"
 import { Button } from "@repo/ui/button"
 import { Card, CardContent } from "@repo/ui/card"
 import { Input } from "@repo/ui/input"
@@ -29,7 +30,7 @@ export function ResetPasswordForm({
   const [confirmPassword, setConfirmPassword] = React.useState("")
   const [isPending, setIsPending] = React.useState(false)
   const [sessionState, setSessionState] = React.useState<SessionState>("loading")
-  const [signOutAll, setSignOutAll] = React.useState(true)
+  const [signOutAll, setSignOutAll] = React.useState(false)
 
   const [timeLeft, setTimeLeft] = React.useState(120) // 2 minutes
 
@@ -40,7 +41,7 @@ export function ResetPasswordForm({
       if (hasVisited) {
         sessionStorage.removeItem("reset_password_visited")
         const supabase = createSupabaseBrowserClient()
-        await supabase.auth.signOut()
+        await signOutSession(supabase)
         clearRecoveryCookie()
         window.location.href = "/welcome"
         return
@@ -66,7 +67,7 @@ export function ResetPasswordForm({
   const cleanupAndRedirectToLogin = React.useCallback(async () => {
     sessionStorage.removeItem("reset_password_visited")
     const supabase = createSupabaseBrowserClient()
-    await supabase.auth.signOut()
+    await signOutSession(supabase)
     clearRecoveryCookie()
     window.location.href = "/welcome"
   }, [])
@@ -117,7 +118,7 @@ export function ResetPasswordForm({
 
           // Sign out after password change
           sessionStorage.removeItem("reset_password_visited")
-          await supabase.auth.signOut({ scope: signOutAll ? "global" : "local" })
+          await signOutSession(supabase, signOutAll ? "global" : "local")
           clearRecoveryCookie()
           window.location.href = "/welcome?message=password_changed"
         } catch (err) {

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Shield } from "lucide-react"
 
 import { Button } from "@repo/ui/button"
+import { signOutSession } from "@repo/auth/logout"
 import {
   Dialog,
   DialogContent,
@@ -98,7 +99,7 @@ export function TermsAcceptanceCheck() {
     setIsLoading(true)
     try {
       const supabase = createSupabaseBrowserClient()
-      await supabase.auth.signOut()
+      await signOutSession(supabase)
       toast.info("You must accept the Terms and Conditions to use this platform.")
       router.push("/welcome")
     } catch {

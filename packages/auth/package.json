@@ -5,6 +5,8 @@
   "private": true,
   "exports": {
     "./browser": "./src/browser.ts",
+    "./cookies": "./src/cookies.ts",
+    "./logout": "./src/logout.ts",
     "./redirects": "./src/redirects.ts",
     "./server": "./src/server.ts"
   },

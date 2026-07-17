@@ -1,6 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { createSupabaseRequestClient } from "@repo/auth/server";
+import {
+  hasAuthSessionCookie,
+  resolveAuthSessionMode,
+} from "@repo/auth/cookies";
 
 import { runMiddleware } from "@/proxy/runner";
 import { mfaMiddleware } from "@/proxy/mfa";
@@ -75,29 +79,6 @@ function matchPath(pathname: string, paths: string[]): boolean {
   });
 }
 
-/** Decode AAL from JWT in auth cookie. No network call. */
-function getAalFromCookie(
-  request: NextRequest,
-  supabaseUrl: string,
-): string | null {
-  const projectRef = new URL(supabaseUrl).hostname.split(".")[0];
-  const tokenName = `sb-${projectRef}-auth-token`;
-  const cookie =
-    request.cookies.get(tokenName)?.value ??
-    request.cookies.get(`${tokenName}.0`)?.value;
-  if (!cookie) return null;
-  try {
-    const raw = cookie.startsWith("base64-") ? atob(cookie.slice(7)) : cookie;
-    const parsed = JSON.parse(raw) as { access_token?: string } | string;
-    const token = typeof parsed === "string" ? parsed : parsed.access_token;
-    if (!token) return null;
-    const payload = JSON.parse(atob(token.split(".")[1]!)) as { aal?: string };
-    return payload.aal ?? null;
-  } catch {
-    return null;
-  }
-}
-
 export default async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
@@ -120,6 +101,7 @@ export default async function proxy(request: NextRequest) {
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const authSessionMode = resolveAuthSessionMode();
   const requestHeaders = new Headers(request.headers);
   // Strip internal headers to prevent client forgery
   requestHeaders.delete("x-page-public");
@@ -155,7 +137,12 @@ export default async function proxy(request: NextRequest) {
   // ──────────────────────────────────────────────────────────────
   if (
     !pathname.startsWith("/api/") &&
-    !getAalFromCookie(request, supabaseUrl)
+    !hasAuthSessionCookie({
+      supabaseUrl,
+      hostname: request.nextUrl.hostname,
+      mode: authSessionMode,
+      cookies: request.cookies.getAll(),
+    })
   ) {
     return response;
   }
@@ -163,12 +150,14 @@ export default async function proxy(request: NextRequest) {
   // ──────────────────────────────────────────────────────────────
   // PROTECTED PAGES + AUTH PATHS — full auth check with getUser()
   // ──────────────────────────────────────────────────────────────
-  const supabase = createSupabaseRequestClient({
+  const supabase = await createSupabaseRequestClient({
     supabaseUrl,
     supabaseAnonKey,
     requestCookies: request.cookies,
     responseCookies: response.cookies,
     responseHeaders: response.headers,
+    hostname: request.nextUrl.hostname,
+    sessionMode: authSessionMode,
   });
 
   const {
@@ -198,7 +187,9 @@ export default async function proxy(request: NextRequest) {
     }
   }
 
-  const aalLevel = getAalFromCookie(request, supabaseUrl);
+  const { data: aalData } =
+    await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  const aalLevel = aalData?.currentLevel ?? null;
 
   if (user) {
     requestHeaders.set("x-user-id", user.id);
