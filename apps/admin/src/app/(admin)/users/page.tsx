@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { UserManagement } from "./user-management";
+
+export const metadata: Metadata = { title: "Users" };
 
 export default async function UsersPage() {
   const supabase = await createSupabaseServerClient();

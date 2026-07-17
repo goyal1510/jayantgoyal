@@ -22,18 +22,17 @@ export const APP_BRANDS = {
     publicName: `Studio by ${PERSON_BRAND.fullName}`,
     canonicalUrl: "https://studio.jayantgoyal.com",
     defaultTitle: `Studio by ${PERSON_BRAND.fullName} | Apps, Tools, and Experiments`,
-    titleTemplate: `%s | Studio by ${PERSON_BRAND.fullName}`,
+    titleTemplate: "%s | Studio",
     description: `Explore apps, developer tools, games, personal workspaces, and experiments built by ${PERSON_BRAND.fullName}.`,
   },
   admin: {
     id: "admin",
     name: "Admin",
-    publicName: "Admin",
+    publicName: `Admin by ${PERSON_BRAND.fullName}`,
     canonicalUrl: "https://admin.jayantgoyal.com",
-    defaultTitle: "Admin",
+    defaultTitle: `Admin by ${PERSON_BRAND.fullName}`,
     titleTemplate: "%s | Admin",
-    description:
-      "Private administration for portfolio content and platform operations.",
+    description: `Private administration for ${PERSON_BRAND.fullName}'s portfolio content and platform operations.`,
   },
 } as const;
 

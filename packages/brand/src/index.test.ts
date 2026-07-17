@@ -3,10 +3,12 @@ import { describe, expect, it } from "vitest";
 import { APP_BRANDS, formatAppPageTitle, PERSON_BRAND } from "./index";
 
 describe("canonical platform branding", () => {
-  it("uses the full public identity in Portfolio and Studio metadata", () => {
+  it("uses the full public identity in app-level metadata", () => {
     expect(APP_BRANDS.portfolio.defaultTitle).toContain(PERSON_BRAND.fullName);
     expect(APP_BRANDS.studio.defaultTitle).toContain(PERSON_BRAND.fullName);
+    expect(APP_BRANDS.admin.defaultTitle).toContain(PERSON_BRAND.fullName);
     expect(APP_BRANDS.studio.publicName).toBe("Studio by Jayant Goyal");
+    expect(APP_BRANDS.admin.publicName).toBe("Admin by Jayant Goyal");
   });
 
   it("keeps application names independent from public SEO names", () => {
@@ -25,8 +27,15 @@ describe("canonical platform branding", () => {
   it("formats page-level social titles from the same app contract", () => {
     expect(formatAppPageTitle("portfolio", "Blog")).toBe("Blog | Jayant Goyal");
     expect(formatAppPageTitle("studio", "UUID Generator")).toBe(
-      "UUID Generator | Studio by Jayant Goyal",
+      "UUID Generator | Studio",
     );
     expect(formatAppPageTitle("admin", "Users")).toBe("Users | Admin");
+  });
+
+  it("keeps ownership wording out of repeated page-title suffixes", () => {
+    expect(APP_BRANDS.studio.titleTemplate).toBe("%s | Studio");
+    expect(APP_BRANDS.admin.titleTemplate).toBe("%s | Admin");
+    expect(formatAppPageTitle("studio", "Weather")).not.toContain(" by ");
+    expect(formatAppPageTitle("admin", "Deployments")).not.toContain(" by ");
   });
 });

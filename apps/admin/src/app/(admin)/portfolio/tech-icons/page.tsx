@@ -1,5 +1,9 @@
+import type { Metadata } from "next";
+
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { TechIconsList } from "./tech-icons-list";
+
+export const metadata: Metadata = { title: "Tech Icons" };
 
 export default async function TechIconsPage() {
   const supabase = await createSupabaseServerClient();

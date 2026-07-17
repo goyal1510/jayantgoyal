@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { formatAppPageTitle } from "@repo/brand";
+
 import { getBlogPostBySlug } from "@/lib/blog/queries";
 import { DEFAULT_OG_IMAGE, PERSON_NAME, SITE_URL } from "@/lib/seo/config";
 
@@ -20,6 +22,7 @@ export async function generateMetadata({
 
   const url = `${SITE_URL}/blog/${slug}`;
   const description = post.excerpt ?? undefined;
+  const socialTitle = formatAppPageTitle("portfolio", post.title);
 
   return {
     title: post.title,
@@ -27,7 +30,7 @@ export async function generateMetadata({
     alternates: { canonical: url },
     openGraph: {
       type: "article",
-      title: post.title,
+      title: socialTitle,
       description,
       url,
       publishedTime: post.published_at ?? undefined,
@@ -38,7 +41,7 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: post.title,
+      title: socialTitle,
       description,
       images: [post.cover_image ?? DEFAULT_OG_IMAGE],
     },

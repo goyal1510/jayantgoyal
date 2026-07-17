@@ -52,6 +52,14 @@
 - `pnpm test`, full monorepo TypeScript, zero-warning lint, and full monorepo production build pass after the final dependency graph change.
 - Targeted production dependency remediation upgraded Portfolio's Resend client, removed Studio's unused Resend dependency, and pinned safe `dompurify`, `postcss`, and `prismjs` patch levels. `pnpm audit --prod` now reports no known vulnerabilities at any severity. The full development audit still retains six high advisories exclusively through Vercel CLI's upstream `undici` major-5 dependencies; Vercel `56.3.0` is current and still ships them, so those development-only residuals remain recorded rather than hidden behind incompatible overrides.
 
+## Cross-application branding and metadata proof
+
+- The shared `@repo/brand` contract separates application labels from ownership: UI chrome uses `Portfolio`, `Studio`, and `Admin`; app-level identities use `Jayant Goyal`, `Studio by Jayant Goyal`, and `Admin by Jayant Goyal`.
+- Page titles avoid repetitive ownership wording. Portfolio pages use `%s | Jayant Goyal`, Studio pages use `%s | Studio`, and Admin pages use `%s | Admin`. Admin remains `noindex`/`nofollow`.
+- Every non-redirect page in Portfolio has direct metadata; Studio's remaining MFA and loader-preview routes now do as well; Admin client-only Welcome and Access Denied routes receive metadata through server layouts, while redirect-only index routes inherit and immediately redirect.
+- Automated proof: six Vitest files and sixteen tests pass, including assertions that Studio/Admin child-page suffixes never include ` by `. Full monorepo TypeScript, zero-warning lint, and production builds pass.
+- Rendered local proof: Portfolio home is `Jayant Goyal | Full-Stack Developer` and Blog is `Blog | Jayant Goyal`; Studio home is `Studio by Jayant Goyal | Apps, Tools, and Experiments`, Weather is `Weather | Studio`, and UUID Generator is `UUID Generator | Studio`; authenticated Admin renders `Hero | Admin`, `Users | Admin`, and `Deployments | Admin`.
+
 ## PLATFORM-08 — In Progress
 
 - Execution order changed by accepted ADR-001: Portfolio and Studio boundaries precede shared Auth/SSO.

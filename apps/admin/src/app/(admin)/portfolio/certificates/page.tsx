@@ -1,5 +1,9 @@
+import type { Metadata } from "next";
+
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { CertificatesList } from "./certificates-list";
+
+export const metadata: Metadata = { title: "Certificates" };
 
 export default async function CertificatesPage() {
   const supabase = await createSupabaseServerClient();

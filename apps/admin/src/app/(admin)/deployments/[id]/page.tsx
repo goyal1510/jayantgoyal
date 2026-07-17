@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { DeploymentDetail } from "./deployment-detail";
+
+export const metadata: Metadata = { title: "Deployment Detail" };
 
 export default async function DeploymentDetailPage({
   params,
