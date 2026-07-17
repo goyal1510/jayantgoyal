@@ -104,9 +104,22 @@
   authorization codes, tokens, and provider error messages are not logged.
 - Auth has no service-role environment variable or admin client. Existing
   Studio/Admin service-role operations were not copied.
-- Source/provider boundary: no Auth Vercel project link, hosted variables, DNS
-  record, custom domain, Supabase Site URL change, redirect allowlist change,
-  or default application cutover is included in this local slice.
+- Provider-readiness target is the exact Vercel project `jayantgoyal-auth`
+  (`prj_aioHlnbOo2PcCbTjjDHUwQon2iDD`) linked to `goyal1510/jayantgoyal`, root
+  `apps/auth`, build `pnpm --filter auth build`, install `pnpm install`, and
+  Node.js 24.x. `auth.jayantgoyal.com` is assigned to this project; Cloudflare
+  DNS remains absent.
+- Auth's hosted inventory contains only the public Supabase URL/anon key,
+  `legacy` session mode, and environment-specific public application URLs.
+  Development uses ports 3000 through 3003, Preview has no fixed Auth Site URL,
+  and Production reserves `https://auth.jayantgoyal.com`. No service-role,
+  Vercel, email, or unrelated integration secret was copied.
+- All nine existing Portfolio/Studio/Admin environment inventories resolve to
+  the approved Supabase project `jayantgoyal` (`orwfvyditlguqvxvztkw`) with the
+  same public URL and anon key. The scoped hosted Auth patch adds only the Auth
+  Preview callback family, enables TOTP enrollment/verification, and enables
+  authenticated manual identity linking. The hosted Site URL remains
+  `https://jayantgoyal.com`; no default application cutover occurred.
 - Final local proof passes 153 tests across 26 files, all nine zero-warning lint
   tasks, all nine TypeScript tasks, and the complete Portfolio, Studio, Admin,
   Auth, and shared-package production build. Auth's build manifest contains the
@@ -119,10 +132,16 @@
   35 targeted Auth tests across five files, Auth TypeScript, and zero-warning
   Auth lint pass after the split. The complete expensive gate was not repeated
   after these narrowly scoped corrections under ADR-008.
-- Remaining gates: provider linking, generated Preview application-local flows,
-  hosted environment inventory, scoped Supabase URL update, controlled
-  Production dark launch, user-owned browser acceptance, deployment/rollback
-  identifiers, and observation. PLATFORM-05 is not Done.
+- A direct deployment API request and the subsequent Git Preview check were
+  rejected by Vercel's account-wide daily deployment/build rate limit before an
+  Auth deployment was created. Vercel reports retry in 24 hours; this is an
+  operational limit, not an application build failure. Portfolio, Studio,
+  Admin, and Auth now all use their exact `scripts/ignore-build.sh` project
+  settings to avoid consuming future capacity on unrelated changes.
+- Remaining gates: Cloudflare DNS, first Git deployment, user-owned generated
+  Preview application-local flows, controlled Production dark launch, manual
+  browser acceptance, deployment/rollback identifiers, and observation.
+  PLATFORM-05 is not Done.
 
 ## Cross-phase security gate — In Progress
 

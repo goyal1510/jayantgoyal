@@ -545,6 +545,17 @@ Acceptance checks:
 - [ ] Dark-launch users can complete all initial flows.
 - [x] Existing Studio and Admin auth remain primary and unchanged.
 
+### Phase 5 provider-readiness checklist
+
+- [x] Exact Auth Vercel project, monorepo root, Git repository, and build/install settings verified.
+- [x] Minimal Development, Preview, and Production public environment inventory created without a service-role key.
+- [x] `auth.jayantgoyal.com` assigned to the Auth Vercel project.
+- [ ] Cloudflare DNS routes `auth.jayantgoyal.com` to Vercel.
+- [x] Auth Preview callback family added to the hosted Supabase redirect allowlist without changing the Site URL.
+- [x] TOTP enrollment/verification and authenticated manual identity linking enabled.
+- [ ] First Git production deployment reaches a terminal ready state.
+- [ ] User completes generated Preview and controlled Production acceptance.
+
 ---
 
 ## Phase 6 — Canonical Auth cutover
