@@ -56,9 +56,7 @@
 
 - Execution order changed by accepted ADR-001: Portfolio and Studio boundaries precede shared Auth/SSO.
 - The Portfolio dependency inventory confirms the public app needs portfolio content, public Supabase reads, GitHub statistics, contact delivery, resume export, and shared UI only.
-- The new `apps/portfolio` boundary does not import Studio authentication, product routes, product navigation logic, games, files, messenger, or other product workspaces.
-- Portfolio, Studio, and Admin now consume one configuration-driven sidebar shell from `@repo/ui`. Each app owns its navigation data, active-state rules, visibility/authorization decisions, click behavior, and optional footer; the shared package contains presentation and mobile/collapse behavior only.
-- Portfolio restores its public section navigation, Blog/Resume links, and Studio handoff without importing Studio's product inventory. Desktop collapse, section scrolling, active links, Blog metadata/title, and the mobile drawer were browser-validated; collapsed-label overflow and mobile close timing were corrected centrally in the shared shell.
+- The new `apps/portfolio` boundary does not import Studio authentication, product routes, sidebar code, games, files, messenger, or other product workspaces.
 - Portfolio was first validated additively at `portfolio.jayantgoyal.com`; the apex and `www` were later moved to the same Portfolio project after route checks passed.
 - Product links shown in Portfolio are resolved to the future canonical Studio origin so the later apex cutover does not strand product routes.
 - Focused verification passed: Portfolio TypeScript, zero-warning ESLint, production build, desktop browser rendering, mobile navigation, all seven section anchors, project modal behavior, Studio link rewriting, zero horizontal overflow, and zero captured browser console errors.

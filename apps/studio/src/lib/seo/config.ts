@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { APP_BRANDS, formatAppPageTitle, PERSON_BRAND } from "@repo/brand";
+import { APP_BRANDS, PERSON_BRAND } from "@repo/brand";
 
 import { normalizeHostname } from "@/lib/platform/surface";
 import { STUDIO_URL } from "@/lib/platform/urls";
@@ -70,7 +70,6 @@ export function buildPublicPageMetadata({
   pathname: string;
 }): Metadata {
   const canonical = buildAbsoluteUrl(pathname);
-  const socialTitle = formatAppPageTitle("studio", title);
 
   return {
     title,
@@ -78,7 +77,7 @@ export function buildPublicPageMetadata({
     alternates: { canonical },
     openGraph: {
       type: "website",
-      title: socialTitle,
+      title,
       description,
       url: canonical,
       images: [
@@ -86,14 +85,14 @@ export function buildPublicPageMetadata({
           url: DEFAULT_OG_IMAGE,
           width: 1200,
           height: 630,
-          alt: socialTitle,
+          alt: title,
           type: "image/png",
         },
       ],
     },
     twitter: {
       card: "summary_large_image",
-      title: socialTitle,
+      title,
       description,
       images: [DEFAULT_OG_IMAGE],
     },

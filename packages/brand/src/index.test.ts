@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { APP_BRANDS, formatAppPageTitle, PERSON_BRAND } from "./index";
+import { APP_BRANDS, PERSON_BRAND } from "./index";
 
 describe("canonical platform branding", () => {
   it("uses the full public identity in Portfolio and Studio metadata", () => {
@@ -20,13 +20,5 @@ describe("canonical platform branding", () => {
       expect(app.name).not.toContain(PERSON_BRAND.monogram);
       expect(app.defaultTitle).not.toContain(`${PERSON_BRAND.monogram} `);
     }
-  });
-
-  it("formats page-level social titles from the same app contract", () => {
-    expect(formatAppPageTitle("portfolio", "Blog")).toBe("Blog | Jayant Goyal");
-    expect(formatAppPageTitle("studio", "UUID Generator")).toBe(
-      "UUID Generator | Studio by Jayant Goyal",
-    );
-    expect(formatAppPageTitle("admin", "Users")).toBe("Users | Admin");
   });
 });

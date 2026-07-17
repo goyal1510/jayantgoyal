@@ -39,10 +39,3 @@ export const APP_BRANDS = {
 
 export type AppBrandId = keyof typeof APP_BRANDS;
 export type AppBrand = (typeof APP_BRANDS)[AppBrandId];
-
-export function formatAppPageTitle(
-  appId: AppBrandId,
-  pageTitle: string,
-): string {
-  return APP_BRANDS[appId].titleTemplate.replace("%s", pageTitle);
-}

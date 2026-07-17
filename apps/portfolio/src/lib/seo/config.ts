@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { APP_BRANDS, formatAppPageTitle, PERSON_BRAND } from "@repo/brand";
+import { APP_BRANDS, PERSON_BRAND } from "@repo/brand";
 
 const PORTFOLIO_BRAND = APP_BRANDS.portfolio;
 const FALLBACK_SITE_URL = PORTFOLIO_BRAND.canonicalUrl;
@@ -34,21 +34,20 @@ export function buildPublicPageMetadata({
   pathname: string;
 }): Metadata {
   const url = new URL(pathname, SITE_URL).toString();
-  const socialTitle = formatAppPageTitle("portfolio", title);
 
   return {
     title,
     description,
     alternates: { canonical: url },
     openGraph: {
-      title: socialTitle,
+      title,
       description,
       url,
       images: [{ url: DEFAULT_OG_IMAGE }],
     },
     twitter: {
       card: "summary_large_image",
-      title: socialTitle,
+      title,
       description,
       images: [DEFAULT_OG_IMAGE],
     },
