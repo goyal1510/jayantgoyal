@@ -244,19 +244,6 @@ export interface VercelBuildLogEntry {
   payload: string;
 }
 
-export type VercelEnvTarget = "production" | "preview" | "development";
-
-export interface VercelEnvVar {
-  id: string;
-  key: string;
-  value: string;
-  type: "system" | "encrypted" | "plain" | "secret" | "sensitive";
-  target: VercelEnvTarget[];
-  configurationId?: string | null;
-  createdAt?: number;
-  updatedAt?: number;
-}
-
 export type VercelProjectKey = "studio" | "admin";
 
 /**

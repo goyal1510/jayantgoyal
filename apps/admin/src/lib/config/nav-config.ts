@@ -114,14 +114,10 @@ export function getAdminNavigationContext(
     if (item) return { domain, pageLabel: item.label };
   }
 
-  if (pathname === "/deployments/env") {
-    const system = adminNavigationDomains.find(
-      (domain) => domain.id === "system",
-    );
-    return system ? { domain: system, pageLabel: "Environment" } : null;
-  }
-
-  if (/^\/deployments\/[^/]+$/.test(pathname)) {
+  if (
+    pathname !== "/deployments/env" &&
+    /^\/deployments\/[^/]+$/.test(pathname)
+  ) {
     const system = adminNavigationDomains.find(
       (domain) => domain.id === "system",
     );

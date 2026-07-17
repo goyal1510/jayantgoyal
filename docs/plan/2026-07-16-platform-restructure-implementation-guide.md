@@ -785,7 +785,7 @@ Acceptance checks:
   Proof note required: Navigation map, authorization matrix, mutations tested, audit gaps, and deployment result.
   Stop/escalate if: Admin requires direct dependency on another application’s implementation.
 
-Current slice: the app-owned domain contract and existing-route grouping are implemented. Portfolio and System are visible because they have real operations. Studio remains explicit in the contract but is not rendered as an empty group; its catalog requires a separately approved `jg_app` data contract. The legacy environment-manager route remains reachable for compatibility but is no longer linked from navigation because infrastructure secrets belong in provider configuration.
+Current slice: the app-owned domain contract and existing-route grouping are implemented. Portfolio and System are visible because they have real operations. Studio remains explicit in the contract but is not rendered as an empty group; its catalog requires a separately approved `jg_app` data contract. The browser-facing Vercel environment manager and its API have been removed; the old route temporarily redirects to Deployments while infrastructure secrets remain provider-owned.
 
 ### Phase 10 checklist
 
@@ -820,7 +820,7 @@ System:
 Security:
 
 - [ ] Admin does not own login UI.
-- [ ] Admin does not expose provider secrets.
+- [x] Admin does not expose provider secrets.
 - [x] Admin does not display or modify user credentials.
 - [ ] Self-service account security links to Auth.
 - [ ] Operator-level revocation remains explicitly authorized and audited where possible.
