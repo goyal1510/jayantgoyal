@@ -24,6 +24,7 @@ export const LAST_SIGNIFICANT_UPDATE = "2026-07-17T00:00:00.000Z";
 
 export const INDEXABLE_EXACT_PATHS = ["/", "/terms-conditions"] as const;
 export const INDEXABLE_PREFIXES = [
+  "/products",
   "/tools",
   "/weather",
   "/custom-calculator",

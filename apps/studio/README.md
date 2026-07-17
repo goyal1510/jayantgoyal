@@ -9,17 +9,19 @@ workspaces.
 
 ## Product surfaces
 
-| Feature | Route | Access |
-| --- | --- | --- |
-| Studio inventory | `/` | Public |
-| Developer Tools | `/tools` | Public |
-| Weather | `/weather` | Public |
-| GitHub Stats | `/github-stats` | Public |
-| Games | `/games` | Public and account-backed modes |
-| Activity Tracker | `/activity-tracker` | Account-backed |
-| Calculator | `/calculator` | Account-backed |
-| File Manager | `/files` | Account-backed |
-| Messenger | `/messenger` | Account-backed |
+| Feature                           | Route               | Access                          |
+| --------------------------------- | ------------------- | ------------------------------- |
+| Studio home and featured products | `/`                 | Public                          |
+| Product catalog                   | `/products`         | Public                          |
+| Product details                   | `/products/[slug]`  | Public                          |
+| Developer Tools                   | `/tools`            | Public                          |
+| Weather                           | `/weather`          | Public                          |
+| GitHub Stats                      | `/github-stats`     | Public                          |
+| Games                             | `/games`            | Public and account-backed modes |
+| Activity Tracker                  | `/activity-tracker` | Account-backed                  |
+| Calculator                        | `/calculator`       | Account-backed                  |
+| File Manager                      | `/files`            | Account-backed                  |
+| Messenger                         | `/messenger`        | Account-backed                  |
 
 Professional content, Blog, Resume, and Contact belong to the independent
 Portfolio application. Historical Studio-side paths redirect to the canonical

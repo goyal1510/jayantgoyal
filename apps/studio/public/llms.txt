@@ -18,6 +18,7 @@
 
 ## Links
 - Studio: https://studio.jayantgoyal.com
+- Products: https://studio.jayantgoyal.com/products
 - Portfolio: https://jayantgoyal.com
 - Tools: https://studio.jayantgoyal.com/tools
 - GitHub: https://github.com/goyal1510

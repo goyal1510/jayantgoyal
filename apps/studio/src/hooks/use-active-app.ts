@@ -7,6 +7,7 @@ const ROUTE_MAP: {
   appId: string;
   navResolver?: (pathname: string) => string | undefined;
 }[] = [
+  { prefix: "/products", appId: "studio-products" },
   { prefix: "/games", appId: "game-hub" },
   { prefix: "/tools", appId: "tech-tools" },
   { prefix: "/messenger", appId: "messenger" },

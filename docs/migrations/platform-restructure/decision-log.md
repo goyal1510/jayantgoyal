@@ -77,3 +77,16 @@
 - Consequences: unrelated Vercel preview hosts cannot prove shared-cookie SSO. PLATFORM-04 through PLATFORM-06 therefore require strong local/application-local Preview coverage, an explicit production rollout flag or reversible deployment boundary, controlled test personas, immediate rollback readiness, and production observation. Current Studio/Admin Vercel preview hostname families remain narrowly allowlisted for same-application OAuth callbacks.
 - Code or abstraction deleted/avoided: four stable staging hosts, one long-lived branch, six branch-only environment values, a staging cookie namespace, and a custom preview token broker.
 - Revisit trigger: production auth risk cannot be reduced to an acceptable controlled rollout without a production-like environment, or Vercel introduces a materially simpler first-class cross-project Preview domain/cookie contract.
+
+## ADR-007 — Retain the shared Studio shell on public discovery
+
+- Date: 2026-07-17
+- Status: Accepted
+- Task IDs: PLATFORM-07, PLATFORM-11
+- Context: The initial Phase 11 checklist proposed a separate marketing layout without a workspace sidebar. During deployed visual review, the user explicitly selected the same responsive sidebar/header behavior for Portfolio, Studio, and Admin and asked Studio to remain the reference implementation.
+- Options considered: remove the shell from Studio Home and product pages; keep the entire current product workspace on the landing page; or retain the shared application shell while separating public discovery content from product workspace content.
+- Decision: Studio Home, `/products`, and public product-detail pages use the same shared responsive shell as the rest of Studio. Home shows an intentional featured subset; the catalog and details disclose access before launch; product-specific data, permissions, and workspace UI remain inside the launched route.
+- Why this is the smallest maintainable choice: it preserves the user-approved navigation behavior and one proven shell implementation while still creating a clear discovery-to-launch boundary.
+- Consequences: the Phase 11 layout gate measures separation of discovery content from workspace content rather than absence of the shared sidebar. Shared UI remains route-agnostic; Studio continues to own inventory, breadcrumbs, access labels, and launch destinations.
+- Code or abstraction deleted/avoided: no second marketing shell, duplicated responsive header, or global product-navigation policy.
+- Revisit trigger: public discovery performance or usability evidence shows the shared shell materially harms visitors, or another application proves a reusable marketing-shell contract.

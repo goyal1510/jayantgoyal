@@ -37,6 +37,7 @@ const ZERO_COST_PATHS = [
 const PUBLIC_PAGES = [
   "/",
   "/about",
+  "/products",
   "/tools",
   "/blogs",
   "/blog",

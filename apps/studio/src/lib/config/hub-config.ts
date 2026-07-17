@@ -30,6 +30,7 @@ import {
   Crown,
   Dice5,
   LayoutGrid,
+  Boxes,
   type LucideIcon,
 } from "lucide-react";
 
@@ -344,6 +345,16 @@ const STUDIO_HOME_APP: AppConfig = {
   url: "/",
 };
 
+const STUDIO_PRODUCTS_APP: AppConfig = {
+  id: "studio-products",
+  name: "Products",
+  icon: Boxes,
+  color: "text-violet-500 dark:text-violet-400",
+  isPublic: true,
+  navItems: [],
+  url: "/products",
+};
+
 const PORTFOLIO_EXTERNAL_APP: AppConfig = {
   id: "portfolio",
   name: "Portfolio",
@@ -367,9 +378,8 @@ const PORTFOLIO_BLOG_EXTERNAL_APP: AppConfig = {
 export function getSurfaceApps(): AppConfig[] {
   return [
     STUDIO_HOME_APP,
-    ...HUB_APPS.filter(
-      (app) => app.id !== "portfolio" && app.id !== "blog",
-    ),
+    STUDIO_PRODUCTS_APP,
+    ...HUB_APPS.filter((app) => app.id !== "portfolio" && app.id !== "blog"),
     PORTFOLIO_BLOG_EXTERNAL_APP,
     PORTFOLIO_EXTERNAL_APP,
   ];

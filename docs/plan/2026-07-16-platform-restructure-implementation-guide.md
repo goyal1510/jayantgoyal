@@ -142,7 +142,7 @@ Only one task should be In Progress per implementation lane.
 |     0 | PLATFORM-00 | Baseline and contracts                | In Progress | No behavior change                                   |
 |     1 | PLATFORM-08 | Portfolio application                 | In Progress | Portfolio deploys independently before root cutover  |
 |     2 | PLATFORM-07 | Studio technical deployment           | In Progress | Existing products also run at Studio                 |
-|     3 | PLATFORM-11 | Studio product experience             | Pending     | Public discovery precedes product workspaces         |
+|     3 | PLATFORM-11 | Studio product experience             | In Progress | Public discovery precedes product workspaces         |
 |     4 | PLATFORM-09 | Domain and route cutover              | In Progress | Root is Portfolio; product routes redirect to Studio |
 |     5 | PLATFORM-10 | Admin domain organization             | In Progress | Admin manages Portfolio, Studio, and System          |
 |     6 | PLATFORM-01 | Authentication regression foundation  | Pending     | No behavior change                                   |
@@ -830,7 +830,7 @@ Security:
 ## Phase 11 — Studio product experience
 
 Task ID: PLATFORM-11
-Status: Pending
+Status: In Progress
 Objective: Make Studio feel like an independent product brand with public discovery before authenticated workspaces.
 Dependencies: PLATFORM-09 Done; technical Studio behavior stable.
 Target files/surfaces: Studio marketing layout, product catalog, product detail pages, launch flow, authenticated workspace shell, feature organization.
@@ -846,26 +846,32 @@ Acceptance checks:
   Proof note required: Information architecture, product matrix, public/auth boundaries, accessibility, performance, and deployment result.
   Stop/escalate if: The redesign requires rewriting product behavior before the discovery shell can launch.
 
+Current slice: Studio Home presents an intentional featured subset, while the
+public `/products` catalog and statically generated detail pages expose all
+current products, product types, lifecycle status, access requirements, and a
+consistent launch action. ADR-007 retains the user-approved shared Studio shell
+on discovery pages while keeping product workspace content behind launch.
+
 ### Phase 11 navigation checklist
 
-- [ ] Primary navigation begins with Home and Products.
-- [ ] Apps, Games, Tools, AI, Experiments, and Open Source are filters/types initially.
-- [ ] Search is available when catalog size justifies it.
-- [ ] Featured products are intentional, not all products.
-- [ ] Recently updated products use real data or are omitted.
-- [ ] Authentication requirements are visible before launch.
-- [ ] Product pages have a consistent Launch action.
-- [ ] Related products are added only with meaningful relationships.
+- [x] Primary navigation begins with Home and Products.
+- [x] Real product types are filters; empty AI and Open Source types are not invented.
+- [x] Search is omitted because the ten-product catalog does not justify it yet.
+- [x] Featured products are intentional, not all products.
+- [x] Recently updated products are omitted until real update data exists.
+- [x] Authentication requirements are visible before launch.
+- [x] Product pages have a consistent Launch action.
+- [x] Related products are omitted until meaningful relationships exist.
 
 ### Phase 11 layout checklist
 
-- [ ] Marketing layout has no workspace sidebar.
-- [ ] Product detail pages remain public where possible.
-- [ ] Public product experiences do not require login unnecessarily.
-- [ ] Workspace shell appears only after product launch.
-- [ ] Product-specific permissions remain inside the owning feature.
-- [ ] Professional writing links to Portfolio rather than duplicating content.
-- [ ] Global Changelog remains deferred until a real release cadence exists.
+- [x] Public discovery retains the shared Studio shell selected in ADR-007 and exposes no workspace data.
+- [x] Product detail pages remain public where possible.
+- [x] Public product experiences do not require login unnecessarily.
+- [x] Product workspace content appears only after product launch.
+- [x] Product-specific permissions remain inside the owning feature.
+- [x] Professional writing links to Portfolio rather than duplicating content.
+- [x] Global Changelog remains deferred until a real release cadence exists.
 
 ### Phase 11 feature-organization checklist
 
