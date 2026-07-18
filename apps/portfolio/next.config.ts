@@ -7,12 +7,12 @@ const STUDIO_URL = applicationOrigin(
 );
 
 const portfolioSectionRedirects = [
-  ["/home", "/#home"],
+  ["/home", "/#top"],
   ["/about", "/#about"],
   ["/skills", "/#skills"],
   ["/experience", "/#experience"],
-  ["/projects", "/#projects"],
-  ["/certificates", "/#certificates"],
+  ["/projects", "/#work"],
+  ["/certificates", "/#experience"],
   ["/contact", "/#contact"],
 ] as const;
 
@@ -95,6 +95,7 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   transpilePackages: ["@repo/platform", "@repo/seo", "@repo/ui"],
   images: {
+    qualities: [75, 92],
     remotePatterns: [
       {
         protocol: "https",
@@ -142,6 +143,19 @@ const nextConfig: NextConfig = {
             value: "public, max-age=31536000, immutable",
           },
         ],
+      },
+      {
+        source: "/images/(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/documents/(.*)",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, noarchive" }],
       },
       {
         source: "/assets/Jayant_Resume.pdf",

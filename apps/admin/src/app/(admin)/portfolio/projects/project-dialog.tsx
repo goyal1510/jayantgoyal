@@ -29,6 +29,14 @@ export const emptyProjectForm: ProjectFormData = {
   tags: [],
   github_link: "",
   live_link: "",
+  slug: "",
+  eyebrow: "",
+  impact: "",
+  contribution: "",
+  year_label: "",
+  image_key: "",
+  image_alt: "",
+  is_featured: false,
   sort_order: 0,
   is_visible: true,
 };
@@ -79,12 +87,16 @@ export function ProjectDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={(o) => { onOpenChange(o); if (!o) setTagInput(""); }}>
+    <Dialog
+      open={open}
+      onOpenChange={(o) => {
+        onOpenChange(o);
+        if (!o) setTagInput("");
+      }}
+    >
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            {editing ? "Edit Project" : "Add Project"}
-          </DialogTitle>
+          <DialogTitle>{editing ? "Edit Project" : "Add Project"}</DialogTitle>
           <DialogDescription>
             {editing
               ? "Update the project details."
@@ -106,16 +118,107 @@ export function ProjectDialog({
               />
             </div>
 
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="slug">Slug</Label>
+                <Input
+                  id="slug"
+                  value={formData.slug ?? ""}
+                  onChange={(e) =>
+                    setFormData({ ...formData, slug: e.target.value })
+                  }
+                  placeholder="activity-tracker"
+                  pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="year_label">Year Label</Label>
+                <Input
+                  id="year_label"
+                  value={formData.year_label ?? ""}
+                  onChange={(e) =>
+                    setFormData({ ...formData, year_label: e.target.value })
+                  }
+                  placeholder="2025—26"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="eyebrow">Story Category</Label>
+              <Input
+                id="eyebrow"
+                value={formData.eyebrow ?? ""}
+                onChange={(e) =>
+                  setFormData({ ...formData, eyebrow: e.target.value })
+                }
+                placeholder="Realtime messaging"
+              />
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="short_description">Short Description</Label>
               <Input
                 id="short_description"
                 value={formData.short_description ?? ""}
                 onChange={(e) =>
-                  setFormData({ ...formData, short_description: e.target.value })
+                  setFormData({
+                    ...formData,
+                    short_description: e.target.value,
+                  })
                 }
                 placeholder="A brief one-line description"
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="impact">Outcome / Impact</Label>
+              <Textarea
+                id="impact"
+                value={formData.impact ?? ""}
+                onChange={(e) =>
+                  setFormData({ ...formData, impact: e.target.value })
+                }
+                placeholder="What became better, clearer, faster, or more dependable?"
+                rows={3}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="contribution">Contribution</Label>
+              <Input
+                id="contribution"
+                value={formData.contribution ?? ""}
+                onChange={(e) =>
+                  setFormData({ ...formData, contribution: e.target.value })
+                }
+                placeholder="Product engineering · Realtime UX"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="image_key">Local Image Key</Label>
+                <Input
+                  id="image_key"
+                  value={formData.image_key ?? ""}
+                  onChange={(e) =>
+                    setFormData({ ...formData, image_key: e.target.value })
+                  }
+                  placeholder="activity-tracker"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="image_alt">Image Description</Label>
+                <Input
+                  id="image_alt"
+                  value={formData.image_alt ?? ""}
+                  onChange={(e) =>
+                    setFormData({ ...formData, image_alt: e.target.value })
+                  }
+                  placeholder="Describe the complete product interface"
+                />
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -225,6 +328,17 @@ export function ProjectDialog({
                   })
                 }
               />
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="is_featured"
+                checked={formData.is_featured}
+                onCheckedChange={(checked) =>
+                  setFormData({ ...formData, is_featured: checked })
+                }
+              />
+              <Label htmlFor="is_featured">Featured project</Label>
             </div>
 
             <div className="flex items-center space-x-2">

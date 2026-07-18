@@ -19,6 +19,11 @@ export interface SocialLink {
   color: string;
 }
 
+export interface PortfolioPrinciple {
+  title: string;
+  copy: string;
+}
+
 // ============================================================================
 // Row Types (what we SELECT from the database)
 // ============================================================================
@@ -30,6 +35,10 @@ export interface HeroRow {
   tagline: string | null;
   blurb: string | null;
   location: string | null;
+  headline: string | null;
+  current_title: string | null;
+  availability: string | null;
+  resume_url: string | null;
   is_visible: boolean;
   created_at: string;
   updated_at: string;
@@ -40,6 +49,10 @@ export interface AboutRow {
   summary: string | null;
   personal: PersonalInfo[];
   highlights: string[];
+  headline: string | null;
+  objective: string | null;
+  story: string[];
+  principles: PortfolioPrinciple[];
   is_visible: boolean;
   created_at: string;
   updated_at: string;
@@ -77,6 +90,7 @@ export interface SkillCategoryRow {
   title: string;
   icon_key: string;
   color: string | null;
+  description: string | null;
   sort_order: number;
   is_visible: boolean;
   created_at: string;
@@ -89,6 +103,9 @@ export interface SkillRow {
   name: string;
   icon_key: string;
   level: number | null;
+  proficiency: "core" | "strong" | "working" | "exploring" | null;
+  evidence: string | null;
+  is_featured: boolean;
   sort_order: number;
   is_visible: boolean;
   created_at: string;
@@ -116,6 +133,14 @@ export interface ProjectRow {
   tags: string[];
   github_link: string | null;
   live_link: string | null;
+  slug: string | null;
+  eyebrow: string | null;
+  impact: string | null;
+  contribution: string | null;
+  year_label: string | null;
+  image_key: string | null;
+  image_alt: string | null;
+  is_featured: boolean;
   sort_order: number;
   is_visible: boolean;
   created_at: string;
@@ -129,6 +154,12 @@ export interface CertificateRow {
   description: string | null;
   category: string | null;
   issuer: string | null;
+  issued_at: string | null;
+  credential_id: string | null;
+  credential_url: string | null;
+  document_key: string | null;
+  preview_key: string | null;
+  image_alt: string | null;
   sort_order: number;
   is_visible: boolean;
   created_at: string;
@@ -168,6 +199,10 @@ export interface HeroInsert {
   tagline?: string | null;
   blurb?: string | null;
   location?: string | null;
+  headline?: string | null;
+  current_title?: string | null;
+  availability?: string | null;
+  resume_url?: string | null;
   is_visible?: boolean;
 }
 
@@ -175,6 +210,10 @@ export interface AboutInsert {
   summary?: string | null;
   personal?: PersonalInfo[];
   highlights?: string[];
+  headline?: string | null;
+  objective?: string | null;
+  story?: string[];
+  principles?: PortfolioPrinciple[];
   is_visible?: boolean;
 }
 
@@ -203,6 +242,7 @@ export interface SkillCategoryInsert {
   title: string;
   icon_key: string;
   color?: string | null;
+  description?: string | null;
   sort_order?: number;
   is_visible?: boolean;
 }
@@ -211,6 +251,9 @@ export interface SkillInsert {
   category_id: string;
   name: string;
   level?: number | null;
+  proficiency?: "core" | "strong" | "working" | "exploring" | null;
+  evidence?: string | null;
+  is_featured?: boolean;
   sort_order?: number;
   is_visible?: boolean;
 }
@@ -232,6 +275,14 @@ export interface ProjectInsert {
   tags?: string[];
   github_link?: string | null;
   live_link?: string | null;
+  slug?: string | null;
+  eyebrow?: string | null;
+  impact?: string | null;
+  contribution?: string | null;
+  year_label?: string | null;
+  image_key?: string | null;
+  image_alt?: string | null;
+  is_featured?: boolean;
   sort_order?: number;
   is_visible?: boolean;
 }
@@ -242,6 +293,12 @@ export interface CertificateInsert {
   description?: string | null;
   category?: string | null;
   issuer?: string | null;
+  issued_at?: string | null;
+  credential_id?: string | null;
+  credential_url?: string | null;
+  document_key?: string | null;
+  preview_key?: string | null;
+  image_alt?: string | null;
   sort_order?: number;
   is_visible?: boolean;
 }

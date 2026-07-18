@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 import { formatAppPageTitle } from "@repo/brand";
 
-import { getBlogPostBySlug } from "@/lib/blog/queries";
+import { getBlogPostBySlug, getPublishedBlogPosts } from "@/lib/blog/queries";
 import { DEFAULT_OG_IMAGE, PERSON_NAME, SITE_URL } from "@/lib/seo/config";
 
 import { BlogContent } from "./blog-content";
@@ -54,9 +54,18 @@ export default async function BlogPostPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const post = await getBlogPostBySlug(slug);
+  const [post, publishedPosts] = await Promise.all([
+    getBlogPostBySlug(slug),
+    getPublishedBlogPosts(),
+  ]);
 
   if (!post) notFound();
+
+  const currentIndex = publishedPosts.findIndex(
+    (publishedPost) => publishedPost.slug === post.slug,
+  );
+  const nextPost =
+    currentIndex >= 0 ? (publishedPosts[currentIndex + 1] ?? null) : null;
 
   const articleJsonLd = {
     "@context": "https://schema.org",
@@ -76,7 +85,7 @@ export default async function BlogPostPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
       />
-      <BlogContent post={post} />
+      <BlogContent post={post} nextPost={nextPost} />
     </>
   );
 }

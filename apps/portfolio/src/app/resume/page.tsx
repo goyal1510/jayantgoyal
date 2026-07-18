@@ -1,48 +1,41 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { Download, ExternalLink } from "lucide-react";
+import { ArrowDownToLine, ArrowUpRight } from "lucide-react";
 
-import { Button } from "@repo/ui/button";
-
+import { EditorialSubpageHeader } from "@/components/editorial/subpage-header";
 import { buildPublicPageMetadata } from "@/lib/seo/config";
 
 export const metadata: Metadata = buildPublicPageMetadata({
   title: "Resume",
   description:
-    "View or download Jayant Goyal's current full-stack development resume.",
+    "View or download Jayant Goyal's current full-stack product engineering resume.",
   pathname: "/resume",
 });
 
 export default function ResumePage() {
   return (
-    <div className="mx-auto flex min-h-[65vh] w-full max-w-3xl items-center px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full rounded-2xl border bg-card p-6 shadow-sm sm:p-10">
-        <p className="text-sm font-semibold tracking-[0.2em] text-primary uppercase">
-          Experience snapshot
-        </p>
-        <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-          Resume
-        </h1>
-        <p className="mt-4 max-w-2xl leading-7 text-muted-foreground">
-          Download the latest resume, or return to the Portfolio to explore
-          projects, experience, and technical skills in context.
-        </p>
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <Button asChild size="lg">
+    <main className="editorial-page">
+      <EditorialSubpageHeader />
+      <section className="shell editorial-resume">
+        <span className="section-index">Resume / Current snapshot</span>
+        <div>
+          <h1>The concise version of the path so far.</h1>
+          <p>
+            Product engineering across interfaces, application systems, data,
+            and delivery—along with the experience and education behind the
+            work.
+          </p>
+          <div className="editorial-resume__actions">
             <a href="/api/resume">
-              <Download className="size-4" />
-              Download resume
+              Download latest resume <ArrowDownToLine aria-hidden="true" />
             </a>
-          </Button>
-          <Button asChild size="lg" variant="outline">
             <Link href="/#experience">
-              <ExternalLink className="size-4" />
-              View experience
+              Explore the full story <ArrowUpRight aria-hidden="true" />
             </Link>
-          </Button>
+          </div>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }

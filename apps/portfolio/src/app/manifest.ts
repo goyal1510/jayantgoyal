@@ -11,8 +11,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: PORTFOLIO_BRAND.description,
     start_url: "/",
     display: "standalone",
-    background_color: "#0a0a0a",
-    theme_color: "#0a0a0a",
+    background_color: "#f3f0e8",
+    theme_color: "#f3f0e8",
     icons: [
       {
         src: "/assets/Jayant_favicon_io/android-chrome-192x192.png",

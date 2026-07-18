@@ -28,7 +28,11 @@ import {
 } from "@repo/ui/card";
 import { Badge } from "@repo/ui/badge";
 import type { Project } from "@/lib/types";
-import { ProjectDialog, emptyProjectForm, type ProjectFormData } from "./project-dialog";
+import {
+  ProjectDialog,
+  emptyProjectForm,
+  type ProjectFormData,
+} from "./project-dialog";
 
 interface ProjectsListProps {
   initialData: Project[];
@@ -47,7 +51,8 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
     setEditingItem(null);
     setFormData({
       ...emptyProjectForm,
-      sort_order: items.length > 0 ? Math.max(...items.map((i) => i.sort_order)) + 1 : 0,
+      sort_order:
+        items.length > 0 ? Math.max(...items.map((i) => i.sort_order)) + 1 : 0,
     });
     setDialogOpen(true);
   };
@@ -63,6 +68,14 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
       tags: item.tags ?? [],
       github_link: item.github_link ?? "",
       live_link: item.live_link ?? "",
+      slug: item.slug ?? "",
+      eyebrow: item.eyebrow ?? "",
+      impact: item.impact ?? "",
+      contribution: item.contribution ?? "",
+      year_label: item.year_label ?? "",
+      image_key: item.image_key ?? "",
+      image_alt: item.image_alt ?? "",
+      is_featured: item.is_featured,
       sort_order: item.sort_order,
       is_visible: item.is_visible,
     });
@@ -75,7 +88,11 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
 
     try {
       if (editingItem) {
-        const result = await updatePortfolioData<Project>("projects", editingItem.id, formData);
+        const result = await updatePortfolioData<Project>(
+          "projects",
+          editingItem.id,
+          formData,
+        );
         if (result.error) throw new Error(result.error);
         toast.success("Project updated");
       } else {
@@ -88,7 +105,7 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
       router.refresh();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to save project"
+        error instanceof Error ? error.message : "Failed to save project",
       );
     } finally {
       setSaving(false);
@@ -108,7 +125,7 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
       router.refresh();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to delete project"
+        error instanceof Error ? error.message : "Failed to delete project",
       );
     } finally {
       setDeleting(null);
@@ -117,12 +134,14 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
 
   const toggleVisibility = async (item: Project) => {
     try {
-      const result = await updatePortfolioData<Project>("projects", item.id, { is_visible: !item.is_visible });
+      const result = await updatePortfolioData<Project>("projects", item.id, {
+        is_visible: !item.is_visible,
+      });
       if (result.error) throw new Error(result.error);
       setItems(
         items.map((i) =>
-          i.id === item.id ? { ...i, is_visible: !i.is_visible } : i
-        )
+          i.id === item.id ? { ...i, is_visible: !i.is_visible } : i,
+        ),
       );
       toast.success(item.is_visible ? "Hidden from portfolio" : "Now visible");
     } catch {
@@ -174,7 +193,11 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
                     {item.tags && item.tags.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
                         {item.tags.map((tag) => (
-                          <Badge key={tag} variant="secondary" className="text-xs">
+                          <Badge
+                            key={tag}
+                            variant="secondary"
+                            className="text-xs"
+                          >
                             {tag}
                           </Badge>
                         ))}

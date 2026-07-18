@@ -17,9 +17,21 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/card";
-import type { SkillCategoryWithSkills, SkillCategory, Skill } from "@/lib/types";
-import { CategoryDialog, emptyCategoryForm, type CategoryFormData } from "./category-dialog";
-import { SkillDialog, emptySkillForm, type SkillFormData } from "./skill-dialog";
+import type {
+  SkillCategoryWithSkills,
+  SkillCategory,
+  Skill,
+} from "@/lib/types";
+import {
+  CategoryDialog,
+  emptyCategoryForm,
+  type CategoryFormData,
+} from "./category-dialog";
+import {
+  SkillDialog,
+  emptySkillForm,
+  type SkillFormData,
+} from "./skill-dialog";
 import { SkillCategoryCard } from "./skill-category-card";
 
 interface SkillsManagerProps {
@@ -30,12 +42,15 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
   const router = useRouter();
   const [categories, setCategories] = useState(initialData);
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
-    new Set(initialData.map((c) => c.id))
+    new Set(initialData.map((c) => c.id)),
   );
 
   const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<SkillCategory | null>(null);
-  const [categoryForm, setCategoryForm] = useState<CategoryFormData>(emptyCategoryForm);
+  const [editingCategory, setEditingCategory] = useState<SkillCategory | null>(
+    null,
+  );
+  const [categoryForm, setCategoryForm] =
+    useState<CategoryFormData>(emptyCategoryForm);
   const [savingCategory, setSavingCategory] = useState(false);
 
   const [skillDialogOpen, setSkillDialogOpen] = useState(false);
@@ -59,7 +74,10 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
     setEditingCategory(null);
     setCategoryForm({
       ...emptyCategoryForm,
-      sort_order: categories.length > 0 ? Math.max(...categories.map((c) => c.sort_order)) + 1 : 0,
+      sort_order:
+        categories.length > 0
+          ? Math.max(...categories.map((c) => c.sort_order)) + 1
+          : 0,
     });
     setCategoryDialogOpen(true);
   };
@@ -70,6 +88,7 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
       title: category.title,
       icon_key: category.icon_key,
       color: category.color ?? "",
+      description: category.description ?? "",
       sort_order: category.sort_order,
       is_visible: category.is_visible,
     });
@@ -85,14 +104,14 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
         const result = await updatePortfolioData<SkillCategory>(
           "skill_categories",
           editingCategory.id,
-          categoryForm
+          categoryForm,
         );
         if (result.error) throw new Error(result.error);
         toast.success("Category updated");
       } else {
         const result = await createPortfolioData<SkillCategory>(
           "skill_categories",
-          categoryForm
+          categoryForm,
         );
         if (result.error) throw new Error(result.error);
         toast.success("Category added");
@@ -102,7 +121,7 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
       router.refresh();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to save category"
+        error instanceof Error ? error.message : "Failed to save category",
       );
     } finally {
       setSavingCategory(false);
@@ -127,7 +146,7 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
       router.refresh();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to delete category"
+        error instanceof Error ? error.message : "Failed to delete category",
       );
     } finally {
       setDeleting(null);
@@ -152,6 +171,9 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
       name: skill.name,
       icon_key: skill.icon_key,
       level: skill.level,
+      proficiency: skill.proficiency,
+      evidence: skill.evidence ?? "",
+      is_featured: skill.is_featured,
       sort_order: skill.sort_order,
       is_visible: skill.is_visible,
     });
@@ -167,7 +189,7 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
         const result = await updatePortfolioData<Skill>(
           "skills",
           editingSkill.id,
-          skillForm
+          skillForm,
         );
         if (result.error) throw new Error(result.error);
         toast.success("Skill updated");
@@ -181,7 +203,7 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
       router.refresh();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to save skill"
+        error instanceof Error ? error.message : "Failed to save skill",
       );
     } finally {
       setSavingSkill(false);
@@ -201,12 +223,12 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
         categories.map((c) => ({
           ...c,
           skills: c.skills.filter((s) => s.id !== id),
-        }))
+        })),
       );
       router.refresh();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to delete skill"
+        error instanceof Error ? error.message : "Failed to delete skill",
       );
     } finally {
       setDeleting(null);
@@ -223,9 +245,9 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
         categories.map((c) => ({
           ...c,
           skills: c.skills.map((s) =>
-            s.id === skill.id ? { ...s, is_visible: !s.is_visible } : s
+            s.id === skill.id ? { ...s, is_visible: !s.is_visible } : s,
           ),
-        }))
+        })),
       );
       toast.success(skill.is_visible ? "Skill hidden" : "Skill visible");
     } catch {

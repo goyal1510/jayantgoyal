@@ -32,6 +32,10 @@ export function HeroForm({ initialData }: HeroFormProps) {
     tagline: initialData?.tagline ?? "",
     blurb: initialData?.blurb ?? "",
     location: initialData?.location ?? "",
+    headline: initialData?.headline ?? "",
+    current_title: initialData?.current_title ?? "",
+    availability: initialData?.availability ?? "",
+    resume_url: initialData?.resume_url ?? "",
     is_visible: initialData?.is_visible ?? true,
   });
 
@@ -41,7 +45,11 @@ export function HeroForm({ initialData }: HeroFormProps) {
 
     try {
       if (initialData?.id) {
-        const result = await updatePortfolioData<Hero>("hero", initialData.id, formData);
+        const result = await updatePortfolioData<Hero>(
+          "hero",
+          initialData.id,
+          formData,
+        );
         if (result.error) throw new Error(result.error);
         toast.success("Hero section updated");
       } else {
@@ -53,7 +61,7 @@ export function HeroForm({ initialData }: HeroFormProps) {
       router.refresh();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to save hero section"
+        error instanceof Error ? error.message : "Failed to save hero section",
       );
     } finally {
       setSaving(false);
@@ -95,6 +103,60 @@ export function HeroForm({ initialData }: HeroFormProps) {
                 required
               />
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="headline">Editorial Headline</Label>
+            <Textarea
+              id="headline"
+              value={formData.headline}
+              onChange={(e) =>
+                setFormData({ ...formData, headline: e.target.value })
+              }
+              placeholder="I turn ambitious product ideas into clear, dependable software."
+              rows={3}
+            />
+            <p className="text-xs text-muted-foreground">
+              The primary statement visitors see first.
+            </p>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="current_title">Formal Current Title</Label>
+              <Input
+                id="current_title"
+                value={formData.current_title}
+                onChange={(e) =>
+                  setFormData({ ...formData, current_title: e.target.value })
+                }
+                placeholder="Product Associate Engineer"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="resume_url">Resume URL</Label>
+              <Input
+                id="resume_url"
+                type="url"
+                value={formData.resume_url}
+                onChange={(e) =>
+                  setFormData({ ...formData, resume_url: e.target.value })
+                }
+                placeholder="https://jayantgoyal.com/api/resume"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="availability">Availability</Label>
+            <Input
+              id="availability"
+              value={formData.availability}
+              onChange={(e) =>
+                setFormData({ ...formData, availability: e.target.value })
+              }
+              placeholder="Open to thoughtful product and engineering collaborations."
+            />
           </div>
 
           <div className="space-y-2">

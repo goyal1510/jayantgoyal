@@ -16,7 +16,10 @@ import { Textarea } from "@repo/ui/textarea";
 import { Switch } from "@repo/ui/switch";
 import type { Certificate } from "@/lib/types";
 
-export type CertificateFormData = Omit<Certificate, "id" | "created_at" | "updated_at">;
+export type CertificateFormData = Omit<
+  Certificate,
+  "id" | "created_at" | "updated_at"
+>;
 
 export const emptyCertificateForm: CertificateFormData = {
   name: "",
@@ -24,6 +27,12 @@ export const emptyCertificateForm: CertificateFormData = {
   description: "",
   category: "",
   issuer: "",
+  issued_at: null,
+  credential_id: "",
+  credential_url: "",
+  document_key: "",
+  preview_key: "",
+  image_alt: "",
   sort_order: 0,
   is_visible: true,
 };
@@ -72,6 +81,88 @@ export function CertificateDialog({
                 }
                 placeholder="AWS Solutions Architect"
                 required
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="issued_at">Issued Date</Label>
+                <Input
+                  id="issued_at"
+                  type="date"
+                  value={formData.issued_at ?? ""}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      issued_at: e.target.value || null,
+                    })
+                  }
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="credential_id">Credential ID</Label>
+                <Input
+                  id="credential_id"
+                  value={formData.credential_id ?? ""}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      credential_id: e.target.value,
+                    })
+                  }
+                  placeholder="Leave empty when unknown"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="credential_url">Verification URL</Label>
+              <Input
+                id="credential_url"
+                type="url"
+                value={formData.credential_url ?? ""}
+                onChange={(e) =>
+                  setFormData({ ...formData, credential_url: e.target.value })
+                }
+                placeholder="https://..."
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="document_key">Document Key</Label>
+                <Input
+                  id="document_key"
+                  value={formData.document_key ?? ""}
+                  onChange={(e) =>
+                    setFormData({ ...formData, document_key: e.target.value })
+                  }
+                  placeholder="hackerrank-basic"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="preview_key">Preview Key</Label>
+                <Input
+                  id="preview_key"
+                  value={formData.preview_key ?? ""}
+                  onChange={(e) =>
+                    setFormData({ ...formData, preview_key: e.target.value })
+                  }
+                  placeholder="hackerrank-basic"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="image_alt">Preview Description</Label>
+              <Textarea
+                id="image_alt"
+                value={formData.image_alt ?? ""}
+                onChange={(e) =>
+                  setFormData({ ...formData, image_alt: e.target.value })
+                }
+                placeholder="Describe the certificate for visitors using assistive technology."
+                rows={2}
               />
             </div>
 

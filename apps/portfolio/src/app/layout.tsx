@@ -1,24 +1,11 @@
 import "./globals.css";
 
 import type { Metadata } from "next";
-import { cookies, headers } from "next/headers";
-import { Inter } from "next/font/google";
+import { headers } from "next/headers";
+import { DM_Sans, Instrument_Serif } from "next/font/google";
 import Script from "next/script";
 
-import { Toaster } from "@repo/ui/sonner";
-import { LazyMotionProvider } from "@repo/ui/lazy-motion-provider";
-import {
-  SIDEBAR_STATE_COOKIE_NAME,
-  SIDEBAR_WIDTH_COOKIE_NAME,
-  parseSidebarPreferences,
-} from "@repo/ui/lib/sidebar-preferences";
-import { SidebarInset, SidebarProvider } from "@repo/ui/sidebar";
-import { ThemeProvider } from "@repo/ui/theme-provider";
-
-import { PortfolioSidebar } from "@/components/portfolio-sidebar";
-import { PortfolioTopbar } from "@/components/portfolio-topbar";
-import { getPortfolioDataFromHeaders } from "@/lib/portfolio/server";
-import { PortfolioDataProvider } from "@/lib/portfolio/use-portfolio-data";
+import { fallbackPortfolioData } from "@/lib/portfolio/editorial-data";
 import {
   DEFAULT_OG_IMAGE,
   isCanonicalProductionHost,
@@ -30,10 +17,17 @@ import {
   SITE_URL,
 } from "@/lib/seo/config";
 
-const inter = Inter({
+const sans = DM_Sans({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-inter",
+  variable: "--font-sans",
+});
+
+const serif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+  variable: "--font-serif",
 });
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -49,7 +43,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: SITE_DESCRIPTION,
     keywords: [
       PERSON_NAME,
-      "full-stack developer",
+      "full-stack product engineer",
       "portfolio",
       "Next.js",
       "React",
@@ -104,26 +98,21 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const { data, profile, host, source } = await getPortfolioDataFromHeaders();
-  const cookieStore = await cookies();
-  const sidebarPreferences = parseSidebarPreferences({
-    state: cookieStore.get(SIDEBAR_STATE_COOKIE_NAME)?.value,
-    width: cookieStore.get(SIDEBAR_WIDTH_COOKIE_NAME)?.value,
-  });
+  const profile = fallbackPortfolioData.profile;
   const personJsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
     name: PERSON_NAME,
     url: SITE_URL,
-    jobTitle: data.HERO.role,
-    sameAs: data.CONTACT.socials.map((social) => social.href),
+    jobTitle: profile.role,
+    sameAs: [profile.github, profile.linkedin, profile.instagram],
   };
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <head>
         <Script
           async
@@ -138,34 +127,7 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
         />
       </head>
-      <body className={inter.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <PortfolioDataProvider
-            data={data}
-            profile={profile}
-            host={host}
-            source={source}
-          >
-            <SidebarProvider {...sidebarPreferences}>
-              <PortfolioSidebar />
-              <SidebarInset>
-                <PortfolioTopbar />
-                <LazyMotionProvider>
-                  <div className="mx-auto w-full max-w-7xl py-4">
-                    {children}
-                  </div>
-                </LazyMotionProvider>
-              </SidebarInset>
-            </SidebarProvider>
-          </PortfolioDataProvider>
-          <Toaster />
-        </ThemeProvider>
-      </body>
+      <body className={`${sans.variable} ${serif.variable}`}>{children}</body>
     </html>
   );
 }
