@@ -70,7 +70,9 @@ CREATE TABLE IF NOT EXISTS "portfolio"."certificates" (
     "credential_url" "text",
     "document_key" "text",
     "preview_key" "text",
-    "image_alt" "text"
+    "image_alt" "text",
+    "document_url" "text" NOT NULL,
+    "preview_url" "text" NOT NULL
 );
 
 
@@ -141,7 +143,10 @@ CREATE TABLE IF NOT EXISTS "portfolio"."hero" (
     "current_title" "text",
     "availability" "text",
     "resume_url" "text",
-    "display_name" "text"
+    "display_name" "text",
+    "github_username" "text" NOT NULL,
+    "seo_title" "text" NOT NULL,
+    "seo_description" "text" NOT NULL
 );
 
 
@@ -187,6 +192,7 @@ CREATE TABLE IF NOT EXISTS "portfolio"."projects" (
     "image_key" "text",
     "image_alt" "text",
     "is_featured" boolean DEFAULT false NOT NULL,
+    "image_url" "text" NOT NULL,
     CONSTRAINT "projects_slug_format_check" CHECK ((("slug" IS NULL) OR ("slug" ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'::"text")))
 );
 
