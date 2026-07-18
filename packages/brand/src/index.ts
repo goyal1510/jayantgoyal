@@ -12,9 +12,9 @@ export const APP_BRANDS = {
     name: "Portfolio",
     publicName: PERSON_BRAND.fullName,
     canonicalUrl: PERSON_BRAND.canonicalUrl,
-    defaultTitle: `${PERSON_BRAND.fullName} | Full-Stack Developer`,
+    defaultTitle: `${PERSON_BRAND.fullName} | Full-Stack Product Engineer`,
     titleTemplate: `%s | ${PERSON_BRAND.fullName}`,
-    description: `The portfolio of ${PERSON_BRAND.fullName}, a full-stack developer building reliable products with Next.js, React, TypeScript, and Supabase.`,
+    description: `The portfolio of ${PERSON_BRAND.fullName}, a full-stack product engineer shaping clear, dependable digital products from idea through delivery.`,
   },
   studio: {
     id: "studio",
