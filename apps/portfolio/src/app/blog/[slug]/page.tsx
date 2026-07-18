@@ -4,11 +4,12 @@ import { notFound } from "next/navigation";
 import { formatAppPageTitle } from "@repo/brand";
 
 import { getBlogPostBySlug, getPublishedBlogPosts } from "@/lib/blog/queries";
+import { getPortfolioShellData } from "@/lib/portfolio/editorial-server";
 import { DEFAULT_OG_IMAGE, PERSON_NAME, SITE_URL } from "@/lib/seo/config";
 
 import { BlogContent } from "./blog-content";
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -54,9 +55,10 @@ export default async function BlogPostPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const [post, publishedPosts] = await Promise.all([
+  const [post, publishedPosts, shell] = await Promise.all([
     getBlogPostBySlug(slug),
     getPublishedBlogPosts(),
+    getPortfolioShellData(),
   ]);
 
   if (!post) notFound();
@@ -85,7 +87,12 @@ export default async function BlogPostPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
       />
-      <BlogContent post={post} nextPost={nextPost} />
+      <BlogContent
+        post={post}
+        nextPost={nextPost}
+        brandLabel={shell.brandLabel}
+        navigation={shell.navigation}
+      />
     </>
   );
 }

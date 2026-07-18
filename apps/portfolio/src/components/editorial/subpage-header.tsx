@@ -1,20 +1,26 @@
 import { ArrowDown } from "lucide-react";
 import Link from "next/link";
 
-import { PERSON_BRAND } from "@repo/brand";
-
 import { PortfolioNavigation } from "@/components/editorial/portfolio-navigation";
+import type { PortfolioNavigationItem } from "@/lib/portfolio/editorial-data";
 
-export function EditorialSubpageHeader() {
+export function EditorialSubpageHeader({
+  brandLabel,
+  navigation,
+}: {
+  brandLabel: string;
+  navigation: PortfolioNavigationItem[];
+}) {
   return (
     <header className="editorial-subpage-header">
       <div className="shell editorial-subpage-header__inner">
         <Link href="/" className="monogram" aria-label="Portfolio home">
-          {PERSON_BRAND.monogram}
+          {brandLabel}
         </Link>
         <PortfolioNavigation
           surface="subpage"
           ariaLabel="Portfolio navigation"
+          items={navigation}
         />
         <Link className="editorial-subpage-header__contact" href="/#contact">
           Let&apos;s talk <ArrowDown aria-hidden="true" />

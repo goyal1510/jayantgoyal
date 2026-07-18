@@ -28,6 +28,7 @@ export function HeroForm({ initialData }: HeroFormProps) {
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
     name: initialData?.name ?? "",
+    display_name: initialData?.display_name ?? "",
     role: initialData?.role ?? "",
     tagline: initialData?.tagline ?? "",
     blurb: initialData?.blurb ?? "",
@@ -91,6 +92,24 @@ export function HeroForm({ initialData }: HeroFormProps) {
                 required
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="display_name">Header Wordmark</Label>
+              <Input
+                id="display_name"
+                value={formData.display_name}
+                onChange={(e) =>
+                  setFormData({ ...formData, display_name: e.target.value })
+                }
+                placeholder="Jayant"
+                required
+              />
+              <p className="text-xs text-muted-foreground">
+                The visible name in every public Portfolio header.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="role">Role / Title</Label>
               <Input
@@ -160,28 +179,34 @@ export function HeroForm({ initialData }: HeroFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tagline">Tagline</Label>
+            <Label htmlFor="tagline">Current Focus</Label>
             <Input
               id="tagline"
               value={formData.tagline}
               onChange={(e) =>
                 setFormData({ ...formData, tagline: e.target.value })
               }
-              placeholder="Building the future, one line at a time"
+              placeholder="Healthcare product systems"
             />
+            <p className="text-xs text-muted-foreground">
+              Shown beside the “Building” label in the hero field note.
+            </p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="blurb">Blurb</Label>
+            <Label htmlFor="blurb">Hero Introduction</Label>
             <Textarea
               id="blurb"
               value={formData.blurb}
               onChange={(e) =>
                 setFormData({ ...formData, blurb: e.target.value })
               }
-              placeholder="A short introduction about yourself..."
+              placeholder="I'm Jayant Goyal, a full-stack product engineer..."
               rows={4}
             />
+            <p className="text-xs text-muted-foreground">
+              The complete sentence directly below the editorial headline.
+            </p>
           </div>
 
           <div className="space-y-2">

@@ -31,6 +31,7 @@ export interface PortfolioPrinciple {
 export interface HeroRow {
   id: string;
   name: string;
+  display_name: string | null;
   role: string;
   tagline: string | null;
   blurb: string | null;
@@ -183,6 +184,21 @@ export interface NavItemRow {
   label: string;
   icon_key: string;
   color: string | null;
+  note: string | null;
+  sort_order: number;
+  is_visible: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SectionContentRow {
+  id: string;
+  section_key: string;
+  eyebrow: string;
+  headline: string | null;
+  accent: string | null;
+  description: string | null;
+  supporting_text: string | null;
   sort_order: number;
   is_visible: boolean;
   created_at: string;
@@ -195,6 +211,7 @@ export interface NavItemRow {
 
 export interface HeroInsert {
   name: string;
+  display_name?: string | null;
   role: string;
   tagline?: string | null;
   blurb?: string | null;
@@ -316,6 +333,18 @@ export interface NavItemInsert {
   label: string;
   icon_key: string;
   color?: string | null;
+  note?: string | null;
+  sort_order?: number;
+  is_visible?: boolean;
+}
+
+export interface SectionContentInsert {
+  section_key: string;
+  eyebrow: string;
+  headline?: string | null;
+  accent?: string | null;
+  description?: string | null;
+  supporting_text?: string | null;
   sort_order?: number;
   is_visible?: boolean;
 }
@@ -335,6 +364,7 @@ export type ProjectUpdate = Partial<ProjectInsert>;
 export type CertificateUpdate = Partial<CertificateInsert>;
 export type ContactUpdate = Partial<ContactInsert>;
 export type NavItemUpdate = Partial<NavItemInsert>;
+export type SectionContentUpdate = Partial<SectionContentInsert>;
 
 // ============================================================================
 // Composite Types

@@ -5,9 +5,10 @@ import { ArrowUpRight } from "lucide-react";
 
 import { EditorialSubpageHeader } from "@/components/editorial/subpage-header";
 import { getPublishedBlogPosts } from "@/lib/blog/queries";
+import { getPortfolioShellData } from "@/lib/portfolio/editorial-server";
 import { buildPublicPageMetadata } from "@/lib/seo/config";
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = buildPublicPageMetadata({
   title: "Writing",
@@ -17,11 +18,17 @@ export const metadata: Metadata = buildPublicPageMetadata({
 });
 
 export default async function BlogPage() {
-  const posts = await getPublishedBlogPosts();
+  const [posts, shell] = await Promise.all([
+    getPublishedBlogPosts(),
+    getPortfolioShellData(),
+  ]);
 
   return (
     <main className="editorial-page">
-      <EditorialSubpageHeader />
+      <EditorialSubpageHeader
+        brandLabel={shell.brandLabel}
+        navigation={shell.navigation}
+      />
       <section className="shell editorial-page-hero">
         <span className="section-index">Writing / Notes from the build</span>
         <div>

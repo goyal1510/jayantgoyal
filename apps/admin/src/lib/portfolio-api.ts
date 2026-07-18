@@ -9,7 +9,8 @@ type PortfolioTable =
   | "projects"
   | "certificates"
   | "contact"
-  | "nav_items";
+  | "nav_items"
+  | "section_content";
 
 interface ApiResponse<T> {
   data?: T;
@@ -19,7 +20,7 @@ interface ApiResponse<T> {
 
 export async function fetchPortfolioData<T>(
   table: PortfolioTable,
-  id?: string
+  id?: string,
 ): Promise<ApiResponse<T>> {
   const url = id
     ? `/api/portfolio/${table}?id=${id}`
@@ -31,7 +32,7 @@ export async function fetchPortfolioData<T>(
 
 export async function createPortfolioData<T>(
   table: PortfolioTable,
-  data: Partial<T>
+  data: Partial<T>,
 ): Promise<ApiResponse<T>> {
   const response = await fetch(`/api/portfolio/${table}`, {
     method: "POST",
@@ -44,7 +45,7 @@ export async function createPortfolioData<T>(
 export async function updatePortfolioData<T>(
   table: PortfolioTable,
   id: string,
-  data: Partial<T>
+  data: Partial<T>,
 ): Promise<ApiResponse<T>> {
   const response = await fetch(`/api/portfolio/${table}?id=${id}`, {
     method: "PUT",
@@ -56,7 +57,7 @@ export async function updatePortfolioData<T>(
 
 export async function deletePortfolioData(
   table: PortfolioTable,
-  id: string
+  id: string,
 ): Promise<ApiResponse<void>> {
   const response = await fetch(`/api/portfolio/${table}?id=${id}`, {
     method: "DELETE",

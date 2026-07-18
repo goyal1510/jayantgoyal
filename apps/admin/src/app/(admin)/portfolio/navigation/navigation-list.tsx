@@ -26,7 +26,11 @@ import {
   CardTitle,
 } from "@repo/ui/card";
 import type { NavItem } from "@/lib/types";
-import { NavigationDialog, emptyNavForm, type NavFormData } from "./navigation-dialog";
+import {
+  NavigationDialog,
+  emptyNavForm,
+  type NavFormData,
+} from "./navigation-dialog";
 
 interface NavigationListProps {
   initialData: NavItem[];
@@ -45,7 +49,8 @@ export function NavigationList({ initialData }: NavigationListProps) {
     setEditingItem(null);
     setFormData({
       ...emptyNavForm,
-      sort_order: items.length > 0 ? Math.max(...items.map((i) => i.sort_order)) + 1 : 0,
+      sort_order:
+        items.length > 0 ? Math.max(...items.map((i) => i.sort_order)) + 1 : 0,
     });
     setDialogOpen(true);
   };
@@ -57,6 +62,7 @@ export function NavigationList({ initialData }: NavigationListProps) {
       label: item.label,
       icon_key: item.icon_key,
       color: item.color ?? "",
+      note: item.note ?? "",
       sort_order: item.sort_order,
       is_visible: item.is_visible,
     });
@@ -69,11 +75,18 @@ export function NavigationList({ initialData }: NavigationListProps) {
 
     try {
       if (editingItem) {
-        const result = await updatePortfolioData<NavItem>("nav_items", editingItem.id, formData);
+        const result = await updatePortfolioData<NavItem>(
+          "nav_items",
+          editingItem.id,
+          formData,
+        );
         if (result.error) throw new Error(result.error);
         toast.success("Nav item updated");
       } else {
-        const result = await createPortfolioData<NavItem>("nav_items", formData);
+        const result = await createPortfolioData<NavItem>(
+          "nav_items",
+          formData,
+        );
         if (result.error) throw new Error(result.error);
         toast.success("Nav item added");
       }
@@ -82,7 +95,7 @@ export function NavigationList({ initialData }: NavigationListProps) {
       router.refresh();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to save nav item"
+        error instanceof Error ? error.message : "Failed to save nav item",
       );
     } finally {
       setSaving(false);
@@ -102,7 +115,7 @@ export function NavigationList({ initialData }: NavigationListProps) {
       router.refresh();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to delete nav item"
+        error instanceof Error ? error.message : "Failed to delete nav item",
       );
     } finally {
       setDeleting(null);
@@ -111,12 +124,14 @@ export function NavigationList({ initialData }: NavigationListProps) {
 
   const toggleVisibility = async (item: NavItem) => {
     try {
-      const result = await updatePortfolioData<NavItem>("nav_items", item.id, { is_visible: !item.is_visible });
+      const result = await updatePortfolioData<NavItem>("nav_items", item.id, {
+        is_visible: !item.is_visible,
+      });
       if (result.error) throw new Error(result.error);
       setItems(
         items.map((i) =>
-          i.id === item.id ? { ...i, is_visible: !i.is_visible } : i
-        )
+          i.id === item.id ? { ...i, is_visible: !i.is_visible } : i,
+        ),
       );
       toast.success(item.is_visible ? "Hidden from nav" : "Now visible");
     } catch {
@@ -176,7 +191,8 @@ export function NavigationList({ initialData }: NavigationListProps) {
                       )}
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      Section: #{item.section_id} • Icon: {item.icon_key}
+                      Section: #{item.section_id} • Mobile note:{" "}
+                      {item.note || "—"}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">

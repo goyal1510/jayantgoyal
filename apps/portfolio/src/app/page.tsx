@@ -3,10 +3,7 @@ import type { Metadata } from "next";
 import { PortfolioExperience } from "@/components/editorial/portfolio-experience";
 import { getPublishedBlogPreviews } from "@/lib/blog/editorial-queries";
 import { getGitHubCodeStats } from "@/lib/github/server";
-import {
-  fallbackBlogPosts,
-  fallbackPortfolioData,
-} from "@/lib/portfolio/editorial-data";
+import { fallbackBlogPosts } from "@/lib/portfolio/editorial-data";
 import { getEditorialPortfolioData } from "@/lib/portfolio/editorial-server";
 import {
   DEFAULT_OG_IMAGE,
@@ -14,7 +11,7 @@ import {
   SITE_TITLE,
 } from "@/lib/seo/config";
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: { absolute: SITE_TITLE },
@@ -48,13 +45,9 @@ export default async function PortfolioPage() {
     getPublishedBlogPreviews(),
   ]);
 
-  const data = portfolio.data.projects.length
-    ? portfolio.data
-    : fallbackPortfolioData;
-
   return (
     <PortfolioExperience
-      data={data}
+      data={portfolio.data}
       githubStats={githubStats}
       blogPosts={publishedPosts.length > 0 ? publishedPosts : fallbackBlogPosts}
     />

@@ -4,7 +4,10 @@ import Link from "next/link";
 import { ArrowDownToLine, ArrowUpRight } from "lucide-react";
 
 import { EditorialSubpageHeader } from "@/components/editorial/subpage-header";
+import { getPortfolioShellData } from "@/lib/portfolio/editorial-server";
 import { buildPublicPageMetadata } from "@/lib/seo/config";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = buildPublicPageMetadata({
   title: "Resume",
@@ -13,10 +16,15 @@ export const metadata: Metadata = buildPublicPageMetadata({
   pathname: "/resume",
 });
 
-export default function ResumePage() {
+export default async function ResumePage() {
+  const shell = await getPortfolioShellData();
+
   return (
     <main className="editorial-page">
-      <EditorialSubpageHeader />
+      <EditorialSubpageHeader
+        brandLabel={shell.brandLabel}
+        navigation={shell.navigation}
+      />
       <section className="shell editorial-resume">
         <span className="section-index">Resume / Current snapshot</span>
         <div>

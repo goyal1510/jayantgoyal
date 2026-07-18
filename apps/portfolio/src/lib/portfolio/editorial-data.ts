@@ -4,12 +4,15 @@ export type ProjectTone = "paper" | "ink" | "signal";
 
 export type PortfolioProfile = {
   name: string;
+  displayName: string;
   monogram: string;
   email: string;
   phone: string;
   location: string;
   role: string;
   headline: string;
+  introduction: string;
+  focus: string;
   currentRole: string;
   availability: string;
   github: string;
@@ -21,6 +24,7 @@ export type PortfolioProfile = {
 export type PortfolioAbout = {
   headline: string;
   objective: string;
+  lead: string;
   story: string[];
   facts: Array<{ label: string; value: string }>;
   highlights: string[];
@@ -91,14 +95,50 @@ export type PortfolioPrinciple = {
   copy: string;
 };
 
+export type PortfolioNavigationItem = {
+  key: string;
+  label: string;
+  note: string;
+};
+
+export const PORTFOLIO_SECTION_KEYS = [
+  "skills",
+  "education",
+  "experience",
+  "credentials",
+  "activity",
+  "work",
+  "writing",
+  "contact",
+] as const;
+
+export type PortfolioSectionKey = (typeof PORTFOLIO_SECTION_KEYS)[number];
+
+export type PortfolioSectionContent = {
+  eyebrow: string;
+  headline: string;
+  accent: string;
+  description: string;
+  supportingText: string;
+};
+
+export type PortfolioSectionContentMap = Record<
+  PortfolioSectionKey,
+  PortfolioSectionContent
+>;
+
 export const portfolioProfile: PortfolioProfile = {
   name: PERSON_BRAND.fullName,
+  displayName: PERSON_BRAND.givenName,
   monogram: PERSON_BRAND.monogram,
   email: "goyal151002@gmail.com",
   phone: "+91 94134 95328",
   location: "Hyderabad, India",
   role: "Full-stack product engineer",
   headline: "I turn ambitious product ideas into clear, dependable software.",
+  introduction:
+    "I'm Jayant Goyal, a full-stack product engineer who turns ambitious, messy ideas into reliable experiences.",
+  focus: "Healthcare product systems",
   currentRole: "Product Associate Engineer",
   availability: "Open to thoughtful collaborations",
   github: "https://github.com/goyal1510",
@@ -111,6 +151,7 @@ export const about: PortfolioAbout = {
   headline: "I like the whole problem, not only the screen.",
   objective:
     "I am a full-stack product engineer working across product thinking, interface craft, APIs, data, and delivery. I care about building useful systems that remain clear as they grow.",
+  lead: "I care about the path from the first product question to the final interaction detail.",
   story: [
     "My work moves comfortably between Next.js interfaces, TypeScript application logic, Supabase backends, and the smaller interaction details that make software feel dependable.",
     "I enjoy ambiguous product problems: finding the real constraint, mapping the system, shipping an early version, and learning from how people actually use it.",
@@ -555,9 +596,86 @@ export const principles: PortfolioPrinciple[] = [
   },
 ];
 
+export const navigation: PortfolioNavigationItem[] = [
+  { key: "about", label: "About", note: "Story" },
+  { key: "skills", label: "Skills", note: "Capabilities" },
+  { key: "experience", label: "Experience", note: "Timeline" },
+  { key: "activity", label: "Activity", note: "GitHub" },
+  { key: "work", label: "Work", note: "Projects" },
+  { key: "writing", label: "Writing", note: "Journal" },
+];
+
+export const sectionContent: PortfolioSectionContentMap = {
+  skills: {
+    eyebrow: "Capabilities / Across the stack",
+    headline:
+      "Broad enough to own the path. Focused enough to sweat the details.",
+    accent: "",
+    description:
+      "The tools I use to shape interfaces, systems, data, and the space between them.",
+    supportingText: "",
+  },
+  education: {
+    eyebrow: "Education / Foundation",
+    headline: "Where the foundation was built.",
+    accent: "",
+    description: "",
+    supportingText: "",
+  },
+  experience: {
+    eyebrow: "Career / The path so far",
+    headline: "Each role moved me closer to the whole product.",
+    accent: "",
+    description:
+      "What began in enterprise engineering now spans product thinking, systems, interfaces, and the responsibility of shipping them together.",
+    supportingText: "",
+  },
+  credentials: {
+    eyebrow: "Credentials / Milestones",
+    headline: "A few milestones, kept in one deck.",
+    accent: "",
+    description:
+      "Formal chapters from the learning and internships behind the work.",
+    supportingText: "",
+  },
+  activity: {
+    eyebrow: "Open source / GitHub",
+    headline: "The work between the launches.",
+    accent: "",
+    description:
+      "A live view of the repositories, languages, and contribution rhythm behind the public work.",
+    supportingText: "",
+  },
+  work: {
+    eyebrow: "Selected work / Product systems",
+    headline: "Built for real days, real people, and real pressure.",
+    accent: "",
+    description:
+      "A selection spanning developer tools, realtime collaboration, personal workflows, games, utilities, and commerce—designed and engineered from the first decision through delivery.",
+    supportingText: "",
+  },
+  writing: {
+    eyebrow: "Writing / Notes from the build",
+    headline: "",
+    accent: "",
+    description: "",
+    supportingText: "",
+  },
+  contact: {
+    eyebrow: "Contact / Start a conversation",
+    headline: "Have an idea with",
+    accent: "sharp edges?",
+    description:
+      "Tell me what you are trying to make, where it feels difficult, and what a useful outcome would look like.",
+    supportingText: "I normally reply within one business day.",
+  },
+};
+
 export type PortfolioEditorialData = {
   profile: PortfolioProfile;
   about: PortfolioAbout;
+  navigation: PortfolioNavigationItem[];
+  sectionContent: PortfolioSectionContentMap;
   education: PortfolioEducation[];
   experience: PortfolioExperience[];
   skillGroups: PortfolioSkillGroup[];
@@ -569,6 +687,8 @@ export type PortfolioEditorialData = {
 export const fallbackPortfolioData: PortfolioEditorialData = {
   profile: portfolioProfile,
   about,
+  navigation,
+  sectionContent,
   education,
   experience,
   skillGroups,

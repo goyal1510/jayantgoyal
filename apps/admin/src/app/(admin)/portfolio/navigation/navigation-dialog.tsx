@@ -22,6 +22,7 @@ export const emptyNavForm: NavFormData = {
   label: "",
   icon_key: "",
   color: "",
+  note: "",
   sort_order: 0,
   is_visible: true,
 };
@@ -85,8 +86,8 @@ export function NavigationDialog({
                 required
               />
               <p className="text-xs text-muted-foreground">
-                The HTML id of the section this links to (e.g., &quot;about&quot;,
-                &quot;experience&quot;)
+                The HTML id of the section this links to (e.g.,
+                &quot;about&quot;, &quot;experience&quot;)
               </p>
             </div>
 
@@ -124,6 +125,21 @@ export function NavigationDialog({
                   />
                 </div>
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="note">Mobile Menu Note</Label>
+              <Input
+                id="note"
+                value={formData.note ?? ""}
+                onChange={(e) =>
+                  setFormData({ ...formData, note: e.target.value })
+                }
+                placeholder="Capabilities"
+              />
+              <p className="text-xs text-muted-foreground">
+                Short context shown beside the label in the mobile menu.
+              </p>
             </div>
 
             <div className="space-y-2">

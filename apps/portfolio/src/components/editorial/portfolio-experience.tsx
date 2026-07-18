@@ -35,6 +35,7 @@ import type {
   PortfolioExperience as PortfolioExperienceItem,
   PortfolioProfile,
   PortfolioProject,
+  PortfolioSectionContent,
 } from "@/lib/portfolio/editorial-data";
 import type { GitHubLOCStats } from "@/lib/github/types";
 
@@ -74,19 +75,21 @@ function Reveal({
   );
 }
 
-function ProjectWall({ projects }: { projects: PortfolioProject[] }) {
+function ProjectWall({
+  projects,
+  content,
+}: {
+  projects: PortfolioProject[];
+  content: PortfolioSectionContent;
+}) {
   return (
     <section id="work" className="project-desk">
       <div className="shell">
         <Reveal className="section-heading section-heading--light">
-          <span className="section-index">Selected work / Product systems</span>
+          <span className="section-index">{content.eyebrow}</span>
           <div>
-            <h2>Built for real days, real people, and real pressure.</h2>
-            <p>
-              A selection spanning developer tools, realtime collaboration,
-              personal workflows, games, utilities, and commerce—designed and
-              engineered from the first decision through delivery.
-            </p>
+            <h2>{content.headline}</h2>
+            <p>{content.description}</p>
           </div>
         </Reveal>
 
@@ -148,8 +151,10 @@ function ProjectWall({ projects }: { projects: PortfolioProject[] }) {
 
 function CertificateDeck({
   credentials,
+  content,
 }: {
   credentials: PortfolioCredential[];
+  content: PortfolioSectionContent;
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const activeCertificate = credentials[activeIndex] ?? credentials[0];
@@ -169,12 +174,10 @@ function CertificateDeck({
   return (
     <div className="credential-gallery">
       <div className="credential-gallery__heading">
-        <span className="section-index">Credentials / Milestones</span>
+        <span className="section-index">{content.eyebrow}</span>
         <div>
-          <h3>A few milestones, kept in one deck.</h3>
-          <p>
-            Formal chapters from the learning and internships behind the work.
-          </p>
+          <h3>{content.headline}</h3>
+          <p>{content.description}</p>
         </div>
       </div>
 
@@ -230,22 +233,22 @@ function CertificateDeck({
 function ExperienceLandscape({
   experience,
   credentials,
+  content,
+  credentialContent,
 }: {
   experience: PortfolioExperienceItem[];
   credentials: PortfolioCredential[];
+  content: PortfolioSectionContent;
+  credentialContent: PortfolioSectionContent;
 }) {
   return (
     <section id="experience" className="experience-desk">
       <div className="shell">
         <Reveal className="section-heading section-heading--light">
-          <span className="section-index">Career / The path so far</span>
+          <span className="section-index">{content.eyebrow}</span>
           <div>
-            <h2>Each role moved me closer to the whole product.</h2>
-            <p>
-              What began in enterprise engineering now spans product thinking,
-              systems, interfaces, and the responsibility of shipping them
-              together.
-            </p>
+            <h2>{content.headline}</h2>
+            <p>{content.description}</p>
           </div>
         </Reveal>
 
@@ -275,7 +278,10 @@ function ExperienceLandscape({
           ))}
         </div>
 
-        <CertificateDeck credentials={credentials} />
+        <CertificateDeck
+          credentials={credentials}
+          content={credentialContent}
+        />
       </div>
     </section>
   );
@@ -284,21 +290,20 @@ function ExperienceLandscape({
 function ActivitySection({
   githubStats,
   profile,
+  content,
 }: {
   githubStats: GitHubLOCStats | null;
   profile: PortfolioProfile;
+  content: PortfolioSectionContent;
 }) {
   return (
     <section id="activity" className="activity-section">
       <div className="shell">
         <Reveal className="section-heading">
-          <span className="section-index">Open source / GitHub</span>
+          <span className="section-index">{content.eyebrow}</span>
           <div>
-            <h2>The work between the launches.</h2>
-            <p>
-              A live view of the repositories, languages, and contribution
-              rhythm behind the public work.
-            </p>
+            <h2>{content.headline}</h2>
+            <p>{content.description}</p>
           </div>
         </Reveal>
 
@@ -306,7 +311,7 @@ function ActivitySection({
           <div className="github-paper__topline">
             <div>
               <Github aria-hidden="true" />
-              <span>github.com/goyal1510</span>
+              <span>{profile.github.replace(/^https?:\/\//, "")}</span>
             </div>
             <a href={profile.github} target="_blank" rel="noreferrer">
               View profile <ArrowUpRight aria-hidden="true" />
@@ -320,15 +325,19 @@ function ActivitySection({
   );
 }
 
-function WritingSection({ blogPosts }: { blogPosts: BlogPreview[] }) {
+function WritingSection({
+  blogPosts,
+  content,
+}: {
+  blogPosts: BlogPreview[];
+  content: PortfolioSectionContent;
+}) {
   return (
     <section id="writing" className="writing-section">
       <div className="shell">
         <div className="writing-block">
           <div className="writing-block__heading">
-            <span className="section-index">
-              Writing / Notes from the build
-            </span>
+            <span className="section-index">{content.eyebrow}</span>
             <Link href="/blog">
               All articles <ArrowUpRight aria-hidden="true" />
             </Link>
@@ -370,22 +379,23 @@ function WritingSection({ blogPosts }: { blogPosts: BlogPreview[] }) {
   );
 }
 
-function ContactSection({ profile }: { profile: PortfolioProfile }) {
+function ContactSection({
+  profile,
+  content,
+}: {
+  profile: PortfolioProfile;
+  content: PortfolioSectionContent;
+}) {
   return (
     <footer id="contact" className="contact-section">
       <div className="shell">
         <div className="contact-section__grid">
           <Reveal className="contact-section__copy">
-            <span className="section-index">
-              Contact / Start a conversation
-            </span>
+            <span className="section-index">{content.eyebrow}</span>
             <h2>
-              Have an idea with <em>sharp edges?</em>
+              {content.headline} <em>{content.accent}</em>
             </h2>
-            <p>
-              Tell me what you are trying to make, where it feels difficult, and
-              what a useful outcome would look like.
-            </p>
+            <p>{content.description}</p>
             <div className="contact-details">
               <a href={`mailto:${profile.email}`}>
                 <Mail aria-hidden="true" />
@@ -418,14 +428,16 @@ function ContactSection({ profile }: { profile: PortfolioProfile }) {
           <Reveal className="contact-form-paper" delay={0.08}>
             <div className="contact-form-paper__heading">
               <span>New message</span>
-              <p>I normally reply within one business day.</p>
+              <p>{content.supportingText}</p>
             </div>
             <ContactForm />
           </Reveal>
         </div>
 
         <div className="contact-section__footer">
-          <span>{profile.name} © 2026</span>
+          <span>
+            {profile.name} © {new Date().getFullYear()}
+          </span>
           <span>{profile.location}</span>
           <div>
             <a
@@ -480,6 +492,8 @@ export function PortfolioExperience({
     projects,
     credentials,
     principles,
+    navigation,
+    sectionContent,
   } = data;
   const [cursorLabel, setCursorLabel] = useState("");
   const { scrollYProgress } = useScroll();
@@ -526,9 +540,13 @@ export function PortfolioExperience({
       <header className="site-header">
         <div className="shell site-header__inner">
           <a className="monogram" href="#top" aria-label="Back to top">
-            {profile.monogram}
+            {profile.displayName}
           </a>
-          <PortfolioNavigation surface="home" ariaLabel="Primary navigation" />
+          <PortfolioNavigation
+            surface="home"
+            ariaLabel="Primary navigation"
+            items={navigation}
+          />
           <a className="header-contact" href="#contact">
             Let&apos;s talk <ArrowDown aria-hidden="true" />
           </a>
@@ -540,10 +558,7 @@ export function PortfolioExperience({
           <motion.div className="hero__type" style={{ y: heroY }}>
             <span className="section-index">Portfolio / 2026</span>
             <h1>{profile.headline}</h1>
-            <p>
-              I&apos;m {profile.name}, a full-stack product engineer who turns
-              ambitious, messy ideas into reliable experiences.
-            </p>
+            <p>{profile.introduction}</p>
             <a href="#work" className="text-link" data-cursor="Explore">
               See the project wall <ArrowDown aria-hidden="true" />
             </a>
@@ -555,7 +570,7 @@ export function PortfolioExperience({
             <dl>
               <div>
                 <dt>Building</dt>
-                <dd>Healthcare product systems</dd>
+                <dd>{profile.focus}</dd>
               </div>
               <div>
                 <dt>Working as</dt>
@@ -584,10 +599,7 @@ export function PortfolioExperience({
 
           <div className="profile-grid">
             <Reveal className="profile-story">
-              <p className="profile-story__lead">
-                I care about the path from the first product question to the
-                final interaction detail.
-              </p>
+              <p className="profile-story__lead">{about.lead}</p>
               <div className="profile-story__columns">
                 {about.story.map((paragraph) => (
                   <p key={paragraph}>{paragraph}</p>
@@ -617,8 +629,10 @@ export function PortfolioExperience({
 
           <div className="education-block">
             <div className="education-block__heading">
-              <span className="section-index">Education / Foundation</span>
-              <h3>Where the foundation was built.</h3>
+              <span className="section-index">
+                {sectionContent.education.eyebrow}
+              </span>
+              <h3>{sectionContent.education.headline}</h3>
             </div>
             <div className="education-journey">
               {education.map((item, index) => (
@@ -650,17 +664,11 @@ export function PortfolioExperience({
         <div className="shell">
           <Reveal className="section-heading">
             <span className="section-index">
-              Capabilities / Across the stack
+              {sectionContent.skills.eyebrow}
             </span>
             <div>
-              <h2>
-                Broad enough to own the path. Focused enough to sweat the
-                details.
-              </h2>
-              <p>
-                The tools I use to shape interfaces, systems, data, and the
-                space between them.
-              </p>
+              <h2>{sectionContent.skills.headline}</h2>
+              <p>{sectionContent.skills.description}</p>
             </div>
           </Reveal>
 
@@ -716,11 +724,20 @@ export function PortfolioExperience({
         </div>
       </section>
 
-      <ExperienceLandscape experience={experience} credentials={credentials} />
-      <ActivitySection githubStats={githubStats} profile={profile} />
-      <ProjectWall projects={projects} />
-      <WritingSection blogPosts={blogPosts} />
-      <ContactSection profile={profile} />
+      <ExperienceLandscape
+        experience={experience}
+        credentials={credentials}
+        content={sectionContent.experience}
+        credentialContent={sectionContent.credentials}
+      />
+      <ActivitySection
+        githubStats={githubStats}
+        profile={profile}
+        content={sectionContent.activity}
+      />
+      <ProjectWall projects={projects} content={sectionContent.work} />
+      <WritingSection blogPosts={blogPosts} content={sectionContent.writing} />
+      <ContactSection profile={profile} content={sectionContent.contact} />
     </main>
   );
 }

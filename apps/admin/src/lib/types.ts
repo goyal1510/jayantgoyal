@@ -45,6 +45,7 @@ export interface AuthUser {
 export interface Hero {
   id: string;
   name: string;
+  display_name: string | null;
   role: string;
   tagline: string | null;
   blurb: string | null;
@@ -218,6 +219,21 @@ export interface NavItem {
   label: string;
   icon_key: string;
   color: string | null;
+  note: string | null;
+  sort_order: number;
+  is_visible: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SectionContent {
+  id: string;
+  section_key: string;
+  eyebrow: string;
+  headline: string | null;
+  accent: string | null;
+  description: string | null;
+  supporting_text: string | null;
   sort_order: number;
   is_visible: boolean;
   created_at: string;

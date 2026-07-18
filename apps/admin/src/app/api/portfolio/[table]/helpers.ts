@@ -14,6 +14,7 @@ export const ALLOWED_TABLES = [
   "certificates",
   "contact",
   "nav_items",
+  "section_content",
 ];
 
 export const TABLES_WITH_SORT_ORDER = [
@@ -25,6 +26,7 @@ export const TABLES_WITH_SORT_ORDER = [
   "projects",
   "certificates",
   "nav_items",
+  "section_content",
 ];
 
 export async function checkAdminAccess() {
@@ -78,7 +80,7 @@ export async function authorizeAndGetClient() {
     return {
       error: NextResponse.json(
         { error: authCheck.error },
-        { status: authCheck.status }
+        { status: authCheck.status },
       ),
     };
   }
@@ -88,7 +90,7 @@ export async function authorizeAndGetClient() {
     return {
       error: NextResponse.json(
         { error: "Server configuration error" },
-        { status: 500 }
+        { status: 500 },
       ),
     };
   }

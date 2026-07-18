@@ -5,19 +5,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 
-const NAV_ITEMS = [
-  { key: "about", label: "About", note: "Story" },
-  { key: "skills", label: "Skills", note: "Capabilities" },
-  { key: "experience", label: "Experience", note: "Timeline" },
-  { key: "activity", label: "Activity", note: "GitHub" },
-  { key: "work", label: "Work", note: "Projects" },
-  { key: "writing", label: "Writing", note: "Journal" },
-] as const;
+import {
+  fallbackPortfolioData,
+  type PortfolioNavigationItem,
+} from "@/lib/portfolio/editorial-data";
 
 type NavigationSurface = "home" | "subpage";
-type NavigationKey = (typeof NAV_ITEMS)[number]["key"];
 
-function getItemHref(key: NavigationKey, surface: NavigationSurface) {
+function getItemHref(key: string, surface: NavigationSurface) {
   if (surface === "home") return `#${key}`;
   return key === "writing" ? "/blog" : `/#${key}`;
 }
@@ -25,15 +20,18 @@ function getItemHref(key: NavigationKey, surface: NavigationSurface) {
 export function PortfolioNavigation({
   surface,
   ariaLabel,
+  items,
 }: {
   surface: NavigationSurface;
   ariaLabel: string;
+  items?: PortfolioNavigationItem[];
 }) {
   const pathname = usePathname();
   const menuId = useId();
   const [menuOpen, setMenuOpen] = useState(false);
   const firstLinkRef = useRef<HTMLAnchorElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
+  const navigationItems = items ?? fallbackPortfolioData.navigation;
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -69,7 +67,7 @@ export function PortfolioNavigation({
     <>
       <nav className="portfolio-navigation" aria-label={ariaLabel}>
         <div className="portfolio-navigation__links">
-          {NAV_ITEMS.map((item) => (
+          {navigationItems.map((item) => (
             <Link
               key={item.key}
               href={getItemHref(item.key, surface)}
@@ -100,11 +98,13 @@ export function PortfolioNavigation({
           <div className="shell portfolio-mobile-menu__inner">
             <div className="portfolio-mobile-menu__eyebrow">
               <span>Navigation / Portfolio</span>
-              <span>{String(NAV_ITEMS.length).padStart(2, "0")} sections</span>
+              <span>
+                {String(navigationItems.length).padStart(2, "0")} sections
+              </span>
             </div>
 
             <ol className="portfolio-mobile-menu__list">
-              {NAV_ITEMS.map((item, index) => {
+              {navigationItems.map((item, index) => {
                 const current =
                   item.key === "writing" && pathname.startsWith("/blog");
 

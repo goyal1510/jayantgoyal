@@ -11,6 +11,7 @@ import remarkGfm from "remark-gfm";
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 
 import { EditorialSubpageHeader } from "@/components/editorial/subpage-header";
+import type { PortfolioNavigationItem } from "@/lib/portfolio/editorial-data";
 import type { BlogPost } from "@/lib/blog/queries";
 
 type NextPost = Pick<BlogPost, "title" | "slug" | "excerpt" | "published_at">;
@@ -143,9 +144,13 @@ const markdownComponents: Components = {
 export function BlogContent({
   post,
   nextPost,
+  brandLabel,
+  navigation,
 }: {
   post: BlogPost;
   nextPost: NextPost | null;
+  brandLabel: string;
+  navigation: PortfolioNavigationItem[];
 }) {
   const articleRef = useRef<HTMLElement>(null);
   const [readingProgress, setReadingProgress] = useState(0);
@@ -209,7 +214,7 @@ export function BlogContent({
 
   return (
     <main className="editorial-page">
-      <EditorialSubpageHeader />
+      <EditorialSubpageHeader brandLabel={brandLabel} navigation={navigation} />
       <div
         className="editorial-article__progress"
         aria-hidden="true"

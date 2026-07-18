@@ -4,19 +4,25 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 import {
   fallbackPortfolioData,
+  PORTFOLIO_SECTION_KEYS,
   type PortfolioAbout,
   type PortfolioCredential,
   type PortfolioEditorialData,
+  type PortfolioNavigationItem,
   type PortfolioPrinciple,
   type PortfolioProfile,
   type PortfolioProject,
+  type PortfolioSectionContentMap,
   type ProjectTone,
   type SkillProficiency,
 } from "./editorial-data";
 
 type HeroRow = {
   name: string;
+  display_name?: string | null;
   role: string;
+  tagline: string | null;
+  blurb: string | null;
   headline?: string | null;
   current_title?: string | null;
   availability?: string | null;
@@ -103,6 +109,21 @@ type ContactRow = {
   phone: string | null;
   location: string | null;
   socials: unknown;
+};
+
+type NavigationRow = {
+  section_id: string;
+  label: string;
+  note?: string | null;
+};
+
+type SectionContentRow = {
+  section_key: string;
+  eyebrow: string;
+  headline: string | null;
+  accent: string | null;
+  description: string | null;
+  supporting_text: string | null;
 };
 
 const projectAliases: Record<string, string> = {
@@ -270,8 +291,11 @@ function mapProfile(
   return {
     ...fallback,
     name: hero.name,
+    displayName: hero.display_name ?? fallback.displayName,
     role: hero.role,
     headline: hero.headline ?? fallback.headline,
+    introduction: hero.blurb ?? fallback.introduction,
+    focus: hero.tagline ?? fallback.focus,
     currentRole: hero.current_title ?? fallback.currentRole,
     availability: hero.availability ?? fallback.availability,
     resume: hero.resume_url ?? fallback.resume,
@@ -292,11 +316,42 @@ function mapAbout(row: AboutRow): PortfolioAbout {
   return {
     headline: row.headline ?? fallback.headline,
     objective: row.objective ?? row.summary ?? fallback.objective,
-    story: mappedStory.length > 0 ? mappedStory : fallback.story,
-    facts: mappedFacts.length > 0 ? mappedFacts : fallback.facts,
-    highlights:
-      mappedHighlights.length > 0 ? mappedHighlights : fallback.highlights,
+    lead: row.summary ?? fallback.lead,
+    story: mappedStory,
+    facts: mappedFacts,
+    highlights: mappedHighlights,
   };
+}
+
+function mapNavigation(rows: NavigationRow[]): PortfolioNavigationItem[] {
+  return rows.map((row) => ({
+    key: row.section_id,
+    label: row.label,
+    note: row.note ?? row.label,
+  }));
+}
+
+function mapSectionContent(
+  rows: SectionContentRow[],
+): PortfolioSectionContentMap {
+  const rowsByKey = new Map(rows.map((row) => [row.section_key, row]));
+
+  return Object.fromEntries(
+    PORTFOLIO_SECTION_KEYS.map((key) => {
+      const row = rowsByKey.get(key);
+      const fallback = fallbackPortfolioData.sectionContent[key];
+      return [
+        key,
+        {
+          eyebrow: row?.eyebrow ?? fallback.eyebrow,
+          headline: row?.headline ?? fallback.headline,
+          accent: row?.accent ?? fallback.accent,
+          description: row?.description ?? fallback.description,
+          supportingText: row?.supporting_text ?? fallback.supportingText,
+        },
+      ];
+    }),
+  ) as PortfolioSectionContentMap;
 }
 
 export const getEditorialPortfolioData = cache(
@@ -316,6 +371,8 @@ export const getEditorialPortfolioData = cache(
         projectsResult,
         certificatesResult,
         contactResult,
+        navigationResult,
+        sectionContentResult,
       ] = await Promise.all([
         supabase
           .schema("portfolio")
@@ -371,6 +428,20 @@ export const getEditorialPortfolioData = cache(
           .select("*")
           .eq("is_visible", true)
           .maybeSingle(),
+        supabase
+          .schema("portfolio")
+          .from("nav_items")
+          .select("section_id, label, note")
+          .eq("is_visible", true)
+          .order("sort_order"),
+        supabase
+          .schema("portfolio")
+          .from("section_content")
+          .select(
+            "section_key, eyebrow, headline, accent, description, supporting_text",
+          )
+          .eq("is_visible", true)
+          .order("sort_order"),
       ]);
 
       const errors = [
@@ -383,6 +454,8 @@ export const getEditorialPortfolioData = cache(
         projectsResult.error,
         certificatesResult.error,
         contactResult.error,
+        navigationResult.error,
+        sectionContentResult.error,
       ].filter(Boolean);
 
       if (errors.length > 0 || !heroResult.data || !aboutResult.data) {
@@ -394,17 +467,6 @@ export const getEditorialPortfolioData = cache(
 
       const heroRow = heroResult.data as HeroRow;
       const projectRows = (projectsResult.data ?? []) as ProjectRow[];
-      const hasEditorialSchema =
-        Boolean(heroRow.headline) &&
-        projectRows.length > 0 &&
-        projectRows.every((project) =>
-          Boolean(project.slug && project.image_key),
-        );
-
-      if (!hasEditorialSchema) {
-        return { data: fallbackPortfolioData, source: "fallback" };
-      }
-
       const categories = (categoriesResult.data ?? []) as SkillCategoryRow[];
       const skillRows = (skillsResult.data ?? []) as SkillRow[];
       const aboutRow = aboutResult.data as AboutRow;
@@ -418,6 +480,12 @@ export const getEditorialPortfolioData = cache(
             (contactResult.data as ContactRow | null) ?? null,
           ),
           about: mapAbout(aboutRow),
+          navigation: mapNavigation(
+            (navigationResult.data ?? []) as NavigationRow[],
+          ),
+          sectionContent: mapSectionContent(
+            (sectionContentResult.data ?? []) as SectionContentRow[],
+          ),
           education: ((educationResult.data ?? []) as EducationRow[]).map(
             (row) => ({
               school: row.school,
@@ -455,10 +523,7 @@ export const getEditorialPortfolioData = cache(
           credentials: (
             (certificatesResult.data ?? []) as CertificateRow[]
           ).map(mapCredential),
-          principles:
-            databasePrinciples.length > 0
-              ? databasePrinciples
-              : fallbackPortfolioData.principles,
+          principles: databasePrinciples,
         },
       };
     } catch (error) {
@@ -470,3 +535,49 @@ export const getEditorialPortfolioData = cache(
     }
   },
 );
+
+export const getPortfolioShellData = cache(async () => {
+  try {
+    const supabase = await createSupabaseServerClient();
+    const [heroResult, navigationResult] = await Promise.all([
+      supabase
+        .schema("portfolio")
+        .from("hero")
+        .select("name, display_name")
+        .eq("is_visible", true)
+        .maybeSingle(),
+      supabase
+        .schema("portfolio")
+        .from("nav_items")
+        .select("section_id, label, note")
+        .eq("is_visible", true)
+        .order("sort_order"),
+    ]);
+
+    if (heroResult.error || navigationResult.error || !heroResult.data) {
+      throw new Error(
+        heroResult.error?.message ??
+          navigationResult.error?.message ??
+          "Portfolio shell content is missing",
+      );
+    }
+
+    return {
+      brandLabel:
+        (heroResult.data as { display_name?: string | null }).display_name ??
+        fallbackPortfolioData.profile.displayName,
+      navigation: mapNavigation(
+        (navigationResult.data ?? []) as NavigationRow[],
+      ),
+    };
+  } catch (error) {
+    console.error(
+      "Unable to load the Portfolio shell from Supabase; using the verified fallback.",
+      error instanceof Error ? error.message : "Unknown error",
+    );
+    return {
+      brandLabel: fallbackPortfolioData.profile.displayName,
+      navigation: fallbackPortfolioData.navigation,
+    };
+  }
+});

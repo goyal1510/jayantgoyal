@@ -12,6 +12,7 @@ import {
   Palette,
   Rocket,
   FileText,
+  FilePenLine,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -33,6 +34,7 @@ export interface AdminNavigationDomain {
 
 export const portfolioNavItems: NavItem[] = [
   { label: "Hero", href: "/portfolio/hero", icon: MonitorSmartphone },
+  { label: "Section Copy", href: "/portfolio/section-copy", icon: FilePenLine },
   { label: "About", href: "/portfolio/about", icon: User },
   { label: "Education", href: "/portfolio/education", icon: GraduationCap },
   { label: "Experience", href: "/portfolio/experience", icon: Briefcase },
