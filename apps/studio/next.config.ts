@@ -129,9 +129,15 @@ const nextConfig: NextConfig = {
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "X-Frame-Options", value: "DENY" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(self)" },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=(self)",
+          },
           { key: "X-DNS-Prefetch-Control", value: "on" },
-          { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" },
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=31536000; includeSubDomains",
+          },
           {
             key: "Content-Security-Policy",
             value: [
@@ -148,20 +154,21 @@ const nextConfig: NextConfig = {
               "frame-ancestors 'none'",
             ].join("; "),
           },
-          { key: "Link", value: '</.well-known/api-catalog>; rel="api-catalog", </llms.txt>; rel="ai-content"' },
-        ],
-      },
-      {
-        source: "/assets/Jayant_Resume.pdf",
-        headers: [
-          { key: "X-Robots-Tag", value: "noindex, noarchive" },
+          {
+            key: "Link",
+            value:
+              '</.well-known/api-catalog>; rel="api-catalog", </llms.txt>; rel="ai-content"',
+          },
         ],
       },
       // Cache static assets aggressively
       {
         source: "/assets/(.*)",
         headers: [
-          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
         ],
       },
     ];

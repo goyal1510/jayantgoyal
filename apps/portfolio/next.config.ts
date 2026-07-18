@@ -157,10 +157,6 @@ const nextConfig: NextConfig = {
         source: "/documents/(.*)",
         headers: [{ key: "X-Robots-Tag", value: "noindex, noarchive" }],
       },
-      {
-        source: "/assets/Jayant_Resume.pdf",
-        headers: [{ key: "X-Robots-Tag", value: "noindex, noarchive" }],
-      },
     ];
   },
 };

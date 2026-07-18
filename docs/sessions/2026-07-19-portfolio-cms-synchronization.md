@@ -30,3 +30,6 @@
 - Shipped the additive contract and synchronized Portfolio/Admin applications to production, then applied the gated `20260719093000_remove_legacy_portfolio_contract.sql` cleanup to the verified `jayantgoyal` project after both Vercel deployments reported Ready.
 - Verified the cleaned remote contract contains 9 projects, 5 credentials, 13 section records, and 6 navigation items; confirmed legacy columns return PostgreSQL `42703`, `tech_icons` is absent, and the public site still renders successfully.
 - Refreshed all three canonical remote schema snapshots after cleanup and removed the temporary legacy Name-fact filter because the redundant database record is now deleted at the source.
+- Completed a post-cleanup residue audit: the live database contains only active canonical rows and the Admin upload bucket is intentionally empty; removed the obsolete `PORTFOLIO_DATA_SOURCE` contract, stale fallback/Tech Icons documentation, and headers for the deleted duplicate Resume path.
+- Removed the ignored local and all-target Vercel `PORTFOLIO_DATA_SOURCE` setting after confirming the production Portfolio no longer has any alternate content path.
+- Formatted the remaining Admin documentation and Studio configuration touched by the residue cleanup before validation.

@@ -14,18 +14,19 @@ Administrative dashboard for managing portfolio data and users.
 
 ## Portfolio Management
 
-| Section | Description |
-|---------|-------------|
-| **Hero** | Name, title, tagline, social links |
-| **About** | Bio, description, profile image |
-| **Experience** | Work history with company, role, dates |
-| **Education** | Degrees, institutions, years |
-| **Skills** | Skill categories and items |
-| **Tech Icons** | Technology icons displayed on portfolio |
-| **Projects** | Project cards with images, links, tech stack |
-| **Certificates** | Certifications and achievements |
-| **Contact** | Contact information and form settings |
-| **Navigation** | Portfolio navigation menu items |
+| Section          | Description                                                             |
+| ---------------- | ----------------------------------------------------------------------- |
+| **Hero**         | Public identity, headline, SEO, GitHub username, and Resume             |
+| **Section Copy** | Headings, descriptions, and visibility for public sections and subpages |
+| **About**        | Story, objective, personal facts, and product principles                |
+| **Experience**   | Work history with company, role, dates                                  |
+| **Education**    | Degrees, institutions, years                                            |
+| **Skills**       | Capability groups, proficiency labels, and evidence                     |
+| **Projects**     | Project stories, full-width screenshots, links, and technologies        |
+| **Certificates** | Credential metadata, documents, previews, and verification links        |
+| **Contact**      | Contact details, social links, and the Resend recipient                 |
+| **Navigation**   | Labels, notes, ordering, and visibility for real Portfolio anchors      |
+| **Blog**         | Published articles, cover images, tags, and publication state           |
 
 ## Tech Stack
 
@@ -52,17 +53,19 @@ apps/admin/
 │   │   │   │   ├── education/
 │   │   │   │   ├── experience/
 │   │   │   │   ├── skills/
-│   │   │   │   ├── tech-icons/
 │   │   │   │   ├── projects/
 │   │   │   │   ├── certificates/
 │   │   │   │   ├── contact/
-│   │   │   │   └── navigation/
+│   │   │   │   ├── navigation/
+│   │   │   │   └── section-copy/
+│   │   │   ├── blog/             # Blog content management
 │   │   │   └── users/            # User management
 │   │   ├── api/
 │   │   │   ├── portfolio/[table]/ # Generic CRUD for portfolio tables
+│   │   │   ├── portfolio/assets/ # Authenticated public media uploads
 │   │   │   └── users/            # User API
 │   │   ├── auth/callback/        # OAuth callback
-│   │   ├── login/                # Login page
+│   │   ├── welcome/              # Login and authentication entry
 │   │   └── unauthorized/         # Access denied page
 │   ├── components/
 │   │   ├── sidebar/              # Navigation sidebar
@@ -91,6 +94,7 @@ Single API route handles all portfolio tables:
 ### Form Components
 
 Each portfolio section has a dedicated form/list component:
+
 - `hero-form.tsx` - Single record form
 - `education-list.tsx` - CRUD list with add/edit/delete
 - `skills-manager.tsx` - Nested category + items management
@@ -98,7 +102,7 @@ Each portfolio section has a dedicated form/list component:
 ### Route Groups
 
 - `(admin)/` - Protected routes requiring authentication
-- Public routes: `/login`, `/unauthorized`, `/auth/callback`
+- Public routes: `/welcome`, `/unauthorized`, `/auth/callback`
 
 ## Environment Variables
 

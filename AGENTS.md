@@ -380,12 +380,14 @@ not part of the Studio application shell.
 
 **Data flow:**
 
-1. Server fetches via `getPortfolioDataFromHeaders()`
-2. Falls back to hardcoded data if DB unavailable
-3. Distributed via React Context (`PortfolioDataProvider`)
-4. Client accesses via `usePortfolioData()` hook
+1. Server components load the canonical CMS contract through
+   `getPortfolioEditorialData()` or `getPortfolioShellData()`.
+2. Database errors surface instead of falling back to duplicated static data.
+3. Typed editorial data is passed directly to the public Portfolio components.
+4. Admin writes the same Portfolio tables and the `portfolio-assets` bucket.
 
-**Icons:** Stored as string keys in DB, resolved at runtime via `getIconComponent()`
+**Icons:** Social icon keys are stored in the database and resolved by the
+public editorial renderer.
 
 ### Loading System
 
@@ -671,12 +673,14 @@ Database conventions:
 
 ### Portfolio Data System
 
-Multi-source: `PORTFOLIO_DATA_SOURCE=database` fetches from Supabase; otherwise uses hardcoded data from `jayant-portfolio-data.ts`. Served via `PortfolioDataProvider` context, consumed with `usePortfolioData()`. Icons stored as string keys, resolved via `getIconComponent()` from `ICON_MAP`.
+Database-only: server components load the typed Portfolio editorial and shell
+contracts from Supabase. Missing records and query failures surface as errors;
+there is no hardcoded content fallback. Admin edits the same canonical tables
+and uploads public media through the `portfolio-assets` bucket.
 
 ### State Management
 
 - **Zustand** with `persist` middleware and `skipHydration: true` — manual hydration required to avoid SSR mismatch
-- **React Context** for portfolio data distribution
 - **Local `useState`** for most page-level state
 
 ## Conventions
