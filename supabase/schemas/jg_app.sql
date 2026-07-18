@@ -268,6 +268,27 @@ $$;
 ALTER FUNCTION "jg_app"."handle_soft_delete"() OWNER TO "postgres";
 
 
+CREATE OR REPLACE FUNCTION "jg_app"."is_nonblank_text_array"("value" "text"[]) RETURNS boolean
+    LANGUAGE "plpgsql" IMMUTABLE STRICT
+    SET "search_path" TO ''
+    AS $$
+declare
+  item text;
+begin
+  foreach item in array value loop
+    if item is null or btrim(item) = '' then
+      return false;
+    end if;
+  end loop;
+
+  return true;
+end;
+$$;
+
+
+ALTER FUNCTION "jg_app"."is_nonblank_text_array"("value" "text"[]) OWNER TO "postgres";
+
+
 CREATE OR REPLACE FUNCTION "jg_app"."list_directory"("p_user_id" "uuid", "p_directory_path" "text" DEFAULT '/'::"text") RETURNS TABLE("id" "uuid", "file_path" "text", "file_name" "text", "display_name" "text", "mime_type" "text", "size_bytes" bigint, "file_type" "text", "is_directory" boolean, "child_count" integer, "created_at" timestamp with time zone, "updated_at" timestamp with time zone)
     LANGUAGE "plpgsql"
     AS $$
@@ -437,8 +458,13 @@ CREATE TABLE IF NOT EXISTS "jg_app"."blog_posts" (
     "is_visible" boolean DEFAULT true NOT NULL,
     "is_published" boolean DEFAULT false NOT NULL,
     "published_at" timestamp with time zone,
-    "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"()
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    CONSTRAINT "blog_posts_published_at_check" CHECK (((NOT "is_published") OR ("published_at" IS NOT NULL))),
+    CONSTRAINT "blog_posts_published_content_check" CHECK (((NOT "is_published") OR ("btrim"("content") <> ''::"text"))),
+    CONSTRAINT "blog_posts_required_fields_nonblank_check" CHECK ((("btrim"("title") <> ''::"text") AND ("btrim"("slug") <> ''::"text"))),
+    CONSTRAINT "blog_posts_slug_format_check" CHECK (("slug" ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'::"text")),
+    CONSTRAINT "blog_posts_tags_items_check" CHECK ("jg_app"."is_nonblank_text_array"("tags"))
 );
 
 
@@ -764,10 +790,6 @@ CREATE INDEX "idx_at_entries_user_id" ON "jg_app"."activity_tracker_entries" USI
 
 
 CREATE INDEX "idx_blog_published" ON "jg_app"."blog_posts" USING "btree" ("is_published", "is_visible", "published_at" DESC);
-
-
-
-CREATE INDEX "idx_blog_slug" ON "jg_app"."blog_posts" USING "btree" ("slug");
 
 
 
@@ -1292,6 +1314,12 @@ GRANT ALL ON FUNCTION "jg_app"."get_file_by_path"("p_user_id" "uuid", "p_file_pa
 
 
 GRANT ALL ON FUNCTION "jg_app"."handle_soft_delete"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "jg_app"."is_nonblank_text_array"("value" "text"[]) TO "anon";
+GRANT ALL ON FUNCTION "jg_app"."is_nonblank_text_array"("value" "text"[]) TO "authenticated";
+GRANT ALL ON FUNCTION "jg_app"."is_nonblank_text_array"("value" "text"[]) TO "service_role";
 
 
 

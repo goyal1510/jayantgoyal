@@ -19,6 +19,52 @@ CREATE SCHEMA IF NOT EXISTS "portfolio";
 ALTER SCHEMA "portfolio" OWNER TO "postgres";
 
 
+CREATE OR REPLACE FUNCTION "portfolio"."is_exact_text_object_array"("value" "jsonb", "required_fields" "text"[]) RETURNS boolean
+    LANGUAGE "plpgsql" IMMUTABLE STRICT
+    SET "search_path" TO ''
+    AS $$
+declare
+  element jsonb;
+  required_field text;
+  object_key text;
+begin
+  if jsonb_typeof(value) is distinct from 'array' then
+    return false;
+  end if;
+
+  for element in
+    select item
+    from jsonb_array_elements(value) as elements(item)
+  loop
+    if jsonb_typeof(element) is distinct from 'object' then
+      return false;
+    end if;
+
+    foreach required_field in array required_fields loop
+      if jsonb_typeof(element -> required_field) is distinct from 'string'
+        or btrim(element ->> required_field) = '' then
+        return false;
+      end if;
+    end loop;
+
+    for object_key in
+      select key
+      from jsonb_object_keys(element) as object_keys(key)
+    loop
+      if not object_key = any(required_fields) then
+        return false;
+      end if;
+    end loop;
+  end loop;
+
+  return true;
+end;
+$$;
+
+
+ALTER FUNCTION "portfolio"."is_exact_text_object_array"("value" "jsonb", "required_fields" "text"[]) OWNER TO "postgres";
+
+
 CREATE OR REPLACE FUNCTION "portfolio"."update_updated_at_column"() RETURNS "trigger"
     LANGUAGE "plpgsql"
     AS $$
@@ -37,15 +83,19 @@ SET default_table_access_method = "heap";
 
 
 CREATE TABLE IF NOT EXISTS "portfolio"."about" (
-    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
     "summary" "text" NOT NULL,
     "personal" "jsonb" DEFAULT '[]'::"jsonb" NOT NULL,
-    "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "headline" "text" NOT NULL,
     "objective" "text" NOT NULL,
-    "story" "jsonb" DEFAULT '[]'::"jsonb" NOT NULL,
-    "principles" "jsonb" DEFAULT '[]'::"jsonb" NOT NULL
+    "principles" "jsonb" DEFAULT '[]'::"jsonb" NOT NULL,
+    "story" "text"[] DEFAULT '{}'::"text"[] NOT NULL,
+    CONSTRAINT "about_personal_shape_check" CHECK ("portfolio"."is_exact_text_object_array"("personal", ARRAY['label'::"text", 'value'::"text"])),
+    CONSTRAINT "about_principles_shape_check" CHECK ("portfolio"."is_exact_text_object_array"("principles", ARRAY['title'::"text", 'copy'::"text"])),
+    CONSTRAINT "about_required_copy_nonblank_check" CHECK ((("btrim"("summary") <> ''::"text") AND ("btrim"("headline") <> ''::"text") AND ("btrim"("objective") <> ''::"text"))),
+    CONSTRAINT "about_story_items_check" CHECK ("jg_app"."is_nonblank_text_array"("story"))
 );
 
 
@@ -53,21 +103,23 @@ ALTER TABLE "portfolio"."about" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "portfolio"."certificates" (
-    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
     "name" "text" NOT NULL,
     "description" "text",
     "category" "text" NOT NULL,
     "issuer" "text" NOT NULL,
-    "sort_order" integer DEFAULT 0,
-    "is_visible" boolean DEFAULT true,
-    "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"(),
+    "sort_order" integer DEFAULT 0 NOT NULL,
+    "is_visible" boolean DEFAULT true NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "issued_at" "date",
     "credential_id" "text",
     "credential_url" "text",
     "image_alt" "text" NOT NULL,
     "document_url" "text" NOT NULL,
-    "preview_url" "text" NOT NULL
+    "preview_url" "text" NOT NULL,
+    CONSTRAINT "certificates_required_fields_nonblank_check" CHECK ((("btrim"("name") <> ''::"text") AND ("btrim"("category") <> ''::"text") AND ("btrim"("issuer") <> ''::"text") AND ("btrim"("image_alt") <> ''::"text") AND ("btrim"("document_url") <> ''::"text") AND ("btrim"("preview_url") <> ''::"text"))),
+    CONSTRAINT "certificates_sort_order_nonnegative_check" CHECK (("sort_order" >= 0))
 );
 
 
@@ -75,13 +127,15 @@ ALTER TABLE "portfolio"."certificates" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "portfolio"."contact" (
-    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
     "email" "text" NOT NULL,
     "phone" "text" NOT NULL,
     "location" "text" NOT NULL,
     "socials" "jsonb" DEFAULT '[]'::"jsonb" NOT NULL,
-    "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"()
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    CONSTRAINT "contact_required_fields_nonblank_check" CHECK ((("btrim"("email") <> ''::"text") AND ("btrim"("phone") <> ''::"text") AND ("btrim"("location") <> ''::"text"))),
+    CONSTRAINT "contact_socials_shape_check" CHECK ("portfolio"."is_exact_text_object_array"("socials", ARRAY['label'::"text", 'href'::"text", 'icon_key'::"text"]))
 );
 
 
@@ -89,16 +143,18 @@ ALTER TABLE "portfolio"."contact" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "portfolio"."education" (
-    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
     "school" "text" NOT NULL,
     "degree" "text" NOT NULL,
     "period" "text" NOT NULL,
     "location" "text",
     "detail" "text",
-    "sort_order" integer DEFAULT 0,
-    "is_visible" boolean DEFAULT true,
-    "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"()
+    "sort_order" integer DEFAULT 0 NOT NULL,
+    "is_visible" boolean DEFAULT true NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    CONSTRAINT "education_required_fields_nonblank_check" CHECK ((("btrim"("school") <> ''::"text") AND ("btrim"("degree") <> ''::"text") AND ("btrim"("period") <> ''::"text"))),
+    CONSTRAINT "education_sort_order_nonnegative_check" CHECK (("sort_order" >= 0))
 );
 
 
@@ -106,17 +162,20 @@ ALTER TABLE "portfolio"."education" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "portfolio"."experience" (
-    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
     "company" "text" NOT NULL,
     "role" "text" NOT NULL,
     "period" "text" NOT NULL,
     "location" "text",
     "summary" "text",
-    "bullets" "jsonb" DEFAULT '[]'::"jsonb",
-    "sort_order" integer DEFAULT 0,
-    "is_visible" boolean DEFAULT true,
-    "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"()
+    "sort_order" integer DEFAULT 0 NOT NULL,
+    "is_visible" boolean DEFAULT true NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "bullets" "text"[] DEFAULT '{}'::"text"[] NOT NULL,
+    CONSTRAINT "experience_bullets_items_check" CHECK ("jg_app"."is_nonblank_text_array"("bullets")),
+    CONSTRAINT "experience_required_fields_nonblank_check" CHECK ((("btrim"("company") <> ''::"text") AND ("btrim"("role") <> ''::"text") AND ("btrim"("period") <> ''::"text"))),
+    CONSTRAINT "experience_sort_order_nonnegative_check" CHECK (("sort_order" >= 0))
 );
 
 
@@ -124,13 +183,13 @@ ALTER TABLE "portfolio"."experience" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "portfolio"."hero" (
-    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
     "name" "text" NOT NULL,
     "role" "text" NOT NULL,
     "tagline" "text" NOT NULL,
     "blurb" "text" NOT NULL,
-    "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "headline" "text" NOT NULL,
     "current_title" "text" NOT NULL,
     "availability" "text" NOT NULL,
@@ -138,7 +197,8 @@ CREATE TABLE IF NOT EXISTS "portfolio"."hero" (
     "display_name" "text" NOT NULL,
     "github_username" "text" NOT NULL,
     "seo_title" "text" NOT NULL,
-    "seo_description" "text" NOT NULL
+    "seo_description" "text" NOT NULL,
+    CONSTRAINT "hero_required_fields_nonblank_check" CHECK ((("btrim"("name") <> ''::"text") AND ("btrim"("display_name") <> ''::"text") AND ("btrim"("role") <> ''::"text") AND ("btrim"("tagline") <> ''::"text") AND ("btrim"("blurb") <> ''::"text") AND ("btrim"("headline") <> ''::"text") AND ("btrim"("current_title") <> ''::"text") AND ("btrim"("availability") <> ''::"text") AND ("btrim"("resume_url") <> ''::"text") AND ("btrim"("github_username") <> ''::"text") AND ("btrim"("seo_title") <> ''::"text") AND ("btrim"("seo_description") <> ''::"text")))
 );
 
 
@@ -146,14 +206,17 @@ ALTER TABLE "portfolio"."hero" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "portfolio"."nav_items" (
-    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
     "section_id" "text" NOT NULL,
     "label" "text" NOT NULL,
-    "sort_order" integer DEFAULT 0,
-    "is_visible" boolean DEFAULT true,
-    "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"(),
-    "note" "text"
+    "sort_order" integer DEFAULT 0 NOT NULL,
+    "is_visible" boolean DEFAULT true NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "note" "text",
+    CONSTRAINT "nav_items_required_fields_nonblank_check" CHECK ((("btrim"("section_id") <> ''::"text") AND ("btrim"("label") <> ''::"text"))),
+    CONSTRAINT "nav_items_section_id_check" CHECK (("section_id" = ANY (ARRAY['about'::"text", 'skills'::"text", 'experience'::"text", 'activity'::"text", 'work'::"text", 'writing'::"text"]))),
+    CONSTRAINT "nav_items_sort_order_nonnegative_check" CHECK (("sort_order" >= 0))
 );
 
 
@@ -161,16 +224,15 @@ ALTER TABLE "portfolio"."nav_items" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "portfolio"."projects" (
-    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
     "name" "text" NOT NULL,
     "short_description" "text" NOT NULL,
-    "tags" "jsonb" DEFAULT '[]'::"jsonb",
     "github_link" "text",
     "live_link" "text",
-    "sort_order" integer DEFAULT 0,
-    "is_visible" boolean DEFAULT true,
-    "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"(),
+    "sort_order" integer DEFAULT 0 NOT NULL,
+    "is_visible" boolean DEFAULT true NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "slug" "text" NOT NULL,
     "eyebrow" "text" NOT NULL,
     "impact" "text" NOT NULL,
@@ -178,7 +240,11 @@ CREATE TABLE IF NOT EXISTS "portfolio"."projects" (
     "year_label" "text" NOT NULL,
     "image_alt" "text" NOT NULL,
     "image_url" "text" NOT NULL,
-    CONSTRAINT "projects_slug_format_check" CHECK ((("slug" IS NULL) OR ("slug" ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'::"text")))
+    "tags" "text"[] DEFAULT '{}'::"text"[] NOT NULL,
+    CONSTRAINT "projects_required_fields_nonblank_check" CHECK ((("btrim"("name") <> ''::"text") AND ("btrim"("short_description") <> ''::"text") AND ("btrim"("slug") <> ''::"text") AND ("btrim"("eyebrow") <> ''::"text") AND ("btrim"("impact") <> ''::"text") AND ("btrim"("contribution") <> ''::"text") AND ("btrim"("year_label") <> ''::"text") AND ("btrim"("image_alt") <> ''::"text") AND ("btrim"("image_url") <> ''::"text"))),
+    CONSTRAINT "projects_slug_format_check" CHECK (("slug" ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'::"text")),
+    CONSTRAINT "projects_sort_order_nonnegative_check" CHECK (("sort_order" >= 0)),
+    CONSTRAINT "projects_tags_items_check" CHECK ("jg_app"."is_nonblank_text_array"("tags"))
 );
 
 
@@ -196,7 +262,8 @@ CREATE TABLE IF NOT EXISTS "portfolio"."section_content" (
     "is_visible" boolean DEFAULT true NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
-    CONSTRAINT "section_content_key_format_check" CHECK (("section_key" ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'::"text"))
+    CONSTRAINT "section_content_required_fields_nonblank_check" CHECK ((("btrim"("section_key") <> ''::"text") AND ("btrim"("eyebrow") <> ''::"text"))),
+    CONSTRAINT "section_content_section_key_check" CHECK (("section_key" = ANY (ARRAY['hero'::"text", 'about'::"text", 'skills'::"text", 'education'::"text", 'experience'::"text", 'credentials'::"text", 'activity'::"text", 'work'::"text", 'writing'::"text", 'contact'::"text", 'blog'::"text", 'article'::"text", 'resume'::"text"])))
 );
 
 
@@ -204,13 +271,15 @@ ALTER TABLE "portfolio"."section_content" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "portfolio"."skill_categories" (
-    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
     "title" "text" NOT NULL,
-    "sort_order" integer DEFAULT 0,
-    "is_visible" boolean DEFAULT true,
-    "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"(),
-    "description" "text" NOT NULL
+    "sort_order" integer DEFAULT 0 NOT NULL,
+    "is_visible" boolean DEFAULT true NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "description" "text" NOT NULL,
+    CONSTRAINT "skill_categories_required_fields_nonblank_check" CHECK ((("btrim"("title") <> ''::"text") AND ("btrim"("description") <> ''::"text"))),
+    CONSTRAINT "skill_categories_sort_order_nonnegative_check" CHECK (("sort_order" >= 0))
 );
 
 
@@ -218,16 +287,18 @@ ALTER TABLE "portfolio"."skill_categories" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "portfolio"."skills" (
-    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
     "category_id" "uuid" NOT NULL,
     "name" "text" NOT NULL,
-    "sort_order" integer DEFAULT 0,
-    "is_visible" boolean DEFAULT true,
-    "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"(),
+    "sort_order" integer DEFAULT 0 NOT NULL,
+    "is_visible" boolean DEFAULT true NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "proficiency" "text" NOT NULL,
     "evidence" "text" NOT NULL,
-    CONSTRAINT "skills_proficiency_check" CHECK ((("proficiency" IS NULL) OR ("proficiency" = ANY (ARRAY['core'::"text", 'strong'::"text", 'working'::"text", 'exploring'::"text"]))))
+    CONSTRAINT "skills_proficiency_check" CHECK (("proficiency" = ANY (ARRAY['core'::"text", 'strong'::"text", 'working'::"text", 'exploring'::"text"]))),
+    CONSTRAINT "skills_required_fields_nonblank_check" CHECK ((("btrim"("name") <> ''::"text") AND ("btrim"("evidence") <> ''::"text"))),
+    CONSTRAINT "skills_sort_order_nonnegative_check" CHECK (("sort_order" >= 0))
 );
 
 
@@ -313,10 +384,6 @@ CREATE INDEX "idx_skill_categories_sort_order" ON "portfolio"."skill_categories"
 
 
 
-CREATE INDEX "idx_skills_category_id" ON "portfolio"."skills" USING "btree" ("category_id");
-
-
-
 CREATE INDEX "idx_skills_sort_order" ON "portfolio"."skills" USING "btree" ("sort_order");
 
 
@@ -337,7 +404,7 @@ CREATE UNIQUE INDEX "portfolio_nav_items_section_id_key" ON "portfolio"."nav_ite
 
 
 
-CREATE UNIQUE INDEX "portfolio_projects_slug_key" ON "portfolio"."projects" USING "btree" ("slug") WHERE ("slug" IS NOT NULL);
+CREATE UNIQUE INDEX "portfolio_projects_slug_key" ON "portfolio"."projects" USING "btree" ("slug");
 
 
 
@@ -394,6 +461,11 @@ CREATE OR REPLACE TRIGGER "skill_categories_updated_at" BEFORE UPDATE ON "portfo
 
 
 CREATE OR REPLACE TRIGGER "skills_updated_at" BEFORE UPDATE ON "portfolio"."skills" FOR EACH ROW EXECUTE FUNCTION "portfolio"."update_updated_at_column"();
+
+
+
+ALTER TABLE ONLY "portfolio"."nav_items"
+    ADD CONSTRAINT "nav_items_section_id_fkey" FOREIGN KEY ("section_id") REFERENCES "portfolio"."section_content"("section_key") ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 
@@ -470,7 +542,9 @@ CREATE POLICY "Public read access" ON "portfolio"."hero" FOR SELECT USING (true)
 
 
 
-CREATE POLICY "Public read access" ON "portfolio"."nav_items" FOR SELECT USING (("is_visible" = true));
+CREATE POLICY "Public read access" ON "portfolio"."nav_items" FOR SELECT USING (("is_visible" AND (EXISTS ( SELECT 1
+   FROM "portfolio"."section_content"
+  WHERE (("section_content"."section_key" = "nav_items"."section_id") AND "section_content"."is_visible")))));
 
 
 
@@ -486,7 +560,9 @@ CREATE POLICY "Public read access" ON "portfolio"."skill_categories" FOR SELECT 
 
 
 
-CREATE POLICY "Public read access" ON "portfolio"."skills" FOR SELECT USING (("is_visible" = true));
+CREATE POLICY "Public read access" ON "portfolio"."skills" FOR SELECT USING (("is_visible" AND (EXISTS ( SELECT 1
+   FROM "portfolio"."skill_categories"
+  WHERE (("skill_categories"."id" = "skills"."category_id") AND "skill_categories"."is_visible")))));
 
 
 
