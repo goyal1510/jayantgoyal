@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
 import { ArrowUpRight } from "lucide-react";
 
@@ -10,18 +11,24 @@ import { buildPublicPageMetadata } from "@/lib/seo/config";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = buildPublicPageMetadata({
-  title: "Writing",
-  description:
-    "Writing by Jayant Goyal about product engineering, web development, and practical software delivery.",
-  pathname: "/blog",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const { sectionContent } = await getPortfolioShellData();
+  const content = sectionContent.blog;
+
+  return buildPublicPageMetadata({
+    title: "Writing",
+    description: content.description,
+    pathname: "/blog",
+  });
+}
 
 export default async function BlogPage() {
   const [posts, shell] = await Promise.all([
     getPublishedBlogPosts(),
     getPortfolioShellData(),
   ]);
+  const content = shell.sectionContent.blog;
+  if (!content.isVisible) notFound();
 
   return (
     <main className="editorial-page">
@@ -30,21 +37,17 @@ export default async function BlogPage() {
         navigation={shell.navigation}
       />
       <section className="shell editorial-page-hero">
-        <span className="section-index">Writing / Notes from the build</span>
+        <span className="section-index">{content.eyebrow}</span>
         <div>
-          <h1>Ideas get sharper when they are written down.</h1>
-          <p>
-            Field notes on product engineering, web architecture, automation,
-            and the decisions that surface while making software real.
-          </p>
+          <h1>{content.headline}</h1>
+          <p>{content.description}</p>
         </div>
       </section>
 
       <section className="shell editorial-writing-index" aria-label="Articles">
         {posts.length === 0 ? (
           <div className="editorial-writing-index__empty">
-            <h2>The next note is taking shape.</h2>
-            <p>New writing will appear here after it is published.</p>
+            <h2>{content.supportingText}</h2>
           </div>
         ) : (
           posts.map((post) => (

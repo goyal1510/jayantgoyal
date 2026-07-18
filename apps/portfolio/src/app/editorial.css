@@ -1773,6 +1773,38 @@ main footer[id] {
   letter-spacing: -0.04em;
 }
 
+.certificate-deck__description {
+  max-width: 56ch;
+  margin: 10px auto 0;
+  color: rgba(243, 240, 232, 0.62);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.certificate-deck__metadata {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 18px;
+  margin-top: 12px;
+}
+
+.certificate-deck__verify {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  margin-top: 14px;
+  color: var(--paper);
+  font-size: 0.72rem;
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+
+.certificate-deck__verify svg {
+  width: 14px;
+  height: 14px;
+}
+
 @keyframes certificate-in {
   from {
     opacity: 0;

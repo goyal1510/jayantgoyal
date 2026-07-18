@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element */
+
 import {
   motion,
   useReducedMotion,
@@ -13,14 +15,18 @@ import {
   ArrowRight,
   ArrowUpRight,
   FileText,
+  Facebook,
+  Globe2,
   Github,
   Instagram,
   Linkedin,
   Mail,
   MapPin,
   Phone,
+  Twitter,
+  Youtube,
+  type LucideIcon,
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -36,6 +42,8 @@ import type {
   PortfolioProfile,
   PortfolioProject,
   PortfolioSectionContent,
+  PortfolioSectionKey,
+  PortfolioSocialLink,
 } from "@/lib/portfolio/editorial-data";
 import type { GitHubLOCStats } from "@/lib/github/types";
 
@@ -43,6 +51,25 @@ const reveal = {
   hidden: { opacity: 0, y: 28 },
   visible: { opacity: 1, y: 0 },
 };
+
+const SOCIAL_ICON_MAP: Record<string, LucideIcon> = {
+  facebook: Facebook,
+  github: Github,
+  instagram: Instagram,
+  linkedin: Linkedin,
+  twitter: Twitter,
+  x: Twitter,
+  youtube: Youtube,
+};
+
+function SocialIcon({ social }: { social: PortfolioSocialLink }) {
+  const identity = `${social.iconKey} ${social.label}`.toLowerCase();
+  const key = Object.keys(SOCIAL_ICON_MAP).find((candidate) =>
+    identity.includes(candidate),
+  );
+  const Icon = key ? SOCIAL_ICON_MAP[key] : Globe2;
+  return Icon ? <Icon aria-hidden="true" /> : null;
+}
 
 function Reveal({
   children,
@@ -105,14 +132,10 @@ function ProjectWall({
                 <div className="project-fragment">
                   <div className="torn-sheet">
                     <div className="torn-sheet__image">
-                      <Image
+                      <img
                         src={project.image}
                         alt={project.imageAlt}
-                        width={2940}
-                        height={project.imageHeight}
-                        quality={92}
                         loading={index < 2 ? "eager" : "lazy"}
-                        sizes="(max-width: 760px) calc(100vw - 72px), (max-width: 1100px) 52vw, 56vw"
                       />
                     </div>
                   </div>
@@ -132,12 +155,16 @@ function ProjectWall({
                   </ul>
                   <p className="project-story__role">{project.role}</p>
                   <div className="project-story__links">
-                    <a href={project.href} target="_blank" rel="noreferrer">
-                      Live product <ArrowUpRight aria-hidden="true" />
-                    </a>
-                    <a href={project.github} target="_blank" rel="noreferrer">
-                      Source <Github aria-hidden="true" />
-                    </a>
+                    {project.href ? (
+                      <a href={project.href} target="_blank" rel="noreferrer">
+                        Live product <ArrowUpRight aria-hidden="true" />
+                      </a>
+                    ) : null}
+                    {project.github ? (
+                      <a href={project.github} target="_blank" rel="noreferrer">
+                        Source <Github aria-hidden="true" />
+                      </a>
+                    ) : null}
                   </div>
                 </div>
               </article>
@@ -192,13 +219,9 @@ function CertificateDeck({
             rel="noreferrer"
             key={activeCertificate.name}
           >
-            <Image
+            <img
               src={activeCertificate.image}
               alt={activeCertificate.imageAlt}
-              width={activeCertificate.imageWidth}
-              height={activeCertificate.imageHeight}
-              quality={92}
-              sizes="(max-width: 760px) 84vw, 62vw"
             />
           </a>
         </div>
@@ -216,6 +239,31 @@ function CertificateDeck({
               {activeCertificate.category} · {activeCertificate.issuer}
             </span>
             <strong>{activeCertificate.name}</strong>
+            {activeCertificate.description ? (
+              <p className="certificate-deck__description">
+                {activeCertificate.description}
+              </p>
+            ) : null}
+            {activeCertificate.issuedAt || activeCertificate.credentialId ? (
+              <div className="certificate-deck__metadata">
+                {activeCertificate.issuedAt ? (
+                  <span>Issued {activeCertificate.issuedAt}</span>
+                ) : null}
+                {activeCertificate.credentialId ? (
+                  <span>ID {activeCertificate.credentialId}</span>
+                ) : null}
+              </div>
+            ) : null}
+            {activeCertificate.credentialUrl ? (
+              <a
+                className="certificate-deck__verify"
+                href={activeCertificate.credentialUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Verify credential <ArrowUpRight aria-hidden="true" />
+              </a>
+            ) : null}
           </div>
           <button
             type="button"
@@ -244,44 +292,52 @@ function ExperienceLandscape({
   return (
     <section id="experience" className="experience-desk">
       <div className="shell">
-        <Reveal className="section-heading section-heading--light">
-          <span className="section-index">{content.eyebrow}</span>
-          <div>
-            <h2>{content.headline}</h2>
-            <p>{content.description}</p>
-          </div>
-        </Reveal>
-
-        <div className="experience-journey">
-          {experience.map((item, index) => (
-            <Reveal
-              key={`${item.company}-${item.role}`}
-              className="experience-stop"
-              delay={index * 0.05}
-            >
-              <article>
-                <span className="experience-stop__period">{item.period}</span>
-                <div className="experience-stop__story">
-                  <h3>{item.company}</h3>
-                  <p className="experience-stop__role">
-                    {item.role} · {item.location}
-                  </p>
-                  <p className="experience-stop__summary">{item.summary}</p>
-                  <ul>
-                    {item.outcomes.map((outcome) => (
-                      <li key={outcome}>{outcome}</li>
-                    ))}
-                  </ul>
-                </div>
-              </article>
+        {content.isVisible ? (
+          <>
+            <Reveal className="section-heading section-heading--light">
+              <span className="section-index">{content.eyebrow}</span>
+              <div>
+                <h2>{content.headline}</h2>
+                <p>{content.description}</p>
+              </div>
             </Reveal>
-          ))}
-        </div>
 
-        <CertificateDeck
-          credentials={credentials}
-          content={credentialContent}
-        />
+            <div className="experience-journey">
+              {experience.map((item, index) => (
+                <Reveal
+                  key={`${item.company}-${item.role}`}
+                  className="experience-stop"
+                  delay={index * 0.05}
+                >
+                  <article>
+                    <span className="experience-stop__period">
+                      {item.period}
+                    </span>
+                    <div className="experience-stop__story">
+                      <h3>{item.company}</h3>
+                      <p className="experience-stop__role">
+                        {item.role} · {item.location}
+                      </p>
+                      <p className="experience-stop__summary">{item.summary}</p>
+                      <ul>
+                        {item.outcomes.map((outcome) => (
+                          <li key={outcome}>{outcome}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </article>
+                </Reveal>
+              ))}
+            </div>
+          </>
+        ) : null}
+
+        {credentialContent.isVisible && credentials.length > 0 ? (
+          <CertificateDeck
+            credentials={credentials}
+            content={credentialContent}
+          />
+        ) : null}
       </div>
     </section>
   );
@@ -317,8 +373,11 @@ function ActivitySection({
               View profile <ArrowUpRight aria-hidden="true" />
             </a>
           </div>
-          <GithubContributions username="goyal1510" />
-          <GithubCodeStats username="goyal1510" initialStats={githubStats} />
+          <GithubContributions username={profile.githubUsername} />
+          <GithubCodeStats
+            username={profile.githubUsername}
+            initialStats={githubStats}
+          />
         </div>
       </div>
     </section>
@@ -343,6 +402,11 @@ function WritingSection({
             </Link>
           </div>
           <div className="writing-index">
+            {blogPosts.length === 0 ? (
+              <div className="editorial-writing-index__empty">
+                <p>No published notes yet.</p>
+              </div>
+            ) : null}
             {blogPosts.map((post, index) => (
               <Reveal
                 key={post.slug}
@@ -440,30 +504,17 @@ function ContactSection({
           </span>
           <span>{profile.location}</span>
           <div>
-            <a
-              href={profile.github}
-              target="_blank"
-              rel="noreferrer"
-              aria-label="GitHub"
-            >
-              <Github aria-hidden="true" />
-            </a>
-            <a
-              href={profile.linkedin}
-              target="_blank"
-              rel="noreferrer"
-              aria-label="LinkedIn"
-            >
-              <Linkedin aria-hidden="true" />
-            </a>
-            <a
-              href={profile.instagram}
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Instagram"
-            >
-              <Instagram aria-hidden="true" />
-            </a>
+            {profile.socials.map((social) => (
+              <a
+                key={`${social.label}-${social.href}`}
+                href={social.href}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={social.label}
+              >
+                <SocialIcon social={social} />
+              </a>
+            ))}
             <a href={`mailto:${profile.email}`} aria-label="Email">
               <Mail aria-hidden="true" />
             </a>
@@ -495,6 +546,10 @@ export function PortfolioExperience({
     navigation,
     sectionContent,
   } = data;
+  const visibleNavigation = navigation.filter((item) => {
+    const content = sectionContent[item.key as PortfolioSectionKey];
+    return content?.isVisible ?? true;
+  });
   const [cursorLabel, setCursorLabel] = useState("");
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, {
@@ -545,199 +600,235 @@ export function PortfolioExperience({
           <PortfolioNavigation
             surface="home"
             ariaLabel="Primary navigation"
-            items={navigation}
+            items={visibleNavigation}
           />
-          <a className="header-contact" href="#contact">
-            Let&apos;s talk <ArrowDown aria-hidden="true" />
-          </a>
+          {sectionContent.contact.isVisible ? (
+            <a className="header-contact" href="#contact">
+              Let&apos;s talk <ArrowDown aria-hidden="true" />
+            </a>
+          ) : null}
         </div>
       </header>
 
-      <section id="top" className="hero">
-        <div className="shell hero__grid">
-          <motion.div className="hero__type" style={{ y: heroY }}>
-            <span className="section-index">Portfolio / 2026</span>
-            <h1>{profile.headline}</h1>
-            <p>{profile.introduction}</p>
-            <a href="#work" className="text-link" data-cursor="Explore">
-              See the project wall <ArrowDown aria-hidden="true" />
-            </a>
-          </motion.div>
-
-          <Reveal className="hero-note" delay={0.12}>
-            <span>Field note / Current</span>
-            <p>{profile.availability}</p>
-            <dl>
-              <div>
-                <dt>Building</dt>
-                <dd>{profile.focus}</dd>
-              </div>
-              <div>
-                <dt>Working as</dt>
-                <dd>{profile.currentRole}</dd>
-              </div>
-              <div>
-                <dt>Based in</dt>
-                <dd>{profile.location}</dd>
-              </div>
-            </dl>
-          </Reveal>
-        </div>
-      </section>
-
-      <section id="about" className="profile-section">
-        <div className="shell">
-          <Reveal className="section-heading">
-            <span className="section-index">
-              About / Product mind, engineering hands
-            </span>
-            <div>
-              <h2>{about.headline}</h2>
-              <p>{about.objective}</p>
-            </div>
-          </Reveal>
-
-          <div className="profile-grid">
-            <Reveal className="profile-story">
-              <p className="profile-story__lead">{about.lead}</p>
-              <div className="profile-story__columns">
-                {about.story.map((paragraph) => (
-                  <p key={paragraph}>{paragraph}</p>
-                ))}
-              </div>
-              <div className="profile-actions">
-                <a href={profile.resume} target="_blank" rel="noreferrer">
-                  Résumé <FileText aria-hidden="true" />
+      {sectionContent.hero.isVisible ? (
+        <section id="top" className="hero">
+          <div className="shell hero__grid">
+            <motion.div className="hero__type" style={{ y: heroY }}>
+              <span className="section-index">
+                {sectionContent.hero.eyebrow}
+              </span>
+              <h1>{profile.headline}</h1>
+              <p>{profile.introduction}</p>
+              {sectionContent.work.isVisible ? (
+                <a href="#work" className="text-link" data-cursor="Explore">
+                  See the project wall <ArrowDown aria-hidden="true" />
                 </a>
-                <a href="#contact">
-                  Contact <Mail aria-hidden="true" />
-                </a>
+              ) : null}
+            </motion.div>
+
+            <Reveal className="hero-note" delay={0.12}>
+              <span>{sectionContent.hero.supportingText}</span>
+              <p>{profile.availability}</p>
+              <dl>
+                <div>
+                  <dt>Building</dt>
+                  <dd>{profile.focus}</dd>
+                </div>
+                <div>
+                  <dt>Working as</dt>
+                  <dd>{profile.currentRole}</dd>
+                </div>
+                <div>
+                  <dt>Based in</dt>
+                  <dd>{profile.location}</dd>
+                </div>
+              </dl>
+            </Reveal>
+          </div>
+        </section>
+      ) : (
+        <div id="top" />
+      )}
+
+      {sectionContent.about.isVisible || sectionContent.education.isVisible ? (
+        <section id="about" className="profile-section">
+          <div className="shell">
+            {sectionContent.about.isVisible ? (
+              <>
+                <Reveal className="section-heading">
+                  <span className="section-index">
+                    {sectionContent.about.eyebrow}
+                  </span>
+                  <div>
+                    <h2>{about.headline}</h2>
+                    <p>{about.objective}</p>
+                  </div>
+                </Reveal>
+
+                <div className="profile-grid">
+                  <Reveal className="profile-story">
+                    <p className="profile-story__lead">{about.lead}</p>
+                    <div className="profile-story__columns">
+                      {about.story.map((paragraph) => (
+                        <p key={paragraph}>{paragraph}</p>
+                      ))}
+                    </div>
+                    <div className="profile-actions">
+                      <a href={profile.resume} target="_blank" rel="noreferrer">
+                        Résumé <FileText aria-hidden="true" />
+                      </a>
+                      <a href="#contact">
+                        Contact <Mail aria-hidden="true" />
+                      </a>
+                    </div>
+                  </Reveal>
+
+                  <div className="profile-facts">
+                    {about.facts.map((fact, index) => (
+                      <Reveal key={fact.label} delay={index * 0.04}>
+                        <article>
+                          <span>{fact.label}</span>
+                          <strong>{fact.value}</strong>
+                        </article>
+                      </Reveal>
+                    ))}
+                  </div>
+                </div>
+              </>
+            ) : null}
+
+            {sectionContent.education.isVisible ? (
+              <div className="education-block">
+                <div className="education-block__heading">
+                  <span className="section-index">
+                    {sectionContent.education.eyebrow}
+                  </span>
+                  <h3>{sectionContent.education.headline}</h3>
+                </div>
+                <div className="education-journey">
+                  {education.map((item, index) => (
+                    <Reveal
+                      key={`${item.school}-${item.period}`}
+                      className="education-stop"
+                      delay={index * 0.05}
+                    >
+                      <article>
+                        <span className="education-stop__period">
+                          {item.period}
+                        </span>
+                        <div className="education-stop__story">
+                          <h4>{item.school}</h4>
+                          <p className="education-stop__degree">
+                            {item.degree}
+                          </p>
+                          <p className="education-stop__meta">
+                            {item.location} · <strong>{item.detail}</strong>
+                          </p>
+                        </div>
+                      </article>
+                    </Reveal>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </div>
+        </section>
+      ) : null}
+
+      {sectionContent.skills.isVisible ? (
+        <section id="skills" className="capability-section">
+          <div className="shell">
+            <Reveal className="section-heading">
+              <span className="section-index">
+                {sectionContent.skills.eyebrow}
+              </span>
+              <div>
+                <h2>{sectionContent.skills.headline}</h2>
+                <p>{sectionContent.skills.description}</p>
               </div>
             </Reveal>
 
-            <div className="profile-facts">
-              {about.facts.map((fact, index) => (
-                <Reveal key={fact.label} delay={index * 0.04}>
-                  <article>
-                    <span>{fact.label}</span>
-                    <strong>{fact.value}</strong>
-                  </article>
-                </Reveal>
-              ))}
-            </div>
-          </div>
-
-          <div className="education-block">
-            <div className="education-block__heading">
-              <span className="section-index">
-                {sectionContent.education.eyebrow}
-              </span>
-              <h3>{sectionContent.education.headline}</h3>
-            </div>
-            <div className="education-journey">
-              {education.map((item, index) => (
+            <div className="capability-matrix" aria-label="Capability index">
+              <div className="capability-matrix__labels" aria-hidden="true">
+                <span>Practice</span>
+                <span>What it covers</span>
+                <span>Working set</span>
+              </div>
+              {skillGroups.map((group, index) => (
                 <Reveal
-                  key={`${item.school}-${item.period}`}
-                  className="education-stop"
-                  delay={index * 0.05}
+                  key={group.title}
+                  className="capability-row"
+                  delay={index * 0.04}
                 >
                   <article>
-                    <span className="education-stop__period">
-                      {item.period}
-                    </span>
-                    <div className="education-stop__story">
-                      <h4>{item.school}</h4>
-                      <p className="education-stop__degree">{item.degree}</p>
-                      <p className="education-stop__meta">
-                        {item.location} · <strong>{item.detail}</strong>
-                      </p>
+                    <div className="capability-row__title">
+                      <span aria-hidden="true">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <h3>{group.title}</h3>
                     </div>
+                    <p className="skill-group__description">
+                      {group.description}
+                    </p>
+                    <ul>
+                      {group.items.map((item) => (
+                        <li
+                          key={item.name}
+                          title={item.evidence}
+                          data-proficiency={item.proficiency}
+                        >
+                          {item.name}
+                          {item.proficiency ? (
+                            <small>{item.proficiency}</small>
+                          ) : null}
+                        </li>
+                      ))}
+                    </ul>
                   </article>
                 </Reveal>
               ))}
             </div>
-          </div>
-        </div>
-      </section>
 
-      <section id="skills" className="capability-section">
-        <div className="shell">
-          <Reveal className="section-heading">
-            <span className="section-index">
-              {sectionContent.skills.eyebrow}
-            </span>
-            <div>
-              <h2>{sectionContent.skills.headline}</h2>
-              <p>{sectionContent.skills.description}</p>
-            </div>
-          </Reveal>
-
-          <div className="capability-matrix" aria-label="Capability index">
-            <div className="capability-matrix__labels" aria-hidden="true">
-              <span>Practice</span>
-              <span>What it covers</span>
-              <span>Working set</span>
-            </div>
-            {skillGroups.map((group, index) => (
-              <Reveal
-                key={group.title}
-                className="capability-row"
-                delay={index * 0.04}
-              >
-                <article>
-                  <div className="capability-row__title">
-                    <span aria-hidden="true">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <h3>{group.title}</h3>
-                  </div>
-                  <p className="skill-group__description">
-                    {group.description}
-                  </p>
-                  <ul>
-                    {group.items.map((item) => (
-                      <li
-                        key={item.name}
-                        title={item.evidence}
-                        data-proficiency={item.proficiency}
-                      >
-                        {item.name}
-                        {item.proficiency ? (
-                          <small>{item.proficiency}</small>
-                        ) : null}
-                      </li>
-                    ))}
-                  </ul>
+            <div className="principles-strip">
+              {principles.map((principle) => (
+                <article key={principle.title}>
+                  <h3>{principle.title}</h3>
+                  <p>{principle.copy}</p>
                 </article>
-              </Reveal>
-            ))}
+              ))}
+            </div>
           </div>
+        </section>
+      ) : null}
 
-          <div className="principles-strip">
-            {principles.map((principle) => (
-              <article key={principle.title}>
-                <h3>{principle.title}</h3>
-                <p>{principle.copy}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <ExperienceLandscape
-        experience={experience}
-        credentials={credentials}
-        content={sectionContent.experience}
-        credentialContent={sectionContent.credentials}
-      />
-      <ActivitySection
-        githubStats={githubStats}
-        profile={profile}
-        content={sectionContent.activity}
-      />
-      <ProjectWall projects={projects} content={sectionContent.work} />
-      <WritingSection blogPosts={blogPosts} content={sectionContent.writing} />
-      <ContactSection profile={profile} content={sectionContent.contact} />
+      {sectionContent.experience.isVisible ||
+      sectionContent.credentials.isVisible ? (
+        <ExperienceLandscape
+          experience={experience}
+          credentials={credentials}
+          content={sectionContent.experience}
+          credentialContent={sectionContent.credentials}
+        />
+      ) : null}
+      {sectionContent.activity.isVisible ? (
+        <ActivitySection
+          githubStats={githubStats}
+          profile={profile}
+          content={sectionContent.activity}
+        />
+      ) : null}
+      {sectionContent.work.isVisible ? (
+        <ProjectWall projects={projects} content={sectionContent.work} />
+      ) : null}
+      {sectionContent.writing.isVisible ? (
+        <WritingSection
+          blogPosts={blogPosts}
+          content={sectionContent.writing}
+        />
+      ) : null}
+      {sectionContent.contact.isVisible ? (
+        <ContactSection profile={profile} content={sectionContent.contact} />
+      ) : null}
     </main>
   );
 }

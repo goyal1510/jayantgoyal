@@ -5,10 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 
-import {
-  fallbackPortfolioData,
-  type PortfolioNavigationItem,
-} from "@/lib/portfolio/editorial-data";
+import type { PortfolioNavigationItem } from "@/lib/portfolio/editorial-data";
 
 type NavigationSurface = "home" | "subpage";
 
@@ -24,14 +21,14 @@ export function PortfolioNavigation({
 }: {
   surface: NavigationSurface;
   ariaLabel: string;
-  items?: PortfolioNavigationItem[];
+  items: PortfolioNavigationItem[];
 }) {
   const pathname = usePathname();
   const menuId = useId();
   const [menuOpen, setMenuOpen] = useState(false);
   const firstLinkRef = useRef<HTMLAnchorElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
-  const navigationItems = items ?? fallbackPortfolioData.navigation;
+  const navigationItems = items;
 
   useEffect(() => {
     if (!menuOpen) return;

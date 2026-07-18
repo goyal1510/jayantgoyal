@@ -1,5 +1,7 @@
 import { Resend } from "resend";
 
+import { getPortfolioContactEmail } from "../portfolio/editorial-server";
+
 const MAX_NAME_LENGTH = 120;
 const MAX_EMAIL_LENGTH = 320;
 const MAX_SUBJECT_LENGTH = 200;
@@ -21,7 +23,9 @@ function normalizeField(value: unknown, maxLength: number) {
   return value.trim().slice(0, maxLength);
 }
 
-function normalizeSubmission(input: Record<string, unknown>): ContactSubmission {
+function normalizeSubmission(
+  input: Record<string, unknown>,
+): ContactSubmission {
   return {
     name: normalizeField(input.name, MAX_NAME_LENGTH),
     email: normalizeField(input.email, MAX_EMAIL_LENGTH),
@@ -68,13 +72,14 @@ export async function deliverContactSubmission(
   }
 
   try {
+    const recipient = await getPortfolioContactEmail();
     const resend = new Resend(apiKey);
     const from =
       process.env.RESEND_FROM_EMAIL ??
       "Portfolio Contact <onboarding@resend.dev>";
     const { data, error } = await resend.emails.send({
       from,
-      to: ["goyal151002@gmail.com"],
+      to: [recipient],
       replyTo: `${name} <${email}>`,
       subject,
       html: `

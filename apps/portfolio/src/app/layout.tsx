@@ -5,14 +5,11 @@ import { headers } from "next/headers";
 import { DM_Sans, Instrument_Serif } from "next/font/google";
 import Script from "next/script";
 
-import { fallbackPortfolioData } from "@/lib/portfolio/editorial-data";
+import { getPortfolioShellData } from "@/lib/portfolio/editorial-server";
 import {
   DEFAULT_OG_IMAGE,
   isCanonicalProductionHost,
-  PERSON_NAME,
-  SITE_DESCRIPTION,
   SITE_NAME,
-  SITE_TITLE,
   SITE_TITLE_TEMPLATE,
   SITE_URL,
 } from "@/lib/seo/config";
@@ -33,16 +30,17 @@ const serif = Instrument_Serif({
 export async function generateMetadata(): Promise<Metadata> {
   const requestHeaders = await headers();
   const shouldIndex = isCanonicalProductionHost(requestHeaders.get("host"));
+  const { profile } = await getPortfolioShellData();
 
   return {
     metadataBase: new URL(SITE_URL),
     title: {
-      default: SITE_TITLE,
+      default: profile.seoTitle,
       template: SITE_TITLE_TEMPLATE,
     },
-    description: SITE_DESCRIPTION,
+    description: profile.seoDescription,
     keywords: [
-      PERSON_NAME,
+      profile.name,
       "full-stack product engineer",
       "portfolio",
       "Next.js",
@@ -50,29 +48,29 @@ export async function generateMetadata(): Promise<Metadata> {
       "TypeScript",
       "Supabase",
     ],
-    authors: [{ name: PERSON_NAME, url: SITE_URL }],
-    creator: PERSON_NAME,
+    authors: [{ name: profile.name, url: SITE_URL }],
+    creator: profile.name,
     alternates: { canonical: "/" },
     openGraph: {
       type: "profile",
       locale: "en_US",
       url: "/",
       siteName: SITE_NAME,
-      title: SITE_TITLE,
-      description: SITE_DESCRIPTION,
+      title: profile.seoTitle,
+      description: profile.seoDescription,
       images: [
         {
           url: DEFAULT_OG_IMAGE,
           width: 1200,
           height: 630,
-          alt: SITE_TITLE,
+          alt: profile.seoTitle,
         },
       ],
     },
     twitter: {
       card: "summary_large_image",
-      title: SITE_TITLE,
-      description: SITE_DESCRIPTION,
+      title: profile.seoTitle,
+      description: profile.seoDescription,
       images: [DEFAULT_OG_IMAGE],
     },
     robots: {
@@ -98,17 +96,17 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const profile = fallbackPortfolioData.profile;
+  const { profile } = await getPortfolioShellData();
   const personJsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
-    name: PERSON_NAME,
+    name: profile.name,
     url: SITE_URL,
     jobTitle: profile.role,
-    sameAs: [profile.github, profile.linkedin, profile.instagram],
+    sameAs: profile.socials.map((social) => social.href),
   };
 
   return (

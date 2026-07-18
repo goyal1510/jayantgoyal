@@ -2,6 +2,8 @@ import { createSign } from "node:crypto";
 
 import { NextResponse } from "next/server";
 
+import { getPortfolioShellData } from "@/lib/portfolio/editorial-server";
+
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
@@ -9,7 +11,6 @@ const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const DRIVE_EXPORT_MIME_TYPE = "application/pdf";
 const DRIVE_READONLY_SCOPE = "https://www.googleapis.com/auth/drive.readonly";
 const RESUME_FILE_NAME = "Jayant_Resume.pdf";
-const STATIC_RESUME_PATH = "/assets/Jayant_Resume.pdf";
 
 function base64Url(input: string | Buffer): string {
   return Buffer.from(input)
@@ -105,12 +106,21 @@ async function exportResumePdf(
 }
 
 export async function GET(request: Request) {
+  const { profile } = await getPortfolioShellData();
   const documentId = process.env.GOOGLE_RESUME_DOCUMENT_ID;
   const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
   const privateKey = getPrivateKey();
 
   if (!documentId || !serviceAccountEmail || !privateKey) {
-    return NextResponse.redirect(new URL(STATIC_RESUME_PATH, request.url), 307);
+    const configuredResume = new URL(profile.resume, request.url);
+    if (configuredResume.pathname !== "/api/resume") {
+      return NextResponse.redirect(configuredResume, 307);
+    }
+
+    return NextResponse.json(
+      { error: "The CMS resume source is not currently available." },
+      { status: 503 },
+    );
   }
 
   try {

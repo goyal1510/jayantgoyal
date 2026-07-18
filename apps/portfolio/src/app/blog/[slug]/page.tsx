@@ -62,6 +62,7 @@ export default async function BlogPostPage({
   ]);
 
   if (!post) notFound();
+  if (!shell.sectionContent.article.isVisible) notFound();
 
   const currentIndex = publishedPosts.findIndex(
     (publishedPost) => publishedPost.slug === post.slug,
@@ -92,6 +93,9 @@ export default async function BlogPostPage({
         nextPost={nextPost}
         brandLabel={shell.brandLabel}
         navigation={shell.navigation}
+        profileName={shell.profile.name}
+        profileRole={shell.profile.role}
+        articleContent={shell.sectionContent.article}
       />
     </>
   );

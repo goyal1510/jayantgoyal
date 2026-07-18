@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
 import { ArrowDownToLine, ArrowUpRight } from "lucide-react";
 
@@ -9,15 +10,19 @@ import { buildPublicPageMetadata } from "@/lib/seo/config";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = buildPublicPageMetadata({
-  title: "Resume",
-  description:
-    "View or download Jayant Goyal's current full-stack product engineering resume.",
-  pathname: "/resume",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const { sectionContent } = await getPortfolioShellData();
+  return buildPublicPageMetadata({
+    title: "Resume",
+    description: sectionContent.resume.description,
+    pathname: "/resume",
+  });
+}
 
 export default async function ResumePage() {
   const shell = await getPortfolioShellData();
+  const content = shell.sectionContent.resume;
+  if (!content.isVisible) notFound();
 
   return (
     <main className="editorial-page">
@@ -26,16 +31,12 @@ export default async function ResumePage() {
         navigation={shell.navigation}
       />
       <section className="shell editorial-resume">
-        <span className="section-index">Resume / Current snapshot</span>
+        <span className="section-index">{content.eyebrow}</span>
         <div>
-          <h1>The concise version of the path so far.</h1>
-          <p>
-            Product engineering across interfaces, application systems, data,
-            and delivery—along with the experience and education behind the
-            work.
-          </p>
+          <h1>{content.headline}</h1>
+          <p>{content.description}</p>
           <div className="editorial-resume__actions">
-            <a href="/api/resume">
+            <a href={shell.profile.resume}>
               Download latest resume <ArrowDownToLine aria-hidden="true" />
             </a>
             <Link href="/#experience">
