@@ -297,7 +297,3 @@ GRANT ALL ON TABLE "jg_account"."profiles" TO "service_role";
 GRANT USAGE ON SEQUENCE "jg_account"."profiles_id_seq" TO "anon";
 GRANT USAGE ON SEQUENCE "jg_account"."profiles_id_seq" TO "authenticated";
 GRANT USAGE ON SEQUENCE "jg_account"."profiles_id_seq" TO "service_role";
-
-
-
-

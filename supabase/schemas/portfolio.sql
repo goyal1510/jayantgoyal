@@ -43,7 +43,11 @@ CREATE TABLE IF NOT EXISTS "portfolio"."about" (
     "highlights" "jsonb" DEFAULT '[]'::"jsonb",
     "is_visible" boolean DEFAULT true,
     "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"()
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    "headline" "text",
+    "objective" "text",
+    "story" "jsonb" DEFAULT '[]'::"jsonb" NOT NULL,
+    "principles" "jsonb" DEFAULT '[]'::"jsonb" NOT NULL
 );
 
 
@@ -60,7 +64,13 @@ CREATE TABLE IF NOT EXISTS "portfolio"."certificates" (
     "sort_order" integer DEFAULT 0,
     "is_visible" boolean DEFAULT true,
     "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"()
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    "issued_at" "date",
+    "credential_id" "text",
+    "credential_url" "text",
+    "document_key" "text",
+    "preview_key" "text",
+    "image_alt" "text"
 );
 
 
@@ -126,7 +136,11 @@ CREATE TABLE IF NOT EXISTS "portfolio"."hero" (
     "location" "text",
     "is_visible" boolean DEFAULT true,
     "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"()
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    "headline" "text",
+    "current_title" "text",
+    "availability" "text",
+    "resume_url" "text"
 );
 
 
@@ -162,7 +176,16 @@ CREATE TABLE IF NOT EXISTS "portfolio"."projects" (
     "sort_order" integer DEFAULT 0,
     "is_visible" boolean DEFAULT true,
     "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"()
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    "slug" "text",
+    "eyebrow" "text",
+    "impact" "text",
+    "contribution" "text",
+    "year_label" "text",
+    "image_key" "text",
+    "image_alt" "text",
+    "is_featured" boolean DEFAULT false NOT NULL,
+    CONSTRAINT "projects_slug_format_check" CHECK ((("slug" IS NULL) OR ("slug" ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'::"text")))
 );
 
 
@@ -177,7 +200,8 @@ CREATE TABLE IF NOT EXISTS "portfolio"."skill_categories" (
     "sort_order" integer DEFAULT 0,
     "is_visible" boolean DEFAULT true,
     "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"()
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    "description" "text"
 );
 
 
@@ -194,7 +218,11 @@ CREATE TABLE IF NOT EXISTS "portfolio"."skills" (
     "created_at" timestamp with time zone DEFAULT "now"(),
     "updated_at" timestamp with time zone DEFAULT "now"(),
     "icon_key" "text" DEFAULT ''::"text" NOT NULL,
-    CONSTRAINT "skills_level_check" CHECK ((("level" >= 0) AND ("level" <= 100)))
+    "proficiency" "text",
+    "evidence" "text",
+    "is_featured" boolean DEFAULT true NOT NULL,
+    CONSTRAINT "skills_level_check" CHECK ((("level" >= 0) AND ("level" <= 100))),
+    CONSTRAINT "skills_proficiency_check" CHECK ((("proficiency" IS NULL) OR ("proficiency" = ANY (ARRAY['core'::"text", 'strong'::"text", 'working'::"text", 'exploring'::"text"]))))
 );
 
 
@@ -304,6 +332,34 @@ CREATE INDEX "idx_skills_sort_order" ON "portfolio"."skills" USING "btree" ("sor
 
 
 CREATE INDEX "idx_tech_icons_sort_order" ON "portfolio"."tech_icons" USING "btree" ("sort_order");
+
+
+
+CREATE UNIQUE INDEX "portfolio_about_singleton_key" ON "portfolio"."about" USING "btree" ((true));
+
+
+
+CREATE UNIQUE INDEX "portfolio_contact_singleton_key" ON "portfolio"."contact" USING "btree" ((true));
+
+
+
+CREATE UNIQUE INDEX "portfolio_hero_singleton_key" ON "portfolio"."hero" USING "btree" ((true));
+
+
+
+CREATE UNIQUE INDEX "portfolio_nav_items_section_id_key" ON "portfolio"."nav_items" USING "btree" ("section_id");
+
+
+
+CREATE UNIQUE INDEX "portfolio_projects_slug_key" ON "portfolio"."projects" USING "btree" ("slug") WHERE ("slug" IS NOT NULL);
+
+
+
+CREATE UNIQUE INDEX "portfolio_skill_categories_title_key" ON "portfolio"."skill_categories" USING "btree" ("lower"(TRIM(BOTH FROM "title")));
+
+
+
+CREATE UNIQUE INDEX "portfolio_skills_category_name_key" ON "portfolio"."skills" USING "btree" ("category_id", "lower"(TRIM(BOTH FROM "name")));
 
 
 
