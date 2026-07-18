@@ -13,14 +13,19 @@ import {
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
 import { Switch } from "@repo/ui/switch";
+import { Textarea } from "@repo/ui/textarea";
 import type { SkillCategory } from "@/lib/types";
 
-export type CategoryFormData = Omit<SkillCategory, "id" | "created_at" | "updated_at">;
+export type CategoryFormData = Omit<
+  SkillCategory,
+  "id" | "created_at" | "updated_at"
+>;
 
 export const emptyCategoryForm: CategoryFormData = {
   title: "",
   icon_key: "",
   color: "",
+  description: "",
   sort_order: 0,
   is_visible: true,
 };
@@ -69,6 +74,18 @@ export function CategoryDialog({
                 }
                 placeholder="Frontend Development"
                 required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="cat-description">Editorial Description</Label>
+              <Textarea
+                id="cat-description"
+                value={formData.description ?? ""}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+                placeholder="Explain where this capability shows up in shipped work."
+                rows={3}
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -129,9 +146,7 @@ export function CategoryDialog({
               Cancel
             </Button>
             <Button type="submit" disabled={saving}>
-              {saving && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
+              {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {editing ? "Update" : "Add"}
             </Button>
           </DialogFooter>

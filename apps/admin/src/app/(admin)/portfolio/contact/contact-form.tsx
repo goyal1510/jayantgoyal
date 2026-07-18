@@ -4,10 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2, Save, Plus, X } from "lucide-react";
-import {
-  createPortfolioData,
-  updatePortfolioData,
-} from "@/lib/portfolio-api";
+import { createPortfolioData, updatePortfolioData } from "@/lib/portfolio-api";
 import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
@@ -42,7 +39,11 @@ export function ContactForm({ initialData }: ContactFormProps) {
 
     try {
       if (initialData?.id) {
-        const result = await updatePortfolioData<Contact>("contact", initialData.id, formData);
+        const result = await updatePortfolioData<Contact>(
+          "contact",
+          initialData.id,
+          formData,
+        );
         if (result.error) throw new Error(result.error);
         toast.success("Contact info updated");
       } else {
@@ -54,7 +55,7 @@ export function ContactForm({ initialData }: ContactFormProps) {
       router.refresh();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to save contact info"
+        error instanceof Error ? error.message : "Failed to save contact info",
       );
     } finally {
       setSaving(false);
@@ -66,7 +67,7 @@ export function ContactForm({ initialData }: ContactFormProps) {
       ...formData,
       socials: [
         ...formData.socials,
-        { platform: "", url: "", icon_key: "" },
+        { label: "", href: "", icon_key: "", color: "" },
       ],
     });
   };
@@ -81,15 +82,16 @@ export function ContactForm({ initialData }: ContactFormProps) {
   const updateSocial = (
     index: number,
     field: keyof SocialLink,
-    value: string
+    value: string,
   ) => {
     const updated = [...formData.socials];
     const currentItem = updated[index];
     if (!currentItem) return;
     updated[index] = {
-      platform: field === "platform" ? value : currentItem.platform,
-      url: field === "url" ? value : currentItem.url,
+      label: field === "label" ? value : currentItem.label,
+      href: field === "href" ? value : currentItem.href,
       icon_key: field === "icon_key" ? value : currentItem.icon_key,
+      color: field === "color" ? value : currentItem.color,
     };
     setFormData({ ...formData, socials: updated });
   };
@@ -99,9 +101,7 @@ export function ContactForm({ initialData }: ContactFormProps) {
       <Card>
         <CardHeader>
           <CardTitle>Contact Details</CardTitle>
-          <CardDescription>
-            Your primary contact information.
-          </CardDescription>
+          <CardDescription>Your primary contact information.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
@@ -154,13 +154,13 @@ export function ContactForm({ initialData }: ContactFormProps) {
         <CardContent className="space-y-4">
           {formData.socials.map((social, index) => (
             <div key={index} className="flex gap-4 items-start">
-              <div className="flex-1 grid gap-4 md:grid-cols-3">
+              <div className="grid flex-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
                 <div className="space-y-2">
-                  <Label>Platform</Label>
+                  <Label>Label</Label>
                   <Input
-                    value={social.platform}
+                    value={social.label}
                     onChange={(e) =>
-                      updateSocial(index, "platform", e.target.value)
+                      updateSocial(index, "label", e.target.value)
                     }
                     placeholder="LinkedIn"
                   />
@@ -168,9 +168,21 @@ export function ContactForm({ initialData }: ContactFormProps) {
                 <div className="space-y-2">
                   <Label>URL</Label>
                   <Input
-                    value={social.url}
-                    onChange={(e) => updateSocial(index, "url", e.target.value)}
+                    value={social.href}
+                    onChange={(e) =>
+                      updateSocial(index, "href", e.target.value)
+                    }
                     placeholder="https://linkedin.com/in/..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Color Class</Label>
+                  <Input
+                    value={social.color}
+                    onChange={(e) =>
+                      updateSocial(index, "color", e.target.value)
+                    }
+                    placeholder="text-blue-600"
                   />
                 </div>
                 <div className="space-y-2">
@@ -215,7 +227,9 @@ export function ContactForm({ initialData }: ContactFormProps) {
                 setFormData({ ...formData, is_visible: checked })
               }
             />
-            <Label htmlFor="is_visible">Show contact section on portfolio</Label>
+            <Label htmlFor="is_visible">
+              Show contact section on portfolio
+            </Label>
           </div>
         </CardContent>
       </Card>

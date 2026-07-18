@@ -27,7 +27,11 @@ import {
   CardTitle,
 } from "@repo/ui/card";
 import type { Certificate } from "@/lib/types";
-import { CertificateDialog, emptyCertificateForm, type CertificateFormData } from "./certificate-dialog";
+import {
+  CertificateDialog,
+  emptyCertificateForm,
+  type CertificateFormData,
+} from "./certificate-dialog";
 
 interface CertificatesListProps {
   initialData: Certificate[];
@@ -38,7 +42,8 @@ export function CertificatesList({ initialData }: CertificatesListProps) {
   const [items, setItems] = useState(initialData);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<Certificate | null>(null);
-  const [formData, setFormData] = useState<CertificateFormData>(emptyCertificateForm);
+  const [formData, setFormData] =
+    useState<CertificateFormData>(emptyCertificateForm);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
 
@@ -46,7 +51,8 @@ export function CertificatesList({ initialData }: CertificatesListProps) {
     setEditingItem(null);
     setFormData({
       ...emptyCertificateForm,
-      sort_order: items.length > 0 ? Math.max(...items.map((i) => i.sort_order)) + 1 : 0,
+      sort_order:
+        items.length > 0 ? Math.max(...items.map((i) => i.sort_order)) + 1 : 0,
     });
     setDialogOpen(true);
   };
@@ -59,6 +65,12 @@ export function CertificatesList({ initialData }: CertificatesListProps) {
       description: item.description ?? "",
       category: item.category ?? "",
       issuer: item.issuer ?? "",
+      issued_at: item.issued_at,
+      credential_id: item.credential_id ?? "",
+      credential_url: item.credential_url ?? "",
+      document_key: item.document_key ?? "",
+      preview_key: item.preview_key ?? "",
+      image_alt: item.image_alt ?? "",
       sort_order: item.sort_order,
       is_visible: item.is_visible,
     });
@@ -71,11 +83,18 @@ export function CertificatesList({ initialData }: CertificatesListProps) {
 
     try {
       if (editingItem) {
-        const result = await updatePortfolioData<Certificate>("certificates", editingItem.id, formData);
+        const result = await updatePortfolioData<Certificate>(
+          "certificates",
+          editingItem.id,
+          formData,
+        );
         if (result.error) throw new Error(result.error);
         toast.success("Certificate updated");
       } else {
-        const result = await createPortfolioData<Certificate>("certificates", formData);
+        const result = await createPortfolioData<Certificate>(
+          "certificates",
+          formData,
+        );
         if (result.error) throw new Error(result.error);
         toast.success("Certificate added");
       }
@@ -84,7 +103,7 @@ export function CertificatesList({ initialData }: CertificatesListProps) {
       router.refresh();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to save certificate"
+        error instanceof Error ? error.message : "Failed to save certificate",
       );
     } finally {
       setSaving(false);
@@ -104,7 +123,7 @@ export function CertificatesList({ initialData }: CertificatesListProps) {
       router.refresh();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to delete certificate"
+        error instanceof Error ? error.message : "Failed to delete certificate",
       );
     } finally {
       setDeleting(null);
@@ -113,12 +132,16 @@ export function CertificatesList({ initialData }: CertificatesListProps) {
 
   const toggleVisibility = async (item: Certificate) => {
     try {
-      const result = await updatePortfolioData<Certificate>("certificates", item.id, { is_visible: !item.is_visible });
+      const result = await updatePortfolioData<Certificate>(
+        "certificates",
+        item.id,
+        { is_visible: !item.is_visible },
+      );
       if (result.error) throw new Error(result.error);
       setItems(
         items.map((i) =>
-          i.id === item.id ? { ...i, is_visible: !i.is_visible } : i
-        )
+          i.id === item.id ? { ...i, is_visible: !i.is_visible } : i,
+        ),
       );
       toast.success(item.is_visible ? "Hidden from portfolio" : "Now visible");
     } catch {
