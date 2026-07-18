@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { ArrowUpRight } from "lucide-react";
 
 import { EditorialSubpageHeader } from "@/components/editorial/subpage-header";
+import { formatEditorialDate } from "@/lib/blog/date";
 import { getPublishedBlogPosts } from "@/lib/blog/queries";
 import { getPortfolioShellData } from "@/lib/portfolio/editorial-server";
 import { buildPublicPageMetadata } from "@/lib/seo/config";
@@ -57,13 +58,7 @@ export default async function BlogPage() {
               className="editorial-writing-row"
             >
               <time dateTime={post.published_at ?? undefined}>
-                {post.published_at
-                  ? new Date(post.published_at).toLocaleDateString("en-GB", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    })
-                  : "Published"}
+                {formatEditorialDate(post.published_at, "short") ?? "Published"}
               </time>
               <div>
                 <h2>{post.title}</h2>

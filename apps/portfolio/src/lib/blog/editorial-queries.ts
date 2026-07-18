@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 
+import { formatEditorialDate } from "@/lib/blog/date";
 import type { BlogPreview } from "@/lib/portfolio/editorial-data";
 
 type BlogRow = {
@@ -35,14 +36,7 @@ export async function getPublishedBlogPreviews(): Promise<BlogPreview[]> {
     title: post.title,
     slug: post.slug,
     excerpt: post.excerpt ?? "Read the latest note from the workbench.",
-    date: post.published_at
-      ? new Intl.DateTimeFormat("en-GB", {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-          timeZone: "UTC",
-        }).format(new Date(post.published_at))
-      : "Published",
+    date: formatEditorialDate(post.published_at, "short") ?? "Published",
     tags: post.tags ?? [],
   }));
 }

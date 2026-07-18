@@ -11,6 +11,7 @@ import remarkGfm from "remark-gfm";
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 
 import { EditorialSubpageHeader } from "@/components/editorial/subpage-header";
+import { formatEditorialDate } from "@/lib/blog/date";
 import type {
   PortfolioNavigationItem,
   PortfolioSectionContent,
@@ -82,16 +83,6 @@ function extractSections(content: string): ArticleSection[] {
   return Array.from(content.matchAll(/^##\s+(.+)$/gm), (match) => {
     const label = match[1]?.replace(/[*_`]/g, "").trim() ?? "Section";
     return { id: slugifyHeading(label), label };
-  });
-}
-
-function formatArticleDate(value: string | null): string | null {
-  if (!value) return null;
-
-  return new Date(value).toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
   });
 }
 
@@ -174,8 +165,8 @@ export function BlogContent({
     [content],
   );
   const readingMinutes = Math.max(1, Math.ceil(wordCount / 220));
-  const publishedDate = formatArticleDate(post.published_at);
-  const updatedDate = formatArticleDate(post.updated_at);
+  const publishedDate = formatEditorialDate(post.published_at);
+  const updatedDate = formatEditorialDate(post.updated_at);
 
   useEffect(() => {
     const updateProgress = () => {
