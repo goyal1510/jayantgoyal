@@ -5,7 +5,6 @@ type PortfolioTable =
   | "experience"
   | "skill_categories"
   | "skills"
-  | "tech_icons"
   | "projects"
   | "certificates"
   | "contact"

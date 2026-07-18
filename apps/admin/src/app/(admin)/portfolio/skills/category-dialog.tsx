@@ -23,8 +23,6 @@ export type CategoryFormData = Omit<
 
 export const emptyCategoryForm: CategoryFormData = {
   title: "",
-  icon_key: "",
-  color: "",
   description: "",
   sort_order: 0,
   is_visible: true,
@@ -86,31 +84,8 @@ export function CategoryDialog({
                 }
                 placeholder="Explain where this capability shows up in shipped work."
                 rows={3}
+                required
               />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="cat-icon">Icon Key</Label>
-                <Input
-                  id="cat-icon"
-                  value={formData.icon_key}
-                  onChange={(e) =>
-                    setFormData({ ...formData, icon_key: e.target.value })
-                  }
-                  placeholder="Code2"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="cat-color">Color</Label>
-                <Input
-                  id="cat-color"
-                  value={formData.color ?? ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, color: e.target.value })
-                  }
-                  placeholder="#3B82F6"
-                />
-              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="cat-sort">Sort Order</Label>

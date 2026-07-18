@@ -17,6 +17,7 @@ import { Textarea } from "@repo/ui/textarea";
 import { Switch } from "@repo/ui/switch";
 import { Badge } from "@repo/ui/badge";
 import type { BlogPost } from "@/lib/types";
+import { PortfolioAssetUpload } from "@/components/portfolio/asset-upload";
 
 export type BlogFormData = Omit<BlogPost, "id" | "created_at" | "updated_at">;
 
@@ -30,7 +31,6 @@ export const emptyBlogForm: BlogFormData = {
   is_published: false,
   published_at: "",
   is_visible: true,
-  sort_order: 0,
 };
 
 interface BlogDialogProps {
@@ -98,7 +98,13 @@ export function BlogDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={(o) => { onOpenChange(o); if (!o) setTagInput(""); }}>
+    <Dialog
+      open={open}
+      onOpenChange={(o) => {
+        onOpenChange(o);
+        if (!o) setTagInput("");
+      }}
+    >
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
@@ -143,7 +149,10 @@ export function BlogDialog({
                   variant="outline"
                   size="icon"
                   onClick={() =>
-                    setFormData({ ...formData, slug: generateSlug(formData.title) })
+                    setFormData({
+                      ...formData,
+                      slug: generateSlug(formData.title),
+                    })
                   }
                   title="Generate slug from title"
                 >
@@ -179,17 +188,15 @@ export function BlogDialog({
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="cover_image">Cover Image URL</Label>
-              <Input
-                id="cover_image"
-                value={formData.cover_image ?? ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, cover_image: e.target.value })
-                }
-                placeholder="https://example.com/image.jpg"
-              />
-            </div>
+            <PortfolioAssetUpload
+              id="cover_image"
+              label="Cover Image"
+              kind="blog-cover"
+              value={formData.cover_image ?? ""}
+              onChange={(cover_image) =>
+                setFormData({ ...formData, cover_image })
+              }
+            />
 
             <div className="space-y-2">
               <Label>Tags</Label>
@@ -222,37 +229,21 @@ export function BlogDialog({
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="published_at">Published At</Label>
-                <Input
-                  id="published_at"
-                  type="datetime-local"
-                  value={toDatetimeLocalValue(formData.published_at)}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      published_at: e.target.value
-                        ? new Date(e.target.value).toISOString()
-                        : "",
-                    })
-                  }
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="sort_order">Sort Order</Label>
-                <Input
-                  id="sort_order"
-                  type="number"
-                  value={formData.sort_order}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      sort_order: parseInt(e.target.value) || 0,
-                    })
-                  }
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="published_at">Published At</Label>
+              <Input
+                id="published_at"
+                type="datetime-local"
+                value={toDatetimeLocalValue(formData.published_at)}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    published_at: e.target.value
+                      ? new Date(e.target.value).toISOString()
+                      : "",
+                  })
+                }
+              />
             </div>
 
             <div className="flex items-center gap-6">

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { Loader2, X } from "lucide-react";
+
+import { Badge } from "@repo/ui/badge";
 import { Button } from "@repo/ui/button";
 import {
   Dialog,
@@ -13,43 +15,30 @@ import {
 } from "@repo/ui/dialog";
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
-import { Textarea } from "@repo/ui/textarea";
 import { Switch } from "@repo/ui/switch";
-import { Badge } from "@repo/ui/badge";
+import { Textarea } from "@repo/ui/textarea";
+
+import { PortfolioAssetUpload } from "@/components/portfolio/asset-upload";
 import type { Project } from "@/lib/types";
 
 export type ProjectFormData = Omit<Project, "id" | "created_at" | "updated_at">;
 
 export const emptyProjectForm: ProjectFormData = {
   name: "",
-  short_description: "",
-  full_description: "",
-  image_light: "",
-  image_dark: "",
-  tags: [],
-  github_link: "",
-  live_link: "",
   slug: "",
   eyebrow: "",
+  short_description: "",
   impact: "",
   contribution: "",
   year_label: "",
-  image_key: "",
+  image_url: "",
   image_alt: "",
-  is_featured: false,
+  tags: [],
+  github_link: "",
+  live_link: "",
   sort_order: 0,
   is_visible: true,
 };
-
-interface ProjectDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  editing: Project | null;
-  formData: ProjectFormData;
-  setFormData: (data: ProjectFormData) => void;
-  onSubmit: (e: React.FormEvent) => void;
-  saving: boolean;
-}
 
 export function ProjectDialog({
   open,
@@ -59,115 +48,105 @@ export function ProjectDialog({
   setFormData,
   onSubmit,
   saving,
-}: ProjectDialogProps) {
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  editing: Project | null;
+  formData: ProjectFormData;
+  setFormData: (data: ProjectFormData) => void;
+  onSubmit: (event: React.FormEvent) => void;
+  saving: boolean;
+}) {
   const [tagInput, setTagInput] = useState("");
 
-  const addTag = () => {
-    if (tagInput.trim() && !formData.tags.includes(tagInput.trim())) {
-      setFormData({
-        ...formData,
-        tags: [...formData.tags, tagInput.trim()],
-      });
-      setTagInput("");
-    }
-  };
-
-  const removeTag = (tag: string) => {
-    setFormData({
-      ...formData,
-      tags: formData.tags.filter((t) => t !== tag),
-    });
-  };
-
-  const handleTagKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      addTag();
-    }
-  };
+  function addTag() {
+    const tag = tagInput.trim();
+    if (!tag || formData.tags.includes(tag)) return;
+    setFormData({ ...formData, tags: [...formData.tags, tag] });
+    setTagInput("");
+  }
 
   return (
     <Dialog
       open={open}
-      onOpenChange={(o) => {
-        onOpenChange(o);
-        if (!o) setTagInput("");
+      onOpenChange={(nextOpen) => {
+        onOpenChange(nextOpen);
+        if (!nextOpen) setTagInput("");
       }}
     >
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{editing ? "Edit Project" : "Add Project"}</DialogTitle>
           <DialogDescription>
-            {editing
-              ? "Update the project details."
-              : "Add a new project to your portfolio."}
+            Every field below maps directly to the public project story.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={onSubmit}>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Project Name</Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                placeholder="My Awesome Project"
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-5 py-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="name">Project Name</Label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(event) =>
+                    setFormData({ ...formData, name: event.target.value })
+                  }
+                  required
+                />
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="slug">Slug</Label>
                 <Input
                   id="slug"
-                  value={formData.slug ?? ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, slug: e.target.value })
+                  value={formData.slug}
+                  onChange={(event) =>
+                    setFormData({ ...formData, slug: event.target.value })
                   }
-                  placeholder="activity-tracker"
                   pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="eyebrow">Story Category</Label>
+                <Input
+                  id="eyebrow"
+                  value={formData.eyebrow}
+                  onChange={(event) =>
+                    setFormData({ ...formData, eyebrow: event.target.value })
+                  }
+                  required
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="year_label">Year Label</Label>
                 <Input
                   id="year_label"
-                  value={formData.year_label ?? ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, year_label: e.target.value })
+                  value={formData.year_label}
+                  onChange={(event) =>
+                    setFormData({ ...formData, year_label: event.target.value })
                   }
-                  placeholder="2025—26"
+                  required
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="eyebrow">Story Category</Label>
-              <Input
-                id="eyebrow"
-                value={formData.eyebrow ?? ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, eyebrow: e.target.value })
-                }
-                placeholder="Realtime messaging"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="short_description">Short Description</Label>
-              <Input
+              <Label htmlFor="short_description">Project Summary</Label>
+              <Textarea
                 id="short_description"
-                value={formData.short_description ?? ""}
-                onChange={(e) =>
+                value={formData.short_description}
+                onChange={(event) =>
                   setFormData({
                     ...formData,
-                    short_description: e.target.value,
+                    short_description: event.target.value,
                   })
                 }
-                placeholder="A brief one-line description"
+                rows={3}
+                required
               />
             </div>
 
@@ -175,12 +154,12 @@ export function ProjectDialog({
               <Label htmlFor="impact">Outcome / Impact</Label>
               <Textarea
                 id="impact"
-                value={formData.impact ?? ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, impact: e.target.value })
+                value={formData.impact}
+                onChange={(event) =>
+                  setFormData({ ...formData, impact: event.target.value })
                 }
-                placeholder="What became better, clearer, faster, or more dependable?"
                 rows={3}
+                required
               />
             </div>
 
@@ -188,168 +167,131 @@ export function ProjectDialog({
               <Label htmlFor="contribution">Contribution</Label>
               <Input
                 id="contribution"
-                value={formData.contribution ?? ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, contribution: e.target.value })
+                value={formData.contribution}
+                onChange={(event) =>
+                  setFormData({
+                    ...formData,
+                    contribution: event.target.value,
+                  })
                 }
-                placeholder="Product engineering · Realtime UX"
+                required
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="image_key">Local Image Key</Label>
-                <Input
-                  id="image_key"
-                  value={formData.image_key ?? ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, image_key: e.target.value })
-                  }
-                  placeholder="activity-tracker"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="image_alt">Image Description</Label>
-                <Input
-                  id="image_alt"
-                  value={formData.image_alt ?? ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, image_alt: e.target.value })
-                  }
-                  placeholder="Describe the complete product interface"
-                />
-              </div>
-            </div>
+            <PortfolioAssetUpload
+              id="image_url"
+              label="Full Project Screenshot"
+              kind="project-image"
+              value={formData.image_url}
+              onChange={(image_url) => setFormData({ ...formData, image_url })}
+              required
+            />
 
             <div className="space-y-2">
-              <Label htmlFor="full_description">Full Description</Label>
-              <Textarea
-                id="full_description"
-                value={formData.full_description ?? ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, full_description: e.target.value })
+              <Label htmlFor="image_alt">Screenshot Description</Label>
+              <Input
+                id="image_alt"
+                value={formData.image_alt}
+                onChange={(event) =>
+                  setFormData({ ...formData, image_alt: event.target.value })
                 }
-                placeholder="Detailed description of the project..."
-                rows={4}
+                required
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="image_light">Image URL (Light Mode)</Label>
-                <Input
-                  id="image_light"
-                  value={formData.image_light ?? ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, image_light: e.target.value })
-                  }
-                  placeholder="/images/project-light.png"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="image_dark">Image URL (Dark Mode)</Label>
-                <Input
-                  id="image_dark"
-                  value={formData.image_dark ?? ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, image_dark: e.target.value })
-                  }
-                  placeholder="/images/project-dark.png"
-                />
-              </div>
-            </div>
-
             <div className="space-y-2">
-              <Label>Tags</Label>
+              <Label>Technologies</Label>
               <div className="flex gap-2">
                 <Input
                   value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  onKeyDown={handleTagKeyDown}
-                  placeholder="Type a tag and press Enter"
+                  onChange={(event) => setTagInput(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      event.preventDefault();
+                      addTag();
+                    }
+                  }}
+                  placeholder="Type a technology and press Enter"
                 />
                 <Button type="button" variant="outline" onClick={addTag}>
                   Add
                 </Button>
               </div>
-              {formData.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {formData.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary">
-                      {tag}
-                      <button
-                        type="button"
-                        onClick={() => removeTag(tag)}
-                        className="ml-1 cursor-pointer hover:text-destructive"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </Badge>
-                  ))}
-                </div>
-              )}
+              <div className="flex flex-wrap gap-2">
+                {formData.tags.map((tag) => (
+                  <Badge key={tag} variant="secondary">
+                    {tag}
+                    <button
+                      type="button"
+                      className="ml-1"
+                      onClick={() =>
+                        setFormData({
+                          ...formData,
+                          tags: formData.tags.filter((item) => item !== tag),
+                        })
+                      }
+                      aria-label={`Remove ${tag}`}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="github_link">GitHub Link</Label>
-                <Input
-                  id="github_link"
-                  value={formData.github_link ?? ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, github_link: e.target.value })
-                  }
-                  placeholder="https://github.com/..."
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="live_link">Live Demo Link</Label>
+                <Label htmlFor="live_link">Live Product URL</Label>
                 <Input
                   id="live_link"
+                  type="url"
                   value={formData.live_link ?? ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, live_link: e.target.value })
+                  onChange={(event) =>
+                    setFormData({ ...formData, live_link: event.target.value })
                   }
-                  placeholder="https://myproject.com"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="github_link">Source URL</Label>
+                <Input
+                  id="github_link"
+                  type="url"
+                  value={formData.github_link ?? ""}
+                  onChange={(event) =>
+                    setFormData({
+                      ...formData,
+                      github_link: event.target.value,
+                    })
+                  }
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="sort_order">Sort Order</Label>
-              <Input
-                id="sort_order"
-                type="number"
-                value={formData.sort_order}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    sort_order: parseInt(e.target.value) || 0,
-                  })
-                }
-              />
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="is_featured"
-                checked={formData.is_featured}
-                onCheckedChange={(checked) =>
-                  setFormData({ ...formData, is_featured: checked })
-                }
-              />
-              <Label htmlFor="is_featured">Featured project</Label>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="is_visible"
-                checked={formData.is_visible}
-                onCheckedChange={(checked) =>
-                  setFormData({ ...formData, is_visible: checked })
-                }
-              />
-              <Label htmlFor="is_visible">Visible on portfolio</Label>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="sort_order">Display Order</Label>
+                <Input
+                  id="sort_order"
+                  type="number"
+                  value={formData.sort_order}
+                  onChange={(event) =>
+                    setFormData({
+                      ...formData,
+                      sort_order: Number(event.target.value),
+                    })
+                  }
+                />
+              </div>
+              <div className="flex items-end gap-2 pb-2">
+                <Switch
+                  id="is_visible"
+                  checked={formData.is_visible}
+                  onCheckedChange={(is_visible) =>
+                    setFormData({ ...formData, is_visible })
+                  }
+                />
+                <Label htmlFor="is_visible">Visible on Portfolio</Label>
+              </div>
             </div>
           </div>
           <DialogFooter>
@@ -361,8 +303,10 @@ export function ProjectDialog({
               Cancel
             </Button>
             <Button type="submit" disabled={saving}>
-              {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {editing ? "Update" : "Add"}
+              {saving ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : null}
+              {editing ? "Update Project" : "Add Project"}
             </Button>
           </DialogFooter>
         </form>

@@ -15,6 +15,7 @@ import {
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
 import { Textarea } from "@repo/ui/textarea";
+import { Switch } from "@repo/ui/switch";
 
 import { updatePortfolioData } from "@/lib/portfolio-api";
 import type { SectionContent } from "@/lib/types";
@@ -61,6 +62,7 @@ export function SectionCopyManager({
           accent: section.accent,
           description: section.description,
           supporting_text: section.supporting_text,
+          is_visible: section.is_visible,
         },
       );
       if (result.error) throw new Error(result.error);
@@ -120,6 +122,23 @@ export function SectionCopyManager({
                   }
                   required
                 />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Switch
+                  id={`${section.id}-visible`}
+                  checked={section.is_visible}
+                  onCheckedChange={(is_visible) =>
+                    setSections((current) =>
+                      current.map((item) =>
+                        item.id === section.id ? { ...item, is_visible } : item,
+                      ),
+                    )
+                  }
+                />
+                <Label htmlFor={`${section.id}-visible`}>
+                  Render this section or page publicly
+                </Label>
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">

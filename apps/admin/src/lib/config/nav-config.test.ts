@@ -22,6 +22,11 @@ describe("Admin navigation domains", () => {
     expect(
       adminNavigationDomains.find((domain) => domain.id === "studio")?.items,
     ).toEqual([]);
+    expect(
+      adminNavigationDomains
+        .find((domain) => domain.id === "portfolio")
+        ?.items.some((item) => item.href === "/portfolio/tech-icons"),
+    ).toBe(false);
   });
 
   it("keeps operational domains restricted to super admins", () => {

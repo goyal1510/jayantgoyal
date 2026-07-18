@@ -9,7 +9,6 @@ import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
 import { Textarea } from "@repo/ui/textarea";
-import { Switch } from "@repo/ui/switch";
 import {
   Card,
   CardContent,
@@ -33,8 +32,6 @@ export function AboutForm({ initialData }: AboutFormProps) {
     story: initialData?.story ?? ([] as string[]),
     principles: initialData?.principles ?? ([] as PortfolioPrinciple[]),
     personal: initialData?.personal ?? ([] as PersonalInfo[]),
-    highlights: initialData?.highlights ?? ([] as string[]),
-    is_visible: initialData?.is_visible ?? true,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -93,26 +90,6 @@ export function AboutForm({ initialData }: AboutFormProps) {
       value: field === "value" ? value : currentItem.value,
     };
     setFormData({ ...formData, personal: updated });
-  };
-
-  const addHighlight = () => {
-    setFormData({
-      ...formData,
-      highlights: [...formData.highlights, ""],
-    });
-  };
-
-  const removeHighlight = (index: number) => {
-    setFormData({
-      ...formData,
-      highlights: formData.highlights.filter((_, i) => i !== index),
-    });
-  };
-
-  const updateHighlight = (index: number, value: string) => {
-    const updated = [...formData.highlights];
-    updated[index] = value;
-    setFormData({ ...formData, highlights: updated });
   };
 
   const addStoryParagraph = () => {
@@ -333,57 +310,6 @@ export function AboutForm({ initialData }: AboutFormProps) {
             <Plus className="mr-2 h-4 w-4" />
             Add Personal Info
           </Button>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Highlights</CardTitle>
-          <CardDescription>
-            Key achievements or skills to highlight.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {formData.highlights.map((highlight, index) => (
-            <div key={index} className="flex gap-4 items-center">
-              <Input
-                className="flex-1"
-                value={highlight}
-                onChange={(e) => updateHighlight(index, e.target.value)}
-                placeholder="5+ years of experience..."
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={() => removeHighlight(index)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          ))}
-          <Button type="button" variant="outline" onClick={addHighlight}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Highlight
-          </Button>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Visibility</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="is_visible"
-              checked={formData.is_visible}
-              onCheckedChange={(checked) =>
-                setFormData({ ...formData, is_visible: checked })
-              }
-            />
-            <Label htmlFor="is_visible">Visible on portfolio</Label>
-          </div>
         </CardContent>
       </Card>
 

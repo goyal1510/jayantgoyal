@@ -9,7 +9,6 @@ import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
 import { Textarea } from "@repo/ui/textarea";
-import { Switch } from "@repo/ui/switch";
 import {
   Card,
   CardContent,
@@ -18,6 +17,7 @@ import {
   CardTitle,
 } from "@repo/ui/card";
 import type { Hero } from "@/lib/types";
+import { PortfolioAssetUpload } from "@/components/portfolio/asset-upload";
 
 interface HeroFormProps {
   initialData: Hero | null;
@@ -32,12 +32,13 @@ export function HeroForm({ initialData }: HeroFormProps) {
     role: initialData?.role ?? "",
     tagline: initialData?.tagline ?? "",
     blurb: initialData?.blurb ?? "",
-    location: initialData?.location ?? "",
     headline: initialData?.headline ?? "",
     current_title: initialData?.current_title ?? "",
     availability: initialData?.availability ?? "",
     resume_url: initialData?.resume_url ?? "",
-    is_visible: initialData?.is_visible ?? true,
+    github_username: initialData?.github_username ?? "",
+    seo_title: initialData?.seo_title ?? "",
+    seo_description: initialData?.seo_description ?? "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -134,6 +135,7 @@ export function HeroForm({ initialData }: HeroFormProps) {
               }
               placeholder="I turn ambitious product ideas into clear, dependable software."
               rows={3}
+              required
             />
             <p className="text-xs text-muted-foreground">
               The primary statement visitors see first.
@@ -150,21 +152,19 @@ export function HeroForm({ initialData }: HeroFormProps) {
                   setFormData({ ...formData, current_title: e.target.value })
                 }
                 placeholder="Product Associate Engineer"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="resume_url">Resume URL</Label>
-              <Input
-                id="resume_url"
-                type="url"
-                value={formData.resume_url}
-                onChange={(e) =>
-                  setFormData({ ...formData, resume_url: e.target.value })
-                }
-                placeholder="https://jayantgoyal.com/api/resume"
+                required
               />
             </div>
           </div>
+
+          <PortfolioAssetUpload
+            id="resume_url"
+            label="Resume PDF or Export URL"
+            kind="resume"
+            value={formData.resume_url}
+            onChange={(resume_url) => setFormData({ ...formData, resume_url })}
+            required
+          />
 
           <div className="space-y-2">
             <Label htmlFor="availability">Availability</Label>
@@ -175,6 +175,7 @@ export function HeroForm({ initialData }: HeroFormProps) {
                 setFormData({ ...formData, availability: e.target.value })
               }
               placeholder="Open to thoughtful product and engineering collaborations."
+              required
             />
           </div>
 
@@ -187,6 +188,7 @@ export function HeroForm({ initialData }: HeroFormProps) {
                 setFormData({ ...formData, tagline: e.target.value })
               }
               placeholder="Healthcare product systems"
+              required
             />
             <p className="text-xs text-muted-foreground">
               Shown beside the “Building” label in the hero field note.
@@ -203,6 +205,7 @@ export function HeroForm({ initialData }: HeroFormProps) {
               }
               placeholder="I'm Jayant Goyal, a full-stack product engineer..."
               rows={4}
+              required
             />
             <p className="text-xs text-muted-foreground">
               The complete sentence directly below the editorial headline.
@@ -210,26 +213,50 @@ export function HeroForm({ initialData }: HeroFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="location">Location</Label>
+            <Label htmlFor="github_username">GitHub Username</Label>
             <Input
-              id="location"
-              value={formData.location}
-              onChange={(e) =>
-                setFormData({ ...formData, location: e.target.value })
+              id="github_username"
+              value={formData.github_username}
+              onChange={(event) =>
+                setFormData({
+                  ...formData,
+                  github_username: event.target.value,
+                })
               }
-              placeholder="San Francisco, CA"
+              placeholder="goyal1510"
+              required
+            />
+            <p className="text-xs text-muted-foreground">
+              Drives the live contribution map and repository statistics.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="seo_title">Search & Social Title</Label>
+            <Input
+              id="seo_title"
+              value={formData.seo_title}
+              onChange={(event) =>
+                setFormData({ ...formData, seo_title: event.target.value })
+              }
+              required
             />
           </div>
 
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="is_visible"
-              checked={formData.is_visible}
-              onCheckedChange={(checked) =>
-                setFormData({ ...formData, is_visible: checked })
+          <div className="space-y-2">
+            <Label htmlFor="seo_description">Search & Social Description</Label>
+            <Textarea
+              id="seo_description"
+              value={formData.seo_description}
+              onChange={(event) =>
+                setFormData({
+                  ...formData,
+                  seo_description: event.target.value,
+                })
               }
+              rows={3}
+              required
             />
-            <Label htmlFor="is_visible">Visible on portfolio</Label>
           </div>
 
           <Button type="submit" disabled={saving}>

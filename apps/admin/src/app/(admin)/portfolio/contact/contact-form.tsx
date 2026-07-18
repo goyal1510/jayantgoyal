@@ -8,7 +8,6 @@ import { createPortfolioData, updatePortfolioData } from "@/lib/portfolio-api";
 import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
-import { Switch } from "@repo/ui/switch";
 import {
   Card,
   CardContent,
@@ -30,7 +29,6 @@ export function ContactForm({ initialData }: ContactFormProps) {
     phone: initialData?.phone ?? "",
     location: initialData?.location ?? "",
     socials: initialData?.socials ?? ([] as SocialLink[]),
-    is_visible: initialData?.is_visible ?? true,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -65,10 +63,7 @@ export function ContactForm({ initialData }: ContactFormProps) {
   const addSocial = () => {
     setFormData({
       ...formData,
-      socials: [
-        ...formData.socials,
-        { label: "", href: "", icon_key: "", color: "" },
-      ],
+      socials: [...formData.socials, { label: "", href: "", icon_key: "" }],
     });
   };
 
@@ -91,7 +86,6 @@ export function ContactForm({ initialData }: ContactFormProps) {
       label: field === "label" ? value : currentItem.label,
       href: field === "href" ? value : currentItem.href,
       icon_key: field === "icon_key" ? value : currentItem.icon_key,
-      color: field === "color" ? value : currentItem.color,
     };
     setFormData({ ...formData, socials: updated });
   };
@@ -115,6 +109,7 @@ export function ContactForm({ initialData }: ContactFormProps) {
                   setFormData({ ...formData, email: e.target.value })
                 }
                 placeholder="your@email.com"
+                required
               />
             </div>
             <div className="space-y-2">
@@ -127,6 +122,7 @@ export function ContactForm({ initialData }: ContactFormProps) {
                   setFormData({ ...formData, phone: e.target.value })
                 }
                 placeholder="+1 (555) 123-4567"
+                required
               />
             </div>
           </div>
@@ -139,6 +135,7 @@ export function ContactForm({ initialData }: ContactFormProps) {
                 setFormData({ ...formData, location: e.target.value })
               }
               placeholder="San Francisco, CA"
+              required
             />
           </div>
         </CardContent>
@@ -154,7 +151,7 @@ export function ContactForm({ initialData }: ContactFormProps) {
         <CardContent className="space-y-4">
           {formData.socials.map((social, index) => (
             <div key={index} className="flex gap-4 items-start">
-              <div className="grid flex-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+              <div className="grid flex-1 gap-4 md:grid-cols-3">
                 <div className="space-y-2">
                   <Label>Label</Label>
                   <Input
@@ -173,16 +170,6 @@ export function ContactForm({ initialData }: ContactFormProps) {
                       updateSocial(index, "href", e.target.value)
                     }
                     placeholder="https://linkedin.com/in/..."
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Color Class</Label>
-                  <Input
-                    value={social.color}
-                    onChange={(e) =>
-                      updateSocial(index, "color", e.target.value)
-                    }
-                    placeholder="text-blue-600"
                   />
                 </div>
                 <div className="space-y-2">
@@ -211,26 +198,6 @@ export function ContactForm({ initialData }: ContactFormProps) {
             <Plus className="mr-2 h-4 w-4" />
             Add Social Link
           </Button>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Visibility</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="is_visible"
-              checked={formData.is_visible}
-              onCheckedChange={(checked) =>
-                setFormData({ ...formData, is_visible: checked })
-              }
-            />
-            <Label htmlFor="is_visible">
-              Show contact section on portfolio
-            </Label>
-          </div>
         </CardContent>
       </Card>
 

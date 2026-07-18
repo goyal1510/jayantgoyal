@@ -1,0 +1,29 @@
+# Portfolio CMS Synchronization
+
+- Date: 2026-07-19
+- Areas: Portfolio, Admin, Supabase
+- Goal: make the current public Portfolio, its database contract, and the Admin editing experience fully synchronous; remove obsolete editors, fields, and legacy content paths that no longer affect the redesigned Portfolio.
+- Started from deployed `origin/main` in the protected `codex/portfolio-cms-sync` worktree branch.
+- The implementation will begin with a field-level usage audit so destructive cleanup is limited to data proven unused by both the public Portfolio and Admin workflows.
+- The live audit found dead dashboard-era fields and editors (`tech_icons`, numeric skill levels, skill/project featured flags, category/navigation colors and icons, project light/dark images, local media keys, duplicate singleton visibility/location fields, and stale hidden navigation/category rows).
+- Added a zero-downtime two-migration plan. The additive migration introduces CMS-controlled GitHub/SEO identity, canonical project/certificate URLs, Blog/Article/Resume copy rows, and a public `portfolio-assets` bucket. The cleanup migration removes only the verified legacy contract after the synchronized applications are deployed.
+- Hardened the cleanup contract with singleton public-read policies that no longer depend on retired visibility columns and required-field constraints for every value the redesigned Portfolio needs to render without static content fallbacks.
+- Applied the additive CMS migration to the verified `jayantgoyal` Supabase project, confirmed all canonical identity/media/copy fields and the constrained public asset bucket, and refreshed the three remote schema snapshots (only `portfolio.sql` changed).
+- Replaced the redesigned Portfolio's static content dataset with a strict database-only editorial contract, including CMS-owned SEO, GitHub identity, media URLs, social links, and all thirteen section/page copy records; removed navigation and Blog fallback behavior from the live page path.
+- Wired section visibility, project/certificate media, GitHub activity, dynamic social links, home metadata, and structured identity directly to CMS data; external project and certificate media now render without Next.js image-proxy assumptions.
+- Moved Blog index, article sign-off, Resume page, resume source, and contact-email recipient to CMS-owned records so public subpages and Resend delivery no longer depend on duplicated Portfolio literals.
+- Added an authenticated Admin media pipeline for project images, certificate documents/previews, Blog covers, and the resume, backed by the constrained `portfolio-assets` bucket; removed retired Tech Icon navigation/API/type contracts.
+- Rebuilt the Admin project and credential editors around only the fields rendered by the new Portfolio, with direct upload/preview controls and required canonical storytelling metadata instead of dashboard-era image keys and duplicate descriptions.
+- Updated Hero, About, and Contact editors to match the canonical singleton contract: GitHub/SEO/resume are now editable, duplicated location and unused highlight/visibility/color controls are gone, and social records contain only values rendered publicly.
+- Simplified Skills management to the exact public capability model—category description plus skill name, evidence, proficiency, ordering, and visibility—removing percentage levels, decorative icons/colors, and featured flags that the redesigned interface never used.
+- Locked Admin navigation to real Portfolio anchors and made all thirteen home/subpage copy records visibility-aware; removed arbitrary section creation/deletion, decorative nav styling, and the obsolete section-copy sort contract.
+- Added Blog cover uploads to the same Admin asset workflow and regression coverage for MIME, size, extension, and retired navigation behavior.
+- Deleted the retired dashboard Portfolio component/data stack and Tech Icons Admin route, then removed their animation/sidebar CSS so the repository has one public Portfolio implementation and one canonical CMS path.
+- Moved duplicate dashboard-era project screenshots, certificate PDFs, and the duplicate legacy resume from `public/assets` to the macOS Trash; retained only the favicon assets and the canonical media paths currently referenced by migrated CMS rows.
+- Removed the Blog sort-order contract because public writing is ordered by publication date, and changed Blog queries to surface database failures instead of disguising them as an empty CMS.
+- Completed the public credential mapping so optional description, issue date, credential ID, and verification link are visibly rendered instead of being retained as unused CMS fields.
+- Formatted the synchronized Portfolio/Admin implementation before the full lint, type, test, build, and browser-validation pass.
+- Adjusted the contact-to-CMS import to remain resolvable in the repository's root Vitest environment after the first full test run exposed its missing Portfolio path alias.
+- Browser validation confirmed live database copy, nine project stories, Blog/article copy, top-edge progress bars, dynamic socials, and the mobile menu; retained a temporary filter for the redundant legacy Name fact until the gated cleanup migration removes it remotely.
+- Resynchronized Admin collection state after each server refresh across Projects, Credentials, Skills, Education, Experience, and Blog; required all canonical Hero and Contact fields so incomplete CMS records cannot silently weaken the public Portfolio.
+- Formatted the complete Portfolio/Admin synchronization diff before the final validation pass.

@@ -12,6 +12,14 @@ export default async function NavigationPage() {
     .schema("portfolio")
     .from("nav_items")
     .select("*")
+    .in("section_id", [
+      "about",
+      "skills",
+      "experience",
+      "activity",
+      "work",
+      "writing",
+    ])
     .order("sort_order", { ascending: true });
 
   return <NavigationList initialData={navItems ?? []} />;

@@ -11,12 +11,30 @@ export default async function SectionCopyPage() {
   const { data, error } = await supabase
     .schema("portfolio")
     .from("section_content")
-    .select("*")
-    .order("sort_order", { ascending: true });
+    .select("*");
 
   if (error) {
     throw new Error(`Unable to load Portfolio section copy: ${error.message}`);
   }
 
-  return <SectionCopyManager initialData={data ?? []} />;
+  const order = [
+    "hero",
+    "about",
+    "skills",
+    "education",
+    "experience",
+    "credentials",
+    "activity",
+    "work",
+    "writing",
+    "contact",
+    "blog",
+    "article",
+    "resume",
+  ];
+  const sections = [...(data ?? [])].sort(
+    (a, b) => order.indexOf(a.section_key) - order.indexOf(b.section_key),
+  );
+
+  return <SectionCopyManager initialData={sections} />;
 }

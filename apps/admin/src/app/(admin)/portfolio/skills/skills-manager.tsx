@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
@@ -60,6 +60,10 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
 
   const [deleting, setDeleting] = useState<string | null>(null);
 
+  useEffect(() => {
+    setCategories(initialData);
+  }, [initialData]);
+
   const toggleCategory = (id: string) => {
     const newExpanded = new Set(expandedCategories);
     if (newExpanded.has(id)) {
@@ -86,9 +90,7 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
     setEditingCategory(category);
     setCategoryForm({
       title: category.title,
-      icon_key: category.icon_key,
-      color: category.color ?? "",
-      description: category.description ?? "",
+      description: category.description,
       sort_order: category.sort_order,
       is_visible: category.is_visible,
     });
@@ -169,11 +171,8 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
     setSkillForm({
       category_id: skill.category_id,
       name: skill.name,
-      icon_key: skill.icon_key,
-      level: skill.level,
       proficiency: skill.proficiency,
-      evidence: skill.evidence ?? "",
-      is_featured: skill.is_featured,
+      evidence: skill.evidence,
       sort_order: skill.sort_order,
       is_visible: skill.is_visible,
     });

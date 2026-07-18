@@ -45,30 +45,29 @@ export interface AuthUser {
 export interface Hero {
   id: string;
   name: string;
-  display_name: string | null;
+  display_name: string;
   role: string;
-  tagline: string | null;
-  blurb: string | null;
-  location: string | null;
-  headline: string | null;
-  current_title: string | null;
-  availability: string | null;
-  resume_url: string | null;
-  is_visible: boolean;
+  tagline: string;
+  blurb: string;
+  headline: string;
+  current_title: string;
+  availability: string;
+  resume_url: string;
+  github_username: string;
+  seo_title: string;
+  seo_description: string;
   created_at: string;
   updated_at: string;
 }
 
 export interface About {
   id: string;
-  summary: string | null;
+  summary: string;
   personal: PersonalInfo[];
-  highlights: string[];
-  headline: string | null;
-  objective: string | null;
+  headline: string;
+  objective: string;
   story: string[];
   principles: PortfolioPrinciple[];
-  is_visible: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -113,9 +112,7 @@ export interface Experience {
 export interface SkillCategory {
   id: string;
   title: string;
-  icon_key: string;
-  color: string | null;
-  description: string | null;
+  description: string;
   sort_order: number;
   is_visible: boolean;
   created_at: string;
@@ -126,11 +123,8 @@ export interface Skill {
   id: string;
   category_id: string;
   name: string;
-  icon_key: string;
-  level: number | null;
-  proficiency: "core" | "strong" | "working" | "exploring" | null;
-  evidence: string | null;
-  is_featured: boolean;
+  proficiency: "core" | "strong" | "working" | "exploring";
+  evidence: string;
   sort_order: number;
   is_visible: boolean;
   created_at: string;
@@ -141,35 +135,20 @@ export interface SkillCategoryWithSkills extends SkillCategory {
   skills: Skill[];
 }
 
-export interface TechIcon {
-  id: string;
-  icon_key: string;
-  name: string;
-  color: string | null;
-  sort_order: number;
-  is_visible: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
 export interface Project {
   id: string;
   name: string;
-  short_description: string | null;
-  full_description: string | null;
-  image_light: string | null;
-  image_dark: string | null;
+  short_description: string;
   tags: string[];
   github_link: string | null;
   live_link: string | null;
-  slug: string | null;
-  eyebrow: string | null;
-  impact: string | null;
-  contribution: string | null;
-  year_label: string | null;
-  image_key: string | null;
-  image_alt: string | null;
-  is_featured: boolean;
+  slug: string;
+  eyebrow: string;
+  impact: string;
+  contribution: string;
+  year_label: string;
+  image_url: string;
+  image_alt: string;
   sort_order: number;
   is_visible: boolean;
   created_at: string;
@@ -179,16 +158,15 @@ export interface Project {
 export interface Certificate {
   id: string;
   name: string;
-  path: string;
   description: string | null;
-  category: string | null;
-  issuer: string | null;
+  category: string;
+  issuer: string;
   issued_at: string | null;
   credential_id: string | null;
   credential_url: string | null;
-  document_key: string | null;
-  preview_key: string | null;
-  image_alt: string | null;
+  document_url: string;
+  preview_url: string;
+  image_alt: string;
   sort_order: number;
   is_visible: boolean;
   created_at: string;
@@ -197,11 +175,10 @@ export interface Certificate {
 
 export interface Contact {
   id: string;
-  email: string | null;
-  phone: string | null;
-  location: string | null;
+  email: string;
+  phone: string;
+  location: string;
   socials: SocialLink[];
-  is_visible: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -210,15 +187,12 @@ export interface SocialLink {
   label: string;
   href: string;
   icon_key: string;
-  color: string;
 }
 
 export interface NavItem {
   id: string;
   section_id: string;
   label: string;
-  icon_key: string;
-  color: string | null;
   note: string | null;
   sort_order: number;
   is_visible: boolean;
@@ -234,7 +208,6 @@ export interface SectionContent {
   accent: string | null;
   description: string | null;
   supporting_text: string | null;
-  sort_order: number;
   is_visible: boolean;
   created_at: string;
   updated_at: string;
@@ -309,7 +282,6 @@ export interface BlogPost {
   is_visible: boolean;
   is_published: boolean;
   published_at: string | null;
-  sort_order: number;
   created_at: string;
   updated_at: string;
 }

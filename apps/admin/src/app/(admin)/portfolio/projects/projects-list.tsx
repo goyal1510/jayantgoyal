@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
@@ -47,6 +47,10 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
 
+  useEffect(() => {
+    setItems(initialData);
+  }, [initialData]);
+
   const openAddDialog = () => {
     setEditingItem(null);
     setFormData({
@@ -61,21 +65,17 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
     setEditingItem(item);
     setFormData({
       name: item.name,
-      short_description: item.short_description ?? "",
-      full_description: item.full_description ?? "",
-      image_light: item.image_light ?? "",
-      image_dark: item.image_dark ?? "",
+      short_description: item.short_description,
       tags: item.tags ?? [],
       github_link: item.github_link ?? "",
       live_link: item.live_link ?? "",
-      slug: item.slug ?? "",
-      eyebrow: item.eyebrow ?? "",
-      impact: item.impact ?? "",
-      contribution: item.contribution ?? "",
-      year_label: item.year_label ?? "",
-      image_key: item.image_key ?? "",
-      image_alt: item.image_alt ?? "",
-      is_featured: item.is_featured,
+      slug: item.slug,
+      eyebrow: item.eyebrow,
+      impact: item.impact,
+      contribution: item.contribution,
+      year_label: item.year_label,
+      image_url: item.image_url,
+      image_alt: item.image_alt,
       sort_order: item.sort_order,
       is_visible: item.is_visible,
     });

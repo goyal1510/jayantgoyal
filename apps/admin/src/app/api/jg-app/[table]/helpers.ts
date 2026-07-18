@@ -9,7 +9,7 @@ export { checkAdminAccess, getAdminClient, authorizeAndGetClient };
 
 export const ALLOWED_TABLES = ["blog_posts"];
 
-export const TABLES_WITH_SORT_ORDER = ["blog_posts"];
+export const TABLES_WITH_SORT_ORDER: string[] = [];
 
 export function validateTable(table: string) {
   if (!ALLOWED_TABLES.includes(table)) {

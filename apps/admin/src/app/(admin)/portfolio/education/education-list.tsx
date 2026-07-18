@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
@@ -26,7 +26,11 @@ import {
   CardTitle,
 } from "@repo/ui/card";
 import type { Education } from "@/lib/types";
-import { EducationDialog, emptyEducationForm, type EducationFormData } from "./education-dialog";
+import {
+  EducationDialog,
+  emptyEducationForm,
+  type EducationFormData,
+} from "./education-dialog";
 
 interface EducationListProps {
   initialData: Education[];
@@ -37,15 +41,21 @@ export function EducationList({ initialData }: EducationListProps) {
   const [items, setItems] = useState(initialData);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<Education | null>(null);
-  const [formData, setFormData] = useState<EducationFormData>(emptyEducationForm);
+  const [formData, setFormData] =
+    useState<EducationFormData>(emptyEducationForm);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
+
+  useEffect(() => {
+    setItems(initialData);
+  }, [initialData]);
 
   const openAddDialog = () => {
     setEditingItem(null);
     setFormData({
       ...emptyEducationForm,
-      sort_order: items.length > 0 ? Math.max(...items.map((i) => i.sort_order)) + 1 : 0,
+      sort_order:
+        items.length > 0 ? Math.max(...items.map((i) => i.sort_order)) + 1 : 0,
     });
     setDialogOpen(true);
   };
@@ -73,12 +83,15 @@ export function EducationList({ initialData }: EducationListProps) {
         const result = await updatePortfolioData<Education>(
           "education",
           editingItem.id,
-          formData
+          formData,
         );
         if (result.error) throw new Error(result.error);
         toast.success("Education updated");
       } else {
-        const result = await createPortfolioData<Education>("education", formData);
+        const result = await createPortfolioData<Education>(
+          "education",
+          formData,
+        );
         if (result.error) throw new Error(result.error);
         toast.success("Education added");
       }
@@ -87,7 +100,7 @@ export function EducationList({ initialData }: EducationListProps) {
       router.refresh();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to save education"
+        error instanceof Error ? error.message : "Failed to save education",
       );
     } finally {
       setSaving(false);
@@ -107,7 +120,7 @@ export function EducationList({ initialData }: EducationListProps) {
       router.refresh();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to delete education"
+        error instanceof Error ? error.message : "Failed to delete education",
       );
     } finally {
       setDeleting(null);
@@ -116,14 +129,18 @@ export function EducationList({ initialData }: EducationListProps) {
 
   const toggleVisibility = async (item: Education) => {
     try {
-      const result = await updatePortfolioData<Education>("education", item.id, {
-        is_visible: !item.is_visible,
-      });
+      const result = await updatePortfolioData<Education>(
+        "education",
+        item.id,
+        {
+          is_visible: !item.is_visible,
+        },
+      );
       if (result.error) throw new Error(result.error);
       setItems(
         items.map((i) =>
-          i.id === item.id ? { ...i, is_visible: !i.is_visible } : i
-        )
+          i.id === item.id ? { ...i, is_visible: !i.is_visible } : i,
+        ),
       );
       toast.success(item.is_visible ? "Hidden from portfolio" : "Now visible");
     } catch {

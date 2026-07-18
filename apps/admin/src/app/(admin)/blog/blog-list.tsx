@@ -1,21 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import {
-  Loader2,
-  Plus,
-  Pencil,
-  Trash2,
-  Eye,
-  EyeOff,
-} from "lucide-react";
-import {
-  createBlogData,
-  updateBlogData,
-  deleteBlogData,
-} from "@/lib/blog-api";
+import { Loader2, Plus, Pencil, Trash2, Eye, EyeOff } from "lucide-react";
+import { createBlogData, updateBlogData, deleteBlogData } from "@/lib/blog-api";
 import { Button } from "@repo/ui/button";
 import { Badge } from "@repo/ui/badge";
 import type { BlogPost } from "@/lib/types";
@@ -34,11 +23,14 @@ export function BlogList({ initialData }: BlogListProps) {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
 
+  useEffect(() => {
+    setItems(initialData);
+  }, [initialData]);
+
   const openAddDialog = () => {
     setEditingItem(null);
     setFormData({
       ...emptyBlogForm,
-      sort_order: items.length > 0 ? Math.max(...items.map((i) => i.sort_order)) + 1 : 0,
     });
     setDialogOpen(true);
   };
@@ -55,7 +47,6 @@ export function BlogList({ initialData }: BlogListProps) {
       is_published: item.is_published,
       published_at: item.published_at ?? "",
       is_visible: item.is_visible,
-      sort_order: item.sort_order,
     });
     setDialogOpen(true);
   };
@@ -78,7 +69,11 @@ export function BlogList({ initialData }: BlogListProps) {
       };
 
       if (editingItem) {
-        const result = await updateBlogData<BlogPost>("blog_posts", editingItem.id, sanitized);
+        const result = await updateBlogData<BlogPost>(
+          "blog_posts",
+          editingItem.id,
+          sanitized,
+        );
         if (result.error) throw new Error(result.error);
         toast.success("Blog post updated");
       } else {
@@ -91,7 +86,7 @@ export function BlogList({ initialData }: BlogListProps) {
       router.refresh();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to save blog post"
+        error instanceof Error ? error.message : "Failed to save blog post",
       );
     } finally {
       setSaving(false);
@@ -109,7 +104,7 @@ export function BlogList({ initialData }: BlogListProps) {
       router.refresh();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to delete blog post"
+        error instanceof Error ? error.message : "Failed to delete blog post",
       );
     } finally {
       setDeleting(null);
@@ -118,9 +113,15 @@ export function BlogList({ initialData }: BlogListProps) {
 
   const toggleVisibility = async (item: BlogPost) => {
     try {
-      const result = await updateBlogData<BlogPost>("blog_posts", item.id, { is_visible: !item.is_visible });
+      const result = await updateBlogData<BlogPost>("blog_posts", item.id, {
+        is_visible: !item.is_visible,
+      });
       if (result.error) throw new Error(result.error);
-      setItems(items.map((i) => i.id === item.id ? { ...i, is_visible: !i.is_visible } : i));
+      setItems(
+        items.map((i) =>
+          i.id === item.id ? { ...i, is_visible: !i.is_visible } : i,
+        ),
+      );
       toast.success(item.is_visible ? "Hidden" : "Visible");
     } catch {
       toast.error("Failed to update visibility");
@@ -151,16 +152,24 @@ export function BlogList({ initialData }: BlogListProps) {
                 <div className="flex items-center gap-2">
                   <p className="font-medium truncate">{item.title}</p>
                   {item.is_published ? (
-                    <Badge variant="default" className="text-xs shrink-0">Published</Badge>
+                    <Badge variant="default" className="text-xs shrink-0">
+                      Published
+                    </Badge>
                   ) : (
-                    <Badge variant="secondary" className="text-xs shrink-0">Draft</Badge>
+                    <Badge variant="secondary" className="text-xs shrink-0">
+                      Draft
+                    </Badge>
                   )}
                   {!item.is_visible && (
-                    <Badge variant="outline" className="text-xs shrink-0">Hidden</Badge>
+                    <Badge variant="outline" className="text-xs shrink-0">
+                      Hidden
+                    </Badge>
                   )}
                 </div>
                 {item.excerpt && (
-                  <p className="text-sm text-muted-foreground truncate mt-0.5">{item.excerpt}</p>
+                  <p className="text-sm text-muted-foreground truncate mt-0.5">
+                    {item.excerpt}
+                  </p>
                 )}
               </div>
               {item.published_at && (
@@ -173,14 +182,38 @@ export function BlogList({ initialData }: BlogListProps) {
                 </time>
               )}
               <div className="flex shrink-0 items-center gap-1">
-                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => toggleVisibility(item)}>
-                  {item.is_visible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={() => toggleVisibility(item)}
+                >
+                  {item.is_visible ? (
+                    <Eye className="h-4 w-4" />
+                  ) : (
+                    <EyeOff className="h-4 w-4" />
+                  )}
                 </Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEditDialog(item)}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={() => openEditDialog(item)}
+                >
                   <Pencil className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDelete(item.id)} disabled={deleting === item.id}>
-                  {deleting === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={() => handleDelete(item.id)}
+                  disabled={deleting === item.id}
+                >
+                  {deleting === item.id ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
+
 import { Button } from "@repo/ui/button";
 import {
   Dialog,
@@ -12,8 +13,10 @@ import {
 } from "@repo/ui/dialog";
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
-import { Textarea } from "@repo/ui/textarea";
 import { Switch } from "@repo/ui/switch";
+import { Textarea } from "@repo/ui/textarea";
+
+import { PortfolioAssetUpload } from "@/components/portfolio/asset-upload";
 import type { Certificate } from "@/lib/types";
 
 export type CertificateFormData = Omit<
@@ -23,29 +26,18 @@ export type CertificateFormData = Omit<
 
 export const emptyCertificateForm: CertificateFormData = {
   name: "",
-  path: "",
   description: "",
   category: "",
   issuer: "",
   issued_at: null,
   credential_id: "",
   credential_url: "",
-  document_key: "",
-  preview_key: "",
+  document_url: "",
+  preview_url: "",
   image_alt: "",
   sort_order: 0,
   is_visible: true,
 };
-
-interface CertificateDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  editing: Certificate | null;
-  formData: CertificateFormData;
-  setFormData: (data: CertificateFormData) => void;
-  onSubmit: (e: React.FormEvent) => void;
-  saving: boolean;
-}
 
 export function CertificateDialog({
   open,
@@ -55,46 +47,122 @@ export function CertificateDialog({
   setFormData,
   onSubmit,
   saving,
-}: CertificateDialogProps) {
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  editing: Certificate | null;
+  formData: CertificateFormData;
+  setFormData: (data: CertificateFormData) => void;
+  onSubmit: (event: React.FormEvent) => void;
+  saving: boolean;
+}) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {editing ? "Edit Certificate" : "Add Certificate"}
           </DialogTitle>
           <DialogDescription>
-            {editing
-              ? "Update the certificate details."
-              : "Add a new certificate to your portfolio."}
+            The document, preview, and credential details all appear in the
+            public certificate deck.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={onSubmit}>
-          <div className="space-y-4 py-4">
+          <div className="space-y-5 py-4">
             <div className="space-y-2">
               <Label htmlFor="name">Certificate Name</Label>
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
+                onChange={(event) =>
+                  setFormData({ ...formData, name: event.target.value })
                 }
-                placeholder="AWS Solutions Architect"
                 required
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="issuer">Issuer</Label>
+                <Input
+                  id="issuer"
+                  value={formData.issuer}
+                  onChange={(event) =>
+                    setFormData({ ...formData, issuer: event.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="category">Category</Label>
+                <Input
+                  id="category"
+                  value={formData.category}
+                  onChange={(event) =>
+                    setFormData({ ...formData, category: event.target.value })
+                  }
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={formData.description ?? ""}
+                onChange={(event) =>
+                  setFormData({ ...formData, description: event.target.value })
+                }
+                rows={3}
+              />
+            </div>
+
+            <PortfolioAssetUpload
+              id="document_url"
+              label="Certificate PDF"
+              kind="certificate-document"
+              value={formData.document_url}
+              onChange={(document_url) =>
+                setFormData({ ...formData, document_url })
+              }
+              required
+            />
+            <PortfolioAssetUpload
+              id="preview_url"
+              label="Certificate Preview"
+              kind="certificate-preview"
+              value={formData.preview_url}
+              onChange={(preview_url) =>
+                setFormData({ ...formData, preview_url })
+              }
+              required
+            />
+
+            <div className="space-y-2">
+              <Label htmlFor="image_alt">Preview Description</Label>
+              <Input
+                id="image_alt"
+                value={formData.image_alt}
+                onChange={(event) =>
+                  setFormData({ ...formData, image_alt: event.target.value })
+                }
+                required
+              />
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="issued_at">Issued Date</Label>
                 <Input
                   id="issued_at"
                   type="date"
                   value={formData.issued_at ?? ""}
-                  onChange={(e) =>
+                  onChange={(event) =>
                     setFormData({
                       ...formData,
-                      issued_at: e.target.value || null,
+                      issued_at: event.target.value || null,
                     })
                   }
                 />
@@ -104,13 +172,12 @@ export function CertificateDialog({
                 <Input
                   id="credential_id"
                   value={formData.credential_id ?? ""}
-                  onChange={(e) =>
+                  onChange={(event) =>
                     setFormData({
                       ...formData,
-                      credential_id: e.target.value,
+                      credential_id: event.target.value,
                     })
                   }
-                  placeholder="Leave empty when unknown"
                 />
               </div>
             </div>
@@ -121,129 +188,40 @@ export function CertificateDialog({
                 id="credential_url"
                 type="url"
                 value={formData.credential_url ?? ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, credential_url: e.target.value })
-                }
-                placeholder="https://..."
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="document_key">Document Key</Label>
-                <Input
-                  id="document_key"
-                  value={formData.document_key ?? ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, document_key: e.target.value })
-                  }
-                  placeholder="hackerrank-basic"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="preview_key">Preview Key</Label>
-                <Input
-                  id="preview_key"
-                  value={formData.preview_key ?? ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, preview_key: e.target.value })
-                  }
-                  placeholder="hackerrank-basic"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="image_alt">Preview Description</Label>
-              <Textarea
-                id="image_alt"
-                value={formData.image_alt ?? ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, image_alt: e.target.value })
-                }
-                placeholder="Describe the certificate for visitors using assistive technology."
-                rows={2}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="path">Certificate Path / URL</Label>
-              <Input
-                id="path"
-                value={formData.path}
-                onChange={(e) =>
-                  setFormData({ ...formData, path: e.target.value })
-                }
-                placeholder="/certificates/aws-sa.pdf or https://..."
-                required
-              />
-              <p className="text-xs text-muted-foreground">
-                Path to the certificate file or verification URL
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="issuer">Issuer</Label>
-                <Input
-                  id="issuer"
-                  value={formData.issuer ?? ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, issuer: e.target.value })
-                  }
-                  placeholder="Amazon Web Services"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="category">Category</Label>
-                <Input
-                  id="category"
-                  value={formData.category ?? ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, category: e.target.value })
-                  }
-                  placeholder="Cloud Computing"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                value={formData.description ?? ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
-                placeholder="Brief description of the certification..."
-                rows={3}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="sort_order">Sort Order</Label>
-              <Input
-                id="sort_order"
-                type="number"
-                value={formData.sort_order}
-                onChange={(e) =>
+                onChange={(event) =>
                   setFormData({
                     ...formData,
-                    sort_order: parseInt(e.target.value) || 0,
+                    credential_url: event.target.value,
                   })
                 }
               />
             </div>
 
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="is_visible"
-                checked={formData.is_visible}
-                onCheckedChange={(checked) =>
-                  setFormData({ ...formData, is_visible: checked })
-                }
-              />
-              <Label htmlFor="is_visible">Visible on portfolio</Label>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="sort_order">Display Order</Label>
+                <Input
+                  id="sort_order"
+                  type="number"
+                  value={formData.sort_order}
+                  onChange={(event) =>
+                    setFormData({
+                      ...formData,
+                      sort_order: Number(event.target.value),
+                    })
+                  }
+                />
+              </div>
+              <div className="flex items-end gap-2 pb-2">
+                <Switch
+                  id="is_visible"
+                  checked={formData.is_visible}
+                  onCheckedChange={(is_visible) =>
+                    setFormData({ ...formData, is_visible })
+                  }
+                />
+                <Label htmlFor="is_visible">Visible on Portfolio</Label>
+              </div>
             </div>
           </div>
           <DialogFooter>
@@ -255,8 +233,10 @@ export function CertificateDialog({
               Cancel
             </Button>
             <Button type="submit" disabled={saving}>
-              {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {editing ? "Update" : "Add"}
+              {saving ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : null}
+              {editing ? "Update Certificate" : "Add Certificate"}
             </Button>
           </DialogFooter>
         </form>

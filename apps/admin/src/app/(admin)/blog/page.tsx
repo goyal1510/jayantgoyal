@@ -12,7 +12,7 @@ export default async function BlogPage() {
     .schema("jg_app")
     .from("blog_posts")
     .select("*")
-    .order("sort_order", { ascending: true });
+    .order("published_at", { ascending: false });
 
   return <BlogList initialData={posts ?? []} />;
 }

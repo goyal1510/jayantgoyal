@@ -9,7 +9,6 @@ export const ALLOWED_TABLES = [
   "experience",
   "skill_categories",
   "skills",
-  "tech_icons",
   "projects",
   "certificates",
   "contact",
@@ -22,11 +21,9 @@ export const TABLES_WITH_SORT_ORDER = [
   "experience",
   "skill_categories",
   "skills",
-  "tech_icons",
   "projects",
   "certificates",
   "nav_items",
-  "section_content",
 ];
 
 export async function checkAdminAccess() {

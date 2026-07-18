@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
@@ -26,7 +26,11 @@ import {
   CardTitle,
 } from "@repo/ui/card";
 import type { Experience } from "@/lib/types";
-import { ExperienceDialog, emptyExperienceForm, type ExperienceFormData } from "./experience-dialog";
+import {
+  ExperienceDialog,
+  emptyExperienceForm,
+  type ExperienceFormData,
+} from "./experience-dialog";
 
 interface ExperienceListProps {
   initialData: Experience[];
@@ -37,15 +41,21 @@ export function ExperienceList({ initialData }: ExperienceListProps) {
   const [items, setItems] = useState(initialData);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<Experience | null>(null);
-  const [formData, setFormData] = useState<ExperienceFormData>(emptyExperienceForm);
+  const [formData, setFormData] =
+    useState<ExperienceFormData>(emptyExperienceForm);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
+
+  useEffect(() => {
+    setItems(initialData);
+  }, [initialData]);
 
   const openAddDialog = () => {
     setEditingItem(null);
     setFormData({
       ...emptyExperienceForm,
-      sort_order: items.length > 0 ? Math.max(...items.map((i) => i.sort_order)) + 1 : 0,
+      sort_order:
+        items.length > 0 ? Math.max(...items.map((i) => i.sort_order)) + 1 : 0,
     });
     setDialogOpen(true);
   };
@@ -74,12 +84,15 @@ export function ExperienceList({ initialData }: ExperienceListProps) {
         const result = await updatePortfolioData<Experience>(
           "experience",
           editingItem.id,
-          formData
+          formData,
         );
         if (result.error) throw new Error(result.error);
         toast.success("Experience updated");
       } else {
-        const result = await createPortfolioData<Experience>("experience", formData);
+        const result = await createPortfolioData<Experience>(
+          "experience",
+          formData,
+        );
         if (result.error) throw new Error(result.error);
         toast.success("Experience added");
       }
@@ -88,7 +101,7 @@ export function ExperienceList({ initialData }: ExperienceListProps) {
       router.refresh();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to save experience"
+        error instanceof Error ? error.message : "Failed to save experience",
       );
     } finally {
       setSaving(false);
@@ -108,7 +121,7 @@ export function ExperienceList({ initialData }: ExperienceListProps) {
       router.refresh();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to delete experience"
+        error instanceof Error ? error.message : "Failed to delete experience",
       );
     } finally {
       setDeleting(null);
@@ -117,14 +130,18 @@ export function ExperienceList({ initialData }: ExperienceListProps) {
 
   const toggleVisibility = async (item: Experience) => {
     try {
-      const result = await updatePortfolioData<Experience>("experience", item.id, {
-        is_visible: !item.is_visible,
-      });
+      const result = await updatePortfolioData<Experience>(
+        "experience",
+        item.id,
+        {
+          is_visible: !item.is_visible,
+        },
+      );
       if (result.error) throw new Error(result.error);
       setItems(
         items.map((i) =>
-          i.id === item.id ? { ...i, is_visible: !i.is_visible } : i
-        )
+          i.id === item.id ? { ...i, is_visible: !i.is_visible } : i,
+        ),
       );
       toast.success(item.is_visible ? "Hidden from portfolio" : "Now visible");
     } catch {

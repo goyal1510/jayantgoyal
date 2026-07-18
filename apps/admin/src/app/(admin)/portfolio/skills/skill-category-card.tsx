@@ -16,7 +16,11 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@repo/ui/collapsible";
-import type { SkillCategoryWithSkills, SkillCategory, Skill } from "@/lib/types";
+import type {
+  SkillCategoryWithSkills,
+  SkillCategory,
+  Skill,
+} from "@/lib/types";
 
 interface SkillCategoryCardProps {
   category: SkillCategoryWithSkills;
@@ -63,14 +67,11 @@ export function SkillCategoryCard({
                 ({category.skills.length} skills)
               </span>
               {!category.is_visible && (
-                <span className="text-xs text-muted-foreground">
-                  (Hidden)
-                </span>
+                <span className="text-xs text-muted-foreground">(Hidden)</span>
               )}
             </div>
             <p className="text-sm text-muted-foreground">
-              Icon: {category.icon_key || "None"}{" "}
-              {category.color && `• Color: ${category.color}`}
+              {category.description}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -117,16 +118,12 @@ export function SkillCategoryCard({
                 >
                   <div className="flex-1">
                     <span className="font-medium">{skill.name}</span>
-                    {skill.icon_key && (
-                      <span className="ml-2 text-sm text-muted-foreground">
-                        Icon: {skill.icon_key}
-                      </span>
-                    )}
-                    {skill.level !== null && (
-                      <span className="ml-2 text-sm text-muted-foreground">
-                        Level: {skill.level}%
-                      </span>
-                    )}
+                    <span className="ml-2 text-xs uppercase tracking-wide text-muted-foreground">
+                      {skill.proficiency}
+                    </span>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {skill.evidence}
+                    </p>
                     {!skill.is_visible && (
                       <span className="ml-2 text-xs text-muted-foreground">
                         (Hidden)

@@ -21,11 +21,8 @@ export type SkillFormData = Omit<Skill, "id" | "created_at" | "updated_at">;
 export const emptySkillForm: SkillFormData = {
   category_id: "",
   name: "",
-  icon_key: "",
-  level: null,
-  proficiency: null,
+  proficiency: "strong",
   evidence: "",
-  is_featured: true,
   sort_order: 0,
   is_visible: true,
 };
@@ -79,16 +76,14 @@ export function SkillDialog({
               <select
                 id="skill-proficiency"
                 className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-                value={formData.proficiency ?? ""}
+                value={formData.proficiency}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    proficiency:
-                      (e.target.value as SkillFormData["proficiency"]) || null,
+                    proficiency: e.target.value as SkillFormData["proficiency"],
                   })
                 }
               >
-                <option value="">Not specified</option>
                 <option value="core">Core</option>
                 <option value="strong">Strong</option>
                 <option value="working">Working</option>
@@ -102,47 +97,17 @@ export function SkillDialog({
               <Label htmlFor="skill-evidence">Evidence</Label>
               <Textarea
                 id="skill-evidence"
-                value={formData.evidence ?? ""}
+                value={formData.evidence}
                 onChange={(e) =>
                   setFormData({ ...formData, evidence: e.target.value })
                 }
                 placeholder="Where has this skill been applied?"
                 rows={3}
+                required
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="skill-icon-key">Icon Key</Label>
-              <Input
-                id="skill-icon-key"
-                value={formData.icon_key}
-                onChange={(e) =>
-                  setFormData({ ...formData, icon_key: e.target.value })
-                }
-                placeholder="react, java, supabase, nextjs"
-              />
-              <p className="text-xs text-muted-foreground">
-                Optional. Leave blank to use the skill name as the icon key.
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="skill-level">Level (0-100)</Label>
-                <Input
-                  id="skill-level"
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={formData.level ?? ""}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      level: e.target.value ? parseInt(e.target.value) : null,
-                    })
-                  }
-                  placeholder="85"
-                />
-              </div>
-              <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <div className="flex-1 space-y-2">
                 <Label htmlFor="skill-sort">Sort Order</Label>
                 <Input
                   id="skill-sort"
@@ -156,16 +121,6 @@ export function SkillDialog({
                   }
                 />
               </div>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="skill-featured"
-                checked={formData.is_featured}
-                onCheckedChange={(checked) =>
-                  setFormData({ ...formData, is_featured: checked })
-                }
-              />
-              <Label htmlFor="skill-featured">Featured capability</Label>
             </div>
             <div className="flex items-center space-x-2">
               <Switch

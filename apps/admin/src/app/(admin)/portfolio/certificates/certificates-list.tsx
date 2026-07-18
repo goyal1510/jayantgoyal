@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
@@ -47,6 +47,10 @@ export function CertificatesList({ initialData }: CertificatesListProps) {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
 
+  useEffect(() => {
+    setItems(initialData);
+  }, [initialData]);
+
   const openAddDialog = () => {
     setEditingItem(null);
     setFormData({
@@ -61,16 +65,15 @@ export function CertificatesList({ initialData }: CertificatesListProps) {
     setEditingItem(item);
     setFormData({
       name: item.name,
-      path: item.path,
       description: item.description ?? "",
-      category: item.category ?? "",
-      issuer: item.issuer ?? "",
+      category: item.category,
+      issuer: item.issuer,
       issued_at: item.issued_at,
       credential_id: item.credential_id ?? "",
       credential_url: item.credential_url ?? "",
-      document_key: item.document_key ?? "",
-      preview_key: item.preview_key ?? "",
-      image_alt: item.image_alt ?? "",
+      document_url: item.document_url,
+      preview_url: item.preview_url,
+      image_alt: item.image_alt,
       sort_order: item.sort_order,
       is_visible: item.is_visible,
     });
