@@ -140,7 +140,8 @@ CREATE TABLE IF NOT EXISTS "portfolio"."hero" (
     "headline" "text",
     "current_title" "text",
     "availability" "text",
-    "resume_url" "text"
+    "resume_url" "text",
+    "display_name" "text"
 );
 
 
@@ -156,7 +157,8 @@ CREATE TABLE IF NOT EXISTS "portfolio"."nav_items" (
     "sort_order" integer DEFAULT 0,
     "is_visible" boolean DEFAULT true,
     "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"()
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    "note" "text"
 );
 
 
@@ -190,6 +192,25 @@ CREATE TABLE IF NOT EXISTS "portfolio"."projects" (
 
 
 ALTER TABLE "portfolio"."projects" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "portfolio"."section_content" (
+    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
+    "section_key" "text" NOT NULL,
+    "eyebrow" "text" NOT NULL,
+    "headline" "text",
+    "accent" "text",
+    "description" "text",
+    "supporting_text" "text",
+    "sort_order" integer DEFAULT 0 NOT NULL,
+    "is_visible" boolean DEFAULT true NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    CONSTRAINT "section_content_key_format_check" CHECK (("section_key" ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'::"text"))
+);
+
+
+ALTER TABLE "portfolio"."section_content" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "portfolio"."skill_categories" (
@@ -284,6 +305,11 @@ ALTER TABLE ONLY "portfolio"."projects"
 
 
 
+ALTER TABLE ONLY "portfolio"."section_content"
+    ADD CONSTRAINT "section_content_pkey" PRIMARY KEY ("id");
+
+
+
 ALTER TABLE ONLY "portfolio"."skill_categories"
     ADD CONSTRAINT "skill_categories_pkey" PRIMARY KEY ("id");
 
@@ -316,6 +342,10 @@ CREATE INDEX "idx_nav_items_sort_order" ON "portfolio"."nav_items" USING "btree"
 
 
 CREATE INDEX "idx_projects_sort_order" ON "portfolio"."projects" USING "btree" ("sort_order");
+
+
+
+CREATE INDEX "idx_section_content_sort_order" ON "portfolio"."section_content" USING "btree" ("sort_order");
 
 
 
@@ -352,6 +382,10 @@ CREATE UNIQUE INDEX "portfolio_nav_items_section_id_key" ON "portfolio"."nav_ite
 
 
 CREATE UNIQUE INDEX "portfolio_projects_slug_key" ON "portfolio"."projects" USING "btree" ("slug") WHERE ("slug" IS NOT NULL);
+
+
+
+CREATE UNIQUE INDEX "portfolio_section_content_key_key" ON "portfolio"."section_content" USING "btree" ("section_key");
 
 
 
@@ -392,6 +426,10 @@ CREATE OR REPLACE TRIGGER "nav_items_updated_at" BEFORE UPDATE ON "portfolio"."n
 
 
 CREATE OR REPLACE TRIGGER "projects_updated_at" BEFORE UPDATE ON "portfolio"."projects" FOR EACH ROW EXECUTE FUNCTION "portfolio"."update_updated_at_column"();
+
+
+
+CREATE OR REPLACE TRIGGER "section_content_updated_at" BEFORE UPDATE ON "portfolio"."section_content" FOR EACH ROW EXECUTE FUNCTION "portfolio"."update_updated_at_column"();
 
 
 
@@ -444,6 +482,10 @@ CREATE POLICY "Admin write access" ON "portfolio"."projects" USING ("jg_account"
 
 
 
+CREATE POLICY "Admin write access" ON "portfolio"."section_content" USING ("jg_account"."is_admin"()) WITH CHECK ("jg_account"."is_admin"());
+
+
+
 CREATE POLICY "Admin write access" ON "portfolio"."skill_categories" USING ("jg_account"."is_admin"()) WITH CHECK ("jg_account"."is_admin"());
 
 
@@ -488,6 +530,10 @@ CREATE POLICY "Public read access" ON "portfolio"."projects" FOR SELECT USING ((
 
 
 
+CREATE POLICY "Public read access" ON "portfolio"."section_content" FOR SELECT USING (("is_visible" = true));
+
+
+
 CREATE POLICY "Public read access" ON "portfolio"."skill_categories" FOR SELECT USING (("is_visible" = true));
 
 
@@ -522,6 +568,9 @@ ALTER TABLE "portfolio"."nav_items" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "portfolio"."projects" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "portfolio"."section_content" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "portfolio"."skill_categories" ENABLE ROW LEVEL SECURITY;
@@ -590,6 +639,12 @@ GRANT ALL ON TABLE "portfolio"."nav_items" TO "service_role";
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."projects" TO "anon";
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."projects" TO "authenticated";
 GRANT ALL ON TABLE "portfolio"."projects" TO "service_role";
+
+
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."section_content" TO "anon";
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."section_content" TO "authenticated";
+GRANT ALL ON TABLE "portfolio"."section_content" TO "service_role";
 
 
 
