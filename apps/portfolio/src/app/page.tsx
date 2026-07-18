@@ -1,23 +1,20 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 
-import { AboutSection } from "@/components/portfolio/sections/about-section";
-import { HeroSection } from "@/components/portfolio/sections/hero-section";
+import { PortfolioExperience } from "@/components/editorial/portfolio-experience";
+import { getPublishedBlogPreviews } from "@/lib/blog/editorial-queries";
+import { getGitHubCodeStats } from "@/lib/github/server";
 import {
-  fetchGitHubRepos,
-  fetchGitHubUser,
-  fetchRepoLanguages,
-} from "@/lib/github-stats/api.server";
-import { computeLOCStats } from "@/lib/github-stats/compute";
-import type { GitHubLOCStats } from "@/lib/github-stats/types";
-import { getPortfolioDataFromHeaders } from "@/lib/portfolio/server";
+  fallbackBlogPosts,
+  fallbackPortfolioData,
+} from "@/lib/portfolio/editorial-data";
+import { getEditorialPortfolioData } from "@/lib/portfolio/editorial-server";
 import {
   DEFAULT_OG_IMAGE,
   SITE_DESCRIPTION,
   SITE_TITLE,
 } from "@/lib/seo/config";
 
-import { PortfolioInteractive } from "./portfolio-interactive";
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: { absolute: SITE_TITLE },
@@ -44,44 +41,22 @@ export const metadata: Metadata = {
   },
 };
 
-async function getGitHubCodeStats(): Promise<GitHubLOCStats | null> {
-  try {
-    const username = "goyal1510";
-    const [user, repos] = await Promise.all([
-      fetchGitHubUser(username),
-      fetchGitHubRepos(username),
-    ]);
-    const activeRepos = repos.filter((repo) => !repo.fork && !repo.archived);
-    const languageResults = await Promise.allSettled(
-      activeRepos.map((repo) => fetchRepoLanguages(username, repo.name)),
-    );
-    const languagesByRepo = languageResults
-      .filter((result) => result.status === "fulfilled")
-      .map((result) => result.value);
-
-    return computeLOCStats(
-      languagesByRepo,
-      activeRepos.length,
-      user.created_at,
-    );
-  } catch {
-    return null;
-  }
-}
-
 export default async function PortfolioPage() {
-  const [{ data, source }, codeStats] = await Promise.all([
-    getPortfolioDataFromHeaders(),
-    getGitHubCodeStats(),
+  const [portfolio, githubStats, publishedPosts] = await Promise.all([
+    getEditorialPortfolioData(),
+    getGitHubCodeStats("goyal1510"),
+    getPublishedBlogPreviews(),
   ]);
 
+  const data = portfolio.data.projects.length
+    ? portfolio.data
+    : fallbackPortfolioData;
+
   return (
-    <div className="relative z-10 space-y-16">
-      <HeroSection hero={data.HERO} source={source} />
-      <AboutSection about={data.ABOUT} education={data.EDUCATION} />
-      <Suspense>
-        <PortfolioInteractive codeStats={codeStats} />
-      </Suspense>
-    </div>
+    <PortfolioExperience
+      data={data}
+      githubStats={githubStats}
+      blogPosts={publishedPosts.length > 0 ? publishedPosts : fallbackBlogPosts}
+    />
   );
 }

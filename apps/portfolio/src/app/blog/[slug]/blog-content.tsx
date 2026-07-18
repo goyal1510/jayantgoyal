@@ -2,142 +2,356 @@
 
 /* eslint-disable @next/next/no-img-element */
 
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import type { Components } from "react-markdown";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-import { Badge } from "@repo/ui/badge";
-import { Button } from "@repo/ui/button";
+import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 
+import { EditorialSubpageHeader } from "@/components/editorial/subpage-header";
 import type { BlogPost } from "@/lib/blog/queries";
 
-const markdownComponents: Components = {
-  h1: ({ children }) => (
-    <h1 className="mt-8 mb-4 text-3xl font-bold">{children}</h1>
-  ),
-  h2: ({ children }) => (
-    <h2 className="mt-8 mb-3 border-b pb-2 text-2xl font-semibold">
-      {children}
-    </h2>
-  ),
-  h3: ({ children }) => (
-    <h3 className="mt-6 mb-2 text-xl font-semibold">{children}</h3>
-  ),
-  h4: ({ children }) => (
-    <h4 className="mt-4 mb-2 text-lg font-medium">{children}</h4>
-  ),
-  p: ({ children }) => (
-    <p className="mb-4 leading-7 text-muted-foreground">{children}</p>
-  ),
-  a: ({ href, children }) => (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-primary underline underline-offset-4 hover:text-primary/80"
-    >
-      {children}
-    </a>
-  ),
-  ul: ({ children }) => (
-    <ul className="mb-4 list-disc space-y-1.5 pl-6 text-muted-foreground">
-      {children}
-    </ul>
-  ),
-  ol: ({ children }) => (
-    <ol className="mb-4 list-decimal space-y-1.5 pl-6 text-muted-foreground">
-      {children}
-    </ol>
-  ),
-  li: ({ children }) => <li className="leading-7">{children}</li>,
-  blockquote: ({ children }) => (
-    <blockquote className="my-4 border-l-4 border-primary/30 pl-4 text-muted-foreground italic">
-      {children}
-    </blockquote>
-  ),
-  code: ({ children, className }) =>
-    className ? (
-      <code className="my-4 block overflow-x-auto rounded-lg bg-muted p-4 font-mono text-sm leading-relaxed">
-        {children}
-      </code>
-    ) : (
-      <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">
-        {children}
-      </code>
-    ),
-  pre: ({ children }) => (
-    <pre className="my-4 overflow-x-auto rounded-lg bg-muted p-4">
-      {children}
-    </pre>
-  ),
-  hr: () => <hr className="my-8 border-border" />,
-  img: ({ src, alt }) => (
-    <img src={src} alt={alt ?? ""} className="my-6 max-w-full rounded-lg" />
-  ),
-  table: ({ children }) => (
-    <div className="my-4 overflow-x-auto">
-      <table className="w-full border-collapse text-sm">{children}</table>
-    </div>
-  ),
-  th: ({ children }) => (
-    <th className="border border-border bg-muted px-3 py-2 text-left font-semibold">
-      {children}
-    </th>
-  ),
-  td: ({ children }) => (
-    <td className="border border-border px-3 py-2">{children}</td>
-  ),
-  strong: ({ children }) => (
-    <strong className="font-semibold text-foreground">{children}</strong>
-  ),
+type NextPost = Pick<BlogPost, "title" | "slug" | "excerpt" | "published_at">;
+
+type ArticleSection = {
+  id: string;
+  label: string;
 };
 
-export function BlogContent({ post }: { post: BlogPost }) {
-  return (
-    <article className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-      <Button asChild variant="ghost" className="mb-6">
-        <Link href="/blog">← All posts</Link>
-      </Button>
+function headingText(children: ReactNode): string {
+  if (typeof children === "string" || typeof children === "number") {
+    return String(children);
+  }
 
-      <div className="overflow-hidden rounded-xl border bg-card">
-        {post.cover_image && (
-          <img
-            src={post.cover_image}
-            alt={post.title}
-            className="max-h-96 w-full object-cover"
-          />
-        )}
-        <header className="border-b p-5 sm:p-8">
-          <h1 className="text-2xl font-bold tracking-tight sm:text-4xl">
-            {post.title}
-          </h1>
-          <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-            {post.published_at && (
-              <time dateTime={post.published_at}>
-                {new Date(post.published_at).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                })}
+  if (Array.isArray(children)) {
+    return children.map(headingText).join("");
+  }
+
+  if (
+    children &&
+    typeof children === "object" &&
+    "props" in children &&
+    typeof children.props === "object" &&
+    children.props &&
+    "children" in children.props
+  ) {
+    return headingText(children.props.children as ReactNode);
+  }
+
+  return "";
+}
+
+function slugifyHeading(value: string): string {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+}
+
+function normalizeTitle(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function prepareArticleContent(content: string, title: string): string {
+  const lines = content.trimStart().split("\n");
+  const firstLine = lines[0]?.trim() ?? "";
+  const markdownTitle = firstLine.replace(/^#\s+/, "").trim();
+
+  if (
+    firstLine.startsWith("# ") &&
+    normalizeTitle(markdownTitle) === normalizeTitle(title)
+  ) {
+    return lines.slice(1).join("\n").trimStart();
+  }
+
+  return content;
+}
+
+function extractSections(content: string): ArticleSection[] {
+  return Array.from(content.matchAll(/^##\s+(.+)$/gm), (match) => {
+    const label = match[1]?.replace(/[*_`]/g, "").trim() ?? "Section";
+    return { id: slugifyHeading(label), label };
+  });
+}
+
+function formatArticleDate(value: string | null): string | null {
+  if (!value) return null;
+
+  return new Date(value).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+const markdownComponents: Components = {
+  h1: ({ children }) => {
+    const label = headingText(children);
+    return <h2 id={slugifyHeading(label)}>{children}</h2>;
+  },
+  h2: ({ children }) => {
+    const label = headingText(children);
+    return <h2 id={slugifyHeading(label)}>{children}</h2>;
+  },
+  h3: ({ children }) => {
+    const label = headingText(children);
+    return <h3 id={slugifyHeading(label)}>{children}</h3>;
+  },
+  h4: ({ children }) => <h4>{children}</h4>,
+  p: ({ children }) => <p>{children}</p>,
+  a: ({ href, children }) => {
+    const isExternal = href?.startsWith("http");
+    return (
+      <a
+        href={href}
+        target={isExternal ? "_blank" : undefined}
+        rel={isExternal ? "noopener noreferrer" : undefined}
+      >
+        {children}
+      </a>
+    );
+  },
+  ul: ({ children }) => <ul>{children}</ul>,
+  ol: ({ children }) => <ol>{children}</ol>,
+  li: ({ children }) => <li>{children}</li>,
+  blockquote: ({ children }) => <blockquote>{children}</blockquote>,
+  code: ({ children, className }) =>
+    className ? (
+      <code className={className}>{children}</code>
+    ) : (
+      <code>{children}</code>
+    ),
+  pre: ({ children }) => <pre>{children}</pre>,
+  hr: () => <hr />,
+  img: ({ src, alt }) => <img src={src} alt={alt ?? ""} />,
+  table: ({ children }) => (
+    <div className="editorial-prose__table">
+      <table>{children}</table>
+    </div>
+  ),
+  th: ({ children }) => <th>{children}</th>,
+  td: ({ children }) => <td>{children}</td>,
+};
+
+export function BlogContent({
+  post,
+  nextPost,
+}: {
+  post: BlogPost;
+  nextPost: NextPost | null;
+}) {
+  const articleRef = useRef<HTMLElement>(null);
+  const [readingProgress, setReadingProgress] = useState(0);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const content = useMemo(
+    () => prepareArticleContent(post.content, post.title),
+    [post.content, post.title],
+  );
+  const sections = useMemo(() => extractSections(content), [content]);
+  const wordCount = useMemo(
+    () => content.trim().split(/\s+/).filter(Boolean).length,
+    [content],
+  );
+  const readingMinutes = Math.max(1, Math.ceil(wordCount / 220));
+  const publishedDate = formatArticleDate(post.published_at);
+  const updatedDate = formatArticleDate(post.updated_at);
+
+  useEffect(() => {
+    const updateProgress = () => {
+      const article = articleRef.current;
+      if (!article) return;
+
+      const start = article.offsetTop;
+      const distance = Math.max(1, article.offsetHeight - window.innerHeight);
+      const progress = Math.min(
+        1,
+        Math.max(0, (window.scrollY - start) / distance),
+      );
+      setReadingProgress(progress);
+    };
+
+    updateProgress();
+    window.addEventListener("scroll", updateProgress, { passive: true });
+    window.addEventListener("resize", updateProgress);
+
+    return () => {
+      window.removeEventListener("scroll", updateProgress);
+      window.removeEventListener("resize", updateProgress);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (sections.length === 0) return;
+
+    const headings = sections
+      .map((section) => document.getElementById(section.id))
+      .filter((heading): heading is HTMLElement => Boolean(heading));
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleHeading = entries.find((entry) => entry.isIntersecting);
+        if (visibleHeading) setActiveSection(visibleHeading.target.id);
+      },
+      { rootMargin: "-18% 0px -68%", threshold: 0 },
+    );
+
+    headings.forEach((heading) => observer.observe(heading));
+    setActiveSection(headings[0]?.id ?? null);
+
+    return () => observer.disconnect();
+  }, [sections]);
+
+  return (
+    <main className="editorial-page">
+      <EditorialSubpageHeader />
+      <div
+        className="editorial-article__progress"
+        aria-hidden="true"
+        style={{ transform: `scaleX(${readingProgress})` }}
+      />
+
+      <article ref={articleRef} className="shell editorial-article">
+        <Link className="editorial-article__back" href="/blog">
+          <ArrowLeft aria-hidden="true" /> All writing
+        </Link>
+
+        <header className="editorial-article__header">
+          <div className="editorial-article__meta">
+            <span className="section-index">Field note / Published</span>
+            {publishedDate ? (
+              <time dateTime={post.published_at ?? undefined}>
+                {publishedDate}
               </time>
-            )}
-            {post.tags.map((tag) => (
-              <Badge key={tag} variant="secondary">
-                {tag}
-              </Badge>
-            ))}
+            ) : null}
+          </div>
+
+          <div className="editorial-article__headline">
+            <h1>{post.title}</h1>
+            <div className="editorial-article__summary">
+              {post.excerpt ? <p>{post.excerpt}</p> : null}
+              <div className="editorial-article__reading-meta">
+                <span>{readingMinutes} min read</span>
+                <span>{wordCount.toLocaleString("en-US")} words</span>
+              </div>
+              <ul aria-label="Topics">
+                {post.tags.map((tag) => (
+                  <li key={tag}>{tag}</li>
+                ))}
+              </ul>
+            </div>
           </div>
         </header>
-        <div className="p-5 sm:p-8">
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            components={markdownComponents}
+
+        {post.cover_image ? (
+          <img
+            src={post.cover_image}
+            alt=""
+            className="editorial-article__cover"
+          />
+        ) : null}
+
+        <div className="editorial-reading-layout">
+          <aside className="editorial-article__toc" aria-label="On this page">
+            <div>
+              <span className="section-index">Inside this note</span>
+              <ol>
+                {sections.map((section, index) => (
+                  <li key={section.id}>
+                    <a
+                      href={`#${section.id}`}
+                      aria-current={
+                        activeSection === section.id ? "location" : undefined
+                      }
+                    >
+                      <span>{String(index + 1).padStart(2, "0")}</span>
+                      {section.label}
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </aside>
+
+          <div className="editorial-prose">
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={markdownComponents}
+            >
+              {content}
+            </ReactMarkdown>
+          </div>
+
+          <aside
+            className="editorial-article__facts"
+            aria-label="Article details"
           >
-            {post.content}
-          </ReactMarkdown>
+            <div>
+              <span className="section-index">Article details</span>
+              <dl>
+                <div>
+                  <dt>Written by</dt>
+                  <dd>Jayant Goyal</dd>
+                </div>
+                <div>
+                  <dt>Reading time</dt>
+                  <dd>{readingMinutes} minutes</dd>
+                </div>
+                {updatedDate ? (
+                  <div>
+                    <dt>Last updated</dt>
+                    <dd>{updatedDate}</dd>
+                  </div>
+                ) : null}
+              </dl>
+              <Link href="/#contact">
+                Discuss an idea <ArrowUpRight aria-hidden="true" />
+              </Link>
+            </div>
+          </aside>
         </div>
-      </div>
-    </article>
+
+        <footer className="editorial-article__footer">
+          <div className="editorial-article__signoff">
+            <span className="section-index">From the workbench</span>
+            <h2>Notes from building products end to end.</h2>
+            <p>
+              Written by Jayant Goyal—full-stack product engineer working across
+              interface craft, systems, data, and delivery.
+            </p>
+            <Link href="/#contact">
+              Start a conversation <ArrowUpRight aria-hidden="true" />
+            </Link>
+          </div>
+
+          {nextPost ? (
+            <Link
+              className="editorial-article__next"
+              href={`/blog/${nextPost.slug}`}
+            >
+              <span className="section-index">Continue reading</span>
+              <h2>{nextPost.title}</h2>
+              {nextPost.excerpt ? <p>{nextPost.excerpt}</p> : null}
+              <span className="editorial-article__next-action">
+                Next note <ArrowRight aria-hidden="true" />
+              </span>
+            </Link>
+          ) : (
+            <Link className="editorial-article__next" href="/blog">
+              <span className="section-index">Keep exploring</span>
+              <h2>Return to the complete writing index.</h2>
+              <span className="editorial-article__next-action">
+                All writing <ArrowRight aria-hidden="true" />
+              </span>
+            </Link>
+          )}
+        </footer>
+      </article>
+    </main>
   );
 }
