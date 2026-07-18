@@ -437,7 +437,6 @@ CREATE TABLE IF NOT EXISTS "jg_app"."blog_posts" (
     "is_visible" boolean DEFAULT true NOT NULL,
     "is_published" boolean DEFAULT false NOT NULL,
     "published_at" timestamp with time zone,
-    "sort_order" integer DEFAULT 0 NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"(),
     "updated_at" timestamp with time zone DEFAULT "now"()
 );
@@ -769,10 +768,6 @@ CREATE INDEX "idx_blog_published" ON "jg_app"."blog_posts" USING "btree" ("is_pu
 
 
 CREATE INDEX "idx_blog_slug" ON "jg_app"."blog_posts" USING "btree" ("slug");
-
-
-
-CREATE INDEX "idx_blog_sort_order" ON "jg_app"."blog_posts" USING "btree" ("sort_order");
 
 
 

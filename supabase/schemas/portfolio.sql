@@ -38,14 +38,12 @@ SET default_table_access_method = "heap";
 
 CREATE TABLE IF NOT EXISTS "portfolio"."about" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
-    "summary" "text",
-    "personal" "jsonb" DEFAULT '[]'::"jsonb",
-    "highlights" "jsonb" DEFAULT '[]'::"jsonb",
-    "is_visible" boolean DEFAULT true,
+    "summary" "text" NOT NULL,
+    "personal" "jsonb" DEFAULT '[]'::"jsonb" NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"(),
     "updated_at" timestamp with time zone DEFAULT "now"(),
-    "headline" "text",
-    "objective" "text",
+    "headline" "text" NOT NULL,
+    "objective" "text" NOT NULL,
     "story" "jsonb" DEFAULT '[]'::"jsonb" NOT NULL,
     "principles" "jsonb" DEFAULT '[]'::"jsonb" NOT NULL
 );
@@ -57,10 +55,9 @@ ALTER TABLE "portfolio"."about" OWNER TO "postgres";
 CREATE TABLE IF NOT EXISTS "portfolio"."certificates" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "name" "text" NOT NULL,
-    "path" "text" NOT NULL,
     "description" "text",
-    "category" "text",
-    "issuer" "text",
+    "category" "text" NOT NULL,
+    "issuer" "text" NOT NULL,
     "sort_order" integer DEFAULT 0,
     "is_visible" boolean DEFAULT true,
     "created_at" timestamp with time zone DEFAULT "now"(),
@@ -68,9 +65,7 @@ CREATE TABLE IF NOT EXISTS "portfolio"."certificates" (
     "issued_at" "date",
     "credential_id" "text",
     "credential_url" "text",
-    "document_key" "text",
-    "preview_key" "text",
-    "image_alt" "text",
+    "image_alt" "text" NOT NULL,
     "document_url" "text" NOT NULL,
     "preview_url" "text" NOT NULL
 );
@@ -81,11 +76,10 @@ ALTER TABLE "portfolio"."certificates" OWNER TO "postgres";
 
 CREATE TABLE IF NOT EXISTS "portfolio"."contact" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
-    "email" "text",
-    "phone" "text",
-    "location" "text",
-    "socials" "jsonb" DEFAULT '[]'::"jsonb",
-    "is_visible" boolean DEFAULT true,
+    "email" "text" NOT NULL,
+    "phone" "text" NOT NULL,
+    "location" "text" NOT NULL,
+    "socials" "jsonb" DEFAULT '[]'::"jsonb" NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"(),
     "updated_at" timestamp with time zone DEFAULT "now"()
 );
@@ -133,17 +127,15 @@ CREATE TABLE IF NOT EXISTS "portfolio"."hero" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "name" "text" NOT NULL,
     "role" "text" NOT NULL,
-    "tagline" "text",
-    "blurb" "text",
-    "location" "text",
-    "is_visible" boolean DEFAULT true,
+    "tagline" "text" NOT NULL,
+    "blurb" "text" NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"(),
     "updated_at" timestamp with time zone DEFAULT "now"(),
-    "headline" "text",
-    "current_title" "text",
-    "availability" "text",
-    "resume_url" "text",
-    "display_name" "text",
+    "headline" "text" NOT NULL,
+    "current_title" "text" NOT NULL,
+    "availability" "text" NOT NULL,
+    "resume_url" "text" NOT NULL,
+    "display_name" "text" NOT NULL,
     "github_username" "text" NOT NULL,
     "seo_title" "text" NOT NULL,
     "seo_description" "text" NOT NULL
@@ -157,8 +149,6 @@ CREATE TABLE IF NOT EXISTS "portfolio"."nav_items" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "section_id" "text" NOT NULL,
     "label" "text" NOT NULL,
-    "icon_key" "text" NOT NULL,
-    "color" "text",
     "sort_order" integer DEFAULT 0,
     "is_visible" boolean DEFAULT true,
     "created_at" timestamp with time zone DEFAULT "now"(),
@@ -173,10 +163,7 @@ ALTER TABLE "portfolio"."nav_items" OWNER TO "postgres";
 CREATE TABLE IF NOT EXISTS "portfolio"."projects" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "name" "text" NOT NULL,
-    "short_description" "text",
-    "full_description" "text",
-    "image_light" "text",
-    "image_dark" "text",
+    "short_description" "text" NOT NULL,
     "tags" "jsonb" DEFAULT '[]'::"jsonb",
     "github_link" "text",
     "live_link" "text",
@@ -184,14 +171,12 @@ CREATE TABLE IF NOT EXISTS "portfolio"."projects" (
     "is_visible" boolean DEFAULT true,
     "created_at" timestamp with time zone DEFAULT "now"(),
     "updated_at" timestamp with time zone DEFAULT "now"(),
-    "slug" "text",
-    "eyebrow" "text",
-    "impact" "text",
-    "contribution" "text",
-    "year_label" "text",
-    "image_key" "text",
-    "image_alt" "text",
-    "is_featured" boolean DEFAULT false NOT NULL,
+    "slug" "text" NOT NULL,
+    "eyebrow" "text" NOT NULL,
+    "impact" "text" NOT NULL,
+    "contribution" "text" NOT NULL,
+    "year_label" "text" NOT NULL,
+    "image_alt" "text" NOT NULL,
     "image_url" "text" NOT NULL,
     CONSTRAINT "projects_slug_format_check" CHECK ((("slug" IS NULL) OR ("slug" ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'::"text")))
 );
@@ -208,7 +193,6 @@ CREATE TABLE IF NOT EXISTS "portfolio"."section_content" (
     "accent" "text",
     "description" "text",
     "supporting_text" "text",
-    "sort_order" integer DEFAULT 0 NOT NULL,
     "is_visible" boolean DEFAULT true NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
@@ -222,13 +206,11 @@ ALTER TABLE "portfolio"."section_content" OWNER TO "postgres";
 CREATE TABLE IF NOT EXISTS "portfolio"."skill_categories" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "title" "text" NOT NULL,
-    "icon_key" "text" NOT NULL,
-    "color" "text",
     "sort_order" integer DEFAULT 0,
     "is_visible" boolean DEFAULT true,
     "created_at" timestamp with time zone DEFAULT "now"(),
     "updated_at" timestamp with time zone DEFAULT "now"(),
-    "description" "text"
+    "description" "text" NOT NULL
 );
 
 
@@ -239,36 +221,17 @@ CREATE TABLE IF NOT EXISTS "portfolio"."skills" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "category_id" "uuid" NOT NULL,
     "name" "text" NOT NULL,
-    "level" integer,
     "sort_order" integer DEFAULT 0,
     "is_visible" boolean DEFAULT true,
     "created_at" timestamp with time zone DEFAULT "now"(),
     "updated_at" timestamp with time zone DEFAULT "now"(),
-    "icon_key" "text" DEFAULT ''::"text" NOT NULL,
-    "proficiency" "text",
-    "evidence" "text",
-    "is_featured" boolean DEFAULT true NOT NULL,
-    CONSTRAINT "skills_level_check" CHECK ((("level" >= 0) AND ("level" <= 100))),
+    "proficiency" "text" NOT NULL,
+    "evidence" "text" NOT NULL,
     CONSTRAINT "skills_proficiency_check" CHECK ((("proficiency" IS NULL) OR ("proficiency" = ANY (ARRAY['core'::"text", 'strong'::"text", 'working'::"text", 'exploring'::"text"]))))
 );
 
 
 ALTER TABLE "portfolio"."skills" OWNER TO "postgres";
-
-
-CREATE TABLE IF NOT EXISTS "portfolio"."tech_icons" (
-    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
-    "icon_key" "text" NOT NULL,
-    "name" "text" NOT NULL,
-    "color" "text",
-    "sort_order" integer DEFAULT 0,
-    "is_visible" boolean DEFAULT true,
-    "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"()
-);
-
-
-ALTER TABLE "portfolio"."tech_icons" OWNER TO "postgres";
 
 
 ALTER TABLE ONLY "portfolio"."about"
@@ -326,11 +289,6 @@ ALTER TABLE ONLY "portfolio"."skills"
 
 
 
-ALTER TABLE ONLY "portfolio"."tech_icons"
-    ADD CONSTRAINT "tech_icons_pkey" PRIMARY KEY ("id");
-
-
-
 CREATE INDEX "idx_certificates_sort_order" ON "portfolio"."certificates" USING "btree" ("sort_order");
 
 
@@ -351,10 +309,6 @@ CREATE INDEX "idx_projects_sort_order" ON "portfolio"."projects" USING "btree" (
 
 
 
-CREATE INDEX "idx_section_content_sort_order" ON "portfolio"."section_content" USING "btree" ("sort_order");
-
-
-
 CREATE INDEX "idx_skill_categories_sort_order" ON "portfolio"."skill_categories" USING "btree" ("sort_order");
 
 
@@ -364,10 +318,6 @@ CREATE INDEX "idx_skills_category_id" ON "portfolio"."skills" USING "btree" ("ca
 
 
 CREATE INDEX "idx_skills_sort_order" ON "portfolio"."skills" USING "btree" ("sort_order");
-
-
-
-CREATE INDEX "idx_tech_icons_sort_order" ON "portfolio"."tech_icons" USING "btree" ("sort_order");
 
 
 
@@ -447,10 +397,6 @@ CREATE OR REPLACE TRIGGER "skills_updated_at" BEFORE UPDATE ON "portfolio"."skil
 
 
 
-CREATE OR REPLACE TRIGGER "tech_icons_updated_at" BEFORE UPDATE ON "portfolio"."tech_icons" FOR EACH ROW EXECUTE FUNCTION "portfolio"."update_updated_at_column"();
-
-
-
 ALTER TABLE ONLY "portfolio"."skills"
     ADD CONSTRAINT "skills_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "portfolio"."skill_categories"("id") ON DELETE CASCADE;
 
@@ -500,11 +446,7 @@ CREATE POLICY "Admin write access" ON "portfolio"."skills" USING ("jg_account"."
 
 
 
-CREATE POLICY "Admin write access" ON "portfolio"."tech_icons" USING ("jg_account"."is_admin"()) WITH CHECK ("jg_account"."is_admin"());
-
-
-
-CREATE POLICY "Public read access" ON "portfolio"."about" FOR SELECT USING (("is_visible" = true));
+CREATE POLICY "Public read access" ON "portfolio"."about" FOR SELECT USING (true);
 
 
 
@@ -512,7 +454,7 @@ CREATE POLICY "Public read access" ON "portfolio"."certificates" FOR SELECT USIN
 
 
 
-CREATE POLICY "Public read access" ON "portfolio"."contact" FOR SELECT USING (("is_visible" = true));
+CREATE POLICY "Public read access" ON "portfolio"."contact" FOR SELECT USING (true);
 
 
 
@@ -524,7 +466,7 @@ CREATE POLICY "Public read access" ON "portfolio"."experience" FOR SELECT USING 
 
 
 
-CREATE POLICY "Public read access" ON "portfolio"."hero" FOR SELECT USING (("is_visible" = true));
+CREATE POLICY "Public read access" ON "portfolio"."hero" FOR SELECT USING (true);
 
 
 
@@ -545,10 +487,6 @@ CREATE POLICY "Public read access" ON "portfolio"."skill_categories" FOR SELECT 
 
 
 CREATE POLICY "Public read access" ON "portfolio"."skills" FOR SELECT USING (("is_visible" = true));
-
-
-
-CREATE POLICY "Public read access" ON "portfolio"."tech_icons" FOR SELECT USING (("is_visible" = true));
 
 
 
@@ -583,9 +521,6 @@ ALTER TABLE "portfolio"."skill_categories" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "portfolio"."skills" ENABLE ROW LEVEL SECURITY;
-
-
-ALTER TABLE "portfolio"."tech_icons" ENABLE ROW LEVEL SECURITY;
 
 
 GRANT USAGE ON SCHEMA "portfolio" TO "anon";
@@ -663,12 +598,6 @@ GRANT ALL ON TABLE "portfolio"."skill_categories" TO "service_role";
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."skills" TO "anon";
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."skills" TO "authenticated";
 GRANT ALL ON TABLE "portfolio"."skills" TO "service_role";
-
-
-
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."tech_icons" TO "anon";
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."tech_icons" TO "authenticated";
-GRANT ALL ON TABLE "portfolio"."tech_icons" TO "service_role";
 
 
 

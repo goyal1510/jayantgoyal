@@ -144,7 +144,6 @@ function personalFacts(
     const label = "label" in item ? item.label : null;
     const factValue = "value" in item ? item.value : null;
     if (typeof label !== "string" || typeof factValue !== "string") return [];
-    if (label.toLowerCase() === "name") return [];
     return [{ label, value: factValue }];
   });
 }

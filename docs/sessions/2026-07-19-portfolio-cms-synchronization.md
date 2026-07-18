@@ -27,3 +27,6 @@
 - Browser validation confirmed live database copy, nine project stories, Blog/article copy, top-edge progress bars, dynamic socials, and the mobile menu; retained a temporary filter for the redundant legacy Name fact until the gated cleanup migration removes it remotely.
 - Resynchronized Admin collection state after each server refresh across Projects, Credentials, Skills, Education, Experience, and Blog; required all canonical Hero and Contact fields so incomplete CMS records cannot silently weaken the public Portfolio.
 - Formatted the complete Portfolio/Admin synchronization diff before the final validation pass.
+- Shipped the additive contract and synchronized Portfolio/Admin applications to production, then applied the gated `20260719093000_remove_legacy_portfolio_contract.sql` cleanup to the verified `jayantgoyal` project after both Vercel deployments reported Ready.
+- Verified the cleaned remote contract contains 9 projects, 5 credentials, 13 section records, and 6 navigation items; confirmed legacy columns return PostgreSQL `42703`, `tech_icons` is absent, and the public site still renders successfully.
+- Refreshed all three canonical remote schema snapshots after cleanup and removed the temporary legacy Name-fact filter because the redundant database record is now deleted at the source.
