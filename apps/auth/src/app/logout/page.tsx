@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 
 import { logoutAction } from "@/app/actions/logout";
 import { resolveAuthReturnTarget } from "@/lib/auth/returns";
-import { AuthCard, AuthPageShell } from "@repo/ui/auth-presentation";
+import { AuthCard } from "@repo/ui/auth-presentation";
+import { AuthWelcomeShell } from "@/components/auth/auth-welcome-shell";
 import { Button } from "@repo/ui/button";
 
 export const metadata: Metadata = { title: "Sign out" };
@@ -13,10 +14,10 @@ export default async function LogoutPage({
   searchParams: Promise<{ return_to?: string }>;
 }) {
   const { return_to: returnTo } = await searchParams;
-  const safeReturnTo = resolveAuthReturnTarget(returnTo, undefined, "/login");
+  const safeReturnTo = resolveAuthReturnTarget(returnTo, undefined, "/welcome");
   return (
-    <AuthPageShell>
-      <AuthCard>
+    <AuthWelcomeShell>
+      <AuthCard bare>
         <div className="space-y-5 text-center">
           <h1 className="text-2xl font-bold">Sign out</h1>
           <p className="text-muted-foreground text-sm">
@@ -38,6 +39,6 @@ export default async function LogoutPage({
           </form>
         </div>
       </AuthCard>
-    </AuthPageShell>
+    </AuthWelcomeShell>
   );
 }

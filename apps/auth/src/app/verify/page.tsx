@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { AuthCard, AuthPageShell } from "@repo/ui/auth-presentation";
+import { AuthCard } from "@repo/ui/auth-presentation";
+import { AuthWelcomeShell } from "@/components/auth/auth-welcome-shell";
 import { Button } from "@repo/ui/button";
 
 export const metadata: Metadata = { title: "Verify email" };
@@ -13,8 +14,8 @@ export default async function VerifyPage({
 }) {
   const { status } = await searchParams;
   return (
-    <AuthPageShell>
-      <AuthCard>
+    <AuthWelcomeShell>
+      <AuthCard bare>
         <div className="space-y-4 text-center">
           <h1 className="text-2xl font-bold">
             {status === "confirmed" ? "Email verified" : "Check your email"}
@@ -25,10 +26,10 @@ export default async function VerifyPage({
               : "Open the verification link sent to your email address."}
           </p>
           <Button asChild className="w-full">
-            <Link href="/login">Continue to sign in</Link>
+            <Link href="/welcome">Continue to sign in</Link>
           </Button>
         </div>
       </AuthCard>
-    </AuthPageShell>
+    </AuthWelcomeShell>
   );
 }

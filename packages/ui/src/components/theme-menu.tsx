@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Moon, Sun, SunMoon } from "lucide-react";
+import { Check, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 
 import { Button } from "@repo/ui/button";
@@ -14,12 +14,11 @@ import {
 const themes = [
   { id: "light", label: "Light", icon: Sun },
   { id: "dark", label: "Dark", icon: Moon },
-  { id: "system", label: "System", icon: SunMoon },
 ] as const;
 
-/** Shared light/dark/system menu; apps decide where it sits in their top bar. */
+/** Shared light/dark menu for public surfaces without an account menu. */
 export function ThemeMenu() {
-  const { resolvedTheme, setTheme, theme } = useTheme();
+  const { setTheme, theme } = useTheme();
 
   return (
     <DropdownMenu>
@@ -35,7 +34,7 @@ export function ThemeMenu() {
           <DropdownMenuItem key={id} onSelect={() => setTheme(id)}>
             <Icon className="size-4" />
             <span>{label}</span>
-            {theme === id || (id === "system" && !theme && resolvedTheme) ? (
+            {theme === id ? (
               <Check className="ml-auto size-4" aria-hidden="true" />
             ) : null}
           </DropdownMenuItem>

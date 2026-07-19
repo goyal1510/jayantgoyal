@@ -4,7 +4,8 @@ import { redirect } from "next/navigation";
 
 import { ResetPasswordForm } from "@/components/auth/reset-password-form";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { AuthPageShell } from "@repo/ui/auth-presentation";
+import { AuthWelcomeShell } from "@/components/auth/auth-welcome-shell";
+import { hasVerifiedTotpFactor, requiresRecoveryMfa } from "@/lib/auth/policy";
 
 export const metadata: Metadata = { title: "Reset password" };
 
@@ -15,15 +16,27 @@ export default async function ResetPasswordPage() {
     cookies(),
     createSupabaseServerClient(),
   ]);
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [{ data: userData }, { data: factors }, { data: assurance }] =
+    await Promise.all([
+      supabase.auth.getUser(),
+      supabase.auth.mfa.listFactors(),
+      supabase.auth.mfa.getAuthenticatorAssuranceLevel(),
+    ]);
+  const user = userData.user;
   if (cookieStore.get("auth_recovery")?.value !== "verified" || !user) {
     redirect("/error?code=expired_link");
   }
+  if (
+    requiresRecoveryMfa({
+      hasVerifiedFactor: hasVerifiedTotpFactor(factors),
+      currentLevel: assurance?.currentLevel,
+    })
+  ) {
+    redirect(`/mfa?return_to=${encodeURIComponent("/reset-password")}`);
+  }
   return (
-    <AuthPageShell>
+    <AuthWelcomeShell>
       <ResetPasswordForm />
-    </AuthPageShell>
+    </AuthWelcomeShell>
   );
 }

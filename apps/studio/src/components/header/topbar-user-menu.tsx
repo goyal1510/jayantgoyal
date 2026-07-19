@@ -17,7 +17,7 @@ type StudioUser = { name: string; email: string };
 const fallbackUser: StudioUser = { name: "User", email: "user@example.com" };
 let cachedUser: StudioUser | null | undefined;
 
-export function TopbarUserMenu() {
+export function TopbarUserMenu({ inSidebar = false }: { inSidebar?: boolean }) {
   const [user, setUser] = React.useState<StudioUser | null>(cachedUser ?? null);
   const [displayName, setDisplayName] = React.useState(
     cachedUser?.name ?? fallbackUser.name,
@@ -133,6 +133,8 @@ export function TopbarUserMenu() {
   return (
     <ApplicationUserMenu
       user={{ ...user, name: displayName }}
+      inSidebar={inSidebar}
+      termsHref="/terms-conditions"
       onSettings={handleSettings}
       onSignOut={() => {
         startSigningOut(handleSignOut);

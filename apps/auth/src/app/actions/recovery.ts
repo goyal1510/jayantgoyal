@@ -16,6 +16,7 @@ import {
   type AuthActionState,
 } from "@/lib/auth/action-support";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { hasVerifiedTotpFactor, requiresRecoveryMfa } from "@/lib/auth/policy";
 
 export async function forgotPasswordAction(
   _previous: AuthActionState,
@@ -59,13 +60,20 @@ export async function resetPasswordAction(
     return { error: "This recovery session is invalid or has expired." };
   }
   const supabase = await createSupabaseServerClient();
-  const [{ data: userData }, { data: assurance }] = await Promise.all([
-    supabase.auth.getUser(),
-    supabase.auth.mfa.getAuthenticatorAssuranceLevel(),
-  ]);
+  const [{ data: userData }, { data: assurance }, { data: factors }] =
+    await Promise.all([
+      supabase.auth.getUser(),
+      supabase.auth.mfa.getAuthenticatorAssuranceLevel(),
+      supabase.auth.mfa.listFactors(),
+    ]);
   if (!userData.user) return { error: "This recovery session has expired." };
-  if (assurance?.nextLevel === "aal2" && assurance.currentLevel !== "aal2") {
-    return { error: "Complete multi-factor verification before continuing." };
+  if (
+    requiresRecoveryMfa({
+      hasVerifiedFactor: hasVerifiedTotpFactor(factors),
+      currentLevel: assurance?.currentLevel,
+    })
+  ) {
+    redirect(`/mfa?return_to=${encodeURIComponent("/reset-password")}`);
   }
 
   const { error } = await supabase.auth.updateUser({ password });
@@ -77,5 +85,5 @@ export async function resetPasswordAction(
   const scope: SignOutScope =
     stringField(formData, "scope") === "global" ? "global" : "local";
   await signOutSession(supabase, scope);
-  redirect("/login?password_changed=true");
+  redirect("/welcome?message=password_changed");
 }

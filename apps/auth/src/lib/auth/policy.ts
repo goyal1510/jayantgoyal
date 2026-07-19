@@ -1,5 +1,16 @@
 const PROTECTED_PREFIXES = ["/account", "/logout", "/mfa"] as const;
 
+type MfaFactorLike = {
+  status?: string | null;
+};
+
+type MfaFactorsLike =
+  | {
+      totp?: readonly MfaFactorLike[];
+    }
+  | null
+  | undefined;
+
 export function isProtectedAuthPath(pathname: string): boolean {
   return PROTECTED_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
@@ -23,6 +34,20 @@ export function requiresAccountMfaStepUp({
     nextLevel === "aal2" &&
     currentLevel !== "aal2"
   );
+}
+
+export function hasVerifiedTotpFactor(factors: MfaFactorsLike): boolean {
+  return Boolean(factors?.totp?.some((factor) => factor.status === "verified"));
+}
+
+export function requiresRecoveryMfa({
+  hasVerifiedFactor,
+  currentLevel,
+}: {
+  hasVerifiedFactor: boolean;
+  currentLevel: string | null | undefined;
+}): boolean {
+  return hasVerifiedFactor && currentLevel !== "aal2";
 }
 
 export function hasRecentSignIn(

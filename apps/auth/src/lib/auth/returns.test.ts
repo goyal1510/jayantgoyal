@@ -43,7 +43,7 @@ describe("Auth return targets", () => {
         requestOrigin: "https://auth.jayantgoyal.com",
       }),
     ).toBe(
-      "https://auth.jayantgoyal.com/login?signed_out=true&return_to=https%3A%2F%2Fadmin.jayantgoyal.com%2Fusers",
+      "https://auth.jayantgoyal.com/welcome?signed_out=true&return_to=https%3A%2F%2Fadmin.jayantgoyal.com%2Fusers",
     );
   });
 
@@ -53,6 +53,6 @@ describe("Auth return targets", () => {
         value: "https://evil.example/phish",
         requestOrigin: "https://auth.jayantgoyal.com",
       }),
-    ).toBe("https://auth.jayantgoyal.com/login?signed_out=true");
+    ).toBe("https://auth.jayantgoyal.com/welcome?signed_out=true");
   });
 });

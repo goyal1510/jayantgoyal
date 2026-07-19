@@ -86,7 +86,7 @@ describe("canonical Auth entry ownership", () => {
     });
 
     expect(login.origin).toBe(CANONICAL_AUTH_ORIGIN);
-    expect(login.pathname).toBe("/login");
+    expect(login.pathname).toBe("/welcome");
     expect(login.searchParams.get("return_to")).toBe(
       "https://studio.jayantgoyal.com/files?folder=one",
     );

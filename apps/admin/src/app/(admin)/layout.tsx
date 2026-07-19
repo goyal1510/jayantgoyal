@@ -2,10 +2,8 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
-import { TopbarUserMenu } from "@/components/header/topbar-user-menu";
 import { AdminCommandPalette } from "@/components/header/command-palette";
 import { DynamicBreadcrumb } from "@/components/sidebar/dynamic-breadcrumb";
-import { ThemeMenu } from "@repo/ui/theme-menu";
 import { ApplicationShell } from "@repo/ui/application-shell";
 import { ApplicationTopbar } from "@repo/ui/application-topbar";
 import { LazyMotionProvider } from "@repo/ui/lazy-motion-provider";
@@ -69,8 +67,6 @@ export default async function AdminLayout({
           actions={
             <>
               <AdminCommandPalette role={authUser.role} />
-              <ThemeMenu />
-              <TopbarUserMenu user={authUser} />
             </>
           }
         />

@@ -10,8 +10,10 @@ import { ApplicationUserMenu } from "@repo/ui/application-user-menu";
 
 export function TopbarUserMenu({
   user,
+  inSidebar = false,
 }: {
   user: { name: string; email: string };
+  inSidebar?: boolean;
 }) {
   const [isSigningOut, startSigningOut] = useTransition();
 
@@ -30,6 +32,7 @@ export function TopbarUserMenu({
   return (
     <ApplicationUserMenu
       user={user}
+      inSidebar={inSidebar}
       onSettings={openSettings}
       onSignOut={() => {
         startSigningOut(signOut);

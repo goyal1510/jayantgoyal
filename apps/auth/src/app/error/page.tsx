@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { AuthCard, AuthPageShell } from "@repo/ui/auth-presentation";
+import { AuthCard } from "@repo/ui/auth-presentation";
+import { AuthWelcomeShell } from "@/components/auth/auth-welcome-shell";
 import { Button } from "@repo/ui/button";
 
 const MESSAGES: Record<string, string> = {
@@ -28,19 +29,19 @@ export default async function AuthErrorPage({
   const { code = "invalid_callback" } = await searchParams;
   const message = MESSAGES[code] ?? MESSAGES.invalid_callback;
   return (
-    <AuthPageShell>
-      <AuthCard>
+    <AuthWelcomeShell>
+      <AuthCard bare>
         <div className="space-y-4 text-center">
           <h1 className="text-2xl font-bold">Unable to continue</h1>
           <p className="text-muted-foreground text-sm">{message}</p>
           <Button asChild className="w-full">
-            <Link href="/login">Try again</Link>
+            <Link href="/welcome">Try again</Link>
           </Button>
           <Button asChild variant="ghost" className="w-full">
             <Link href="/forgot-password">Recover account</Link>
           </Button>
         </div>
       </AuthCard>
-    </AuthPageShell>
+    </AuthWelcomeShell>
   );
 }

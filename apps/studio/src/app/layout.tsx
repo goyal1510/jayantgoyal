@@ -146,12 +146,7 @@ export default async function RootLayout({
       <body
         className={`${manrope.variable} ${ibmPlexMono.variable} application-surface`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
+        <ThemeProvider attribute="class" disableTransitionOnChange>
           {children}
           <Toaster />
           <ToastSoundProvider />

@@ -16,7 +16,7 @@ export function ResetPasswordForm() {
   const [globalLogout, setGlobalLogout] = useState(false);
 
   return (
-    <AuthCard>
+    <AuthCard bare>
       <form action={action} className="space-y-5">
         <input
           type="hidden"

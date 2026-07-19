@@ -24,7 +24,13 @@ function copyAuthState(source: NextResponse, target: NextResponse) {
 }
 
 export default async function proxy(request: NextRequest) {
-  if (request.nextUrl.pathname === "/callback") return NextResponse.next();
+  if (
+    request.nextUrl.pathname === "/callback" ||
+    request.nextUrl.pathname === "/auth/callback" ||
+    request.nextUrl.pathname === "/callback/auth/callback"
+  ) {
+    return NextResponse.next();
+  }
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -45,7 +51,7 @@ export default async function proxy(request: NextRequest) {
   });
   if (!hasSession) {
     if (!protectedRoute) return response;
-    const login = new URL("/login", request.url);
+    const login = new URL("/welcome", request.url);
     login.searchParams.set(
       "return_to",
       `${request.nextUrl.pathname}${request.nextUrl.search}`,
@@ -67,7 +73,7 @@ export default async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (protectedRoute && !user) {
-    const login = new URL("/login", request.url);
+    const login = new URL("/welcome", request.url);
     login.searchParams.set(
       "return_to",
       `${request.nextUrl.pathname}${request.nextUrl.search}`,
@@ -97,7 +103,7 @@ export default async function proxy(request: NextRequest) {
       assurance?.nextLevel !== "aal2" &&
       !hasRecentSignIn(user.last_sign_in_at)
     ) {
-      const login = new URL("/login", request.url);
+      const login = new URL("/welcome", request.url);
       login.searchParams.set(
         "return_to",
         `${request.nextUrl.pathname}${request.nextUrl.search}`,

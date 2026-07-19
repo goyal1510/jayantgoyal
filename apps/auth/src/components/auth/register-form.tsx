@@ -51,7 +51,7 @@ export function RegisterForm({ returnTo }: { returnTo: string }) {
           Already registered?{" "}
           <Link
             className="underline underline-offset-4"
-            href={`/login?return_to=${encodeURIComponent(returnTo)}`}
+            href={`/welcome?return_to=${encodeURIComponent(returnTo)}`}
           >
             Sign in
           </Link>

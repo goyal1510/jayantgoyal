@@ -6,7 +6,7 @@ import { MfaForm } from "@/components/auth/mfa-form";
 import { AUTH_ORIGIN, resolveAuthReturnTarget } from "@/lib/auth/returns";
 import { requestOriginFromHeaders } from "@/lib/auth/origin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { AuthPageShell } from "@repo/ui/auth-presentation";
+import { AuthWelcomeShell } from "@/components/auth/auth-welcome-shell";
 
 export const metadata: Metadata = { title: "Verify MFA" };
 export const dynamic = "force-dynamic";
@@ -30,7 +30,7 @@ export default async function MfaPage({
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect(`/login?return_to=${encodeURIComponent(returnTo)}`);
+  if (!user) redirect(`/welcome?return_to=${encodeURIComponent(returnTo)}`);
 
   const [{ data: factors }, { data: assurance }] = await Promise.all([
     supabase.auth.mfa.listFactors(),
@@ -42,8 +42,8 @@ export default async function MfaPage({
   if (assurance?.currentLevel === "aal2") redirect(returnTo);
 
   return (
-    <AuthPageShell>
+    <AuthWelcomeShell>
       <MfaForm returnTo={returnTo} />
-    </AuthPageShell>
+    </AuthWelcomeShell>
   );
 }

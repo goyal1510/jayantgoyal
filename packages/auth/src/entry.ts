@@ -113,10 +113,7 @@ function authOriginForRequest(
 
   if (request.hostname.endsWith(".localhost")) {
     const domain = request.hostname.split(".").slice(1).join(".");
-    return resolveAuthApplicationOrigin(
-      `http://auth.${domain}:3003`,
-      domain,
-    );
+    return resolveAuthApplicationOrigin(`http://auth.${domain}:3003`, domain);
   }
 
   return resolveAuthApplicationOrigin(configuredOrigin);
@@ -135,7 +132,7 @@ export function buildAuthLoginUrl({
 }): URL {
   const request = resolveExternalRequestUrl({ requestUrl, requestHeaders });
   const loginUrl = new URL(
-    authSurfacePath("login"),
+    authSurfacePath("welcome"),
     `${authOriginForRequest(request, authOrigin)}/`,
   );
   const targetPath = safeReturnPath(returnPath, "/");

@@ -14,7 +14,7 @@ const initialState = {};
 export function MfaForm({ returnTo }: { returnTo: string }) {
   const [state, action] = useActionState(verifyMfaAction, initialState);
   return (
-    <AuthCard>
+    <AuthCard bare>
       <form action={action} className="space-y-5">
         <input type="hidden" name="return_to" value={returnTo} />
         <div className="text-center">

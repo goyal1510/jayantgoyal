@@ -32,7 +32,10 @@ describe("Studio Auth entry cutover", () => {
   it("keeps legacy account settings and MFA cleanup routes removed", () => {
     expect(
       existsSync(
-        new URL("./components/sidebar/account-settings-sheet.tsx", import.meta.url),
+        new URL(
+          "./components/sidebar/account-settings-sheet.tsx",
+          import.meta.url,
+        ),
       ),
     ).toBe(false);
     expect(
@@ -41,11 +44,13 @@ describe("Studio Auth entry cutover", () => {
       ),
     ).toBe(false);
     expect(
-      existsSync(new URL("./app/api/account/mfa-cleanup/route.ts", import.meta.url)),
+      existsSync(
+        new URL("./app/api/account/mfa-cleanup/route.ts", import.meta.url),
+      ),
     ).toBe(false);
-    expect(existsSync(new URL("./app/api/account/delete/route.ts", import.meta.url))).toBe(
-      true,
-    );
+    expect(
+      existsSync(new URL("./app/api/account/delete/route.ts", import.meta.url)),
+    ).toBe(true);
   });
 
   it("keeps the protected layout on the shared session-cookie contract", () => {
@@ -61,7 +66,9 @@ describe("Studio Auth entry cutover", () => {
 
   it("keeps the local welcome route in rollback mode", async () => {
     const response = await studioProxy(
-      new NextRequest("https://studio.jayantgoyal.com/welcome?redirect=%2Ffiles"),
+      new NextRequest(
+        "https://studio.jayantgoyal.com/welcome?redirect=%2Ffiles",
+      ),
     );
 
     expect(response.headers.get("location")).toBeNull();
@@ -71,11 +78,13 @@ describe("Studio Auth entry cutover", () => {
     vi.stubEnv("NEXT_PUBLIC_AUTH_FLOW_OWNER", "auth");
 
     const response = await studioProxy(
-      new NextRequest("https://studio.jayantgoyal.com/welcome?redirect=%2Ffiles"),
+      new NextRequest(
+        "https://studio.jayantgoyal.com/welcome?redirect=%2Ffiles",
+      ),
     );
 
     expect(response.headers.get("location")).toBe(
-      "https://auth.jayantgoyal.com/login?return_to=https%3A%2F%2Fstudio.jayantgoyal.com%2Ffiles",
+      "https://auth.jayantgoyal.com/welcome?return_to=https%3A%2F%2Fstudio.jayantgoyal.com%2Ffiles",
     );
   });
 });

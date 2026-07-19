@@ -21,9 +21,18 @@ export function AuthPageShell({ children }: { children: ReactNode }) {
 
 export function AuthCard({
   children,
+  bare = false,
   className,
   ...props
-}: ComponentProps<"div">) {
+}: ComponentProps<"div"> & { bare?: boolean }) {
+  if (bare) {
+    return (
+      <div className={cn("flex flex-col gap-6", className)} {...props}>
+        {children}
+      </div>
+    );
+  }
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden">
@@ -48,11 +57,13 @@ export function AuthDivider({ label = "or" }: { label?: string }) {
 export function PasswordField({
   id = "password",
   label = "Password",
+  labelClassName,
   forgotPasswordHref,
   className,
   ...props
 }: Omit<ComponentProps<typeof Input>, "type"> & {
   label?: string;
+  labelClassName?: string;
   forgotPasswordHref?: string;
 }) {
   const [visible, setVisible] = useState(false);
@@ -60,7 +71,9 @@ export function PasswordField({
   return (
     <div className="grid gap-2">
       <div className="flex items-center">
-        <Label htmlFor={id}>{label}</Label>
+        <Label htmlFor={id} className={labelClassName}>
+          {label}
+        </Label>
         {forgotPasswordHref && (
           <Link
             href={forgotPasswordHref}

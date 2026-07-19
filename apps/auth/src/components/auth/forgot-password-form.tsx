@@ -15,7 +15,7 @@ const initialState = {};
 export function ForgotPasswordForm() {
   const [state, action] = useActionState(forgotPasswordAction, initialState);
   return (
-    <AuthCard>
+    <AuthCard bare>
       <form action={action} className="space-y-5">
         <div className="text-center">
           <h1 className="text-2xl font-bold">Reset your password</h1>
@@ -39,7 +39,7 @@ export function ForgotPasswordForm() {
           pendingLabel="Sending..."
         />
         <p className="text-center text-sm">
-          <Link className="underline underline-offset-4" href="/login">
+          <Link className="underline underline-offset-4" href="/welcome">
             Back to sign in
           </Link>
         </p>

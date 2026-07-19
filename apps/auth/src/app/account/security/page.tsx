@@ -1,16 +1,11 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { ArrowUpRight, CheckCircle2, CircleAlert, KeyRound, ShieldCheck, UserRound } from "lucide-react";
 
-import { MfaManager } from "@/components/account/mfa-manager";
-import { PasswordForm } from "@/components/account/password-form";
-import { ProfileForm } from "@/components/account/profile-form";
+import { AccountWorkspaceHeader } from "@/components/account/account-workspace-header";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@repo/ui/card";
+import { Badge } from "@repo/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/card";
 
 export const metadata: Metadata = { title: "Account security" };
 
@@ -32,52 +27,108 @@ export default async function AccountSecurityPage() {
           .single()
       : Promise.resolve({ data: null }),
   ]);
-  const factorId = factors?.totp[0]?.id ?? null;
+  const hasVerifiedMfa = Boolean(
+    factors?.totp.some((factor) => factor.status === "verified"),
+  );
+  const displayName = [profile?.first_name, profile?.last_name]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <>
-      <div>
-        <h1 className="text-2xl font-bold">Account security</h1>
-        <p className="text-muted-foreground text-sm">
-          Manage password and multi-factor authentication.
-        </p>
-      </div>
-      <Card>
+    <div className="space-y-6">
+      <AccountWorkspaceHeader workspace="security" />
+
+      <section className="grid gap-4 md:grid-cols-3" aria-label="Security areas">
+        <SecurityAreaCard
+          href="/account/profile"
+          icon={UserRound}
+          title="Profile"
+          description="The name used across Studio and Admin."
+          status={displayName || "Needs a name"}
+          ready={Boolean(displayName)}
+        />
+        <SecurityAreaCard
+          href="/account/password"
+          icon={KeyRound}
+          title="Password"
+          description="Change your password after confirming the current one."
+          status="Protected"
+          ready
+        />
+        <SecurityAreaCard
+          href="/account/mfa"
+          icon={ShieldCheck}
+          title="MFA"
+          description="Use an authenticator code as a second key."
+          status={hasVerifiedMfa ? "Enabled" : "Not enabled"}
+          ready={hasVerifiedMfa}
+        />
+      </section>
+
+      <Card className="border-dashed bg-muted/20">
         <CardHeader>
-          <CardTitle>Profile</CardTitle>
+          <CardTitle className="text-lg">Recovery behavior</CardTitle>
           <CardDescription>
-            Keep the name shown across the Studio and Admin applications up to
-            date.
+            Password recovery respects the same MFA posture shown above.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <ProfileForm
-            firstName={profile?.first_name ?? ""}
-            lastName={profile?.last_name ?? ""}
-          />
+        <CardContent className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+          {hasVerifiedMfa ? (
+            <CheckCircle2 className="size-4 text-emerald-600" />
+          ) : (
+            <CircleAlert className="size-4 text-amber-600" />
+          )}
+          <span>
+            {hasVerifiedMfa
+              ? "Recovery links will ask for your authenticator before a password can be changed."
+              : "Add an authenticator to require MFA during password recovery."}
+          </span>
+          <Badge variant={hasVerifiedMfa ? "secondary" : "outline"}>
+            {hasVerifiedMfa ? "MFA protected" : "Action available"}
+          </Badge>
         </CardContent>
       </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>Password</CardTitle>
-          <CardDescription>
-            Re-enter the current password before choosing a new one.
-          </CardDescription>
+    </div>
+  );
+}
+
+function SecurityAreaCard({
+  href,
+  icon: Icon,
+  title,
+  description,
+  status,
+  ready,
+}: {
+  href: string;
+  icon: typeof UserRound;
+  title: string;
+  description: string;
+  status: string;
+  ready: boolean;
+}) {
+  return (
+    <Link href={href} className="group">
+      <Card className="h-full transition-colors group-hover:border-foreground/30 group-hover:bg-muted/20">
+        <CardHeader className="flex-row items-start justify-between space-y-0">
+          <span className="grid size-10 place-items-center rounded-xl bg-muted">
+            <Icon className="size-5" />
+          </span>
+          <Badge variant={ready ? "secondary" : "outline"}>
+            {ready ? "Ready" : "Review"}
+          </Badge>
         </CardHeader>
         <CardContent>
-          <PasswordForm />
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>Multi-factor authentication</CardTitle>
-          <CardDescription>
-            Use a time-based code from an authenticator app.
+          <CardTitle className="text-xl">{title}</CardTitle>
+          <CardDescription className="mt-2 leading-6">
+            {description}
           </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <MfaManager initialFactorId={factorId} />
+          <span className="mt-5 inline-flex items-center gap-1 text-sm font-medium">
+            {status}
+            <ArrowUpRight className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+          </span>
         </CardContent>
       </Card>
-    </>
+    </Link>
   );
 }

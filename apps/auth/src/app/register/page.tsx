@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
-import { RegisterForm } from "@/components/auth/register-form";
+import { redirect } from "next/navigation";
+
 import { resolveAuthReturnTarget } from "@/lib/auth/returns";
-import { AuthPageShell } from "@repo/ui/auth-presentation";
 
 export const metadata: Metadata = { title: "Register" };
 
@@ -12,9 +12,7 @@ export default async function RegisterPage({
   searchParams: Promise<{ return_to?: string }>;
 }) {
   const { return_to: returnTo } = await searchParams;
-  return (
-    <AuthPageShell>
-      <RegisterForm returnTo={resolveAuthReturnTarget(returnTo)} />
-    </AuthPageShell>
+  redirect(
+    `/welcome?return_to=${encodeURIComponent(resolveAuthReturnTarget(returnTo))}`,
   );
 }

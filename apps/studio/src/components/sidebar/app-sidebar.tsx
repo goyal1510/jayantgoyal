@@ -1,30 +1,17 @@
 "use client";
 
 import * as React from "react";
-import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
-import { FileText, LayoutGrid } from "lucide-react";
+import { LayoutGrid } from "lucide-react";
 
 import { APP_BRANDS } from "@repo/brand";
 import { ApplicationSidebarFrame } from "@repo/ui/application-shell";
 import { cn } from "@repo/ui/lib/utils";
-import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@repo/ui/sidebar";
 
 import { useActiveApp } from "@/hooks/use-active-app";
 import { getSurfaceApps, type AppConfig } from "@/lib/config/hub-config";
 import { NavApps } from "@/components/sidebar/nav-apps";
-
-const TermsDialog = dynamic(
-  () =>
-    import("@/components/auth/terms-dialog").then((module) => ({
-      default: module.TermsDialog,
-    })),
-  { ssr: false },
-);
+import { TopbarUserMenu } from "@/components/header/topbar-user-menu";
 
 const DISCOVERY_IDS = [
   "studio-home",
@@ -104,22 +91,7 @@ export function AppSidebar({
       contentClassName="gap-0"
       footerClassName="border-t border-sidebar-border/80"
       footerSeparator={false}
-      footer={
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <TermsDialog>
-              <SidebarMenuButton
-                type="button"
-                tooltip="Terms & Conditions"
-                className="w-full"
-              >
-                <FileText />
-                <span>Terms & Conditions</span>
-              </SidebarMenuButton>
-            </TermsDialog>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      }
+      footer={<TopbarUserMenu inSidebar />}
       {...props}
     >
       <>

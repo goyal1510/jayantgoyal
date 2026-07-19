@@ -18,6 +18,7 @@ import {
 } from "@/lib/config/nav-config";
 import type { NavItem } from "@/lib/config/nav-config";
 import type { AuthUser } from "@/lib/types";
+import { TopbarUserMenu } from "@/components/header/topbar-user-menu";
 
 const adminBrand = {
   name: APP_BRANDS.admin.name,
@@ -52,6 +53,9 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
   return (
     <ApplicationSidebarFrame
       brand={adminBrand}
+      footerClassName="border-t border-sidebar-border/80"
+      footerSeparator={false}
+      footer={<TopbarUserMenu user={user} inSidebar />}
       {...props}
     >
       {sections.map((section) => (

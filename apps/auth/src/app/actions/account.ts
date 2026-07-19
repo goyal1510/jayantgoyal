@@ -91,7 +91,6 @@ export async function updateProfileAction(
     : { success: "Profile updated." };
 }
 
-
 async function requireProviderMutation(returnTo: string) {
   const context = await actionContext();
   if ("error" in context) redirect("/error?code=invalid_origin");
@@ -99,7 +98,7 @@ async function requireProviderMutation(returnTo: string) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect(`/login?return_to=${encodeURIComponent(returnTo)}`);
+  if (!user) redirect(`/welcome?return_to=${encodeURIComponent(returnTo)}`);
   const { data: assurance } =
     await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
   if (assurance?.nextLevel === "aal2" && assurance.currentLevel !== "aal2") {
@@ -109,15 +108,14 @@ async function requireProviderMutation(returnTo: string) {
     assurance?.nextLevel !== "aal2" &&
     !hasRecentSignIn(user.last_sign_in_at)
   ) {
-    redirect(`/login?return_to=${encodeURIComponent(returnTo)}`);
+    redirect(`/welcome?return_to=${encodeURIComponent(returnTo)}`);
   }
   return { context, supabase, user };
 }
 
 export async function linkGoogleAction(): Promise<void> {
-  const { context, supabase } = await requireProviderMutation(
-    "/account/providers",
-  );
+  const { context, supabase } =
+    await requireProviderMutation("/account/providers");
   const { data, error } = await supabase.auth.linkIdentity({
     provider: "google",
     options: {
@@ -131,9 +129,8 @@ export async function linkGoogleAction(): Promise<void> {
 }
 
 export async function unlinkIdentityAction(formData: FormData): Promise<void> {
-  const { supabase, user } = await requireProviderMutation(
-    "/account/providers",
-  );
+  const { supabase, user } =
+    await requireProviderMutation("/account/providers");
   const identityId = stringField(formData, "identity_id");
   const identities = user.identities ?? [];
   const identity = identities.find((item) => item.id === identityId);

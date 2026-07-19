@@ -54,9 +54,9 @@ export function buildSignedOutLoginUrl({
   value: string | null | undefined;
   requestOrigin?: string;
 }): string {
-  const returnTo = resolveAuthReturnTarget(value, requestOrigin, "/login");
-  const login = new URL("/login", `${requestOrigin}/`);
+  const returnTo = resolveAuthReturnTarget(value, requestOrigin, "/welcome");
+  const login = new URL("/welcome", `${requestOrigin}/`);
   login.searchParams.set("signed_out", "true");
-  if (returnTo !== "/login") login.searchParams.set("return_to", returnTo);
+  if (returnTo !== "/welcome") login.searchParams.set("return_to", returnTo);
   return login.toString();
 }

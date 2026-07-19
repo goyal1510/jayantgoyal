@@ -9,7 +9,7 @@
  */
 
 export const AUTH_SURFACE_ROUTES = [
-  { id: "login", pathname: "/login", area: "entry" },
+  { id: "welcome", pathname: "/welcome", area: "entry" },
   { id: "register", pathname: "/register", area: "entry" },
   { id: "forgot-password", pathname: "/forgot-password", area: "recovery" },
   { id: "reset-password", pathname: "/reset-password", area: "recovery" },

@@ -11,7 +11,6 @@ import { DynamicBreadcrumb } from "@/components/sidebar/dynamic-breadcrumb";
 import { LazyMotionProvider } from "@repo/ui/lazy-motion-provider";
 import { ApplicationShell } from "@repo/ui/application-shell";
 import { ApplicationTopbar } from "@repo/ui/application-topbar";
-import { Separator } from "@repo/ui/separator";
 import {
   SIDEBAR_STATE_COOKIE_NAME,
   SIDEBAR_WIDTH_COOKIE_NAME,
@@ -23,8 +22,6 @@ import { AuthGateWrapper } from "@/components/auth/auth-gate";
 import { LazyCommandPalette } from "@/components/providers/lazy-components";
 import { AuthToast } from "@/components/auth/auth-toast";
 import { DynamicBreadcrumbJsonLd } from "@/components/seo/dynamic-breadcrumb-jsonld";
-import { TopbarUserMenu } from "@/components/header/topbar-user-menu";
-import { ThemeMenu } from "@repo/ui/theme-menu";
 
 export default async function ProtectedLayout({
   children,
@@ -66,9 +63,6 @@ export default async function ProtectedLayout({
             actions={
               <>
                 <LazyCommandPalette />
-                <ThemeMenu />
-                <Separator orientation="vertical" className="h-6" />
-                <TopbarUserMenu />
               </>
             }
           />

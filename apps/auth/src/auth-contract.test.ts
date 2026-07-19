@@ -16,6 +16,7 @@ function readActions(): string {
 }
 
 const ROUTE_FILES = new Map<string, string>([
+  ["/welcome", "app/welcome/page.tsx"],
   ["/login", "app/login/page.tsx"],
   ["/register", "app/register/page.tsx"],
   ["/forgot-password", "app/forgot-password/page.tsx"],
@@ -36,6 +37,10 @@ describe("standalone Auth application contract", () => {
       expect(existsSync(`${sourceRoot}/${route}`), pathname).toBe(true);
     });
     expect(existsSync(`${sourceRoot}/app/error/page.tsx`)).toBe(true);
+    expect(existsSync(`${sourceRoot}/app/auth/callback/route.ts`)).toBe(true);
+    expect(
+      existsSync(`${sourceRoot}/app/callback/auth/callback/route.ts`),
+    ).toBe(true);
   });
 
   it("keeps logout as a POST server action rather than a GET route", () => {
@@ -63,8 +68,8 @@ describe("standalone Auth application contract", () => {
       actions.match(/export async function \w+Action/g) ?? [];
     const originChecks =
       actions.match(/const context = await actionContext\(\);/g) ?? [];
-    expect(exportedActions.length).toBe(15);
-    expect(originChecks.length).toBe(14);
+    expect(exportedActions.length).toBe(16);
+    expect(originChecks.length).toBe(15);
     expect(actions.match(/await requireProviderMutation\(/g)).toHaveLength(2);
   });
 
@@ -83,12 +88,38 @@ describe("standalone Auth application contract", () => {
     expect(actions).toContain('cookieStore.delete("auth_recovery")');
   });
 
+  it("keeps the recovery reset form behind the MFA step-up", () => {
+    const resetPage = readFileSync(
+      `${sourceRoot}/app/reset-password/page.tsx`,
+      "utf8",
+    );
+    const recovery = readFileSync(
+      `${sourceRoot}/app/actions/recovery.ts`,
+      "utf8",
+    );
+    expect(resetPage).toContain("getAuthenticatorAssuranceLevel");
+    expect(resetPage).toContain("redirect(`/mfa?return_to=");
+    expect(recovery).toContain("getAuthenticatorAssuranceLevel");
+    expect(recovery).toContain("redirect(`/mfa?return_to=");
+  });
+
+  it("keeps provider management out of the visible account navigation", () => {
+    const accountLayout = readFileSync(
+      `${sourceRoot}/app/account/layout.tsx`,
+      "utf8",
+    );
+    expect(accountLayout).toContain("ApplicationShell");
+    expect(accountLayout).toContain("AccountSidebar");
+    expect(accountLayout).toContain("AccountTopbarUserMenu");
+    expect(accountLayout).not.toContain('href="/account/providers"');
+  });
+
   it("preserves password bytes instead of trimming credentials", () => {
     const actions = readActions();
     expect(actions).toContain(
       'const currentPassword = rawStringField(formData, "current_password")',
     );
-    expect(actions.match(/const password = rawStringField/g)).toHaveLength(4);
+    expect(actions.match(/const password = rawStringField/g)).toHaveLength(5);
     expect(actions).not.toContain(
       'const password = stringField(formData, "password")',
     );

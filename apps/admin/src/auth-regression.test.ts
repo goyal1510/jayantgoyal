@@ -7,9 +7,10 @@ const { createRequestClientMock } = vi.hoisted(() => ({
 }));
 
 vi.mock("@repo/auth/server", async () => {
-  const actual = await vi.importActual<typeof import("@repo/auth/server")>(
-    "@repo/auth/server",
-  );
+  const actual =
+    await vi.importActual<typeof import("@repo/auth/server")>(
+      "@repo/auth/server",
+    );
   return {
     ...actual,
     createSupabaseRequestClient: createRequestClientMock,
@@ -107,7 +108,10 @@ describe("Admin Proxy authentication contract", () => {
   it("keeps legacy account settings and MFA cleanup routes removed", () => {
     expect(
       existsSync(
-        new URL("./components/sidebar/account-settings-sheet.tsx", import.meta.url),
+        new URL(
+          "./components/sidebar/account-settings-sheet.tsx",
+          import.meta.url,
+        ),
       ),
     ).toBe(false);
     expect(
@@ -116,11 +120,13 @@ describe("Admin Proxy authentication contract", () => {
       ),
     ).toBe(false);
     expect(
-      existsSync(new URL("./app/api/account/mfa-cleanup/route.ts", import.meta.url)),
+      existsSync(
+        new URL("./app/api/account/mfa-cleanup/route.ts", import.meta.url),
+      ),
     ).toBe(false);
-    expect(existsSync(new URL("./app/api/account/delete/route.ts", import.meta.url))).toBe(
-      true,
-    );
+    expect(
+      existsSync(new URL("./app/api/account/delete/route.ts", import.meta.url)),
+    ).toBe(true);
   });
 
   it("routes login entry to Auth only when the cutover flag is enabled", async () => {
@@ -133,7 +139,7 @@ describe("Admin Proxy authentication contract", () => {
     );
 
     expect(response.headers.get("location")).toBe(
-      "https://auth.jayantgoyal.com/login?return_to=https%3A%2F%2Fadmin.jayantgoyal.com%2Fdeployments",
+      "https://auth.jayantgoyal.com/welcome?return_to=https%3A%2F%2Fadmin.jayantgoyal.com%2Fdeployments",
     );
     expect(createRequestClientMock).not.toHaveBeenCalled();
   });

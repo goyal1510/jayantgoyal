@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  hasVerifiedTotpFactor,
   hasRecentSignIn,
   isProtectedAuthPath,
+  requiresRecoveryMfa,
   requiresAccountMfaStepUp,
 } from "./policy";
 
@@ -18,6 +20,7 @@ describe("Auth route policy", () => {
   );
 
   it.each([
+    "/welcome",
     "/login",
     "/register",
     "/forgot-password",
@@ -44,6 +47,32 @@ describe("Auth route policy", () => {
         hasUser: true,
         currentLevel: "aal2",
         nextLevel: "aal2",
+      }),
+    ).toBe(false);
+  });
+
+  it("requires recovery MFA while a verified factor is below AAL2", () => {
+    expect(
+      hasVerifiedTotpFactor({
+        totp: [{ status: "verified" }],
+      }),
+    ).toBe(true);
+    expect(
+      requiresRecoveryMfa({
+        hasVerifiedFactor: true,
+        currentLevel: "aal1",
+      }),
+    ).toBe(true);
+    expect(
+      requiresRecoveryMfa({
+        hasVerifiedFactor: true,
+        currentLevel: "aal2",
+      }),
+    ).toBe(false);
+    expect(
+      requiresRecoveryMfa({
+        hasVerifiedFactor: false,
+        currentLevel: "aal1",
       }),
     ).toBe(false);
   });
