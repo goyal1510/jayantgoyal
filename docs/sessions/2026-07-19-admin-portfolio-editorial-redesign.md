@@ -557,7 +557,7 @@
   and 251 tests pass; repository typecheck, lint, architecture, service-role,
   brand-asset, diff, and all four Portfolio/Admin/Studio/Auth production builds
   pass. The work was split into four reviewed commits and pushed directly to
-  `main` at `30c6d31468c63a4e89c37f4453f1ca3674e5783f`; no migration or
+  `main` at `4de1f1b03d726274031c3cd04b2c3f0213d06a97`; no migration or
   production CMS write was performed.
 - Updated the release checklist to reflect the four-phase commit review,
   current-base freshness check, final validation, and direct push to `main`.
