@@ -18,6 +18,7 @@ import { Switch } from "@repo/ui/switch";
 import { Textarea } from "@repo/ui/textarea";
 
 import { PortfolioAssetUpload } from "@/components/portfolio/asset-upload";
+import { AccessibleForm } from "@/components/accessible-form";
 import type { Certificate } from "@/lib/types";
 
 export type CertificateFormData = Omit<
@@ -71,7 +72,7 @@ export function CertificateDialog({
             public certificate deck.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={onSubmit}>
+        <AccessibleForm onSubmit={onSubmit}>
           <div className="space-y-5 py-4">
             <div className="space-y-2">
               <Label htmlFor="name">Certificate Name</Label>
@@ -243,7 +244,7 @@ export function CertificateDialog({
               {editing ? "Update Certificate" : "Add Certificate"}
             </Button>
           </DialogFooter>
-        </form>
+        </AccessibleForm>
       </DialogContent>
     </Dialog>
   );

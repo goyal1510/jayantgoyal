@@ -17,8 +17,12 @@ import { Label } from "@repo/ui/label";
 import { Textarea } from "@repo/ui/textarea";
 import { Switch } from "@repo/ui/switch";
 import type { Experience } from "@/lib/types";
+import { AccessibleForm } from "@/components/accessible-form";
 
-export type ExperienceFormData = Omit<Experience, "id" | "created_at" | "updated_at">;
+export type ExperienceFormData = Omit<
+  Experience,
+  "id" | "created_at" | "updated_at"
+>;
 
 export const emptyExperienceForm: ExperienceFormData = {
   company: "",
@@ -85,7 +89,7 @@ export function ExperienceDialog({
               : "Add a new experience entry to your portfolio."}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={onSubmit}>
+        <AccessibleForm onSubmit={onSubmit}>
           <div className="space-y-4 py-4">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
@@ -155,7 +159,10 @@ export function ExperienceDialog({
               <Label>Key Accomplishments / Responsibilities</Label>
               {formData.bullets.map((bullet, index) => (
                 <div key={index} className="flex gap-2 items-start">
-                  <Label htmlFor={`experience-bullet-${index}`} className="sr-only">
+                  <Label
+                    htmlFor={`experience-bullet-${index}`}
+                    className="sr-only"
+                  >
                     Accomplishment {index + 1}
                   </Label>
                   <Textarea
@@ -220,7 +227,7 @@ export function ExperienceDialog({
               {editing ? "Update" : "Add"}
             </Button>
           </DialogFooter>
-        </form>
+        </AccessibleForm>
       </DialogContent>
     </Dialog>
   );

@@ -20,6 +20,7 @@ import {
 import type { Hero } from "@/lib/types";
 import { PortfolioAssetUpload } from "@/components/portfolio/asset-upload";
 import { useUnsavedChangesGuard } from "@/lib/use-unsaved-changes-guard";
+import { AccessibleForm } from "@/components/accessible-form";
 
 interface HeroFormProps {
   initialData: Hero | null;
@@ -103,7 +104,7 @@ export function HeroForm({ initialData }: HeroFormProps) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <AccessibleForm onSubmit={handleSubmit} className="space-y-6">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
@@ -286,15 +287,15 @@ export function HeroForm({ initialData }: HeroFormProps) {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <FormMessage>{formError}</FormMessage>
             <Button type="submit" disabled={saving}>
-            {saving ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Save className="mr-2 h-4 w-4" />
-            )}
-            Save Changes
+              {saving ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="mr-2 h-4 w-4" />
+              )}
+              Save Changes
             </Button>
           </div>
-        </form>
+        </AccessibleForm>
       </CardContent>
     </Card>
   );

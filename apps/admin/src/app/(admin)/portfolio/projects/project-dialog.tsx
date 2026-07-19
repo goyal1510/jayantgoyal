@@ -20,6 +20,7 @@ import { Switch } from "@repo/ui/switch";
 import { Textarea } from "@repo/ui/textarea";
 
 import { PortfolioAssetUpload } from "@/components/portfolio/asset-upload";
+import { AccessibleForm } from "@/components/accessible-form";
 import type { Project } from "@/lib/types";
 
 export type ProjectFormData = Omit<Project, "id" | "created_at" | "updated_at">;
@@ -84,7 +85,7 @@ export function ProjectDialog({
             Every field below maps directly to the public project story.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={onSubmit}>
+        <AccessibleForm onSubmit={onSubmit}>
           <div className="space-y-5 py-4">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
@@ -314,7 +315,7 @@ export function ProjectDialog({
               {editing ? "Update Project" : "Add Project"}
             </Button>
           </DialogFooter>
-        </form>
+        </AccessibleForm>
       </DialogContent>
     </Dialog>
   );

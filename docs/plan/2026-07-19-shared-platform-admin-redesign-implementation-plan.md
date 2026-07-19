@@ -546,12 +546,13 @@ independent forms.
       and Experience dialogs now stack their paired fields below the medium
       breakpoint.
 - [x] Dialogs and sheets trap focus and restore it on close.
-- [ ] All fields have programmatic labels and useful descriptions.
-- [ ] Validation errors are associated with fields and announced.
+- [x] All fields have programmatic labels and useful descriptions.
+- [x] Validation errors are associated with fields and announced.
 - [x] Focus styles are visible in light and dark modes.
 - [x] Reduced-motion preferences are honored by the shared Studio/Admin
       application surface; Portfolio remains outside that stylesheet boundary.
-- [ ] Reordering has a keyboard-accessible alternative.
+- [x] Reordering has a keyboard-accessible alternative through the numeric
+      Display/Sort Order fields on every ordered collection editor.
 
 ### Gate
 
@@ -763,7 +764,7 @@ explicit authorization and a restoration record.
       navigation, command menu, and representative feature routes.
 - [x] Auth: login, security entry, MFA entry, logout, and safe returns when
       affected.
-- [ ] Keyboard-only traversal of navigation, menus, dialogs, forms, and reorder
+- [x] Keyboard-only traversal of navigation, menus, dialogs, forms, and reorder
       alternatives.
 - [x] Reduced-motion behavior where animation exists.
 
@@ -830,7 +831,7 @@ type-safe and reviewable state.
 - [x] Overview and content-health checks complete.
 - [x] Detached Section Copy and Navigation removed from ordinary navigation.
 - [x] Full CMS round trip verified.
-- [ ] Admin responsive/accessibility checks pass.
+- [x] Admin responsive/accessibility checks pass.
 
 ### Release 3 — Consolidation
 
@@ -854,9 +855,11 @@ type-safe and reviewable state.
 - [x] No fabricated counts, statuses, or GitHub values appear in Admin or
       Portfolio.
 - [x] Shared packages are dependency leaves and import no application source.
-- [ ] Duplicated GitHub and account implementations are removed after parity.
-- [ ] Automated, browser, accessibility, CMS round-trip, and deployment checks
-      pass for the affected release.
+- [ ] Duplicated GitHub and account implementations are removed after parity;
+      account-delete compatibility routes remain until Auth owns self-delete.
+- [x] Automated, browser, accessibility, CMS round-trip, and deployment checks
+      pass for the affected release; account deletion and Auth ownership remain
+      explicitly deferred as described above.
 - [x] Any migration is applied safely and all schema snapshots are current.
 
 ## 8. Explicitly deferred until separately designed

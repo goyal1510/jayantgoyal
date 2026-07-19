@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from "@repo/ui/select";
 import type { UserRole } from "@/lib/types";
+import { AccessibleForm } from "@/components/accessible-form";
 
 interface AvailableUser {
   id: string;
@@ -50,19 +51,23 @@ export function AddUserDialog({
   adding,
 }: AddUserDialogProps) {
   return (
-    <Dialog open={open} onOpenChange={(o) => {
-      onOpenChange(o);
-      if (!o) {
-        setSelectedUserId("");
-        setNewRole("user" as UserRole);
-      }
-    }}>
+    <Dialog
+      open={open}
+      onOpenChange={(o) => {
+        onOpenChange(o);
+        if (!o) {
+          setSelectedUserId("");
+          setNewRole("user" as UserRole);
+        }
+      }}
+    >
       <DialogContent>
-        <form onSubmit={onSubmit}>
+        <AccessibleForm onSubmit={onSubmit}>
           <DialogHeader>
             <DialogTitle>Add User</DialogTitle>
             <DialogDescription>
-              Add an existing user and assign a role. The user must have already signed up.
+              Add an existing user and assign a role. The user must have already
+              signed up.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -113,7 +118,7 @@ export function AddUserDialog({
               Add User
             </Button>
           </DialogFooter>
-        </form>
+        </AccessibleForm>
       </DialogContent>
     </Dialog>
   );

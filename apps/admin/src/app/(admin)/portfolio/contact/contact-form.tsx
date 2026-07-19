@@ -27,6 +27,7 @@ import {
 } from "@repo/ui/card";
 import type { Contact, SocialLink } from "@/lib/types";
 import { useUnsavedChangesGuard } from "@/lib/use-unsaved-changes-guard";
+import { AccessibleForm } from "@/components/accessible-form";
 
 interface ContactFormProps {
   initialData: Contact | null;
@@ -60,13 +61,15 @@ export function ContactForm({ initialData }: ContactFormProps) {
     e.preventDefault();
     setFormError(null);
     const invalidSocialIndex = formData.socials.findIndex(
-      (social) => !social.label.trim() || !social.href.trim() || !social.icon_key,
+      (social) =>
+        !social.label.trim() || !social.href.trim() || !social.icon_key,
     );
     setInvalidSocialIndex(
       invalidSocialIndex === -1 ? null : invalidSocialIndex,
     );
     if (invalidSocialIndex !== -1) {
-      const message = "Complete each social link label, URL, and icon before saving";
+      const message =
+        "Complete each social link label, URL, and icon before saving";
       setFormError(message);
       toast.error(message);
       return;
@@ -131,7 +134,7 @@ export function ContactForm({ initialData }: ContactFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <AccessibleForm onSubmit={handleSubmit} className="space-y-6">
       <Card>
         <CardHeader>
           <CardTitle>Contact Details</CardTitle>
@@ -201,7 +204,9 @@ export function ContactForm({ initialData }: ContactFormProps) {
                   <Input
                     id={`social-label-${index}`}
                     value={social.label}
-                    aria-invalid={invalidSocialIndex === index && !social.label.trim()}
+                    aria-invalid={
+                      invalidSocialIndex === index && !social.label.trim()
+                    }
                     aria-describedby={
                       invalidSocialIndex === index
                         ? `social-error-${index}`
@@ -219,7 +224,9 @@ export function ContactForm({ initialData }: ContactFormProps) {
                     id={`social-url-${index}`}
                     type="url"
                     value={social.href}
-                    aria-invalid={invalidSocialIndex === index && !social.href.trim()}
+                    aria-invalid={
+                      invalidSocialIndex === index && !social.href.trim()
+                    }
                     aria-describedby={
                       invalidSocialIndex === index
                         ? `social-error-${index}`
@@ -295,6 +302,6 @@ export function ContactForm({ initialData }: ContactFormProps) {
           Save Changes
         </Button>
       </div>
-    </form>
+    </AccessibleForm>
   );
 }

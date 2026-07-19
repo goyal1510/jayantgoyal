@@ -13,6 +13,7 @@ import { Label } from "@repo/ui/label";
 
 import { updatePortfolioData } from "@/lib/portfolio-api";
 import type { Hero } from "@/lib/types";
+import { AccessibleForm } from "@/components/accessible-form";
 
 const GITHUB_USERNAME_PATTERN = /^[a-zA-Z0-9-]{1,39}$/;
 
@@ -76,7 +77,10 @@ export function ActivitySourceForm({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={save} className="flex flex-col gap-4 sm:flex-row sm:items-end">
+        <AccessibleForm
+          onSubmit={save}
+          className="flex flex-col gap-4 sm:flex-row sm:items-end"
+        >
           <div className="min-w-0 flex-1 space-y-2">
             <Label htmlFor="activity-github-username">GitHub username</Label>
             <Input
@@ -88,17 +92,22 @@ export function ActivitySourceForm({
               required
             />
             <p className="text-xs text-muted-foreground">
-              The public Portfolio fetches contribution and repository data for this account at render time.
+              The public Portfolio fetches contribution and repository data for
+              this account at render time.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3 sm:shrink-0">
             <FormMessage>{formError}</FormMessage>
             <Button type="submit" disabled={saving} className="shrink-0">
-            {saving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
-            Save source
+              {saving ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Save className="size-4" />
+              )}
+              Save source
             </Button>
           </div>
-        </form>
+        </AccessibleForm>
       </CardContent>
     </Card>
   );

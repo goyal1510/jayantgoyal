@@ -21,6 +21,7 @@ import { Badge } from "@repo/ui/badge";
 import type { BlogPost } from "@/lib/types";
 import { PortfolioAssetUpload } from "@/components/portfolio/asset-upload";
 import { MarkdownPreview } from "@/components/portfolio/markdown-preview";
+import { AccessibleForm } from "@/components/accessible-form";
 
 export type BlogFormData = Omit<BlogPost, "id" | "created_at" | "updated_at">;
 
@@ -121,7 +122,7 @@ export function BlogDialog({
               : "Create a new blog post."}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={onSubmit}>
+        <AccessibleForm onSubmit={onSubmit}>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="title">Title</Label>
@@ -295,7 +296,7 @@ export function BlogDialog({
               {editing ? "Update" : "Add"}
             </Button>
           </DialogFooter>
-        </form>
+        </AccessibleForm>
       </DialogContent>
     </Dialog>
   );

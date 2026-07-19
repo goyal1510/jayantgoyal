@@ -23,6 +23,7 @@ import { Textarea } from "@repo/ui/textarea";
 
 import { savePortfolioSectionPresentation } from "@/lib/portfolio-api";
 import type { NavItem, SectionContent } from "@/lib/types";
+import { AccessibleForm } from "@/components/accessible-form";
 
 interface SectionEditorialPanelProps {
   sectionKey: PortfolioSectionKey;
@@ -192,7 +193,7 @@ export function SectionEditorialPanel({
         </div>
       </CardHeader>
       <CardContent>
-        <form onSubmit={save} className="space-y-5">
+        <AccessibleForm onSubmit={save} className="space-y-5">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor={`${sectionKey}-eyebrow`}>Eyebrow</Label>
@@ -352,7 +353,7 @@ export function SectionEditorialPanel({
               </Button>
             </div>
           </div>
-        </form>
+        </AccessibleForm>
       </CardContent>
     </Card>
   );

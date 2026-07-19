@@ -18,6 +18,7 @@ import {
 import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
+import { AccessibleForm } from "@/components/accessible-form";
 
 function LoginForm() {
   const router = useRouter();
@@ -110,7 +111,7 @@ function LoginForm() {
   return (
     <AuthPageShell>
       <AuthCard>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+        <AccessibleForm onSubmit={handleSubmit} className="flex flex-col gap-6">
           <div className="flex flex-col items-center text-center">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary">
               <Shield className="h-6 w-6 text-primary-foreground" />
@@ -146,7 +147,7 @@ function LoginForm() {
             pending={isGooglePending}
             onClick={handleGoogleLogin}
           />
-        </form>
+        </AccessibleForm>
       </AuthCard>
     </AuthPageShell>
   );

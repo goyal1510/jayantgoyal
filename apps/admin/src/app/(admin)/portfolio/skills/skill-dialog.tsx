@@ -16,6 +16,7 @@ import { Label } from "@repo/ui/label";
 import { Switch } from "@repo/ui/switch";
 import { Textarea } from "@repo/ui/textarea";
 import type { Skill } from "@/lib/types";
+import { AccessibleForm } from "@/components/accessible-form";
 
 export type SkillFormData = Omit<Skill, "id" | "created_at" | "updated_at">;
 
@@ -60,7 +61,7 @@ export function SkillDialog({
               : "Add a new skill to this category."}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={onSubmit}>
+        <AccessibleForm onSubmit={onSubmit}>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="skill-name">Skill Name</Label>
@@ -150,7 +151,7 @@ export function SkillDialog({
               {editing ? "Update" : "Add"}
             </Button>
           </DialogFooter>
-        </form>
+        </AccessibleForm>
       </DialogContent>
     </Dialog>
   );

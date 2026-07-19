@@ -15,8 +15,12 @@ import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
 import { Switch } from "@repo/ui/switch";
 import type { Education } from "@/lib/types";
+import { AccessibleForm } from "@/components/accessible-form";
 
-export type EducationFormData = Omit<Education, "id" | "created_at" | "updated_at">;
+export type EducationFormData = Omit<
+  Education,
+  "id" | "created_at" | "updated_at"
+>;
 
 export const emptyEducationForm: EducationFormData = {
   school: "",
@@ -62,7 +66,7 @@ export function EducationDialog({
               : "Add a new education entry to your portfolio."}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={onSubmit}>
+        <AccessibleForm onSubmit={onSubmit}>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="school">School / Institution</Label>
@@ -163,7 +167,7 @@ export function EducationDialog({
               {editing ? "Update" : "Add"}
             </Button>
           </DialogFooter>
-        </form>
+        </AccessibleForm>
       </DialogContent>
     </Dialog>
   );

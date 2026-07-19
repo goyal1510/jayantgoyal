@@ -20,6 +20,7 @@ import {
 } from "@repo/ui/card";
 import type { About, PersonalInfo, PortfolioPrinciple } from "@/lib/types";
 import { useUnsavedChangesGuard } from "@/lib/use-unsaved-changes-guard";
+import { AccessibleForm } from "@/components/accessible-form";
 
 interface AboutFormProps {
   initialData: About | null;
@@ -157,7 +158,7 @@ export function AboutForm({ initialData }: AboutFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <AccessibleForm onSubmit={handleSubmit} className="space-y-6">
       <Card>
         <CardHeader>
           <CardTitle>Summary</CardTitle>
@@ -251,10 +252,7 @@ export function AboutForm({ initialData }: AboutFormProps) {
           {formData.principles.map((principle, index) => (
             <div key={index} className="flex items-start gap-3">
               <div className="grid flex-1 gap-3 md:grid-cols-[0.7fr_1.3fr]">
-                <Label
-                  htmlFor={`principle-title-${index}`}
-                  className="sr-only"
-                >
+                <Label htmlFor={`principle-title-${index}`} className="sr-only">
                   Principle {index + 1} title
                 </Label>
                 <Input
@@ -265,10 +263,7 @@ export function AboutForm({ initialData }: AboutFormProps) {
                   }
                   placeholder="Find the signal"
                 />
-                <Label
-                  htmlFor={`principle-copy-${index}`}
-                  className="sr-only"
-                >
+                <Label htmlFor={`principle-copy-${index}`} className="sr-only">
                   Principle {index + 1} description
                 </Label>
                 <Textarea
@@ -358,6 +353,6 @@ export function AboutForm({ initialData }: AboutFormProps) {
           Save Changes
         </Button>
       </div>
-    </form>
+    </AccessibleForm>
   );
 }
