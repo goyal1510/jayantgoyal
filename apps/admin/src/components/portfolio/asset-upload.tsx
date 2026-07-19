@@ -15,6 +15,17 @@ import {
   type PortfolioAssetKind,
 } from "@/lib/portfolio-assets";
 
+const PORTFOLIO_ORIGIN =
+  process.env.NEXT_PUBLIC_PORTFOLIO_URL ?? "https://jayantgoyal.com";
+
+function resolveAssetUrl(value: string) {
+  if (value.startsWith("/") && !value.startsWith("//")) {
+    return `${PORTFOLIO_ORIGIN}${value}`;
+  }
+
+  return value;
+}
+
 export function PortfolioAssetUpload({
   id,
   label,
@@ -33,6 +44,7 @@ export function PortfolioAssetUpload({
   const [uploading, setUploading] = useState(false);
   const isImage =
     kind.endsWith("image") || kind.endsWith("preview") || kind === "blog-cover";
+  const resolvedValue = value ? resolveAssetUrl(value) : "";
 
   async function upload(file: File) {
     setUploading(true);
@@ -98,7 +110,7 @@ export function PortfolioAssetUpload({
         </Button>
         {value ? (
           <a
-            href={value}
+            href={resolvedValue}
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
@@ -109,7 +121,7 @@ export function PortfolioAssetUpload({
       </div>
       {isImage && value ? (
         <img
-          src={value}
+          src={resolvedValue}
           alt="Current uploaded preview"
           className="max-h-48 w-full rounded-md border bg-muted object-contain"
         />
