@@ -292,6 +292,15 @@
   The slice was committed as `82d1b1f` and pushed directly to `main`; Vercel
   reports Admin, Studio, Portfolio, and Auth deployments pending for that
   commit.
+- Authenticated production Admin validation completed with the supplied
+  account through `agent-browser` without exposing or changing CMS content.
+  `/portfolio` and all eight canonical workspaces (Home, About, Skills,
+  Experience, Activity, Work, Writing, Contact) loaded live data, exposed
+  editor fields/save actions, and reported no application errors. The 390px
+  pass exposed only the outside sidebar trigger, opened the navigation sheet,
+  preserved account access, and had no horizontal overflow. The explicit
+  mutation/restore checklist remains open because this pass was intentionally
+  read-only.
 - Tightened `pnpm check:service-role` so client modules are also rejected when
   they import the shared `@repo/auth/service-role` entry directly. This keeps
   the new central factory server-only by policy, not only by convention.
