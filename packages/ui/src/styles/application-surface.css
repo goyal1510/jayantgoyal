@@ -1,0 +1,85 @@
+/* Shared product-app surface tokens. Portfolio intentionally does not import this. */
+.application-surface {
+  font-family: var(--font-manrope), sans-serif;
+
+  --background: 42 38% 96%;
+  --foreground: 24 25% 9%;
+  --card: 42 40% 98%;
+  --card-foreground: 24 25% 9%;
+  --popover: 42 40% 98%;
+  --popover-foreground: 24 25% 9%;
+  --primary: 78 18% 72%;
+  --primary-foreground: 24 25% 9%;
+  --secondary: 38 26% 91%;
+  --secondary-foreground: 24 25% 13%;
+  --muted: 39 23% 91%;
+  --muted-foreground: 25 9% 38%;
+  --accent: 76 19% 86%;
+  --accent-foreground: 24 25% 13%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 35 15% 80%;
+  --input: 35 15% 80%;
+  --ring: 78 18% 62%;
+  --radius: 0.65rem;
+
+  --sidebar: hsl(42 36% 95%);
+  --sidebar-foreground: hsl(24 25% 13%);
+  --sidebar-primary: hsl(24 25% 9%);
+  --sidebar-primary-foreground: hsl(42 40% 98%);
+  --sidebar-accent: hsl(76 19% 84%);
+  --sidebar-accent-foreground: hsl(24 25% 13%);
+  --sidebar-border: hsl(35 15% 80%);
+  --sidebar-ring: hsl(78 18% 62%);
+}
+
+.dark .application-surface {
+  --background: 220 10% 8%;
+  --foreground: 40 30% 94%;
+  --card: 220 8% 12%;
+  --card-foreground: 40 30% 94%;
+  --popover: 220 8% 13%;
+  --popover-foreground: 40 30% 94%;
+  --primary: 76 28% 70%;
+  --primary-foreground: 220 12% 8%;
+  --secondary: 220 7% 17%;
+  --secondary-foreground: 40 30% 94%;
+  --muted: 220 6% 18%;
+  --muted-foreground: 37 12% 68%;
+  --accent: 77 14% 24%;
+  --accent-foreground: 40 30% 94%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 220 6% 25%;
+  --input: 220 6% 25%;
+  --ring: 76 30% 70%;
+
+  --sidebar: hsl(220 10% 9%);
+  --sidebar-foreground: hsl(40 30% 94%);
+  --sidebar-primary: hsl(40 30% 94%);
+  --sidebar-primary-foreground: hsl(220 12% 8%);
+  --sidebar-accent: hsl(77 14% 23%);
+  --sidebar-accent-foreground: hsl(40 30% 94%);
+  --sidebar-border: hsl(220 6% 22%);
+  --sidebar-ring: hsl(76 30% 70%);
+}
+
+.application-surface :where(button, a, input, textarea, select):focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+.application-surface :where(code, kbd, pre, [data-font="mono"]) {
+  font-family: var(--font-ibm-plex-mono), monospace;
+}
+
+/* Product-app motion is optional; the editorial Portfolio keeps its own CSS. */
+@media (prefers-reduced-motion: reduce) {
+  .application-surface,
+  .application-surface * {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

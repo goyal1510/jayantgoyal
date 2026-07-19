@@ -65,7 +65,7 @@ export function resolveAuthSessionMode(
   value = process.env.NEXT_PUBLIC_AUTH_SESSION_MODE,
 ): AuthSessionMode {
   if (value === "compatibility" || value === "platform") return value;
-  return "legacy";
+  return value === "legacy" ? "legacy" : "platform";
 }
 
 export function legacyCookieNameForSupabaseUrl(supabaseUrl: string): string {

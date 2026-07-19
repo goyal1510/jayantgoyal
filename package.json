@@ -3,6 +3,9 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
+    "check:architecture": "node scripts/check-architecture-boundaries.mjs",
+    "check:brand-assets": "node scripts/check-brand-assets.mjs",
+    "check:service-role": "node scripts/check-service-role-boundaries.mjs",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "check-types": "turbo run check-types",

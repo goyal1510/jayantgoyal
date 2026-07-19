@@ -8,7 +8,7 @@ import type {
 } from "react";
 import { Fragment } from "react";
 import Link from "next/link";
-import { Home } from "lucide-react";
+import { ChevronRight, Home } from "lucide-react";
 
 import {
   Breadcrumb,
@@ -30,10 +30,20 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
   SidebarRail,
+  SidebarInset,
+  SidebarProvider,
   SidebarTrigger,
   useSidebar,
 } from "./sidebar";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "./collapsible";
 import { cn } from "../lib/utils";
 
 export interface ApplicationBrand {
@@ -45,12 +55,14 @@ export interface ApplicationBrand {
 export interface ApplicationNavigationItem {
   id: string;
   label: string;
-  href: string;
+  href?: string;
   icon: ElementType<{ className?: string }>;
   iconClassName?: string;
   isActive?: boolean;
   external?: boolean;
   onSelect?: MouseEventHandler<HTMLAnchorElement>;
+  children?: ApplicationNavigationItem[];
+  defaultOpen?: boolean;
 }
 
 export interface ApplicationNavigationSection {
@@ -107,6 +119,37 @@ export interface ApplicationSidebarFrameProps
   footer?: ReactNode;
 }
 
+export interface ApplicationShellProps
+  extends Omit<ComponentProps<typeof SidebarProvider>, "children"> {
+  sidebar: ReactNode;
+  header?: ReactNode;
+  children: ReactNode;
+  insetClassName?: string;
+  contentClassName?: string;
+}
+
+/** Shared product-app frame; navigation and permissions remain app-owned. */
+export function ApplicationShell({
+  sidebar,
+  header,
+  children,
+  insetClassName,
+  contentClassName,
+  ...providerProps
+}: ApplicationShellProps) {
+  return (
+    <SidebarProvider {...providerProps}>
+      {sidebar}
+      <SidebarInset className={insetClassName}>
+        {header}
+        <div className={cn("flex min-w-0 flex-1 flex-col", contentClassName)}>
+          {children}
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}
+
 export function ApplicationSidebarFrame({
   brand,
   children,
@@ -151,54 +194,123 @@ export function ApplicationSidebarMenu({
 }: {
   items: ApplicationNavigationItem[];
 }) {
+  return <ApplicationNavigationTree items={items} />;
+}
+
+function closeNestedMobileSidebar(
+  isMobile: boolean,
+  setOpenMobile: (open: boolean) => void,
+) {
+  if (isMobile) setOpenMobile(false);
+}
+
+function ApplicationNavigationNode({
+  item,
+  nested = false,
+}: {
+  item: ApplicationNavigationItem;
+  nested?: boolean;
+}) {
   const { isMobile, setOpenMobile } = useSidebar();
+  const hasChildren = Boolean(item.children?.length);
 
-  return (
-    <SidebarMenu>
-      {items.map((item) => {
-        const content = (
-          <>
-            <item.icon className={item.iconClassName} />
-            <span>{item.label}</span>
-          </>
-        );
-        const handleSelect: MouseEventHandler<HTMLAnchorElement> = (event) => {
-          item.onSelect?.(event);
-          closeMobileSidebar(isMobile, setOpenMobile);
-        };
-
-        return (
-          <SidebarMenuItem key={item.id}>
+  if (hasChildren) {
+    const childIsActive = item.children?.some((child) => child.isActive) ?? false;
+    return (
+      <Collapsible
+        asChild
+        defaultOpen={item.defaultOpen || childIsActive}
+        className="group/collapsible"
+      >
+        <SidebarMenuItem>
+          <CollapsibleTrigger asChild>
             <SidebarMenuButton
-              asChild
               isActive={item.isActive}
               tooltip={item.label}
+              className={nested ? "text-sm" : undefined}
             >
-              {item.external ? (
-                <a href={item.href} onClick={handleSelect}>
-                  {content}
-                </a>
-              ) : (
-                <Link href={item.href} onClick={handleSelect}>
-                  {content}
-                </Link>
-              )}
+              <item.icon className={item.iconClassName} />
+              <span>{item.label}</span>
+              <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
             </SidebarMenuButton>
-          </SidebarMenuItem>
-        );
-      })}
-    </SidebarMenu>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <SidebarMenuSub>
+              {item.children?.map((child) => (
+                <ApplicationNavigationNode key={child.id} item={child} nested />
+              ))}
+            </SidebarMenuSub>
+          </CollapsibleContent>
+        </SidebarMenuItem>
+      </Collapsible>
+    );
+  }
+
+  const content = (
+    <>
+      <item.icon className={item.iconClassName} />
+      <span>{item.label}</span>
+    </>
   );
+  const handleSelect: MouseEventHandler<HTMLAnchorElement> = (event) => {
+    item.onSelect?.(event);
+    closeNestedMobileSidebar(isMobile, setOpenMobile);
+  };
+
+  if (nested) {
+    return (
+      <SidebarMenuSubItem>
+        <SidebarMenuSubButton asChild isActive={item.isActive}>
+          {item.external ? (
+            <a href={item.href} onClick={handleSelect}>
+              {content}
+            </a>
+          ) : (
+            <Link href={item.href ?? "#"} onClick={handleSelect}>
+              {content}
+            </Link>
+          )}
+        </SidebarMenuSubButton>
+      </SidebarMenuSubItem>
+    );
+  }
+
+  return (
+    <SidebarMenuItem>
+      <SidebarMenuButton asChild isActive={item.isActive} tooltip={item.label}>
+        {item.external ? (
+          <a href={item.href} onClick={handleSelect}>
+            {content}
+          </a>
+        ) : (
+          <Link href={item.href ?? "#"} onClick={handleSelect}>
+            {content}
+          </Link>
+        )}
+      </SidebarMenuButton>
+    </SidebarMenuItem>
+  );
+}
+
+/** Recursive navigation presentation for flat and nested app-owned trees. */
+export function ApplicationNavigationTree({
+  items,
+}: {
+  items: ApplicationNavigationItem[];
+}) {
+  return <SidebarMenu>{items.map((item) => <ApplicationNavigationNode key={item.id} item={item} />)}</SidebarMenu>;
 }
 
 export function ApplicationHeader({
   breadcrumb,
   actions,
   className,
+  sidebarControl,
 }: {
   breadcrumb: ReactNode;
   actions?: ReactNode;
   className?: string;
+  sidebarControl?: ReactNode;
 }) {
   return (
     <header
@@ -208,8 +320,12 @@ export function ApplicationHeader({
       )}
     >
       <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
-        <SidebarTrigger className="-ml-1 shrink-0" />
-        <Separator orientation="vertical" className="mr-2 h-4 shrink-0" />
+        {sidebarControl ?? (
+          <>
+            <SidebarTrigger className="-ml-1 shrink-0" />
+            <Separator orientation="vertical" className="mr-2 h-4 shrink-0" />
+          </>
+        )}
         <div className="min-w-0 flex-1 overflow-hidden">{breadcrumb}</div>
       </div>
       {actions != null && (

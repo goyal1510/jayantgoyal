@@ -305,9 +305,26 @@ function SidebarTrigger({
   )
 }
 
-function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
+function SidebarRail({
+  className,
+  onKeyDown,
+  ...props
+}: React.ComponentProps<"button">) {
   const { toggleSidebar, state, setSidebarWidth, setIsResizing, isMobile } = useSidebar()
   const isCollapsed = state === "collapsed"
+
+  const handleKeyDown = React.useCallback(
+    (event: React.KeyboardEvent<HTMLButtonElement>) => {
+      onKeyDown?.(event)
+      if (event.defaultPrevented) return
+
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault()
+        toggleSidebar()
+      }
+    },
+    [onKeyDown, toggleSidebar]
+  )
 
   const handleMouseDown = React.useCallback(
     (e: React.MouseEvent) => {
@@ -392,13 +409,14 @@ function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
       data-sidebar="rail"
       data-slot="sidebar-rail"
       aria-label="Toggle Sidebar"
-      tabIndex={-1}
+      tabIndex={0}
       onMouseDown={handleMouseDown}
       onDoubleClick={handleDoubleClick}
       onClick={isCollapsed ? toggleSidebar : undefined}
+      onKeyDown={handleKeyDown}
       title="Toggle Sidebar"
       className={cn(
-        "hover:after:bg-sidebar-border absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] sm:flex",
+        "hover:after:bg-sidebar-border focus-visible:ring-sidebar-ring absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] sm:flex",
         isCollapsed ? "cursor-pointer" : "cursor-col-resize",
         "hover:group-data-[collapsible=offcanvas]:bg-sidebar group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full",
         "[[data-side=left][data-collapsible=offcanvas]_&]:-right-2",

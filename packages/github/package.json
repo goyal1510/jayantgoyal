@@ -1,27 +1,17 @@
 {
-  "name": "@repo/auth",
+  "name": "@repo/github",
   "version": "0.0.0",
   "type": "module",
   "private": true,
   "exports": {
-    "./browser": "./src/browser.ts",
-    "./cookies": "./src/cookies.ts",
-    "./entry": "./src/entry.ts",
-    "./logout": "./src/logout.ts",
-    "./password": "./src/password.ts",
-    "./redirects": "./src/redirects.ts",
-    "./server": "./src/server.ts",
-    "./service-role": "./src/service-role.ts",
-    "./surface": "./src/surface.ts"
+    ".": "./src/index.ts",
+    "./proxy": "./src/proxy.ts",
+    "./server": "./src/server.ts"
   },
   "scripts": {
     "build": "echo 'source package — nothing to compile'",
     "check-types": "tsc --noEmit",
     "lint": "eslint src --max-warnings 0"
-  },
-  "dependencies": {
-    "@supabase/ssr": "^0.12.3",
-    "@supabase/supabase-js": "^2.110.7"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

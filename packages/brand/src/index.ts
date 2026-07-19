@@ -1,3 +1,5 @@
+export * from "./assets";
+
 export const PERSON_BRAND = {
   givenName: "Jayant",
   familyName: "Goyal",

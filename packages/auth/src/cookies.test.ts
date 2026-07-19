@@ -15,12 +15,16 @@ import {
 } from "./cookies";
 
 describe("auth session mode", () => {
-  it.each([undefined, "", "invalid", "legacy"])(
-    "defaults %s to the rollback-safe legacy mode",
+  it.each([undefined, "", "invalid"])(
+    "defaults %s to the shared platform cookie mode",
     (value) => {
-      expect(resolveAuthSessionMode(value)).toBe("legacy");
+      expect(resolveAuthSessionMode(value)).toBe("platform");
     },
   );
+
+  it("keeps legacy mode available only as an explicit rollback", () => {
+    expect(resolveAuthSessionMode("legacy")).toBe("legacy");
+  });
 
   it.each(["compatibility", "platform"] as const)(
     "accepts %s mode",

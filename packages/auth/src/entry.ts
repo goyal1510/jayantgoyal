@@ -1,5 +1,6 @@
 import { safeReturnPath } from "./redirects";
 import { resolveLocalDevelopmentCookieDomain } from "./cookies";
+import { authSurfacePath } from "./surface";
 
 export const CANONICAL_AUTH_ORIGIN = "https://auth.jayantgoyal.com";
 
@@ -51,7 +52,7 @@ export function resolveExternalRequestUrl({
 export function resolveAuthFlowOwner(
   value = process.env.NEXT_PUBLIC_AUTH_FLOW_OWNER,
 ): AuthFlowOwner {
-  return value === "auth" ? "auth" : "legacy";
+  return value === "legacy" ? "legacy" : "auth";
 }
 
 export function resolveAuthApplicationOrigin(
@@ -98,6 +99,29 @@ export function resolveAuthApplicationOrigin(
   return CANONICAL_AUTH_ORIGIN;
 }
 
+function authOriginForRequest(
+  request: URL,
+  configuredOrigin?: string | null,
+): string {
+  if (configuredOrigin || process.env.NEXT_PUBLIC_AUTH_URL) {
+    return resolveAuthApplicationOrigin(configuredOrigin);
+  }
+
+  if (request.hostname === "localhost" || request.hostname === "127.0.0.1") {
+    return resolveAuthApplicationOrigin("http://localhost:3003");
+  }
+
+  if (request.hostname.endsWith(".localhost")) {
+    const domain = request.hostname.split(".").slice(1).join(".");
+    return resolveAuthApplicationOrigin(
+      `http://auth.${domain}:3003`,
+      domain,
+    );
+  }
+
+  return resolveAuthApplicationOrigin(configuredOrigin);
+}
+
 export function buildAuthLoginUrl({
   requestUrl,
   requestHeaders,
@@ -111,8 +135,8 @@ export function buildAuthLoginUrl({
 }): URL {
   const request = resolveExternalRequestUrl({ requestUrl, requestHeaders });
   const loginUrl = new URL(
-    "/login",
-    `${resolveAuthApplicationOrigin(authOrigin)}/`,
+    authSurfacePath("login"),
+    `${authOriginForRequest(request, authOrigin)}/`,
   );
   const targetPath = safeReturnPath(returnPath, "/");
   const returnTarget = new URL(targetPath, `${request.origin}/`);
@@ -131,8 +155,10 @@ function buildAuthOwnedUrl({
 }): URL {
   const request = new URL(requestUrl);
   const destination = new URL(
-    pathname,
-    `${resolveAuthApplicationOrigin(authOrigin)}/`,
+    pathname === "/account/security"
+      ? authSurfacePath("account-security")
+      : authSurfacePath("logout"),
+    `${authOriginForRequest(request, authOrigin)}/`,
   );
   destination.searchParams.set("return_to", request.toString());
   return destination;

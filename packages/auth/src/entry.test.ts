@@ -19,10 +19,11 @@ afterAll(() => {
 });
 
 describe("canonical Auth entry ownership", () => {
-  it("keeps the current application as the default and rollback owner", () => {
+  it("uses the standalone Auth app as the default owner while retaining an explicit rollback", () => {
     vi.stubEnv("NEXT_PUBLIC_AUTH_FLOW_OWNER", "");
-    expect(resolveAuthFlowOwner()).toBe("legacy");
-    expect(resolveAuthFlowOwner("unknown")).toBe("legacy");
+    expect(resolveAuthFlowOwner()).toBe("auth");
+    expect(resolveAuthFlowOwner("unknown")).toBe("auth");
+    expect(resolveAuthFlowOwner("legacy")).toBe("legacy");
   });
 
   it("enables Auth only through the exact rollout value", () => {
@@ -88,6 +89,19 @@ describe("canonical Auth entry ownership", () => {
     expect(login.pathname).toBe("/login");
     expect(login.searchParams.get("return_to")).toBe(
       "https://studio.jayantgoyal.com/files?folder=one",
+    );
+  });
+
+  it("uses the local Auth app when a local product has no explicit Auth URL", () => {
+    vi.stubEnv("NEXT_PUBLIC_AUTH_URL", "");
+    const login = buildAuthLoginUrl({
+      requestUrl: "http://localhost:3002/welcome",
+      returnPath: "/portfolio",
+    });
+
+    expect(login.origin).toBe("http://localhost:3003");
+    expect(login.searchParams.get("return_to")).toBe(
+      "http://localhost:3002/portfolio",
     );
   });
 
