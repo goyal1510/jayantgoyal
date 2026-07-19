@@ -362,7 +362,8 @@ Platform
       compatibility routes are tracked in the Auth cleanup gate below.
 - [x] Add Admin command search for destinations and Portfolio workspaces.
 - [x] Make sidebar collapse behavior match Studio.
-- [ ] Validate mobile hamburger/off-canvas behavior.
+- [x] Validate mobile hamburger/off-canvas behavior through the shared frame;
+      Studio's in-app browser check covers the exact frame consumed by Admin.
 - [x] Preserve role-based route and navigation filtering.
 
 ### Gate
@@ -576,20 +577,20 @@ product identity or feature interfaces.
 - [x] Migrate Studio command-palette presentation while retaining Studio search
       data.
 - [x] Replace `StudioWorkspaceHeader` imports with the shared header.
-- [ ] Migrate one low-risk screen first, then feature groups incrementally.
-- [ ] Preserve nested app navigation and active-route behavior.
-- [ ] Preserve Terms utility behavior.
-- [ ] Preserve public/auth route boundaries.
-- [ ] Remove superseded local shell components only after import searches show
+- [x] Migrate one low-risk screen first, then feature groups incrementally.
+- [x] Preserve nested app navigation and active-route behavior.
+- [x] Preserve Terms utility behavior.
+- [x] Preserve public/auth route boundaries.
+- [x] Remove superseded local shell components only after import searches show
       zero consumers.
 
 ### Gate
 
 - [ ] Studio reference states match before/after in desktop/mobile and
       light/dark modes.
-- [ ] Tools, games, Files, Messenger, Activity, Calculator, Weather, and GitHub
+- [x] Tools, games, Files, Messenger, Activity, Calculator, Weather, and GitHub
       Stats remain reachable.
-- [ ] No Studio feature CSS was moved into the shared application stylesheet.
+- [x] No Studio feature CSS was moved into the shared application stylesheet.
 
 ---
 

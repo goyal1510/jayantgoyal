@@ -131,7 +131,7 @@ export function ApplicationSidebarCollapseButton() {
   );
 }
 
-/** Desktop-only affordance that turns the collapsed brand into an expand control. */
+/** Desktop-only control that turns the collapsed brand into an expand control. */
 export function ApplicationSidebarExpandButton() {
   const { isMobile, state, toggleSidebar } = useSidebar();
 
@@ -140,7 +140,7 @@ export function ApplicationSidebarExpandButton() {
   return (
     <button
       type="button"
-      className="pointer-events-none absolute inset-0 z-10 m-0 inline-flex size-8 items-center justify-center rounded-lg border-0 bg-sidebar-primary p-0 text-sidebar-primary-foreground opacity-0 outline-none transition-opacity group-hover/application-brand:pointer-events-auto group-hover/application-brand:opacity-100 focus-visible:pointer-events-auto focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+      className="absolute inset-0 z-10 m-0 inline-flex size-8 items-center justify-center rounded-lg border-0 bg-sidebar-primary p-0 text-sidebar-primary-foreground outline-none transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring"
       onClick={toggleSidebar}
       aria-label="Expand sidebar"
       title="Expand sidebar"

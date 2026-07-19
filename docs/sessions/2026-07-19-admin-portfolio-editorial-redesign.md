@@ -271,6 +271,21 @@
 - Preserved the caller-provided Studio `collapsible` mode while moving the
   frame ownership into the shared component; the focused lint pass caught this
   forwarding omission before validation continued.
+- Browser validation showed that a hover-only collapsed-brand overlay made the
+  expand affordance unreliable for keyboard and automated interaction. The
+  shared collapsed control is now always visible and pointer-active, so the
+  collapsed icon is unambiguously the expand button in both Studio and Admin.
+- The responsive browser pass also exposed a hydration mismatch caused by the
+  sidebar reading `window.innerWidth` directly during render in addition to the
+  hydration-safe `useIsMobile` snapshot. Removed that second render-time branch;
+  mobile mode now comes from the subscribed hook after hydration, while the
+  click handler still reads the live media query for immediate toggles.
+- Re-ran the in-app browser audit after the responsive fix: desktop collapse,
+  always-visible collapsed-brand expand, and restore all work; mobile exposes
+  only the outside Toggle Sidebar control, opens the Studio navigation sheet,
+  and preserves Discover/Terms content. Browser console errors were empty at
+  both viewport sizes; the credential-free `/api/account/init` 500 remains the
+  expected local environment warning.
 - Tightened `pnpm check:service-role` so client modules are also rejected when
   they import the shared `@repo/auth/service-role` entry directly. This keeps
   the new central factory server-only by policy, not only by convention.
