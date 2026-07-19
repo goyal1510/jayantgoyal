@@ -525,10 +525,10 @@ independent forms.
 
 ### Interaction checklist
 
-- [ ] Use inline singleton forms for Home, About, and Contact.
-- [ ] Use consistent collection rows for timelines, projects, skills,
+- [x] Use inline singleton forms for Home, About, and Contact.
+- [x] Use consistent collection rows for timelines, projects, skills,
       credentials, and Blog posts.
-- [ ] Use dialogs/sheets only where focused create/edit work benefits from them.
+- [x] Use dialogs/sheets only where focused create/edit work benefits from them.
 - [x] Add unsaved-change protection for long forms.
 - [x] Add clear saving, saved, error, and retry states.
 - [x] Replace remaining `window.confirm` usage in migrated Admin screens.
@@ -559,7 +559,8 @@ independent forms.
 - [x] The complete Portfolio can be operated without visiting a generic table
       or detached Section Copy/Navigation screen.
 - [x] No visible count or status is fabricated.
-- [ ] Editing remains usable on mobile, tablet, and desktop.
+- [x] Editing remains usable on mobile, tablet, and desktop; Admin Home was
+      checked at 390px, 768px, and desktop widths without horizontal overflow.
 
 ---
 
@@ -693,7 +694,7 @@ packages/github/
       calls them.
 - [ ] Remove duplicated account-delete endpoints after an Auth-owned deletion
       operation is approved and verified.
-- [ ] Keep application authorization policy and proxies local.
+- [x] Keep application authorization policy and proxies local.
 
 ### Portfolio cleanup checklist
 
@@ -704,7 +705,7 @@ packages/github/
 - [x] Remove unused `next-themes`, `sonner`, and `simple-icons` dependencies.
 - [ ] Consider the shared Lazy Motion runtime only if bundle measurement
       justifies it and visual regression testing passes.
-- [ ] Do not import product-app theme CSS, shell components, cards, dialogs, or
+- [x] Do not import product-app theme CSS, shell components, cards, dialogs, or
       navigation into Portfolio.
 
 ### Gate
