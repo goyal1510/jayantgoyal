@@ -1,33 +1,26 @@
+import {
+  PORTFOLIO_BLOG_DETAIL_SELECT_COLUMNS,
+  PORTFOLIO_BLOG_SELECT_COLUMNS,
+  type PortfolioBlogDetailRecord,
+  type PortfolioBlogListRecord,
+} from "@repo/portfolio-data";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-export interface BlogPost {
-  id: string;
-  title: string;
-  slug: string;
-  excerpt: string | null;
-  content: string;
-  cover_image: string | null;
-  tags: string[];
-  published_at: string | null;
-  created_at: string;
-  updated_at: string;
-}
+export type BlogPost = PortfolioBlogDetailRecord;
+export type BlogListPost = PortfolioBlogListRecord;
 
-const BLOG_LIST_COLUMNS =
-  "id, title, slug, excerpt, cover_image, tags, published_at, created_at, updated_at";
-
-export async function getPublishedBlogPosts(): Promise<BlogPost[]> {
+export async function getPublishedBlogPosts(): Promise<BlogListPost[]> {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
     .schema("jg_app")
     .from("blog_posts")
-    .select(BLOG_LIST_COLUMNS)
+    .select(PORTFOLIO_BLOG_SELECT_COLUMNS)
     .eq("is_published", true)
     .eq("is_visible", true)
     .order("published_at", { ascending: false });
 
   if (error) throw new Error(`Unable to load Blog posts: ${error.message}`);
-  return (data ?? []) as BlogPost[];
+  return (data ?? []) as BlogListPost[];
 }
 
 export async function getBlogPostBySlug(
@@ -37,7 +30,7 @@ export async function getBlogPostBySlug(
   const { data, error } = await supabase
     .schema("jg_app")
     .from("blog_posts")
-    .select("*")
+    .select(PORTFOLIO_BLOG_DETAIL_SELECT_COLUMNS)
     .eq("slug", slug)
     .eq("is_published", true)
     .eq("is_visible", true)

@@ -1,8 +1,6 @@
 "use client";
 
-import Link from "next/link";
-
-import { Button } from "@repo/ui/button";
+import { EditorialButton } from "@/components/editorial/editorial-button";
 
 export default function ErrorPage({ reset }: { reset: () => void }) {
   return (
@@ -16,12 +14,10 @@ export default function ErrorPage({ reset }: { reset: () => void }) {
         remains available.
       </p>
       <div className="mt-7 flex flex-wrap justify-center gap-3">
-        <Button type="button" onClick={reset}>
+        <EditorialButton onClick={reset}>
           Try again
-        </Button>
-        <Button asChild variant="outline">
-          <Link href="/">Return to Portfolio</Link>
-        </Button>
+        </EditorialButton>
+        <EditorialButton href="/">Return to Portfolio</EditorialButton>
       </div>
     </div>
   );

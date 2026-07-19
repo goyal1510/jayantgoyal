@@ -16,9 +16,12 @@ import type {
   PortfolioNavigationItem,
   PortfolioSectionContent,
 } from "@/lib/portfolio/editorial-data";
-import type { BlogPost } from "@/lib/blog/queries";
+import type { BlogListPost, BlogPost } from "@/lib/blog/queries";
 
-type NextPost = Pick<BlogPost, "title" | "slug" | "excerpt" | "published_at">;
+type NextPost = Pick<
+  BlogListPost,
+  "title" | "slug" | "excerpt" | "published_at"
+>;
 
 type ArticleSection = {
   id: string;

@@ -93,7 +93,7 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@repo/platform", "@repo/seo", "@repo/ui"],
+  transpilePackages: ["@repo/platform", "@repo/seo"],
   images: {
     qualities: [75, 92],
     remotePatterns: [

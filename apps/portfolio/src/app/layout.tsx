@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { DM_Sans, Instrument_Serif } from "next/font/google";
 import Script from "next/script";
+import { BRAND_ASSET_PATHS } from "@repo/brand";
 
 import { getPortfolioShellData } from "@/lib/portfolio/editorial-server";
 import {
@@ -79,19 +80,19 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     icons: {
       icon: [
-        { url: "/assets/Jayant_favicon_io/favicon.ico" },
+        { url: BRAND_ASSET_PATHS.favicon },
         {
-          url: "/assets/Jayant_favicon_io/favicon-32x32.png",
+          url: BRAND_ASSET_PATHS.favicon32,
           sizes: "32x32",
           type: "image/png",
         },
         {
-          url: "/assets/Jayant_favicon_io/favicon-16x16.png",
+          url: BRAND_ASSET_PATHS.favicon16,
           sizes: "16x16",
           type: "image/png",
         },
       ],
-      apple: "/assets/Jayant_favicon_io/apple-touch-icon.png",
+      apple: BRAND_ASSET_PATHS.appleTouchIcon,
     },
   };
 }

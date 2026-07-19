@@ -1,6 +1,4 @@
-import Link from "next/link";
-
-import { Button } from "@repo/ui/button";
+import { EditorialButton } from "@/components/editorial/editorial-button";
 
 export default function NotFound() {
   return (
@@ -14,12 +12,8 @@ export default function NotFound() {
         platform restructure.
       </p>
       <div className="mt-7 flex flex-wrap justify-center gap-3">
-        <Button asChild>
-          <Link href="/">Return to Portfolio</Link>
-        </Button>
-        <Button asChild variant="outline">
-          <Link href="/blog">Read the blog</Link>
-        </Button>
+        <EditorialButton href="/">Return to Portfolio</EditorialButton>
+        <EditorialButton href="/blog">Read the blog</EditorialButton>
       </div>
     </div>
   );

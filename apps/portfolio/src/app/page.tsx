@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
+import { githubServerClient } from "@repo/github/server";
 
 import { PortfolioExperience } from "@/components/editorial/portfolio-experience";
 import { getPublishedBlogPreviews } from "@/lib/blog/editorial-queries";
-import { getGitHubCodeStats } from "@/lib/github/server";
 import { getEditorialPortfolioData } from "@/lib/portfolio/editorial-server";
 import { DEFAULT_OG_IMAGE } from "@/lib/seo/config";
 
@@ -42,9 +42,19 @@ export default async function PortfolioPage() {
     getEditorialPortfolioData(),
     getPublishedBlogPreviews(),
   ]);
-  const githubStats = portfolio.sectionContent.activity.isVisible
-    ? await getGitHubCodeStats(portfolio.profile.githubUsername)
-    : null;
+  let githubStats = null;
+  if (portfolio.sectionContent.activity.isVisible) {
+    try {
+      githubStats = await githubServerClient.getCodeStats(
+        portfolio.profile.githubUsername,
+      );
+    } catch (error) {
+      console.error(
+        "Unable to load Portfolio GitHub code statistics",
+        error instanceof Error ? error.message : "Unknown error",
+      );
+    }
+  }
 
   return (
     <PortfolioExperience

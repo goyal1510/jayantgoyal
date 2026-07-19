@@ -1,14 +1,32 @@
 import { cache } from "react";
 
+import {
+  isSkillProficiency,
+  readPersonalInfo,
+  readPrinciples,
+  readSocialLinks,
+  readStringArray,
+  PORTFOLIO_SELECT_COLUMNS,
+  PORTFOLIO_SECTION_KEYS,
+  type PortfolioAboutPublicRow,
+  type PortfolioCertificatePublicRow,
+  type PortfolioContactPublicRow,
+  type PortfolioEducationPublicRow,
+  type PortfolioExperiencePublicRow,
+  type PortfolioHeroPublicRow,
+  type PortfolioNavigationPublicRow,
+  type PortfolioProjectPublicRow,
+  type PortfolioSectionContentPublicRow,
+  type PortfolioSkillCategoryPublicRow,
+  type PortfolioSkillPublicRow,
+} from "@repo/portfolio-data";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 import {
-  PORTFOLIO_SECTION_KEYS,
   type PortfolioAbout,
   type PortfolioCredential,
   type PortfolioEditorialData,
   type PortfolioNavigationItem,
-  type PortfolioPrinciple,
   type PortfolioProfile,
   type PortfolioProject,
   type PortfolioSectionContentMap,
@@ -17,179 +35,32 @@ import {
   type SkillProficiency,
 } from "./editorial-data";
 
-type HeroRow = {
-  name: string;
-  display_name: string;
-  role: string;
-  tagline: string;
-  blurb: string;
-  headline: string;
-  current_title: string;
-  availability: string;
-  resume_url: string;
-  github_username: string;
-  seo_title: string;
-  seo_description: string;
-};
+type HeroRow = PortfolioHeroPublicRow;
+type AboutRow = PortfolioAboutPublicRow;
+type EducationRow = PortfolioEducationPublicRow;
+type ExperienceRow = PortfolioExperiencePublicRow;
+type SkillCategoryRow = PortfolioSkillCategoryPublicRow;
+type SkillRow = PortfolioSkillPublicRow;
+type ProjectRow = PortfolioProjectPublicRow;
+type CertificateRow = PortfolioCertificatePublicRow;
+type ContactRow = PortfolioContactPublicRow;
+type NavigationRow = PortfolioNavigationPublicRow;
+type SectionContentRow = PortfolioSectionContentPublicRow;
 
-type AboutRow = {
-  headline: string;
-  objective: string;
-  summary: string;
-  story: unknown;
-  personal: unknown;
-  principles: unknown;
-};
-
-type EducationRow = {
-  school: string;
-  degree: string;
-  period: string;
-  location: string | null;
-  detail: string | null;
-};
-
-type ExperienceRow = {
-  company: string;
-  role: string;
-  period: string;
-  location: string | null;
-  summary: string | null;
-  bullets: unknown;
-};
-
-type SkillCategoryRow = {
-  id: string;
-  title: string;
-  description: string;
-};
-
-type SkillRow = {
-  category_id: string;
-  name: string;
-  proficiency: string;
-  evidence: string;
-};
-
-type ProjectRow = {
-  name: string;
-  slug: string;
-  eyebrow: string;
-  short_description: string;
-  impact: string;
-  contribution: string;
-  year_label: string;
-  image_url: string;
-  image_alt: string;
-  tags: unknown;
-  github_link: string | null;
-  live_link: string | null;
-};
-
-type CertificateRow = {
-  name: string;
-  description: string | null;
-  category: string;
-  issuer: string;
-  issued_at: string | null;
-  credential_id: string | null;
-  credential_url: string | null;
-  document_url: string;
-  preview_url: string;
-  image_alt: string;
-};
-
-type SocialLinkRow = {
-  label?: unknown;
-  href?: unknown;
-  icon_key?: unknown;
-};
-
-type ContactRow = {
-  email: string;
-  phone: string;
-  location: string;
-  socials: unknown;
-};
-
-type NavigationRow = {
-  section_id: string;
-  label: string;
-  note: string | null;
-};
-
-type SectionContentRow = {
-  section_key: string;
-  eyebrow: string;
-  headline: string | null;
-  accent: string | null;
-  description: string | null;
-  supporting_text: string | null;
-  is_visible: boolean;
-};
-
-function strings(value: unknown): string[] {
-  return Array.isArray(value)
-    ? value.filter((item): item is string => typeof item === "string")
-    : [];
-}
-
-function personalFacts(
-  value: unknown,
-): Array<{ label: string; value: string }> {
-  if (!Array.isArray(value)) return [];
-
-  return value.flatMap((item) => {
-    if (!item || typeof item !== "object") return [];
-    const label = "label" in item ? item.label : null;
-    const factValue = "value" in item ? item.value : null;
-    if (typeof label !== "string" || typeof factValue !== "string") return [];
-    return [{ label, value: factValue }];
-  });
-}
-
-function mapPrinciples(value: unknown): PortfolioPrinciple[] {
-  if (!Array.isArray(value)) return [];
-
-  return value.flatMap((item) => {
-    if (!item || typeof item !== "object") return [];
-    const title = "title" in item ? item.title : null;
-    const copy = "copy" in item ? item.copy : null;
-    return typeof title === "string" && typeof copy === "string"
-      ? [{ title, copy }]
-      : [];
-  });
+function castData<T>(value: unknown): T {
+  return value as T;
 }
 
 function mapSocials(value: unknown): PortfolioSocialLink[] {
-  if (!Array.isArray(value)) return [];
-
-  return value.flatMap((item) => {
-    if (!item || typeof item !== "object") return [];
-    const row = item as SocialLinkRow;
-    if (typeof row.label !== "string" || typeof row.href !== "string") {
-      return [];
-    }
-
-    return [
-      {
-        label: row.label,
-        href: row.href,
-        iconKey: typeof row.icon_key === "string" ? row.icon_key : "Globe",
-      },
-    ];
-  });
+  return readSocialLinks(value).map((row) => ({
+    label: row.label,
+    href: row.href,
+    iconKey: row.icon_key,
+  }));
 }
 
 function mapProficiency(value: string): SkillProficiency {
-  if (
-    value === "core" ||
-    value === "strong" ||
-    value === "working" ||
-    value === "exploring"
-  ) {
-    return value;
-  }
+  if (isSkillProficiency(value)) return value;
 
   throw new Error(`Unsupported skill proficiency: ${value}`);
 }
@@ -209,7 +80,7 @@ function mapProject(row: ProjectRow, index: number): PortfolioProject {
     imageAlt: row.image_alt,
     href: row.live_link,
     github: row.github_link,
-    tags: strings(row.tags),
+    tags: readStringArray(row.tags),
     tone: tones[index % tones.length] ?? "paper",
   };
 }
@@ -262,8 +133,8 @@ function mapAbout(row: AboutRow): PortfolioAbout {
     headline: row.headline,
     objective: row.objective,
     lead: row.summary,
-    story: strings(row.story),
-    facts: personalFacts(row.personal),
+    story: readStringArray(row.story),
+    facts: readPersonalInfo(row.personal),
   };
 }
 
@@ -328,72 +199,64 @@ export const getEditorialPortfolioData = cache(
       supabase
         .schema("portfolio")
         .from("hero")
-        .select(
-          "name, display_name, role, tagline, blurb, headline, current_title, availability, resume_url, github_username, seo_title, seo_description",
-        )
+        .select(PORTFOLIO_SELECT_COLUMNS.hero)
         .maybeSingle(),
       supabase
         .schema("portfolio")
         .from("about")
-        .select("headline, objective, summary, story, personal, principles")
+        .select(PORTFOLIO_SELECT_COLUMNS.about)
         .maybeSingle(),
       supabase
         .schema("portfolio")
         .from("education")
-        .select("school, degree, period, location, detail")
+        .select(PORTFOLIO_SELECT_COLUMNS.education)
         .eq("is_visible", true)
         .order("sort_order"),
       supabase
         .schema("portfolio")
         .from("experience")
-        .select("company, role, period, location, summary, bullets")
+        .select(PORTFOLIO_SELECT_COLUMNS.experience)
         .eq("is_visible", true)
         .order("sort_order"),
       supabase
         .schema("portfolio")
         .from("skill_categories")
-        .select("id, title, description")
+        .select(PORTFOLIO_SELECT_COLUMNS.skill_categories)
         .eq("is_visible", true)
         .order("sort_order"),
       supabase
         .schema("portfolio")
         .from("skills")
-        .select("category_id, name, proficiency, evidence")
+        .select(PORTFOLIO_SELECT_COLUMNS.skills)
         .eq("is_visible", true)
         .order("sort_order"),
       supabase
         .schema("portfolio")
         .from("projects")
-        .select(
-          "name, slug, eyebrow, short_description, impact, contribution, year_label, image_url, image_alt, tags, github_link, live_link",
-        )
+        .select(PORTFOLIO_SELECT_COLUMNS.projects)
         .eq("is_visible", true)
         .order("sort_order"),
       supabase
         .schema("portfolio")
         .from("certificates")
-        .select(
-          "name, description, category, issuer, issued_at, credential_id, credential_url, document_url, preview_url, image_alt",
-        )
+        .select(PORTFOLIO_SELECT_COLUMNS.certificates)
         .eq("is_visible", true)
         .order("sort_order"),
       supabase
         .schema("portfolio")
         .from("contact")
-        .select("email, phone, location, socials")
+        .select(PORTFOLIO_SELECT_COLUMNS.contact)
         .maybeSingle(),
       supabase
         .schema("portfolio")
         .from("nav_items")
-        .select("section_id, label, note")
+        .select(PORTFOLIO_SELECT_COLUMNS.nav_items)
         .eq("is_visible", true)
         .order("sort_order"),
       supabase
         .schema("portfolio")
         .from("section_content")
-        .select(
-          "section_key, eyebrow, headline, accent, description, supporting_text, is_visible",
-        ),
+        .select(PORTFOLIO_SELECT_COLUMNS.section_content),
     ]);
 
     throwQueryErrors([
@@ -414,22 +277,22 @@ export const getEditorialPortfolioData = cache(
       throw new Error("Core Portfolio CMS records are missing");
     }
 
-    const hero = heroResult.data as HeroRow;
-    const about = aboutResult.data as AboutRow;
-    const contact = contactResult.data as ContactRow;
-    const categories = (categoriesResult.data ?? []) as SkillCategoryRow[];
-    const skills = (skillsResult.data ?? []) as SkillRow[];
+    const hero = castData<HeroRow>(heroResult.data);
+    const about = castData<AboutRow>(aboutResult.data);
+    const contact = castData<ContactRow>(contactResult.data);
+    const categories = castData<SkillCategoryRow[]>(categoriesResult.data ?? []);
+    const skills = castData<SkillRow[]>(skillsResult.data ?? []);
 
     return {
       profile: mapProfile(hero, contact),
       about: mapAbout(about),
       navigation: mapNavigation(
-        (navigationResult.data ?? []) as NavigationRow[],
+        castData<NavigationRow[]>(navigationResult.data ?? []),
       ),
       sectionContent: mapSectionContent(
-        (sectionContentResult.data ?? []) as SectionContentRow[],
+        castData<SectionContentRow[]>(sectionContentResult.data ?? []),
       ),
-      education: ((educationResult.data ?? []) as EducationRow[]).map(
+      education: castData<EducationRow[]>(educationResult.data ?? []).map(
         (row) => ({
           school: row.school,
           degree: row.degree,
@@ -438,14 +301,14 @@ export const getEditorialPortfolioData = cache(
           detail: row.detail ?? "",
         }),
       ),
-      experience: ((experienceResult.data ?? []) as ExperienceRow[]).map(
+      experience: castData<ExperienceRow[]>(experienceResult.data ?? []).map(
         (row) => ({
           company: row.company,
           role: row.role,
           period: row.period,
           location: row.location ?? "",
           summary: row.summary ?? "",
-          outcomes: strings(row.bullets),
+      outcomes: readStringArray(row.bullets),
         }),
       ),
       skillGroups: categories.map((category) => ({
@@ -459,11 +322,13 @@ export const getEditorialPortfolioData = cache(
             evidence: skill.evidence,
           })),
       })),
-      projects: ((projectsResult.data ?? []) as ProjectRow[]).map(mapProject),
-      credentials: ((certificatesResult.data ?? []) as CertificateRow[]).map(
+      projects: castData<ProjectRow[]>(projectsResult.data ?? []).map(mapProject),
+      credentials: castData<CertificateRow[]>(
+        certificatesResult.data ?? [],
+      ).map(
         mapCredential,
       ),
-      principles: mapPrinciples(about.principles),
+      principles: readPrinciples(about.principles),
     };
   },
 );
@@ -475,27 +340,23 @@ export const getPortfolioShellData = cache(async () => {
       supabase
         .schema("portfolio")
         .from("hero")
-        .select(
-          "name, display_name, role, tagline, blurb, headline, current_title, availability, resume_url, github_username, seo_title, seo_description",
-        )
+        .select(PORTFOLIO_SELECT_COLUMNS.hero)
         .maybeSingle(),
       supabase
         .schema("portfolio")
         .from("contact")
-        .select("email, phone, location, socials")
+        .select(PORTFOLIO_SELECT_COLUMNS.contact)
         .maybeSingle(),
       supabase
         .schema("portfolio")
         .from("nav_items")
-        .select("section_id, label, note")
+        .select(PORTFOLIO_SELECT_COLUMNS.nav_items)
         .eq("is_visible", true)
         .order("sort_order"),
       supabase
         .schema("portfolio")
         .from("section_content")
-        .select(
-          "section_key, eyebrow, headline, accent, description, supporting_text, is_visible",
-        ),
+        .select(PORTFOLIO_SELECT_COLUMNS.section_content),
     ]);
 
   throwQueryErrors([
@@ -510,16 +371,18 @@ export const getPortfolioShellData = cache(async () => {
   }
 
   const profile = mapProfile(
-    heroResult.data as HeroRow,
-    contactResult.data as ContactRow,
+    castData<HeroRow>(heroResult.data),
+    castData<ContactRow>(contactResult.data),
   );
 
   return {
     brandLabel: profile.displayName,
-    navigation: mapNavigation((navigationResult.data ?? []) as NavigationRow[]),
+    navigation: mapNavigation(
+      castData<NavigationRow[]>(navigationResult.data ?? []),
+    ),
     profile,
     sectionContent: mapSectionContent(
-      (sectionContentResult.data ?? []) as SectionContentRow[],
+      castData<SectionContentRow[]>(sectionContentResult.data ?? []),
     ),
   };
 });

@@ -45,7 +45,7 @@ import type {
   PortfolioSectionKey,
   PortfolioSocialLink,
 } from "@/lib/portfolio/editorial-data";
-import type { GitHubLOCStats } from "@/lib/github/types";
+import type { GitHubLOCStats } from "@repo/github";
 
 const reveal = {
   hidden: { opacity: 0, y: 28 },

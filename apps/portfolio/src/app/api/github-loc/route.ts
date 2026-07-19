@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  fetchGitHubUser,
-  fetchGitHubRepos,
-  fetchRepoLanguages,
-} from "@/lib/github-stats/api.server";
-import { computeLOCStats } from "@/lib/github-stats/compute";
-import type { GitHubLOCStats } from "@/lib/github-stats/types";
+import { githubServerClient } from "@repo/github/server";
+import type { GitHubLOCStats } from "@repo/github";
 
 interface ResponseCacheEntry {
   data: GitHubLOCStats;
@@ -14,7 +9,6 @@ interface ResponseCacheEntry {
 
 const RESPONSE_CACHE_TTL = 60 * 60 * 1000; // 1 hour
 const responseCache = new Map<string, ResponseCacheEntry>();
-const BATCH_SIZE = 10;
 
 export async function GET(request: NextRequest) {
   const username = request.nextUrl.searchParams.get("username");
@@ -37,32 +31,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const [user, repos] = await Promise.all([
-      fetchGitHubUser(username),
-      fetchGitHubRepos(username),
-    ]);
-
-    const activeRepos = repos.filter((r) => !r.fork && !r.archived);
-
-    // Batch language requests
-    const languagesByRepo: Record<string, number>[] = [];
-    for (let i = 0; i < activeRepos.length; i += BATCH_SIZE) {
-      const batch = activeRepos.slice(i, i + BATCH_SIZE);
-      const results = await Promise.allSettled(
-        batch.map((repo) => fetchRepoLanguages(username, repo.name)),
-      );
-      for (const result of results) {
-        if (result.status === "fulfilled") {
-          languagesByRepo.push(result.value);
-        }
-      }
-    }
-
-    const stats = computeLOCStats(
-      languagesByRepo,
-      activeRepos.length,
-      user.created_at,
-    );
+    const stats = await githubServerClient.getCodeStats(username);
 
     responseCache.set(cacheKey, { data: stats, timestamp: Date.now() });
 
