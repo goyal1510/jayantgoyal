@@ -553,3 +553,9 @@
 - Normalized the two plan metadata lines that carried trailing whitespace; the
   staged documentation now passes `git diff --check` with the implementation
   changes included.
+- Re-ran the complete automated release checks after the cleanup: 49 test files
+  and 251 tests pass; repository typecheck, lint, architecture, service-role,
+  brand-asset, diff, and all four Portfolio/Admin/Studio/Auth production builds
+  pass. The work was split into four reviewed commits and pushed directly to
+  `main` at `30c6d31468c63a4e89c37f4453f1ca3674e5783f`; no migration or
+  production CMS write was performed.
