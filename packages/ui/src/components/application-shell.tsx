@@ -155,6 +155,10 @@ export interface ApplicationSidebarFrameProps
   brand: ApplicationBrand;
   children: ReactNode;
   footer?: ReactNode;
+  headerClassName?: string;
+  contentClassName?: string;
+  footerClassName?: string;
+  footerSeparator?: boolean;
 }
 
 export interface ApplicationShellProps
@@ -192,12 +196,16 @@ export function ApplicationSidebarFrame({
   brand,
   children,
   footer,
+  headerClassName,
+  contentClassName,
+  footerClassName,
+  footerSeparator = true,
   collapsible = "icon",
   ...props
 }: ApplicationSidebarFrameProps) {
   return (
     <Sidebar collapsible={collapsible} {...props}>
-      <SidebarHeader className="p-2">
+      <SidebarHeader className={cn("p-2", headerClassName)}>
         <div className="flex items-center gap-1">
           <div className="group/application-brand relative min-w-0 flex-1">
             <ApplicationBrandHeader brand={brand} />
@@ -206,11 +214,11 @@ export function ApplicationSidebarFrame({
           <ApplicationSidebarCollapseButton />
         </div>
       </SidebarHeader>
-      <SidebarContent>{children}</SidebarContent>
+      <SidebarContent className={contentClassName}>{children}</SidebarContent>
       {footer != null && (
         <>
-          <Separator />
-          <SidebarFooter>{footer}</SidebarFooter>
+          {footerSeparator ? <Separator /> : null}
+          <SidebarFooter className={footerClassName}>{footer}</SidebarFooter>
         </>
       )}
       <SidebarRail />

@@ -6,21 +6,12 @@ import { usePathname } from "next/navigation";
 import { FileText, LayoutGrid } from "lucide-react";
 
 import { APP_BRANDS } from "@repo/brand";
-import {
-  ApplicationBrandHeader,
-  ApplicationSidebarCollapseButton,
-  ApplicationSidebarExpandButton,
-} from "@repo/ui/application-shell";
+import { ApplicationSidebarFrame } from "@repo/ui/application-shell";
 import { cn } from "@repo/ui/lib/utils";
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarRail,
 } from "@repo/ui/sidebar";
 
 import { useActiveApp } from "@/hooks/use-active-app";
@@ -57,7 +48,10 @@ function selectApps(apps: AppConfig[], ids: string[]) {
   });
 }
 
-type AppSidebarProps = Omit<React.ComponentProps<typeof Sidebar>, "children">;
+type AppSidebarProps = Omit<
+  React.ComponentProps<typeof ApplicationSidebarFrame>,
+  "brand" | "children" | "footer"
+>;
 
 export function AppSidebar({
   className,
@@ -92,7 +86,12 @@ export function AppSidebar({
   );
 
   return (
-    <Sidebar
+    <ApplicationSidebarFrame
+      brand={{
+        name: APP_BRANDS.studio.name,
+        href: "/",
+        icon: LayoutGrid,
+      }}
       collapsible={collapsible}
       className={cn(
         "border-sidebar-border/80",
@@ -102,24 +101,28 @@ export function AppSidebar({
         "[&_[data-sidebar=menu-button]]:rounded-lg",
         className,
       )}
+      contentClassName="gap-0"
+      footerClassName="border-t border-sidebar-border/80"
+      footerSeparator={false}
+      footer={
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <TermsDialog>
+              <SidebarMenuButton
+                type="button"
+                tooltip="Terms & Conditions"
+                className="w-full"
+              >
+                <FileText />
+                <span>Terms & Conditions</span>
+              </SidebarMenuButton>
+            </TermsDialog>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      }
       {...props}
     >
-      <SidebarHeader className="p-2">
-        <div className="flex items-center gap-1">
-          <div className="group/application-brand relative min-w-0 flex-1">
-            <ApplicationBrandHeader
-              brand={{
-                name: APP_BRANDS.studio.name,
-                href: "/",
-                icon: LayoutGrid,
-              }}
-            />
-            <ApplicationSidebarExpandButton />
-          </div>
-          <ApplicationSidebarCollapseButton />
-        </div>
-      </SidebarHeader>
-      <SidebarContent className="gap-0">
+      <>
         <NavApps
           apps={discoveryApps}
           activeAppId={activeAppId}
@@ -138,24 +141,7 @@ export function AppSidebar({
           activeNavId={activeNavId}
           label="Experiments"
         />
-      </SidebarContent>
-      <SidebarFooter className="border-t border-sidebar-border/80">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <TermsDialog>
-              <SidebarMenuButton
-                type="button"
-                tooltip="Terms & Conditions"
-                className="w-full"
-              >
-                <FileText />
-                <span>Terms & Conditions</span>
-              </SidebarMenuButton>
-            </TermsDialog>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
-      <SidebarRail />
-    </Sidebar>
+      </>
+    </ApplicationSidebarFrame>
   );
 }

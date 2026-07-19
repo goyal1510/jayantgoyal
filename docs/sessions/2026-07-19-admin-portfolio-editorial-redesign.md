@@ -258,6 +258,19 @@
   41 test files/216 tests, service-role/architecture/brand checks, and
   `git diff --check` all pass. Portfolio remains outside the product surface;
   no migration, production write, commit, push, or deployment was performed.
+- Audited the Studio shell for superseded local frames after the shared
+  ApplicationShell/ApplicationTopbar convergence. `StudioApplicationHeader`
+  had zero consumers (all protected routes use the shared top bar), so the
+  orphaned file was removed; Studio's app-owned sidebar navigation, nested
+  flyouts, Terms utility, and topbar account adapter remain intact.
+- Refactored Studio's sidebar to consume `ApplicationSidebarFrame` directly,
+  adding narrow header/content/footer styling slots so its grouped navigation
+  and Terms utility retain their existing presentation. Admin and Studio now
+  share the complete frame and collapse/expand behavior, while navigation and
+  permissions remain app-owned.
+- Preserved the caller-provided Studio `collapsible` mode while moving the
+  frame ownership into the shared component; the focused lint pass caught this
+  forwarding omission before validation continued.
 - Tightened `pnpm check:service-role` so client modules are also rejected when
   they import the shared `@repo/auth/service-role` entry directly. This keeps
   the new central factory server-only by policy, not only by convention.
