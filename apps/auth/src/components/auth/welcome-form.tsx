@@ -3,11 +3,16 @@
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 
-import { authenticateAction, googleAction } from "@/app/actions/entry";
+import {
+  authenticateAction,
+  githubAction,
+  googleAction,
+} from "@/app/actions/entry";
 import { ActionMessage } from "@/components/auth/action-message";
 import { SubmitButton } from "@/components/auth/submit-button";
 import {
   AuthDivider,
+  GithubIcon,
   GoogleIcon,
   PasswordField,
 } from "@repo/ui/auth-presentation";
@@ -29,6 +34,22 @@ function GoogleSubmitButton() {
     >
       <GoogleIcon className="size-5" />
       {pending ? "Opening Google…" : "Continue with Google"}
+    </Button>
+  );
+}
+
+function GithubSubmitButton() {
+  const { pending } = useFormStatus();
+
+  return (
+    <Button
+      type="submit"
+      variant="outline"
+      className="h-12 w-full rounded-xl border-[#d8d1c5] bg-white/45 text-[#262528] hover:bg-white dark:border-white/15 dark:bg-white/5 dark:text-[#f5f1e9] dark:hover:bg-white/10"
+      disabled={pending}
+    >
+      <GithubIcon className="size-5" />
+      {pending ? "Opening GitHub…" : "Continue with GitHub"}
     </Button>
   );
 }
@@ -76,6 +97,10 @@ export function WelcomeForm({ returnTo }: { returnTo: string }) {
         <form action={googleAction}>
           <input type="hidden" name="return_to" value={returnTo} />
           <GoogleSubmitButton />
+        </form>
+        <form action={githubAction}>
+          <input type="hidden" name="return_to" value={returnTo} />
+          <GithubSubmitButton />
         </form>
       </div>
     </div>

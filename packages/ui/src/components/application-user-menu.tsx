@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { useTheme } from "next-themes";
 
-import { Avatar, AvatarFallback } from "./avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { Button } from "./button";
 import {
   DropdownMenu,
@@ -79,7 +79,7 @@ function UserMenuTrigger({
   className,
   ...props
 }: {
-  user: { name: string };
+  user: { name: string; avatarUrl?: string | null };
   inSidebar: boolean;
 } & React.ComponentProps<typeof Button>) {
   return (
@@ -101,6 +101,7 @@ function UserMenuTrigger({
             "rounded-md bg-sidebar-accent group-data-[collapsible=icon]:size-8 group-data-[collapsible=icon]:rounded-md",
         )}
       >
+        {user.avatarUrl ? <AvatarImage src={user.avatarUrl} alt="" /> : null}
         <AvatarFallback className="rounded-md bg-sidebar-accent text-sm font-semibold text-sidebar-accent-foreground">
           {initials(user.name)}
         </AvatarFallback>
@@ -180,7 +181,7 @@ export function ApplicationUserMenu({
   isSigningOut = false,
   inSidebar = false,
 }: {
-  user: { name: string; email: string };
+  user: { name: string; email: string; avatarUrl?: string | null };
   onSettings?: () => void;
   termsHref?: string;
   onSignOut: () => void | Promise<void>;

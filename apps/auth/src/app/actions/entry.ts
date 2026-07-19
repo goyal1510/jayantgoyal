@@ -157,3 +157,24 @@ export async function googleAction(formData: FormData): Promise<void> {
   if (error || !data.url) redirect("/error?code=provider_unavailable");
   redirect(data.url);
 }
+
+export async function githubAction(formData: FormData): Promise<void> {
+  const context = await actionContext();
+  if ("error" in context) redirect("/error?code=invalid_origin");
+
+  const returnTo = resolveAuthReturnTarget(
+    stringField(formData, "return_to"),
+    context.requestOrigin,
+  );
+  await rememberReturnTarget(returnTo, context.requestOrigin);
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "github",
+    options: {
+      redirectTo: `${context.requestOrigin}/callback`,
+      skipBrowserRedirect: true,
+    },
+  });
+  if (error || !data.url) redirect("/error?code=provider_unavailable");
+  redirect(data.url);
+}

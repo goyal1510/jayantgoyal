@@ -12,7 +12,7 @@ export function TopbarUserMenu({
   user,
   inSidebar = false,
 }: {
-  user: { name: string; email: string };
+  user: { name: string; email: string; avatarUrl?: string | null };
   inSidebar?: boolean;
 }) {
   const [isSigningOut, startSigningOut] = useTransition();

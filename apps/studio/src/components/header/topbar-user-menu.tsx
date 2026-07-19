@@ -12,9 +12,13 @@ import { ApplicationUserMenu } from "@repo/ui/application-user-menu";
 import { Button } from "@repo/ui/button";
 import { Skeleton } from "@repo/ui/skeleton";
 
-type StudioUser = { name: string; email: string };
+type StudioUser = { name: string; email: string; avatarUrl: string | null };
 
-const fallbackUser: StudioUser = { name: "User", email: "user@example.com" };
+const fallbackUser: StudioUser = {
+  name: "User",
+  email: "user@example.com",
+  avatarUrl: null,
+};
 let cachedUser: StudioUser | null | undefined;
 
 export function TopbarUserMenu({ inSidebar = false }: { inSidebar?: boolean }) {
@@ -35,7 +39,13 @@ export function TopbarUserMenu({ inSidebar = false }: { inSidebar?: boolean }) {
       if (!response.ok) throw new Error("Failed to load user.");
 
       const payload = (await response.json()) as
-        | { user?: { name?: string; email?: string } }
+        | {
+            user?: {
+              name?: string;
+              email?: string;
+              avatarUrl?: string | null;
+            };
+          }
         | undefined;
 
       if (!payload?.user) {
@@ -47,6 +57,7 @@ export function TopbarUserMenu({ inSidebar = false }: { inSidebar?: boolean }) {
       const userData: StudioUser = {
         name: payload.user.name?.trim() || fallbackUser.name,
         email: payload.user.email?.trim() || fallbackUser.email,
+        avatarUrl: payload.user.avatarUrl?.trim() || null,
       };
       cachedUser = userData;
       setUser(userData);

@@ -16,7 +16,10 @@ export async function GET(request: NextRequest) {
 
   if (!userId) {
     // Fallback: called directly without proxy (e.g., during development)
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
     if (error || !user) {
       return NextResponse.json({
         user: null,
@@ -32,7 +35,7 @@ export async function GET(request: NextRequest) {
   const { data: profile } = await supabase
     .schema("jg_account")
     .from("profiles")
-    .select("first_name, last_name, terms_accepted")
+    .select("first_name, last_name, avatar_url, terms_accepted")
     .eq("user_id", userId)
     .single();
 
@@ -48,7 +51,12 @@ export async function GET(request: NextRequest) {
   const termsAccepted = profile.terms_accepted === true;
 
   const res = NextResponse.json({
-    user: { id: userId, name: name || "User", email: userEmail },
+    user: {
+      id: userId,
+      name: name || "User",
+      email: userEmail,
+      avatarUrl: profile.avatar_url ?? null,
+    },
     isAuthenticated: true,
     needsAcceptance: !termsAccepted,
   });

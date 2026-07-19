@@ -8,7 +8,7 @@ export function AccountTopbarUserMenu({
   user,
   inSidebar = false,
 }: {
-  user: { name: string; email: string };
+  user: { name: string; email: string; avatarUrl?: string | null };
   inSidebar?: boolean;
 }) {
   const router = useRouter();

@@ -128,6 +128,21 @@ export async function linkGoogleAction(): Promise<void> {
   redirect(data.url);
 }
 
+export async function linkGithubAction(): Promise<void> {
+  const { context, supabase } =
+    await requireProviderMutation("/account/providers");
+  const { data, error } = await supabase.auth.linkIdentity({
+    provider: "github",
+    options: {
+      redirectTo: `${context.requestOrigin}/callback`,
+      skipBrowserRedirect: true,
+    },
+  });
+  if (error || !data.url) redirect("/error?code=provider_unavailable");
+  await rememberReturnTarget("/account/providers", context.requestOrigin);
+  redirect(data.url);
+}
+
 export async function unlinkIdentityAction(formData: FormData): Promise<void> {
   const { supabase, user } =
     await requireProviderMutation("/account/providers");

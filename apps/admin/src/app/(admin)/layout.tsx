@@ -38,7 +38,7 @@ export default async function AdminLayout({
   const { data: profile } = await supabase
     .schema("jg_account")
     .from("profiles")
-    .select("role, first_name, last_name")
+    .select("role, first_name, last_name, avatar_url")
     .eq("user_id", user.id)
     .single();
 
@@ -55,6 +55,7 @@ export default async function AdminLayout({
     id: user.id,
     email: user.email ?? "",
     name: fullName,
+    avatarUrl: profile.avatar_url ?? null,
     role: profile.role as UserRole,
   };
 

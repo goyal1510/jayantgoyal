@@ -4,6 +4,7 @@ import type { ComponentProps, ReactNode } from "react";
 import { useState } from "react";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
+import { Github } from "lucide-react";
 
 import { Button } from "./button";
 import { Card, CardContent } from "./card";
@@ -130,6 +131,10 @@ export function GoogleIcon({ className }: { className?: string }) {
       />
     </svg>
   );
+}
+
+export function GithubIcon({ className }: { className?: string }) {
+  return <Github className={className} aria-hidden="true" />;
 }
 
 export function GoogleSignInButton({

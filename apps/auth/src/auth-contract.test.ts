@@ -68,9 +68,9 @@ describe("standalone Auth application contract", () => {
       actions.match(/export async function \w+Action/g) ?? [];
     const originChecks =
       actions.match(/const context = await actionContext\(\);/g) ?? [];
-    expect(exportedActions.length).toBe(16);
-    expect(originChecks.length).toBe(15);
-    expect(actions.match(/await requireProviderMutation\(/g)).toHaveLength(2);
+    expect(exportedActions.length).toBe(18);
+    expect(originChecks.length).toBe(16);
+    expect(actions.match(/await requireProviderMutation\(/g)).toHaveLength(3);
   });
 
   it("requires and consumes a verified recovery marker", () => {
@@ -110,7 +110,7 @@ describe("standalone Auth application contract", () => {
     );
     expect(accountLayout).toContain("ApplicationShell");
     expect(accountLayout).toContain("AccountSidebar");
-    expect(accountLayout).toContain("AccountTopbarUserMenu");
+    expect(accountLayout).not.toContain("AccountTopbarUserMenu");
     expect(accountLayout).not.toContain('href="/account/providers"');
   });
 

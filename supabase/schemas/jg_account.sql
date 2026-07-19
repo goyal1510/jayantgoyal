@@ -43,17 +43,89 @@ $$;
 ALTER FUNCTION "jg_account"."count_my_sessions"() OWNER TO "postgres";
 
 
+CREATE OR REPLACE FUNCTION "jg_account"."sync_profile_from_metadata"("p_user_id" "uuid", "p_metadata" "jsonb") RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+DECLARE
+  metadata jsonb := coalesce(p_metadata, '{}'::jsonb);
+  full_name text;
+  first_name text;
+  last_name text;
+  avatar_url text;
+BEGIN
+  full_name := coalesce(
+    nullif(btrim(metadata ->> 'full_name'), ''),
+    nullif(btrim(metadata ->> 'name'), ''),
+    nullif(btrim(metadata ->> 'user_name'), '')
+  );
+
+  first_name := coalesce(
+    nullif(btrim(metadata ->> 'first_name'), ''),
+    nullif(btrim(metadata ->> 'given_name'), ''),
+    nullif(split_part(full_name, ' ', 1), '')
+  );
+
+  if full_name is not null and position(' ' in full_name) > 0 then
+    last_name := nullif(
+      btrim(regexp_replace(full_name, '^[^[:space:]]+[[:space:]]+', '')),
+      ''
+    );
+  end if;
+
+  last_name := coalesce(
+    nullif(btrim(metadata ->> 'last_name'), ''),
+    nullif(btrim(metadata ->> 'family_name'), ''),
+    last_name
+  );
+
+  avatar_url := coalesce(
+    nullif(btrim(metadata ->> 'avatar_url'), ''),
+    nullif(btrim(metadata ->> 'picture'), ''),
+    nullif(btrim(metadata ->> 'avatar_url_https'), '')
+  );
+
+  insert into jg_account.profiles as profile (
+    user_id,
+    first_name,
+    last_name,
+    avatar_url,
+    terms_accepted
+  )
+  values (
+    p_user_id,
+    coalesce(first_name, ''),
+    coalesce(last_name, ''),
+    avatar_url,
+    false
+  )
+  on conflict (user_id) do update
+  set first_name = case
+        when nullif(btrim(profile.first_name), '') is null
+          then excluded.first_name
+        else profile.first_name
+      end,
+      last_name = case
+        when nullif(btrim(profile.last_name), '') is null
+          then excluded.last_name
+        else profile.last_name
+      end,
+      avatar_url = coalesce(excluded.avatar_url, profile.avatar_url);
+END;
+$$;
+
+
+ALTER FUNCTION "jg_account"."sync_profile_from_metadata"("p_user_id" "uuid", "p_metadata" "jsonb") OWNER TO "postgres";
+
+
 CREATE OR REPLACE FUNCTION "jg_account"."handle_new_user"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO ''
     AS $$
 BEGIN
-  INSERT INTO jg_account.profiles (user_id, first_name, last_name, terms_accepted)
-  VALUES (
+  PERFORM jg_account.sync_profile_from_metadata(
     NEW.id,
-    '',
-    '',
-    FALSE
+    NEW.raw_user_meta_data
   );
   RETURN NEW;
 EXCEPTION WHEN OTHERS THEN
@@ -61,6 +133,28 @@ EXCEPTION WHEN OTHERS THEN
   RETURN NEW;
 END;
 $$;
+
+
+CREATE OR REPLACE FUNCTION "jg_account"."handle_user_metadata_update"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+BEGIN
+  IF NEW.raw_user_meta_data IS DISTINCT FROM OLD.raw_user_meta_data THEN
+    PERFORM jg_account.sync_profile_from_metadata(
+      NEW.id,
+      NEW.raw_user_meta_data
+    );
+  END IF;
+  RETURN NEW;
+EXCEPTION WHEN OTHERS THEN
+  RAISE WARNING 'jg_account.handle_user_metadata_update failed for user %: %', NEW.id, SQLERRM;
+  RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION "jg_account"."handle_user_metadata_update"() OWNER TO "postgres";
 
 
 ALTER FUNCTION "jg_account"."handle_new_user"() OWNER TO "postgres";

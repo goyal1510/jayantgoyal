@@ -28,7 +28,7 @@ interface AccountSidebarProps
     React.ComponentProps<typeof ApplicationSidebarFrame>,
     "brand" | "children" | "footer"
   > {
-  user: { name: string; email: string };
+  user: { name: string; email: string; avatarUrl?: string | null };
 }
 
 export function AccountSidebar({

@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 
 import {
+  linkGithubAction,
   linkGoogleAction,
   unlinkIdentityAction,
 } from "@/app/actions/account";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { GoogleIcon } from "@repo/ui/auth-presentation";
+import { GithubIcon, GoogleIcon } from "@repo/ui/auth-presentation";
 import { Button } from "@repo/ui/button";
 import {
   Card,
@@ -25,6 +26,7 @@ export default async function ProvidersPage() {
   } = await supabase.auth.getUser();
   const identities = user?.identities ?? [];
   const google = identities.find((identity) => identity.provider === "google");
+  const github = identities.find((identity) => identity.provider === "github");
 
   return (
     <>
@@ -64,6 +66,40 @@ export default async function ProvidersPage() {
           ) : (
             <form action={linkGoogleAction}>
               <Button type="submit">Connect Google</Button>
+            </form>
+          )}
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <GithubIcon className="size-5" /> GitHub
+          </CardTitle>
+          <CardDescription>
+            {github ? "Connected" : "Not connected"}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {github ? (
+            <form action={unlinkIdentityAction}>
+              <input type="hidden" name="identity_id" value={github.id} />
+              <Button
+                type="submit"
+                variant="destructive"
+                disabled={identities.length < 2}
+              >
+                Disconnect GitHub
+              </Button>
+              {identities.length < 2 && (
+                <p className="text-muted-foreground mt-2 text-xs">
+                  Add another sign-in method before disconnecting the last
+                  identity.
+                </p>
+              )}
+            </form>
+          ) : (
+            <form action={linkGithubAction}>
+              <Button type="submit">Connect GitHub</Button>
             </form>
           )}
         </CardContent>

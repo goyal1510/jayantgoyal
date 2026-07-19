@@ -32,7 +32,7 @@ export default async function AccountLayout({
     ? await supabase
         .schema("jg_account")
         .from("profiles")
-        .select("first_name, last_name")
+        .select("first_name, last_name, avatar_url")
         .eq("user_id", user.id)
         .single()
     : { data: null };
@@ -46,7 +46,13 @@ export default async function AccountLayout({
     <div className="application-surface min-h-svh bg-background">
       <ApplicationShell
         sidebar={
-          <AccountSidebar user={{ name: fullName, email: user?.email ?? "" }} />
+          <AccountSidebar
+            user={{
+              name: fullName,
+              email: user?.email ?? "",
+              avatarUrl: profile?.avatar_url ?? null,
+            }}
+          />
         }
         header={
           <ApplicationTopbar

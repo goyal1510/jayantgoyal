@@ -145,7 +145,7 @@ const nextConfig: NextConfig = {
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
-              "img-src 'self' data: blob: https://openweathermap.org https://avatars.githubusercontent.com https://*.supabase.co https://api.qrserver.com",
+              "img-src 'self' data: blob: https://openweathermap.org https://avatars.githubusercontent.com https://*.githubusercontent.com https://*.googleusercontent.com https://*.supabase.co https://api.qrserver.com",
               "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://api.resend.com https://github-contributions-api.jogruber.de https://api.openweathermap.org https://api.github.com",
               "frame-src 'none'",
               "object-src 'none'",
