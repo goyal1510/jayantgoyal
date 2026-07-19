@@ -741,14 +741,14 @@ the complete program.
 Validate against a safe local/test path first. Production writes require
 explicit authorization and a restoration record.
 
-- [ ] Change and restore Home copy.
-- [ ] Change and restore About and Education ordering.
-- [ ] Change and restore one Skill and category.
-- [ ] Change and restore one Experience and Credential.
-- [ ] Change and restore Activity copy/GitHub username.
-- [ ] Change and restore one Project including full image preview and alt text.
-- [ ] Create/edit/delete or restore a Blog draft.
-- [ ] Change and restore Contact/social data.
+- [x] Change and restore Home copy.
+- [x] Change and restore About and Education ordering.
+- [x] Change and restore one Skill and category.
+- [x] Change and restore one Experience and Credential.
+- [x] Change and restore Activity copy/GitHub username.
+- [x] Change and restore one Project including full image preview and alt text.
+- [x] Create/edit/delete or restore a Blog draft.
+- [x] Change and restore Contact/social data.
 - [ ] Confirm each change is visible from Portfolio's database query path.
 - [ ] Confirm hidden/unpublished content remains absent publicly.
 - [ ] Confirm no fallback or hardcoded content masks failed database reads.
