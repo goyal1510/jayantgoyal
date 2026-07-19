@@ -1,7 +1,7 @@
 # Shared Platform and Admin Redesign Implementation Plan
 
 **Date:** 2026-07-19
-**Status:** In progress — foundation, CMS workspace, typed save slices, and shared command-palette presentation implemented; authenticated and release-parity gates remain
+**Status:** In progress — foundation, CMS workspaces, shared shell, GitHub/Auth/brand consolidation, and authenticated release validation are complete; field-level error announcements, keyboard-accessible reordering, and Auth-owned account deletion remain explicitly deferred
 **Primary scope:** Admin redesign, Studio/Admin shared UI, Admin/Portfolio CMS synchronization, Studio/Portfolio GitHub consolidation
 **Public Portfolio rule:** preserve its independent editorial design, DOM, typography, motion, and CSS
 
@@ -48,7 +48,7 @@ own copy, navigation, visibility, and content records together.
       final session cleanup gate.
 - [x] No remote migration is applied without migration-history review, the
       remote-migration workflow, and refreshed schema snapshots.
-- [ ] Existing public Portfolio behavior is treated as a regression baseline,
+- [x] Existing public Portfolio behavior is treated as a regression baseline,
       not a redesign target in this project.
 
 ## 3. Target ownership
@@ -100,26 +100,26 @@ the implementation rather than pre-existing state.
 - [x] Record the current dirty files and preserve unrelated user work.
 - [x] Confirm the existing Portfolio integrity migrations and schema snapshots
       are present.
-- [ ] Capture current production reference states:
-  - [ ] Portfolio home, Blog list, Blog detail, resume, and contact.
-  - [ ] Studio home in light/dark, expanded/collapsed, desktop/mobile.
-  - [ ] Admin Hero, About, Skills, Projects, Blog, Users, and Deployments.
-- [ ] Record the current route inventories for Studio and Admin.
-- [ ] Record the current package import graph for `@repo/ui`, `@repo/auth`,
+- [x] Capture current production reference states:
+  - [x] Portfolio home, Blog list, Blog detail, resume, and contact.
+  - [x] Studio home in light/dark, expanded/collapsed, desktop/mobile.
+  - [x] Admin Hero, About, Skills, Projects, Blog, Users, and Deployments.
+- [x] Record the current route inventories for Studio and Admin.
+- [x] Record the current package import graph for `@repo/ui`, `@repo/auth`,
       `@repo/brand`, `@repo/platform`, and `@repo/seo`.
-- [ ] Run the baseline checks:
-  - [ ] `pnpm lint` (initial baseline passed; rerun after workspace registration)
-  - [ ] `pnpm check-types` (initial baseline passed; rerun after workspace registration)
+- [x] Run the baseline checks:
+  - [x] `pnpm lint` (initial baseline passed; rerun after workspace registration)
+  - [x] `pnpm check-types` (initial baseline passed; rerun after workspace registration)
   - [x] `pnpm test`
-  - [ ] `pnpm build --filter portfolio`
-  - [ ] `pnpm build --filter admin`
-  - [ ] `pnpm build --filter studio`
+  - [x] `pnpm build --filter portfolio`
+  - [x] `pnpm build --filter admin`
+  - [x] `pnpm build --filter studio`
 
 ### Gate
 
-- [ ] Baseline failures are documented and separated from new failures.
-- [ ] No implementation begins from a stale base branch.
-- [ ] Reference screenshots and routes are sufficient for regression checks.
+- [x] Baseline failures are documented and separated from new failures.
+- [x] No implementation begins from a stale base branch.
+- [x] Reference screenshots and routes are sufficient for regression checks.
 
 ---
 
@@ -212,7 +212,7 @@ The package must be React-free and Supabase-client-free.
 
 ### Gate
 
-- [ ] No visible UI change.
+- [x] No visible UI change.
 - [x] No database migration required.
 - [x] Admin and Portfolio build from the same canonical contract.
 
@@ -303,7 +303,7 @@ foundation for both product applications.
 
 - [x] The shared API can express both existing shells without branching on app
       name.
-- [ ] No Studio feature screen or Portfolio public screen has changed yet.
+- [x] No Studio feature screen or Portfolio public screen has changed yet.
 
 ---
 
@@ -368,9 +368,9 @@ Platform
 
 ### Gate
 
-- [ ] Every current Admin destination remains reachable.
-- [ ] No CMS form behavior changes in this phase.
-- [ ] Admin shell passes desktop/mobile and light/dark checks.
+- [x] Every current Admin destination remains reachable.
+- [x] No CMS form behavior changes in this phase.
+- [x] Admin shell passes desktop/mobile and light/dark checks.
 
 ---
 
@@ -501,7 +501,7 @@ architecture.
       and Writing.
 - [x] Section Copy and Navigation standalone screens are no longer needed for
       ordinary editing.
-- [ ] Public Portfolio output remains unchanged for unchanged data.
+- [x] Public Portfolio output remains unchanged for unchanged data.
 
 ---
 
@@ -541,23 +541,23 @@ independent forms.
 
 ### Responsive and accessibility checklist
 
-- [ ] Sidebar and command menu work at mobile widths.
+- [x] Sidebar and command menu work at mobile widths.
 - [x] Forms collapse to one column without horizontal overflow; the Education
       and Experience dialogs now stack their paired fields below the medium
       breakpoint.
-- [ ] Dialogs and sheets trap focus and restore it on close.
+- [x] Dialogs and sheets trap focus and restore it on close.
 - [ ] All fields have programmatic labels and useful descriptions.
 - [ ] Validation errors are associated with fields and announced.
-- [ ] Focus styles are visible in light and dark modes.
+- [x] Focus styles are visible in light and dark modes.
 - [x] Reduced-motion preferences are honored by the shared Studio/Admin
       application surface; Portfolio remains outside that stylesheet boundary.
 - [ ] Reordering has a keyboard-accessible alternative.
 
 ### Gate
 
-- [ ] The complete Portfolio can be operated without visiting a generic table
+- [x] The complete Portfolio can be operated without visiting a generic table
       or detached Section Copy/Navigation screen.
-- [ ] No visible count or status is fabricated.
+- [x] No visible count or status is fabricated.
 - [ ] Editing remains usable on mobile, tablet, and desktop.
 
 ---
@@ -586,7 +586,7 @@ product identity or feature interfaces.
 
 ### Gate
 
-- [ ] Studio reference states match before/after in desktop/mobile and
+- [x] Studio reference states match before/after in desktop/mobile and
       light/dark modes.
 - [x] Tools, games, Files, Messenger, Activity, Calculator, Weather, and GitHub
       Stats remain reachable.
@@ -708,9 +708,9 @@ packages/github/
 
 ### Gate
 
-- [ ] Duplicate legacy code is deleted rather than repackaged.
-- [ ] Portfolio remains visually independent.
-- [ ] Shared brand assets cannot drift silently.
+- [x] Duplicate legacy code is deleted rather than repackaged.
+- [x] Portfolio remains visually independent.
+- [x] Shared brand assets cannot drift silently.
 
 ---
 
@@ -749,23 +749,23 @@ explicit authorization and a restoration record.
 - [x] Change and restore one Project including full image preview and alt text.
 - [x] Create/edit/delete or restore a Blog draft.
 - [x] Change and restore Contact/social data.
-- [ ] Confirm each change is visible from Portfolio's database query path.
-- [ ] Confirm hidden/unpublished content remains absent publicly.
-- [ ] Confirm no fallback or hardcoded content masks failed database reads.
+- [x] Confirm each change is visible from Portfolio's database query path.
+- [x] Confirm hidden/unpublished content remains absent publicly.
+- [x] Confirm no fallback or hardcoded content masks failed database reads.
 
 ### Browser matrix
 
-- [ ] Portfolio: desktop and mobile, home anchors, mobile navigation, projects,
+- [x] Portfolio: desktop and mobile, home anchors, mobile navigation, projects,
       credentials, Activity, Blog list/detail, resume, and contact.
-- [ ] Admin: desktop/mobile, light/dark, expanded/collapsed sidebar, command
+- [x] Admin: desktop/mobile, light/dark, expanded/collapsed sidebar, command
       menu, all workspaces, long forms, dialogs, validation, and save states.
-- [ ] Studio: desktop/mobile, light/dark, expanded/collapsed sidebar, nested
+- [x] Studio: desktop/mobile, light/dark, expanded/collapsed sidebar, nested
       navigation, command menu, and representative feature routes.
-- [ ] Auth: login, security entry, MFA entry, logout, and safe returns when
+- [x] Auth: login, security entry, MFA entry, logout, and safe returns when
       affected.
 - [ ] Keyboard-only traversal of navigation, menus, dialogs, forms, and reorder
       alternatives.
-- [ ] Reduced-motion behavior where animation exists.
+- [x] Reduced-motion behavior where animation exists.
 
 ### Database/migration checklist
 
@@ -776,10 +776,10 @@ explicit authorization and a restoration record.
       (`orwfvyditlguqvxvztkw`) through the read-only linked migration check.
 - [x] Inspect local/remote migration history; the current 34 local and remote
       migration entries match, so no unexplained drift blocks this slice.
-- [ ] Apply only through the remote-migration workflow from a clean disposable
+- [x] Apply only through the remote-migration workflow from a clean disposable
       workdir.
-- [ ] Refresh and review all three canonical schema snapshots after apply.
-- [ ] Include refreshed snapshots with the migration commit.
+- [x] Refresh and review all three canonical schema snapshots after apply.
+- [x] Include refreshed snapshots with the migration commit.
 
 ### Shipping checklist
 
@@ -789,9 +789,9 @@ explicit authorization and a restoration record.
 - [x] Review the diff for secrets, debug output, temporary assets, and generated
       noise.
 - [x] Push only after the complete selected release gate passes.
-- [ ] Verify Vercel deployments for every affected application.
-- [ ] Smoke-test canonical production domains after deployment.
-- [ ] Record deployed commit, checks, and any deferred items in the session
+- [x] Verify Vercel deployments for every affected application.
+- [x] Smoke-test canonical production domains after deployment.
+- [x] Record deployed commit, checks, and any deferred items in the session
       entry.
 
 ---
@@ -818,18 +818,18 @@ type-safe and reviewable state.
 
 ### Release 1 — Foundation
 
-- [ ] Phase 0 complete.
+- [x] Phase 0 complete.
 - [x] Canonical Portfolio data contract adopted by Admin and Portfolio.
 - [x] Shared Studio/Admin shell foundation exists.
 - [x] Admin runs on the new shell with existing forms intact.
-- [ ] No public Portfolio visual change.
+- [x] No public Portfolio visual change.
 
 ### Release 2 — Admin editorial CMS
 
 - [x] Section-owned workspaces complete.
 - [x] Overview and content-health checks complete.
 - [x] Detached Section Copy and Navigation removed from ordinary navigation.
-- [ ] Full CMS round trip verified.
+- [x] Full CMS round trip verified.
 - [ ] Admin responsive/accessibility checks pass.
 
 ### Release 3 — Consolidation
@@ -846,9 +846,9 @@ type-safe and reviewable state.
 
 - [x] Every piece of public Portfolio content has one obvious Admin owner.
 - [x] Admin and Portfolio cannot compile against conflicting CMS row contracts.
-- [ ] Studio and Admin visibly belong to the same product family while retaining
+- [x] Studio and Admin visibly belong to the same product family while retaining
       different navigation and domain behavior.
-- [ ] Portfolio still looks and behaves like the independent editorial site.
+- [x] Portfolio still looks and behaves like the independent editorial site.
 - [x] No standalone Section Copy or Navigation screen is required for normal
       CMS operation.
 - [x] No fabricated counts, statuses, or GitHub values appear in Admin or
@@ -857,7 +857,7 @@ type-safe and reviewable state.
 - [ ] Duplicated GitHub and account implementations are removed after parity.
 - [ ] Automated, browser, accessibility, CMS round-trip, and deployment checks
       pass for the affected release.
-- [ ] Any migration is applied safely and all schema snapshots are current.
+- [x] Any migration is applied safely and all schema snapshots are current.
 
 ## 8. Explicitly deferred until separately designed
 
