@@ -559,3 +559,8 @@
   pass. The work was split into four reviewed commits and pushed directly to
   `main` at `30c6d31468c63a4e89c37f4453f1ca3674e5783f`; no migration or
   production CMS write was performed.
+- Updated the release checklist to reflect the four-phase commit review,
+  current-base freshness check, final validation, and direct push to `main`.
+  Vercel deployment confirmation, production smoke tests, and authenticated
+  CMS round-trip validation remain intentionally open rather than being marked
+  complete without credentials or a deployment result.

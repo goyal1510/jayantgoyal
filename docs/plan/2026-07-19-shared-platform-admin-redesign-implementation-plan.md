@@ -782,12 +782,12 @@ explicit authorization and a restoration record.
 
 ### Shipping checklist
 
-- [ ] Split commits by coherent phase/package.
-- [ ] Rebase or merge the latest `origin/main` before final validation.
-- [ ] Re-run affected checks after resolving base changes.
-- [ ] Review the diff for secrets, debug output, temporary assets, and generated
+- [x] Split commits by coherent phase/package.
+- [x] Rebase or merge the latest `origin/main` before final validation.
+- [x] Re-run affected checks after resolving base changes.
+- [x] Review the diff for secrets, debug output, temporary assets, and generated
       noise.
-- [ ] Push only after the complete selected release gate passes.
+- [x] Push only after the complete selected release gate passes.
 - [ ] Verify Vercel deployments for every affected application.
 - [ ] Smoke-test canonical production domains after deployment.
 - [ ] Record deployed commit, checks, and any deferred items in the session
