@@ -564,3 +564,50 @@
   Vercel deployment confirmation, production smoke tests, and authenticated
   CMS round-trip validation remain intentionally open rather than being marked
   complete without credentials or a deployment result.
+- Browser validation exposed a Studio-only mobile shell defect: the custom
+  top-bar control was hidden when the React mobile flag lagged the responsive
+  viewport. The control now remains CSS-visible below the medium breakpoint
+  and chooses the mobile sheet from the live media query before toggling the
+  desktop sidebar; this preserves desktop behavior while making the hamburger
+  deterministic on narrow screens.
+- The shared mobile hook now uses `useSyncExternalStore` with a viewport
+  snapshot and media-query subscription instead of effect-only state. This
+  removes the stale desktop/mobile branch that prevented the Radix Sheet from
+  opening at narrow widths and gives Studio and Admin one deterministic
+  responsive contract.
+- The sidebar provider also checks the live viewport when toggling and allows
+  the mobile sheet branch to render while its mobile-open state is active. This
+  covers a stale first render during navigation or viewport emulation while
+  preserving the existing desktop cookie state.
+- The sidebar render branch now includes a synchronous viewport guard as a
+  final hydration-safe fallback. This prevents a narrow viewport from ever
+  falling through to the desktop-only branch when the browser reports its
+  width before a media-query subscription settles.
+- The Studio hamburger now exposes its controlled mobile-sheet state through
+  `aria-expanded`. This keeps the trigger accessible and gives browser QA a
+  direct assertion that the click reached the shared sidebar provider before
+  checking the Radix sheet portal.
+- Corrected the shell direction after review: Studio and Admin now both use
+  the shared `SidebarTrigger` in the application header. The Studio-specific
+  top-bar control (which looked like a hamburger and duplicated the shared
+  sheet trigger) was removed; Studio keeps only its in-sidebar collapse and
+  collapsed-brand expand affordances. This keeps the product shells aligned
+  while Portfolio retains its own independent mobile navigation.
+- Refined the shared shell to match Studio's original interaction model: both
+  Admin and Studio now use the same shared in-sidebar collapse button and
+  collapsed-brand expand affordance on desktop, while the shared header
+  trigger is visible only on mobile to open the left sheet. The Studio-local
+  copies were removed so there is one implementation and no app-specific
+  hamburger variant.
+- Kept the dormant Studio header wrapper on the same mobile-only trigger
+  contract as the live shared topbar, so any future caller cannot reintroduce
+  a desktop duplicate control accidentally.
+- Corrected Studio's brand wrapper to use the shared expand-control hover group.
+  This preserves the original collapsed-rail affordance after moving the
+  collapse/expand implementation into `@repo/ui`.
+- Browser recheck after the shared-control move: Studio desktop renders the
+  collapse control with the header trigger CSS-hidden; at 390px the shared
+  header trigger is visible, the desktop sidebar is not rendered, and the
+  desktop collapse affordance has a zero-sized hidden box. Admin's protected
+  route correctly redirected to the Auth login boundary in the credential-free
+  local run, so authenticated Admin interaction remains unverified here.

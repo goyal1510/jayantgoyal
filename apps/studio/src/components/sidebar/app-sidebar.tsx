@@ -6,7 +6,11 @@ import { usePathname } from "next/navigation";
 import { FileText, LayoutGrid } from "lucide-react";
 
 import { APP_BRANDS } from "@repo/brand";
-import { ApplicationBrandHeader } from "@repo/ui/application-shell";
+import {
+  ApplicationBrandHeader,
+  ApplicationSidebarCollapseButton,
+  ApplicationSidebarExpandButton,
+} from "@repo/ui/application-shell";
 import { cn } from "@repo/ui/lib/utils";
 import {
   Sidebar,
@@ -22,10 +26,6 @@ import {
 import { useActiveApp } from "@/hooks/use-active-app";
 import { getSurfaceApps, type AppConfig } from "@/lib/config/hub-config";
 import { NavApps } from "@/components/sidebar/nav-apps";
-import {
-  SidebarCollapsedExpandButton,
-  SidebarHeaderCollapseButton,
-} from "@/components/header/studio-sidebar-toggle";
 
 const TermsDialog = dynamic(
   () =>
@@ -106,7 +106,7 @@ export function AppSidebar({
     >
       <SidebarHeader className="p-2">
         <div className="flex items-center gap-1">
-          <div className="group/studio-brand relative min-w-0 flex-1">
+          <div className="group/application-brand relative min-w-0 flex-1">
             <ApplicationBrandHeader
               brand={{
                 name: APP_BRANDS.studio.name,
@@ -114,9 +114,9 @@ export function AppSidebar({
                 icon: LayoutGrid,
               }}
             />
-            <SidebarCollapsedExpandButton />
+            <ApplicationSidebarExpandButton />
           </div>
-          <SidebarHeaderCollapseButton />
+          <ApplicationSidebarCollapseButton />
         </div>
       </SidebarHeader>
       <SidebarContent className="gap-0">

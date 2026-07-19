@@ -110,7 +110,13 @@ function SidebarProvider({
 
   // Helper to toggle the sidebar.
   const toggleSidebar = React.useCallback(() => {
-    return isMobile ? setOpenMobile((open) => !open) : setOpen((open) => !open)
+    const viewportIsMobile =
+      typeof window !== "undefined" &&
+      window.matchMedia("(max-width: 767px)").matches
+
+    return isMobile || viewportIsMobile
+      ? setOpenMobile((open) => !open)
+      : setOpen((open) => !open)
   }, [isMobile, setOpen, setOpenMobile])
 
   // Adds a keyboard shortcut to toggle the sidebar.
@@ -188,6 +194,8 @@ function Sidebar({
   collapsible?: "offcanvas" | "icon" | "none"
 }) {
   const { isMobile, state, openMobile, setOpenMobile, isResizing } = useSidebar()
+  const viewportIsMobile =
+    typeof window !== "undefined" && window.innerWidth < 768
 
   if (collapsible === "none") {
     return (
@@ -204,7 +212,7 @@ function Sidebar({
     )
   }
 
-  if (isMobile) {
+  if (isMobile || viewportIsMobile || openMobile) {
     return (
       <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
         <SheetContent

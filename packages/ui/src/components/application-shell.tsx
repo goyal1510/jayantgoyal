@@ -8,7 +8,7 @@ import type {
 } from "react";
 import { Fragment } from "react";
 import Link from "next/link";
-import { ChevronRight, Home } from "lucide-react";
+import { ChevronRight, Home, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 
 import {
   Breadcrumb,
@@ -112,6 +112,44 @@ export function ApplicationBrandHeader({ brand }: { brand: ApplicationBrand }) {
   );
 }
 
+/** Desktop-only control for collapsing an open product navigation rail. */
+export function ApplicationSidebarCollapseButton() {
+  const { isMobile, state, toggleSidebar } = useSidebar();
+
+  if (isMobile || state === "collapsed") return null;
+
+  return (
+    <button
+      type="button"
+      className="m-0 inline-flex size-9 shrink-0 items-center justify-center rounded-lg border-0 bg-transparent p-0 text-sidebar-foreground outline-none transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+      onClick={toggleSidebar}
+      aria-label="Collapse sidebar"
+      title="Collapse sidebar"
+    >
+      <PanelLeftClose className="size-5" strokeWidth={1.8} />
+    </button>
+  );
+}
+
+/** Desktop-only affordance that turns the collapsed brand into an expand control. */
+export function ApplicationSidebarExpandButton() {
+  const { isMobile, state, toggleSidebar } = useSidebar();
+
+  if (isMobile || state === "expanded") return null;
+
+  return (
+    <button
+      type="button"
+      className="pointer-events-none absolute inset-0 z-10 m-0 inline-flex size-8 items-center justify-center rounded-lg border-0 bg-sidebar-primary p-0 text-sidebar-primary-foreground opacity-0 outline-none transition-opacity group-hover/application-brand:pointer-events-auto group-hover/application-brand:opacity-100 focus-visible:pointer-events-auto focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+      onClick={toggleSidebar}
+      aria-label="Expand sidebar"
+      title="Expand sidebar"
+    >
+      <PanelLeftOpen className="size-5" strokeWidth={2} />
+    </button>
+  );
+}
+
 export interface ApplicationSidebarFrameProps
   extends Omit<ComponentProps<typeof Sidebar>, "children"> {
   brand: ApplicationBrand;
@@ -159,8 +197,14 @@ export function ApplicationSidebarFrame({
 }: ApplicationSidebarFrameProps) {
   return (
     <Sidebar collapsible={collapsible} {...props}>
-      <SidebarHeader>
-        <ApplicationBrandHeader brand={brand} />
+      <SidebarHeader className="p-2">
+        <div className="flex items-center gap-1">
+          <div className="group/application-brand relative min-w-0 flex-1">
+            <ApplicationBrandHeader brand={brand} />
+            <ApplicationSidebarExpandButton />
+          </div>
+          <ApplicationSidebarCollapseButton />
+        </div>
       </SidebarHeader>
       <SidebarContent>{children}</SidebarContent>
       {footer != null && (
@@ -322,8 +366,8 @@ export function ApplicationHeader({
       <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
         {sidebarControl ?? (
           <>
-            <SidebarTrigger className="-ml-1 shrink-0" />
-            <Separator orientation="vertical" className="mr-2 h-4 shrink-0" />
+            <SidebarTrigger className="-ml-1 shrink-0 md:hidden" />
+            <Separator orientation="vertical" className="mr-2 h-4 shrink-0 md:hidden" />
           </>
         )}
         <div className="min-w-0 flex-1 overflow-hidden">{breadcrumb}</div>

@@ -1,8 +1,7 @@
 import type { ReactNode } from "react";
 
 import { cn } from "@repo/ui/lib/utils";
-
-import { TopbarSidebarControl } from "@/components/header/studio-sidebar-toggle";
+import { SidebarTrigger } from "@repo/ui/sidebar";
 
 export function StudioApplicationHeader({
   breadcrumb,
@@ -21,7 +20,7 @@ export function StudioApplicationHeader({
       )}
     >
       <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
-        <TopbarSidebarControl />
+        <SidebarTrigger className="-ml-1 shrink-0 md:hidden" />
         <div className="min-w-0 flex-1 overflow-hidden">{breadcrumb}</div>
       </div>
       {actions != null ? (

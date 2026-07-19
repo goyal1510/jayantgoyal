@@ -24,7 +24,6 @@ import { LazyCommandPalette } from "@/components/providers/lazy-components";
 import { AuthToast } from "@/components/auth/auth-toast";
 import { DynamicBreadcrumbJsonLd } from "@/components/seo/dynamic-breadcrumb-jsonld";
 import { TopbarUserMenu } from "@/components/header/topbar-user-menu";
-import { TopbarSidebarControl } from "@/components/header/studio-sidebar-toggle";
 import { ThemeMenu } from "@repo/ui/theme-menu";
 
 export default async function ProtectedLayout({
@@ -58,7 +57,6 @@ export default async function ProtectedLayout({
         sidebar={<AppSidebar />}
         header={
           <ApplicationTopbar
-            sidebarControl={<TopbarSidebarControl />}
             className="border-border/70 bg-background/90 px-4"
             breadcrumb={
               <div className="w-full [&_[data-slot=breadcrumb-link]]:inline-flex [&_[data-slot=breadcrumb-link]]:h-8 [&_[data-slot=breadcrumb-link]]:items-center [&_[data-slot=breadcrumb-link]]:justify-center [&_[data-slot=breadcrumb-link]]:rounded-md [&_[data-slot=breadcrumb-link]]:px-2 [&_[data-slot=breadcrumb-link]]:hover:bg-accent [&_[data-slot=breadcrumb-link]]:hover:text-accent-foreground">
