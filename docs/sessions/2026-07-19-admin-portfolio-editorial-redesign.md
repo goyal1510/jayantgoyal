@@ -286,6 +286,12 @@
   and preserves Discover/Terms content. Browser console errors were empty at
   both viewport sizes; the credential-free `/api/account/init` 500 remains the
   expected local environment warning.
+- Final repository validation after the shared-frame/responsive fix is green:
+  repository type-check and lint, 49 test files/251 tests, architecture,
+  brand-asset, service-role, Studio/Admin production builds, and diff checks.
+  The slice was committed as `82d1b1f` and pushed directly to `main`; Vercel
+  reports Admin, Studio, Portfolio, and Auth deployments pending for that
+  commit.
 - Tightened `pnpm check:service-role` so client modules are also rejected when
   they import the shared `@repo/auth/service-role` entry directly. This keeps
   the new central factory server-only by policy, not only by convention.
