@@ -1,33 +1,22 @@
 import type { Metadata } from "next";
-
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { SectionEditorialPanel } from "@/components/portfolio/section-editorial-panel";
+import { PortfolioWorkspaceHeader } from "@/components/portfolio/portfolio-workspace-header";
+import { loadSkillsWorkspace } from "@/lib/portfolio-workspace";
 import { SkillsManager } from "./skills-manager";
-import type { SkillCategoryWithSkills } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Skills" };
 
 export default async function SkillsPage() {
   const supabase = await createSupabaseServerClient();
 
-  const { data: categories } = await supabase
-    .schema("portfolio")
-    .from("skill_categories")
-    .select("*")
-    .order("sort_order", { ascending: true });
+  const { categories, editorial } = await loadSkillsWorkspace(supabase);
 
-  const { data: skills } = await supabase
-    .schema("portfolio")
-    .from("skills")
-    .select("*")
-    .order("sort_order", { ascending: true });
-
-  // Combine categories with their skills
-  const categoriesWithSkills: SkillCategoryWithSkills[] = (
-    categories ?? []
-  ).map((cat) => ({
-    ...cat,
-    skills: (skills ?? []).filter((s) => s.category_id === cat.id),
-  }));
-
-  return <SkillsManager initialData={categoriesWithSkills} />;
+  return (
+    <div className="mx-auto w-full max-w-6xl space-y-6">
+      <PortfolioWorkspaceHeader workspace="skills" />
+      <SectionEditorialPanel sectionKey="skills" {...editorial} />
+      <SkillsManager initialData={categories} />
+    </div>
+  );
 }

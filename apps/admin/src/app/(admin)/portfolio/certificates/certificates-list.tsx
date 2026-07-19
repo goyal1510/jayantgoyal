@@ -19,6 +19,9 @@ import {
   deletePortfolioData,
 } from "@/lib/portfolio-api";
 import { Button } from "@repo/ui/button";
+import { ConfirmationDialog } from "@repo/ui/confirmation-dialog";
+import { IconAction } from "@repo/ui/icon-action";
+import { VisibilityBadge } from "@repo/ui/status-badge";
 import {
   Card,
   CardContent,
@@ -45,7 +48,9 @@ export function CertificatesList({ initialData }: CertificatesListProps) {
   const [formData, setFormData] =
     useState<CertificateFormData>(emptyCertificateForm);
   const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<Certificate | null>(null);
 
   useEffect(() => {
     setItems(initialData);
@@ -58,6 +63,7 @@ export function CertificatesList({ initialData }: CertificatesListProps) {
       sort_order:
         items.length > 0 ? Math.max(...items.map((i) => i.sort_order)) + 1 : 0,
     });
+    setFormError(null);
     setDialogOpen(true);
   };
 
@@ -77,16 +83,18 @@ export function CertificatesList({ initialData }: CertificatesListProps) {
       sort_order: item.sort_order,
       is_visible: item.is_visible,
     });
+    setFormError(null);
     setDialogOpen(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+    setFormError(null);
 
     try {
       if (editingItem) {
-        const result = await updatePortfolioData<Certificate>(
+        const result = await updatePortfolioData(
           "certificates",
           editingItem.id,
           formData,
@@ -94,10 +102,7 @@ export function CertificatesList({ initialData }: CertificatesListProps) {
         if (result.error) throw new Error(result.error);
         toast.success("Certificate updated");
       } else {
-        const result = await createPortfolioData<Certificate>(
-          "certificates",
-          formData,
-        );
+        const result = await createPortfolioData("certificates", formData);
         if (result.error) throw new Error(result.error);
         toast.success("Certificate added");
       }
@@ -105,17 +110,16 @@ export function CertificatesList({ initialData }: CertificatesListProps) {
       setDialogOpen(false);
       router.refresh();
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to save certificate",
-      );
+      const message =
+        error instanceof Error ? error.message : "Failed to save certificate";
+      setFormError(message);
+      toast.error(message);
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this certificate?")) return;
-
     setDeleting(id);
 
     try {
@@ -135,11 +139,9 @@ export function CertificatesList({ initialData }: CertificatesListProps) {
 
   const toggleVisibility = async (item: Certificate) => {
     try {
-      const result = await updatePortfolioData<Certificate>(
-        "certificates",
-        item.id,
-        { is_visible: !item.is_visible },
-      );
+      const result = await updatePortfolioData("certificates", item.id, {
+        is_visible: !item.is_visible,
+      });
       if (result.error) throw new Error(result.error);
       setItems(
         items.map((i) =>
@@ -197,11 +199,7 @@ export function CertificatesList({ initialData }: CertificatesListProps) {
                           <div className="flex-1">
                             <div className="flex items-center gap-2">
                               <h4 className="font-medium">{item.name}</h4>
-                              {!item.is_visible && (
-                                <span className="text-xs text-muted-foreground">
-                                  (Hidden)
-                                </span>
-                              )}
+                              <VisibilityBadge visible={item.is_visible} />
                             </div>
                             {item.issuer && (
                               <p className="text-sm text-muted-foreground">
@@ -215,36 +213,34 @@ export function CertificatesList({ initialData }: CertificatesListProps) {
                             )}
                           </div>
                           <div className="flex items-center gap-2">
-                            <Button
+                            <IconAction
+                              icon={item.is_visible ? Eye : EyeOff}
+                              label={
+                                item.is_visible
+                                  ? "Hide credential"
+                                  : "Show credential"
+                              }
                               variant="ghost"
-                              size="icon"
                               onClick={() => toggleVisibility(item)}
-                            >
-                              {item.is_visible ? (
-                                <Eye className="h-4 w-4" />
-                              ) : (
-                                <EyeOff className="h-4 w-4" />
-                              )}
-                            </Button>
-                            <Button
+                            />
+                            <IconAction
+                              icon={Pencil}
+                              label="Edit credential"
                               variant="ghost"
-                              size="icon"
                               onClick={() => openEditDialog(item)}
-                            >
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                            <Button
+                            />
+                            <IconAction
+                              icon={deleting === item.id ? Loader2 : Trash2}
+                              iconClassName={
+                                deleting === item.id
+                                  ? "size-4 animate-spin"
+                                  : undefined
+                              }
+                              label="Delete credential"
                               variant="ghost"
-                              size="icon"
-                              onClick={() => handleDelete(item.id)}
+                              onClick={() => setPendingDelete(item)}
                               disabled={deleting === item.id}
-                            >
-                              {deleting === item.id ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              ) : (
-                                <Trash2 className="h-4 w-4" />
-                              )}
-                            </Button>
+                            />
                           </div>
                         </div>
                       ))}
@@ -264,6 +260,20 @@ export function CertificatesList({ initialData }: CertificatesListProps) {
         setFormData={setFormData}
         onSubmit={handleSubmit}
         saving={saving}
+        errorMessage={formError}
+      />
+      <ConfirmationDialog
+        open={pendingDelete !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingDelete(null);
+        }}
+        title="Delete this credential?"
+        description="This removes the credential from the Experience workspace and public Portfolio."
+        confirmLabel="Delete credential"
+        destructive
+        onConfirm={() => {
+          if (pendingDelete) return handleDelete(pendingDelete.id);
+        }}
       />
     </>
   );

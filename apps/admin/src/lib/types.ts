@@ -2,6 +2,24 @@
  * Admin Types
  */
 
+import type {
+  PortfolioAboutRecord,
+  PortfolioBlogPostRecord,
+  PortfolioCertificateRecord,
+  PortfolioContactRecord,
+  PortfolioEducationRecord,
+  PortfolioExperienceRecord,
+  PortfolioHeroRecord,
+  PortfolioNavigationRecord,
+  PortfolioPersonalInfo,
+  PortfolioPrinciple as PortfolioPrincipleRecord,
+  PortfolioProjectRecord,
+  PortfolioSectionContentRecord,
+  PortfolioSkillCategoryRecord,
+  PortfolioSkillRecord,
+  PortfolioSocialLink,
+} from "@repo/portfolio-data";
+
 export type UserRole = "user" | "admin" | "super_admin";
 
 export interface Profile {
@@ -42,176 +60,25 @@ export interface AuthUser {
  * Portfolio Types
  */
 
-export interface Hero {
-  id: string;
-  name: string;
-  display_name: string;
-  role: string;
-  tagline: string;
-  blurb: string;
-  headline: string;
-  current_title: string;
-  availability: string;
-  resume_url: string;
-  github_username: string;
-  seo_title: string;
-  seo_description: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface About {
-  id: string;
-  summary: string;
-  personal: PersonalInfo[];
-  headline: string;
-  objective: string;
-  story: string[];
-  principles: PortfolioPrinciple[];
-  created_at: string;
-  updated_at: string;
-}
-
-export interface PortfolioPrinciple {
-  title: string;
-  copy: string;
-}
-
-export interface PersonalInfo {
-  label: string;
-  value: string;
-}
-
-export interface Education {
-  id: string;
-  school: string;
-  degree: string;
-  period: string;
-  location: string | null;
-  detail: string | null;
-  sort_order: number;
-  is_visible: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface Experience {
-  id: string;
-  company: string;
-  role: string;
-  period: string;
-  location: string | null;
-  summary: string | null;
-  bullets: string[];
-  sort_order: number;
-  is_visible: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface SkillCategory {
-  id: string;
-  title: string;
-  description: string;
-  sort_order: number;
-  is_visible: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface Skill {
-  id: string;
-  category_id: string;
-  name: string;
-  proficiency: "core" | "strong" | "working" | "exploring";
-  evidence: string;
-  sort_order: number;
-  is_visible: boolean;
-  created_at: string;
-  updated_at: string;
-}
+export type Hero = PortfolioHeroRecord;
+export type About = PortfolioAboutRecord;
+export type PortfolioPrinciple = PortfolioPrincipleRecord;
+export type PersonalInfo = PortfolioPersonalInfo;
+export type Education = PortfolioEducationRecord;
+export type Experience = PortfolioExperienceRecord;
+export type SkillCategory = PortfolioSkillCategoryRecord;
+export type Skill = PortfolioSkillRecord;
 
 export interface SkillCategoryWithSkills extends SkillCategory {
   skills: Skill[];
 }
 
-export interface Project {
-  id: string;
-  name: string;
-  short_description: string;
-  tags: string[];
-  github_link: string | null;
-  live_link: string | null;
-  slug: string;
-  eyebrow: string;
-  impact: string;
-  contribution: string;
-  year_label: string;
-  image_url: string;
-  image_alt: string;
-  sort_order: number;
-  is_visible: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface Certificate {
-  id: string;
-  name: string;
-  description: string | null;
-  category: string;
-  issuer: string;
-  issued_at: string | null;
-  credential_id: string | null;
-  credential_url: string | null;
-  document_url: string;
-  preview_url: string;
-  image_alt: string;
-  sort_order: number;
-  is_visible: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface Contact {
-  id: string;
-  email: string;
-  phone: string;
-  location: string;
-  socials: SocialLink[];
-  created_at: string;
-  updated_at: string;
-}
-
-export interface SocialLink {
-  label: string;
-  href: string;
-  icon_key: string;
-}
-
-export interface NavItem {
-  id: string;
-  section_id: string;
-  label: string;
-  note: string | null;
-  sort_order: number;
-  is_visible: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface SectionContent {
-  id: string;
-  section_key: string;
-  eyebrow: string;
-  headline: string | null;
-  accent: string | null;
-  description: string | null;
-  supporting_text: string | null;
-  is_visible: boolean;
-  created_at: string;
-  updated_at: string;
-}
+export type Project = PortfolioProjectRecord;
+export type Certificate = PortfolioCertificateRecord;
+export type Contact = PortfolioContactRecord;
+export type SocialLink = PortfolioSocialLink;
+export type NavItem = PortfolioNavigationRecord;
+export type SectionContent = PortfolioSectionContentRecord;
 
 /**
  * Vercel Types
@@ -271,17 +138,4 @@ export type VercelProjectKey = "studio" | "admin";
  * Blog Types
  */
 
-export interface BlogPost {
-  id: string;
-  title: string;
-  slug: string;
-  excerpt: string | null;
-  content: string;
-  cover_image: string | null;
-  tags: string[];
-  is_visible: boolean;
-  is_published: boolean;
-  published_at: string | null;
-  created_at: string;
-  updated_at: string;
-}
+export type BlogPost = PortfolioBlogPostRecord;

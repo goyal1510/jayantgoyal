@@ -3,10 +3,24 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Loader2, Plus, Pencil, Trash2, Eye, EyeOff } from "lucide-react";
+import {
+  ExternalLink,
+  Loader2,
+  Plus,
+  Pencil,
+  Trash2,
+  Eye,
+  EyeOff,
+} from "lucide-react";
+import {
+  getBlogPublicationState,
+  isPublicBlogPost,
+} from "@repo/portfolio-data";
 import { createBlogData, updateBlogData, deleteBlogData } from "@/lib/blog-api";
 import { Button } from "@repo/ui/button";
-import { Badge } from "@repo/ui/badge";
+import { ConfirmationDialog } from "@repo/ui/confirmation-dialog";
+import { IconAction } from "@repo/ui/icon-action";
+import { StatusBadge } from "@repo/ui/status-badge";
 import type { BlogPost } from "@/lib/types";
 import { BlogDialog, emptyBlogForm, type BlogFormData } from "./blog-dialog";
 
@@ -21,7 +35,9 @@ export function BlogList({ initialData }: BlogListProps) {
   const [editingItem, setEditingItem] = useState<BlogPost | null>(null);
   const [formData, setFormData] = useState<BlogFormData>(emptyBlogForm);
   const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<BlogPost | null>(null);
 
   useEffect(() => {
     setItems(initialData);
@@ -32,6 +48,7 @@ export function BlogList({ initialData }: BlogListProps) {
     setFormData({
       ...emptyBlogForm,
     });
+    setFormError(null);
     setDialogOpen(true);
   };
 
@@ -48,12 +65,14 @@ export function BlogList({ initialData }: BlogListProps) {
       published_at: item.published_at ?? "",
       is_visible: item.is_visible,
     });
+    setFormError(null);
     setDialogOpen(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+    setFormError(null);
 
     try {
       const payload = { ...formData };
@@ -69,7 +88,7 @@ export function BlogList({ initialData }: BlogListProps) {
       };
 
       if (editingItem) {
-        const result = await updateBlogData<BlogPost>(
+        const result = await updateBlogData(
           "blog_posts",
           editingItem.id,
           sanitized,
@@ -77,7 +96,7 @@ export function BlogList({ initialData }: BlogListProps) {
         if (result.error) throw new Error(result.error);
         toast.success("Blog post updated");
       } else {
-        const result = await createBlogData<BlogPost>("blog_posts", sanitized);
+        const result = await createBlogData("blog_posts", sanitized);
         if (result.error) throw new Error(result.error);
         toast.success("Blog post added");
       }
@@ -85,16 +104,16 @@ export function BlogList({ initialData }: BlogListProps) {
       setDialogOpen(false);
       router.refresh();
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to save blog post",
-      );
+      const message =
+        error instanceof Error ? error.message : "Failed to save blog post";
+      setFormError(message);
+      toast.error(message);
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this blog post?")) return;
     setDeleting(id);
     try {
       const result = await deleteBlogData("blog_posts", id);
@@ -113,7 +132,7 @@ export function BlogList({ initialData }: BlogListProps) {
 
   const toggleVisibility = async (item: BlogPost) => {
     try {
-      const result = await updateBlogData<BlogPost>("blog_posts", item.id, {
+      const result = await updateBlogData("blog_posts", item.id, {
         is_visible: !item.is_visible,
       });
       if (result.error) throw new Error(result.error);
@@ -151,20 +170,15 @@ export function BlogList({ initialData }: BlogListProps) {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <p className="font-medium truncate">{item.title}</p>
-                  {item.is_published ? (
-                    <Badge variant="default" className="text-xs shrink-0">
-                      Published
-                    </Badge>
-                  ) : (
-                    <Badge variant="secondary" className="text-xs shrink-0">
-                      Draft
-                    </Badge>
-                  )}
-                  {!item.is_visible && (
-                    <Badge variant="outline" className="text-xs shrink-0">
-                      Hidden
-                    </Badge>
-                  )}
+                  {(() => {
+                    const state = getBlogPublicationState(item);
+                    return (
+                      <StatusBadge
+                        status={state}
+                        className="shrink-0 text-xs"
+                      />
+                    );
+                  })()}
                 </div>
                 {item.excerpt && (
                   <p className="text-sm text-muted-foreground truncate mt-0.5">
@@ -181,40 +195,39 @@ export function BlogList({ initialData }: BlogListProps) {
                   })}
                 </time>
               )}
+              {isPublicBlogPost(item) ? (
+                <a
+                  href={`${process.env.NEXT_PUBLIC_PORTFOLIO_URL ?? "https://jayantgoyal.com"}/blog/${item.slug}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex shrink-0 items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                >
+                  View <ExternalLink className="size-3" />
+                </a>
+              ) : null}
               <div className="flex shrink-0 items-center gap-1">
-                <Button
+                <IconAction
+                  icon={item.is_visible ? Eye : EyeOff}
+                  label={item.is_visible ? "Hide article" : "Show article"}
                   variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
                   onClick={() => toggleVisibility(item)}
-                >
-                  {item.is_visible ? (
-                    <Eye className="h-4 w-4" />
-                  ) : (
-                    <EyeOff className="h-4 w-4" />
-                  )}
-                </Button>
-                <Button
+                />
+                <IconAction
+                  icon={Pencil}
+                  label="Edit article"
                   variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
                   onClick={() => openEditDialog(item)}
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
-                <Button
+                />
+                <IconAction
+                  icon={deleting === item.id ? Loader2 : Trash2}
+                  iconClassName={
+                    deleting === item.id ? "size-4 animate-spin" : undefined
+                  }
+                  label="Delete article"
                   variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => handleDelete(item.id)}
+                  onClick={() => setPendingDelete(item)}
                   disabled={deleting === item.id}
-                >
-                  {deleting === item.id ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Trash2 className="h-4 w-4" />
-                  )}
-                </Button>
+                />
               </div>
             </div>
           ))
@@ -229,6 +242,20 @@ export function BlogList({ initialData }: BlogListProps) {
         setFormData={setFormData}
         onSubmit={handleSubmit}
         saving={saving}
+        errorMessage={formError}
+      />
+      <ConfirmationDialog
+        open={pendingDelete !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingDelete(null);
+        }}
+        title="Delete this article?"
+        description="This permanently removes the article from the CMS and the public Portfolio."
+        confirmLabel="Delete article"
+        destructive
+        onConfirm={() => {
+          if (pendingDelete) return handleDelete(pendingDelete.id);
+        }}
       />
     </>
   );

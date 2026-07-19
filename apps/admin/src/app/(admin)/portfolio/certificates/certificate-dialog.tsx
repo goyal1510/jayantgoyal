@@ -3,6 +3,7 @@
 import { Loader2 } from "lucide-react";
 
 import { Button } from "@repo/ui/button";
+import { FormMessage } from "@repo/ui/form-message";
 import {
   Dialog,
   DialogContent,
@@ -47,6 +48,7 @@ export function CertificateDialog({
   setFormData,
   onSubmit,
   saving,
+  errorMessage,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -55,6 +57,7 @@ export function CertificateDialog({
   setFormData: (data: CertificateFormData) => void;
   onSubmit: (event: React.FormEvent) => void;
   saving: boolean;
+  errorMessage?: string | null;
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -225,6 +228,7 @@ export function CertificateDialog({
             </div>
           </div>
           <DialogFooter>
+            <FormMessage>{errorMessage}</FormMessage>
             <Button
               type="button"
               variant="outline"

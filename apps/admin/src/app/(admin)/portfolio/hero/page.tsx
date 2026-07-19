@@ -1,18 +1,8 @@
-import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { HeroForm } from "./hero-form";
+import { PORTFOLIO_LEGACY_ADMIN_ROUTE_TARGETS } from "@/lib/config/portfolio-route-map";
 
-export const metadata: Metadata = { title: "Hero" };
-
-export default async function HeroPage() {
-  const supabase = await createSupabaseServerClient();
-
-  const { data: hero } = await supabase
-    .schema("portfolio")
-    .from("hero")
-    .select("*")
-    .single();
-
-  return <HeroForm initialData={hero} />;
+/** Compatibility route for existing Hero bookmarks. */
+export default function LegacyHeroPage() {
+  redirect(PORTFOLIO_LEGACY_ADMIN_ROUTE_TARGETS["/portfolio/hero"]);
 }

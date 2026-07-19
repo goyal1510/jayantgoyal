@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { Button } from "@repo/ui/button";
+import { ConfirmationDialog } from "@repo/ui/confirmation-dialog";
 import {
   Card,
   CardContent,
@@ -40,6 +41,11 @@ export function UserManagement({ currentUserId }: UserManagementProps) {
   const [selectedUserId, setSelectedUserId] = useState("");
   const [newRole, setNewRole] = useState<UserRole>("user");
   const [addingUser, setAddingUser] = useState(false);
+  const [pendingRemoval, setPendingRemoval] = useState<{
+    profileId: number;
+    userId: string;
+    name: string;
+  } | null>(null);
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
@@ -103,10 +109,6 @@ export function UserManagement({ currentUserId }: UserManagementProps) {
   async function removeUser(profileId: number, userId: string) {
     if (userId === currentUserId) {
       toast.error("You cannot remove yourself");
-      return;
-    }
-
-    if (!confirm("Are you sure you want to remove this user's admin access?")) {
       return;
     }
 
@@ -213,7 +215,16 @@ export function UserManagement({ currentUserId }: UserManagementProps) {
               currentUserId={currentUserId}
               actionLoading={actionLoading}
               onUpdateRole={updateRole}
-              onRemoveUser={removeUser}
+              onRemoveUser={(profileId, userId) => {
+                const profile = profiles.find((item) => item.id === profileId);
+                setPendingRemoval({
+                  profileId,
+                  userId,
+                  name: profile
+                    ? `${profile.first_name} ${profile.last_name}`.trim() || profile.email || "this user"
+                    : "this user",
+                });
+              }}
             />
           )}
         </CardContent>
@@ -229,6 +240,21 @@ export function UserManagement({ currentUserId }: UserManagementProps) {
         setNewRole={setNewRole}
         onSubmit={handleAddUser}
         adding={addingUser}
+      />
+      <ConfirmationDialog
+        open={pendingRemoval !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingRemoval(null);
+        }}
+        title="Remove admin access?"
+        description={`This will return ${pendingRemoval?.name ?? "this user"} to a regular account role.`}
+        confirmLabel="Remove access"
+        destructive
+        onConfirm={() => {
+          if (pendingRemoval) {
+            return removeUser(pendingRemoval.profileId, pendingRemoval.userId);
+          }
+        }}
       />
     </div>
   );

@@ -27,5 +27,5 @@ export function DynamicBreadcrumb() {
       ]
     : [];
 
-  return <BreadcrumbTrail homeHref="/portfolio/hero" items={items} />;
+  return <BreadcrumbTrail homeHref="/portfolio" items={items} />;
 }

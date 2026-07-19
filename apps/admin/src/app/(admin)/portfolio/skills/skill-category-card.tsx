@@ -11,6 +11,8 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { Button } from "@repo/ui/button";
+import { IconAction } from "@repo/ui/icon-action";
+import { VisibilityBadge } from "@repo/ui/status-badge";
 import {
   Collapsible,
   CollapsibleContent,
@@ -52,7 +54,16 @@ export function SkillCategoryCard({
       <div className="rounded-lg border">
         <div className="flex items-center gap-4 p-4">
           <CollapsibleTrigger asChild>
-            <Button variant="ghost" size="icon">
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label={
+                expanded ? "Collapse skill category" : "Expand skill category"
+              }
+              title={
+                expanded ? "Collapse skill category" : "Expand skill category"
+              }
+            >
               {expanded ? (
                 <ChevronDown className="h-4 w-4" />
               ) : (
@@ -66,9 +77,7 @@ export function SkillCategoryCard({
               <span className="text-xs text-muted-foreground">
                 ({category.skills.length} skills)
               </span>
-              {!category.is_visible && (
-                <span className="text-xs text-muted-foreground">(Hidden)</span>
-              )}
+              <VisibilityBadge visible={category.is_visible} />
             </div>
             <p className="text-sm text-muted-foreground">
               {category.description}
@@ -83,25 +92,22 @@ export function SkillCategoryCard({
               <Plus className="mr-2 h-4 w-4" />
               Add Skill
             </Button>
-            <Button
+            <IconAction
+              icon={Pencil}
+              label="Edit skill category"
               variant="ghost"
-              size="icon"
               onClick={() => onEditCategory(category)}
-            >
-              <Pencil className="h-4 w-4" />
-            </Button>
-            <Button
+            />
+            <IconAction
+              icon={deleting === category.id ? Loader2 : Trash2}
+              iconClassName={
+                deleting === category.id ? "size-4 animate-spin" : undefined
+              }
+              label="Delete skill category"
               variant="ghost"
-              size="icon"
               onClick={() => onDeleteCategory(category.id)}
               disabled={deleting === category.id}
-            >
-              {deleting === category.id ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Trash2 className="h-4 w-4" />
-              )}
-            </Button>
+            />
           </div>
         </div>
         <CollapsibleContent>
@@ -124,43 +130,36 @@ export function SkillCategoryCard({
                     <p className="mt-1 text-sm text-muted-foreground">
                       {skill.evidence}
                     </p>
-                    {!skill.is_visible && (
-                      <span className="ml-2 text-xs text-muted-foreground">
-                        (Hidden)
-                      </span>
-                    )}
+                    <VisibilityBadge
+                      visible={skill.is_visible}
+                      className="ml-2"
+                    />
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button
+                    <IconAction
+                      icon={skill.is_visible ? Eye : EyeOff}
+                      label={skill.is_visible ? "Hide skill" : "Show skill"}
                       variant="ghost"
-                      size="icon"
                       onClick={() => onToggleSkillVisibility(skill)}
-                    >
-                      {skill.is_visible ? (
-                        <Eye className="h-4 w-4" />
-                      ) : (
-                        <EyeOff className="h-4 w-4" />
-                      )}
-                    </Button>
-                    <Button
+                    />
+                    <IconAction
+                      icon={Pencil}
+                      label="Edit skill"
                       variant="ghost"
-                      size="icon"
                       onClick={() => onEditSkill(skill)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
+                    />
+                    <IconAction
+                      icon={deleting === skill.id ? Loader2 : Trash2}
+                      iconClassName={
+                        deleting === skill.id
+                          ? "size-4 animate-spin"
+                          : undefined
+                      }
+                      label="Delete skill"
                       variant="ghost"
-                      size="icon"
                       onClick={() => onDeleteSkill(skill.id)}
                       disabled={deleting === skill.id}
-                    >
-                      {deleting === skill.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Trash2 className="h-4 w-4" />
-                      )}
-                    </Button>
+                    />
                   </div>
                 </div>
               ))

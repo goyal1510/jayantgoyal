@@ -1,18 +1,8 @@
-import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { CertificatesList } from "./certificates-list";
+import { PORTFOLIO_LEGACY_ADMIN_ROUTE_TARGETS } from "@/lib/config/portfolio-route-map";
 
-export const metadata: Metadata = { title: "Certificates" };
-
-export default async function CertificatesPage() {
-  const supabase = await createSupabaseServerClient();
-
-  const { data: certificates } = await supabase
-    .schema("portfolio")
-    .from("certificates")
-    .select("*")
-    .order("sort_order", { ascending: true });
-
-  return <CertificatesList initialData={certificates ?? []} />;
+/** Compatibility route for existing Certificates bookmarks. */
+export default function LegacyCertificatesPage() {
+  redirect(PORTFOLIO_LEGACY_ADMIN_ROUTE_TARGETS["/portfolio/certificates"]);
 }

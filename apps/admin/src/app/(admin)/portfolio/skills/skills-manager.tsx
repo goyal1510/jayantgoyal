@@ -10,6 +10,7 @@ import {
   deletePortfolioData,
 } from "@/lib/portfolio-api";
 import { Button } from "@repo/ui/button";
+import { ConfirmationDialog } from "@repo/ui/confirmation-dialog";
 import {
   Card,
   CardContent,
@@ -52,13 +53,20 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
   const [categoryForm, setCategoryForm] =
     useState<CategoryFormData>(emptyCategoryForm);
   const [savingCategory, setSavingCategory] = useState(false);
+  const [categoryFormError, setCategoryFormError] = useState<string | null>(
+    null,
+  );
 
   const [skillDialogOpen, setSkillDialogOpen] = useState(false);
   const [editingSkill, setEditingSkill] = useState<Skill | null>(null);
   const [skillForm, setSkillForm] = useState<SkillFormData>(emptySkillForm);
   const [savingSkill, setSavingSkill] = useState(false);
+  const [skillFormError, setSkillFormError] = useState<string | null>(null);
 
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<
+    { kind: "category"; item: SkillCategory } | { kind: "skill"; item: Skill } | null
+  >(null);
 
   useEffect(() => {
     setCategories(initialData);
@@ -83,6 +91,7 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
           ? Math.max(...categories.map((c) => c.sort_order)) + 1
           : 0,
     });
+    setCategoryFormError(null);
     setCategoryDialogOpen(true);
   };
 
@@ -94,16 +103,18 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
       sort_order: category.sort_order,
       is_visible: category.is_visible,
     });
+    setCategoryFormError(null);
     setCategoryDialogOpen(true);
   };
 
   const handleCategorySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSavingCategory(true);
+    setCategoryFormError(null);
 
     try {
       if (editingCategory) {
-        const result = await updatePortfolioData<SkillCategory>(
+        const result = await updatePortfolioData(
           "skill_categories",
           editingCategory.id,
           categoryForm,
@@ -111,7 +122,7 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
         if (result.error) throw new Error(result.error);
         toast.success("Category updated");
       } else {
-        const result = await createPortfolioData<SkillCategory>(
+        const result = await createPortfolioData(
           "skill_categories",
           categoryForm,
         );
@@ -122,9 +133,10 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
       setCategoryDialogOpen(false);
       router.refresh();
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to save category",
-      );
+      const message =
+        error instanceof Error ? error.message : "Failed to save category";
+      setCategoryFormError(message);
+      toast.error(message);
     } finally {
       setSavingCategory(false);
     }
@@ -136,8 +148,6 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
       toast.error("Delete all skills in this category first");
       return;
     }
-    if (!confirm("Are you sure you want to delete this category?")) return;
-
     setDeleting(id);
 
     try {
@@ -163,6 +173,7 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
       category_id: categoryId,
       sort_order: category?.skills.length ?? 0,
     });
+    setSkillFormError(null);
     setSkillDialogOpen(true);
   };
 
@@ -176,16 +187,18 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
       sort_order: skill.sort_order,
       is_visible: skill.is_visible,
     });
+    setSkillFormError(null);
     setSkillDialogOpen(true);
   };
 
   const handleSkillSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSavingSkill(true);
+    setSkillFormError(null);
 
     try {
       if (editingSkill) {
-        const result = await updatePortfolioData<Skill>(
+        const result = await updatePortfolioData(
           "skills",
           editingSkill.id,
           skillForm,
@@ -193,7 +206,7 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
         if (result.error) throw new Error(result.error);
         toast.success("Skill updated");
       } else {
-        const result = await createPortfolioData<Skill>("skills", skillForm);
+        const result = await createPortfolioData("skills", skillForm);
         if (result.error) throw new Error(result.error);
         toast.success("Skill added");
       }
@@ -201,17 +214,16 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
       setSkillDialogOpen(false);
       router.refresh();
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to save skill",
-      );
+      const message =
+        error instanceof Error ? error.message : "Failed to save skill";
+      setSkillFormError(message);
+      toast.error(message);
     } finally {
       setSavingSkill(false);
     }
   };
 
   const handleDeleteSkill = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this skill?")) return;
-
     setDeleting(id);
 
     try {
@@ -236,7 +248,7 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
 
   const toggleSkillVisibility = async (skill: Skill) => {
     try {
-      const result = await updatePortfolioData<Skill>("skills", skill.id, {
+      const result = await updatePortfolioData("skills", skill.id, {
         is_visible: !skill.is_visible,
       });
       if (result.error) throw new Error(result.error);
@@ -284,10 +296,18 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
                   expanded={expandedCategories.has(category.id)}
                   onToggle={() => toggleCategory(category.id)}
                   onEditCategory={openEditCategoryDialog}
-                  onDeleteCategory={handleDeleteCategory}
+                  onDeleteCategory={(id) => {
+                    const item = categories.find((category) => category.id === id);
+                    if (item) setPendingDelete({ kind: "category", item });
+                  }}
                   onAddSkill={openAddSkillDialog}
                   onEditSkill={openEditSkillDialog}
-                  onDeleteSkill={handleDeleteSkill}
+                  onDeleteSkill={(id) => {
+                    const item = categories
+                      .flatMap((category) => category.skills)
+                      .find((skill) => skill.id === id);
+                    if (item) setPendingDelete({ kind: "skill", item });
+                  }}
                   onToggleSkillVisibility={toggleSkillVisibility}
                   deleting={deleting}
                 />
@@ -305,6 +325,7 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
         setFormData={setCategoryForm}
         onSubmit={handleCategorySubmit}
         saving={savingCategory}
+        errorMessage={categoryFormError}
       />
 
       <SkillDialog
@@ -315,6 +336,31 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
         setFormData={setSkillForm}
         onSubmit={handleSkillSubmit}
         saving={savingSkill}
+        errorMessage={skillFormError}
+      />
+      <ConfirmationDialog
+        open={pendingDelete !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingDelete(null);
+        }}
+        title={
+          pendingDelete?.kind === "category"
+            ? "Delete this skill category?"
+            : "Delete this skill?"
+        }
+        description={
+          pendingDelete?.kind === "category"
+            ? "This removes the empty category from the Skills workspace."
+            : "This removes the skill from the public Skills section."
+        }
+        confirmLabel={pendingDelete?.kind === "category" ? "Delete category" : "Delete skill"}
+        destructive
+        onConfirm={() => {
+          if (!pendingDelete) return;
+          return pendingDelete.kind === "category"
+            ? handleDeleteCategory(pendingDelete.item.id)
+            : handleDeleteSkill(pendingDelete.item.id);
+        }}
       />
     </>
   );

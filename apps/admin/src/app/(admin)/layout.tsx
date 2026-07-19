@@ -2,9 +2,12 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
+import { TopbarUserMenu } from "@/components/header/topbar-user-menu";
+import { AdminCommandPalette } from "@/components/header/command-palette";
 import { DynamicBreadcrumb } from "@/components/sidebar/dynamic-breadcrumb";
-import ThemeToggle from "@/components/theme/theme-toggle";
-import { ApplicationHeader } from "@repo/ui/application-shell";
+import { ThemeMenu } from "@repo/ui/theme-menu";
+import { ApplicationShell } from "@repo/ui/application-shell";
+import { ApplicationTopbar } from "@repo/ui/application-topbar";
 import { LazyMotionProvider } from "@repo/ui/lazy-motion-provider";
 import {
   SIDEBAR_STATE_COOKIE_NAME,
@@ -12,7 +15,6 @@ import {
   parseSidebarPreferences,
 } from "@repo/ui/lib/sidebar-preferences";
 import { RouteChangeProvider } from "@repo/ui/route-change-provider";
-import { SidebarInset, SidebarProvider } from "@repo/ui/sidebar";
 import type { UserRole } from "@/lib/types";
 
 export default async function AdminLayout({
@@ -59,19 +61,26 @@ export default async function AdminLayout({
   };
 
   return (
-    <SidebarProvider {...sidebarPreferences}>
-      <AppSidebar user={authUser} />
-      <SidebarInset>
-        <ApplicationHeader
+    <ApplicationShell
+      sidebar={<AppSidebar user={authUser} />}
+      header={
+        <ApplicationTopbar
           breadcrumb={<DynamicBreadcrumb />}
-          actions={<ThemeToggle />}
+          actions={
+            <>
+              <AdminCommandPalette role={authUser.role} />
+              <ThemeMenu />
+              <TopbarUserMenu user={authUser} />
+            </>
+          }
         />
-        <LazyMotionProvider>
-          <div className="flex flex-1 flex-col gap-4 p-4 min-w-0">
-            <RouteChangeProvider>{children}</RouteChangeProvider>
-          </div>
-        </LazyMotionProvider>
-      </SidebarInset>
-    </SidebarProvider>
+      }
+      contentClassName="gap-4 p-4 sm:p-6"
+      {...sidebarPreferences}
+    >
+      <LazyMotionProvider>
+        <RouteChangeProvider>{children}</RouteChangeProvider>
+      </LazyMotionProvider>
+    </ApplicationShell>
   );
 }

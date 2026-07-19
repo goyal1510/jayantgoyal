@@ -1,18 +1,8 @@
-import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { EducationList } from "./education-list";
+import { PORTFOLIO_LEGACY_ADMIN_ROUTE_TARGETS } from "@/lib/config/portfolio-route-map";
 
-export const metadata: Metadata = { title: "Education" };
-
-export default async function EducationPage() {
-  const supabase = await createSupabaseServerClient();
-
-  const { data: education } = await supabase
-    .schema("portfolio")
-    .from("education")
-    .select("*")
-    .order("sort_order", { ascending: true });
-
-  return <EducationList initialData={education ?? []} />;
+/** Compatibility route for existing Education bookmarks. */
+export default function LegacyEducationPage() {
+  redirect(PORTFOLIO_LEGACY_ADMIN_ROUTE_TARGETS["/portfolio/education"]);
 }

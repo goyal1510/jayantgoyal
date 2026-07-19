@@ -2,6 +2,7 @@
 
 import { Loader2 } from "lucide-react";
 import { Button } from "@repo/ui/button";
+import { FormMessage } from "@repo/ui/form-message";
 import {
   Dialog,
   DialogContent,
@@ -36,6 +37,7 @@ interface CategoryDialogProps {
   setFormData: (data: CategoryFormData) => void;
   onSubmit: (e: React.FormEvent) => void;
   saving: boolean;
+  errorMessage?: string | null;
 }
 
 export function CategoryDialog({
@@ -46,6 +48,7 @@ export function CategoryDialog({
   setFormData,
   onSubmit,
   saving,
+  errorMessage,
 }: CategoryDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -113,6 +116,7 @@ export function CategoryDialog({
             </div>
           </div>
           <DialogFooter>
+            <FormMessage>{errorMessage}</FormMessage>
             <Button
               type="button"
               variant="outline"

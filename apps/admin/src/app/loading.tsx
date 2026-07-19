@@ -1,4 +1,4 @@
-import { CircularLoader } from "@/components/ui/circular-loader";
+import { CircularLoader } from "@repo/ui/circular-loader";
 
 export default function Loading() {
   return (

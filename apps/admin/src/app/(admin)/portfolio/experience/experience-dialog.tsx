@@ -2,6 +2,8 @@
 
 import { Loader2, Plus, X } from "lucide-react";
 import { Button } from "@repo/ui/button";
+import { IconAction } from "@repo/ui/icon-action";
+import { FormMessage } from "@repo/ui/form-message";
 import {
   Dialog,
   DialogContent,
@@ -37,6 +39,7 @@ interface ExperienceDialogProps {
   setFormData: (data: ExperienceFormData) => void;
   onSubmit: (e: React.FormEvent) => void;
   saving: boolean;
+  errorMessage?: string | null;
 }
 
 export function ExperienceDialog({
@@ -47,6 +50,7 @@ export function ExperienceDialog({
   setFormData,
   onSubmit,
   saving,
+  errorMessage,
 }: ExperienceDialogProps) {
   const addBullet = () => {
     setFormData({
@@ -83,7 +87,7 @@ export function ExperienceDialog({
         </DialogHeader>
         <form onSubmit={onSubmit}>
           <div className="space-y-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="company">Company</Label>
                 <Input
@@ -109,7 +113,7 @@ export function ExperienceDialog({
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="period">Period</Label>
                 <Input
@@ -151,21 +155,24 @@ export function ExperienceDialog({
               <Label>Key Accomplishments / Responsibilities</Label>
               {formData.bullets.map((bullet, index) => (
                 <div key={index} className="flex gap-2 items-start">
+                  <Label htmlFor={`experience-bullet-${index}`} className="sr-only">
+                    Accomplishment {index + 1}
+                  </Label>
                   <Textarea
+                    id={`experience-bullet-${index}`}
                     value={bullet}
                     onChange={(e) => updateBullet(index, e.target.value)}
                     placeholder="Describe an accomplishment..."
                     rows={2}
                     className="flex-1"
                   />
-                  <Button
+                  <IconAction
+                    icon={X}
+                    label="Remove accomplishment"
                     type="button"
                     variant="ghost"
-                    size="icon"
                     onClick={() => removeBullet(index)}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
+                  />
                 </div>
               ))}
               <Button type="button" variant="outline" onClick={addBullet}>
@@ -200,6 +207,7 @@ export function ExperienceDialog({
             </div>
           </div>
           <DialogFooter>
+            <FormMessage>{errorMessage}</FormMessage>
             <Button
               type="button"
               variant="outline"

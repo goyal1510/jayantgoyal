@@ -1,8 +1,8 @@
 "use client";
 
 import { Check, X, Trash2, Loader2 } from "lucide-react";
-import { Button } from "@repo/ui/button";
 import { Badge } from "@repo/ui/badge";
+import { IconAction } from "@repo/ui/icon-action";
 import {
   Select,
   SelectContent,
@@ -112,20 +112,16 @@ export function UsersTable({
                           <SelectItem value="super_admin">Super Admin</SelectItem>
                         </SelectContent>
                       </Select>
-                      <Button
+                      <IconAction
+                        icon={isLoading ? Loader2 : Trash2}
+                        iconClassName={isLoading ? "size-3.5 animate-spin" : "size-3.5"}
+                        label={`Remove ${profile.email || "user"}`}
                         variant="destructive"
-                        size="icon-sm"
                         onClick={() =>
                           onRemoveUser(profile.id, profile.user_id)
                         }
                         disabled={isLoading}
-                      >
-                        {isLoading ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        ) : (
-                          <Trash2 className="h-3.5 w-3.5" />
-                        )}
-                      </Button>
+                      />
                     </div>
                   )}
                 </td>

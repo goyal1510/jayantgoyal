@@ -1,16 +1,23 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import { APP_BRANDS } from "@repo/brand";
+import { IBM_Plex_Mono, Manrope } from "next/font/google";
+import { APP_BRANDS, BRAND_ASSET_PATHS } from "@repo/brand";
 import { ThemeProvider } from "@repo/ui/theme-provider";
 import { Toaster } from "@repo/ui/sonner";
 
 const ADMIN_BRAND = APP_BRANDS.admin;
 
-const inter = Inter({
+const manrope = Manrope({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-inter",
+  variable: "--font-manrope",
+});
+
+const ibmPlexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-ibm-plex-mono",
+  weight: ["400", "500"],
 });
 
 export const metadata: Metadata = {
@@ -29,31 +36,31 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/assets/Jayant_favicon_io/favicon.ico" },
+      { url: BRAND_ASSET_PATHS.favicon },
       {
-        url: "/assets/Jayant_favicon_io/favicon-32x32.png",
+        url: BRAND_ASSET_PATHS.favicon32,
         sizes: "32x32",
         type: "image/png",
       },
       {
-        url: "/assets/Jayant_favicon_io/favicon-16x16.png",
+        url: BRAND_ASSET_PATHS.favicon16,
         sizes: "16x16",
         type: "image/png",
       },
       {
-        url: "/assets/Jayant_favicon_io/android-chrome-192x192.png",
+        url: BRAND_ASSET_PATHS.android192,
         sizes: "192x192",
         type: "image/png",
       },
       {
-        url: "/assets/Jayant_favicon_io/android-chrome-512x512.png",
+        url: BRAND_ASSET_PATHS.android512,
         sizes: "512x512",
         type: "image/png",
       },
     ],
     apple: [
       {
-        url: "/assets/Jayant_favicon_io/apple-touch-icon.png",
+        url: BRAND_ASSET_PATHS.appleTouchIcon,
         sizes: "180x180",
         type: "image/png",
       },
@@ -68,7 +75,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body
+        className={`${manrope.variable} ${ibmPlexMono.variable} application-surface`}
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

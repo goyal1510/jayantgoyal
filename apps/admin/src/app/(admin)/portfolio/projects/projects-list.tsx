@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element */
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -27,6 +29,9 @@ import {
   CardTitle,
 } from "@repo/ui/card";
 import { Badge } from "@repo/ui/badge";
+import { ConfirmationDialog } from "@repo/ui/confirmation-dialog";
+import { IconAction } from "@repo/ui/icon-action";
+import { VisibilityBadge } from "@repo/ui/status-badge";
 import type { Project } from "@/lib/types";
 import {
   ProjectDialog,
@@ -45,7 +50,9 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
   const [editingItem, setEditingItem] = useState<Project | null>(null);
   const [formData, setFormData] = useState<ProjectFormData>(emptyProjectForm);
   const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<Project | null>(null);
 
   useEffect(() => {
     setItems(initialData);
@@ -58,6 +65,7 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
       sort_order:
         items.length > 0 ? Math.max(...items.map((i) => i.sort_order)) + 1 : 0,
     });
+    setFormError(null);
     setDialogOpen(true);
   };
 
@@ -79,16 +87,18 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
       sort_order: item.sort_order,
       is_visible: item.is_visible,
     });
+    setFormError(null);
     setDialogOpen(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+    setFormError(null);
 
     try {
       if (editingItem) {
-        const result = await updatePortfolioData<Project>(
+        const result = await updatePortfolioData(
           "projects",
           editingItem.id,
           formData,
@@ -96,7 +106,7 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
         if (result.error) throw new Error(result.error);
         toast.success("Project updated");
       } else {
-        const result = await createPortfolioData<Project>("projects", formData);
+        const result = await createPortfolioData("projects", formData);
         if (result.error) throw new Error(result.error);
         toast.success("Project added");
       }
@@ -104,17 +114,16 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
       setDialogOpen(false);
       router.refresh();
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to save project",
-      );
+      const message =
+        error instanceof Error ? error.message : "Failed to save project";
+      setFormError(message);
+      toast.error(message);
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this project?")) return;
-
     setDeleting(id);
 
     try {
@@ -134,7 +143,7 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
 
   const toggleVisibility = async (item: Project) => {
     try {
-      const result = await updatePortfolioData<Project>("projects", item.id, {
+      const result = await updatePortfolioData("projects", item.id, {
         is_visible: !item.is_visible,
       });
       if (result.error) throw new Error(result.error);
@@ -174,21 +183,37 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
               {items.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-start gap-4 rounded-lg border p-4"
+                  className="flex flex-col gap-4 rounded-lg border p-4 sm:flex-row"
                 >
+                  <div className="flex aspect-[16/10] w-full shrink-0 items-center justify-center overflow-hidden rounded-md border bg-muted/40 sm:w-56">
+                    {item.image_url ? (
+                      <img
+                        src={item.image_url}
+                        alt={
+                          item.image_alt || `${item.name} project screenshot`
+                        }
+                        className="h-full w-full object-contain"
+                      />
+                    ) : (
+                      <span className="px-4 text-center text-xs text-muted-foreground">
+                        Add a full project screenshot
+                      </span>
+                    )}
+                  </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <h3 className="font-semibold">{item.name}</h3>
-                      {!item.is_visible && (
-                        <span className="text-xs text-muted-foreground">
-                          (Hidden)
-                        </span>
-                      )}
+                      <VisibilityBadge visible={item.is_visible} />
                     </div>
                     {item.short_description && (
                       <p className="text-sm text-muted-foreground mt-1">
                         {item.short_description}
                       </p>
+                    )}
+                    {!item.image_alt && (
+                      <Badge variant="destructive" className="ml-1 text-xs">
+                        Missing image description
+                      </Badge>
                     )}
                     {item.tags && item.tags.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
@@ -229,36 +254,28 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button
+                    <IconAction
+                      icon={item.is_visible ? Eye : EyeOff}
+                      label={item.is_visible ? "Hide project" : "Show project"}
                       variant="ghost"
-                      size="icon"
                       onClick={() => toggleVisibility(item)}
-                    >
-                      {item.is_visible ? (
-                        <Eye className="h-4 w-4" />
-                      ) : (
-                        <EyeOff className="h-4 w-4" />
-                      )}
-                    </Button>
-                    <Button
+                    />
+                    <IconAction
+                      icon={Pencil}
+                      label="Edit project"
                       variant="ghost"
-                      size="icon"
                       onClick={() => openEditDialog(item)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
+                    />
+                    <IconAction
+                      icon={deleting === item.id ? Loader2 : Trash2}
+                      iconClassName={
+                        deleting === item.id ? "size-4 animate-spin" : undefined
+                      }
+                      label="Delete project"
                       variant="ghost"
-                      size="icon"
-                      onClick={() => handleDelete(item.id)}
+                      onClick={() => setPendingDelete(item)}
                       disabled={deleting === item.id}
-                    >
-                      {deleting === item.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Trash2 className="h-4 w-4" />
-                      )}
-                    </Button>
+                    />
                   </div>
                 </div>
               ))}
@@ -275,6 +292,20 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
         setFormData={setFormData}
         onSubmit={handleSubmit}
         saving={saving}
+        errorMessage={formError}
+      />
+      <ConfirmationDialog
+        open={pendingDelete !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingDelete(null);
+        }}
+        title="Delete this project?"
+        description="This permanently removes the project story and its screenshot from the CMS."
+        confirmLabel="Delete project"
+        destructive
+        onConfirm={() => {
+          if (pendingDelete) return handleDelete(pendingDelete.id);
+        }}
       />
     </>
   );

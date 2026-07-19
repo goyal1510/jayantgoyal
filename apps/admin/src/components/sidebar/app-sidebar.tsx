@@ -12,7 +12,6 @@ import {
   type ApplicationNavigationSection,
 } from "@repo/ui/application-shell";
 
-import { NavUser } from "@/components/sidebar/nav-user";
 import {
   getVisibleAdminNavigationDomains,
   isAdminNavigationItemActive,
@@ -22,7 +21,7 @@ import type { AuthUser } from "@/lib/types";
 
 const adminBrand = {
   name: APP_BRANDS.admin.name,
-  href: "/portfolio/hero",
+  href: "/portfolio",
   icon: Shield,
 };
 
@@ -53,7 +52,6 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
   return (
     <ApplicationSidebarFrame
       brand={adminBrand}
-      footer={<NavUser user={{ email: user.email, name: user.name }} />}
       {...props}
     >
       {sections.map((section) => (

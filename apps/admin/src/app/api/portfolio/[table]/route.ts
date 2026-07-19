@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import {
   validateTable,
   authorizeAndGetClient,
+  getPortfolioAdminSelectColumns,
+  validatePortfolioRequestBody,
+  revalidatePortfolioPublicContent,
   TABLES_WITH_SORT_ORDER,
 } from "./helpers";
 
@@ -28,7 +31,7 @@ export async function GET(
       const result = await auth.client
         .schema("portfolio")
         .from(table)
-        .select("*")
+        .select(getPortfolioAdminSelectColumns(table))
         .eq("id", id)
         .single();
       data = result.data;
@@ -37,7 +40,7 @@ export async function GET(
       const result = await auth.client
         .schema("portfolio")
         .from(table)
-        .select("*")
+        .select(getPortfolioAdminSelectColumns(table))
         .order("sort_order", { ascending: true });
       data = result.data;
       error = result.error;
@@ -45,7 +48,7 @@ export async function GET(
       const result = await auth.client
         .schema("portfolio")
         .from(table)
-        .select("*");
+        .select(getPortfolioAdminSelectColumns(table));
       data = result.data;
       error = result.error;
     }
@@ -78,18 +81,21 @@ export async function POST(
     if ("error" in auth) return auth.error;
 
     const body = await request.json();
+    const payloadError = validatePortfolioRequestBody(table, body, "create");
+    if (payloadError) return payloadError;
 
     const { data, error } = await auth.client
       .schema("portfolio")
       .from(table)
       .insert(body)
-      .select()
+      .select(getPortfolioAdminSelectColumns(table))
       .single();
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    revalidatePortfolioPublicContent();
     return NextResponse.json({ data });
   } catch (error) {
     console.error("Error creating portfolio data:", error);
@@ -124,19 +130,22 @@ export async function PUT(
     }
 
     const body = await request.json();
+    const payloadError = validatePortfolioRequestBody(table, body, "update");
+    if (payloadError) return payloadError;
 
     const { data, error } = await auth.client
       .schema("portfolio")
       .from(table)
       .update(body)
       .eq("id", id)
-      .select()
+      .select(getPortfolioAdminSelectColumns(table))
       .single();
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    revalidatePortfolioPublicContent();
     return NextResponse.json({ data });
   } catch (error) {
     console.error("Error updating portfolio data:", error);
@@ -180,6 +189,7 @@ export async function DELETE(
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    revalidatePortfolioPublicContent();
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting portfolio data:", error);

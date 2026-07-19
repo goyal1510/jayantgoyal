@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { Button } from "@repo/ui/button";
 import { Badge } from "@repo/ui/badge";
+import { IconAction } from "@repo/ui/icon-action";
 import type { VercelDeployment, VercelDeploymentState } from "@/lib/types";
 
 const stateBadgeVariant: Record<
@@ -104,35 +105,30 @@ export function DeploymentsTable({
                           href={d.inspectorUrl}
                           target="_blank"
                           rel="noopener noreferrer"
+                          aria-label="Open deployment in Vercel"
                           title="Open in Vercel"
                         >
-                          <ExternalLink className="h-3.5 w-3.5" />
+                          <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
                         </a>
                       </Button>
                     )}
-                    <Button
+                    <IconAction
+                      icon={isLoading ? Loader2 : Rocket}
+                      iconClassName={isLoading ? "size-3.5 animate-spin" : "size-3.5"}
+                      label={`Redeploy ${d.uid.slice(0, 12)}`}
                       variant="ghost"
-                      size="icon-sm"
                       onClick={() => onRedeploy(d)}
                       disabled={isLoading}
-                      title="Redeploy"
-                    >
-                      {isLoading ? (
-                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                      ) : (
-                        <Rocket className="h-3.5 w-3.5" />
-                      )}
-                    </Button>
+                    />
                     {d.state === "READY" && d.target === "production" && (
-                      <Button
+                      <IconAction
+                        icon={RotateCcw}
+                        iconClassName="size-3.5"
+                        label={`Rollback ${d.uid.slice(0, 12)}`}
                         variant="ghost"
-                        size="icon-sm"
                         onClick={() => onRollback(d)}
                         disabled={isLoading}
-                        title="Rollback to this deployment"
-                      >
-                        <RotateCcw className="h-3.5 w-3.5" />
-                      </Button>
+                      />
                     )}
                   </div>
                 </td>

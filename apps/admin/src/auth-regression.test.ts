@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 const { createRequestClientMock } = vi.hoisted(() => ({
@@ -92,15 +92,35 @@ afterAll(() => {
 
 describe("Admin Proxy authentication contract", () => {
   it("switches account navigation through the shared owner contract", () => {
-    const navUser = readFileSync(
-      new URL("./components/sidebar/nav-user.tsx", import.meta.url),
+    const topbar = readFileSync(
+      new URL("./components/header/topbar-user-menu.tsx", import.meta.url),
       "utf8",
     );
+    expect(topbar).toContain("buildAuthAccountSecurityUrl");
+    expect(topbar).toContain("buildAuthLogoutUrl");
+    expect(topbar).not.toContain("AccountSettingsSheet");
+    expect(
+      existsSync(new URL("./components/sidebar/nav-user.tsx", import.meta.url)),
+    ).toBe(false);
+  });
 
-    expect(navUser).toContain("resolveAuthFlowOwner");
-    expect(navUser).toContain("buildAuthAccountSecurityUrl");
-    expect(navUser).toContain("buildAuthLogoutUrl");
-    expect(navUser).toMatch(/authOwnsNavigation\s*\?\s*undefined/);
+  it("keeps legacy account settings and MFA cleanup routes removed", () => {
+    expect(
+      existsSync(
+        new URL("./components/sidebar/account-settings-sheet.tsx", import.meta.url),
+      ),
+    ).toBe(false);
+    expect(
+      existsSync(
+        new URL("./components/auth/mfa-settings-section.tsx", import.meta.url),
+      ),
+    ).toBe(false);
+    expect(
+      existsSync(new URL("./app/api/account/mfa-cleanup/route.ts", import.meta.url)),
+    ).toBe(false);
+    expect(existsSync(new URL("./app/api/account/delete/route.ts", import.meta.url))).toBe(
+      true,
+    );
   });
 
   it("routes login entry to Auth only when the cutover flag is enabled", async () => {

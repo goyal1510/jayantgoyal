@@ -1,20 +1,16 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { revalidatePath } from "next/cache";
+import { createSupabaseServiceRoleClient } from "@repo/auth/service-role";
+import {
+  PORTFOLIO_ADMIN_SELECT_COLUMNS,
+  PORTFOLIO_TABLES,
+  type PortfolioTable,
+  validatePortfolioWriteInput,
+} from "@repo/portfolio-data";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getPortfolioPublicRevalidationPaths } from "@/lib/portfolio-revalidation";
 
-export const ALLOWED_TABLES = [
-  "hero",
-  "about",
-  "education",
-  "experience",
-  "skill_categories",
-  "skills",
-  "projects",
-  "certificates",
-  "contact",
-  "nav_items",
-  "section_content",
-];
+export const ALLOWED_TABLES = PORTFOLIO_TABLES;
 
 export const TABLES_WITH_SORT_ORDER = [
   "education",
@@ -52,23 +48,50 @@ export async function checkAdminAccess() {
 }
 
 export function getAdminClient() {
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-
-  if (!serviceRoleKey || !supabaseUrl) {
+  try {
+    return createSupabaseServiceRoleClient();
+  } catch {
     return null;
   }
-
-  return createClient(supabaseUrl, serviceRoleKey, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
 }
 
 export function validateTable(table: string) {
-  if (!ALLOWED_TABLES.includes(table)) {
+  if (!ALLOWED_TABLES.includes(table as PortfolioTable)) {
     return NextResponse.json({ error: "Invalid table" }, { status: 400 });
   }
   return null;
+}
+
+export function getPortfolioAdminSelectColumns(table: string) {
+  return PORTFOLIO_ADMIN_SELECT_COLUMNS[table as PortfolioTable];
+}
+
+export function validatePortfolioRequestBody(
+  table: string,
+  body: unknown,
+  operation: "create" | "update",
+) {
+  const errors = validatePortfolioWriteInput(table, body, operation);
+  if (errors.length === 0) return null;
+
+  return NextResponse.json(
+    {
+      error: "Invalid Portfolio payload",
+      fields: errors,
+    },
+    { status: 400 },
+  );
+}
+
+export function revalidatePortfolioPublicContent() {
+  for (const path of getPortfolioPublicRevalidationPaths()) {
+    revalidatePath(path);
+  }
+
+  // Dynamic article pages cannot be enumerated from the mutation payload. The
+  // pattern invalidates every public Blog detail page without exposing CMS
+  // state to the client.
+  revalidatePath("/blog/[slug]", "page");
 }
 
 export async function authorizeAndGetClient() {

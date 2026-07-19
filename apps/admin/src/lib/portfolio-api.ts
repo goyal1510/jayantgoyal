@@ -1,26 +1,23 @@
-type PortfolioTable =
-  | "hero"
-  | "about"
-  | "education"
-  | "experience"
-  | "skill_categories"
-  | "skills"
-  | "projects"
-  | "certificates"
-  | "contact"
-  | "nav_items"
-  | "section_content";
+import type {
+  PortfolioCreateInput,
+  PortfolioRecordMap,
+  PortfolioSectionPresentationInput,
+  PortfolioSectionPresentationResponse,
+  PortfolioTable,
+  PortfolioUpdateInput,
+} from "@repo/portfolio-data";
 
-interface ApiResponse<T> {
+export interface PortfolioApiResponse<T> {
   data?: T;
   error?: string;
+  fields?: string[];
   success?: boolean;
 }
 
-export async function fetchPortfolioData<T>(
-  table: PortfolioTable,
+export async function fetchPortfolioData<Table extends PortfolioTable>(
+  table: Table,
   id?: string,
-): Promise<ApiResponse<T>> {
+): Promise<PortfolioApiResponse<PortfolioRecordMap[Table]>> {
   const url = id
     ? `/api/portfolio/${table}?id=${id}`
     : `/api/portfolio/${table}`;
@@ -29,10 +26,10 @@ export async function fetchPortfolioData<T>(
   return response.json();
 }
 
-export async function createPortfolioData<T>(
-  table: PortfolioTable,
-  data: Partial<T>,
-): Promise<ApiResponse<T>> {
+export async function createPortfolioData<Table extends PortfolioTable>(
+  table: Table,
+  data: PortfolioCreateInput<Table>,
+): Promise<PortfolioApiResponse<PortfolioRecordMap[Table]>> {
   const response = await fetch(`/api/portfolio/${table}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -41,11 +38,11 @@ export async function createPortfolioData<T>(
   return response.json();
 }
 
-export async function updatePortfolioData<T>(
-  table: PortfolioTable,
+export async function updatePortfolioData<Table extends PortfolioTable>(
+  table: Table,
   id: string,
-  data: Partial<T>,
-): Promise<ApiResponse<T>> {
+  data: PortfolioUpdateInput<Table>,
+): Promise<PortfolioApiResponse<PortfolioRecordMap[Table]>> {
   const response = await fetch(`/api/portfolio/${table}?id=${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
@@ -57,9 +54,20 @@ export async function updatePortfolioData<T>(
 export async function deletePortfolioData(
   table: PortfolioTable,
   id: string,
-): Promise<ApiResponse<void>> {
+): Promise<PortfolioApiResponse<void>> {
   const response = await fetch(`/api/portfolio/${table}?id=${id}`, {
     method: "DELETE",
+  });
+  return response.json();
+}
+
+export async function savePortfolioSectionPresentation(
+  input: PortfolioSectionPresentationInput,
+): Promise<PortfolioApiResponse<PortfolioSectionPresentationResponse>> {
+  const response = await fetch("/api/portfolio/section-presentation", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
   });
   return response.json();
 }

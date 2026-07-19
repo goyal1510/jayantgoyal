@@ -18,6 +18,9 @@ import {
   deletePortfolioData,
 } from "@/lib/portfolio-api";
 import { Button } from "@repo/ui/button";
+import { ConfirmationDialog } from "@repo/ui/confirmation-dialog";
+import { IconAction } from "@repo/ui/icon-action";
+import { VisibilityBadge } from "@repo/ui/status-badge";
 import {
   Card,
   CardContent,
@@ -44,7 +47,9 @@ export function EducationList({ initialData }: EducationListProps) {
   const [formData, setFormData] =
     useState<EducationFormData>(emptyEducationForm);
   const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<Education | null>(null);
 
   useEffect(() => {
     setItems(initialData);
@@ -57,6 +62,7 @@ export function EducationList({ initialData }: EducationListProps) {
       sort_order:
         items.length > 0 ? Math.max(...items.map((i) => i.sort_order)) + 1 : 0,
     });
+    setFormError(null);
     setDialogOpen(true);
   };
 
@@ -71,16 +77,18 @@ export function EducationList({ initialData }: EducationListProps) {
       sort_order: item.sort_order,
       is_visible: item.is_visible,
     });
+    setFormError(null);
     setDialogOpen(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+    setFormError(null);
 
     try {
       if (editingItem) {
-        const result = await updatePortfolioData<Education>(
+        const result = await updatePortfolioData(
           "education",
           editingItem.id,
           formData,
@@ -88,10 +96,7 @@ export function EducationList({ initialData }: EducationListProps) {
         if (result.error) throw new Error(result.error);
         toast.success("Education updated");
       } else {
-        const result = await createPortfolioData<Education>(
-          "education",
-          formData,
-        );
+        const result = await createPortfolioData("education", formData);
         if (result.error) throw new Error(result.error);
         toast.success("Education added");
       }
@@ -99,17 +104,16 @@ export function EducationList({ initialData }: EducationListProps) {
       setDialogOpen(false);
       router.refresh();
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to save education",
-      );
+      const message =
+        error instanceof Error ? error.message : "Failed to save education";
+      setFormError(message);
+      toast.error(message);
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this entry?")) return;
-
     setDeleting(id);
 
     try {
@@ -129,13 +133,9 @@ export function EducationList({ initialData }: EducationListProps) {
 
   const toggleVisibility = async (item: Education) => {
     try {
-      const result = await updatePortfolioData<Education>(
-        "education",
-        item.id,
-        {
-          is_visible: !item.is_visible,
-        },
-      );
+      const result = await updatePortfolioData("education", item.id, {
+        is_visible: !item.is_visible,
+      });
       if (result.error) throw new Error(result.error);
       setItems(
         items.map((i) =>
@@ -180,11 +180,7 @@ export function EducationList({ initialData }: EducationListProps) {
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <h3 className="font-semibold">{item.school}</h3>
-                      {!item.is_visible && (
-                        <span className="text-xs text-muted-foreground">
-                          (Hidden)
-                        </span>
-                      )}
+                      <VisibilityBadge visible={item.is_visible} />
                     </div>
                     <p className="text-sm text-muted-foreground">
                       {item.degree} • {item.period}
@@ -196,36 +192,30 @@ export function EducationList({ initialData }: EducationListProps) {
                     )}
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button
+                    <IconAction
+                      icon={item.is_visible ? Eye : EyeOff}
+                      label={
+                        item.is_visible ? "Hide education" : "Show education"
+                      }
                       variant="ghost"
-                      size="icon"
                       onClick={() => toggleVisibility(item)}
-                    >
-                      {item.is_visible ? (
-                        <Eye className="h-4 w-4" />
-                      ) : (
-                        <EyeOff className="h-4 w-4" />
-                      )}
-                    </Button>
-                    <Button
+                    />
+                    <IconAction
+                      icon={Pencil}
+                      label="Edit education"
                       variant="ghost"
-                      size="icon"
                       onClick={() => openEditDialog(item)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
+                    />
+                    <IconAction
+                      icon={deleting === item.id ? Loader2 : Trash2}
+                      iconClassName={
+                        deleting === item.id ? "size-4 animate-spin" : undefined
+                      }
+                      label="Delete education"
                       variant="ghost"
-                      size="icon"
-                      onClick={() => handleDelete(item.id)}
+                      onClick={() => setPendingDelete(item)}
                       disabled={deleting === item.id}
-                    >
-                      {deleting === item.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Trash2 className="h-4 w-4" />
-                      )}
-                    </Button>
+                    />
                   </div>
                 </div>
               ))}
@@ -242,6 +232,20 @@ export function EducationList({ initialData }: EducationListProps) {
         setFormData={setFormData}
         onSubmit={handleSubmit}
         saving={saving}
+        errorMessage={formError}
+      />
+      <ConfirmationDialog
+        open={pendingDelete !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingDelete(null);
+        }}
+        title="Delete this education entry?"
+        description="This removes the entry from the About timeline in the public Portfolio."
+        confirmLabel="Delete entry"
+        destructive
+        onConfirm={() => {
+          if (pendingDelete) return handleDelete(pendingDelete.id);
+        }}
       />
     </>
   );

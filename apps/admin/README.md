@@ -14,19 +14,23 @@ Administrative dashboard for managing portfolio data and users.
 
 ## Portfolio Management
 
-| Section          | Description                                                             |
-| ---------------- | ----------------------------------------------------------------------- |
-| **Hero**         | Public identity, headline, SEO, GitHub username, and Resume             |
-| **Section Copy** | Headings, descriptions, and visibility for public sections and subpages |
-| **About**        | Story, objective, personal facts, and product principles                |
-| **Experience**   | Work history with company, role, dates                                  |
-| **Education**    | Degrees, institutions, years                                            |
+| Workspace        | Description                                                              |
+| ---------------- | ------------------------------------------------------------------------ |
+| **Overview**     | Editorial health, publishing state, and shortcuts into each workspace   |
+| **Home**         | Public identity, headline, SEO, GitHub username, and Resume             |
+| **About**        | Story, education, personal facts, and product principles                |
 | **Skills**       | Capability groups, proficiency labels, and evidence                     |
-| **Projects**     | Project stories, full-width screenshots, links, and technologies        |
-| **Certificates** | Credential metadata, documents, previews, and verification links        |
+| **Experience**   | Work history and credentials, with role, dates, and verification         |
+| **Activity**     | GitHub identity and contribution/activity presentation                   |
+| **Work**         | Project stories, full-width screenshots, links, and technologies        |
+| **Writing**      | Published articles, cover images, tags, and publication state            |
 | **Contact**      | Contact details, social links, and the Resend recipient                 |
-| **Navigation**   | Labels, notes, ordering, and visibility for real Portfolio anchors      |
-| **Blog**         | Published articles, cover images, tags, and publication state           |
+
+Section copy and navigation metadata are edited inside the workspace that
+owns the public section. They are not separate Admin destinations. Account
+profile, password, MFA, providers, and logout are owned by the shared Auth
+account surface reached from the top-right user menu; the retired
+application-local settings sheets are no longer part of Admin.
 
 ## Tech Stack
 
@@ -48,17 +52,15 @@ apps/admin/
 │   │   │   ├── layout.tsx        # Admin layout with sidebar
 │   │   │   ├── page.tsx          # Dashboard home
 │   │   │   ├── portfolio/        # Portfolio management
-│   │   │   │   ├── hero/
+│   │   │   │   ├── home/
 │   │   │   │   ├── about/
-│   │   │   │   ├── education/
-│   │   │   │   ├── experience/
 │   │   │   │   ├── skills/
-│   │   │   │   ├── projects/
-│   │   │   │   ├── certificates/
-│   │   │   │   ├── contact/
-│   │   │   │   ├── navigation/
-│   │   │   │   └── section-copy/
-│   │   │   ├── blog/             # Blog content management
+│   │   │   │   ├── experience/
+│   │   │   │   ├── activity/
+│   │   │   │   ├── work/
+│   │   │   │   ├── writing/
+│   │   │   │   └── contact/
+│   │   │   ├── blog/             # Compatibility redirect to Writing
 │   │   │   └── users/            # User management
 │   │   ├── api/
 │   │   │   ├── portfolio/[table]/ # Generic CRUD for portfolio tables
@@ -68,13 +70,16 @@ apps/admin/
 │   │   ├── welcome/              # Login and authentication entry
 │   │   └── unauthorized/         # Access denied page
 │   ├── components/
-│   │   ├── sidebar/              # Navigation sidebar
-│   │   └── theme/                # Theme toggle
+│   │   ├── header/               # Shared top-bar controls
+│   │   ├── portfolio/            # Workspace/editorial primitives
+│   │   └── sidebar/              # Shared-shell navigation adapter
 │   └── lib/
 │       ├── supabase/             # Supabase clients
 │       ├── portfolio-api.ts      # Portfolio data operations
 │       ├── types.ts              # TypeScript types
-│       └── config/nav-config.ts  # Sidebar navigation config
+│       ├── config/nav-config.ts  # Sidebar navigation config
+│       ├── config/portfolio-route-map.ts
+│       └── portfolio-workspace.ts # Section-owned CMS loaders
 └── public/
 ```
 

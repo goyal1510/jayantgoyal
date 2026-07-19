@@ -5,6 +5,7 @@ import { Loader2, X } from "lucide-react";
 
 import { Badge } from "@repo/ui/badge";
 import { Button } from "@repo/ui/button";
+import { FormMessage } from "@repo/ui/form-message";
 import {
   Dialog,
   DialogContent,
@@ -48,6 +49,7 @@ export function ProjectDialog({
   setFormData,
   onSubmit,
   saving,
+  errorMessage,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -56,6 +58,7 @@ export function ProjectDialog({
   setFormData: (data: ProjectFormData) => void;
   onSubmit: (event: React.FormEvent) => void;
   saving: boolean;
+  errorMessage?: string | null;
 }) {
   const [tagInput, setTagInput] = useState("");
 
@@ -200,9 +203,10 @@ export function ProjectDialog({
             </div>
 
             <div className="space-y-2">
-              <Label>Technologies</Label>
+              <Label htmlFor="project-tag-input">Technologies</Label>
               <div className="flex gap-2">
                 <Input
+                  id="project-tag-input"
                   value={tagInput}
                   onChange={(event) => setTagInput(event.target.value)}
                   onKeyDown={(event) => {
@@ -295,6 +299,7 @@ export function ProjectDialog({
             </div>
           </div>
           <DialogFooter>
+            <FormMessage>{errorMessage}</FormMessage>
             <Button
               type="button"
               variant="outline"

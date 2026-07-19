@@ -6,6 +6,8 @@ import { toast } from "sonner";
 import { Loader2, Save, Plus, X } from "lucide-react";
 import { createPortfolioData, updatePortfolioData } from "@/lib/portfolio-api";
 import { Button } from "@repo/ui/button";
+import { FormMessage } from "@repo/ui/form-message";
+import { IconAction } from "@repo/ui/icon-action";
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
 import { Textarea } from "@repo/ui/textarea";
@@ -17,6 +19,7 @@ import {
   CardTitle,
 } from "@repo/ui/card";
 import type { About, PersonalInfo, PortfolioPrinciple } from "@/lib/types";
+import { useUnsavedChangesGuard } from "@/lib/use-unsaved-changes-guard";
 
 interface AboutFormProps {
   initialData: About | null;
@@ -25,6 +28,7 @@ interface AboutFormProps {
 export function AboutForm({ initialData }: AboutFormProps) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     summary: initialData?.summary ?? "",
     headline: initialData?.headline ?? "",
@@ -33,14 +37,27 @@ export function AboutForm({ initialData }: AboutFormProps) {
     principles: initialData?.principles ?? ([] as PortfolioPrinciple[]),
     personal: initialData?.personal ?? ([] as PersonalInfo[]),
   });
+  const [savedSnapshot, setSavedSnapshot] = useState(() =>
+    JSON.stringify({
+      summary: initialData?.summary ?? "",
+      headline: initialData?.headline ?? "",
+      objective: initialData?.objective ?? "",
+      story: initialData?.story ?? [],
+      principles: initialData?.principles ?? [],
+      personal: initialData?.personal ?? [],
+    }),
+  );
+  const isDirty = JSON.stringify(formData) !== savedSnapshot;
+  useUnsavedChangesGuard(isDirty && !saving);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+    setFormError(null);
 
     try {
       if (initialData?.id) {
-        const result = await updatePortfolioData<About>(
+        const result = await updatePortfolioData(
           "about",
           initialData.id,
           formData,
@@ -48,16 +65,18 @@ export function AboutForm({ initialData }: AboutFormProps) {
         if (result.error) throw new Error(result.error);
         toast.success("About section updated");
       } else {
-        const result = await createPortfolioData<About>("about", formData);
+        const result = await createPortfolioData("about", formData);
         if (result.error) throw new Error(result.error);
         toast.success("About section created");
       }
 
+      setSavedSnapshot(JSON.stringify(formData));
       router.refresh();
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to save about section",
-      );
+      const message =
+        error instanceof Error ? error.message : "Failed to save about section";
+      setFormError(message);
+      toast.error(message);
     } finally {
       setSaving(false);
     }
@@ -195,21 +214,23 @@ export function AboutForm({ initialData }: AboutFormProps) {
         <CardContent className="space-y-4">
           {formData.story.map((paragraph, index) => (
             <div key={index} className="flex items-start gap-3">
+              <Label htmlFor={`story-paragraph-${index}`} className="sr-only">
+                Story paragraph {index + 1}
+              </Label>
               <Textarea
+                id={`story-paragraph-${index}`}
                 value={paragraph}
                 onChange={(e) => updateStoryParagraph(index, e.target.value)}
                 placeholder="Add a paragraph about your work and perspective."
                 rows={3}
               />
-              <Button
+              <IconAction
+                icon={X}
+                label="Remove story paragraph"
                 type="button"
                 variant="ghost"
-                size="icon"
                 onClick={() => removeStoryParagraph(index)}
-                aria-label="Remove story paragraph"
-              >
-                <X className="h-4 w-4" />
-              </Button>
+              />
             </div>
           ))}
           <Button type="button" variant="outline" onClick={addStoryParagraph}>
@@ -230,14 +251,28 @@ export function AboutForm({ initialData }: AboutFormProps) {
           {formData.principles.map((principle, index) => (
             <div key={index} className="flex items-start gap-3">
               <div className="grid flex-1 gap-3 md:grid-cols-[0.7fr_1.3fr]">
+                <Label
+                  htmlFor={`principle-title-${index}`}
+                  className="sr-only"
+                >
+                  Principle {index + 1} title
+                </Label>
                 <Input
+                  id={`principle-title-${index}`}
                   value={principle.title}
                   onChange={(e) =>
                     updatePrinciple(index, "title", e.target.value)
                   }
                   placeholder="Find the signal"
                 />
+                <Label
+                  htmlFor={`principle-copy-${index}`}
+                  className="sr-only"
+                >
+                  Principle {index + 1} description
+                </Label>
                 <Textarea
+                  id={`principle-copy-${index}`}
                   value={principle.copy}
                   onChange={(e) =>
                     updatePrinciple(index, "copy", e.target.value)
@@ -246,15 +281,13 @@ export function AboutForm({ initialData }: AboutFormProps) {
                   rows={2}
                 />
               </div>
-              <Button
+              <IconAction
+                icon={X}
+                label="Remove working principle"
                 type="button"
                 variant="ghost"
-                size="icon"
                 onClick={() => removePrinciple(index)}
-                aria-label="Remove principle"
-              >
-                <X className="h-4 w-4" />
-              </Button>
+              />
             </div>
           ))}
           <Button type="button" variant="outline" onClick={addPrinciple}>
@@ -276,8 +309,9 @@ export function AboutForm({ initialData }: AboutFormProps) {
           {formData.personal.map((item, index) => (
             <div key={index} className="flex gap-4 items-start">
               <div className="flex-1 space-y-2">
-                <Label>Label</Label>
+                <Label htmlFor={`personal-label-${index}`}>Label</Label>
                 <Input
+                  id={`personal-label-${index}`}
                   value={item.label}
                   onChange={(e) =>
                     updatePersonalInfo(index, "label", e.target.value)
@@ -286,8 +320,9 @@ export function AboutForm({ initialData }: AboutFormProps) {
                 />
               </div>
               <div className="flex-1 space-y-2">
-                <Label>Value</Label>
+                <Label htmlFor={`personal-value-${index}`}>Value</Label>
                 <Input
+                  id={`personal-value-${index}`}
                   value={item.value}
                   onChange={(e) =>
                     updatePersonalInfo(index, "value", e.target.value)
@@ -295,15 +330,14 @@ export function AboutForm({ initialData }: AboutFormProps) {
                   placeholder="25"
                 />
               </div>
-              <Button
+              <IconAction
+                icon={X}
+                label="Remove personal information"
                 type="button"
                 variant="ghost"
-                size="icon"
                 className="mt-8"
                 onClick={() => removePersonalInfo(index)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
+              />
             </div>
           ))}
           <Button type="button" variant="outline" onClick={addPersonalInfo}>
@@ -313,14 +347,17 @@ export function AboutForm({ initialData }: AboutFormProps) {
         </CardContent>
       </Card>
 
-      <Button type="submit" disabled={saving}>
-        {saving ? (
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-        ) : (
-          <Save className="mr-2 h-4 w-4" />
-        )}
-        Save Changes
-      </Button>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <FormMessage>{formError}</FormMessage>
+        <Button type="submit" disabled={saving}>
+          {saving ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Save className="mr-2 h-4 w-4" />
+          )}
+          Save Changes
+        </Button>
+      </div>
     </form>
   );
 }

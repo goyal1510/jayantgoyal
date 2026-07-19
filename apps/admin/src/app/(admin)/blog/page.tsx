@@ -1,18 +1,8 @@
-import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { BlogList } from "./blog-list";
+import { PORTFOLIO_LEGACY_ADMIN_ROUTE_TARGETS } from "@/lib/config/portfolio-route-map";
 
-export const metadata: Metadata = { title: "Blog Posts" };
-
-export default async function BlogPage() {
-  const supabase = await createSupabaseServerClient();
-
-  const { data: posts } = await supabase
-    .schema("jg_app")
-    .from("blog_posts")
-    .select("*")
-    .order("published_at", { ascending: false });
-
-  return <BlogList initialData={posts ?? []} />;
+/** Compatibility route for existing Blog bookmarks. */
+export default function LegacyBlogPage() {
+  redirect(PORTFOLIO_LEGACY_ADMIN_ROUTE_TARGETS["/blog"]);
 }

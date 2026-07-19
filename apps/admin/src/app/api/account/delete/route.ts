@@ -1,19 +1,9 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createSupabaseServiceRoleClient } from "@repo/auth/service-role";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function DELETE() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !serviceRoleKey) {
-    return NextResponse.json(
-      { error: "Service role key is not configured." },
-      { status: 500 }
-    );
-  }
-
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
@@ -23,35 +13,34 @@ export async function DELETE() {
   if (authError || !user) {
     return NextResponse.json(
       { error: "You must be signed in to delete the account." },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
-  // Anonymous users cannot delete their accounts (they can just sign out)
   if (user.is_anonymous === true) {
     return NextResponse.json(
       { error: "Anonymous accounts cannot be deleted. Please sign out instead." },
-      { status: 403 }
+      { status: 403 },
     );
   }
 
-  const adminClient = createClient(supabaseUrl, serviceRoleKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
+  let adminClient;
+  try {
+    adminClient = createSupabaseServiceRoleClient();
+  } catch {
+    return NextResponse.json(
+      { error: "Service role key is not configured." },
+      { status: 500 },
+    );
+  }
 
   const { error } = await adminClient.auth.admin.deleteUser(user.id);
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
-  }
+  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
 
   try {
     await supabase.auth.signOut();
   } catch {
-    // Best-effort cookie cleanup; ignore errors.
+    // Best-effort cookie cleanup; the user has already been deleted.
   }
 
   return NextResponse.json({ success: true });

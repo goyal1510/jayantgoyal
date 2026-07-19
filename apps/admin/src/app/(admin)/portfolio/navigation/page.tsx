@@ -1,26 +1,8 @@
-import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { NavigationList } from "./navigation-list";
+import { PORTFOLIO_LEGACY_ADMIN_ROUTE_TARGETS } from "@/lib/config/portfolio-route-map";
 
-export const metadata: Metadata = { title: "Navigation" };
-
-export default async function NavigationPage() {
-  const supabase = await createSupabaseServerClient();
-
-  const { data: navItems } = await supabase
-    .schema("portfolio")
-    .from("nav_items")
-    .select("*")
-    .in("section_id", [
-      "about",
-      "skills",
-      "experience",
-      "activity",
-      "work",
-      "writing",
-    ])
-    .order("sort_order", { ascending: true });
-
-  return <NavigationList initialData={navItems ?? []} />;
+/** Compatibility route for the retired standalone navigation editor. */
+export default function LegacyNavigationPage() {
+  redirect(PORTFOLIO_LEGACY_ADMIN_ROUTE_TARGETS["/portfolio/navigation"]);
 }

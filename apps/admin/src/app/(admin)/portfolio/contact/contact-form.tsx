@@ -4,10 +4,20 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2, Save, Plus, X } from "lucide-react";
+import { PORTFOLIO_SOCIAL_ICON_OPTIONS } from "@repo/portfolio-data";
 import { createPortfolioData, updatePortfolioData } from "@/lib/portfolio-api";
 import { Button } from "@repo/ui/button";
+import { IconAction } from "@repo/ui/icon-action";
+import { FormMessage } from "@repo/ui/form-message";
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@repo/ui/select";
 import {
   Card,
   CardContent,
@@ -16,6 +26,7 @@ import {
   CardTitle,
 } from "@repo/ui/card";
 import type { Contact, SocialLink } from "@/lib/types";
+import { useUnsavedChangesGuard } from "@/lib/use-unsaved-changes-guard";
 
 interface ContactFormProps {
   initialData: Contact | null;
@@ -24,20 +35,47 @@ interface ContactFormProps {
 export function ContactForm({ initialData }: ContactFormProps) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [invalidSocialIndex, setInvalidSocialIndex] = useState<number | null>(
+    null,
+  );
   const [formData, setFormData] = useState({
     email: initialData?.email ?? "",
     phone: initialData?.phone ?? "",
     location: initialData?.location ?? "",
     socials: initialData?.socials ?? ([] as SocialLink[]),
   });
+  const [savedSnapshot, setSavedSnapshot] = useState(() =>
+    JSON.stringify({
+      email: initialData?.email ?? "",
+      phone: initialData?.phone ?? "",
+      location: initialData?.location ?? "",
+      socials: initialData?.socials ?? [],
+    }),
+  );
+  const isDirty = JSON.stringify(formData) !== savedSnapshot;
+  useUnsavedChangesGuard(isDirty && !saving);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError(null);
+    const invalidSocialIndex = formData.socials.findIndex(
+      (social) => !social.label.trim() || !social.href.trim() || !social.icon_key,
+    );
+    setInvalidSocialIndex(
+      invalidSocialIndex === -1 ? null : invalidSocialIndex,
+    );
+    if (invalidSocialIndex !== -1) {
+      const message = "Complete each social link label, URL, and icon before saving";
+      setFormError(message);
+      toast.error(message);
+      return;
+    }
     setSaving(true);
 
     try {
       if (initialData?.id) {
-        const result = await updatePortfolioData<Contact>(
+        const result = await updatePortfolioData(
           "contact",
           initialData.id,
           formData,
@@ -45,16 +83,18 @@ export function ContactForm({ initialData }: ContactFormProps) {
         if (result.error) throw new Error(result.error);
         toast.success("Contact info updated");
       } else {
-        const result = await createPortfolioData<Contact>("contact", formData);
+        const result = await createPortfolioData("contact", formData);
         if (result.error) throw new Error(result.error);
         toast.success("Contact info created");
       }
 
+      setSavedSnapshot(JSON.stringify(formData));
       router.refresh();
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to save contact info",
-      );
+      const message =
+        error instanceof Error ? error.message : "Failed to save contact info";
+      setFormError(message);
+      toast.error(message);
     } finally {
       setSaving(false);
     }
@@ -95,7 +135,11 @@ export function ContactForm({ initialData }: ContactFormProps) {
       <Card>
         <CardHeader>
           <CardTitle>Contact Details</CardTitle>
-          <CardDescription>Your primary contact information.</CardDescription>
+          <CardDescription>
+            Your primary contact information. The public form is delivered by
+            the Portfolio server through Resend; provider secrets never enter
+            this editor or the browser.
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
@@ -153,9 +197,16 @@ export function ContactForm({ initialData }: ContactFormProps) {
             <div key={index} className="flex gap-4 items-start">
               <div className="grid flex-1 gap-4 md:grid-cols-3">
                 <div className="space-y-2">
-                  <Label>Label</Label>
+                  <Label htmlFor={`social-label-${index}`}>Label</Label>
                   <Input
+                    id={`social-label-${index}`}
                     value={social.label}
+                    aria-invalid={invalidSocialIndex === index && !social.label.trim()}
+                    aria-describedby={
+                      invalidSocialIndex === index
+                        ? `social-error-${index}`
+                        : undefined
+                    }
                     onChange={(e) =>
                       updateSocial(index, "label", e.target.value)
                     }
@@ -163,35 +214,67 @@ export function ContactForm({ initialData }: ContactFormProps) {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>URL</Label>
+                  <Label htmlFor={`social-url-${index}`}>URL</Label>
                   <Input
+                    id={`social-url-${index}`}
+                    type="url"
                     value={social.href}
+                    aria-invalid={invalidSocialIndex === index && !social.href.trim()}
+                    aria-describedby={
+                      invalidSocialIndex === index
+                        ? `social-error-${index}`
+                        : undefined
+                    }
                     onChange={(e) =>
                       updateSocial(index, "href", e.target.value)
                     }
                     placeholder="https://linkedin.com/in/..."
+                    required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Icon Key</Label>
-                  <Input
-                    value={social.icon_key}
-                    onChange={(e) =>
-                      updateSocial(index, "icon_key", e.target.value)
+                  <Label htmlFor={`social-icon-${index}`}>Icon</Label>
+                  <Select
+                    value={social.icon_key || undefined}
+                    onValueChange={(value) =>
+                      updateSocial(index, "icon_key", value)
                     }
-                    placeholder="Linkedin"
-                  />
+                  >
+                    <SelectTrigger
+                      id={`social-icon-${index}`}
+                      aria-invalid={
+                        invalidSocialIndex === index && !social.icon_key
+                      }
+                      aria-describedby={
+                        invalidSocialIndex === index
+                          ? `social-error-${index}`
+                          : undefined
+                      }
+                    >
+                      <SelectValue placeholder="Choose an icon" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PORTFOLIO_SOCIAL_ICON_OPTIONS.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
+                {invalidSocialIndex === index ? (
+                  <FormMessage id={`social-error-${index}`}>
+                    Complete this social link before saving.
+                  </FormMessage>
+                ) : null}
               </div>
-              <Button
-                type="button"
+              <IconAction
+                icon={X}
+                label={`Remove ${social.label || "social link"}`}
                 variant="ghost"
-                size="icon"
                 className="mt-8"
                 onClick={() => removeSocial(index)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
+              />
             </div>
           ))}
           <Button type="button" variant="outline" onClick={addSocial}>
@@ -201,14 +284,17 @@ export function ContactForm({ initialData }: ContactFormProps) {
         </CardContent>
       </Card>
 
-      <Button type="submit" disabled={saving}>
-        {saving ? (
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-        ) : (
-          <Save className="mr-2 h-4 w-4" />
-        )}
-        Save Changes
-      </Button>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <FormMessage>{formError}</FormMessage>
+        <Button type="submit" disabled={saving}>
+          {saving ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Save className="mr-2 h-4 w-4" />
+          )}
+          Save Changes
+        </Button>
+      </div>
     </form>
   );
 }

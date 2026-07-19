@@ -1,15 +1,21 @@
+import type {
+  PortfolioBlogPostRecord,
+  PortfolioBlogUpdateInput,
+  PortfolioBlogWriteInput,
+} from "@repo/portfolio-data";
+
 type BlogTable = "blog_posts";
 
-interface ApiResponse<T> {
+export interface BlogApiResponse<T> {
   data?: T;
   error?: string;
   success?: boolean;
 }
 
-export async function fetchBlogData<T>(
+export async function fetchBlogData(
   table: BlogTable,
   id?: string
-): Promise<ApiResponse<T>> {
+): Promise<BlogApiResponse<PortfolioBlogPostRecord | PortfolioBlogPostRecord[]>> {
   const url = id
     ? `/api/jg-app/${table}?id=${id}`
     : `/api/jg-app/${table}`;
@@ -18,10 +24,10 @@ export async function fetchBlogData<T>(
   return response.json();
 }
 
-export async function createBlogData<T>(
+export async function createBlogData(
   table: BlogTable,
-  data: Partial<T>
-): Promise<ApiResponse<T>> {
+  data: PortfolioBlogWriteInput,
+): Promise<BlogApiResponse<PortfolioBlogPostRecord>> {
   const response = await fetch(`/api/jg-app/${table}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -30,11 +36,11 @@ export async function createBlogData<T>(
   return response.json();
 }
 
-export async function updateBlogData<T>(
+export async function updateBlogData(
   table: BlogTable,
   id: string,
-  data: Partial<T>
-): Promise<ApiResponse<T>> {
+  data: PortfolioBlogUpdateInput,
+): Promise<BlogApiResponse<PortfolioBlogPostRecord>> {
   const response = await fetch(`/api/jg-app/${table}?id=${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
@@ -46,7 +52,7 @@ export async function updateBlogData<T>(
 export async function deleteBlogData(
   table: BlogTable,
   id: string
-): Promise<ApiResponse<void>> {
+): Promise<BlogApiResponse<void>> {
   const response = await fetch(`/api/jg-app/${table}?id=${id}`, {
     method: "DELETE",
   });

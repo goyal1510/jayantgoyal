@@ -87,14 +87,15 @@ rollback. Auth accepts only relative
 destinations, canonical platform origins, local ports, and explicitly
 configured exact Preview origins; it does not accept wildcard return hosts.
 
-The same owner flag controls signed-in account navigation. In `legacy`, the
-existing application-local Settings sheet and sign-out action remain unchanged.
-In `auth`, Settings navigates to canonical `/account/security` and Log out to
-canonical `/logout`, each with the exact application URL in `return_to`. Auth
-logout remains a same-origin POST action, validates the return target, and
-returns to Auth login with that safe destination preserved for a later sign-in.
-Legacy account and logout code remains present until deployed acceptance and
-the compatibility observation window permit cleanup.
+The same owner flag controls signed-in account navigation. The shared
+application user menu is now the only settings presentation in Studio and
+Admin. It navigates to canonical `/account/security` and Log out to canonical
+`/logout`, each with the exact application URL in `return_to` when Auth owns
+the flow. Auth logout remains a same-origin POST action, validates the return
+target, and returns to Auth login with that safe destination preserved for a
+later sign-in. The remaining product account-delete endpoints are server-owned
+compatibility routes until an approved Auth-owned self-delete operation exists;
+they are not legacy settings sheets.
 
 The hosted Supabase redirect allowlist separately includes the generated Auth
 Preview family required for provider callbacks. This provider-side wildcard is

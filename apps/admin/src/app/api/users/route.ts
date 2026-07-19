@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createSupabaseServiceRoleClient } from "@repo/auth/service-role";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 interface ProfileRow {
@@ -37,19 +37,7 @@ export async function GET() {
     }
 
     // Use service role to fetch user emails
-    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-
-    if (!serviceRoleKey || !supabaseUrl) {
-      return NextResponse.json(
-        { error: "Server configuration error" },
-        { status: 500 }
-      );
-    }
-
-    const adminClient = createClient(supabaseUrl, serviceRoleKey, {
-      auth: { autoRefreshToken: false, persistSession: false },
-    });
+    const adminClient = createSupabaseServiceRoleClient();
 
     // Fetch all profiles
     const { data: profiles, error: profilesError } = await adminClient
@@ -149,19 +137,7 @@ export async function POST(request: Request) {
     }
 
     // Use service role
-    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-
-    if (!serviceRoleKey || !supabaseUrl) {
-      return NextResponse.json(
-        { error: "Server configuration error" },
-        { status: 500 }
-      );
-    }
-
-    const adminClient = createClient(supabaseUrl, serviceRoleKey, {
-      auth: { autoRefreshToken: false, persistSession: false },
-    });
+    const adminClient = createSupabaseServiceRoleClient();
 
     // Verify user exists
     const { data: authUser, error: authError } = await adminClient.auth.admin.getUserById(user_id);

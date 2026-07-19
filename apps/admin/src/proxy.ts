@@ -14,9 +14,6 @@ export const config = {
   ],
 };
 
-// APIs safe to call without completing MFA
-const UNRESTRICTED_APIS = ["/api/account/profile", "/api/account/mfa-cleanup"];
-
 function withAuthState(source: NextResponse, target: NextResponse) {
   source.cookies.getAll().forEach(({ name, value, ...options }) => {
     target.cookies.set(name, value, options);
@@ -113,19 +110,13 @@ export default async function proxy(request: NextRequest) {
       }
 
       if (pathname.startsWith("/api/")) {
-        const isAllowed = UNRESTRICTED_APIS.some((api) =>
-          pathname.startsWith(api),
+        return withAuthState(
+          response,
+          NextResponse.json(
+            { error: "MFA verification required." },
+            { status: 403 },
+          ),
         );
-        if (!isAllowed) {
-          return withAuthState(
-            response,
-            NextResponse.json(
-              { error: "MFA verification required." },
-              { status: 403 },
-            ),
-          );
-        }
-        return response;
       }
 
       const mfaUrl = new URL("/mfa-verify", request.url);

@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { Loader2, X, Wand2 } from "lucide-react";
 import { Button } from "@repo/ui/button";
+import { FormMessage } from "@repo/ui/form-message";
+import { IconAction } from "@repo/ui/icon-action";
 import {
   Dialog,
   DialogContent,
@@ -18,6 +20,7 @@ import { Switch } from "@repo/ui/switch";
 import { Badge } from "@repo/ui/badge";
 import type { BlogPost } from "@/lib/types";
 import { PortfolioAssetUpload } from "@/components/portfolio/asset-upload";
+import { MarkdownPreview } from "@/components/portfolio/markdown-preview";
 
 export type BlogFormData = Omit<BlogPost, "id" | "created_at" | "updated_at">;
 
@@ -41,6 +44,7 @@ interface BlogDialogProps {
   setFormData: (data: BlogFormData) => void;
   onSubmit: (e: React.FormEvent) => void;
   saving: boolean;
+  errorMessage?: string | null;
 }
 
 function generateSlug(title: string): string {
@@ -70,6 +74,7 @@ export function BlogDialog({
   setFormData,
   onSubmit,
   saving,
+  errorMessage,
 }: BlogDialogProps) {
   const [tagInput, setTagInput] = useState("");
 
@@ -144,20 +149,17 @@ export function BlogDialog({
                   required
                   className="font-mono"
                 />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
+                <IconAction
                   onClick={() =>
                     setFormData({
                       ...formData,
                       slug: generateSlug(formData.title),
                     })
                   }
-                  title="Generate slug from title"
-                >
-                  <Wand2 className="h-4 w-4" />
-                </Button>
+                  icon={Wand2}
+                  label="Generate slug from title"
+                  variant="outline"
+                />
               </div>
             </div>
 
@@ -175,17 +177,25 @@ export function BlogDialog({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="content">Content</Label>
-              <Textarea
-                id="content"
-                value={formData.content}
-                onChange={(e) =>
-                  setFormData({ ...formData, content: e.target.value })
-                }
-                placeholder="Write your blog post in Markdown..."
-                rows={12}
-                required
-              />
+              <div className="flex items-center justify-between gap-3">
+                <Label htmlFor="content">Content</Label>
+                <span className="text-xs text-muted-foreground">
+                  Markdown · preview matches public syntax
+                </span>
+              </div>
+              <div className="grid gap-3 lg:grid-cols-2">
+                <Textarea
+                  id="content"
+                  value={formData.content}
+                  onChange={(e) =>
+                    setFormData({ ...formData, content: e.target.value })
+                  }
+                  placeholder="Write your blog post in Markdown..."
+                  rows={12}
+                  required
+                />
+                <MarkdownPreview content={formData.content} />
+              </div>
             </div>
 
             <PortfolioAssetUpload
@@ -199,9 +209,10 @@ export function BlogDialog({
             />
 
             <div className="space-y-2">
-              <Label>Tags</Label>
+              <Label htmlFor="blog-tag-input">Tags</Label>
               <div className="flex gap-2">
                 <Input
+                  id="blog-tag-input"
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
                   onKeyDown={handleTagKeyDown}
@@ -219,7 +230,8 @@ export function BlogDialog({
                       <button
                         type="button"
                         onClick={() => removeTag(tag)}
-                        className="ml-1 cursor-pointer hover:text-destructive"
+                        aria-label={`Remove tag ${tag}`}
+                        className="ml-1 cursor-pointer rounded-sm p-0.5 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       >
                         <X className="h-3 w-3" />
                       </button>
@@ -270,6 +282,7 @@ export function BlogDialog({
             </div>
           </div>
           <DialogFooter>
+            <FormMessage>{errorMessage}</FormMessage>
             <Button
               type="button"
               variant="outline"

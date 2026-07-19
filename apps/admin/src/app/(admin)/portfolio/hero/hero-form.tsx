@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Loader2, Save } from "lucide-react";
 import { createPortfolioData, updatePortfolioData } from "@/lib/portfolio-api";
 import { Button } from "@repo/ui/button";
+import { FormMessage } from "@repo/ui/form-message";
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
 import { Textarea } from "@repo/ui/textarea";
@@ -18,6 +19,7 @@ import {
 } from "@repo/ui/card";
 import type { Hero } from "@/lib/types";
 import { PortfolioAssetUpload } from "@/components/portfolio/asset-upload";
+import { useUnsavedChangesGuard } from "@/lib/use-unsaved-changes-guard";
 
 interface HeroFormProps {
   initialData: Hero | null;
@@ -26,6 +28,7 @@ interface HeroFormProps {
 export function HeroForm({ initialData }: HeroFormProps) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: initialData?.name ?? "",
     display_name: initialData?.display_name ?? "",
@@ -40,14 +43,33 @@ export function HeroForm({ initialData }: HeroFormProps) {
     seo_title: initialData?.seo_title ?? "",
     seo_description: initialData?.seo_description ?? "",
   });
+  const [savedSnapshot, setSavedSnapshot] = useState(() =>
+    JSON.stringify({
+      name: initialData?.name ?? "",
+      display_name: initialData?.display_name ?? "",
+      role: initialData?.role ?? "",
+      tagline: initialData?.tagline ?? "",
+      blurb: initialData?.blurb ?? "",
+      headline: initialData?.headline ?? "",
+      current_title: initialData?.current_title ?? "",
+      availability: initialData?.availability ?? "",
+      resume_url: initialData?.resume_url ?? "",
+      github_username: initialData?.github_username ?? "",
+      seo_title: initialData?.seo_title ?? "",
+      seo_description: initialData?.seo_description ?? "",
+    }),
+  );
+  const isDirty = JSON.stringify(formData) !== savedSnapshot;
+  useUnsavedChangesGuard(isDirty && !saving);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+    setFormError(null);
 
     try {
       if (initialData?.id) {
-        const result = await updatePortfolioData<Hero>(
+        const result = await updatePortfolioData(
           "hero",
           initialData.id,
           formData,
@@ -55,16 +77,18 @@ export function HeroForm({ initialData }: HeroFormProps) {
         if (result.error) throw new Error(result.error);
         toast.success("Hero section updated");
       } else {
-        const result = await createPortfolioData<Hero>("hero", formData);
+        const result = await createPortfolioData("hero", formData);
         if (result.error) throw new Error(result.error);
         toast.success("Hero section created");
       }
 
+      setSavedSnapshot(JSON.stringify(formData));
       router.refresh();
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to save hero section",
-      );
+      const message =
+        error instanceof Error ? error.message : "Failed to save hero section";
+      setFormError(message);
+      toast.error(message);
     } finally {
       setSaving(false);
     }
@@ -259,14 +283,17 @@ export function HeroForm({ initialData }: HeroFormProps) {
             />
           </div>
 
-          <Button type="submit" disabled={saving}>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <FormMessage>{formError}</FormMessage>
+            <Button type="submit" disabled={saving}>
             {saving ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
               <Save className="mr-2 h-4 w-4" />
             )}
             Save Changes
-          </Button>
+            </Button>
+          </div>
         </form>
       </CardContent>
     </Card>

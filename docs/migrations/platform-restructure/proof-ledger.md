@@ -164,11 +164,13 @@
   Legacy callback, recovery, MFA, and logout code is retained.
 - The same owner contract now covers the signed-in menu. Studio/Admin Settings
   use canonical Auth account security and Log out uses canonical Auth logout
-  only when the owner is exactly `auth`; `legacy` retains the current settings
-  sheet and local sign-out callback. Both canonical destinations preserve the
-  exact application URL. Auth logout validates that destination through the
-  existing exact-origin policy, stays POST-only, and returns to Auth login with
-  safe context for a later sign-in. Unsafe destinations reduce to Auth login.
+  when the owner is exactly `auth`; the former local settings sheet and local
+  sign-out presentation have since been retired. `legacy` remains an emergency
+  route-ownership rollback value, not a promise that the removed UI exists.
+  Both canonical destinations preserve the exact application URL. Auth logout
+  validates that destination through the existing exact-origin policy, stays
+  POST-only, and returns to Auth login with safe context for a later sign-in.
+  Unsafe destinations reduce to Auth login.
 - Focused readiness proof passes 14 tests across the shared Auth entry contract
   and the Studio/Admin adapters. Auth, Studio, and Admin zero-warning lint and
   TypeScript pass after one nullable annotation caught by the first type gate.

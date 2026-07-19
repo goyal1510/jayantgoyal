@@ -2,6 +2,7 @@
 
 import { Loader2 } from "lucide-react";
 import { Button } from "@repo/ui/button";
+import { FormMessage } from "@repo/ui/form-message";
 import {
   Dialog,
   DialogContent,
@@ -35,6 +36,7 @@ interface SkillDialogProps {
   setFormData: (data: SkillFormData) => void;
   onSubmit: (e: React.FormEvent) => void;
   saving: boolean;
+  errorMessage?: string | null;
 }
 
 export function SkillDialog({
@@ -45,6 +47,7 @@ export function SkillDialog({
   setFormData,
   onSubmit,
   saving,
+  errorMessage,
 }: SkillDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -134,6 +137,7 @@ export function SkillDialog({
             </div>
           </div>
           <DialogFooter>
+            <FormMessage>{errorMessage}</FormMessage>
             <Button
               type="button"
               variant="outline"

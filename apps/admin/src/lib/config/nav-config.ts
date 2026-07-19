@@ -1,21 +1,20 @@
 import {
   Users,
-  User,
+  UserRound,
   Briefcase,
-  FolderGit2,
-  Award,
+  FolderKanban,
+  Activity,
   Code2,
-  GraduationCap,
   Mail,
-  Navigation,
-  MonitorSmartphone,
+  LayoutDashboard,
   Rocket,
-  FileText,
-  FilePenLine,
+  PenLine,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
+import { PORTFOLIO_WORKSPACE_ROUTES } from "@repo/portfolio-data";
 import type { UserRole } from "@/lib/types";
+import { getCanonicalAdminPath } from "./portfolio-route-map";
 
 export interface NavItem {
   label: string;
@@ -25,27 +24,30 @@ export interface NavItem {
 
 export interface AdminNavigationDomain {
   id: "portfolio" | "studio" | "system";
-  label: "Portfolio" | "Studio" | "System";
+  label: "Portfolio" | "Studio" | "Platform";
   homeHref: string | null;
   items: readonly NavItem[];
   roles: readonly UserRole[];
 }
 
 export const portfolioNavItems: NavItem[] = [
-  { label: "Hero", href: "/portfolio/hero", icon: MonitorSmartphone },
-  { label: "Section Copy", href: "/portfolio/section-copy", icon: FilePenLine },
-  { label: "About", href: "/portfolio/about", icon: User },
-  { label: "Education", href: "/portfolio/education", icon: GraduationCap },
-  { label: "Experience", href: "/portfolio/experience", icon: Briefcase },
-  { label: "Skills", href: "/portfolio/skills", icon: Code2 },
-  { label: "Projects", href: "/portfolio/projects", icon: FolderGit2 },
-  { label: "Certificates", href: "/portfolio/certificates", icon: Award },
-  { label: "Contact", href: "/portfolio/contact", icon: Mail },
-  { label: "Navigation", href: "/portfolio/navigation", icon: Navigation },
-];
-
-export const blogNavItems: NavItem[] = [
-  { label: "Blog", href: "/blog", icon: FileText },
+  { label: "Overview", href: "/portfolio", icon: LayoutDashboard },
+  { label: "Home", href: PORTFOLIO_WORKSPACE_ROUTES.home, icon: UserRound },
+  { label: "About", href: PORTFOLIO_WORKSPACE_ROUTES.about, icon: UserRound },
+  { label: "Skills", href: PORTFOLIO_WORKSPACE_ROUTES.skills, icon: Code2 },
+  {
+    label: "Experience",
+    href: PORTFOLIO_WORKSPACE_ROUTES.experience,
+    icon: Briefcase,
+  },
+  {
+    label: "Activity",
+    href: PORTFOLIO_WORKSPACE_ROUTES.activity,
+    icon: Activity,
+  },
+  { label: "Work", href: PORTFOLIO_WORKSPACE_ROUTES.work, icon: FolderKanban },
+  { label: "Writing", href: PORTFOLIO_WORKSPACE_ROUTES.writing, icon: PenLine },
+  { label: "Contact", href: PORTFOLIO_WORKSPACE_ROUTES.contact, icon: Mail },
 ];
 
 export const systemNavItems: NavItem[] = [
@@ -60,8 +62,8 @@ export const adminNavigationDomains: readonly AdminNavigationDomain[] = [
   {
     id: "portfolio",
     label: "Portfolio",
-    homeHref: "/portfolio/hero",
-    items: [...portfolioNavItems, ...blogNavItems],
+    homeHref: "/portfolio",
+    items: portfolioNavItems,
     roles: ["admin", "super_admin"],
   },
   {
@@ -73,7 +75,7 @@ export const adminNavigationDomains: readonly AdminNavigationDomain[] = [
   },
   {
     id: "system",
-    label: "System",
+    label: "Platform",
     homeHref: "/users",
     items: [...systemNavItems, ...deploymentNavItems],
     roles: ["super_admin"],
@@ -92,7 +94,9 @@ export function isAdminNavigationItemActive(
   pathname: string,
   item: NavItem,
 ): boolean {
-  if (pathname === item.href) return true;
+  const canonicalPath = getCanonicalAdminPath(pathname);
+
+  if (canonicalPath === item.href) return true;
 
   return (
     item.href === "/deployments" &&
@@ -109,8 +113,12 @@ export interface AdminNavigationContext {
 export function getAdminNavigationContext(
   pathname: string,
 ): AdminNavigationContext | null {
+  const canonicalPath = getCanonicalAdminPath(pathname);
+
   for (const domain of adminNavigationDomains) {
-    const item = domain.items.find((candidate) => candidate.href === pathname);
+    const item = domain.items.find(
+      (candidate) => candidate.href === canonicalPath,
+    );
     if (item) return { domain, pageLabel: item.label };
   }
 

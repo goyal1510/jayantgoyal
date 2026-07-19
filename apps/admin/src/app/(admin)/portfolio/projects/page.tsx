@@ -1,18 +1,8 @@
-import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { ProjectsList } from "./projects-list";
+import { PORTFOLIO_LEGACY_ADMIN_ROUTE_TARGETS } from "@/lib/config/portfolio-route-map";
 
-export const metadata: Metadata = { title: "Projects" };
-
-export default async function ProjectsPage() {
-  const supabase = await createSupabaseServerClient();
-
-  const { data: projects } = await supabase
-    .schema("portfolio")
-    .from("projects")
-    .select("*")
-    .order("sort_order", { ascending: true });
-
-  return <ProjectsList initialData={projects ?? []} />;
+/** Compatibility route for existing Projects bookmarks. */
+export default function LegacyProjectsPage() {
+  redirect(PORTFOLIO_LEGACY_ADMIN_ROUTE_TARGETS["/portfolio/projects"]);
 }

@@ -2,6 +2,7 @@
 
 import { Loader2 } from "lucide-react";
 import { Button } from "@repo/ui/button";
+import { FormMessage } from "@repo/ui/form-message";
 import {
   Dialog,
   DialogContent,
@@ -35,6 +36,7 @@ interface EducationDialogProps {
   setFormData: (data: EducationFormData) => void;
   onSubmit: (e: React.FormEvent) => void;
   saving: boolean;
+  errorMessage?: string | null;
 }
 
 export function EducationDialog({
@@ -45,6 +47,7 @@ export function EducationDialog({
   setFormData,
   onSubmit,
   saving,
+  errorMessage,
 }: EducationDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -85,7 +88,7 @@ export function EducationDialog({
                 required
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="period">Period</Label>
                 <Input
@@ -147,6 +150,7 @@ export function EducationDialog({
             </div>
           </div>
           <DialogFooter>
+            <FormMessage>{errorMessage}</FormMessage>
             <Button
               type="button"
               variant="outline"
