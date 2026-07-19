@@ -10,7 +10,7 @@ import {
   Legend,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card";
-import type { LanguageDistribution } from "@/lib/github-stats/types";
+import type { LanguageDistribution } from "@repo/github";
 
 interface LanguagePieChartProps {
   data: LanguageDistribution[];

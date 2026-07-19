@@ -4,7 +4,6 @@ import type { ProxyContext } from "./types";
 /** APIs allowed during recovery mode */
 const RECOVERY_APIS = [
   "/api/account/init",
-  "/api/account/mfa-cleanup",
 ];
 
 /** Pages allowed during recovery mode */

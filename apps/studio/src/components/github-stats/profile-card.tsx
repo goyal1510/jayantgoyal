@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { m } from "framer-motion";
 import { Card, CardContent } from "@repo/ui/card";
-import type { GitHubUser } from "@/lib/github-stats/types";
+import type { GitHubUser } from "@repo/github";
 
 interface ProfileCardProps {
   user: GitHubUser;

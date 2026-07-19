@@ -9,7 +9,7 @@ import {
   parseMemoryMatchState,
   type MemoryMatchSeat,
 } from "@/lib/games/memory-match"
-import { createSupabaseAdminClient } from "@/lib/supabase/admin"
+import { createSupabaseServiceRoleClient } from "@repo/auth/service-role"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 
 export async function POST(
@@ -45,7 +45,7 @@ export async function POST(
   }
 
   const cardId = rawCardId
-  const supabase = createSupabaseAdminClient()
+  const supabase = createSupabaseServiceRoleClient()
   const { data: session, error: sessionError } = await supabase
     .schema("jg_app")
     .from("game_hub_sessions")

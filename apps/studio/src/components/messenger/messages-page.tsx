@@ -6,7 +6,7 @@ import { MessageList } from "@/components/messenger/message-list";
 import { MessageInputDialog } from "@/components/messenger/message-input-dialog";
 import { PageSpinner } from "@repo/ui/page-spinner";
 import type { Database } from "@/lib/messenger/database.types";
-import { StudioWorkspaceHeader } from "@/components/studio/studio-workspace-header";
+import { WorkspaceHeader } from "@repo/ui/workspace-header";
 import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
 import { MessageSquareText, Plus, Search } from "lucide-react";
@@ -199,7 +199,7 @@ export function MessagesPage() {
 
   return (
     <div className="mx-auto w-full max-w-[1180px] space-y-5">
-      <StudioWorkspaceHeader
+      <WorkspaceHeader
         icon={MessageSquareText}
         title="Messenger"
         description="Keep short notes, code fragments, and reusable snippets in one private, realtime stream."

@@ -8,13 +8,13 @@ import DragDropContainer from "@/components/custom-calculator/DragDropContainer"
 import DragDropProvider from "@/components/custom-calculator/DragDropProvider";
 import { useCalculatorStore } from "@/lib/custom-calculator/useCalculatorStore";
 import { Blocks } from "lucide-react";
-import { StudioWorkspaceHeader } from "@/components/studio/studio-workspace-header";
+import { WorkspaceHeader } from "@repo/ui/workspace-header";
 
 function CalculatorApp() {
   return (
     <DragDropProvider>
       <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-5">
-        <StudioWorkspaceHeader
+        <WorkspaceHeader
           icon={Blocks}
           title="Calculator Builder"
           description="Choose the keys you need, review the selected layout, and use the calculator as you build it."
@@ -43,7 +43,7 @@ export default function CustomCalculatorClient() {
   if (!isClient) {
     return (
       <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-5">
-        <StudioWorkspaceHeader
+        <WorkspaceHeader
           icon={Blocks}
           title="Calculator Builder"
           description="Choose the keys you need, review the selected layout, and use the calculator as you build it."

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { StudioWorkspaceHeader } from "@/components/studio/studio-workspace-header";
+import { WorkspaceHeader } from "@repo/ui/workspace-header";
 import { getGamePlayLabels } from "@/lib/games/catalog";
 import { GAME_META, type GameSlug } from "@/lib/games/config";
 import { GAME_PRESENTATION } from "@/lib/games/presentation";
@@ -18,7 +18,7 @@ export function GamePageFrame({
 
   return (
     <article className="mx-auto w-full max-w-[1280px] space-y-6">
-      <StudioWorkspaceHeader
+      <WorkspaceHeader
         icon={Icon}
         title={meta.name}
         description={meta.description}

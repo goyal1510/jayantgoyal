@@ -11,7 +11,7 @@ import {
   parseLudoState,
   type LudoSeat,
 } from "@/lib/games/ludo"
-import { createSupabaseAdminClient } from "@/lib/supabase/admin"
+import { createSupabaseServiceRoleClient } from "@repo/auth/service-role"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 
 export async function POST(
@@ -41,7 +41,7 @@ export async function POST(
     return NextResponse.json({ error: "A valid Ludo action is required." }, { status: 400 })
   }
 
-  const supabase = createSupabaseAdminClient()
+  const supabase = createSupabaseServiceRoleClient()
   const { data: session, error: sessionError } = await supabase
     .schema("jg_app")
     .from("game_hub_sessions")

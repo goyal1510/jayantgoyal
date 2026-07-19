@@ -18,7 +18,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@repo/ui/table"
 import { Download, Trash2, Sparkles } from "lucide-react"
 import { toast } from "sonner"
 

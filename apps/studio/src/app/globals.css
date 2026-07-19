@@ -1,6 +1,7 @@
 @config "../../tailwind.config.ts";
 @import "@repo/tailwind-config";
 @import "tailwindcss";
+@import "@repo/ui/application-surface.css";
 
 @custom-variant dark (&:is(.dark *));
 

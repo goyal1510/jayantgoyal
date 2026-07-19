@@ -9,7 +9,7 @@ import {
 import {
   ContextMenu,
   ContextMenuTrigger,
-} from "@/components/ui/context-menu"
+} from "@repo/ui/context-menu"
 import { Card } from "@repo/ui/card"
 import { MoreVertical } from "lucide-react"
 import { cn } from "@repo/ui/lib/utils"

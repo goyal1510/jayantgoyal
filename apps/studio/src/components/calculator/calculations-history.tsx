@@ -11,7 +11,7 @@ import {
 import type { CalculationWithDenominations } from "@/lib/calculator/database";
 import { Button } from "@repo/ui/button";
 import { PageSpinner } from "@repo/ui/page-spinner";
-import { StudioWorkspaceHeader } from "@/components/studio/studio-workspace-header";
+import { WorkspaceHeader } from "@repo/ui/workspace-header";
 
 import { CalculationHistoryFilters } from "./calculation-history-filters";
 import { CalculationDetailSheet } from "./calculation-detail-sheet";
@@ -226,7 +226,7 @@ export function CalculationsHistory() {
 
   return (
     <div className="mx-auto w-full max-w-[1180px] space-y-6">
-      <StudioWorkspaceHeader
+      <WorkspaceHeader
         icon={Banknote}
         title="Currency History"
         description="Find a saved count, review its denomination breakdown, or continue with a new calculation."

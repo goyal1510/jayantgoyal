@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { MfaManager } from "@/components/account/mfa-manager";
 import { PasswordForm } from "@/components/account/password-form";
+import { ProfileForm } from "@/components/account/profile-form";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   Card,
@@ -17,7 +18,20 @@ export const dynamic = "force-dynamic";
 
 export default async function AccountSecurityPage() {
   const supabase = await createSupabaseServerClient();
-  const { data: factors } = await supabase.auth.mfa.listFactors();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const [{ data: factors }, { data: profile }] = await Promise.all([
+    supabase.auth.mfa.listFactors(),
+    user
+      ? supabase
+          .schema("jg_account")
+          .from("profiles")
+          .select("first_name, last_name")
+          .eq("user_id", user.id)
+          .single()
+      : Promise.resolve({ data: null }),
+  ]);
   const factorId = factors?.totp[0]?.id ?? null;
   return (
     <>
@@ -27,6 +41,21 @@ export default async function AccountSecurityPage() {
           Manage password and multi-factor authentication.
         </p>
       </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Profile</CardTitle>
+          <CardDescription>
+            Keep the name shown across the Studio and Admin applications up to
+            date.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ProfileForm
+            firstName={profile?.first_name ?? ""}
+            lastName={profile?.last_name ?? ""}
+          />
+        </CardContent>
+      </Card>
       <Card>
         <CardHeader>
           <CardTitle>Password</CardTitle>

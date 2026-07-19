@@ -9,7 +9,7 @@ import {
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuSeparator,
-} from "@/components/ui/context-menu"
+} from "@repo/ui/context-menu"
 import { Eye, Download, Pencil, FolderInput, Copy, Trash2 } from "lucide-react"
 import type { DirectoryListingItem } from "@/lib/file-manager/types"
 

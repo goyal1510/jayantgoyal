@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 
-import { StudioWorkspaceHeader } from "@/components/studio/studio-workspace-header";
+import { WorkspaceHeader } from "@repo/ui/workspace-header";
 import { ToolFavoriteButton } from "@/components/tools/tool-favorite-button";
 import { getToolTone } from "@/lib/tools/tool-tones";
 import {
@@ -32,7 +32,7 @@ export function ToolUsageShell({ children }: ToolUsageShellProps) {
 
   return (
     <div className="space-y-6">
-      <StudioWorkspaceHeader
+      <WorkspaceHeader
         icon={tool.icon}
         title={tool.title}
         description={tool.description}

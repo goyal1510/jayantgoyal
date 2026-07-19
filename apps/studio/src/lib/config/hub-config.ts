@@ -27,6 +27,9 @@ import {
   getStudioSurface,
   type StudioSurfaceId,
 } from "@/lib/config/studio-surfaces";
+import type {
+  ApplicationNavigationItem,
+} from "@repo/ui/application-shell";
 
 export type NavItem = {
   id: string;
@@ -47,6 +50,42 @@ export type AppConfig = {
   url?: string;
   externalUrl?: string;
 };
+
+/**
+ * App-owned bridge into the shared navigation presentation contract.
+ *
+ * Studio keeps its richer NavApps/TechTools renderers for now, but deriving
+ * this tree here means the shared shell can consume Studio's active product
+ * and nested destinations without learning Studio route or permission rules.
+ */
+export function toApplicationNavigationItem(
+  app: AppConfig,
+  activeAppId?: string,
+  activeNavId?: string,
+): ApplicationNavigationItem {
+  const isActive = activeAppId === app.id;
+
+  return {
+    id: app.id,
+    label: app.name,
+    href: app.externalUrl ?? app.url ?? `/${app.id}`,
+    icon: app.icon,
+    iconClassName: app.color,
+    external: Boolean(app.externalUrl),
+    isActive,
+    defaultOpen: isActive,
+    children: app.navItems.length
+      ? app.navItems.map((item) => ({
+          id: item.id,
+          label: item.label,
+          href: item.url ?? `/${app.id}/${item.id}`,
+          icon: item.icon,
+          iconClassName: item.color,
+          isActive: isActive && activeNavId === item.id,
+        }))
+      : undefined,
+  };
+}
 
 function createSurfaceApp(
   id: StudioSurfaceId,

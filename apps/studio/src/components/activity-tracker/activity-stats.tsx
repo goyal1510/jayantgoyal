@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { PageSpinner } from "@repo/ui/page-spinner";
-import { Progress } from "@/components/ui/progress";
+import { Progress } from "@repo/ui/progress";
 import { ActivityStats as ActivityStatsType } from "@/lib/activity-tracker/database";
 import { toast } from "sonner";
 

@@ -8,8 +8,9 @@ import {
 
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { DynamicBreadcrumb } from "@/components/sidebar/dynamic-breadcrumb";
-import ThemeToogle from "@/components/theme/theme-toogle";
 import { LazyMotionProvider } from "@repo/ui/lazy-motion-provider";
+import { ApplicationShell } from "@repo/ui/application-shell";
+import { ApplicationTopbar } from "@repo/ui/application-topbar";
 import { Separator } from "@repo/ui/separator";
 import {
   SIDEBAR_STATE_COOKIE_NAME,
@@ -17,14 +18,14 @@ import {
   parseSidebarPreferences,
 } from "@repo/ui/lib/sidebar-preferences";
 import { RouteChangeProvider } from "@repo/ui/route-change-provider";
-import { SidebarInset, SidebarProvider } from "@repo/ui/sidebar";
 import { TermsAcceptanceCheck } from "@/components/auth/terms-acceptance-check";
 import { AuthGateWrapper } from "@/components/auth/auth-gate";
 import { LazyCommandPalette } from "@/components/providers/lazy-components";
 import { AuthToast } from "@/components/auth/auth-toast";
 import { DynamicBreadcrumbJsonLd } from "@/components/seo/dynamic-breadcrumb-jsonld";
 import { TopbarUserMenu } from "@/components/header/topbar-user-menu";
-import { StudioApplicationHeader } from "@/components/header/studio-application-header";
+import { TopbarSidebarControl } from "@/components/header/studio-sidebar-toggle";
+import { ThemeMenu } from "@repo/ui/theme-menu";
 
 export default async function ProtectedLayout({
   children,
@@ -53,10 +54,11 @@ export default async function ProtectedLayout({
       {isAuthenticated && <TermsAcceptanceCheck />}
       <AuthToast />
       <DynamicBreadcrumbJsonLd />
-      <SidebarProvider {...sidebarPreferences}>
-        <AppSidebar />
-        <SidebarInset>
-          <StudioApplicationHeader
+      <ApplicationShell
+        sidebar={<AppSidebar />}
+        header={
+          <ApplicationTopbar
+            sidebarControl={<TopbarSidebarControl />}
             className="border-border/70 bg-background/90 px-4"
             breadcrumb={
               <div className="w-full [&_[data-slot=breadcrumb-link]]:inline-flex [&_[data-slot=breadcrumb-link]]:h-8 [&_[data-slot=breadcrumb-link]]:items-center [&_[data-slot=breadcrumb-link]]:justify-center [&_[data-slot=breadcrumb-link]]:rounded-md [&_[data-slot=breadcrumb-link]]:px-2 [&_[data-slot=breadcrumb-link]]:hover:bg-accent [&_[data-slot=breadcrumb-link]]:hover:text-accent-foreground">
@@ -66,23 +68,24 @@ export default async function ProtectedLayout({
             actions={
               <>
                 <LazyCommandPalette />
-                <ThemeToogle />
+                <ThemeMenu />
                 <Separator orientation="vertical" className="h-6" />
                 <TopbarUserMenu />
               </>
             }
           />
-          <LazyMotionProvider>
-            <div className="flex min-w-0 flex-1 flex-col gap-4 p-4 sm:p-6 lg:p-8 xl:p-10">
-              <RouteChangeProvider>
-                <AuthGateWrapper isAuthenticated={isAuthenticated}>
-                  {children}
-                </AuthGateWrapper>
-              </RouteChangeProvider>
-            </div>
-          </LazyMotionProvider>
-        </SidebarInset>
-      </SidebarProvider>
+        }
+        contentClassName="gap-4 p-4 sm:p-6 lg:p-8 xl:p-10"
+        {...sidebarPreferences}
+      >
+        <LazyMotionProvider>
+          <RouteChangeProvider>
+            <AuthGateWrapper isAuthenticated={isAuthenticated}>
+              {children}
+            </AuthGateWrapper>
+          </RouteChangeProvider>
+        </LazyMotionProvider>
+      </ApplicationShell>
     </>
   );
 }

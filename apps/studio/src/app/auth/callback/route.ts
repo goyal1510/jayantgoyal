@@ -5,13 +5,13 @@ import {
   copyAuthCacheHeaders,
   createSupabaseRequestClient,
 } from "@repo/auth/server";
+import { createSupabaseServiceRoleClient } from "@repo/auth/service-role";
 
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 /** Check MFA via Admin API — no cookie dependency */
 async function userHasMfa(userId: string): Promise<boolean> {
   try {
-    const adminClient = createSupabaseAdminClient();
+    const adminClient = createSupabaseServiceRoleClient();
     const { data, error } = await adminClient.auth.admin.mfa.listFactors({
       userId,
     });

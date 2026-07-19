@@ -10,14 +10,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@repo/ui/table";
 import { Switch } from "@repo/ui/switch";
 import { Activity } from "@/lib/activity-tracker/database";
 import { toast } from "sonner";
 import { ListChecks, Pencil } from "lucide-react";
 
 import { EditActivityDialog } from "./edit-activity-dialog";
-import { StudioWorkspaceHeader } from "@/components/studio/studio-workspace-header";
+import { WorkspaceHeader } from "@repo/ui/workspace-header";
 
 interface ActivitiesResponse {
   activities: Activity[];
@@ -122,7 +122,7 @@ export default function ManagementClient() {
   if (isLoading) {
     return (
       <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-5">
-        <StudioWorkspaceHeader
+        <WorkspaceHeader
           icon={ListChecks}
           title="Manage activities"
           description="Rename routines and control which activities appear in your monthly tracker."
@@ -135,7 +135,7 @@ export default function ManagementClient() {
 
   return (
     <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-5">
-      <StudioWorkspaceHeader
+        <WorkspaceHeader
         icon={ListChecks}
         title="Manage activities"
         description="Rename routines and control which activities appear in your monthly tracker."

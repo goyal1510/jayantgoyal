@@ -7,7 +7,7 @@ import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
 import { cn } from "@repo/ui/lib/utils";
 
-import { StudioWorkspaceHeader } from "@/components/studio/studio-workspace-header";
+import { WorkspaceHeader } from "@repo/ui/workspace-header";
 
 import { useWeather } from "./use-weather";
 import {
@@ -42,7 +42,7 @@ export function WeatherDashboard() {
 
   return (
     <div className="mx-auto w-full max-w-[1280px] space-y-5">
-      <StudioWorkspaceHeader
+      <WorkspaceHeader
         icon={CloudSun}
         title="Weather"
         description="Check current conditions and the next five days for any city or your current location."
@@ -100,7 +100,7 @@ export function WeatherDashboard() {
             ))}
           </div>
         ) : null}
-      </StudioWorkspaceHeader>
+      </WorkspaceHeader>
 
       {error ? (
         <div

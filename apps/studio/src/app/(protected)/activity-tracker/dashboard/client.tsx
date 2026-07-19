@@ -22,7 +22,7 @@ import {
 } from "@/lib/activity-tracker/date";
 import { Plus, Target } from "lucide-react";
 import { toast } from "sonner";
-import { StudioWorkspaceHeader } from "@/components/studio/studio-workspace-header";
+import { WorkspaceHeader } from "@repo/ui/workspace-header";
 
 export default function DashboardClient() {
   const [currentMonth, setCurrentMonth] =
@@ -76,7 +76,7 @@ export default function DashboardClient() {
 
   return (
     <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-5">
-      <StudioWorkspaceHeader
+      <WorkspaceHeader
         icon={Target}
         title="Activity overview"
         description="See monthly consistency, compare completion rates, and add the next routine you want to build."

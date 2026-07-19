@@ -11,7 +11,7 @@ import {
   CartesianGrid,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card";
-import type { GitHubRepo } from "@/lib/github-stats/types";
+import type { GitHubRepo } from "@repo/github";
 
 interface TopReposBarChartProps {
   repos: GitHubRepo[];

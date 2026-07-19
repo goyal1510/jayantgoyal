@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server"
 
-import { createSupabaseAdminClient } from "@/lib/supabase/admin"
+import { createSupabaseServiceRoleClient } from "@repo/auth/service-role"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 import {
   asJsonObject,
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "A valid roomCode is required." }, { status: 400 })
   }
 
-  const supabase = createSupabaseAdminClient()
+  const supabase = createSupabaseServiceRoleClient()
   const { data: session, error } = await supabase
     .schema("jg_app")
     .from("game_hub_sessions")
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unsupported gameSlug." }, { status: 400 })
   }
 
-  const supabase = createSupabaseAdminClient()
+  const supabase = createSupabaseServiceRoleClient()
   const sessionSettings = asJsonObject(settings)
   const maxPlayers = gameSlug === "dare-x" || gameSlug === "ludo"
     ? normalizeMaxPlayersForGame(gameSlug, sessionSettings.maxPlayers)

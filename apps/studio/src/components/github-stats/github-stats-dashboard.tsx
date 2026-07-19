@@ -9,18 +9,18 @@ import { Button } from "@repo/ui/button";
 import { Skeleton } from "@repo/ui/skeleton";
 import { Card, CardContent } from "@repo/ui/card";
 import { PageSpinner } from "@repo/ui/page-spinner";
-import { fetchGitHubUser, fetchGitHubRepos } from "@/lib/github-stats/api";
+import { createGitHubProxyClient } from "@repo/github/proxy";
 import {
   computeStats,
   computeLanguageDistribution,
   getTopReposByStars,
-} from "@/lib/github-stats/compute";
-import type { GitHubUser, GitHubRepo } from "@/lib/github-stats/types";
+} from "@repo/github";
+import type { GitHubUser, GitHubRepo } from "@repo/github";
 import { ProfileCard } from "./profile-card";
 import { StatsCards } from "./stats-cards";
 import { ContributionCalendar } from "./contribution-calendar";
 import { RepositoryTable } from "./repository-table";
-import { StudioWorkspaceHeader } from "@/components/studio/studio-workspace-header";
+import { WorkspaceHeader } from "@repo/ui/workspace-header";
 
 const LanguagePieChart = dynamic(
   () =>
@@ -57,6 +57,7 @@ const TopReposBarChart = dynamic(
 );
 
 const DEFAULT_USERNAME = "goyal1510";
+const githubClient = createGitHubProxyClient();
 
 export default function GitHubStatsDashboard() {
   const [input, setInput] = useState("");
@@ -79,8 +80,8 @@ export default function GitHubStatsDashboard() {
 
       try {
         const [userData, repoData] = await Promise.all([
-          fetchGitHubUser(query),
-          fetchGitHubRepos(query),
+          githubClient.fetchUser(query),
+          githubClient.fetchRepositories(query),
         ]);
         setUser(userData);
         setRepos(repoData);
@@ -126,7 +127,7 @@ export default function GitHubStatsDashboard() {
 
   return (
     <div className="mx-auto w-full max-w-[1280px] space-y-6">
-      <StudioWorkspaceHeader
+      <WorkspaceHeader
         icon={Github}
         title="GitHub Stats"
         description="Explore a public profile, understand its repository footprint, and compare contribution patterns at a glance."
@@ -162,7 +163,7 @@ export default function GitHubStatsDashboard() {
             {loading ? "Loading profile" : "Explore profile"}
           </Button>
         </div>
-      </StudioWorkspaceHeader>
+      </WorkspaceHeader>
 
       {/* Error */}
       {error && (

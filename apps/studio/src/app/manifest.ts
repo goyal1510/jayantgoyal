@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-import { APP_BRANDS } from "@repo/brand";
+import { APP_BRANDS, BRAND_ASSET_PATHS } from "@repo/brand";
 
 import { SITE_DESCRIPTION } from "@/lib/seo/config";
 
@@ -17,12 +17,12 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: "#0a0a0a",
     icons: [
       {
-        src: "/assets/Jayant_favicon_io/android-chrome-192x192.png",
+        src: BRAND_ASSET_PATHS.android192,
         sizes: "192x192",
         type: "image/png",
       },
       {
-        src: "/assets/Jayant_favicon_io/android-chrome-512x512.png",
+        src: BRAND_ASSET_PATHS.android512,
         sizes: "512x512",
         type: "image/png",
       },

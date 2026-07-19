@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { WelcomeForm } from "@/components/auth/welcome-form";
-import { CircularLoader } from "@/components/ui/circular-loader";
+import { CircularLoader } from "@repo/ui/circular-loader";
 import { AuthPageShell } from "@repo/ui/auth-presentation";
 
 export const metadata: Metadata = {

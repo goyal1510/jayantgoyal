@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Checkbox } from "@repo/ui/checkbox";
 import { PageSpinner } from "@repo/ui/page-spinner";
 import {
   Table,
@@ -10,7 +10,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@repo/ui/table";
 import { Activity, ActivityEntry } from "@/lib/activity-tracker/database";
 import {
   getDaysInMonth,

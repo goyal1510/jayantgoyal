@@ -7,6 +7,7 @@ import Script from "next/script";
 
 import { Toaster } from "@repo/ui/sonner";
 import { ThemeProvider } from "@repo/ui/theme-provider";
+import { BRAND_ASSET_PATHS } from "@repo/brand";
 
 import { SoftwareAppJsonLd, WebSiteJsonLd } from "@/components/seo/json-ld";
 import { ToastSoundProvider } from "@/components/providers/toast-sound-provider";
@@ -71,21 +72,21 @@ const baseMetadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/assets/Jayant_favicon_io/favicon.ico" },
+      { url: BRAND_ASSET_PATHS.favicon },
       {
-        url: "/assets/Jayant_favicon_io/favicon-32x32.png",
+        url: BRAND_ASSET_PATHS.favicon32,
         sizes: "32x32",
         type: "image/png",
       },
       {
-        url: "/assets/Jayant_favicon_io/favicon-16x16.png",
+        url: BRAND_ASSET_PATHS.favicon16,
         sizes: "16x16",
         type: "image/png",
       },
     ],
     apple: [
       {
-        url: "/assets/Jayant_favicon_io/apple-touch-icon.png",
+        url: BRAND_ASSET_PATHS.appleTouchIcon,
         sizes: "180x180",
         type: "image/png",
       },
@@ -142,7 +143,9 @@ export default async function RootLayout({
         />
         {pathname === "/tools" && <SoftwareAppJsonLd siteUrl={SITE_URL} />}
       </head>
-      <body className={`${manrope.variable} ${ibmPlexMono.variable}`}>
+      <body
+        className={`${manrope.variable} ${ibmPlexMono.variable} application-surface`}
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

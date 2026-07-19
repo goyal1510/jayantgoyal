@@ -9,7 +9,7 @@ import { createCalculation } from "@/lib/calculator/client-calculations";
 import { CURRENCY_DENOMINATIONS } from "@/lib/calculator/database";
 import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
-import { StudioWorkspaceHeader } from "@/components/studio/studio-workspace-header";
+import { WorkspaceHeader } from "@repo/ui/workspace-header";
 
 interface DenominationInput {
   denomination: number;
@@ -131,7 +131,7 @@ export function CurrencyCalculatorForm() {
 
   return (
     <div className="mx-auto w-full max-w-[1180px] space-y-6">
-      <StudioWorkspaceHeader
+      <WorkspaceHeader
         icon={Banknote}
         title="Currency Calculator"
         description="Count Indian currency denominations, see the running total instantly, and save the result with a useful note."

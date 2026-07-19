@@ -56,6 +56,42 @@ export async function changePasswordAction(
     : { success: "Password updated." };
 }
 
+export async function updateProfileAction(
+  _previous: AuthActionState,
+  formData: FormData,
+): Promise<AuthActionState> {
+  const context = await actionContext();
+  if ("error" in context) return context;
+
+  const firstName = stringField(formData, "first_name");
+  const lastName = stringField(formData, "last_name");
+  if (firstName.length > 80 || lastName.length > 80) {
+    return { error: "Names must be 80 characters or fewer." };
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Sign in again before updating your profile." };
+
+  const { data: assurance } =
+    await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (assurance?.nextLevel === "aal2" && assurance.currentLevel !== "aal2") {
+    return { error: "Complete multi-factor verification before continuing." };
+  }
+
+  const { error } = await supabase
+    .schema("jg_account")
+    .from("profiles")
+    .update({ first_name: firstName, last_name: lastName })
+    .eq("user_id", user.id);
+  return error
+    ? { error: "Unable to update your profile right now." }
+    : { success: "Profile updated." };
+}
+
+
 async function requireProviderMutation(returnTo: string) {
   const context = await actionContext();
   if ("error" in context) redirect("/error?code=invalid_origin");

@@ -13,8 +13,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import type { GitHubRepo } from "@/lib/github-stats/types";
+} from "@repo/ui/table";
+import type { GitHubRepo } from "@repo/github";
 
 type SortKey =
   | "name"

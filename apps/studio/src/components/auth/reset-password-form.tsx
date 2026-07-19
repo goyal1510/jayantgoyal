@@ -6,6 +6,7 @@ import { Eye, EyeOff, LogIn, AlertCircle, Timer } from "lucide-react"
 
 import { createSupabaseBrowserClient } from "@/lib/supabase/client"
 import { signOutSession } from "@repo/auth/logout"
+import { passwordValidationError } from "@repo/auth/password"
 import { Button } from "@repo/ui/button"
 import { Card, CardContent } from "@repo/ui/card"
 import { Input } from "@repo/ui/input"
@@ -94,8 +95,9 @@ export function ResetPasswordForm({
     (e: React.FormEvent) => {
       e.preventDefault()
 
-      if (password.length < 8) {
-        toast.error("Password must be at least 8 characters.")
+      const passwordError = passwordValidationError(password)
+      if (passwordError) {
+        toast.error(passwordError)
         return
       }
 

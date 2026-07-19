@@ -2,6 +2,8 @@ import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
+import { AUTH_SURFACE_ROUTES } from "@repo/auth/surface";
+
 const appRoot = fileURLToPath(new URL("..", import.meta.url));
 const sourceRoot = fileURLToPath(new URL(".", import.meta.url));
 
@@ -13,25 +15,27 @@ function readActions(): string {
   ).join("\n");
 }
 
-const ROUTES = [
-  "app/login/page.tsx",
-  "app/register/page.tsx",
-  "app/forgot-password/page.tsx",
-  "app/reset-password/page.tsx",
-  "app/verify/page.tsx",
-  "app/callback/route.ts",
-  "app/mfa/page.tsx",
-  "app/account/security/page.tsx",
-  "app/account/providers/page.tsx",
-  "app/logout/page.tsx",
-  "app/error/page.tsx",
-] as const;
+const ROUTE_FILES = new Map<string, string>([
+  ["/login", "app/login/page.tsx"],
+  ["/register", "app/register/page.tsx"],
+  ["/forgot-password", "app/forgot-password/page.tsx"],
+  ["/reset-password", "app/reset-password/page.tsx"],
+  ["/verify", "app/verify/page.tsx"],
+  ["/callback", "app/callback/route.ts"],
+  ["/mfa", "app/mfa/page.tsx"],
+  ["/account/security", "app/account/security/page.tsx"],
+  ["/account/providers", "app/account/providers/page.tsx"],
+  ["/logout", "app/logout/page.tsx"],
+]);
 
 describe("standalone Auth application contract", () => {
   it("owns every approved dark-launch route", () => {
-    ROUTES.forEach((route) => {
-      expect(existsSync(`${sourceRoot}/${route}`), route).toBe(true);
+    AUTH_SURFACE_ROUTES.forEach(({ pathname }) => {
+      const route = ROUTE_FILES.get(pathname);
+      expect(route, pathname).toBeDefined();
+      expect(existsSync(`${sourceRoot}/${route}`), pathname).toBe(true);
     });
+    expect(existsSync(`${sourceRoot}/app/error/page.tsx`)).toBe(true);
   });
 
   it("keeps logout as a POST server action rather than a GET route", () => {
@@ -44,14 +48,23 @@ describe("standalone Auth application contract", () => {
     expect(existsSync(`${sourceRoot}/app/logout/route.ts`)).toBe(false);
   });
 
+  it("keeps profile mutations inside Auth while account deletion stays out of the client app", () => {
+    const actions = readActions();
+    expect(actions).toContain("export async function updateProfileAction");
+    expect(
+      existsSync(`${sourceRoot}/components/account/profile-form.tsx`),
+    ).toBe(true);
+    expect(actions).not.toContain("createSupabaseServiceRoleClient");
+  });
+
   it("verifies Origin for every exported mutation action", () => {
     const actions = readActions();
     const exportedActions =
       actions.match(/export async function \w+Action/g) ?? [];
     const originChecks =
       actions.match(/const context = await actionContext\(\);/g) ?? [];
-    expect(exportedActions.length).toBe(14);
-    expect(originChecks.length).toBe(13);
+    expect(exportedActions.length).toBe(15);
+    expect(originChecks.length).toBe(14);
     expect(actions.match(/await requireProviderMutation\(/g)).toHaveLength(2);
   });
 

@@ -9,7 +9,7 @@ import {
 import {
   ContextMenu,
   ContextMenuTrigger,
-} from "@/components/ui/context-menu"
+} from "@repo/ui/context-menu"
 import { MoreVertical } from "lucide-react"
 import { formatFileSize, formatDate } from "@/lib/file-manager/format-utils"
 import type { DirectoryListingItem } from "@/lib/file-manager/types"

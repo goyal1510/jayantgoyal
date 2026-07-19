@@ -5,7 +5,6 @@ import type { ProxyContext } from "./types";
 const TERMS_EXEMPT_APIS = [
   "/api/account/init",
   "/api/account/accept-terms",
-  "/api/account/mfa-cleanup",
 ];
 
 /**

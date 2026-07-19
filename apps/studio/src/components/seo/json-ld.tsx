@@ -1,4 +1,4 @@
-import { PERSON_BRAND } from "@repo/brand";
+import { BRAND_ASSET_PATHS, PERSON_BRAND } from "@repo/brand";
 
 import {
   LAST_SIGNIFICANT_UPDATE,
@@ -17,7 +17,7 @@ export function PersonJsonLd() {
     familyName: PERSON_BRAND.familyName,
     url: SITE_URL,
     jobTitle: "Full-Stack Developer",
-    image: `${SITE_URL}/assets/Jayant_favicon_io/android-chrome-512x512.png`,
+    image: `${SITE_URL}${BRAND_ASSET_PATHS.android512}`,
     email: "goyal151002@gmail.com",
     address: {
       "@type": "PostalAddress",
@@ -89,7 +89,7 @@ export function ProfilePageJsonLd() {
       familyName: PERSON_BRAND.familyName,
       url: SITE_URL,
       jobTitle: "Full-Stack Developer",
-      image: `${SITE_URL}/assets/Jayant_favicon_io/android-chrome-512x512.png`,
+      image: `${SITE_URL}${BRAND_ASSET_PATHS.android512}`,
       description: SITE_DESCRIPTION,
       sameAs: [
         "https://github.com/goyal1510",

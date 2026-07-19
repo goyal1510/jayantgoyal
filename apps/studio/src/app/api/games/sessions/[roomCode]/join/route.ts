@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server"
 
 import { getSeatForIndex, normalizeDisplayName, normalizeRoomCode } from "@/lib/games/online-sessions"
 import { getOnlineSessionBundle } from "@/lib/games/online-sessions.server"
-import { createSupabaseAdminClient } from "@/lib/supabase/admin"
+import { createSupabaseServiceRoleClient } from "@repo/auth/service-role"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 
 export async function POST(
@@ -26,7 +26,7 @@ export async function POST(
 
   const body = await request.json().catch(() => ({}))
   const displayName = normalizeDisplayName(body?.displayName, user.email?.split("@")[0] ?? "Player")
-  const supabase = createSupabaseAdminClient()
+  const supabase = createSupabaseServiceRoleClient()
 
   const { data: session, error: sessionError } = await supabase
     .schema("jg_app")

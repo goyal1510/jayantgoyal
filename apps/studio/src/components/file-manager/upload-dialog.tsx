@@ -9,7 +9,7 @@ import {
   DialogTitle,
 } from "@repo/ui/dialog"
 import { Button } from "@repo/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { ScrollArea } from "@repo/ui/scroll-area"
 import { Upload, X, FileIcon, AlertCircle } from "lucide-react"
 import { cn } from "@repo/ui/lib/utils"
 import { toast } from "sonner"

@@ -5,7 +5,7 @@ import { FolderOpen } from "lucide-react";
 import { Spinner } from "@repo/ui/spinner";
 import { PageSpinner } from "@repo/ui/page-spinner";
 import { Card } from "@repo/ui/card";
-import { StudioWorkspaceHeader } from "@/components/studio/studio-workspace-header";
+import { WorkspaceHeader } from "@repo/ui/workspace-header";
 import { CreateFolderDialog } from "@/components/file-manager/create-folder-dialog";
 import { RenameDialog } from "@/components/file-manager/rename-dialog";
 import { DeleteDialog } from "@/components/file-manager/delete-dialog";
@@ -62,7 +62,7 @@ export function FileList({ initialPath = "/" }: FileListProps) {
 
   return (
     <div className="space-y-4">
-      <StudioWorkspaceHeader
+      <WorkspaceHeader
         icon={FolderOpen}
         title="File Manager"
         description="Organize private files and folders, switch views, and keep uploads easy to find."

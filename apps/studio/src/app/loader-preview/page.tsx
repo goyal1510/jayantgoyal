@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { CircularLoader } from "@/components/ui/circular-loader";
+import { CircularLoader } from "@repo/ui/circular-loader";
 
 export const metadata: Metadata = { title: "Loader Preview" };
 

@@ -16,8 +16,8 @@ vi.mock("@repo/auth/server", async () => {
   };
 });
 
-vi.mock("@/lib/supabase/admin", () => ({
-  createSupabaseAdminClient: createAdminClientMock,
+vi.mock("@repo/auth/service-role", () => ({
+  createSupabaseServiceRoleClient: createAdminClientMock,
 }));
 
 import { GET as authCallback } from "./route";

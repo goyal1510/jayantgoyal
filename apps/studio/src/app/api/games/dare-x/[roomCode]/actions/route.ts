@@ -9,7 +9,7 @@ import {
 } from "@/lib/games/dare-x"
 import { asJsonObject, normalizeRoomCode } from "@/lib/games/online-sessions"
 import { getCurrentMoveNumber, getOnlineSessionBundle } from "@/lib/games/online-sessions.server"
-import { createSupabaseAdminClient } from "@/lib/supabase/admin"
+import { createSupabaseServiceRoleClient } from "@repo/auth/service-role"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 
 export async function POST(
@@ -38,7 +38,7 @@ export async function POST(
     return NextResponse.json({ error: "Invalid Dare X action." }, { status: 400 })
   }
 
-  const supabase = createSupabaseAdminClient()
+  const supabase = createSupabaseServiceRoleClient()
   const { data: session, error: sessionError } = await supabase
     .schema("jg_app")
     .from("game_hub_sessions")

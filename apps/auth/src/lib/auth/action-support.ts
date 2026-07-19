@@ -5,6 +5,7 @@ import {
   requestOriginFromHeaders,
 } from "@/lib/auth/origin";
 import { AUTH_ORIGIN } from "@/lib/auth/returns";
+import { isValidPassword } from "@repo/auth/password";
 
 export type AuthActionState = {
   error?: string;
@@ -63,10 +64,5 @@ export function validEmail(value: string): boolean {
 }
 
 export function validPassword(value: string): boolean {
-  return (
-    value.length >= 8 &&
-    /[A-Z]/.test(value) &&
-    /[0-9]/.test(value) &&
-    /[^A-Za-z0-9]/.test(value)
-  );
+  return isValidPassword(value);
 }
