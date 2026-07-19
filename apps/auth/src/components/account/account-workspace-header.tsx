@@ -1,6 +1,7 @@
 import {
   KeyRound,
   LayoutDashboard,
+  Link2,
   ShieldCheck,
   UserRound,
   type LucideIcon,
@@ -8,7 +9,12 @@ import {
 
 import { WorkspaceHeader, type WorkspaceTone } from "@repo/ui/workspace-header";
 
-type AccountWorkspaceKey = "security" | "profile" | "password" | "mfa";
+type AccountWorkspaceKey =
+  | "security"
+  | "profile"
+  | "password"
+  | "mfa"
+  | "providers";
 
 const WORKSPACE_COPY: Record<
   AccountWorkspaceKey,
@@ -51,6 +57,14 @@ const WORKSPACE_COPY: Record<
     detail: "Time-based codes · verified before recovery changes",
     icon: ShieldCheck,
     tone: "blue",
+  },
+  providers: {
+    title: "Connected providers",
+    description:
+      "Manage the Google, GitHub, and other sign-in methods attached to this account.",
+    detail: "Keep more than one trusted way back into your account",
+    icon: Link2,
+    tone: "sand",
   },
 };
 

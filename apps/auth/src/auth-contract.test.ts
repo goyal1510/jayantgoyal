@@ -68,8 +68,8 @@ describe("standalone Auth application contract", () => {
       actions.match(/export async function \w+Action/g) ?? [];
     const originChecks =
       actions.match(/const context = await actionContext\(\);/g) ?? [];
-    expect(exportedActions.length).toBe(18);
-    expect(originChecks.length).toBe(16);
+    expect(exportedActions.length).toBe(20);
+    expect(originChecks.length).toBe(17);
     expect(actions.match(/await requireProviderMutation\(/g)).toHaveLength(3);
   });
 
@@ -103,15 +103,39 @@ describe("standalone Auth application contract", () => {
     expect(recovery).toContain("redirect(`/mfa?return_to=");
   });
 
-  it("keeps provider management out of the visible account navigation", () => {
+  it("exposes provider management in the visible account navigation", () => {
     const accountLayout = readFileSync(
       `${sourceRoot}/app/account/layout.tsx`,
+      "utf8",
+    );
+    const accountSidebar = readFileSync(
+      `${sourceRoot}/components/account/account-sidebar.tsx`,
       "utf8",
     );
     expect(accountLayout).toContain("ApplicationShell");
     expect(accountLayout).toContain("AccountSidebar");
     expect(accountLayout).not.toContain("AccountTopbarUserMenu");
-    expect(accountLayout).not.toContain('href="/account/providers"');
+    expect(accountSidebar).toContain('label: "Providers"');
+    expect(accountSidebar).toContain('href: "/account/providers"');
+    expect(accountSidebar).toContain(
+      'pathname.startsWith("/account/providers")',
+    );
+  });
+
+  it("keeps display names in profiles instead of auth metadata", () => {
+    const accountLayout = readFileSync(
+      `${sourceRoot}/app/account/layout.tsx`,
+      "utf8",
+    );
+    const studioCallback = readFileSync(
+      fileURLToPath(
+        new URL("../../studio/src/app/auth/callback/route.ts", import.meta.url),
+      ),
+      "utf8",
+    );
+    expect(accountLayout).toContain("profileDisplayName");
+    expect(accountLayout).not.toContain("user_metadata");
+    expect(studioCallback).not.toContain("user_metadata");
   });
 
   it("preserves password bytes instead of trimming credentials", () => {

@@ -5,6 +5,7 @@ import {
   linkGoogleAction,
   unlinkIdentityAction,
 } from "@/app/actions/account";
+import { AccountWorkspaceHeader } from "@/components/account/account-workspace-header";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { GithubIcon, GoogleIcon } from "@repo/ui/auth-presentation";
 import { Button } from "@repo/ui/button";
@@ -29,13 +30,8 @@ export default async function ProvidersPage() {
   const github = identities.find((identity) => identity.provider === "github");
 
   return (
-    <>
-      <div>
-        <h1 className="text-2xl font-bold">Connected providers</h1>
-        <p className="text-muted-foreground text-sm">
-          Manage the sign-in methods attached to this account.
-        </p>
-      </div>
+    <div className="space-y-6">
+      <AccountWorkspaceHeader workspace="providers" />
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -104,6 +100,6 @@ export default async function ProvidersPage() {
           )}
         </CardContent>
       </Card>
-    </>
+    </div>
   );
 }

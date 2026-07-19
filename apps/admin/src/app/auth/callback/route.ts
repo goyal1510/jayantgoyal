@@ -5,6 +5,7 @@ import {
   copyAuthCacheHeaders,
   createSupabaseRequestClient,
 } from "@repo/auth/server";
+import { syncProfileNamesFromIdentities } from "@repo/auth/profile";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -41,6 +42,11 @@ export async function GET(request: NextRequest) {
     });
     return errorResponse;
   }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user) await syncProfileNamesFromIdentities(supabase, user);
 
   // Always redirect through /mfa-verify after OAuth — the page checks
   // if MFA is actually needed and redirects through if not.

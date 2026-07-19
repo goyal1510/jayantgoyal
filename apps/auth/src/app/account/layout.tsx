@@ -3,6 +3,10 @@ import { cookies } from "next/headers";
 import { AccountBreadcrumb } from "@/components/account/account-breadcrumb";
 import { AccountSidebar } from "@/components/account/account-sidebar";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import {
+  profileDisplayName,
+  resolveProfileAvatar,
+} from "@repo/auth/profile";
 import { ApplicationShell } from "@repo/ui/application-shell";
 import { ApplicationTopbar } from "@repo/ui/application-topbar";
 import { RouteChangeProvider } from "@repo/ui/route-change-provider";
@@ -32,15 +36,16 @@ export default async function AccountLayout({
     ? await supabase
         .schema("jg_account")
         .from("profiles")
-        .select("first_name, last_name, avatar_url")
+        .select(
+          "first_name, last_name, avatar_url, avatar_mode, avatar_storage_path",
+        )
         .eq("user_id", user.id)
         .single()
     : { data: null };
-  const fullName =
-    `${profile?.first_name ?? ""} ${profile?.last_name ?? ""}`.trim() ||
-    user?.user_metadata?.full_name ||
-    user?.email?.split("@")[0] ||
-    "Account";
+  const fullName = profileDisplayName(profile ?? {});
+  const avatarUrl = user
+    ? await resolveProfileAvatar(supabase, user, profile ?? {})
+    : null;
 
   return (
     <div className="application-surface min-h-svh bg-background">
@@ -50,7 +55,7 @@ export default async function AccountLayout({
             user={{
               name: fullName,
               email: user?.email ?? "",
-              avatarUrl: profile?.avatar_url ?? null,
+              avatarUrl,
             }}
           />
         }

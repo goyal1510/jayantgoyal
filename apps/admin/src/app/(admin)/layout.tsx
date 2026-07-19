@@ -13,6 +13,10 @@ import {
   parseSidebarPreferences,
 } from "@repo/ui/lib/sidebar-preferences";
 import { RouteChangeProvider } from "@repo/ui/route-change-provider";
+import {
+  profileDisplayName,
+  resolveProfileAvatar,
+} from "@repo/auth/profile";
 import type { UserRole } from "@/lib/types";
 
 export default async function AdminLayout({
@@ -38,7 +42,9 @@ export default async function AdminLayout({
   const { data: profile } = await supabase
     .schema("jg_account")
     .from("profiles")
-    .select("role, first_name, last_name, avatar_url")
+    .select(
+      "role, first_name, last_name, avatar_url, avatar_mode, avatar_storage_path",
+    )
     .eq("user_id", user.id)
     .single();
 
@@ -46,16 +52,14 @@ export default async function AdminLayout({
     redirect("/unauthorized");
   }
 
-  const fullName =
-    `${profile.first_name || ""} ${profile.last_name || ""}`.trim() ||
-    user.email?.split("@")[0] ||
-    "User";
+  const fullName = profileDisplayName(profile, "User");
+  const avatarUrl = await resolveProfileAvatar(supabase, user, profile);
 
   const authUser = {
     id: user.id,
     email: user.email ?? "",
     name: fullName,
-    avatarUrl: profile.avatar_url ?? null,
+    avatarUrl,
     role: profile.role as UserRole,
   };
 

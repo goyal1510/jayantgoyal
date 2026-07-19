@@ -1,5 +1,7 @@
 "use server";
 
+import { randomUUID } from "node:crypto";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import {
@@ -12,6 +14,11 @@ import {
 } from "@/lib/auth/action-support";
 import { hasRecentSignIn } from "@/lib/auth/policy";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import {
+  PROFILE_AVATAR_BUCKET,
+  PROFILE_AVATAR_MAX_BYTES,
+  PROFILE_AVATAR_MIME_TYPES,
+} from "@repo/auth/profile";
 
 export async function changePasswordAction(
   _previous: AuthActionState,
@@ -89,6 +96,136 @@ export async function updateProfileAction(
   return error
     ? { error: "Unable to update your profile right now." }
     : { success: "Profile updated." };
+}
+
+const AVATAR_EXTENSIONS: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+};
+
+async function requireProfileMutation() {
+  const context = await actionContext();
+  if ("error" in context) return context;
+
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Sign in again before updating your avatar." };
+
+  const { data: assurance } =
+    await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (assurance?.nextLevel === "aal2" && assurance.currentLevel !== "aal2") {
+    return { error: "Complete multi-factor verification before continuing." };
+  }
+
+  return { context, supabase, user };
+}
+
+export async function uploadAvatarAction(
+  _previous: AuthActionState,
+  formData: FormData,
+): Promise<AuthActionState> {
+  const auth = await requireProfileMutation();
+  if ("error" in auth) return auth;
+
+  const file = formData.get("file");
+  if (!(file instanceof File)) return { error: "Choose an image to upload." };
+  if (
+    !PROFILE_AVATAR_MIME_TYPES.includes(
+      file.type as (typeof PROFILE_AVATAR_MIME_TYPES)[number],
+    )
+  ) {
+    return { error: "Use a JPG, PNG, or WebP image." };
+  }
+  if (file.size > PROFILE_AVATAR_MAX_BYTES) {
+    return { error: "Avatar images must be 5 MB or smaller." };
+  }
+
+  const { data: currentProfile } = await auth.supabase
+    .schema("jg_account")
+    .from("profiles")
+    .select("avatar_storage_path")
+    .eq("user_id", auth.user.id)
+    .maybeSingle();
+
+  const path = `${auth.user.id}/${randomUUID()}.${AVATAR_EXTENSIONS[file.type]}`;
+  const bytes = Buffer.from(await file.arrayBuffer());
+  const { error: uploadError } = await auth.supabase.storage
+    .from(PROFILE_AVATAR_BUCKET)
+    .upload(path, bytes, {
+      contentType: file.type,
+      cacheControl: "3600",
+      upsert: false,
+    });
+  if (uploadError) return { error: "Unable to upload the avatar right now." };
+
+  const { error: profileError } = await auth.supabase
+    .schema("jg_account")
+    .from("profiles")
+    .update({
+      avatar_mode: "upload",
+      avatar_provider: null,
+      avatar_storage_path: path,
+      avatar_url: null,
+      avatar_updated_at: new Date().toISOString(),
+    })
+    .eq("user_id", auth.user.id);
+  if (profileError) {
+    await auth.supabase.storage.from(PROFILE_AVATAR_BUCKET).remove([path]);
+    return { error: "Unable to save the avatar right now." };
+  }
+
+  if (currentProfile?.avatar_storage_path) {
+    await auth.supabase.storage
+      .from(PROFILE_AVATAR_BUCKET)
+      .remove([currentProfile.avatar_storage_path]);
+  }
+
+  revalidatePath("/account/profile");
+  revalidatePath("/account/security");
+  return { success: "Avatar updated." };
+}
+
+export async function removeAvatarAction(
+  _previous: AuthActionState,
+  _formData: FormData,
+): Promise<AuthActionState> {
+  void _previous;
+  void _formData;
+  const auth = await requireProfileMutation();
+  if ("error" in auth) return auth;
+
+  const { data: profile } = await auth.supabase
+    .schema("jg_account")
+    .from("profiles")
+    .select("avatar_storage_path")
+    .eq("user_id", auth.user.id)
+    .maybeSingle();
+
+  const { error } = await auth.supabase
+    .schema("jg_account")
+    .from("profiles")
+    .update({
+      avatar_mode: "provider",
+      avatar_provider: null,
+      avatar_storage_path: null,
+      avatar_url: null,
+      avatar_updated_at: new Date().toISOString(),
+    })
+    .eq("user_id", auth.user.id);
+  if (error) return { error: "Unable to remove the avatar right now." };
+
+  if (profile?.avatar_storage_path) {
+    await auth.supabase.storage
+      .from(PROFILE_AVATAR_BUCKET)
+      .remove([profile.avatar_storage_path]);
+  }
+
+  revalidatePath("/account/profile");
+  revalidatePath("/account/security");
+  return { success: "Avatar removed." };
 }
 
 async function requireProviderMutation(returnTo: string) {

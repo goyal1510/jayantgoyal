@@ -1,6 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowUpRight, CheckCircle2, CircleAlert, KeyRound, ShieldCheck, UserRound } from "lucide-react";
+import {
+  ArrowUpRight,
+  CheckCircle2,
+  CircleAlert,
+  KeyRound,
+  Link2,
+  ShieldCheck,
+  UserRound,
+} from "lucide-react";
 
 import { AccountWorkspaceHeader } from "@/components/account/account-workspace-header";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -30,6 +38,14 @@ export default async function AccountSecurityPage() {
   const hasVerifiedMfa = Boolean(
     factors?.totp.some((factor) => factor.status === "verified"),
   );
+  const connectedOAuthProviders = new Set(
+    (user?.identities ?? [])
+      .map((identity) => identity.provider)
+      .filter((provider) => provider === "google" || provider === "github"),
+  );
+  const providerStatus = connectedOAuthProviders.size
+    ? `${connectedOAuthProviders.size} connected`
+    : "None connected";
   const displayName = [profile?.first_name, profile?.last_name]
     .filter(Boolean)
     .join(" ");
@@ -38,7 +54,10 @@ export default async function AccountSecurityPage() {
     <div className="space-y-6">
       <AccountWorkspaceHeader workspace="security" />
 
-      <section className="grid gap-4 md:grid-cols-3" aria-label="Security areas">
+      <section
+        className="grid gap-4 md:grid-cols-2 xl:grid-cols-4"
+        aria-label="Security areas"
+      >
         <SecurityAreaCard
           href="/account/profile"
           icon={UserRound}
@@ -62,6 +81,14 @@ export default async function AccountSecurityPage() {
           description="Use an authenticator code as a second key."
           status={hasVerifiedMfa ? "Enabled" : "Not enabled"}
           ready={hasVerifiedMfa}
+        />
+        <SecurityAreaCard
+          href="/account/providers"
+          icon={Link2}
+          title="Providers"
+          description="Connect or disconnect Google and GitHub sign-in methods."
+          status={providerStatus}
+          ready={connectedOAuthProviders.size > 0}
         />
       </section>
 

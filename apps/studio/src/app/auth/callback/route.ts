@@ -6,6 +6,7 @@ import {
   createSupabaseRequestClient,
 } from "@repo/auth/server";
 import { createSupabaseServiceRoleClient } from "@repo/auth/service-role";
+import { syncProfileNamesFromIdentities } from "@repo/auth/profile";
 
 
 /** Check MFA via Admin API — no cookie dependency */
@@ -76,32 +77,8 @@ export async function GET(request: NextRequest) {
       return errorResponse;
     }
 
-    // For OAuth users signing in for the first time, populate profile with name from provider
     if (data?.user) {
-      const { data: existingProfile } = await supabase
-        .schema("jg_account")
-        .from("profiles")
-        .select("first_name")
-        .eq("user_id", data.user.id)
-        .single();
-
-      if (existingProfile && !existingProfile.first_name) {
-        const metadata = (data.user.user_metadata ?? {}) as Record<
-          string,
-          unknown
-        >;
-        const fullName = String(metadata.full_name || metadata.name || "");
-        const [firstName = "", ...rest] = fullName.split(" ");
-        const lastName = rest.join(" ");
-
-        if (firstName) {
-          await supabase
-            .schema("jg_account")
-            .from("profiles")
-            .update({ first_name: firstName, last_name: lastName })
-            .eq("user_id", data.user.id);
-        }
-      }
+      await syncProfileNamesFromIdentities(supabase, data.user);
 
       // Check MFA — only redirect to /mfa-verify if user actually has MFA enabled.
       // This avoids an unnecessary redirect (and spinner flash) for users without MFA.

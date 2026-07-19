@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import {
+  profileDisplayName,
+  resolveProfileAvatar,
+} from "@repo/auth/profile";
 
 /**
  * Combined init endpoint — returns profile + terms status in one call.
@@ -13,6 +17,8 @@ export async function GET(request: NextRequest) {
   // Trust proxy-verified headers (set by proxy after getUser())
   let userId = request.headers.get("x-user-id");
   let userEmail = request.headers.get("x-user-email") ?? undefined;
+  let authUser: Awaited<ReturnType<typeof supabase.auth.getUser>>["data"]["user"] =
+    null;
 
   if (!userId) {
     // Fallback: called directly without proxy (e.g., during development)
@@ -29,13 +35,21 @@ export async function GET(request: NextRequest) {
     }
     userId = user.id;
     userEmail = user.email;
+    authUser = user;
+  } else {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    authUser = user;
   }
 
   // Single DB query: profile + terms
   const { data: profile } = await supabase
     .schema("jg_account")
     .from("profiles")
-    .select("first_name, last_name, avatar_url, terms_accepted")
+    .select(
+      "first_name, last_name, avatar_url, avatar_mode, avatar_storage_path, terms_accepted",
+    )
     .eq("user_id", userId)
     .single();
 
@@ -47,15 +61,18 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  const name = `${profile.first_name ?? ""} ${profile.last_name ?? ""}`.trim();
+  const name = profileDisplayName(profile, "User");
   const termsAccepted = profile.terms_accepted === true;
+  const avatarUrl = authUser
+    ? await resolveProfileAvatar(supabase, authUser, profile)
+    : null;
 
   const res = NextResponse.json({
     user: {
       id: userId,
-      name: name || "User",
+      name,
       email: userEmail,
-      avatarUrl: profile.avatar_url ?? null,
+      avatarUrl,
     },
     isAuthenticated: true,
     needsAcceptance: !termsAccepted,

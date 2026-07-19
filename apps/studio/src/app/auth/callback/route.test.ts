@@ -25,7 +25,17 @@ import { GET as authCallback } from "./route";
 type CallbackScenario = {
   exchangeError?: Error | null;
   verifyError?: Error | null;
-  user?: { id: string; user_metadata?: Record<string, unknown> } | null;
+  user?: {
+    id: string;
+    identities?: Array<{
+      id: string;
+      user_id: string;
+      identity_id: string;
+      provider: string;
+      identity_data?: Record<string, unknown>;
+      last_sign_in_at?: string;
+    }>;
+  } | null;
 };
 
 function useCallbackScenario({

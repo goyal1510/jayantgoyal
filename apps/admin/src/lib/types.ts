@@ -28,6 +28,10 @@ export interface Profile {
   first_name: string;
   last_name: string;
   avatar_url: string | null;
+  avatar_mode: "provider" | "upload" | "initials";
+  avatar_provider: string | null;
+  avatar_storage_path: string | null;
+  avatar_updated_at: string | null;
   role: UserRole;
   terms_accepted: boolean;
   terms_accepted_at: string | null;

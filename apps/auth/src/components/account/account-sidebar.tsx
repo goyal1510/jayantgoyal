@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   KeyRound,
   LayoutDashboard,
+  Link2,
   ShieldCheck,
   UserRound,
 } from "lucide-react";
@@ -68,6 +69,13 @@ export function AccountSidebar({
         href: "/account/mfa",
         icon: ShieldCheck,
         isActive: pathname.startsWith("/account/mfa"),
+      },
+      {
+        id: "providers",
+        label: "Providers",
+        href: "/account/providers",
+        icon: Link2,
+        isActive: pathname.startsWith("/account/providers"),
       },
     ],
   };

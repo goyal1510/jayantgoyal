@@ -7,7 +7,7 @@ import {
 
 import { resolveAuthReturnTarget } from "@/lib/auth/returns";
 import { classifyAuthCallback } from "@/lib/auth/callback";
-import { syncProfileFromAuthUser } from "@/lib/auth/profile";
+import { syncProfileNamesFromIdentities } from "@repo/auth/profile";
 
 function noStore(response: NextResponse) {
   response.headers.set("Cache-Control", "private, no-store, max-age=0");
@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (user) await syncProfileFromAuthUser(supabase, user);
+    if (user) await syncProfileNamesFromIdentities(supabase, user);
   } else if (callback.kind === "otp") {
     recovery = callback.recovery;
     const { error } = await supabase.auth.verifyOtp({

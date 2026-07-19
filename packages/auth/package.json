@@ -9,6 +9,7 @@
     "./entry": "./src/entry.ts",
     "./logout": "./src/logout.ts",
     "./password": "./src/password.ts",
+    "./profile": "./src/profile.ts",
     "./redirects": "./src/redirects.ts",
     "./server": "./src/server.ts",
     "./service-role": "./src/service-role.ts",
