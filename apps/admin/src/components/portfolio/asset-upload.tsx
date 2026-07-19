@@ -67,7 +67,8 @@ export function PortfolioAssetUpload({
       <Label htmlFor={id}>{label}</Label>
       <Input
         id={id}
-        type="url"
+        type="text"
+        inputMode="url"
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder="Paste a URL or upload a file"
