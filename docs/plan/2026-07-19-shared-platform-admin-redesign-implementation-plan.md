@@ -1,7 +1,7 @@
 # Shared Platform and Admin Redesign Implementation Plan
 
 **Date:** 2026-07-19
-**Status:** In progress — foundation, CMS workspaces, shared shell, GitHub/Auth/brand consolidation, and authenticated release validation are complete; field-level error announcements, keyboard-accessible reordering, and Auth-owned account deletion remain explicitly deferred
+**Status:** In progress — foundation, CMS workspaces, shared shell, GitHub/Auth/brand consolidation, and authenticated release validation are complete; only Auth-owned account deletion remains explicitly deferred
 **Primary scope:** Admin redesign, Studio/Admin shared UI, Admin/Portfolio CMS synchronization, Studio/Portfolio GitHub consolidation
 **Public Portfolio rule:** preserve its independent editorial design, DOM, typography, motion, and CSS
 
