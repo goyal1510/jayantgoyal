@@ -7,6 +7,7 @@
 ## Categories
 
 ### Generators
+
 - UUID v4, v7
 - ULID
 - Nanoid
@@ -15,18 +16,21 @@
 - Password generator
 
 ### Hash & Encryption
+
 - MD5, SHA-1, SHA-256, SHA-512
 - Bcrypt hash/verify
 - HMAC generation
 - AES encrypt/decrypt
 
 ### Encoders/Decoders
+
 - Base64 encode/decode
 - URL encode/decode
 - HTML entities
 - Unicode escape
 
 ### Converters
+
 - JSON ↔ YAML
 - JSON ↔ TOML
 - JSON ↔ XML
@@ -35,6 +39,7 @@
 - Number base conversion
 
 ### Text Tools
+
 - Case converters (camel, snake, kebab)
 - Lorem ipsum generator
 - Word/character counter
@@ -42,32 +47,39 @@
 - Regex tester
 
 ### Validators
+
 - JSON validator
 - Email validator
 - URL validator
 - Regex validator
 
 ### Formatters
+
 - JSON formatter/minifier
 - SQL formatter
 - XML formatter
 - Code beautifier
 
 ### Parsers
+
 - JWT decoder
 - URL parser
 - User agent parser
 - Cron expression parser
 
 ### Media & QR
+
 - QR code generator
 - Image to Base64
 - Favicon generator
+- Private, owner-authorized YouTube to MP3/MP4 conversion
 
 ## Tech Stack
 
 - **Web Crypto API** - Cryptographic operations
 - **Native APIs** - Encoding, parsing
+- **Private Python worker** - yt-dlp and FFmpeg media processing
+- **Supabase Storage** - Temporary signed media downloads
 - **React 19** - UI rendering
 
 ## Files
@@ -85,5 +97,5 @@ src/
 ## Key Patterns
 
 - **Dynamic routing**: `[category]/[tool]` for clean URLs
-- **Client-side processing**: All operations run in browser
-- **No server calls**: Privacy-first, data never leaves browser
+- **Client-side by default**: Most utilities process data in the browser
+- **Explicit server boundaries**: Media conversion uses an owner-only job API and private worker
