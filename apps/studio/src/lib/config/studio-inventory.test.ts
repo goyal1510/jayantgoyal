@@ -24,6 +24,13 @@ describe("Studio product inventory", () => {
     expect(getStudioProduct("blog")).toBeUndefined();
   });
 
+  it("classifies Media Lab as a utility instead of a Tech Tool", () => {
+    expect(getStudioProduct("media-lab")).toMatchObject({
+      type: "utility",
+      href: "/media-lab/youtube-converter",
+    });
+  });
+
   it("features an intentional subset and builds public detail routes", () => {
     expect(FEATURED_STUDIO_PRODUCTS.map((product) => product.id)).toEqual([
       "tech-tools",

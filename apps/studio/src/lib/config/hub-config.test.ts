@@ -7,7 +7,9 @@ import {
 
 describe("Studio navigation adapter", () => {
   it("preserves active product and nested destination state", () => {
-    const app = getSurfaceApps().find((candidate) => candidate.id === "game-hub");
+    const app = getSurfaceApps().find(
+      (candidate) => candidate.id === "game-hub",
+    );
 
     expect(app).toBeDefined();
 
@@ -30,5 +32,25 @@ describe("Studio navigation adapter", () => {
 
     expect(item.external).toBe(true);
     expect(item.href).toBe(app!.externalUrl);
+  });
+
+  it("exposes Media Lab as its own nested application", () => {
+    const app = getSurfaceApps().find(
+      (candidate) => candidate.id === "media-lab",
+    );
+
+    expect(app).toBeDefined();
+    expect(
+      toApplicationNavigationItem(app!, "media-lab", "youtube-converter"),
+    ).toMatchObject({
+      isActive: true,
+      children: [
+        expect.objectContaining({
+          id: "youtube-converter",
+          label: "YouTube Converter",
+          isActive: true,
+        }),
+      ],
+    });
   });
 });

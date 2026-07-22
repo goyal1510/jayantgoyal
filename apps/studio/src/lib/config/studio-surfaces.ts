@@ -1,6 +1,7 @@
 import {
   Boxes,
   Calculator,
+  Clapperboard,
   Cloud,
   FileText,
   FolderOpen,
@@ -19,6 +20,7 @@ import { PORTFOLIO_URL, portfolioUrl } from "@/lib/platform/urls";
 
 export type StudioSurfaceSection =
   | "discover"
+  | "utility"
   | "workspace"
   | "experiment"
   | "external"
@@ -73,6 +75,18 @@ export const STUDIO_SURFACES = {
     isPublic: true,
     external: false,
     searchKeywords: ["tools", "utilities", "developer tools"],
+  },
+  "media-lab": {
+    id: "media-lab",
+    name: "Media Lab",
+    navLabel: "Media Lab",
+    href: "/media-lab/youtube-converter",
+    icon: Clapperboard,
+    color: "text-rose-500 dark:text-rose-400",
+    section: "utility",
+    isPublic: false,
+    external: false,
+    searchKeywords: ["media", "youtube", "audio", "video", "converter"],
   },
   weather: {
     id: "weather",

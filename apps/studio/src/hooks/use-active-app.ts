@@ -10,6 +10,12 @@ const ROUTE_MAP: {
   { prefix: "/products", appId: "studio-products" },
   { prefix: "/games", appId: "game-hub" },
   { prefix: "/tools", appId: "tech-tools" },
+  {
+    prefix: "/media-lab",
+    appId: "media-lab",
+    navResolver: (pathname) =>
+      pathname.includes("/youtube-converter") ? "youtube-converter" : undefined,
+  },
   { prefix: "/messenger", appId: "messenger" },
   {
     prefix: "/calculator",
