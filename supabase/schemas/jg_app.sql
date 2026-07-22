@@ -30,6 +30,148 @@ CREATE TYPE "jg_app"."game_hub_session_status" AS ENUM (
 ALTER TYPE "jg_app"."game_hub_session_status" OWNER TO "postgres";
 
 
+CREATE OR REPLACE FUNCTION "jg_app"."claim_expired_media_conversion_job"() RETURNS TABLE("job_id" "uuid", "object_path" "text")
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  claimed_id uuid;
+begin
+  select job.id
+  into claimed_id
+  from jg_app.media_conversion_jobs as job
+  where
+    job.status = 'expired'
+    or (
+      job.status = 'completed'
+      and job.expires_at is not null
+      and job.expires_at <= now()
+    )
+    or (
+      job.status in ('failed', 'queued')
+      and job.updated_at < now() - interval '24 hours'
+    )
+  order by job.updated_at
+  for update skip locked
+  limit 1;
+
+  if claimed_id is null then
+    return;
+  end if;
+
+  update jg_app.media_conversion_jobs
+  set status = 'expired'
+  where id = claimed_id;
+
+  return query
+    select job.id, job.storage_path
+    from jg_app.media_conversion_jobs as job
+    where job.id = claimed_id;
+end;
+$$;
+
+
+ALTER FUNCTION "jg_app"."claim_expired_media_conversion_job"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "jg_app"."uuid_v7"() RETURNS "uuid"
+    LANGUAGE "plpgsql"
+    AS $$
+DECLARE
+  ts_ms bigint;
+  uuid_bytes bytea;
+BEGIN
+  ts_ms := extract(epoch FROM clock_timestamp()) * 1000;
+  uuid_bytes := set_byte(
+    set_byte(
+      overlay(
+        -- 6 bytes timestamp + 10 bytes random
+        substring(int8send(ts_ms) FROM 3 FOR 6) ||
+        extensions.gen_random_bytes(10)
+        -- set version 7
+        PLACING '\x70'::bytea FROM 7 FOR 1
+      ),
+      -- set variant bits (10xx)
+      8,
+      (get_byte(extensions.gen_random_bytes(1), 0) & 63) | 128
+    ),
+    -- preserve version nibble
+    6,
+    (get_byte(substring(int8send(ts_ms) FROM 3 FOR 6) || extensions.gen_random_bytes(10), 6) & 15) | 112
+  );
+  RETURN encode(uuid_bytes, 'hex')::uuid;
+END;
+$$;
+
+
+ALTER FUNCTION "jg_app"."uuid_v7"() OWNER TO "postgres";
+
+SET default_tablespace = '';
+
+SET default_table_access_method = "heap";
+
+
+CREATE TABLE IF NOT EXISTS "jg_app"."media_conversion_jobs" (
+    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
+    "user_id" "uuid" NOT NULL,
+    "source_url" "text" NOT NULL,
+    "output_format" "text" NOT NULL,
+    "quality" "text" NOT NULL,
+    "status" "text" DEFAULT 'queued'::"text" NOT NULL,
+    "progress" smallint DEFAULT 0 NOT NULL,
+    "title" "text",
+    "output_filename" "text",
+    "mime_type" "text",
+    "size_bytes" bigint,
+    "storage_path" "text",
+    "error_message" "text",
+    "started_at" timestamp with time zone,
+    "completed_at" timestamp with time zone,
+    "expires_at" timestamp with time zone,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    CONSTRAINT "media_conversion_jobs_output_format_check" CHECK (("output_format" = ANY (ARRAY['mp3'::"text", 'mp4'::"text"]))),
+    CONSTRAINT "media_conversion_jobs_progress_check" CHECK ((("progress" >= 0) AND ("progress" <= 100))),
+    CONSTRAINT "media_conversion_jobs_quality_check" CHECK (("quality" = ANY (ARRAY['small'::"text", 'balanced'::"text", 'high'::"text"]))),
+    CONSTRAINT "media_conversion_jobs_size_bytes_check" CHECK ((("size_bytes" IS NULL) OR ("size_bytes" >= 0))),
+    CONSTRAINT "media_conversion_jobs_source_url_check" CHECK ((("char_length"("btrim"("source_url")) >= 1) AND ("char_length"("btrim"("source_url")) <= 2048))),
+    CONSTRAINT "media_conversion_jobs_status_check" CHECK (("status" = ANY (ARRAY['queued'::"text", 'downloading'::"text", 'converting'::"text", 'uploading'::"text", 'completed'::"text", 'failed'::"text", 'expired'::"text"])))
+);
+
+
+ALTER TABLE "jg_app"."media_conversion_jobs" OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "jg_app"."claim_media_conversion_job"() RETURNS SETOF "jg_app"."media_conversion_jobs"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+begin
+  return query
+    with candidate as (
+      select queued.id
+      from jg_app.media_conversion_jobs as queued
+      where queued.status = 'queued'
+      order by queued.created_at
+      for update skip locked
+      limit 1
+    )
+    update jg_app.media_conversion_jobs as job
+    set
+      status = 'downloading',
+      progress = 1,
+      started_at = now(),
+      error_message = null
+    from candidate
+    where job.id = candidate.id
+    returning job.*;
+end;
+$$;
+
+
+ALTER FUNCTION "jg_app"."claim_media_conversion_job"() OWNER TO "postgres";
+
+
 CREATE OR REPLACE FUNCTION "jg_app"."copy_file"("p_file_id" "uuid", "p_target_directory_path" "text", "p_user_id" "uuid") RETURNS "uuid"
     LANGUAGE "plpgsql"
     AS $_$
@@ -167,43 +309,6 @@ $$;
 
 
 ALTER FUNCTION "jg_app"."get_directory_tree"("p_user_id" "uuid", "p_parent_path" "text") OWNER TO "postgres";
-
-
-CREATE OR REPLACE FUNCTION "jg_app"."uuid_v7"() RETURNS "uuid"
-    LANGUAGE "plpgsql"
-    AS $$
-DECLARE
-  ts_ms bigint;
-  uuid_bytes bytea;
-BEGIN
-  ts_ms := extract(epoch FROM clock_timestamp()) * 1000;
-  uuid_bytes := set_byte(
-    set_byte(
-      overlay(
-        -- 6 bytes timestamp + 10 bytes random
-        substring(int8send(ts_ms) FROM 3 FOR 6) ||
-        extensions.gen_random_bytes(10)
-        -- set version 7
-        PLACING '\x70'::bytea FROM 7 FOR 1
-      ),
-      -- set variant bits (10xx)
-      8,
-      (get_byte(extensions.gen_random_bytes(1), 0) & 63) | 128
-    ),
-    -- preserve version nibble
-    6,
-    (get_byte(substring(int8send(ts_ms) FROM 3 FOR 6) || extensions.gen_random_bytes(10), 6) & 15) | 112
-  );
-  RETURN encode(uuid_bytes, 'hex')::uuid;
-END;
-$$;
-
-
-ALTER FUNCTION "jg_app"."uuid_v7"() OWNER TO "postgres";
-
-SET default_tablespace = '';
-
-SET default_table_access_method = "heap";
 
 
 CREATE TABLE IF NOT EXISTS "jg_app"."file_manager_files" (
@@ -346,6 +451,31 @@ $$;
 
 
 ALTER FUNCTION "jg_app"."move_file"("p_file_id" "uuid", "p_new_directory_path" "text", "p_user_id" "uuid") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "jg_app"."requeue_stale_media_conversion_jobs"() RETURNS integer
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  affected integer;
+begin
+  update jg_app.media_conversion_jobs
+  set
+    status = 'queued',
+    progress = 0,
+    started_at = null,
+    error_message = 'The worker restarted before this job completed. Retrying.'
+  where status in ('downloading', 'converting', 'uploading')
+    and updated_at < now() - interval '30 minutes';
+
+  get diagnostics affected = row_count;
+  return affected;
+end;
+$$;
+
+
+ALTER FUNCTION "jg_app"."requeue_stale_media_conversion_jobs"() OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "jg_app"."soft_delete_file"("p_file_id" "uuid", "p_user_id" "uuid") RETURNS boolean
@@ -740,6 +870,11 @@ ALTER TABLE ONLY "jg_app"."game_hub_typing_speed_results"
 
 
 
+ALTER TABLE ONLY "jg_app"."media_conversion_jobs"
+    ADD CONSTRAINT "media_conversion_jobs_pkey" PRIMARY KEY ("id");
+
+
+
 ALTER TABLE ONLY "jg_app"."messenger_messages"
     ADD CONSTRAINT "messenger_messages_pkey" PRIMARY KEY ("id");
 
@@ -861,6 +996,22 @@ CREATE INDEX "idx_gh_typing_user_id" ON "jg_app"."game_hub_typing_speed_results"
 
 
 
+CREATE INDEX "idx_media_conversion_jobs_cleanup" ON "jg_app"."media_conversion_jobs" USING "btree" ("expires_at") WHERE ("status" = ANY (ARRAY['completed'::"text", 'expired'::"text"]));
+
+
+
+CREATE UNIQUE INDEX "idx_media_conversion_jobs_one_active_per_user" ON "jg_app"."media_conversion_jobs" USING "btree" ("user_id") WHERE ("status" = ANY (ARRAY['queued'::"text", 'downloading'::"text", 'converting'::"text", 'uploading'::"text"]));
+
+
+
+CREATE INDEX "idx_media_conversion_jobs_queue" ON "jg_app"."media_conversion_jobs" USING "btree" ("created_at") WHERE ("status" = 'queued'::"text");
+
+
+
+CREATE INDEX "idx_media_conversion_jobs_user_created" ON "jg_app"."media_conversion_jobs" USING "btree" ("user_id", "created_at" DESC);
+
+
+
 CREATE INDEX "idx_msg_messages_created_at" ON "jg_app"."messenger_messages" USING "btree" ("created_at" DESC);
 
 
@@ -894,6 +1045,10 @@ CREATE OR REPLACE TRIGGER "update_game_hub_session_participants_updated_at" BEFO
 
 
 CREATE OR REPLACE TRIGGER "update_game_hub_sessions_updated_at" BEFORE UPDATE ON "jg_app"."game_hub_sessions" FOR EACH ROW EXECUTE FUNCTION "jg_app"."update_updated_at"();
+
+
+
+CREATE OR REPLACE TRIGGER "update_media_conversion_jobs_updated_at" BEFORE UPDATE ON "jg_app"."media_conversion_jobs" FOR EACH ROW EXECUTE FUNCTION "jg_app"."update_updated_at"();
 
 
 
@@ -990,6 +1145,11 @@ ALTER TABLE ONLY "jg_app"."game_hub_typing_speed_results"
 
 
 
+ALTER TABLE ONLY "jg_app"."media_conversion_jobs"
+    ADD CONSTRAINT "media_conversion_jobs_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
+
+
+
 ALTER TABLE ONLY "jg_app"."messenger_messages"
     ADD CONSTRAINT "messenger_messages_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
 
@@ -1077,6 +1237,10 @@ CREATE POLICY "Users can delete own tool history" ON "jg_app"."tool_history" FOR
 
 
 
+CREATE POLICY "Users can enqueue own media conversion jobs" ON "jg_app"."media_conversion_jobs" FOR INSERT TO "authenticated" WITH CHECK ((("auth"."uid"() = "user_id") AND ("status" = 'queued'::"text") AND ("progress" = 0) AND ("title" IS NULL) AND ("output_filename" IS NULL) AND ("mime_type" IS NULL) AND ("size_bytes" IS NULL) AND ("storage_path" IS NULL) AND ("error_message" IS NULL) AND ("started_at" IS NULL) AND ("completed_at" IS NULL) AND ("expires_at" IS NULL)));
+
+
+
 CREATE POLICY "Users can insert own activities" ON "jg_app"."activity_tracker_activities" FOR INSERT WITH CHECK (("auth"."uid"() = "user_id"));
 
 
@@ -1157,6 +1321,10 @@ CREATE POLICY "Users can view own game participants" ON "jg_app"."game_hub_sessi
 
 
 
+CREATE POLICY "Users can view own media conversion jobs" ON "jg_app"."media_conversion_jobs" FOR SELECT TO "authenticated" USING (("auth"."uid"() = "user_id"));
+
+
+
 CREATE POLICY "Users can view own messages" ON "jg_app"."messenger_messages" FOR SELECT USING (("auth"."uid"() = "user_id"));
 
 
@@ -1229,6 +1397,9 @@ CREATE POLICY "insert_own_denominations" ON "jg_app"."currency_calculator_denomi
 
 
 
+ALTER TABLE "jg_app"."media_conversion_jobs" ENABLE ROW LEVEL SECURITY;
+
+
 ALTER TABLE "jg_app"."messenger_messages" ENABLE ROW LEVEL SECURITY;
 
 
@@ -1271,6 +1442,27 @@ GRANT ALL ON TYPE "jg_app"."game_hub_session_status" TO "service_role";
 
 
 
+REVOKE ALL ON FUNCTION "jg_app"."claim_expired_media_conversion_job"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "jg_app"."claim_expired_media_conversion_job"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "jg_app"."uuid_v7"() TO "anon";
+GRANT ALL ON FUNCTION "jg_app"."uuid_v7"() TO "authenticated";
+GRANT ALL ON FUNCTION "jg_app"."uuid_v7"() TO "service_role";
+
+
+
+GRANT SELECT,INSERT ON TABLE "jg_app"."media_conversion_jobs" TO "authenticated";
+GRANT ALL ON TABLE "jg_app"."media_conversion_jobs" TO "service_role";
+
+
+
+REVOKE ALL ON FUNCTION "jg_app"."claim_media_conversion_job"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "jg_app"."claim_media_conversion_job"() TO "service_role";
+
+
+
 GRANT ALL ON FUNCTION "jg_app"."copy_file"("p_file_id" "uuid", "p_target_directory_path" "text", "p_user_id" "uuid") TO "authenticated";
 GRANT ALL ON FUNCTION "jg_app"."copy_file"("p_file_id" "uuid", "p_target_directory_path" "text", "p_user_id" "uuid") TO "service_role";
 GRANT ALL ON FUNCTION "jg_app"."copy_file"("p_file_id" "uuid", "p_target_directory_path" "text", "p_user_id" "uuid") TO "anon";
@@ -1292,12 +1484,6 @@ GRANT ALL ON FUNCTION "jg_app"."generate_storage_path"("p_user_id" "uuid", "p_fi
 GRANT ALL ON FUNCTION "jg_app"."get_directory_tree"("p_user_id" "uuid", "p_parent_path" "text") TO "authenticated";
 GRANT ALL ON FUNCTION "jg_app"."get_directory_tree"("p_user_id" "uuid", "p_parent_path" "text") TO "service_role";
 GRANT ALL ON FUNCTION "jg_app"."get_directory_tree"("p_user_id" "uuid", "p_parent_path" "text") TO "anon";
-
-
-
-GRANT ALL ON FUNCTION "jg_app"."uuid_v7"() TO "anon";
-GRANT ALL ON FUNCTION "jg_app"."uuid_v7"() TO "authenticated";
-GRANT ALL ON FUNCTION "jg_app"."uuid_v7"() TO "service_role";
 
 
 
@@ -1332,6 +1518,11 @@ GRANT ALL ON FUNCTION "jg_app"."list_directory"("p_user_id" "uuid", "p_directory
 GRANT ALL ON FUNCTION "jg_app"."move_file"("p_file_id" "uuid", "p_new_directory_path" "text", "p_user_id" "uuid") TO "authenticated";
 GRANT ALL ON FUNCTION "jg_app"."move_file"("p_file_id" "uuid", "p_new_directory_path" "text", "p_user_id" "uuid") TO "service_role";
 GRANT ALL ON FUNCTION "jg_app"."move_file"("p_file_id" "uuid", "p_new_directory_path" "text", "p_user_id" "uuid") TO "anon";
+
+
+
+REVOKE ALL ON FUNCTION "jg_app"."requeue_stale_media_conversion_jobs"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "jg_app"."requeue_stale_media_conversion_jobs"() TO "service_role";
 
 
 
