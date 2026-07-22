@@ -28,7 +28,7 @@ Independent Portfolio, Studio, Admin, and Auth applications by **Jayant Goyal**.
 
 ```
 Frontend     Next.js 16 · React 19 · TypeScript 5.9 · Tailwind CSS v4
-Backend      Supabase (Auth, Database, Realtime, Storage)
+Backend      Supabase (Auth, Database, Realtime, Storage) · Python/FastAPI worker
 Monorepo     Turborepo · pnpm Workspaces
 UI/UX        Radix UI · Framer Motion · Lucide Icons · Sonner
 State        Zustand (persisted stores)
@@ -44,7 +44,8 @@ jayantgoyal/
 │   ├── portfolio/          # Public portfolio, blog, resume, contact
 │   ├── studio/             # Products, tools, games, and workspaces
 │   ├── admin/              # Administration and content operations
-│   └── auth/               # Sign-in, recovery, MFA, and account security
+│   ├── auth/               # Sign-in, recovery, MFA, and account security
+│   └── media-worker/       # Private yt-dlp/FFmpeg queue consumer
 │
 ├── packages/
 │   ├── auth/               # Shared Supabase SSR and session contracts
@@ -96,6 +97,7 @@ Track daily activities with custom categories. Monthly calendar view, streak tra
 - **Converters**: JSON/YAML/TOML/XML, Base64, colors, timestamps
 - **Formatters**: JSON, SQL, code beautifiers
 - **Validators**: JSON, regex, JWT decoder
+- **Media Converter**: Owner-only YouTube jobs with temporary MP3/MP4 downloads
 
 ### Games Hub
 
@@ -127,6 +129,11 @@ cp apps/auth/.env.example apps/auth/.env.local
 
 # Run Studio
 pnpm --filter studio dev
+
+# Run the private media worker separately (after configuring its .env)
+cd apps/media-worker
+docker build -t jg-media-worker .
+docker run --rm --env-file .env -p 8080:8080 jg-media-worker
 ```
 
 ### Environment Variables
