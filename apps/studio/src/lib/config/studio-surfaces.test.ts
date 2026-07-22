@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { getAppById, getSurfaceApps } from "./hub-config";
 import { STUDIO_SURFACES } from "./studio-surfaces";
+import { getToolByPath } from "@/lib/tools/tools";
 
 describe("Studio surface registry", () => {
   it("uses unique identifiers and canonical routes", () => {
@@ -12,6 +13,11 @@ describe("Studio surface registry", () => {
     expect(STUDIO_SURFACES["tech-tools"]).toMatchObject({
       name: "Tech Tools",
       href: "/tools",
+    });
+    expect(STUDIO_SURFACES["media-lab"]).toMatchObject({
+      name: "Media Lab",
+      href: "/media-lab/youtube-converter",
+      isPublic: false,
     });
     expect(STUDIO_SURFACES["game-hub"]).toMatchObject({
       name: "Game Hub",
@@ -31,6 +37,7 @@ describe("Studio surface registry", () => {
         "studio-home",
         "studio-products",
         "tech-tools",
+        "media-lab",
         "weather",
         "github-stats",
       ]),
@@ -42,6 +49,15 @@ describe("Studio surface registry", () => {
       label: "All Games",
       url: "/games",
     });
+  });
+
+  it("keeps YouTube Converter outside Tech Tools", () => {
+    expect(getAppById("media-lab")?.navItems[0]).toMatchObject({
+      id: "youtube-converter",
+      label: "YouTube Converter",
+      url: "/media-lab/youtube-converter",
+    });
+    expect(getToolByPath("/tools/media-qr/media-converter")).toBeUndefined();
   });
 
   it("keeps Blog and Portfolio as explicit external destinations", () => {

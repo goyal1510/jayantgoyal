@@ -1,3 +1,4 @@
+/** Shared YouTube Converter contract for the Media Lab surface. */
 export const CONVERSION_QUALITIES = [
   { id: "small", label: "Small", mp3Detail: "128 kbps", mp4Detail: "480p" },
   {

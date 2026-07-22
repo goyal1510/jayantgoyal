@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { isMediaConverterUserAllowed } from "@/lib/tools/media-converter.server";
+import { isMediaConverterUserAllowed } from "@/lib/media-lab/youtube-converter.server";
 
 const JOB_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f-]{27}$/i;
 const SIGNED_URL_TTL_SECONDS = 5 * 60;
@@ -105,7 +105,7 @@ export async function POST(
     );
   } catch (error) {
     console.error(
-      "Error in POST /api/tools/media-converter/jobs/[id]/download:",
+      "Error in POST /api/media-lab/youtube-converter/jobs/[id]/download:",
       error,
     );
     return NextResponse.json(

@@ -72,14 +72,11 @@
 - QR code generator
 - Image to Base64
 - Favicon generator
-- Private, owner-authorized YouTube to MP3/MP4 conversion
 
 ## Tech Stack
 
 - **Web Crypto API** - Cryptographic operations
 - **Native APIs** - Encoding, parsing
-- **Private Python worker** - yt-dlp and FFmpeg media processing
-- **Supabase Storage** - Temporary signed media downloads
 - **React 19** - UI rendering
 
 ## Files
@@ -98,4 +95,3 @@ src/
 
 - **Dynamic routing**: `[category]/[tool]` for clean URLs
 - **Client-side by default**: Most utilities process data in the browser
-- **Explicit server boundaries**: Media conversion uses an owner-only job API and private worker

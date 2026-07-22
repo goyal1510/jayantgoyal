@@ -20,6 +20,7 @@ import {
   Puzzle,
   Crown,
   Dice5,
+  Youtube,
   type LucideIcon,
 } from "lucide-react";
 
@@ -27,9 +28,7 @@ import {
   getStudioSurface,
   type StudioSurfaceId,
 } from "@/lib/config/studio-surfaces";
-import type {
-  ApplicationNavigationItem,
-} from "@repo/ui/application-shell";
+import type { ApplicationNavigationItem } from "@repo/ui/application-shell";
 
 export type NavItem = {
   id: string;
@@ -237,6 +236,16 @@ const GAME_HUB_NAV: NavItem[] = [
 // Tech Tools - uses nested navigation from lib/tools/tools.ts
 // This is just a placeholder, actual navigation is rendered from toolCategories
 
+const MEDIA_LAB_NAV: NavItem[] = [
+  {
+    id: "youtube-converter",
+    label: "YouTube Converter",
+    icon: Youtube,
+    color: "text-red-500 dark:text-red-400",
+    url: "/media-lab/youtube-converter",
+  },
+];
+
 // Activity Tracker navigation items
 const ACTIVITY_TRACKER_NAV: NavItem[] = [
   {
@@ -284,6 +293,7 @@ const CURRENCY_CALC_NAV: NavItem[] = [
 // Ordered: private apps first (dropdowns → direct links), then public apps (dropdowns → direct links)
 export const HUB_APPS: AppConfig[] = [
   // --- Private apps (dropdowns first) ---
+  createSurfaceApp("media-lab", MEDIA_LAB_NAV),
   createSurfaceApp("game-hub", GAME_HUB_NAV),
   createSurfaceApp("activity-tracker", ACTIVITY_TRACKER_NAV),
   createSurfaceApp("currency-calculator", CURRENCY_CALC_NAV),

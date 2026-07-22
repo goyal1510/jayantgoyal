@@ -8,11 +8,11 @@ import {
   normalizeYouTubeUrl,
   toMediaConversionJob,
   type MediaConversionJobRow,
-} from "@/lib/tools/media-converter";
+} from "@/lib/media-lab/youtube-converter";
 import {
   isMediaConverterUserAllowed,
   wakeMediaWorker,
-} from "@/lib/tools/media-converter.server";
+} from "@/lib/media-lab/youtube-converter.server";
 
 const MEDIA_JOB_SELECT =
   "id, source_url, output_format, quality, status, progress, title, output_filename, mime_type, size_bytes, error_message, created_at, completed_at, expires_at";
@@ -74,7 +74,7 @@ export async function GET() {
       { headers: { "Cache-Control": "no-store" } },
     );
   } catch (error) {
-    console.error("Error in GET /api/tools/media-converter/jobs:", error);
+    console.error("Error in GET /api/media-lab/youtube-converter/jobs:", error);
     return NextResponse.json(
       { error: "Unable to load media conversion jobs." },
       { status: 500 },
@@ -193,7 +193,10 @@ export async function POST(request: NextRequest) {
       { status: 202, headers: { "Cache-Control": "no-store" } },
     );
   } catch (error) {
-    console.error("Error in POST /api/tools/media-converter/jobs:", error);
+    console.error(
+      "Error in POST /api/media-lab/youtube-converter/jobs:",
+      error,
+    );
     return NextResponse.json(
       { error: "Unable to start the conversion." },
       { status: 500 },

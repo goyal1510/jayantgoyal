@@ -1,3 +1,4 @@
+/** Server-only access and worker wake controls for Media Lab. */
 type MediaConverterUser = {
   id: string;
   email?: string | null;

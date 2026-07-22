@@ -1,9 +1,9 @@
 # Private Media Worker
 
-Single-consumer Python worker for Studio's permission-first Media Converter. It
-polls Supabase for owner-authorized jobs, uses `yt-dlp` plus FFmpeg, uploads the
-result to a private Supabase Storage bucket with the TUS resumable protocol, and
-removes expired objects.
+Single-consumer Python worker for Media Lab's permission-first YouTube
+Converter. It polls Supabase for owner-authorized jobs, uses `yt-dlp` plus
+FFmpeg, uploads the result to a private Supabase Storage bucket with the TUS
+resumable protocol, and removes expired objects.
 
 The service exposes only `GET /healthz`; job creation remains behind Studio
 authentication and its production owner allowlist. Do not expose the Supabase

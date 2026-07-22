@@ -70,33 +70,4 @@ export const mediaQrToolReferences = {
         "Camera use requires explicit permission and can expose personal surroundings. Confirm the selected device, recording indicator, retention, and destination before capturing sensitive media.",
     },
   ),
-  "/tools/media-qr/media-converter": createToolReference(
-    "/tools/media-qr/media-converter",
-    {
-      summary:
-        "Create a temporary MP3 or MP4 from a YouTube video or Short you own or are explicitly authorized to download.",
-      useCases: [
-        "Extract an MP3 from a YouTube upload you own or are licensed to reuse.",
-        "Create an MP4 copy of an authorized video or Short for an offline workflow.",
-      ],
-      examples: [
-        "Turn your uploaded presentation recording into a 192 kbps MP3.",
-        "Download an authorized Short as a temporary 720p MP4.",
-      ],
-      considerations:
-        "Only submit media you own or have explicit permission to download. Jobs run on a private worker, outputs are stored in a user-scoped private bucket, links expire quickly, and files are automatically deleted.",
-      faqs: [
-        {
-          question: "Why is the download not limited to 4.5 MB?",
-          answer:
-            "Studio sends only small job data. The worker uploads media directly to private object storage, and the browser downloads through a short-lived signed storage URL instead of a Vercel Function response.",
-        },
-        {
-          question: "Can every account use this tool?",
-          answer:
-            "No. Production access fails closed and is limited to explicitly configured owner email addresses or Supabase user IDs.",
-        },
-      ],
-    },
-  ),
 } satisfies ToolReferenceRegistry;

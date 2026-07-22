@@ -1,13 +1,13 @@
-# Media Converter Utility
+# Media Lab YouTube Converter
 
 - **Date:** 2026-07-22
 - **Area:** Studio / utilities
 - **Problem:** Add a Studio utility that accepts YouTube video or Shorts links and offers MP3 or MP4 downloads for content the user owns or is authorized to download.
-- **Current approach:** Work is isolated in the `codex/media-converter` worktree. Seven `.env*` files were copied from the protected source checkout, and the local Supabase stack ID is unique to this worktree. The Studio utility and private worker are implemented and validated; the reviewed migration is live, and worker hosting is the remaining deployment step.
+- **Current approach:** Work is isolated in the `codex/media-converter` worktree. The reviewed migration is live, the private Back4App worker is healthy and polling Supabase, and the Studio experience now lives outside Tech Tools under Utilities → Media Lab → YouTube Converter.
 - **Key decision:** The feature will include an explicit rights/permission safeguard and will not present downloading as permission to copy protected media.
 - **Platform constraint:** Current YouTube policies prohibit third-party apps from downloading audiovisual content or separating audio, so arbitrary YouTube-link extraction will not be implemented. Users can download their own uploads through YouTube Studio and convert the resulting file.
 - **Superseded prototype:** The first implementation used lazy `@ffmpeg/ffmpeg` browser conversion to avoid Vercel functions. Runtime browser QA exposed a CDN engine-fetch failure, and the user chose the private Python worker architecture documented below instead.
-- **Implemented:** Registered `/tools/media-qr/media-converter` in the Tech Tools catalog with metadata, sitemap/breadcrumb discovery through the existing tool registry, and complete reference/FAQ content.
+- **Superseded catalog placement:** The first version registered `/tools/media-qr/media-converter` in Tech Tools; the navigation correction below removes that route and registry entry completely.
 - **Conversion flow:** Added drag/drop and file selection, 500 MB and media-type validation, MP3/MP4 output, three quality levels, lazy FFmpeg loading, progress, cancel, preview, download, and object/virtual-file cleanup. MP4 is limited to video sources; MP3 accepts audio or video.
 - **YouTube flow:** Added normal-video and Shorts URL recognition only to guide owners to YouTube Studio's official MP4 download workflow. The page clearly states that arbitrary YouTube extraction is not enabled.
 - **Tests:** Added focused pure-function coverage for validation, output naming, FFmpeg command construction, media detection, and YouTube URL classification.
@@ -54,3 +54,5 @@
 - **Live cloud validation:** The assigned preview endpoint returned HTTP 200 with `status: ok`, `workerAlive: true`, and a recent Supabase `lastSuccessfulPollAt`, proving the hosted worker is alive and polling the production queue. Back4App's free public URL is temporary for 60 minutes, but the architecture remains functional because jobs flow through outbound Supabase polling rather than inbound worker requests.
 - **Deployment follow-up:** Automatic deploys remain disabled while the service tracks the feature branch. After merge, switch the Back4App branch to `main`, deploy once manually, and optionally enable automatic deployments. Do not configure Studio with the temporary Back4App URL.
 - **Local Docker cleanup:** After the cloud health check passed, removed only the verified `jg-media-worker:media-converter` image (`sha256:8a8201e7f028...`). No unrelated images, volumes, containers, or shared Docker build cache were pruned.
+- **Navigation correction:** The owner clarified that the converter must not belong to Tech Tools. The private utility now has a dedicated **Utilities → Media Lab → YouTube Converter** sidebar hierarchy at `/media-lab/youtube-converter`, its own Utility catalog type, API namespace, breadcrumbs, and documentation. Tech Tools retains only its existing browser utilities. Internal queue, bucket, and worker names remain provider-neutral media-conversion infrastructure.
+- **Navigation validation:** The complete Studio suite passes with 13 files and 45 tests, strict type checking and zero-warning lint pass, architecture and service-role boundary checks remain clean, and the 158-page production build contains only the new `/media-lab/youtube-converter` UI plus `/api/media-lab/youtube-converter/jobs` endpoints. The superseded Tech Tools route is absent from the build.

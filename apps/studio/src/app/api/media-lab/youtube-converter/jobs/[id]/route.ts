@@ -4,8 +4,8 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   toMediaConversionJob,
   type MediaConversionJobRow,
-} from "@/lib/tools/media-converter";
-import { isMediaConverterUserAllowed } from "@/lib/tools/media-converter.server";
+} from "@/lib/media-lab/youtube-converter";
+import { isMediaConverterUserAllowed } from "@/lib/media-lab/youtube-converter.server";
 
 const JOB_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f-]{27}$/i;
 const MEDIA_JOB_SELECT =
@@ -64,7 +64,10 @@ export async function GET(
       { headers: { "Cache-Control": "no-store" } },
     );
   } catch (error) {
-    console.error("Error in GET /api/tools/media-converter/jobs/[id]:", error);
+    console.error(
+      "Error in GET /api/media-lab/youtube-converter/jobs/[id]:",
+      error,
+    );
     return NextResponse.json(
       { error: "Unable to check conversion progress." },
       { status: 500 },

@@ -1,8 +1,8 @@
 # Media Worker Operations And Recovery
 
-The Media Converter is designed so that no durable production dependency lives
-only on a developer laptop. Local Docker images and build cache are disposable;
-the checked-in Dockerfile is the rebuild recipe.
+Media Lab's YouTube Converter is designed so that no durable production
+dependency lives only on a developer laptop. Local Docker images and build
+cache are disposable; the checked-in Dockerfile is the rebuild recipe.
 
 ## Sources Of Truth
 
@@ -148,7 +148,7 @@ expires and the current polling worker does not require a wake request.
 
 ## Safe Decommission
 
-1. Disable new Media Converter access in Studio or remove the owner allowlist.
+1. Disable new YouTube Converter access in Media Lab or remove the owner allowlist.
 2. Wait for active jobs to finish or mark them failed after review.
 3. Delete the worker service and revoke or rotate the service-role credential
    it used.

@@ -13,6 +13,7 @@ import {
 
 const typeLabels: Record<StudioProductType, string> = {
   app: "Apps",
+  utility: "Utilities",
   game: "Games",
   tool: "Tools",
   experiment: "Experiments",
@@ -53,7 +54,7 @@ export function StudioProductCatalog({
           Studio products
         </h1>
         <p className="max-w-3xl text-base leading-7 text-muted-foreground">
-          Tools, workspaces, games, and experiments in one catalog.
+          Utilities, tools, workspaces, games, and experiments in one catalog.
         </p>
       </header>
 

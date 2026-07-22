@@ -8,13 +8,13 @@ import {
   isOutputFormat,
   normalizeYouTubeUrl,
   toMediaConversionJob,
-} from "@/lib/tools/media-converter";
+} from "@/lib/media-lab/youtube-converter";
 import {
   isMediaConverterUserAllowed,
   wakeMediaWorker,
-} from "@/lib/tools/media-converter.server";
+} from "@/lib/media-lab/youtube-converter.server";
 
-describe("media converter", () => {
+describe("YouTube converter", () => {
   it("recognizes and normalizes YouTube videos, Shorts, and compact links", () => {
     expect(
       classifyYouTubeUrl("https://www.youtube.com/watch?v=dQw4w9WgXcQ"),

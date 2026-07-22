@@ -52,7 +52,6 @@ import {
   List,
   RefreshCw,
   Keyboard,
-  Film,
 } from "lucide-react"
 
 export interface Tool {
@@ -631,13 +630,6 @@ export const toolCategories: ToolCategory[] = [
         description: "Take a picture or record a video from your webcam or camera.",
         icon: Camera,
         path: "/tools/media-qr/camera-recorder",
-      },
-      {
-        id: "media-converter",
-        title: "Media Converter",
-        description: "Create temporary MP3 or MP4 downloads from authorized YouTube links.",
-        icon: Film,
-        path: "/tools/media-qr/media-converter",
       },
     ],
   },

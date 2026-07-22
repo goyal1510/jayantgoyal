@@ -28,7 +28,7 @@ import {
   type ConversionQuality,
   type MediaConversionJob,
   type OutputFormat,
-} from "@/lib/tools/media-converter";
+} from "@/lib/media-lab/youtube-converter";
 
 const STATUS_COPY: Record<
   MediaConversionJob["status"],

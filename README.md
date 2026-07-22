@@ -97,7 +97,13 @@ Track daily activities with custom categories. Monthly calendar view, streak tra
 - **Converters**: JSON/YAML/TOML/XML, Base64, colors, timestamps
 - **Formatters**: JSON, SQL, code beautifiers
 - **Validators**: JSON, regex, JWT decoder
-- **Media Converter**: Owner-only YouTube jobs with temporary MP3/MP4 downloads
+
+### Media Lab
+
+Private media utilities that run outside the Tech Tools catalog:
+
+- **YouTube Converter**: Owner-authorized video and Shorts jobs with temporary MP3/MP4 downloads
+- **Cloud processing**: A dedicated worker writes private outputs directly to Supabase Storage
 
 ### Games Hub
 

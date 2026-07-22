@@ -9,7 +9,7 @@ import {
   type ConversionQuality,
   type MediaConversionJob,
   type OutputFormat,
-} from "@/lib/tools/media-converter";
+} from "@/lib/media-lab/youtube-converter";
 
 import {
   ConversionSetupForm,
@@ -17,6 +17,8 @@ import {
   OwnerAuthorizationNotice,
   RecentConversionsCard,
 } from "./components";
+
+const JOBS_ENDPOINT = "/api/media-lab/youtube-converter/jobs";
 
 async function readJson<T>(response: Response): Promise<T> {
   const payload = (await response.json().catch(() => ({}))) as T & {
@@ -28,7 +30,7 @@ async function readJson<T>(response: Response): Promise<T> {
   return payload;
 }
 
-export default function MediaConverterClient() {
+export default function YouTubeConverterClient() {
   const [youtubeUrl, setYoutubeUrl] = React.useState("");
   const [format, setFormat] = React.useState<OutputFormat>("mp3");
   const [quality, setQuality] = React.useState<ConversionQuality>("balanced");
@@ -46,7 +48,7 @@ export default function MediaConverterClient() {
   const loadJobs = React.useCallback(async () => {
     try {
       const payload = await readJson<{ jobs: MediaConversionJob[] }>(
-        await fetch("/api/tools/media-converter/jobs", { cache: "no-store" }),
+        await fetch(JOBS_ENDPOINT, { cache: "no-store" }),
       );
       setRecentJobs(payload.jobs);
       setJob((current) => {
@@ -85,7 +87,7 @@ export default function MediaConverterClient() {
     const poll = async () => {
       try {
         const payload = await readJson<{ job: MediaConversionJob }>(
-          await fetch(`/api/tools/media-converter/jobs/${activeJobId}`, {
+          await fetch(`${JOBS_ENDPOINT}/${activeJobId}`, {
             cache: "no-store",
           }),
         );
@@ -136,7 +138,7 @@ export default function MediaConverterClient() {
     setErrorMessage(null);
     try {
       const payload = await readJson<{ job: MediaConversionJob }>(
-        await fetch("/api/tools/media-converter/jobs", {
+        await fetch(JOBS_ENDPOINT, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -166,7 +168,7 @@ export default function MediaConverterClient() {
     setErrorMessage(null);
     try {
       const payload = await readJson<{ url: string; filename: string }>(
-        await fetch(`/api/tools/media-converter/jobs/${job.id}/download`, {
+        await fetch(`${JOBS_ENDPOINT}/${job.id}/download`, {
           method: "POST",
         }),
       );
