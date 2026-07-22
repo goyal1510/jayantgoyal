@@ -34,9 +34,11 @@ Zero-cost arrangements to evaluate are:
 
 - Run the container on an existing Mac, PC, NAS, or home server. It processes
   jobs whenever that machine and Docker are running; no inbound port is needed.
-- Use Back4app's no-card free container for a constrained private rollout. Its
-  256 MB memory limit requires one replica, short source limits, and a smaller
-  output ceiling; validate FFmpeg behavior before relying on it.
+- Use Back4app's no-card free container for a constrained private rollout. The
+  current `jg-media-worker` deployment uses one 256 MB / 0.25 CPU container,
+  short source limits, and a 150 MiB output ceiling. Its public `b4a.run` URL is
+  temporary on the free plan, but conversion continues through outbound
+  Supabase polling and does not require permanent public ingress.
 - Use Northflank's free Developer Sandbox if it remains available without a
   payment method for the owner account. Stop if signup or deployment requests a
   card or paid resource.
@@ -64,6 +66,11 @@ After deployment, inspect the logs for a successful Supabase poll and request
 `GET /healthz` from the host. It should report `workerAlive: true` with a recent
 `lastSuccessfulPollAt`. The worker claims authorized jobs directly from
 Supabase, so it does not need a public inbound job-submission endpoint.
+
+The initial Back4App deployment passed this check with HTTP 200, `status: ok`,
+and an advancing queue-poll timestamp. The authenticated app dashboard and
+recovery identifiers are documented in
+[`docs/architecture/media-worker-operations.md`](../../docs/architecture/media-worker-operations.md).
 
 Outputs expire after 60 minutes by default. The worker claims expired jobs,
 deletes their Storage objects through the Storage API, and then removes their
