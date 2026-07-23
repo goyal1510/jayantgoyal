@@ -96,20 +96,6 @@ export function DynamicBreadcrumb() {
       return getSurfaceBreadcrumb("tech-tools");
     }
 
-    if (pathname.startsWith("/media-lab")) {
-      const surface = getStudioSurface("media-lab");
-      const mediaLabApp = getAppById("media-lab");
-      const navItem = mediaLabApp?.navItems.find(
-        (item) => item.url === pathname,
-      );
-
-      return {
-        appName: surface.name,
-        appHref: surface.href,
-        pageName: navItem?.label ?? null,
-      };
-    }
-
     if (pathname === "/messenger" || pathname.startsWith("/messenger/")) {
       return getSurfaceBreadcrumb("messenger");
     }

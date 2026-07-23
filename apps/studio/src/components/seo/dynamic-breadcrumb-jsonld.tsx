@@ -44,18 +44,6 @@ function getBreadcrumbItems(pathname: string): { name: string; url: string }[] {
     return items;
   }
 
-  if (pathname.startsWith("/media-lab")) {
-    const surface = getStudioSurface("media-lab");
-    const mediaLabApp = getAppById("media-lab");
-    const navItem = mediaLabApp?.navItems.find((item) => item.url === pathname);
-
-    items.push({ name: surface.name, url: `${SITE_URL}${surface.href}` });
-    if (navItem) {
-      items.push({ name: navItem.label, url: `${SITE_URL}${pathname}` });
-    }
-    return items;
-  }
-
   // Games routes
   if (pathname.startsWith("/games")) {
     const surface = getStudioSurface("game-hub");
