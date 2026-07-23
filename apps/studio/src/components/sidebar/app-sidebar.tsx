@@ -20,7 +20,6 @@ const DISCOVERY_IDS = [
   "weather",
   "github-stats",
 ];
-const UTILITY_IDS = ["media-lab"];
 const WORKSPACE_IDS = [
   "activity-tracker",
   "currency-calculator",
@@ -63,10 +62,6 @@ export function AppSidebar({
     () => selectApps(apps, WORKSPACE_IDS),
     [apps],
   );
-  const utilityApps = React.useMemo(
-    () => selectApps(apps, UTILITY_IDS),
-    [apps],
-  );
   const experimentApps = React.useMemo(
     () => selectApps(apps, EXPERIMENT_IDS),
     [apps],
@@ -105,12 +100,6 @@ export function AppSidebar({
           activeAppId={activeAppId}
           activeNavId={activeNavId}
           label="Discover"
-        />
-        <NavApps
-          apps={utilityApps}
-          activeAppId={activeAppId}
-          activeNavId={activeNavId}
-          label="Utilities"
         />
         <NavApps
           apps={workspaceApps}

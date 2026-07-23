@@ -7,13 +7,7 @@ describe("Studio command palette index", () => {
     const groups = buildStudioSearchGroups();
 
     expect(groups.map((group) => group.id)).toEqual(
-      expect.arrayContaining([
-        "studio",
-        "products",
-        "utilities",
-        "workspaces",
-        "game-hub",
-      ]),
+      expect.arrayContaining(["studio", "products", "workspaces", "game-hub"]),
     );
     expect(groups.find((group) => group.id === "studio")?.items).toEqual(
       expect.arrayContaining([
@@ -22,28 +16,15 @@ describe("Studio command palette index", () => {
         expect.objectContaining({ id: "portfolio" }),
       ]),
     );
-    expect(
-      groups.find((group) => group.id === "workspaces")?.items.length,
-    ).toBeGreaterThan(0);
-    expect(groups.find((group) => group.id === "utilities")?.items).toEqual([
-      expect.objectContaining({
-        id: "media-lab-youtube-converter",
-        label: "Media Lab › YouTube Converter",
-        href: "/media-lab/youtube-converter",
-      }),
-    ]);
+    expect(groups.find((group) => group.id === "workspaces")?.items.length).toBeGreaterThan(0);
     expect(groups.some((group) => group.id.startsWith("tools-"))).toBe(true);
   });
 
   it("preserves explicit external destinations", () => {
     const groups = buildStudioSearchGroups();
-    const externalItems = groups
-      .flatMap((group) => group.items)
-      .filter((item) => item.external);
+    const externalItems = groups.flatMap((group) => group.items).filter((item) => item.external);
 
     expect(externalItems.length).toBeGreaterThan(0);
-    expect(externalItems.every((item) => item.href.startsWith("http"))).toBe(
-      true,
-    );
+    expect(externalItems.every((item) => item.href.startsWith("http"))).toBe(true);
   });
 });

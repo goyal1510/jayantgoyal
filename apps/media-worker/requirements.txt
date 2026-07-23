@@ -1,4 +1,0 @@
-fastapi==0.139.2
-httpx==0.28.1
-uvicorn[standard]==0.51.0
-yt-dlp[default,curl-cffi]==2026.7.4

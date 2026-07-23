@@ -7,13 +7,6 @@ node_modules
 
 # testing
 coverage
-.pytest_cache/
-.ruff_cache/
-
-# python
-__pycache__/
-*.py[cod]
-.venv/
 
 # vercel
 .vercel

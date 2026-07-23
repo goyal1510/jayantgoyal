@@ -26,11 +26,7 @@
     "VERCEL_TOKEN",
     "VERCEL_TEAM_ID",
     "VERCEL_PROJECT_ID_STUDIO",
-    "VERCEL_PROJECT_ID_ADMIN",
-    "MEDIA_CONVERTER_ALLOWED_USER_IDS",
-    "MEDIA_CONVERTER_ALLOWED_EMAILS",
-    "MEDIA_WORKER_WAKE_URL",
-    "MEDIA_WORKER_WAKE_TOKEN"
+    "VERCEL_PROJECT_ID_ADMIN"
   ],
   "tasks": {
     "build": {
@@ -60,11 +56,7 @@
         "VERCEL_TOKEN",
         "VERCEL_TEAM_ID",
         "VERCEL_PROJECT_ID_STUDIO",
-        "VERCEL_PROJECT_ID_ADMIN",
-        "MEDIA_CONVERTER_ALLOWED_USER_IDS",
-        "MEDIA_CONVERTER_ALLOWED_EMAILS",
-        "MEDIA_WORKER_WAKE_URL",
-        "MEDIA_WORKER_WAKE_TOKEN"
+        "VERCEL_PROJECT_ID_ADMIN"
       ],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]

@@ -6,7 +6,6 @@ import { allTools } from "@/lib/tools/tools";
 
 export const STUDIO_PRODUCT_TYPES = [
   "app",
-  "utility",
   "game",
   "tool",
   "experiment",
@@ -31,24 +30,6 @@ export type StudioProduct = {
 };
 
 export const STUDIO_PRODUCTS: readonly StudioProduct[] = [
-  {
-    id: "media-lab",
-    name: STUDIO_SURFACES["media-lab"].name,
-    description:
-      "Private, owner-authorized media workflows powered by a dedicated cloud worker.",
-    href: STUDIO_SURFACES["media-lab"].href,
-    icon: STUDIO_SURFACES["media-lab"].icon,
-    access: "account",
-    type: "utility",
-    status: "beta",
-    capability: "Cloud media processing",
-    highlights: [
-      "YouTube video and Shorts input",
-      "Temporary MP3 and MP4 output",
-      "Private signed downloads",
-    ],
-    featured: false,
-  },
   {
     id: "tech-tools",
     name: STUDIO_SURFACES["tech-tools"].name,

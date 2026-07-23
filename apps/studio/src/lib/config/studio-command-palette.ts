@@ -1,6 +1,9 @@
 import { getAppById } from "./hub-config";
 import { STUDIO_PRODUCTS } from "./studio-inventory";
-import { getStudioSurface, type StudioSurfaceId } from "./studio-surfaces";
+import {
+  getStudioSurface,
+  type StudioSurfaceId,
+} from "./studio-surfaces";
 import { toolCategories } from "@/lib/tools/tools";
 
 export interface StudioCommandPaletteItem {
@@ -27,24 +30,6 @@ const STUDIO_SEARCH_IDS: StudioSurfaceId[] = [
 ];
 
 const WORKSPACE_IDS = ["activity-tracker", "currency-calculator"];
-const UTILITY_IDS = ["media-lab"];
-
-function buildNestedNavigationItems(ids: string[]) {
-  return ids.flatMap((id) => {
-    const app = getAppById(id);
-    if (!app) return [];
-
-    return app.navItems.map((item) => ({
-      id: `${app.id}-${item.id}`,
-      label: `${app.name} › ${item.label}`,
-      value: `${app.name} ${item.label}`,
-      href: item.url ?? app.url ?? `/${app.id}`,
-      icon: item.icon,
-      iconClassName: `size-4 ${item.color ?? ""}`,
-      external: (item.url ?? app.url ?? "").startsWith("http"),
-    }));
-  });
-}
 
 /** Studio-owned search index; the shared palette only renders these groups. */
 export function buildStudioSearchGroups(): StudioCommandPaletteGroup[] {
@@ -70,8 +55,20 @@ export function buildStudioSearchGroups(): StudioCommandPaletteGroup[] {
     external: product.href.startsWith("http"),
   }));
 
-  const workspaceItems = buildNestedNavigationItems(WORKSPACE_IDS);
-  const utilityItems = buildNestedNavigationItems(UTILITY_IDS);
+  const workspaceItems = WORKSPACE_IDS.flatMap((id) => {
+    const app = getAppById(id);
+    if (!app) return [];
+
+    return app.navItems.map((item) => ({
+      id: `${app.id}-${item.id}`,
+      label: `${app.name} › ${item.label}`,
+      value: `${app.name} ${item.label}`,
+      href: item.url ?? app.url ?? `/${app.id}`,
+      icon: item.icon,
+      iconClassName: `size-4 ${item.color ?? ""}`,
+      external: (item.url ?? app.url ?? "").startsWith("http"),
+    }));
+  });
 
   const gameApp = getAppById("game-hub");
   const gameItems =
@@ -102,7 +99,6 @@ export function buildStudioSearchGroups(): StudioCommandPaletteGroup[] {
   return [
     { id: "studio", label: "Studio", items: studioItems },
     { id: "products", label: "Products", items: productItems },
-    { id: "utilities", label: "Utilities", items: utilityItems },
     { id: "workspaces", label: "Workspaces", items: workspaceItems },
     ...(gameItems.length > 0
       ? [{ id: "game-hub", label: "Game Hub", items: gameItems }]

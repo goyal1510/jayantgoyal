@@ -21,7 +21,6 @@ const accessLabels: Record<StudioProduct["access"], string> = {
 
 const typeLabels: Record<StudioProduct["type"], string> = {
   app: "App",
-  utility: "Utility",
   game: "Game",
   tool: "Tool",
   experiment: "Experiment",
@@ -29,8 +28,6 @@ const typeLabels: Record<StudioProduct["type"], string> = {
 
 const typeTones: Record<StudioProduct["type"], string> = {
   app: "border-border/80 bg-card",
-  utility:
-    "border-[#e1a5b2] bg-[#f8dce3] text-[#211512] dark:border-[#7b4452] dark:bg-[#402832] dark:text-[#fff8ef]",
   game: "border-[#cfc0e4] bg-[#e8dcf5] text-[#211512] dark:border-[#5c5068] dark:bg-[#2f2938] dark:text-[#fff8ef]",
   tool: "border-[#d93328] bg-[#ff5a4f] text-[#211512]",
   experiment:
