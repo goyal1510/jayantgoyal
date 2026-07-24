@@ -34,17 +34,18 @@ import { ContactForm } from "@/components/editorial/contact-form";
 import { GithubCodeStats } from "@/components/editorial/github-code-stats";
 import { GithubContributions } from "@/components/editorial/github-contributions";
 import { PortfolioNavigation } from "@/components/editorial/portfolio-navigation";
+import { FeaturedProjects } from "@/components/editorial/project-showcase";
 import type {
   BlogPreview,
   PortfolioCredential,
   PortfolioEditorialData,
   PortfolioExperience as PortfolioExperienceItem,
   PortfolioProfile,
-  PortfolioProject,
   PortfolioSectionContent,
   PortfolioSectionKey,
   PortfolioSocialLink,
 } from "@/lib/portfolio/editorial-data";
+import { getCompactSectionHeading } from "@/lib/portfolio/section-heading";
 import type { GitHubLOCStats } from "@repo/github";
 
 const reveal = {
@@ -102,77 +103,20 @@ function Reveal({
   );
 }
 
-function ProjectWall({
-  projects,
-  content,
-}: {
-  projects: PortfolioProject[];
-  content: PortfolioSectionContent;
-}) {
-  return (
-    <section id="work" className="project-desk">
-      <div className="shell">
-        <Reveal className="section-heading section-heading--light">
-          <span className="section-index">{content.eyebrow}</span>
-          <div>
-            <h2>{content.headline}</h2>
-            <p>{content.description}</p>
-          </div>
-        </Reveal>
+function HeroHeadline({ headline }: { headline: string }) {
+  const accentPhrase = "ambitious";
+  const accentStart = headline.toLowerCase().indexOf(accentPhrase);
 
-        <div className="project-stories">
-          {projects.map((project, index) => (
-            <Reveal
-              key={project.id}
-              className={`project-story project-story--${project.tone}`}
-              delay={(index % 2) * 0.05}
-              animate={false}
-            >
-              <article>
-                <div className="project-fragment">
-                  <div className="torn-sheet">
-                    <div className="torn-sheet__image">
-                      <img
-                        src={project.image}
-                        alt={project.imageAlt}
-                        loading={index < 2 ? "eager" : "lazy"}
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="project-story__copy">
-                  <div className="project-story__meta">
-                    <span>{project.eyebrow}</span>
-                    <span>{project.year}</span>
-                  </div>
-                  <h3>{project.title}</h3>
-                  <p className="project-story__summary">{project.summary}</p>
-                  <p className="project-story__impact">{project.impact}</p>
-                  <ul aria-label="Technologies">
-                    {project.tags.map((tag) => (
-                      <li key={tag}>{tag}</li>
-                    ))}
-                  </ul>
-                  <p className="project-story__role">{project.role}</p>
-                  <div className="project-story__links">
-                    {project.href ? (
-                      <a href={project.href} target="_blank" rel="noreferrer">
-                        Live product <ArrowUpRight aria-hidden="true" />
-                      </a>
-                    ) : null}
-                    {project.github ? (
-                      <a href={project.github} target="_blank" rel="noreferrer">
-                        Source <Github aria-hidden="true" />
-                      </a>
-                    ) : null}
-                  </div>
-                </div>
-              </article>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
+  if (accentStart === -1) return headline;
+
+  const accentEnd = accentStart + accentPhrase.length;
+
+  return (
+    <>
+      {headline.slice(0, accentStart)}
+      <em>{headline.slice(accentStart, accentEnd)}</em>
+      {headline.slice(accentEnd)}
+    </>
   );
 }
 
@@ -185,6 +129,7 @@ function CertificateDeck({
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const activeCertificate = credentials[activeIndex] ?? credentials[0];
+  const heading = getCompactSectionHeading(content.eyebrow, content.headline);
 
   if (!activeCertificate) return null;
 
@@ -201,9 +146,9 @@ function CertificateDeck({
   return (
     <div className="credential-gallery">
       <div className="credential-gallery__heading">
-        <span className="section-index">{content.eyebrow}</span>
+        <span className="section-index">{heading.label}</span>
         <div>
-          <h3>{content.headline}</h3>
+          <h3>{heading.title}</h3>
           <p>{content.description}</p>
         </div>
       </div>
@@ -289,15 +234,17 @@ function ExperienceLandscape({
   content: PortfolioSectionContent;
   credentialContent: PortfolioSectionContent;
 }) {
+  const heading = getCompactSectionHeading(content.eyebrow, content.headline);
+
   return (
     <section id="experience" className="experience-desk">
       <div className="shell">
         {content.isVisible ? (
           <>
             <Reveal className="section-heading section-heading--light">
-              <span className="section-index">{content.eyebrow}</span>
+              <span className="section-index">{heading.label}</span>
               <div>
-                <h2>{content.headline}</h2>
+                <h2>{heading.title}</h2>
                 <p>{content.description}</p>
               </div>
             </Reveal>
@@ -318,12 +265,17 @@ function ExperienceLandscape({
                       <p className="experience-stop__role">
                         {item.role} · {item.location}
                       </p>
-                      <p className="experience-stop__summary">{item.summary}</p>
-                      <ul>
-                        {item.outcomes.map((outcome) => (
-                          <li key={outcome}>{outcome}</li>
-                        ))}
-                      </ul>
+                      {item.outcomes.length > 0 ? (
+                        <ul>
+                          {item.outcomes.slice(0, 2).map((outcome) => (
+                            <li key={outcome}>{outcome}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="experience-stop__summary">
+                          {item.summary}
+                        </p>
+                      )}
                     </div>
                   </article>
                 </Reveal>
@@ -352,13 +304,15 @@ function ActivitySection({
   profile: PortfolioProfile;
   content: PortfolioSectionContent;
 }) {
+  const heading = getCompactSectionHeading(content.eyebrow, content.headline);
+
   return (
     <section id="activity" className="activity-section">
       <div className="shell">
         <Reveal className="section-heading">
-          <span className="section-index">{content.eyebrow}</span>
+          <span className="section-index">{heading.label}</span>
           <div>
-            <h2>{content.headline}</h2>
+            <h2>{heading.title}</h2>
             <p>{content.description}</p>
           </div>
         </Reveal>
@@ -391,15 +345,23 @@ function WritingSection({
   blogPosts: BlogPreview[];
   content: PortfolioSectionContent;
 }) {
+  const heading = getCompactSectionHeading(content.eyebrow, content.headline);
+
   return (
     <section id="writing" className="writing-section">
       <div className="shell">
         <div className="writing-block">
-          <div className="writing-block__heading">
-            <span className="section-index">{content.eyebrow}</span>
-            <Link href="/blog">
-              All articles <ArrowUpRight aria-hidden="true" />
-            </Link>
+          <div className="section-heading writing-block__heading">
+            <span className="section-index">{heading.label}</span>
+            <div>
+              <h2>{heading.title}</h2>
+              <div className="writing-block__heading-meta">
+                <p>{content.description}</p>
+                <Link href="/blog">
+                  All articles <ArrowUpRight aria-hidden="true" />
+                </Link>
+              </div>
+            </div>
           </div>
           <div className="writing-index">
             {blogPosts.length === 0 ? (
@@ -450,16 +412,21 @@ function ContactSection({
   profile: PortfolioProfile;
   content: PortfolioSectionContent;
 }) {
+  const heading = getCompactSectionHeading(content.eyebrow, content.headline);
+
   return (
     <footer id="contact" className="contact-section">
       <div className="shell">
+        <Reveal className="section-heading section-heading--contact">
+          <span className="section-index">{heading.label}</span>
+          <div>
+            <h2>{heading.title}</h2>
+            <p>{content.description}</p>
+          </div>
+        </Reveal>
+
         <div className="contact-section__grid">
           <Reveal className="contact-section__copy">
-            <span className="section-index">{content.eyebrow}</span>
-            <h2>
-              {content.headline} <em>{content.accent}</em>
-            </h2>
-            <p>{content.description}</p>
             <div className="contact-details">
               <a href={`mailto:${profile.email}`}>
                 <Mail aria-hidden="true" />
@@ -558,6 +525,18 @@ export function PortfolioExperience({
     mass: 0.2,
   });
   const heroY = useTransform(scrollYProgress, [0, 0.18], [0, -54]);
+  const aboutHeading = getCompactSectionHeading(
+    sectionContent.about.eyebrow,
+    about.headline,
+  );
+  const educationHeading = getCompactSectionHeading(
+    sectionContent.education.eyebrow,
+    sectionContent.education.headline,
+  );
+  const skillsHeading = getCompactSectionHeading(
+    sectionContent.skills.eyebrow,
+    sectionContent.skills.headline,
+  );
 
   useEffect(() => {
     const root = document.documentElement;
@@ -617,7 +596,9 @@ export function PortfolioExperience({
               <span className="section-index">
                 {sectionContent.hero.eyebrow}
               </span>
-              <h1>{profile.headline}</h1>
+              <h1>
+                <HeroHeadline headline={profile.headline} />
+              </h1>
               <p>{profile.introduction}</p>
               {sectionContent.work.isVisible ? (
                 <a href="#work" className="text-link" data-cursor="Explore">
@@ -656,11 +637,9 @@ export function PortfolioExperience({
             {sectionContent.about.isVisible ? (
               <>
                 <Reveal className="section-heading">
-                  <span className="section-index">
-                    {sectionContent.about.eyebrow}
-                  </span>
+                  <span className="section-index">{aboutHeading.label}</span>
                   <div>
-                    <h2>{about.headline}</h2>
+                    <h2>{aboutHeading.title}</h2>
                     <p>{about.objective}</p>
                   </div>
                 </Reveal>
@@ -668,11 +647,6 @@ export function PortfolioExperience({
                 <div className="profile-grid">
                   <Reveal className="profile-story">
                     <p className="profile-story__lead">{about.lead}</p>
-                    <div className="profile-story__columns">
-                      {about.story.map((paragraph) => (
-                        <p key={paragraph}>{paragraph}</p>
-                      ))}
-                    </div>
                     <div className="profile-actions">
                       <a href={profile.resume} target="_blank" rel="noreferrer">
                         Résumé <FileText aria-hidden="true" />
@@ -701,9 +675,9 @@ export function PortfolioExperience({
               <div className="education-block">
                 <div className="education-block__heading">
                   <span className="section-index">
-                    {sectionContent.education.eyebrow}
+                    {educationHeading.label}
                   </span>
-                  <h3>{sectionContent.education.headline}</h3>
+                  <h3>{educationHeading.title}</h3>
                 </div>
                 <div className="education-journey">
                   {education.map((item, index) => (
@@ -739,11 +713,9 @@ export function PortfolioExperience({
         <section id="skills" className="capability-section">
           <div className="shell">
             <Reveal className="section-heading">
-              <span className="section-index">
-                {sectionContent.skills.eyebrow}
-              </span>
+              <span className="section-index">{skillsHeading.label}</span>
               <div>
-                <h2>{sectionContent.skills.headline}</h2>
+                <h2>{skillsHeading.title}</h2>
                 <p>{sectionContent.skills.description}</p>
               </div>
             </Reveal>
@@ -818,7 +790,7 @@ export function PortfolioExperience({
         />
       ) : null}
       {sectionContent.work.isVisible ? (
-        <ProjectWall projects={projects} content={sectionContent.work} />
+        <FeaturedProjects projects={projects} content={sectionContent.work} />
       ) : null}
       {sectionContent.writing.isVisible ? (
         <WritingSection

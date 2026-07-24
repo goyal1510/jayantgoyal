@@ -11,7 +11,9 @@ type NavigationSurface = "home" | "subpage";
 
 function getItemHref(key: string, surface: NavigationSurface) {
   if (surface === "home") return `#${key}`;
-  return key === "writing" ? "/blog" : `/#${key}`;
+  if (key === "writing") return "/blog";
+  if (key === "work") return "/work";
+  return `/#${key}`;
 }
 
 export function PortfolioNavigation({
@@ -69,6 +71,12 @@ export function PortfolioNavigation({
               key={item.key}
               href={getItemHref(item.key, surface)}
               data-nav-key={item.key}
+              aria-current={
+                (item.key === "writing" && pathname.startsWith("/blog")) ||
+                (item.key === "work" && pathname.startsWith("/work"))
+                  ? "page"
+                  : undefined
+              }
             >
               {item.label}
             </Link>
@@ -103,7 +111,8 @@ export function PortfolioNavigation({
             <ol className="portfolio-mobile-menu__list">
               {navigationItems.map((item, index) => {
                 const current =
-                  item.key === "writing" && pathname.startsWith("/blog");
+                  (item.key === "writing" && pathname.startsWith("/blog")) ||
+                  (item.key === "work" && pathname.startsWith("/work"));
 
                 return (
                   <li key={item.key}>
