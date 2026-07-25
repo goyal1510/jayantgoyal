@@ -6,10 +6,13 @@
     "check:architecture": "node scripts/check-architecture-boundaries.mjs",
     "check:brand-assets": "node scripts/check-brand-assets.mjs",
     "check:service-role": "node scripts/check-service-role-boundaries.mjs",
+    "db:migrations:apply": "node scripts/supabase/migration-workflow.mjs --apply",
+    "db:migrations:check": "node scripts/supabase/migration-workflow.mjs --check",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "check-types": "turbo run check-types",
     "test": "vitest run",
+    "test:db:linked": "node scripts/verify-database-boundaries.mjs",
     "test:watch": "vitest",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
