@@ -42,7 +42,7 @@ vi.mock("./helpers", async () => {
       "experience",
       "skill_categories",
       "skills",
-      "projects",
+      "work",
       "certificates",
       "nav_items",
     ],
@@ -146,7 +146,7 @@ describe("Admin Portfolio table route contract", () => {
     });
 
     const response = requireResponse(
-      await GET(request("/api/portfolio/projects"), routeParams("projects")),
+      await GET(request("/api/portfolio/work"), routeParams("work")),
     );
 
     expect(response.status).toBe(401);
@@ -160,12 +160,12 @@ describe("Admin Portfolio table route contract", () => {
 
     const response = requireResponse(
       await POST(
-        request("/api/portfolio/projects", {
+        request("/api/portfolio/work", {
           method: "POST",
           body: JSON.stringify({ name: "Missing required fields" }),
           headers: { "content-type": "application/json" },
         }),
-        routeParams("projects"),
+        routeParams("work"),
       ),
     );
 
@@ -187,7 +187,7 @@ describe("Admin Portfolio table route contract", () => {
       impact: "Made a complex workflow easier to understand.",
       contribution: "Product direction and implementation.",
       year_label: "2026",
-      image_url: "/projects/signal.png",
+      image_url: "/work/signal.png",
       image_alt: "Signal workspace overview",
       tags: ["Next.js"],
       github_link: "",
@@ -198,12 +198,12 @@ describe("Admin Portfolio table route contract", () => {
 
     const response = requireResponse(
       await POST(
-        request("/api/portfolio/projects", {
+        request("/api/portfolio/work", {
           method: "POST",
           body: JSON.stringify(payload),
           headers: { "content-type": "application/json" },
         }),
-        routeParams("projects"),
+        routeParams("work"),
       ),
     );
 
@@ -220,18 +220,18 @@ describe("Admin Portfolio table route contract", () => {
 
     const update = requireResponse(
       await PUT(
-        request("/api/portfolio/projects", {
+        request("/api/portfolio/work", {
           method: "PUT",
           body: JSON.stringify({ image_alt: "Updated" }),
           headers: { "content-type": "application/json" },
         }),
-        routeParams("projects"),
+        routeParams("work"),
       ),
     );
     const remove = requireResponse(
       await DELETE(
-        request("/api/portfolio/projects", { method: "DELETE" }),
-        routeParams("projects"),
+        request("/api/portfolio/work", { method: "DELETE" }),
+        routeParams("work"),
       ),
     );
 
@@ -251,20 +251,20 @@ describe("Admin Portfolio table route contract", () => {
 
     const update = requireResponse(
       await PUT(
-        request("/api/portfolio/projects?id=project-1", {
+        request("/api/portfolio/work?id=project-1", {
           method: "PUT",
           body: JSON.stringify({ image_alt: "Updated screenshot" }),
           headers: { "content-type": "application/json" },
         }),
-        routeParams("projects"),
+        routeParams("work"),
       ),
     );
     const remove = requireResponse(
       await DELETE(
-        request("/api/portfolio/projects?id=project-1", {
+        request("/api/portfolio/work?id=project-1", {
           method: "DELETE",
         }),
-        routeParams("projects"),
+        routeParams("work"),
       ),
     );
 
@@ -314,7 +314,7 @@ describe("Admin Portfolio table route contract", () => {
     authorizeAndGetClientMock.mockResolvedValue({ client });
 
     const response = requireResponse(
-      await GET(request("/api/portfolio/projects"), routeParams("projects")),
+      await GET(request("/api/portfolio/work"), routeParams("work")),
     );
 
     expect(response.status).toBe(200);

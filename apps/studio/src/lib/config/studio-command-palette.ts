@@ -25,7 +25,7 @@ export interface StudioCommandPaletteGroup {
 const STUDIO_SEARCH_IDS: StudioSurfaceId[] = [
   "studio-home",
   "studio-products",
-  "blog",
+  "writing",
   "portfolio",
 ];
 

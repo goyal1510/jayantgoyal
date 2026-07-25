@@ -1,12 +1,12 @@
-# Jayant Goyal Studio
+# Jayant Studio
 
-> Public product discovery and practical developer tools, games, and productivity workspaces by Jayant Goyal.
+> Public product discovery and practical developer tools, games, and productivity workspaces by Jayant.
 
 ## Features
-- Developer Tools: 99+ utilities (UUID generator, JSON formatter, Base64 encoder, hash generators, regex tester, converters, parsers, and more)
-- Games: Tic Tac Toe, Connect Four, Memory Match, Wordle, Typing Speed Test, Rock Paper Scissors, Dare X
+- Developer Tools: 87 utilities (UUID generator, JSON formatter, Base64 encoder, hash generators, regex tester, converters, parsers, and more)
+- Games: 9 games spanning Tic Tac Toe, Connect Four, Memory Match, Wordle, Typing Speed, Rock Paper Scissors, Dare X, Chess, and Ludo
 - File Manager: Cloud storage with folders, upload, download
-- Messenger: Real-time messaging
+- Sync Scratchpad: Private real-time text, code, and note synchronization
 - Weather: City search with 5-day forecast
 - Activity Tracker: Daily activity tracking with analytics
 - Calculator: Cash denomination calculator

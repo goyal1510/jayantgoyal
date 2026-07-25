@@ -7,7 +7,7 @@ import { resolveAuthReturnTarget } from "@/lib/auth/returns";
 export const metadata: Metadata = {
   title: "Welcome",
   description:
-    "Secure access to Jayant Goyal's Studio, Admin, and connected workspaces.",
+    "Secure access to Jayant's Studio, Admin, and connected workspaces.",
 };
 
 export default async function WelcomePage({

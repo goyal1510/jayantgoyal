@@ -19,16 +19,16 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@repo/ui/collapsible";
-import type { Database } from "@/lib/messenger/database.types";
+import type { Database } from "@/lib/scratchpad/database.types";
 import { cn } from "@repo/ui/lib/utils";
 
-type Message = Database["messenger"]["Tables"]["messages"]["Row"];
+type Entry = Database["scratchpad"]["Tables"]["entries"]["Row"];
 
-interface MessageItemProps {
-  message: Message;
+interface EntryItemProps {
+  entry: Entry;
 }
 
-export function MessageItem({ message }: MessageItemProps) {
+export function EntryItem({ entry }: EntryItemProps) {
   const { theme } = useTheme();
   const [isOpen, setIsOpen] = React.useState(false);
   const [isUpdating, setIsUpdating] = React.useState(false);
@@ -51,7 +51,7 @@ export function MessageItem({ message }: MessageItemProps) {
 
   // Preview: first line only
   const getPreview = () => {
-    const content = message.content || "";
+    const content = entry.content || "";
     const firstLine = content.split("\n")[0] || "";
     return firstLine;
   };
@@ -64,16 +64,16 @@ export function MessageItem({ message }: MessageItemProps) {
 
     try {
       setIsUpdating(true);
-      await fetch(`/api/messenger/${message.id}`, {
+      await fetch(`/api/scratchpad/${entry.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          is_read: !message.is_read,
+          is_read: !entry.is_read,
         }),
       });
-      // Realtime subscription will update the message in the list.
+      // Realtime subscription will update the entry in the list.
     } catch (error) {
       console.error("Failed to update is_read:", error);
     } finally {
@@ -84,7 +84,7 @@ export function MessageItem({ message }: MessageItemProps) {
   const handleCopy = async (e: React.MouseEvent) => {
     e.stopPropagation();
     try {
-      await navigator.clipboard.writeText(message.content || "");
+      await navigator.clipboard.writeText(entry.content || "");
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2000);
     } catch (error) {
@@ -97,7 +97,7 @@ export function MessageItem({ message }: MessageItemProps) {
       <Card
         className={cn(
           "rounded-2xl border-border/80 p-3 shadow-none transition-colors sm:p-4",
-          message.is_read
+          entry.is_read
             ? "bg-card text-foreground/70"
             : "border-[#cfc0e4] bg-[#e8dcf5]/45 dark:border-[#5c5068] dark:bg-[#2f2938]/70",
         )}
@@ -106,12 +106,12 @@ export function MessageItem({ message }: MessageItemProps) {
           <input
             type="checkbox"
             aria-label={
-              message.is_read
-                ? "Mark message as unread"
-                : "Mark message as read"
+              entry.is_read
+                ? "Mark entry as unread"
+                : "Mark entry as read"
             }
             className="mt-1 h-4 w-4 cursor-pointer accent-primary"
-            checked={!!message.is_read}
+            checked={!!entry.is_read}
             onChange={handleToggleRead}
             onClick={(e) => e.stopPropagation()}
             disabled={isUpdating}
@@ -122,29 +122,29 @@ export function MessageItem({ message }: MessageItemProps) {
               <div className="-m-2 flex w-full cursor-pointer items-start justify-between gap-2 rounded-xl p-2 transition-colors hover:bg-background/45">
                 <div className="flex-1 min-w-0">
                   <div className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">
-                    <span>{formatDate(message.created_at)}</span>
-                    {!message.is_read && (
+                    <span>{formatDate(entry.created_at)}</span>
+                    {!entry.is_read && (
                       <span className="font-medium text-foreground">
                         Unread
                       </span>
                     )}
-                    {message.message_type === "code" && message.language && (
+                    {entry.entry_type === "code" && entry.language && (
                       <span className="rounded bg-muted px-2 py-0.5 text-xs font-mono">
-                        {message.language}
+                        {entry.language}
                       </span>
                     )}
                     <span className="flex items-center gap-1">
-                      {message.message_type === "code" ? (
+                      {entry.entry_type === "code" ? (
                         <Code2 className="h-3 w-3" />
                       ) : (
                         <MessageSquare className="h-3 w-3" />
                       )}
-                      {message.message_type === "code" ? "Code" : "Text"}
+                      {entry.entry_type === "code" ? "Code" : "Text"}
                     </span>
                   </div>
                   {!isOpen && (
                     <div className="text-sm">
-                      {message.message_type === "code" ? (
+                      {entry.entry_type === "code" ? (
                         <pre className="whitespace-pre-wrap break-words text-muted-foreground line-clamp-1">
                           {preview}
                         </pre>
@@ -159,10 +159,10 @@ export function MessageItem({ message }: MessageItemProps) {
                 <div className="flex items-center gap-2 shrink-0">
                   <button
                     type="button"
-                    aria-label="Copy message"
+                    aria-label="Copy entry"
                     onClick={handleCopy}
                     className="cursor-pointer rounded-lg p-1.5 transition-colors hover:bg-background/60"
-                    title="Copy message"
+                    title="Copy entry"
                   >
                     {isCopied ? (
                       <Check className="h-4 w-4 text-green-500" />
@@ -181,10 +181,10 @@ export function MessageItem({ message }: MessageItemProps) {
 
             <CollapsibleContent>
               <div className="mt-3 border-t border-border/70 pt-3">
-                {message.message_type === "code" ? (
+                {entry.entry_type === "code" ? (
                   <div className="overflow-x-auto rounded-md">
                     <SyntaxHighlighter
-                      language={message.language || "text"}
+                      language={entry.language || "text"}
                       style={isDark ? vscDarkPlus : vs}
                       customStyle={{
                         margin: 0,
@@ -193,12 +193,12 @@ export function MessageItem({ message }: MessageItemProps) {
                       }}
                       showLineNumbers
                     >
-                      {message.content}
+                      {entry.content}
                     </SyntaxHighlighter>
                   </div>
                 ) : (
                   <div className="whitespace-pre-wrap break-words text-sm">
-                    {message.content}
+                    {entry.content}
                   </div>
                 )}
               </div>

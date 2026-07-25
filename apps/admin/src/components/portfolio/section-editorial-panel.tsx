@@ -41,12 +41,14 @@ const PUBLIC_SECTION_PATHS: Record<PortfolioSectionKey, string> = {
   experience: "/#experience",
   credentials: "/#experience",
   activity: "/#activity",
-  work: "/#work",
-  writing: "/#writing",
+  work: "/work",
   contact: "/#contact",
-  blog: "/blog",
-  article: "/blog",
+  writing: "/writing",
+  article: "/writing",
   resume: "/resume",
+  studio: "/studio",
+  "case-studies": "/case-studies",
+  engineering: "/engineering",
 };
 
 function serializePresentation(

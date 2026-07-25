@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-// PATCH /api/messages/[id] - Update a message
+// PATCH /api/entries/[id] - Update a entry
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -22,24 +22,24 @@ export async function PATCH(
 
     const { id } = await params;
     const body = await request.json();
-    const { content, message_type, language, is_read } = body;
+    const { content, entry_type, language, is_read } = body;
 
-    // Verify the message belongs to the user
-    const { data: existingMessage, error: fetchError } = await supabase
+    // Verify the entry belongs to the user
+    const { data: existingEntry, error: fetchError } = await supabase
       .schema("jg_app")
-      .from("messenger_messages")
-      .select("user_id, message_type")
+      .from("scratchpad_entries")
+      .select("user_id, entry_type")
       .eq("id", id)
       .single();
 
-    if (fetchError || !existingMessage) {
+    if (fetchError || !existingEntry) {
       return NextResponse.json(
-        { error: "Message not found" },
+        { error: "Entry not found" },
         { status: 404 }
       );
     }
 
-    if (existingMessage.user_id !== user.id) {
+    if (existingEntry.user_id !== user.id) {
       return NextResponse.json(
         { error: "Forbidden" },
         { status: 403 }
@@ -48,18 +48,18 @@ export async function PATCH(
 
     const updateData: Record<string, unknown> = {};
     if (content !== undefined) updateData.content = content.trim();
-    if (message_type !== undefined) {
-      if (message_type !== "text" && message_type !== "code") {
+    if (entry_type !== undefined) {
+      if (entry_type !== "text" && entry_type !== "code") {
         return NextResponse.json(
-          { error: "message_type must be 'text' or 'code'" },
+          { error: "entry_type must be 'text' or 'code'" },
           { status: 400 }
         );
       }
-      updateData.message_type = message_type;
+      updateData.entry_type = entry_type;
     }
     if (language !== undefined) {
       updateData.language =
-        (message_type ?? existingMessage.message_type) === "code"
+        (entry_type ?? existingEntry.entry_type) === "code"
           ? language
           : null;
     }
@@ -67,9 +67,9 @@ export async function PATCH(
       updateData.is_read = !!is_read;
     }
 
-    const { data: message, error } = await supabase
+    const { data: entry, error } = await supabase
       .schema("jg_app")
-      .from("messenger_messages")
+      .from("scratchpad_entries")
       .update(updateData)
       .eq("id", id)
       .eq("user_id", user.id)
@@ -77,16 +77,16 @@ export async function PATCH(
       .single();
 
     if (error) {
-      console.error("Error updating message:", error);
+      console.error("Error updating entry:", error);
       return NextResponse.json(
-        { error: error.message || "Failed to update message" },
+        { error: error.message || "Failed to update entry" },
         { status: 500 }
       );
     }
 
-    return NextResponse.json({ message });
+    return NextResponse.json({ entry });
   } catch (error) {
-    console.error("Error in PATCH /api/messages/[id]:", error);
+    console.error("Error in PATCH /api/entries/[id]:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -94,7 +94,7 @@ export async function PATCH(
   }
 }
 
-// DELETE /api/messages/[id] - Delete a message
+// DELETE /api/entries/[id] - Delete a entry
 export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -115,22 +115,22 @@ export async function DELETE(
 
     const { id } = await params;
 
-    // Verify the message belongs to the user
-    const { data: existingMessage, error: fetchError } = await supabase
+    // Verify the entry belongs to the user
+    const { data: existingEntry, error: fetchError } = await supabase
       .schema("jg_app")
-      .from("messenger_messages")
+      .from("scratchpad_entries")
       .select("user_id")
       .eq("id", id)
       .single();
 
-    if (fetchError || !existingMessage) {
+    if (fetchError || !existingEntry) {
       return NextResponse.json(
-        { error: "Message not found" },
+        { error: "Entry not found" },
         { status: 404 }
       );
     }
 
-    if (existingMessage.user_id !== user.id) {
+    if (existingEntry.user_id !== user.id) {
       return NextResponse.json(
         { error: "Forbidden" },
         { status: 403 }
@@ -139,22 +139,22 @@ export async function DELETE(
 
     const { error } = await supabase
       .schema("jg_app")
-      .from("messenger_messages")
+      .from("scratchpad_entries")
       .delete()
       .eq("id", id)
       .eq("user_id", user.id);
 
     if (error) {
-      console.error("Error deleting message:", error);
+      console.error("Error deleting entry:", error);
       return NextResponse.json(
-        { error: error.message || "Failed to delete message" },
+        { error: error.message || "Failed to delete entry" },
         { status: 500 }
       );
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error in DELETE /api/messages/[id]:", error);
+    console.error("Error in DELETE /api/entries/[id]:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

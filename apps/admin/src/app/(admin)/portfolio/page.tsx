@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  Activity,
+  Github,
   ArrowUpRight,
   BookOpen,
   BriefcaseBusiness,
@@ -15,7 +15,7 @@ import {
 
 import {
   PORTFOLIO_ADMIN_SELECT_COLUMNS,
-  PORTFOLIO_BLOG_CMS_SELECT_COLUMNS,
+  PORTFOLIO_WRITING_CMS_SELECT_COLUMNS,
   PORTFOLIO_WORKSPACE_ROUTES,
   type PortfolioNavigationRecord,
   type PortfolioSectionContentRecord,
@@ -72,23 +72,23 @@ const workspaces = [
     description:
       "The live GitHub signal and the editorial framing around the work happening in public.",
     href: PORTFOLIO_WORKSPACE_ROUTES.activity,
-    icon: Activity,
+    icon: Github,
     key: "activity",
   },
   {
     label: "Work",
     description:
-      "Projects, screenshots, links, and the work worth remembering.",
+      "Work, screenshots, links, and the product systems worth remembering.",
     href: PORTFOLIO_WORKSPACE_ROUTES.work,
     icon: FolderKanban,
-    key: "projects",
+    key: "work",
   },
   {
     label: "Writing",
     description: "Published notes, articles, and the ideas behind the work.",
     href: PORTFOLIO_WORKSPACE_ROUTES.writing,
     icon: BookOpen,
-    key: "blog",
+    key: "writing",
   },
   {
     label: "Contact",
@@ -106,9 +106,9 @@ export default async function PortfolioPage() {
     about,
     skills,
     experience,
-    projects,
+    work,
     contact,
-    blog,
+    writing,
     sectionContent,
     navigation,
   ] = await Promise.all([
@@ -132,8 +132,8 @@ export default async function PortfolioPage() {
       .select(PORTFOLIO_ADMIN_SELECT_COLUMNS.experience),
     supabase
       .schema("portfolio")
-      .from("projects")
-      .select(PORTFOLIO_ADMIN_SELECT_COLUMNS.projects),
+      .from("work")
+      .select(PORTFOLIO_ADMIN_SELECT_COLUMNS.work),
     supabase
       .schema("portfolio")
       .from("contact")
@@ -141,8 +141,8 @@ export default async function PortfolioPage() {
       .maybeSingle(),
     supabase
       .schema("jg_app")
-      .from("blog_posts")
-      .select(PORTFOLIO_BLOG_CMS_SELECT_COLUMNS),
+      .from("writing_posts")
+      .select(PORTFOLIO_WRITING_CMS_SELECT_COLUMNS),
     supabase
       .schema("portfolio")
       .from("section_content")
@@ -158,9 +158,9 @@ export default async function PortfolioPage() {
     about,
     skills,
     experience,
-    projects,
+    work,
     contact,
-    blog,
+    writing,
     sectionContent,
     navigation,
   ].flatMap((result) => (result.error ? [result.error.message] : []));
@@ -180,20 +180,20 @@ export default async function PortfolioPage() {
         hero.data as unknown as { github_username?: string | null } | null
       )?.github_username?.trim(),
     ),
-    projects: (projects.data ?? []).length > 0,
-    blog: (blog.data ?? []).length > 0,
+    work: (work.data ?? []).length > 0,
+    writing: (writing.data ?? []).length > 0,
     contact: Boolean(contact.data),
   } as const;
   const completed = Object.values(records).filter(Boolean).length;
   const heroRecord = hero.data as unknown as PortfolioHeroPublicRow | null;
-  const projectRows = (projects.data ?? []) as unknown as Array<{
+  const workRows = (work.data ?? []) as unknown as Array<{
     image_url?: string | null;
     image_alt?: string | null;
     live_link?: string | null;
     github_link?: string | null;
     short_description?: string | null;
   }>;
-  const blogRows = (blog.data ?? []) as unknown as Array<{
+  const writingRows = (writing.data ?? []) as unknown as Array<{
     is_published: boolean;
     is_visible: boolean;
     published_at: string | null;
@@ -208,18 +208,18 @@ export default async function PortfolioPage() {
   const hiddenNavigation = navigationRows.filter(
     (item) => !item.is_visible,
   ).length;
-  const missingProjectAlt = projectRows.filter(
+  const missingWorkAlt = workRows.filter(
     (project) => project.image_url && !project.image_alt,
   ).length;
-  const drafts = blogRows.filter((post) => !post.is_published).length;
-  const hiddenPosts = blogRows.filter((post) => !post.is_visible).length;
-  const missingProjectImages = projectRows.filter(
+  const drafts = writingRows.filter((post) => !post.is_published).length;
+  const hiddenPosts = writingRows.filter((post) => !post.is_visible).length;
+  const missingWorkImages = workRows.filter(
     (project) => !project.image_url,
   ).length;
-  const missingProjectLinks = projectRows.filter(
+  const missingWorkLinks = workRows.filter(
     (project) => !project.live_link && !project.github_link,
   ).length;
-  const missingProjectCopy = projectRows.filter(
+  const missingWorkCopy = workRows.filter(
     (project) => !project.short_description?.trim(),
   ).length;
   const lastUpdatedSections = sectionRows
@@ -233,10 +233,10 @@ export default async function PortfolioPage() {
   const needsAttention =
     hiddenSections +
     hiddenNavigation +
-    missingProjectAlt +
-    missingProjectImages +
-    missingProjectLinks +
-    missingProjectCopy +
+    missingWorkAlt +
+    missingWorkImages +
+    missingWorkLinks +
+    missingWorkCopy +
     drafts +
     hiddenPosts;
 
@@ -356,7 +356,7 @@ export default async function PortfolioPage() {
           <CardContent className="grid gap-3 sm:grid-cols-2">
             {[
               "Section copy lives beside the content it describes.",
-              "Activity stays derived from GitHub instead of being hardcoded.",
+              "GitHub activity stays derived from the public profile instead of being hardcoded.",
               "Visibility and order are edited at the point of use.",
               "Legacy standalone routes redirect to their owning workspace.",
             ].map((rule) => (
@@ -404,19 +404,19 @@ export default async function PortfolioPage() {
               </Badge>
             </div>
             <ul className="space-y-2 text-muted-foreground">
-              {missingProjectAlt ? (
+              {missingWorkAlt ? (
                 <li>
-                  {missingProjectAlt} project screenshot description(s) missing.
+                  {missingWorkAlt} work screenshot description(s) missing.
                 </li>
               ) : null}
-              {missingProjectImages ? (
-                <li>{missingProjectImages} project image(s) missing.</li>
+              {missingWorkImages ? (
+                <li>{missingWorkImages} work image(s) missing.</li>
               ) : null}
-              {missingProjectLinks ? (
-                <li>{missingProjectLinks} project link set(s) missing.</li>
+              {missingWorkLinks ? (
+                <li>{missingWorkLinks} work link set(s) missing.</li>
               ) : null}
-              {missingProjectCopy ? (
-                <li>{missingProjectCopy} project summary(ies) missing.</li>
+              {missingWorkCopy ? (
+                <li>{missingWorkCopy} work summary(ies) missing.</li>
               ) : null}
               {drafts ? (
                 <li>{drafts} writing item(s) still in draft.</li>

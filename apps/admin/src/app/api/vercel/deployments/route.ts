@@ -136,7 +136,7 @@ export async function POST(request: Request) {
 
     if (action === "rollback") {
       const res = await vercelFetch(
-        `/v9/projects/${projectId}/rollback/${deploymentId}`,
+        `/v9/work/${projectId}/rollback/${deploymentId}`,
         { method: "POST" }
       );
 

@@ -134,17 +134,17 @@ export const STUDIO_SURFACES = {
     external: false,
     searchKeywords: ["files", "folders", "storage"],
   },
-  messenger: {
-    id: "messenger",
-    name: "Messenger",
-    navLabel: "Messenger",
-    href: "/messenger",
+  scratchpad: {
+    id: "scratchpad",
+    name: "Sync Scratchpad",
+    navLabel: "Sync Scratchpad",
+    href: "/scratchpad",
     icon: MessageSquare,
     color: "text-blue-500 dark:text-blue-400",
     section: "workspace",
     isPublic: false,
     external: false,
-    searchKeywords: ["messenger", "messages", "chat"],
+    searchKeywords: ["scratchpad", "sync", "notes", "snippets"],
   },
   "game-hub": {
     id: "game-hub",
@@ -182,17 +182,17 @@ export const STUDIO_SURFACES = {
     external: true,
     searchKeywords: ["ecommerce", "store", "shop"],
   },
-  blog: {
-    id: "blog",
-    name: "Blog",
-    navLabel: "Blog",
-    href: portfolioUrl("/blog"),
+  writing: {
+    id: "writing",
+    name: "Writing",
+    navLabel: "Writing",
+    href: portfolioUrl("/writing"),
     icon: FileText,
     color: "text-orange-500 dark:text-orange-400",
     section: "external",
     isPublic: true,
     external: true,
-    searchKeywords: ["blog", "writing", "articles"],
+    searchKeywords: ["writing", "articles", "notes"],
   },
   portfolio: {
     id: "portfolio",
@@ -204,7 +204,7 @@ export const STUDIO_SURFACES = {
     section: "external",
     isPublic: true,
     external: true,
-    searchKeywords: ["portfolio", "jayant goyal", "work"],
+    searchKeywords: ["portfolio", "jayant", "work"],
   },
 } as const satisfies Record<string, StudioSurfaceDefinition>;
 

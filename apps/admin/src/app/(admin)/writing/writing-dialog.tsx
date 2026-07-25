@@ -18,14 +18,14 @@ import { Label } from "@repo/ui/label";
 import { Textarea } from "@repo/ui/textarea";
 import { Switch } from "@repo/ui/switch";
 import { Badge } from "@repo/ui/badge";
-import type { BlogPost } from "@/lib/types";
+import type { WritingPost } from "@/lib/types";
 import { PortfolioAssetUpload } from "@/components/portfolio/asset-upload";
 import { MarkdownPreview } from "@/components/portfolio/markdown-preview";
 import { AccessibleForm } from "@/components/accessible-form";
 
-export type BlogFormData = Omit<BlogPost, "id" | "created_at" | "updated_at">;
+export type WritingFormData = Omit<WritingPost, "id" | "created_at" | "updated_at">;
 
-export const emptyBlogForm: BlogFormData = {
+export const emptyWritingForm: WritingFormData = {
   title: "",
   slug: "",
   excerpt: "",
@@ -37,12 +37,12 @@ export const emptyBlogForm: BlogFormData = {
   is_visible: true,
 };
 
-interface BlogDialogProps {
+interface WritingDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  editing: BlogPost | null;
-  formData: BlogFormData;
-  setFormData: (data: BlogFormData) => void;
+  editing: WritingPost | null;
+  formData: WritingFormData;
+  setFormData: (data: WritingFormData) => void;
   onSubmit: (e: React.FormEvent) => void;
   saving: boolean;
   errorMessage?: string | null;
@@ -67,7 +67,7 @@ function toDatetimeLocalValue(iso: string | null): string {
   }
 }
 
-export function BlogDialog({
+export function WritingDialog({
   open,
   onOpenChange,
   editing,
@@ -76,7 +76,7 @@ export function BlogDialog({
   onSubmit,
   saving,
   errorMessage,
-}: BlogDialogProps) {
+}: WritingDialogProps) {
   const [tagInput, setTagInput] = useState("");
 
   const addTag = () => {
@@ -114,12 +114,12 @@ export function BlogDialog({
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {editing ? "Edit Blog Post" : "Add Blog Post"}
+            {editing ? "Edit Writing Post" : "Add Writing Post"}
           </DialogTitle>
           <DialogDescription>
             {editing
-              ? "Update the blog post details."
-              : "Create a new blog post."}
+              ? "Update the writing post details."
+              : "Create a new writing post."}
           </DialogDescription>
         </DialogHeader>
         <AccessibleForm onSubmit={onSubmit}>
@@ -132,7 +132,7 @@ export function BlogDialog({
                 onChange={(e) =>
                   setFormData({ ...formData, title: e.target.value })
                 }
-                placeholder="My Blog Post Title"
+                placeholder="My Writing Post Title"
                 required
               />
             </div>
@@ -146,7 +146,7 @@ export function BlogDialog({
                   onChange={(e) =>
                     setFormData({ ...formData, slug: e.target.value })
                   }
-                  placeholder="my-blog-post-title"
+                  placeholder="my-writing-post-title"
                   required
                   className="font-mono"
                 />
@@ -191,7 +191,7 @@ export function BlogDialog({
                   onChange={(e) =>
                     setFormData({ ...formData, content: e.target.value })
                   }
-                  placeholder="Write your blog post in Markdown..."
+                  placeholder="Write your writing post in Markdown..."
                   rows={12}
                   required
                 />
@@ -202,7 +202,7 @@ export function BlogDialog({
             <PortfolioAssetUpload
               id="cover_image"
               label="Cover Image"
-              kind="blog-cover"
+              kind="writing-cover"
               value={formData.cover_image ?? ""}
               onChange={(cover_image) =>
                 setFormData({ ...formData, cover_image })
@@ -210,10 +210,10 @@ export function BlogDialog({
             />
 
             <div className="space-y-2">
-              <Label htmlFor="blog-tag-input">Tags</Label>
+              <Label htmlFor="writing-tag-input">Tags</Label>
               <div className="flex gap-2">
                 <Input
-                  id="blog-tag-input"
+                  id="writing-tag-input"
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
                   onKeyDown={handleTagKeyDown}

@@ -8,25 +8,25 @@ const { authorizeAndGetClientMock, revalidateMock } = vi.hoisted(() => ({
 
 vi.mock("./helpers", async () => {
   const { NextResponse } = await import("next/server");
-  const { validatePortfolioBlogWriteInput } = await import(
+  const { validatePortfolioWritingWriteInput } = await import(
     "@repo/portfolio-data"
   );
 
   function validateTable(table: string) {
-    return table === "blog_posts"
+    return table === "writing_posts"
       ? null
       : NextResponse.json({ error: "Invalid table" }, { status: 400 });
   }
 
-  function validateBlogRequestBody(
+  function validateWritingRequestBody(
     body: unknown,
     operation: "create" | "update",
   ) {
-    const fields = validatePortfolioBlogWriteInput(body, operation);
+    const fields = validatePortfolioWritingWriteInput(body, operation);
     return fields.length === 0
       ? null
       : NextResponse.json(
-          { error: "Invalid blog payload", fields },
+          { error: "Invalid writing payload", fields },
           { status: 400 },
         );
   }
@@ -34,10 +34,10 @@ vi.mock("./helpers", async () => {
   return {
     validateTable,
     authorizeAndGetClient: authorizeAndGetClientMock,
-    getBlogAdminSelectColumns: () =>
+    getWritingAdminSelectColumns: () =>
       "id, title, slug, excerpt, content, cover_image, tags, is_visible, is_published, published_at, created_at, updated_at",
-    validateBlogRequestBody,
-    revalidateBlogPublicContent: revalidateMock,
+    validateWritingRequestBody,
+    revalidateWritingPublicContent: revalidateMock,
     TABLES_WITH_SORT_ORDER: [],
   };
 });
@@ -51,7 +51,7 @@ function request(
   return new NextRequest(`https://admin.example.test${url}`, init);
 }
 
-function routeParams(table = "blog_posts") {
+function routeParams(table = "writing_posts") {
   return { params: Promise.resolve({ table }) };
 }
 
@@ -87,13 +87,13 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
-describe("Admin Blog CMS route contract", () => {
+describe("Admin Writing CMS route contract", () => {
   it("does not revalidate public pages on a read", async () => {
     const client = makeClient({ result: { data: [], error: null } });
     authorizeAndGetClientMock.mockResolvedValue({ client });
 
     const response = requireResponse(
-      await GET(request("/api/jg-app/blog_posts"), routeParams()),
+      await GET(request("/api/jg-app/writing_posts"), routeParams()),
     );
 
     expect(response.status).toBe(200);
@@ -107,7 +107,7 @@ describe("Admin Blog CMS route contract", () => {
 
     const response = requireResponse(
       await POST(
-        request("/api/jg-app/blog_posts", {
+        request("/api/jg-app/writing_posts", {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify({
@@ -131,13 +131,13 @@ describe("Admin Blog CMS route contract", () => {
     expect(client.builder.insert).not.toHaveBeenCalled();
   });
 
-  it("revalidates the public Portfolio after a successful blog update", async () => {
+  it("revalidates the public Portfolio after a successful writing update", async () => {
     const client = makeClient();
     authorizeAndGetClientMock.mockResolvedValue({ client });
 
     const response = requireResponse(
       await PUT(
-        request("/api/jg-app/blog_posts?id=post-1", {
+        request("/api/jg-app/writing_posts?id=post-1", {
           method: "PUT",
           headers: { "content-type": "application/json" },
           body: JSON.stringify({ title: "Updated note" }),

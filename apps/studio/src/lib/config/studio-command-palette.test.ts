@@ -12,7 +12,7 @@ describe("Studio command palette index", () => {
     expect(groups.find((group) => group.id === "studio")?.items).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ id: "studio-home" }),
-        expect.objectContaining({ id: "blog" }),
+        expect.objectContaining({ id: "writing" }),
         expect.objectContaining({ id: "portfolio" }),
       ]),
     );

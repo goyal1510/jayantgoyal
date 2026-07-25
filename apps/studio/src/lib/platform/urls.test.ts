@@ -25,7 +25,7 @@ describe("cross-application URLs", () => {
 
     expect(PORTFOLIO_URL).toBe("http://localhost:3000");
     expect(STUDIO_URL).toBe("http://localhost:3001");
-    expect(portfolioUrl("/blog")).toBe("http://localhost:3000/blog");
+    expect(portfolioUrl("/writing")).toBe("http://localhost:3000/writing");
     expect(studioUrl("/tools/json")).toBe(
       "http://localhost:3001/tools/json",
     );

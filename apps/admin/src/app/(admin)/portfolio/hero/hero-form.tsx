@@ -228,7 +228,7 @@ export function HeroForm({ initialData }: HeroFormProps) {
               onChange={(e) =>
                 setFormData({ ...formData, blurb: e.target.value })
               }
-              placeholder="I'm Jayant Goyal, a full-stack product engineer..."
+                placeholder="I'm Jayant, a software engineer..."
               rows={4}
               required
             />

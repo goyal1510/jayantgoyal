@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-// GET /api/messages - Fetch all messages for the authenticated user
+// GET /api/entries - Fetch all entries for the authenticated user
 export async function GET() {
   try {
     const supabase = await createSupabaseServerClient();
@@ -17,24 +17,24 @@ export async function GET() {
       );
     }
 
-    const { data: messages, error } = await supabase
+    const { data: entries, error } = await supabase
       .schema("jg_app")
-      .from("messenger_messages")
+      .from("scratchpad_entries")
       .select("*")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.error("Error fetching messages:", error);
+      console.error("Error fetching entries:", error);
       return NextResponse.json(
-        { error: error.message || "Failed to fetch messages" },
+        { error: error.message || "Failed to fetch entries" },
         { status: 500 }
       );
     }
 
-    return NextResponse.json({ messages: messages || [] });
+    return NextResponse.json({ entries: entries || [] });
   } catch (error) {
-    console.error("Error in GET /api/messages:", error);
+    console.error("Error in GET /api/entries:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -42,7 +42,7 @@ export async function GET() {
   }
 }
 
-// POST /api/messages - Create a new message
+// POST /api/entries - Create a new entry
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createSupabaseServerClient();
@@ -59,45 +59,45 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { content, message_type, language } = body;
+    const { content, entry_type, language } = body;
 
-    if (!content || !message_type) {
+    if (!content || !entry_type) {
       return NextResponse.json(
-        { error: "Content and message_type are required" },
+        { error: "Content and entry_type are required" },
         { status: 400 }
       );
     }
 
-    if (message_type !== "text" && message_type !== "code") {
+    if (entry_type !== "text" && entry_type !== "code") {
       return NextResponse.json(
-        { error: "message_type must be 'text' or 'code'" },
+        { error: "entry_type must be 'text' or 'code'" },
         { status: 400 }
       );
     }
 
-    const { data: message, error } = await supabase
+    const { data: entry, error } = await supabase
       .schema("jg_app")
-      .from("messenger_messages")
+      .from("scratchpad_entries")
       .insert({
         user_id: user.id,
         content: content.trim(),
-        message_type,
-        language: message_type === "code" ? language || null : null,
+        entry_type,
+        language: entry_type === "code" ? language || null : null,
       })
       .select()
       .single();
 
     if (error) {
-      console.error("Error creating message:", error);
+      console.error("Error creating entry:", error);
       return NextResponse.json(
-        { error: error.message || "Failed to create message" },
+        { error: error.message || "Failed to create entry" },
         { status: 500 }
       );
     }
 
-    return NextResponse.json({ message }, { status: 201 });
+    return NextResponse.json({ entry }, { status: 201 });
   } catch (error) {
-    console.error("Error in POST /api/messages:", error);
+    console.error("Error in POST /api/entries:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

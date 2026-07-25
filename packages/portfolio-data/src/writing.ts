@@ -1,6 +1,6 @@
 import { isValidPublicUrl } from "./guards";
 
-export interface PortfolioBlogPostRecord {
+export interface PortfolioWritingPostRecord {
   id: string;
   title: string;
   slug: string;
@@ -15,7 +15,7 @@ export interface PortfolioBlogPostRecord {
   updated_at: string;
 }
 
-export interface PortfolioBlogPreviewRow {
+export interface PortfolioWritingPreviewRow {
   title: string;
   slug: string;
   excerpt: string | null;
@@ -24,55 +24,55 @@ export interface PortfolioBlogPreviewRow {
 }
 
 /** Public list shape; publication flags are query predicates, not view data. */
-export type PortfolioBlogListRecord = Omit<
-  PortfolioBlogPostRecord,
+export type PortfolioWritingListRecord = Omit<
+  PortfolioWritingPostRecord,
   "content" | "is_visible" | "is_published"
 >;
 
 /** Public article shape; publication flags are query predicates, not view data. */
-export type PortfolioBlogDetailRecord = Omit<
-  PortfolioBlogPostRecord,
+export type PortfolioWritingDetailRecord = Omit<
+  PortfolioWritingPostRecord,
   "is_visible" | "is_published"
 >;
 
-export type PortfolioBlogPublicationState = "draft" | "published" | "hidden";
+export type PortfolioWritingPublicationState = "draft" | "published" | "hidden";
 
 /** Keep CMS labels and public eligibility in one shared contract. */
-export function getBlogPublicationState(
+export function getWritingPublicationState(
   post: Pick<
-    PortfolioBlogPostRecord,
+    PortfolioWritingPostRecord,
     "is_published" | "is_visible" | "published_at"
   >,
-): PortfolioBlogPublicationState {
+): PortfolioWritingPublicationState {
   if (!post.is_visible) return "hidden";
   return post.is_published && post.published_at ? "published" : "draft";
 }
 
-export function isPublicBlogPost(
+export function isPublicWritingPost(
   post: Pick<
-    PortfolioBlogPostRecord,
+    PortfolioWritingPostRecord,
     "is_published" | "is_visible" | "published_at"
   >,
 ): boolean {
   return Boolean(post.is_visible && post.is_published && post.published_at);
 }
 
-export type PortfolioBlogWriteInput = Omit<
-  PortfolioBlogPostRecord,
+export type PortfolioWritingWriteInput = Omit<
+  PortfolioWritingPostRecord,
   "id" | "created_at" | "updated_at"
 >;
 
-export type PortfolioBlogUpdateInput = Partial<PortfolioBlogWriteInput>;
+export type PortfolioWritingUpdateInput = Partial<PortfolioWritingWriteInput>;
 
-export type PortfolioBlogWriteOperation = "create" | "update";
+export type PortfolioWritingWriteOperation = "create" | "update";
 
-const PORTFOLIO_BLOG_GENERATED_KEYS = [
+const PORTFOLIO_WRITING_GENERATED_KEYS = [
   "id",
   "created_at",
   "updated_at",
 ] as const;
 
-const PORTFOLIO_BLOG_WRITE_KEYS = [
+const PORTFOLIO_WRITING_WRITE_KEYS = [
   "title",
   "slug",
   "excerpt",
@@ -85,9 +85,9 @@ const PORTFOLIO_BLOG_WRITE_KEYS = [
 ] as const;
 
 /** Validate the runtime boundary for the Admin Writing workspace. */
-export function validatePortfolioBlogWriteInput(
+export function validatePortfolioWritingWriteInput(
   value: unknown,
-  operation: PortfolioBlogWriteOperation,
+  operation: PortfolioWritingWriteOperation,
 ): string[] {
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
     return ["Payload must be a JSON object"];
@@ -95,13 +95,13 @@ export function validatePortfolioBlogWriteInput(
 
   const record = value as Record<string, unknown>;
   const errors: string[] = [];
-  const allowedKeys = new Set<string>(PORTFOLIO_BLOG_WRITE_KEYS);
+  const allowedKeys = new Set<string>(PORTFOLIO_WRITING_WRITE_KEYS);
 
   for (const key of Object.keys(record)) {
-    if ((PORTFOLIO_BLOG_GENERATED_KEYS as readonly string[]).includes(key)) {
+    if ((PORTFOLIO_WRITING_GENERATED_KEYS as readonly string[]).includes(key)) {
       errors.push(`${key} is generated and cannot be written`);
     } else if (!allowedKeys.has(key)) {
-      errors.push(`${key} is not writable on blog_posts`);
+      errors.push(`${key} is not writable on writing_posts`);
     }
   }
 
@@ -149,14 +149,14 @@ export function validatePortfolioBlogWriteInput(
   return errors;
 }
 
-export const PORTFOLIO_BLOG_SELECT_COLUMNS =
+export const PORTFOLIO_WRITING_SELECT_COLUMNS =
   "id, title, slug, excerpt, cover_image, tags, published_at, created_at, updated_at";
 
-export const PORTFOLIO_BLOG_DETAIL_SELECT_COLUMNS =
+export const PORTFOLIO_WRITING_DETAIL_SELECT_COLUMNS =
   "id, title, slug, excerpt, content, cover_image, tags, published_at, created_at, updated_at";
 
-export const PORTFOLIO_BLOG_CMS_SELECT_COLUMNS =
+export const PORTFOLIO_WRITING_CMS_SELECT_COLUMNS =
   "id, title, slug, excerpt, content, cover_image, tags, is_visible, is_published, published_at, created_at, updated_at";
 
-export const PORTFOLIO_BLOG_PREVIEW_SELECT_COLUMNS =
+export const PORTFOLIO_WRITING_PREVIEW_SELECT_COLUMNS =
   "title, slug, excerpt, tags, published_at";

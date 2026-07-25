@@ -32,27 +32,27 @@ import { Badge } from "@repo/ui/badge";
 import { ConfirmationDialog } from "@repo/ui/confirmation-dialog";
 import { IconAction } from "@repo/ui/icon-action";
 import { VisibilityBadge } from "@repo/ui/status-badge";
-import type { Project } from "@/lib/types";
+import type { WorkItem } from "@/lib/types";
 import {
-  ProjectDialog,
-  emptyProjectForm,
-  type ProjectFormData,
-} from "./project-dialog";
+  WorkDialog,
+  emptyWorkForm,
+  type WorkFormData,
+} from "./work-dialog";
 
-interface ProjectsListProps {
-  initialData: Project[];
+interface WorkListProps {
+  initialData: WorkItem[];
 }
 
-export function ProjectsList({ initialData }: ProjectsListProps) {
+export function WorkList({ initialData }: WorkListProps) {
   const router = useRouter();
   const [items, setItems] = useState(initialData);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<Project | null>(null);
-  const [formData, setFormData] = useState<ProjectFormData>(emptyProjectForm);
+  const [editingItem, setEditingItem] = useState<WorkItem | null>(null);
+  const [formData, setFormData] = useState<WorkFormData>(emptyWorkForm);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
-  const [pendingDelete, setPendingDelete] = useState<Project | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<WorkItem | null>(null);
 
   useEffect(() => {
     setItems(initialData);
@@ -61,7 +61,7 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
   const openAddDialog = () => {
     setEditingItem(null);
     setFormData({
-      ...emptyProjectForm,
+      ...emptyWorkForm,
       sort_order:
         items.length > 0 ? Math.max(...items.map((i) => i.sort_order)) + 1 : 0,
     });
@@ -69,7 +69,7 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
     setDialogOpen(true);
   };
 
-  const openEditDialog = (item: Project) => {
+  const openEditDialog = (item: WorkItem) => {
     setEditingItem(item);
     setFormData({
       name: item.name,
@@ -84,6 +84,8 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
       year_label: item.year_label,
       image_url: item.image_url,
       image_alt: item.image_alt,
+      case_study: item.case_study,
+      case_study_published: item.case_study_published,
       sort_order: item.sort_order,
       is_visible: item.is_visible,
     });
@@ -99,23 +101,23 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
     try {
       if (editingItem) {
         const result = await updatePortfolioData(
-          "projects",
+          "work",
           editingItem.id,
           formData,
         );
         if (result.error) throw new Error(result.error);
-        toast.success("Project updated");
+        toast.success("Work updated");
       } else {
-        const result = await createPortfolioData("projects", formData);
+        const result = await createPortfolioData("work", formData);
         if (result.error) throw new Error(result.error);
-        toast.success("Project added");
+        toast.success("Work added");
       }
 
       setDialogOpen(false);
       router.refresh();
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "Failed to save project";
+        error instanceof Error ? error.message : "Failed to save work";
       setFormError(message);
       toast.error(message);
     } finally {
@@ -127,23 +129,23 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
     setDeleting(id);
 
     try {
-      const result = await deletePortfolioData("projects", id);
+      const result = await deletePortfolioData("work", id);
       if (result.error) throw new Error(result.error);
-      toast.success("Project deleted");
+      toast.success("Work deleted");
       setItems(items.filter((i) => i.id !== id));
       router.refresh();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to delete project",
+        error instanceof Error ? error.message : "Failed to delete work",
       );
     } finally {
       setDeleting(null);
     }
   };
 
-  const toggleVisibility = async (item: Project) => {
+  const toggleVisibility = async (item: WorkItem) => {
     try {
-      const result = await updatePortfolioData("projects", item.id, {
+      const result = await updatePortfolioData("work", item.id, {
         is_visible: !item.is_visible,
       });
       if (result.error) throw new Error(result.error);
@@ -163,20 +165,20 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle>Projects</CardTitle>
+            <CardTitle>Work</CardTitle>
             <CardDescription>
-              Showcase your work and side projects.
+              Showcase your work and side work.
             </CardDescription>
           </div>
           <Button onClick={openAddDialog}>
             <Plus className="mr-2 h-4 w-4" />
-            Add Project
+            Add Work
           </Button>
         </CardHeader>
         <CardContent>
           {items.length === 0 ? (
             <p className="text-sm text-muted-foreground py-8 text-center">
-              No projects yet. Click &quot;Add Project&quot; to get started.
+            No work yet. Click &quot;Add Work&quot; to get started.
             </p>
           ) : (
             <div className="space-y-4">
@@ -190,13 +192,13 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
                       <img
                         src={item.image_url}
                         alt={
-                          item.image_alt || `${item.name} project screenshot`
+                          item.image_alt || `${item.name} work screenshot`
                         }
                         className="h-full w-full object-contain"
                       />
                     ) : (
                       <span className="px-4 text-center text-xs text-muted-foreground">
-                        Add a full project screenshot
+                        Add a full work screenshot
                       </span>
                     )}
                   </div>
@@ -204,6 +206,9 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
                     <div className="flex items-center gap-2">
                       <h3 className="font-semibold">{item.name}</h3>
                       <VisibilityBadge visible={item.is_visible} />
+                      {item.case_study_published ? (
+                        <Badge variant="secondary">Case study</Badge>
+                      ) : null}
                     </div>
                     {item.short_description && (
                       <p className="text-sm text-muted-foreground mt-1">
@@ -256,13 +261,13 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
                   <div className="flex items-center gap-2">
                     <IconAction
                       icon={item.is_visible ? Eye : EyeOff}
-                      label={item.is_visible ? "Hide project" : "Show project"}
+                      label={item.is_visible ? "Hide work" : "Show work"}
                       variant="ghost"
                       onClick={() => toggleVisibility(item)}
                     />
                     <IconAction
                       icon={Pencil}
-                      label="Edit project"
+                      label="Edit work"
                       variant="ghost"
                       onClick={() => openEditDialog(item)}
                     />
@@ -271,7 +276,7 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
                       iconClassName={
                         deleting === item.id ? "size-4 animate-spin" : undefined
                       }
-                      label="Delete project"
+                      label="Delete work"
                       variant="ghost"
                       onClick={() => setPendingDelete(item)}
                       disabled={deleting === item.id}
@@ -284,7 +289,7 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
         </CardContent>
       </Card>
 
-      <ProjectDialog
+      <WorkDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         editing={editingItem}
@@ -299,9 +304,9 @@ export function ProjectsList({ initialData }: ProjectsListProps) {
         onOpenChange={(open) => {
           if (!open) setPendingDelete(null);
         }}
-        title="Delete this project?"
-        description="This permanently removes the project story and its screenshot from the CMS."
-        confirmLabel="Delete project"
+        title="Delete this work?"
+        description="This permanently removes the work story and its screenshot from the CMS."
+        confirmLabel="Delete work"
         destructive
         onConfirm={() => {
           if (pendingDelete) return handleDelete(pendingDelete.id);

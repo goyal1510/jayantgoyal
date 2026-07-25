@@ -1,5 +1,5 @@
 import {
-  Activity,
+  Github,
   BookOpen,
   BriefcaseBusiness,
   Code2,
@@ -58,17 +58,17 @@ const WORKSPACE_COPY: Record<
     title: "Activity",
     description:
       "Configure the source for live GitHub activity while keeping contribution data derived, current, and trustworthy.",
-    icon: Activity,
+    icon: Github,
     tone: "sage",
     detail: "GitHub identity and activity presentation",
   },
   work: {
     title: "Work",
     description:
-      "Publish projects as complete stories with their screenshots, context, contribution, links, and accessible descriptions intact.",
+      "Publish work as complete stories with their screenshots, context, contribution, links, and accessible descriptions intact.",
     icon: FolderKanban,
     tone: "coral",
-    detail: "Projects, full previews, links, and image context",
+    detail: "Work, full previews, links, and image context",
   },
   writing: {
     title: "Writing",

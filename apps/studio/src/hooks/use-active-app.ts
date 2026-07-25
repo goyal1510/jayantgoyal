@@ -10,7 +10,7 @@ const ROUTE_MAP: {
   { prefix: "/products", appId: "studio-products" },
   { prefix: "/games", appId: "game-hub" },
   { prefix: "/tools", appId: "tech-tools" },
-  { prefix: "/messenger", appId: "messenger" },
+  { prefix: "/scratchpad", appId: "scratchpad" },
   {
     prefix: "/calculator",
     appId: "currency-calculator",
@@ -30,8 +30,9 @@ const ROUTE_MAP: {
   { prefix: "/github-stats", appId: "github-stats" },
   { prefix: "/custom-calculator", appId: "custom-calculator" },
   { prefix: "/about", appId: "portfolio", navResolver: () => "about" },
-  { prefix: "/blogs", appId: "blog" },
-  { prefix: "/blog", appId: "blog" },
+  { prefix: "/writing", appId: "writing" },
+  { prefix: "/blogs", appId: "writing" },
+  { prefix: "/blog", appId: "writing" },
 ];
 
 /**

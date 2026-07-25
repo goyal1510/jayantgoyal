@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   applicationName: AUTH_BRAND.publicName,
   authors: [{ name: PERSON_BRAND.fullName, url: PERSON_BRAND.canonicalUrl }],
   creator: PERSON_BRAND.fullName,
-  keywords: ["secure sign in", "account security", "Jayant Goyal"],
+  keywords: ["secure sign in", "account security", "Jayant"],
   alternates: { canonical: "/welcome" },
   openGraph: {
     type: "website",

@@ -8,7 +8,7 @@ export function buildToolPageMetadata(pathname: string): Metadata {
 
   return buildPublicPageMetadata({
     title: tool?.title ?? "Developer Tool",
-    description: tool?.description ?? "Free browser-based developer tool by Jayant Goyal.",
+    description: tool?.description ?? "Free browser-based developer tool by Jayant.",
     pathname,
   })
 }

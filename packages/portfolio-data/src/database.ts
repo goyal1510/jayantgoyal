@@ -6,7 +6,7 @@ export type {
   PortfolioExperienceRecord,
   PortfolioHeroRecord,
   PortfolioNavigationRecord,
-  PortfolioProjectRecord,
+  PortfolioWorkRecord,
   PortfolioSkillCategoryRecord,
   PortfolioSkillRecord,
   PortfolioSectionContentRecord,
@@ -25,17 +25,17 @@ export type {
 } from "./portfolio";
 
 export type {
-  PortfolioBlogDetailRecord,
-  PortfolioBlogListRecord,
-  PortfolioBlogPostRecord,
-  PortfolioBlogWriteInput,
-} from "./blog";
+  PortfolioWritingDetailRecord,
+  PortfolioWritingListRecord,
+  PortfolioWritingPostRecord,
+  PortfolioWritingWriteInput,
+} from "./writing";
 
 export {
-  PORTFOLIO_BLOG_SELECT_COLUMNS,
-  PORTFOLIO_BLOG_DETAIL_SELECT_COLUMNS,
-  PORTFOLIO_BLOG_PREVIEW_SELECT_COLUMNS,
-} from "./blog";
+  PORTFOLIO_WRITING_SELECT_COLUMNS,
+  PORTFOLIO_WRITING_DETAIL_SELECT_COLUMNS,
+  PORTFOLIO_WRITING_PREVIEW_SELECT_COLUMNS,
+} from "./writing";
 export {
   PORTFOLIO_ADMIN_SELECT_COLUMNS,
   PORTFOLIO_SELECT_COLUMNS,

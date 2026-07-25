@@ -4,7 +4,7 @@
 
 import type {
   PortfolioAboutRecord,
-  PortfolioBlogPostRecord,
+  PortfolioWritingPostRecord,
   PortfolioCertificateRecord,
   PortfolioContactRecord,
   PortfolioEducationRecord,
@@ -13,7 +13,7 @@ import type {
   PortfolioNavigationRecord,
   PortfolioPersonalInfo,
   PortfolioPrinciple as PortfolioPrincipleRecord,
-  PortfolioProjectRecord,
+  PortfolioWorkRecord,
   PortfolioSectionContentRecord,
   PortfolioSkillCategoryRecord,
   PortfolioSkillRecord,
@@ -78,7 +78,7 @@ export interface SkillCategoryWithSkills extends SkillCategory {
   skills: Skill[];
 }
 
-export type Project = PortfolioProjectRecord;
+export type WorkItem = PortfolioWorkRecord;
 export type Certificate = PortfolioCertificateRecord;
 export type Contact = PortfolioContactRecord;
 export type SocialLink = PortfolioSocialLink;
@@ -140,7 +140,7 @@ export interface VercelBuildLogEntry {
 export type VercelProjectKey = "studio" | "admin";
 
 /**
- * Blog Types
+ * Writing Types
  */
 
-export type BlogPost = PortfolioBlogPostRecord;
+export type WritingPost = PortfolioWritingPostRecord;

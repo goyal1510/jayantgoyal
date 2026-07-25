@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import {
   validateTable,
   authorizeAndGetClient,
-  getBlogAdminSelectColumns,
-  validateBlogRequestBody,
-  revalidateBlogPublicContent,
+  getWritingAdminSelectColumns,
+  validateWritingRequestBody,
+  revalidateWritingPublicContent,
   TABLES_WITH_SORT_ORDER,
 } from "./helpers";
 
@@ -31,7 +31,7 @@ export async function GET(
       const result = await auth.client
         .schema("jg_app")
         .from(table)
-        .select(getBlogAdminSelectColumns())
+        .select(getWritingAdminSelectColumns())
         .eq("id", id)
         .single();
       data = result.data;
@@ -40,7 +40,7 @@ export async function GET(
       const result = await auth.client
         .schema("jg_app")
         .from(table)
-        .select(getBlogAdminSelectColumns())
+        .select(getWritingAdminSelectColumns())
         .order("sort_order", { ascending: true });
       data = result.data;
       error = result.error;
@@ -48,7 +48,7 @@ export async function GET(
       const result = await auth.client
         .schema("jg_app")
         .from(table)
-        .select(getBlogAdminSelectColumns());
+        .select(getWritingAdminSelectColumns());
       data = result.data;
       error = result.error;
     }
@@ -81,21 +81,21 @@ export async function POST(
     if ("error" in auth) return auth.error;
 
     const body = await request.json();
-    const payloadError = validateBlogRequestBody(body, "create");
+    const payloadError = validateWritingRequestBody(body, "create");
     if (payloadError) return payloadError;
 
     const { data, error } = await auth.client
       .schema("jg_app")
       .from(table)
       .insert(body)
-      .select(getBlogAdminSelectColumns())
+      .select(getWritingAdminSelectColumns())
       .single();
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    revalidateBlogPublicContent();
+    revalidateWritingPublicContent();
     return NextResponse.json({ data });
   } catch (error) {
     console.error("Error creating jg_app data:", error);
@@ -130,7 +130,7 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const payloadError = validateBlogRequestBody(body, "update");
+    const payloadError = validateWritingRequestBody(body, "update");
     if (payloadError) return payloadError;
 
     const { data, error } = await auth.client
@@ -138,14 +138,14 @@ export async function PUT(
       .from(table)
       .update(body)
       .eq("id", id)
-      .select(getBlogAdminSelectColumns())
+      .select(getWritingAdminSelectColumns())
       .single();
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    revalidateBlogPublicContent();
+    revalidateWritingPublicContent();
     return NextResponse.json({ data });
   } catch (error) {
     console.error("Error updating jg_app data:", error);
@@ -189,7 +189,7 @@ export async function DELETE(
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    revalidateBlogPublicContent();
+    revalidateWritingPublicContent();
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting jg_app data:", error);

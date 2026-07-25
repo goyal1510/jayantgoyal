@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Activity, ExternalLink, Github, Radio } from "lucide-react";
+import { ExternalLink, Github, Radio } from "lucide-react";
 import { Badge } from "@repo/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card";
 
@@ -65,11 +65,11 @@ export default async function ActivityPage() {
         </Card>
         <Card className="bg-muted/30">
           <CardHeader>
-            <Activity className="size-5 text-muted-foreground" />
+            <Github className="size-5 text-muted-foreground" />
             <CardTitle className="text-base">What is editable</CardTitle>
           </CardHeader>
           <CardContent className="text-sm text-muted-foreground">
-            Edit the identity and links in Home and Contact. Keep activity
+            Edit the identity and links in Home and Contact. Keep GitHub
             metrics derived so the public surface stays trustworthy.
           </CardContent>
         </Card>

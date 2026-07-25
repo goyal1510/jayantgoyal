@@ -13,31 +13,31 @@ import {
   EyeOff,
 } from "lucide-react";
 import {
-  getBlogPublicationState,
-  isPublicBlogPost,
+  getWritingPublicationState,
+  isPublicWritingPost,
 } from "@repo/portfolio-data";
-import { createBlogData, updateBlogData, deleteBlogData } from "@/lib/blog-api";
+import { createWritingData, updateWritingData, deleteWritingData } from "@/lib/writing-api";
 import { Button } from "@repo/ui/button";
 import { ConfirmationDialog } from "@repo/ui/confirmation-dialog";
 import { IconAction } from "@repo/ui/icon-action";
 import { StatusBadge } from "@repo/ui/status-badge";
-import type { BlogPost } from "@/lib/types";
-import { BlogDialog, emptyBlogForm, type BlogFormData } from "./blog-dialog";
+import type { WritingPost } from "@/lib/types";
+import { WritingDialog, emptyWritingForm, type WritingFormData } from "./writing-dialog";
 
-interface BlogListProps {
-  initialData: BlogPost[];
+interface WritingListProps {
+  initialData: WritingPost[];
 }
 
-export function BlogList({ initialData }: BlogListProps) {
+export function WritingList({ initialData }: WritingListProps) {
   const router = useRouter();
   const [items, setItems] = useState(initialData);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<BlogPost | null>(null);
-  const [formData, setFormData] = useState<BlogFormData>(emptyBlogForm);
+  const [editingItem, setEditingItem] = useState<WritingPost | null>(null);
+  const [formData, setFormData] = useState<WritingFormData>(emptyWritingForm);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
-  const [pendingDelete, setPendingDelete] = useState<BlogPost | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<WritingPost | null>(null);
 
   useEffect(() => {
     setItems(initialData);
@@ -46,13 +46,13 @@ export function BlogList({ initialData }: BlogListProps) {
   const openAddDialog = () => {
     setEditingItem(null);
     setFormData({
-      ...emptyBlogForm,
+      ...emptyWritingForm,
     });
     setFormError(null);
     setDialogOpen(true);
   };
 
-  const openEditDialog = (item: BlogPost) => {
+  const openEditDialog = (item: WritingPost) => {
     setEditingItem(item);
     setFormData({
       title: item.title,
@@ -88,24 +88,24 @@ export function BlogList({ initialData }: BlogListProps) {
       };
 
       if (editingItem) {
-        const result = await updateBlogData(
-          "blog_posts",
+        const result = await updateWritingData(
+          "writing_posts",
           editingItem.id,
           sanitized,
         );
         if (result.error) throw new Error(result.error);
-        toast.success("Blog post updated");
+        toast.success("Writing post updated");
       } else {
-        const result = await createBlogData("blog_posts", sanitized);
+        const result = await createWritingData("writing_posts", sanitized);
         if (result.error) throw new Error(result.error);
-        toast.success("Blog post added");
+        toast.success("Writing post added");
       }
 
       setDialogOpen(false);
       router.refresh();
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "Failed to save blog post";
+        error instanceof Error ? error.message : "Failed to save writing post";
       setFormError(message);
       toast.error(message);
     } finally {
@@ -116,23 +116,23 @@ export function BlogList({ initialData }: BlogListProps) {
   const handleDelete = async (id: string) => {
     setDeleting(id);
     try {
-      const result = await deleteBlogData("blog_posts", id);
+      const result = await deleteWritingData("writing_posts", id);
       if (result.error) throw new Error(result.error);
-      toast.success("Blog post deleted");
+      toast.success("Writing post deleted");
       setItems(items.filter((i) => i.id !== id));
       router.refresh();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to delete blog post",
+        error instanceof Error ? error.message : "Failed to delete writing post",
       );
     } finally {
       setDeleting(null);
     }
   };
 
-  const toggleVisibility = async (item: BlogPost) => {
+  const toggleVisibility = async (item: WritingPost) => {
     try {
-      const result = await updateBlogData("blog_posts", item.id, {
+      const result = await updateWritingData("writing_posts", item.id, {
         is_visible: !item.is_visible,
       });
       if (result.error) throw new Error(result.error);
@@ -159,7 +159,7 @@ export function BlogList({ initialData }: BlogListProps) {
       <div className="rounded-lg border">
         {items.length === 0 ? (
           <p className="text-sm text-muted-foreground py-8 text-center">
-            No blog posts yet.
+            No writing posts yet.
           </p>
         ) : (
           items.map((item, i) => (
@@ -171,7 +171,7 @@ export function BlogList({ initialData }: BlogListProps) {
                 <div className="flex items-center gap-2">
                   <p className="font-medium truncate">{item.title}</p>
                   {(() => {
-                    const state = getBlogPublicationState(item);
+                    const state = getWritingPublicationState(item);
                     return (
                       <StatusBadge
                         status={state}
@@ -195,9 +195,9 @@ export function BlogList({ initialData }: BlogListProps) {
                   })}
                 </time>
               )}
-              {isPublicBlogPost(item) ? (
+              {isPublicWritingPost(item) ? (
                 <a
-                  href={`${process.env.NEXT_PUBLIC_PORTFOLIO_URL ?? "https://jayantgoyal.com"}/blog/${item.slug}`}
+                  href={`${process.env.NEXT_PUBLIC_PORTFOLIO_URL ?? "https://jayantgoyal.com"}/writing/${item.slug}`}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex shrink-0 items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
@@ -234,7 +234,7 @@ export function BlogList({ initialData }: BlogListProps) {
         )}
       </div>
 
-      <BlogDialog
+      <WritingDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         editing={editingItem}

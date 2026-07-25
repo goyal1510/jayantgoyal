@@ -25,7 +25,7 @@ export function LoginForm({ returnTo }: { returnTo: string }) {
         <div className="text-center">
           <h1 className="text-2xl font-bold">Sign in</h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            Continue to Jayant Goyal applications.
+            Continue to Jayant applications.
           </p>
         </div>
         <form action={action} className="space-y-4">

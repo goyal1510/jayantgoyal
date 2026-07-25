@@ -3,12 +3,12 @@ import {
   UserRound,
   Briefcase,
   FolderKanban,
-  Activity,
+  Github,
   Code2,
   Mail,
   LayoutDashboard,
   Rocket,
-  PenLine,
+  BookOpen,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -43,10 +43,10 @@ export const portfolioNavItems: NavItem[] = [
   {
     label: "Activity",
     href: PORTFOLIO_WORKSPACE_ROUTES.activity,
-    icon: Activity,
+    icon: Github,
   },
   { label: "Work", href: PORTFOLIO_WORKSPACE_ROUTES.work, icon: FolderKanban },
-  { label: "Writing", href: PORTFOLIO_WORKSPACE_ROUTES.writing, icon: PenLine },
+  { label: "Writing", href: PORTFOLIO_WORKSPACE_ROUTES.writing, icon: BookOpen },
   { label: "Contact", href: PORTFOLIO_WORKSPACE_ROUTES.contact, icon: Mail },
 ];
 

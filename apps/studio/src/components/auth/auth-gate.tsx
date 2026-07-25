@@ -13,6 +13,7 @@ const PUBLIC_PREFIXES = [
   "/tools",
   "/blogs",
   "/blog",
+  "/writing",
   "/weather",
   "/custom-calculator",
   "/github-stats",

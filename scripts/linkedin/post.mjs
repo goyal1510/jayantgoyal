@@ -4,12 +4,12 @@
  *
  * Usage:
  *   node scripts/linkedin/post.mjs "Your post text here"
- *   node scripts/linkedin/post.mjs "Check out my new blog post!" --url https://www.jayantgoyal.com/blog/my-post
- *   node scripts/linkedin/post.mjs --blog introducing-jayantgoyal-com
+ *   node scripts/linkedin/post.mjs "Check out my writing!" --url https://www.jayantgoyal.com/writing/my-post
+ *   node scripts/linkedin/post.mjs --writing introducing-jayantgoyal-com
  *
  * Options:
  *   --url <url>      Attach a link to the post
- *   --blog <slug>    Auto-generate a post from a blog slug (fetches title from DB)
+ *   --writing <slug> Auto-generate a post from a writing slug
  */
 
 import fs from "node:fs";
@@ -37,19 +37,19 @@ function parseArgs() {
   const args = process.argv.slice(2);
   let text = "";
   let url = "";
-  let blogSlug = "";
+  let writingSlug = "";
 
   for (let i = 0; i < args.length; i++) {
     if (args[i] === "--url" && args[i + 1]) {
       url = args[++i];
-    } else if (args[i] === "--blog" && args[i + 1]) {
-      blogSlug = args[++i];
+    } else if (args[i] === "--writing" && args[i + 1]) {
+      writingSlug = args[++i];
     } else if (!args[i].startsWith("--")) {
       text = args[i];
     }
   }
 
-  return { text, url, blogSlug };
+  return { text, url, writingSlug };
 }
 
 async function postToLinkedIn(accessToken, personId, text, articleUrl) {
@@ -107,13 +107,13 @@ function savePost(entry) {
 
 async function main() {
   const token = loadToken();
-  let { text, url, blogSlug } = parseArgs();
+  let { text, url, writingSlug } = parseArgs();
 
-  // Auto-generate post from blog slug
-  if (blogSlug) {
-    url = `https://www.jayantgoyal.com/blog/${blogSlug}`;
+  // Auto-generate post from writing slug
+  if (writingSlug) {
+    url = `https://www.jayantgoyal.com/writing/${writingSlug}`;
     if (!text) {
-      text = `📝 New blog post!\n\nCheck it out 👇\n${url}\n\n#webdev #developer #nextjs #coding`;
+      text = `📝 New writing!\n\nRead it here 👇\n${url}\n\n#webdev #developer #nextjs #coding`;
     }
   }
 
@@ -121,7 +121,7 @@ async function main() {
     console.error("Usage:");
     console.error('  node scripts/linkedin/post.mjs "Your post text"');
     console.error('  node scripts/linkedin/post.mjs "Text" --url https://example.com');
-    console.error("  node scripts/linkedin/post.mjs --blog my-post-slug");
+    console.error("  node scripts/linkedin/post.mjs --writing my-post-slug");
     process.exit(1);
   }
 
@@ -135,7 +135,7 @@ async function main() {
     console.log(`  View: https://www.linkedin.com/feed/`);
 
     // Save to post history
-    savePost({ id: postId, text, url: url || null, blogSlug: blogSlug || null, createdAt: new Date().toISOString() });
+    savePost({ id: postId, text, url: url || null, writingSlug: writingSlug || null, createdAt: new Date().toISOString() });
     console.log(`  Logged to history (${POSTS_FILE})`);
   } catch (err) {
     console.error(`❌ Failed to post: ${err.message}`);

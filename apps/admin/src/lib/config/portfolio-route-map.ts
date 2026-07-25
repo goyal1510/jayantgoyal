@@ -8,9 +8,12 @@ import { PORTFOLIO_WORKSPACE_ROUTES } from "@repo/portfolio-data";
 export const PORTFOLIO_LEGACY_ADMIN_ROUTE_TARGETS = {
   "/portfolio/hero": PORTFOLIO_WORKSPACE_ROUTES.home,
   "/portfolio/projects": PORTFOLIO_WORKSPACE_ROUTES.work,
+  "/portfolio/github": PORTFOLIO_WORKSPACE_ROUTES.activity,
   "/portfolio/education": PORTFOLIO_WORKSPACE_ROUTES.about,
   "/portfolio/certificates": PORTFOLIO_WORKSPACE_ROUTES.experience,
+  "/portfolio/blog": PORTFOLIO_WORKSPACE_ROUTES.writing,
   "/blog": PORTFOLIO_WORKSPACE_ROUTES.writing,
+  "/writing": PORTFOLIO_WORKSPACE_ROUTES.writing,
   "/portfolio/section-copy": "/portfolio",
   "/portfolio/navigation": "/portfolio",
 } as const;

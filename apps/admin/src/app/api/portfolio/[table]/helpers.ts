@@ -17,7 +17,7 @@ export const TABLES_WITH_SORT_ORDER = [
   "experience",
   "skill_categories",
   "skills",
-  "projects",
+  "work",
   "certificates",
   "nav_items",
 ];
@@ -89,9 +89,9 @@ export function revalidatePortfolioPublicContent() {
   }
 
   // Dynamic article pages cannot be enumerated from the mutation payload. The
-  // pattern invalidates every public Blog detail page without exposing CMS
+  // pattern invalidates every public Writing detail page without exposing CMS
   // state to the client.
-  revalidatePath("/blog/[slug]", "page");
+  revalidatePath("/writing/[slug]", "page");
 }
 
 export async function authorizeAndGetClient() {

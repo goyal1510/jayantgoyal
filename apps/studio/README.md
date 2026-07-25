@@ -21,9 +21,9 @@ workspaces.
 | Activity Tracker                  | `/activity-tracker` | Account-backed                  |
 | Calculator                        | `/calculator`       | Account-backed                  |
 | File Manager                      | `/files`            | Account-backed                  |
-| Messenger                         | `/messenger`        | Account-backed                  |
+| Sync Scratchpad                  | `/scratchpad`       | Account-backed                  |
 
-Professional content, Blog, Resume, and Contact belong to the independent
+Professional content, Writing, Resume, and Contact belong to the independent
 Portfolio application. Historical Studio-side paths redirect to the canonical
 Portfolio origin.
 

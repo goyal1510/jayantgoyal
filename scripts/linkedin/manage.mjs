@@ -197,7 +197,7 @@ async function editPost(index, newText, newUrl) {
     id: newId,
     text,
     url: url || null,
-    blogSlug: old.blogSlug || null,
+    writingSlug: old.writingSlug || old.blogSlug || null,
     createdAt: new Date().toISOString(),
     editedFrom: old.id,
   });

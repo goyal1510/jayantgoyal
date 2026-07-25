@@ -7,6 +7,7 @@ import {
   SITE_NAME,
   SITE_URL,
 } from "@/lib/seo/config";
+import { allTools } from "@/lib/tools/tools";
 
 export function PersonJsonLd() {
   const jsonLd = {
@@ -14,9 +15,8 @@ export function PersonJsonLd() {
     "@type": "Person",
     name: PERSON_NAME,
     givenName: PERSON_BRAND.givenName,
-    familyName: PERSON_BRAND.familyName,
     url: SITE_URL,
-    jobTitle: "Full-Stack Developer",
+    jobTitle: "Software Engineer",
     image: `${SITE_URL}${BRAND_ASSET_PATHS.android512}`,
     email: "goyal151002@gmail.com",
     address: {
@@ -86,9 +86,8 @@ export function ProfilePageJsonLd() {
       "@type": "Person",
       name: PERSON_NAME,
       givenName: PERSON_BRAND.givenName,
-      familyName: PERSON_BRAND.familyName,
       url: SITE_URL,
-      jobTitle: "Full-Stack Developer",
+      jobTitle: "Software Engineer",
       image: `${SITE_URL}${BRAND_ASSET_PATHS.android512}`,
       description: SITE_DESCRIPTION,
       sameAs: [
@@ -129,8 +128,7 @@ export function SoftwareAppJsonLd({
     url: `${siteUrl}/tools`,
     applicationCategory: "DeveloperApplication",
     operatingSystem: "Web",
-    description:
-      "A collection of 99+ free developer tools by Jayant, including UUID generator, JSON formatter, Base64 encoder, hash generators, regex tester, and more.",
+    description: `A collection of ${allTools.length} free developer tools by Jayant, including UUID generation, JSON formatting, Base64 encoding, hashing, regex testing, converters, and more.`,
     offers: {
       "@type": "Offer",
       price: "0",

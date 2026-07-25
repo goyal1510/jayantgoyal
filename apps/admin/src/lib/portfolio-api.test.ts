@@ -43,8 +43,10 @@ describe("Admin Portfolio API adapter", () => {
       impact: "Made a complex workflow easier to understand.",
       contribution: "Product direction and implementation.",
       year_label: "2026",
-      image_url: "/projects/signal.png",
+      image_url: "/work/signal.png",
       image_alt: "Signal workspace overview",
+      case_study: null,
+      case_study_published: false,
       tags: ["Next.js"],
       github_link: "",
       live_link: "",
@@ -52,15 +54,15 @@ describe("Admin Portfolio API adapter", () => {
       is_visible: true,
     };
 
-    await createPortfolioData("projects", createPayload);
-    await updatePortfolioData("projects", "project-1", {
+    await createPortfolioData("work", createPayload);
+    await updatePortfolioData("work", "project-1", {
       image_alt: "Updated Signal workspace overview",
     });
-    await deletePortfolioData("projects", "project-1");
+    await deletePortfolioData("work", "project-1");
 
     expect(fetchMock).toHaveBeenNthCalledWith(
       1,
-      "/api/portfolio/projects",
+      "/api/portfolio/work",
       expect.objectContaining({
         method: "POST",
         body: JSON.stringify(createPayload),
@@ -68,7 +70,7 @@ describe("Admin Portfolio API adapter", () => {
     );
     expect(fetchMock).toHaveBeenNthCalledWith(
       2,
-      "/api/portfolio/projects?id=project-1",
+      "/api/portfolio/work?id=project-1",
       expect.objectContaining({
         method: "PUT",
         body: JSON.stringify({
@@ -78,7 +80,7 @@ describe("Admin Portfolio API adapter", () => {
     );
     expect(fetchMock).toHaveBeenNthCalledWith(
       3,
-      "/api/portfolio/projects?id=project-1",
+      "/api/portfolio/work?id=project-1",
       { method: "DELETE" },
     );
   });
@@ -99,7 +101,7 @@ describe("Admin Portfolio API adapter", () => {
       },
       navigation: {
         label: "Work",
-        note: "Projects",
+        note: "Work",
         sort_order: 4,
         is_visible: true,
       },

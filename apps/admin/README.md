@@ -22,7 +22,7 @@ Administrative dashboard for managing portfolio data and users.
 | **Skills**       | Capability groups, proficiency labels, and evidence                     |
 | **Experience**   | Work history and credentials, with role, dates, and verification         |
 | **Activity**     | GitHub identity and contribution/activity presentation                   |
-| **Work**         | Project stories, full-width screenshots, links, and technologies        |
+| **Work**         | Work stories, full-width screenshots, links, and technologies            |
 | **Writing**      | Published articles, cover images, tags, and publication state            |
 | **Contact**      | Contact details, social links, and the Resend recipient                 |
 
@@ -60,7 +60,7 @@ apps/admin/
 │   │   │   │   ├── work/
 │   │   │   │   ├── writing/
 │   │   │   │   └── contact/
-│   │   │   ├── blog/             # Compatibility redirect to Writing
+│   │   │   ├── writing/          # Canonical Writing workspace redirect
 │   │   │   └── users/            # User management
 │   │   ├── api/
 │   │   │   ├── portfolio/[table]/ # Generic CRUD for portfolio tables

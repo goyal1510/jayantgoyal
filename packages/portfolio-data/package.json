@@ -5,7 +5,7 @@
   "private": true,
   "exports": {
     ".": "./src/index.ts",
-    "./blog": "./src/blog.ts",
+    "./writing": "./src/writing.ts",
     "./guards": "./src/guards.ts",
     "./portfolio": "./src/portfolio.ts",
     "./presentation": "./src/presentation.ts",

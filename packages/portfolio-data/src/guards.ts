@@ -1,15 +1,13 @@
 import type {
   PortfolioTable,
+  PortfolioWorkCaseStudy,
   PortfolioPersonalInfo,
   PortfolioPrinciple,
   PortfolioSocialLink,
   SkillProficiency,
 } from "./portfolio";
 import { PORTFOLIO_TABLES } from "./portfolio";
-import {
-  PORTFOLIO_SECTION_KEYS,
-  type PortfolioSectionKey,
-} from "./sections";
+import { PORTFOLIO_SECTION_KEYS, type PortfolioSectionKey } from "./sections";
 
 export type PortfolioWriteOperation = "create" | "update";
 
@@ -57,12 +55,7 @@ const PORTFOLIO_WRITE_KEYS: Record<PortfolioTable, readonly string[]> = {
     "sort_order",
     "is_visible",
   ],
-  skill_categories: [
-    "title",
-    "description",
-    "sort_order",
-    "is_visible",
-  ],
+  skill_categories: ["title", "description", "sort_order", "is_visible"],
   skills: [
     "category_id",
     "name",
@@ -71,7 +64,7 @@ const PORTFOLIO_WRITE_KEYS: Record<PortfolioTable, readonly string[]> = {
     "sort_order",
     "is_visible",
   ],
-  projects: [
+  work: [
     "name",
     "short_description",
     "tags",
@@ -84,6 +77,8 @@ const PORTFOLIO_WRITE_KEYS: Record<PortfolioTable, readonly string[]> = {
     "year_label",
     "image_url",
     "image_alt",
+    "case_study",
+    "case_study_published",
     "sort_order",
     "is_visible",
   ],
@@ -102,13 +97,7 @@ const PORTFOLIO_WRITE_KEYS: Record<PortfolioTable, readonly string[]> = {
     "is_visible",
   ],
   contact: ["email", "phone", "location", "socials"],
-  nav_items: [
-    "section_id",
-    "label",
-    "note",
-    "sort_order",
-    "is_visible",
-  ],
+  nav_items: ["section_id", "label", "note", "sort_order", "is_visible"],
   section_content: [
     "section_key",
     "eyebrow",
@@ -142,7 +131,7 @@ const PORTFOLIO_REQUIRED_CREATE_KEYS: Partial<
   experience: ["company", "role", "period"],
   skill_categories: ["title", "description"],
   skills: ["category_id", "name", "proficiency", "evidence"],
-  projects: [
+  work: [
     "name",
     "short_description",
     "slug",
@@ -168,7 +157,7 @@ const PORTFOLIO_REQUIRED_CREATE_KEYS: Partial<
 
 const PORTFOLIO_URL_KEYS: Partial<Record<PortfolioTable, readonly string[]>> = {
   hero: ["resume_url"],
-  projects: ["image_url", "github_link", "live_link"],
+  work: ["image_url", "github_link", "live_link"],
   certificates: ["credential_url", "document_url", "preview_url"],
 };
 
@@ -187,8 +176,7 @@ export function isValidPublicUrl(value: unknown): value is string {
 
 export function isStringArray(value: unknown): value is string[] {
   return (
-    Array.isArray(value) &&
-    value.every((item) => typeof item === "string")
+    Array.isArray(value) && value.every((item) => typeof item === "string")
   );
 }
 
@@ -257,11 +245,15 @@ export function validatePortfolioWriteInput(
 
   if (portfolioTable === "contact" && value.socials !== undefined) {
     if (!isSocialLinkArray(value.socials)) {
-      errors.push("socials must contain label, href, and icon_key for each link");
+      errors.push(
+        "socials must contain label, href, and icon_key for each link",
+      );
     } else {
       value.socials.forEach((social, index) => {
         if (!isValidPublicUrl(social.href)) {
-          errors.push(`socials[${index}].href must be a valid http(s) URL or site path`);
+          errors.push(
+            `socials[${index}].href must be a valid http(s) URL or site path`,
+          );
         }
       });
     }
@@ -281,7 +273,7 @@ export function validatePortfolioWriteInput(
   }
 
   if (
-    portfolioTable === "projects" &&
+    portfolioTable === "work" &&
     typeof value.slug === "string" &&
     value.slug.trim() !== ""
   ) {
@@ -291,6 +283,34 @@ export function validatePortfolioWriteInput(
     ) {
       errors.push("slug must use lowercase letters, numbers, and hyphens");
     }
+  }
+
+  if (
+    portfolioTable === "work" &&
+    value.case_study !== undefined &&
+    value.case_study !== null &&
+    !isWorkCaseStudyDraft(value.case_study)
+  ) {
+    errors.push(
+      "case_study must use the expected project case-study fields and decision shape",
+    );
+  }
+
+  if (
+    portfolioTable === "work" &&
+    value.case_study_published !== undefined &&
+    typeof value.case_study_published !== "boolean"
+  ) {
+    errors.push("case_study_published must be a boolean");
+  }
+
+  if (
+    portfolioTable === "work" &&
+    operation === "create" &&
+    value.case_study_published === true &&
+    !isWorkCaseStudy(value.case_study)
+  ) {
+    errors.push("a complete case_study is required before publication");
   }
 
   if (
@@ -373,6 +393,71 @@ export function isSocialLinkArray(
 
 export function readSocialLinks(value: unknown): PortfolioSocialLink[] {
   return isSocialLinkArray(value) ? value : [];
+}
+
+export function isWorkCaseStudy(
+  value: unknown,
+): value is PortfolioWorkCaseStudy {
+  const textFields = [
+    "problem",
+    "solution",
+    "architecture",
+    "security",
+    "tradeoffs",
+    "outcome",
+    "next_improvement",
+  ] as const;
+
+  return (
+    isWorkCaseStudyDraft(value) &&
+    textFields.every(
+      (field) =>
+        typeof value[field] === "string" && value[field].trim().length > 0,
+    ) &&
+    Array.isArray(value.decisions) &&
+    value.decisions.length >= 2 &&
+    value.decisions.every(
+      (decision) =>
+        isRecord(decision) &&
+        typeof decision.title === "string" &&
+        decision.title.trim().length > 0 &&
+        typeof decision.detail === "string" &&
+        decision.detail.trim().length > 0,
+    )
+  );
+}
+
+export function isWorkCaseStudyDraft(
+  value: unknown,
+): value is PortfolioWorkCaseStudy {
+  if (!isRecord(value)) return false;
+
+  const textFields = [
+    "problem",
+    "solution",
+    "architecture",
+    "security",
+    "tradeoffs",
+    "outcome",
+    "next_improvement",
+  ] as const;
+
+  return (
+    textFields.every((field) => typeof value[field] === "string") &&
+    Array.isArray(value.decisions) &&
+    value.decisions.every(
+      (decision) =>
+        isRecord(decision) &&
+        typeof decision.title === "string" &&
+        typeof decision.detail === "string",
+    )
+  );
+}
+
+export function readWorkCaseStudy(
+  value: unknown,
+): PortfolioWorkCaseStudy | null {
+  return isWorkCaseStudy(value) ? value : null;
 }
 
 export function isSkillProficiency(value: string): value is SkillProficiency {

@@ -12,10 +12,10 @@ import {
 } from "@/lib/portfolio-assets";
 
 const ASSET_KINDS = new Set<PortfolioAssetKind>([
-  "project-image",
+  "work-image",
   "certificate-document",
   "certificate-preview",
-  "blog-cover",
+  "writing-cover",
   "resume",
 ]);
 

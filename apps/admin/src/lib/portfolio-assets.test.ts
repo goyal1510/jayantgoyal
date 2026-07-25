@@ -7,9 +7,9 @@ import {
 } from "./portfolio-assets";
 
 describe("Portfolio asset validation", () => {
-  it("accepts an image for a project and a PDF for a resume", () => {
+  it("accepts an image for Work and a PDF for a resume", () => {
     expect(
-      validatePortfolioAssetMetadata("project-image", {
+      validatePortfolioAssetMetadata("work-image", {
         type: "image/webp",
         size: 1024,
       }),
@@ -30,13 +30,13 @@ describe("Portfolio asset validation", () => {
       }),
     ).toMatch(/Unsupported file type/);
     expect(
-      validatePortfolioAssetMetadata("blog-cover", {
+      validatePortfolioAssetMetadata("writing-cover", {
         type: "image/png",
         size: 0,
       }),
     ).toMatch(/empty/);
     expect(
-      validatePortfolioAssetMetadata("project-image", {
+      validatePortfolioAssetMetadata("work-image", {
         type: "image/png",
         size: PORTFOLIO_ASSET_MAX_BYTES + 1,
       }),

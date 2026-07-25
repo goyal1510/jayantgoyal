@@ -115,11 +115,6 @@ const editorialRows = [
     is_visible: true,
   },
   {
-    section_key: "blog",
-    eyebrow: "Blog",
-    is_visible: true,
-  },
-  {
     section_key: "article",
     eyebrow: "Article",
     is_visible: true,
@@ -174,17 +169,17 @@ describe("Portfolio CMS workspace loaders", () => {
   it("loads Work and Writing from their owning presentation contexts", async () => {
     const supabase = makeSupabaseMock({
       rows: {
-        "portfolio.projects": [{ id: "project-1", name: "Signal" }],
+        "portfolio.work": [{ id: "project-1", name: "Signal" }],
         "portfolio.section_content": editorialRows,
         "portfolio.nav_items": [],
-        "jg_app.blog_posts": [{ id: "post-1", slug: "hello" }],
+        "jg_app.writing_posts": [{ id: "post-1", slug: "hello" }],
       },
     });
 
     const work = await loadWorkWorkspace(supabase as never);
     const writing = await loadWritingWorkspace(supabase as never);
 
-    expect(work.projects).toEqual([{ id: "project-1", name: "Signal" }]);
+    expect(work.work).toEqual([{ id: "project-1", name: "Signal" }]);
     expect(work.editorial.sectionContent?.section_key).toBe("work");
     expect(writing.posts).toEqual([{ id: "post-1", slug: "hello" }]);
     expect(writing.editorialBySection.article?.sectionContent?.section_key).toBe(
@@ -192,7 +187,7 @@ describe("Portfolio CMS workspace loaders", () => {
     );
   });
 
-  it("loads Experience, Activity, and Contact from their owning records", async () => {
+  it("loads Experience, GitHub, and Contact from their owning records", async () => {
     const supabase = makeSupabaseMock({
       rows: {
         "portfolio.experience": [{ id: "experience-1", company: "Studio" }],
@@ -203,7 +198,7 @@ describe("Portfolio CMS workspace loaders", () => {
           ...editorialRows,
           { section_key: "experience", eyebrow: "Experience", is_visible: true },
           { section_key: "credentials", eyebrow: "Credentials", is_visible: true },
-          { section_key: "activity", eyebrow: "Activity", is_visible: true },
+          { section_key: "activity", eyebrow: "GitHub", is_visible: true },
           { section_key: "contact", eyebrow: "Contact", is_visible: true },
         ],
         "portfolio.nav_items": [],
@@ -241,11 +236,11 @@ describe("Portfolio CMS workspace loaders", () => {
         "portfolio.section_content": editorialRows,
         "portfolio.nav_items": [],
       },
-      errors: { "portfolio.projects": "Projects unavailable" },
+      errors: { "portfolio.work": "Work unavailable" },
     });
 
     await expect(loadWorkWorkspace(supabase as never)).rejects.toThrow(
-      "Unable to load Work: Projects unavailable",
+      "Unable to load Work: Work unavailable",
     );
   });
 });

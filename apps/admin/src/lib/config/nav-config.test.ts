@@ -56,8 +56,8 @@ describe("Admin navigation domains", () => {
   });
 
   it("maps routes to their app-owned breadcrumb domain", () => {
-    expect(getAdminNavigationContext("/blog")?.domain.id).toBe("portfolio");
-    expect(getAdminNavigationContext("/blog")?.pageLabel).toBe("Writing");
+    expect(getAdminNavigationContext("/writing")?.domain.id).toBe("portfolio");
+    expect(getAdminNavigationContext("/writing")?.pageLabel).toBe("Writing");
     expect(getAdminNavigationContext("/deployments")?.domain.id).toBe("system");
     expect(getAdminNavigationContext("/users")?.domain.id).toBe("system");
     expect(getAdminNavigationContext("/deployments/env")).toBeNull();
@@ -72,7 +72,10 @@ describe("Admin navigation domains", () => {
       "/portfolio/projects": "/portfolio/work",
       "/portfolio/education": "/portfolio/about",
       "/portfolio/certificates": "/portfolio/experience",
+      "/portfolio/github": "/portfolio/activity",
+      "/portfolio/blog": "/portfolio/writing",
       "/blog": "/portfolio/writing",
+      "/writing": "/portfolio/writing",
       "/portfolio/section-copy": "/portfolio",
       "/portfolio/navigation": "/portfolio",
     });
@@ -98,7 +101,7 @@ describe("Admin navigation domains", () => {
 
     expect(canonicalPagePaths.every((path) => existsSync(path))).toBe(true);
     for (const legacyPath of Object.keys(PORTFOLIO_LEGACY_ADMIN_ROUTE_TARGETS)) {
-      const route = legacyPath === "/blog" ? "/blog" : legacyPath;
+      const route = legacyPath === "/writing" ? "/writing" : legacyPath;
       expect(
         existsSync(resolve(adminRoot, "src/app/(admin)", `${route.slice(1)}/page.tsx`)),
       ).toBe(true);

@@ -93,7 +93,7 @@ function getBreadcrumbItems(pathname: string): { name: string; url: string }[] {
 
   // Simple single-level pages
   const simplePages: Record<string, string> = {
-    "/messenger": getStudioSurface("messenger").name,
+    "/scratchpad": getStudioSurface("scratchpad").name,
     "/files": getStudioSurface("file-manager").name,
     "/weather": getStudioSurface("weather").name,
     "/github-stats": getStudioSurface("github-stats").name,

@@ -8,9 +8,9 @@ describe("canonical platform branding", () => {
     expect(APP_BRANDS.studio.defaultTitle).toContain(PERSON_BRAND.fullName);
     expect(APP_BRANDS.admin.defaultTitle).toContain(PERSON_BRAND.fullName);
     expect(APP_BRANDS.auth.defaultTitle).toContain(PERSON_BRAND.fullName);
-    expect(APP_BRANDS.studio.publicName).toBe("Studio by Jayant Goyal");
-    expect(APP_BRANDS.admin.publicName).toBe("Admin by Jayant Goyal");
-    expect(APP_BRANDS.auth.publicName).toBe("Auth by Jayant Goyal");
+    expect(APP_BRANDS.studio.publicName).toBe("Studio by Jayant");
+    expect(APP_BRANDS.admin.publicName).toBe("Admin by Jayant");
+    expect(APP_BRANDS.auth.publicName).toBe("Auth by Jayant");
   });
 
   it("keeps application names independent from public SEO names", () => {
@@ -28,7 +28,7 @@ describe("canonical platform branding", () => {
   });
 
   it("formats page-level social titles from the same app contract", () => {
-    expect(formatAppPageTitle("portfolio", "Blog")).toBe("Blog | Jayant Goyal");
+    expect(formatAppPageTitle("portfolio", "Writing")).toBe("Writing | Jayant");
     expect(formatAppPageTitle("studio", "UUID Generator")).toBe(
       "UUID Generator | Studio",
     );

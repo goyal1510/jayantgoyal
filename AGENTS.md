@@ -23,7 +23,7 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 ```
 jayantgoyal/
 ├── apps/
-│   ├── portfolio/          # Public portfolio, blog, resume, contact
+│   ├── portfolio/          # Public portfolio, writing, resume, contact
 │   ├── studio/             # Product discovery, tools, games, workspaces
 │   ├── admin/              # Admin panel for content management
 │   └── auth/               # Authentication and account-security app
@@ -54,7 +54,7 @@ jayantgoyal/
 **Features:**
 
 - **Product Inventory** - Public discovery and launch paths
-- **Messenger** - Real-time chat with Supabase Realtime
+- **Sync Scratchpad** - Private realtime text, code, and note synchronization
 - **File Manager** - Cloud storage with folders, upload, soft delete
 - **Activity Tracker** - Daily tracking with analytics dashboard
 - **Weather** - City search, geolocation, 5-day forecast
@@ -71,7 +71,7 @@ jayantgoyal/
 - `/tools/*` - Developer tools
 - `/activity-tracker/*` - Activity tracking
 - `/files/*` - File manager
-- `/messenger` - Real-time messaging
+- `/scratchpad` - Private realtime scratchpad
 - `/calculator/*` - Calculator tools
 - `/weather` - Weather app
 - `/login`, `/signup`, `/auth/callback` - Auth routes
@@ -82,7 +82,7 @@ jayantgoyal/
 
 **Features:**
 
-- Portfolio data CRUD (hero, about, skills, experience, projects, certificates)
+- Portfolio data CRUD (hero, about, skills, experience, work, certificates)
 - User management
 - Role-based access control (admin, super_admin)
 
@@ -274,7 +274,7 @@ GITHUB_TOKEN=                        # GitHub Stats
 
 ### Portfolio App (`apps/portfolio/.env.local`)
 
-Portfolio owns public content, Blog, Resume, Contact, and its public API
+Portfolio owns public content, Writing, Resume, Contact, and its public API
 integration variables. It intentionally has no Supabase service-role key.
 
 ### Admin App (`apps/admin/.env.local`)
@@ -399,7 +399,7 @@ Unified loading with `<PageSpinner />` component:
 
 ### Database Schema
 
-**Schemas:** `jg_account`, `portfolio`, `jg_app` (activity tracker, calculator, file manager, game hub, messenger, blog)
+**Schemas:** `jg_account`, `portfolio`, `jg_app` (activity tracker, calculator, file manager, game hub, scratchpad, writing)
 
 ## Development Conventions
 
@@ -472,11 +472,11 @@ Focused platform regression tests use Vitest (`pnpm test`). Quality assurance al
    - Add route prefix to `ROUTE_MAP` in `use-active-app.ts`
 7. Run `pnpm lint` and `pnpm check-types`
 
-### Blog & LinkedIn Workflow
+### Writing & LinkedIn Workflow
 
-1. **Create blog post** — insert into `jg_app.blog_posts` via Supabase REST API:
+1. **Create writing post** — insert into `jg_app.writing_posts` via Supabase REST API:
    ```bash
-   curl -X POST "https://orwfvyditlguqvxvztkw.supabase.co/rest/v1/blog_posts" \
+   curl -X POST "https://orwfvyditlguqvxvztkw.supabase.co/rest/v1/writing_posts" \
      -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
      -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
      -H "Content-Profile: jg_app" \
@@ -486,9 +486,9 @@ Focused platform regression tests use Vitest (`pnpm test`). Quality assurance al
    ```
 2. **Post to LinkedIn:**
    ```bash
-   node scripts/linkedin/post.mjs "Post text" --url https://www.jayantgoyal.com/blog/<slug>
-   # Or auto-generate from blog:
-   node scripts/linkedin/post.mjs --blog <slug>
+   node scripts/linkedin/post.mjs "Post text" --url https://www.jayantgoyal.com/writing/<slug>
+   # Or auto-generate from writing:
+   node scripts/linkedin/post.mjs --writing <slug>
    ```
 3. **Manage LinkedIn posts:**
    ```bash
@@ -618,7 +618,7 @@ Supabase Auth via `@supabase/ssr`. Supports email/password, magic link, PKCE OAu
 
 ### Database
 
-**Schemas:** `jg_account`, `portfolio`, `jg_app` (activity tracker, calculator, file manager, game hub, messenger, blog)
+**Schemas:** `jg_account`, `portfolio`, `jg_app` (activity tracker, calculator, file manager, game hub, scratchpad, writing)
 
 Database conventions:
 

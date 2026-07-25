@@ -1,4 +1,4 @@
-export * from "./blog";
+export * from "./writing";
 export * from "./database";
 export * from "./guards";
 export * from "./portfolio";

@@ -21,11 +21,25 @@ import { Textarea } from "@repo/ui/textarea";
 
 import { PortfolioAssetUpload } from "@/components/portfolio/asset-upload";
 import { AccessibleForm } from "@/components/accessible-form";
-import type { Project } from "@/lib/types";
+import type { WorkItem } from "@/lib/types";
 
-export type ProjectFormData = Omit<Project, "id" | "created_at" | "updated_at">;
+export type WorkFormData = Omit<WorkItem, "id" | "created_at" | "updated_at">;
 
-export const emptyProjectForm: ProjectFormData = {
+const emptyCaseStudy: NonNullable<WorkFormData["case_study"]> = {
+  problem: "",
+  solution: "",
+  architecture: "",
+  decisions: [
+    { title: "", detail: "" },
+    { title: "", detail: "" },
+  ],
+  security: "",
+  tradeoffs: "",
+  outcome: "",
+  next_improvement: "",
+};
+
+export const emptyWorkForm: WorkFormData = {
   name: "",
   slug: "",
   eyebrow: "",
@@ -35,6 +49,8 @@ export const emptyProjectForm: ProjectFormData = {
   year_label: "",
   image_url: "",
   image_alt: "",
+  case_study: null,
+  case_study_published: false,
   tags: [],
   github_link: "",
   live_link: "",
@@ -42,7 +58,7 @@ export const emptyProjectForm: ProjectFormData = {
   is_visible: true,
 };
 
-export function ProjectDialog({
+export function WorkDialog({
   open,
   onOpenChange,
   editing,
@@ -54,9 +70,9 @@ export function ProjectDialog({
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  editing: Project | null;
-  formData: ProjectFormData;
-  setFormData: (data: ProjectFormData) => void;
+  editing: WorkItem | null;
+  formData: WorkFormData;
+  setFormData: (data: WorkFormData) => void;
   onSubmit: (event: React.FormEvent) => void;
   saving: boolean;
   errorMessage?: string | null;
@@ -70,6 +86,37 @@ export function ProjectDialog({
     setTagInput("");
   }
 
+  function updateCaseStudy(
+    field: Exclude<
+      keyof NonNullable<WorkFormData["case_study"]>,
+      "decisions"
+    >,
+    value: string,
+  ) {
+    setFormData({
+      ...formData,
+      case_study: {
+        ...(formData.case_study ?? emptyCaseStudy),
+        [field]: value,
+      },
+    });
+  }
+
+  function updateDecision(
+    index: number,
+    field: "title" | "detail",
+    value: string,
+  ) {
+    const caseStudy = formData.case_study ?? emptyCaseStudy;
+    const decisions = caseStudy.decisions.map((decision, decisionIndex) =>
+      decisionIndex === index ? { ...decision, [field]: value } : decision,
+    );
+    setFormData({
+      ...formData,
+      case_study: { ...caseStudy, decisions },
+    });
+  }
+
   return (
     <Dialog
       open={open}
@@ -78,18 +125,18 @@ export function ProjectDialog({
         if (!nextOpen) setTagInput("");
       }}
     >
-      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
+      <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{editing ? "Edit Project" : "Add Project"}</DialogTitle>
+          <DialogTitle>{editing ? "Edit Work" : "Add Work"}</DialogTitle>
           <DialogDescription>
-            Every field below maps directly to the public project story.
+            Every field below maps directly to the public work story.
           </DialogDescription>
         </DialogHeader>
         <AccessibleForm onSubmit={onSubmit}>
           <div className="space-y-5 py-4">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="name">Project Name</Label>
+                <Label htmlFor="name">Work Name</Label>
                 <Input
                   id="name"
                   value={formData.name}
@@ -139,7 +186,7 @@ export function ProjectDialog({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="short_description">Project Summary</Label>
+                <Label htmlFor="short_description">Work Summary</Label>
               <Textarea
                 id="short_description"
                 value={formData.short_description}
@@ -184,8 +231,8 @@ export function ProjectDialog({
 
             <PortfolioAssetUpload
               id="image_url"
-              label="Full Project Screenshot"
-              kind="project-image"
+              label="Full Work Screenshot"
+              kind="work-image"
               value={formData.image_url}
               onChange={(image_url) => setFormData({ ...formData, image_url })}
               required
@@ -204,10 +251,10 @@ export function ProjectDialog({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="project-tag-input">Technologies</Label>
+              <Label htmlFor="work-tag-input">Technologies</Label>
               <div className="flex gap-2">
                 <Input
-                  id="project-tag-input"
+                  id="work-tag-input"
                   value={tagInput}
                   onChange={(event) => setTagInput(event.target.value)}
                   onKeyDown={(event) => {
@@ -243,6 +290,182 @@ export function ProjectDialog({
                 ))}
               </div>
             </div>
+
+            <section className="space-y-4 rounded-lg border p-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h3 className="font-medium">Detailed case study</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Capture the decisions and tradeoffs behind flagship work.
+                  </p>
+                </div>
+                {formData.case_study ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() =>
+                      setFormData({
+                        ...formData,
+                        case_study: null,
+                        case_study_published: false,
+                      })
+                    }
+                  >
+                    Remove draft
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() =>
+                      setFormData({
+                        ...formData,
+                        case_study: structuredClone(emptyCaseStudy),
+                      })
+                    }
+                  >
+                    Add case study
+                  </Button>
+                )}
+              </div>
+
+              {formData.case_study ? (
+                <div className="space-y-5">
+                  {(
+                    [
+                      ["problem", "Problem", 4],
+                      ["solution", "Solution", 4],
+                      ["architecture", "Architecture", 5],
+                    ] as const
+                  ).map(([field, label, rows]) => (
+                    <div key={field} className="space-y-2">
+                      <Label htmlFor={`case-study-${field}`}>{label}</Label>
+                      <Textarea
+                        id={`case-study-${field}`}
+                        value={formData.case_study?.[field] ?? ""}
+                        onChange={(event) =>
+                          updateCaseStudy(field, event.target.value)
+                        }
+                        rows={rows}
+                        required={formData.case_study_published}
+                      />
+                    </div>
+                  ))}
+
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <Label>Key engineering decisions</Label>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          const caseStudy =
+                            formData.case_study ?? emptyCaseStudy;
+                          setFormData({
+                            ...formData,
+                            case_study: {
+                              ...caseStudy,
+                              decisions: [
+                                ...caseStudy.decisions,
+                                { title: "", detail: "" },
+                              ],
+                            },
+                          });
+                        }}
+                      >
+                        Add decision
+                      </Button>
+                    </div>
+                    {formData.case_study.decisions.map((decision, index) => (
+                      <div
+                        key={index}
+                        className="grid gap-3 rounded-md border p-3 md:grid-cols-[minmax(0,0.4fr)_minmax(0,1fr)_auto]"
+                      >
+                        <Input
+                          aria-label={`Decision ${index + 1} title`}
+                          value={decision.title}
+                          onChange={(event) =>
+                            updateDecision(index, "title", event.target.value)
+                          }
+                          placeholder="Decision"
+                          required={formData.case_study_published}
+                        />
+                        <Textarea
+                          aria-label={`Decision ${index + 1} detail`}
+                          value={decision.detail}
+                          onChange={(event) =>
+                            updateDecision(index, "detail", event.target.value)
+                          }
+                          placeholder="Why this choice mattered"
+                          rows={2}
+                          required={formData.case_study_published}
+                        />
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="ghost"
+                          aria-label={`Remove decision ${index + 1}`}
+                          onClick={() => {
+                            const caseStudy =
+                              formData.case_study ?? emptyCaseStudy;
+                            setFormData({
+                              ...formData,
+                              case_study: {
+                                ...caseStudy,
+                                decisions: caseStudy.decisions.filter(
+                                  (_, decisionIndex) => decisionIndex !== index,
+                                ),
+                              },
+                            });
+                          }}
+                        >
+                          <X aria-hidden="true" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+
+                  {(
+                    [
+                      ["security", "Security and authorization", 4],
+                      ["tradeoffs", "Tradeoffs", 4],
+                      ["outcome", "Outcome", 4],
+                      ["next_improvement", "What I would improve next", 4],
+                    ] as const
+                  ).map(([field, label, rows]) => (
+                    <div key={field} className="space-y-2">
+                      <Label htmlFor={`case-study-${field}`}>{label}</Label>
+                      <Textarea
+                        id={`case-study-${field}`}
+                        value={formData.case_study?.[field] ?? ""}
+                        onChange={(event) =>
+                          updateCaseStudy(field, event.target.value)
+                        }
+                        rows={rows}
+                        required={formData.case_study_published}
+                      />
+                    </div>
+                  ))}
+
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      id="case_study_published"
+                      checked={formData.case_study_published}
+                      onCheckedChange={(case_study_published) =>
+                        setFormData({
+                          ...formData,
+                          case_study_published,
+                        })
+                      }
+                    />
+                    <Label htmlFor="case_study_published">
+                      Publish case study
+                    </Label>
+                  </div>
+                </div>
+              ) : null}
+            </section>
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
@@ -312,7 +535,7 @@ export function ProjectDialog({
               {saving ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : null}
-              {editing ? "Update Project" : "Add Project"}
+              {editing ? "Update Work" : "Add Work"}
             </Button>
           </DialogFooter>
         </AccessibleForm>

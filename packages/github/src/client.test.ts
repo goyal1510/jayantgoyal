@@ -12,7 +12,7 @@ function jsonResponse(data: unknown, status = 200): Response {
 function user(login = "goyal1510") {
   return {
     login,
-    name: "Jayant Goyal",
+    name: "Jayant",
     avatar_url: "https://example.com/avatar.png",
     html_url: `https://github.com/${login}`,
     bio: null,

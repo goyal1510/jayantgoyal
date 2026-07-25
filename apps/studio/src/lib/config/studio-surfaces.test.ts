@@ -44,10 +44,10 @@ describe("Studio surface registry", () => {
     });
   });
 
-  it("keeps Blog and Portfolio as explicit external destinations", () => {
-    expect(STUDIO_SURFACES.blog.external).toBe(true);
+  it("keeps Writing and Portfolio as explicit external destinations", () => {
+    expect(STUDIO_SURFACES.writing.external).toBe(true);
     expect(STUDIO_SURFACES.portfolio.external).toBe(true);
-    expect(STUDIO_SURFACES.blog.href).toMatch(/^https:\/\//);
+    expect(STUDIO_SURFACES.writing.href).toMatch(/^https:\/\//);
     expect(STUDIO_SURFACES.portfolio.href).toMatch(/^https:\/\//);
   });
 });

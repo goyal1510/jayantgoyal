@@ -7,14 +7,14 @@ export type Json =
   | Json[]
 
 export interface Database {
-  messenger: {
+  scratchpad: {
     Tables: {
-      messages: {
+      entries: {
         Row: {
           id: string
           user_id: string
           content: string
-          message_type: "text" | "code"
+          entry_type: "text" | "code"
           language: string | null
           created_at: string
           updated_at: string
@@ -24,7 +24,7 @@ export interface Database {
           id?: string
           user_id: string
           content: string
-          message_type: "text" | "code"
+          entry_type: "text" | "code"
           language?: string | null
           created_at?: string
           updated_at?: string
@@ -34,7 +34,7 @@ export interface Database {
           id?: string
           user_id?: string
           content?: string
-          message_type?: "text" | "code"
+          entry_type?: "text" | "code"
           language?: string | null
           created_at?: string
           updated_at?: string

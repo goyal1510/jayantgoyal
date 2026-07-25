@@ -13,12 +13,12 @@ describe("Studio Portfolio ownership redirects", () => {
 
     expect(redirects).toContainEqual({
       source: "/about",
-      destination: "https://jayantgoyal.com/#about",
+      destination: "https://jayantgoyal.com/about",
       permanent: true,
     });
     expect(redirects).toContainEqual({
       source: "/blog/:path*",
-      destination: "https://jayantgoyal.com/blog/:path*",
+      destination: "https://jayantgoyal.com/writing/:path*",
       permanent: true,
     });
   });

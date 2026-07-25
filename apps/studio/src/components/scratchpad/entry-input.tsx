@@ -6,8 +6,8 @@ import { Textarea } from "@repo/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@repo/ui/select";
 import { Code2, MessageSquare, Send } from "lucide-react";
 
-interface MessageInputProps {
-  onSend: (content: string, messageType: "text" | "code", language?: string) => Promise<boolean>;
+interface EntryInputProps {
+  onSend: (content: string, entryType: "text" | "code", language?: string) => Promise<boolean>;
   disabled?: boolean;
 }
 
@@ -36,9 +36,9 @@ const CODE_LANGUAGES = [
   { value: "yaml", label: "YAML" },
 ];
 
-export function MessageInput({ onSend, disabled = false }: MessageInputProps) {
+export function EntryInput({ onSend, disabled = false }: EntryInputProps) {
   const [content, setContent] = React.useState("");
-  const [messageType, setMessageType] = React.useState<"text" | "code">("text");
+  const [entryType, setEntryType] = React.useState<"text" | "code">("text");
   const [language, setLanguage] = React.useState<string>("text");
   const [isSending, setIsSending] = React.useState(false);
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
@@ -49,17 +49,17 @@ export function MessageInput({ onSend, disabled = false }: MessageInputProps) {
     setIsSending(true);
     const success = await onSend(
       content.trim(),
-      messageType,
-      messageType === "code" ? language : undefined
+      entryType,
+      entryType === "code" ? language : undefined
     );
 
     if (success) {
       setContent("");
-      setMessageType("text");
+      setEntryType("text");
       setLanguage("text");
     }
     setIsSending(false);
-  }, [content, messageType, language, onSend, isSending, disabled]);
+  }, [content, entryType, language, onSend, isSending, disabled]);
 
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -76,9 +76,9 @@ export function MessageInput({ onSend, disabled = false }: MessageInputProps) {
       <div className="flex items-center gap-2">
         <Button
           type="button"
-          variant={messageType === "text" ? "default" : "outline"}
+          variant={entryType === "text" ? "default" : "outline"}
           size="sm"
-          onClick={() => setMessageType("text")}
+          onClick={() => setEntryType("text")}
           className="flex items-center gap-2"
         >
           <MessageSquare className="h-4 w-4" />
@@ -86,15 +86,15 @@ export function MessageInput({ onSend, disabled = false }: MessageInputProps) {
         </Button>
         <Button
           type="button"
-          variant={messageType === "code" ? "default" : "outline"}
+          variant={entryType === "code" ? "default" : "outline"}
           size="sm"
-          onClick={() => setMessageType("code")}
+          onClick={() => setEntryType("code")}
           className="flex items-center gap-2"
         >
           <Code2 className="h-4 w-4" />
           Code
         </Button>
-        {messageType === "code" && (
+        {entryType === "code" && (
           <Select value={language} onValueChange={setLanguage}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select language" />
@@ -115,9 +115,9 @@ export function MessageInput({ onSend, disabled = false }: MessageInputProps) {
         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setContent(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={
-          messageType === "code"
+          entryType === "code"
             ? "Paste your code here (indentation will be preserved)..."
-            : "Type your message here..."
+            : "Type your entry here..."
         }
         className="min-h-[150px] resize-none font-mono"
         disabled={isSending || disabled}

@@ -2,8 +2,7 @@ export * from "./assets";
 
 export const PERSON_BRAND = {
   givenName: "Jayant",
-  familyName: "Goyal",
-  fullName: "Jayant Goyal",
+  fullName: "Jayant",
   monogram: "JG",
   canonicalUrl: "https://jayantgoyal.com",
 } as const;
@@ -14,9 +13,9 @@ export const APP_BRANDS = {
     name: "Portfolio",
     publicName: PERSON_BRAND.fullName,
     canonicalUrl: PERSON_BRAND.canonicalUrl,
-    defaultTitle: `${PERSON_BRAND.fullName} | Full-Stack Product Engineer`,
+    defaultTitle: `${PERSON_BRAND.fullName} | Software Engineer`,
     titleTemplate: `%s | ${PERSON_BRAND.fullName}`,
-    description: `The portfolio of ${PERSON_BRAND.fullName}, a full-stack product engineer shaping clear, dependable digital products from idea through delivery.`,
+    description: `The portfolio of ${PERSON_BRAND.fullName}, a software engineer shaping clear, dependable digital products from idea through delivery.`,
   },
   studio: {
     id: "studio",

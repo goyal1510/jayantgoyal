@@ -17,12 +17,12 @@ import { AccessibleForm } from "@/components/accessible-form";
 
 const GITHUB_USERNAME_PATTERN = /^[a-zA-Z0-9-]{1,39}$/;
 
-type ActivitySource = Pick<Hero, "id" | "github_username">;
+type GithubSource = Pick<Hero, "id" | "github_username">;
 
 export function ActivitySourceForm({
   initialData,
 }: {
-  initialData: ActivitySource | null;
+  initialData: GithubSource | null;
 }) {
   const router = useRouter();
   const [username, setUsername] = useState(initialData?.github_username ?? "");
@@ -43,7 +43,7 @@ export function ActivitySourceForm({
     }
 
     if (!initialData?.id) {
-      const message = "Create the Home record before configuring Activity.";
+      const message = "Create the Home record before configuring GitHub.";
       setFormError(message);
       toast.error(message);
       return;
@@ -56,7 +56,7 @@ export function ActivitySourceForm({
       });
       if (result.error) throw new Error(result.error);
       setUsername(normalized);
-      toast.success("GitHub activity source saved");
+      toast.success("GitHub source saved");
       router.refresh();
     } catch (error) {
       const message =
@@ -73,7 +73,7 @@ export function ActivitySourceForm({
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
           <Github className="size-5" />
-          Activity source
+          GitHub source
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -82,9 +82,9 @@ export function ActivitySourceForm({
           className="flex flex-col gap-4 sm:flex-row sm:items-end"
         >
           <div className="min-w-0 flex-1 space-y-2">
-            <Label htmlFor="activity-github-username">GitHub username</Label>
+            <Label htmlFor="activity-username">GitHub username</Label>
             <Input
-              id="activity-github-username"
+              id="activity-username"
               value={username}
               onChange={(event) => setUsername(event.target.value)}
               placeholder="goyal1510"

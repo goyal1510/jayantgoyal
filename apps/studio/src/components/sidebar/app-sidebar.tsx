@@ -24,7 +24,7 @@ const WORKSPACE_IDS = [
   "activity-tracker",
   "currency-calculator",
   "file-manager",
-  "messenger",
+  "scratchpad",
 ];
 const EXPERIMENT_IDS = ["game-hub", "custom-calculator"];
 

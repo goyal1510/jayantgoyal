@@ -5,6 +5,7 @@ import {
   isValidPublicUrl,
   isSkillProficiency,
   readPersonalInfo,
+  readWorkCaseStudy,
   readSocialLinks,
   readStringArray,
   validatePortfolioWriteInput,
@@ -18,10 +19,10 @@ import {
 } from "./sections";
 import { PORTFOLIO_TABLES } from "./portfolio";
 import {
-  getBlogPublicationState,
-  isPublicBlogPost,
-  validatePortfolioBlogWriteInput,
-} from "./blog";
+  getWritingPublicationState,
+  isPublicWritingPost,
+  validatePortfolioWritingWriteInput,
+} from "./writing";
 
 describe("portfolio data guards", () => {
   it("recognizes canonical section and proficiency values", () => {
@@ -32,7 +33,7 @@ describe("portfolio data guards", () => {
   });
 
   it("keeps section ownership and active table registries exhaustive", () => {
-    expect(PORTFOLIO_SECTION_KEYS).toHaveLength(13);
+    expect(PORTFOLIO_SECTION_KEYS).toHaveLength(15);
     expect(new Set(PORTFOLIO_TABLES).size).toBe(11);
     expect(Object.keys(PORTFOLIO_SECTION_WORKSPACES).sort()).toEqual(
       [...PORTFOLIO_SECTION_KEYS].sort(),
@@ -86,39 +87,72 @@ describe("portfolio data guards", () => {
     expect(
       readSocialLinks([{ label: "GitHub", href: "https://github.com" }]),
     ).toEqual([]);
+
+    const caseStudy = {
+      problem: "A repeated product problem.",
+      solution: "A reusable product system.",
+      architecture: "A typed application and relational backend.",
+      decisions: [
+        {
+          title: "Boundary",
+          detail: "Keep the public and private apps apart.",
+        },
+        { title: "Data", detail: "Use explicit schemas and ownership rules." },
+      ],
+      security: "Caller-bound access and row-level security.",
+      tradeoffs: "More explicit contracts in exchange for safer change.",
+      outcome: "A maintainable production workflow.",
+      next_improvement: "Add deeper operational measurement.",
+    };
+    expect(readWorkCaseStudy(caseStudy)).toEqual(caseStudy);
+    expect(readWorkCaseStudy({ ...caseStudy, decisions: [] })).toBeNull();
+    expect(
+      validatePortfolioWriteInput(
+        "work",
+        {
+          case_study: {
+            ...caseStudy,
+            problem: "",
+            decisions: [],
+          },
+          case_study_published: false,
+        },
+        "update",
+      ),
+    ).toEqual([]);
   });
 
-  it("keeps blog publication state and public eligibility consistent", () => {
+  it("keeps writing publication state and public eligibility consistent", () => {
     expect(
-      getBlogPublicationState({
+      getWritingPublicationState({
         is_published: false,
         is_visible: true,
         published_at: null,
       }),
     ).toBe("draft");
     expect(
-      getBlogPublicationState({
+      getWritingPublicationState({
         is_published: true,
         is_visible: false,
         published_at: "2026-07-19T00:00:00.000Z",
       }),
     ).toBe("hidden");
     expect(
-      getBlogPublicationState({
+      getWritingPublicationState({
         is_published: true,
         is_visible: true,
         published_at: "2026-07-19T00:00:00.000Z",
       }),
     ).toBe("published");
     expect(
-      isPublicBlogPost({
+      isPublicWritingPost({
         is_published: true,
         is_visible: true,
         published_at: "2026-07-19T00:00:00.000Z",
       }),
     ).toBe(true);
     expect(
-      isPublicBlogPost({
+      isPublicWritingPost({
         is_published: true,
         is_visible: true,
         published_at: null,
@@ -134,7 +168,7 @@ describe("portfolio data guards", () => {
 
     expect(
       validatePortfolioWriteInput(
-        "projects",
+        "work",
         {
           id: "generated",
           name: "Project",
@@ -173,7 +207,7 @@ describe("portfolio data guards", () => {
 
     expect(
       validatePortfolioWriteInput(
-        "projects",
+        "work",
         { live_link: "javascript:alert(1)" },
         "update",
       ),
@@ -203,7 +237,7 @@ describe("portfolio data guards", () => {
       ),
     ).toEqual(["github_username must be a valid GitHub username"]);
     expect(
-      validatePortfolioWriteInput("projects", { slug: "Not A Slug" }, "update"),
+      validatePortfolioWriteInput("work", { slug: "Not A Slug" }, "update"),
     ).toEqual(["slug must use lowercase letters, numbers, and hyphens"]);
     expect(
       validatePortfolioWriteInput(
@@ -213,11 +247,25 @@ describe("portfolio data guards", () => {
       ),
     ).toEqual(["email must be a valid email address"]);
     expect(
-      validatePortfolioWriteInput("projects", { sort_order: -1 }, "update"),
+      validatePortfolioWriteInput("work", { sort_order: -1 }, "update"),
     ).toEqual(["sort_order must be a non-negative integer"]);
+    expect(
+      validatePortfolioWriteInput(
+        "work",
+        { case_study_published: "yes" },
+        "update",
+      ),
+    ).toEqual(["case_study_published must be a boolean"]);
+    expect(
+      validatePortfolioWriteInput(
+        "work",
+        { case_study_published: true },
+        "create",
+      ),
+    ).toContain("a complete case_study is required before publication");
 
     expect(
-      validatePortfolioBlogWriteInput(
+      validatePortfolioWritingWriteInput(
         {
           id: "generated",
           title: "A note",
@@ -233,7 +281,7 @@ describe("portfolio data guards", () => {
     ]);
 
     expect(
-      validatePortfolioBlogWriteInput(
+      validatePortfolioWritingWriteInput(
         {
           title: "A note",
           slug: "a-note",
@@ -249,7 +297,7 @@ describe("portfolio data guards", () => {
     ]);
 
     expect(
-      validatePortfolioBlogWriteInput(
+      validatePortfolioWritingWriteInput(
         { cover_image: "javascript:alert(1)" },
         "update",
       ),

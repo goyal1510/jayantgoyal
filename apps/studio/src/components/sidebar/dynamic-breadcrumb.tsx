@@ -96,8 +96,8 @@ export function DynamicBreadcrumb() {
       return getSurfaceBreadcrumb("tech-tools");
     }
 
-    if (pathname === "/messenger" || pathname.startsWith("/messenger/")) {
-      return getSurfaceBreadcrumb("messenger");
+    if (pathname === "/scratchpad" || pathname.startsWith("/scratchpad/")) {
+      return getSurfaceBreadcrumb("scratchpad");
     }
 
     if (pathname.startsWith("/calculator")) {

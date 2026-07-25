@@ -1,21 +1,21 @@
 import type {
-  PortfolioBlogPostRecord,
-  PortfolioBlogUpdateInput,
-  PortfolioBlogWriteInput,
+  PortfolioWritingPostRecord,
+  PortfolioWritingUpdateInput,
+  PortfolioWritingWriteInput,
 } from "@repo/portfolio-data";
 
-type BlogTable = "blog_posts";
+type WritingTable = "writing_posts";
 
-export interface BlogApiResponse<T> {
+export interface WritingApiResponse<T> {
   data?: T;
   error?: string;
   success?: boolean;
 }
 
-export async function fetchBlogData(
-  table: BlogTable,
+export async function fetchWritingData(
+  table: WritingTable,
   id?: string
-): Promise<BlogApiResponse<PortfolioBlogPostRecord | PortfolioBlogPostRecord[]>> {
+): Promise<WritingApiResponse<PortfolioWritingPostRecord | PortfolioWritingPostRecord[]>> {
   const url = id
     ? `/api/jg-app/${table}?id=${id}`
     : `/api/jg-app/${table}`;
@@ -24,10 +24,10 @@ export async function fetchBlogData(
   return response.json();
 }
 
-export async function createBlogData(
-  table: BlogTable,
-  data: PortfolioBlogWriteInput,
-): Promise<BlogApiResponse<PortfolioBlogPostRecord>> {
+export async function createWritingData(
+  table: WritingTable,
+  data: PortfolioWritingWriteInput,
+): Promise<WritingApiResponse<PortfolioWritingPostRecord>> {
   const response = await fetch(`/api/jg-app/${table}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -36,11 +36,11 @@ export async function createBlogData(
   return response.json();
 }
 
-export async function updateBlogData(
-  table: BlogTable,
+export async function updateWritingData(
+  table: WritingTable,
   id: string,
-  data: PortfolioBlogUpdateInput,
-): Promise<BlogApiResponse<PortfolioBlogPostRecord>> {
+  data: PortfolioWritingUpdateInput,
+): Promise<WritingApiResponse<PortfolioWritingPostRecord>> {
   const response = await fetch(`/api/jg-app/${table}?id=${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
@@ -49,10 +49,10 @@ export async function updateBlogData(
   return response.json();
 }
 
-export async function deleteBlogData(
-  table: BlogTable,
+export async function deleteWritingData(
+  table: WritingTable,
   id: string
-): Promise<BlogApiResponse<void>> {
+): Promise<WritingApiResponse<void>> {
   const response = await fetch(`/api/jg-app/${table}?id=${id}`, {
     method: "DELETE",
   });

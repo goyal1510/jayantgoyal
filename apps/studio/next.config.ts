@@ -14,13 +14,16 @@ const PORTFOLIO_URL = applicationOrigin(
 );
 
 const portfolioSectionRedirects = [
-  ["/home", "/#home"],
-  ["/about", "/#about"],
-  ["/skills", "/#skills"],
-  ["/experience", "/#experience"],
-  ["/projects", "/#projects"],
-  ["/certificates", "/#certificates"],
-  ["/contact", "/#contact"],
+  ["/home", "/"],
+  ["/about", "/about"],
+  ["/skills", "/engineering"],
+  ["/experience", "/about#experience"],
+  ["/projects", "/work"],
+  ["/work", "/work"],
+  ["/writing", "/writing"],
+  ["/activity", "/#activity"],
+  ["/certificates", "/about#experience"],
+  ["/contact", "/contact"],
 ] as const;
 
 const noindexHeaders = [
@@ -55,12 +58,12 @@ const nextConfig: NextConfig = {
       })),
       {
         source: "/blogs",
-        destination: `${PORTFOLIO_URL}/blog`,
+        destination: `${PORTFOLIO_URL}/writing`,
         permanent: true,
       },
       {
         source: "/blog/:path*",
-        destination: `${PORTFOLIO_URL}/blog/:path*`,
+        destination: `${PORTFOLIO_URL}/writing/:path*`,
         permanent: true,
       },
       {
@@ -81,6 +84,11 @@ const nextConfig: NextConfig = {
       {
         source: "/tools/workspace/:path*",
         destination: "/tools",
+        permanent: true,
+      },
+      {
+        source: "/messenger/:path*",
+        destination: "/scratchpad/:path*",
         permanent: true,
       },
     ];
@@ -104,7 +112,7 @@ const nextConfig: NextConfig = {
         headers: noindexHeaders,
       },
       {
-        source: "/messenger/:path*",
+        source: "/scratchpad/:path*",
         headers: noindexHeaders,
       },
       {

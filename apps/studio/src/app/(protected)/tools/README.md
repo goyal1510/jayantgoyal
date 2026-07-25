@@ -1,12 +1,13 @@
 # Dev Tools
 
-99+ developer utilities for everyday tasks.
+87 developer utilities for everyday tasks.
 
 **Live**: [studio.jayantgoyal.com/tools](https://studio.jayantgoyal.com/tools)
 
 ## Categories
 
 ### Generators
+
 - UUID v4, v7
 - ULID
 - Nanoid
@@ -15,18 +16,21 @@
 - Password generator
 
 ### Hash & Encryption
+
 - MD5, SHA-1, SHA-256, SHA-512
 - Bcrypt hash/verify
 - HMAC generation
 - AES encrypt/decrypt
 
 ### Encoders/Decoders
+
 - Base64 encode/decode
 - URL encode/decode
 - HTML entities
 - Unicode escape
 
 ### Converters
+
 - JSON ↔ YAML
 - JSON ↔ TOML
 - JSON ↔ XML
@@ -35,6 +39,7 @@
 - Number base conversion
 
 ### Text Tools
+
 - Case converters (camel, snake, kebab)
 - Lorem ipsum generator
 - Word/character counter
@@ -42,24 +47,28 @@
 - Regex tester
 
 ### Validators
+
 - JSON validator
 - Email validator
 - URL validator
 - Regex validator
 
 ### Formatters
+
 - JSON formatter/minifier
 - SQL formatter
 - XML formatter
 - Code beautifier
 
 ### Parsers
+
 - JWT decoder
 - URL parser
 - User agent parser
 - Cron expression parser
 
 ### Media & QR
+
 - QR code generator
 - Image to Base64
 - Favicon generator

@@ -2,25 +2,25 @@
 
 import * as React from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-import { MessageList } from "@/components/messenger/message-list";
-import { MessageInputDialog } from "@/components/messenger/message-input-dialog";
+import { EntryList } from "@/components/scratchpad/entry-list";
+import { EntryInputDialog } from "@/components/scratchpad/entry-input-dialog";
 import { PageSpinner } from "@repo/ui/page-spinner";
-import type { Database } from "@/lib/messenger/database.types";
+import type { Database } from "@/lib/scratchpad/database.types";
 import { WorkspaceHeader } from "@repo/ui/workspace-header";
 import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
 import { MessageSquareText, Plus, Search } from "lucide-react";
 
-type Message = Database["messenger"]["Tables"]["messages"]["Row"];
-type MessageFilter = "all" | "unread" | "read";
+type Entry = Database["scratchpad"]["Tables"]["entries"]["Row"];
+type EntryFilter = "all" | "unread" | "read";
 
-export function MessagesPage() {
+export function ScratchpadPage() {
   // Memoize the client so it's only created once, preventing subscription recreation
   const supabase = React.useMemo(() => createSupabaseBrowserClient(), []);
-  const [messages, setMessages] = React.useState<Message[]>([]);
+  const [entries, setEntries] = React.useState<Entry[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [userId, setUserId] = React.useState<string | null>(null);
-  const [filter, setFilter] = React.useState<MessageFilter>("all");
+  const [filter, setFilter] = React.useState<EntryFilter>("all");
   const [query, setQuery] = React.useState("");
 
   // Get user ID
@@ -36,25 +36,25 @@ export function MessagesPage() {
     getUser();
   }, [supabase]);
 
-  // Fetch initial messages using API route
+  // Fetch initial entries using API route
   React.useEffect(() => {
     if (!userId) return;
 
-    async function fetchMessages() {
+    async function fetchEntries() {
       try {
-        const response = await fetch("/api/messenger");
+        const response = await fetch("/api/scratchpad");
         if (!response.ok) {
-          throw new Error("Failed to fetch messages");
+          throw new Error("Failed to fetch entries");
         }
-        const { messages: fetchedMessages } = await response.json();
+        const { entries: fetchedEntries } = await response.json();
         // API already returns newest first, so use as-is
-        setMessages(fetchedMessages || []);
+        setEntries(fetchedEntries || []);
       } catch (error) {
-        console.error("Error fetching messages:", error);
+        console.error("Error fetching entries:", error);
         // Fallback to direct Supabase call (also newest first)
         const { data, error: supabaseError } = await supabase
           .schema("jg_app")
-          .from("messenger_messages")
+          .from("scratchpad_entries")
           .select("*")
           .eq("user_id", userId)
           .order("created_at", { ascending: false });
@@ -62,13 +62,13 @@ export function MessagesPage() {
         if (supabaseError) {
           console.error("Supabase fallback error:", supabaseError);
         } else {
-          setMessages(data || []);
+          setEntries(data || []);
         }
       }
       setLoading(false);
     }
 
-    fetchMessages();
+    fetchEntries();
   }, [userId, supabase]);
 
   // Subscribe to real-time updates
@@ -76,22 +76,22 @@ export function MessagesPage() {
     if (!userId) return;
 
     const channel = supabase
-      .channel(`messages-${userId}`)
+      .channel(`entries-${userId}`)
       .on(
         "postgres_changes",
         {
           event: "INSERT",
           schema: "jg_app",
-          table: "messenger_messages",
+          table: "scratchpad_entries",
           filter: `user_id=eq.${userId}`,
         },
         (payload) => {
-          const newMessage = payload.new as Message;
-          setMessages((prev) => {
-            if (prev.some((m) => m.id === newMessage.id)) {
+          const newEntry = payload.new as Entry;
+          setEntries((prev) => {
+            if (prev.some((item) => item.id === newEntry.id)) {
               return prev;
             }
-            return [newMessage, ...prev];
+            return [newEntry, ...prev];
           });
         },
       )
@@ -100,16 +100,16 @@ export function MessagesPage() {
         {
           event: "UPDATE",
           schema: "jg_app",
-          table: "messenger_messages",
+          table: "scratchpad_entries",
           filter: `user_id=eq.${userId}`,
         },
         (payload) => {
-          const updatedMessage = payload.new as Message;
-          setMessages((prev) =>
-            prev.map((msg) =>
-              msg.id === updatedMessage.id
-                ? { ...msg, ...updatedMessage }
-                : msg,
+          const updatedEntry = payload.new as Entry;
+          setEntries((prev) =>
+            prev.map((item) =>
+              item.id === updatedEntry.id
+                ? { ...item, ...updatedEntry }
+                : item,
             ),
           );
         },
@@ -119,12 +119,12 @@ export function MessagesPage() {
         {
           event: "DELETE",
           schema: "jg_app",
-          table: "messenger_messages",
+          table: "scratchpad_entries",
           filter: `user_id=eq.${userId}`,
         },
         (payload) => {
-          const oldMessage = payload.old as { id: string };
-          setMessages((prev) => prev.filter((msg) => msg.id !== oldMessage.id));
+          const oldEntry = payload.old as { id: string };
+          setEntries((prev) => prev.filter((item) => item.id !== oldEntry.id));
         },
       )
       .subscribe();
@@ -134,83 +134,83 @@ export function MessagesPage() {
     };
   }, [userId, supabase]);
 
-  const handleSendMessage = React.useCallback(
+  const handleCreateEntry = React.useCallback(
     async (
       content: string,
-      messageType: "text" | "code",
+      entryType: "text" | "code",
       language?: string,
     ) => {
       try {
-        const response = await fetch("/api/messenger", {
+        const response = await fetch("/api/scratchpad", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
             content,
-            message_type: messageType,
-            language: messageType === "code" ? language : null,
+            entry_type: entryType,
+            language: entryType === "code" ? language : null,
           }),
         });
 
         if (!response.ok) {
           const error = await response.json();
-          throw new Error(error.error || "Failed to send message");
+          throw new Error(error.error || "Failed to send entry");
         }
 
-        // Add the new message to state immediately
-        const { message } = await response.json();
-        if (message) {
-          setMessages((prev) => {
+        // Add the new entry to state immediately
+        const { entry } = await response.json();
+        if (entry) {
+          setEntries((prev) => {
             // Avoid duplicates if realtime already added it
-            if (prev.some((m) => m.id === message.id)) {
+            if (prev.some((item) => item.id === entry.id)) {
               return prev;
             }
-            return [message, ...prev];
+            return [entry, ...prev];
           });
         }
 
         return true;
       } catch (error) {
-        console.error("Error sending message:", error);
+        console.error("Error sending entry:", error);
         return false;
       }
     },
     [],
   );
 
-  const unreadCount = messages.filter((message) => !message.is_read).length;
-  const visibleMessages = React.useMemo(() => {
+  const unreadCount = entries.filter((entry) => !entry.is_read).length;
+  const visibleEntries = React.useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
-    return messages.filter((message) => {
+    return entries.filter((entry) => {
       const matchesFilter =
         filter === "all" ||
-        (filter === "unread" && !message.is_read) ||
-        (filter === "read" && message.is_read);
+        (filter === "unread" && !entry.is_read) ||
+        (filter === "read" && entry.is_read);
       const matchesQuery =
         !normalizedQuery ||
-        message.content?.toLowerCase().includes(normalizedQuery) ||
-        message.language?.toLowerCase().includes(normalizedQuery);
+        entry.content?.toLowerCase().includes(normalizedQuery) ||
+        entry.language?.toLowerCase().includes(normalizedQuery);
 
       return matchesFilter && matchesQuery;
     });
-  }, [filter, messages, query]);
+  }, [filter, entries, query]);
 
   return (
     <div className="mx-auto w-full max-w-[1180px] space-y-5">
       <WorkspaceHeader
         icon={MessageSquareText}
-        title="Messenger"
+        title="Sync Scratchpad"
         description="Keep short notes, code fragments, and reusable snippets in one private, realtime stream."
         tone="lavender"
         actions={
-          <MessageInputDialog
-            onSend={handleSendMessage}
+          <EntryInputDialog
+            onSend={handleCreateEntry}
             trigger={
               <Button className="h-11 rounded-xl bg-[#211512] px-5 text-[#fff8ef] shadow-none hover:bg-[#211512]/90 dark:bg-[#fff8ef] dark:text-[#211512] dark:hover:bg-[#fff8ef]/90">
                 <Plus className="size-4" />
-                New message
+                New entry
               </Button>
             }
           />
@@ -219,12 +219,12 @@ export function MessagesPage() {
 
       <section className="overflow-hidden rounded-[1.75rem] border border-border/80 bg-card">
         <div className="flex flex-col gap-4 border-b border-border/70 p-4 sm:p-5 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-wrap gap-2" aria-label="Filter messages">
+          <div className="flex flex-wrap gap-2" aria-label="Filter entries">
             {(
               [
-                ["all", `All ${messages.length}`],
+                ["all", `All ${entries.length}`],
                 ["unread", `Unread ${unreadCount}`],
-                ["read", `Read ${messages.length - unreadCount}`],
+                ["read", `Read ${entries.length - unreadCount}`],
               ] as const
             ).map(([value, label]) => (
               <Button
@@ -245,8 +245,8 @@ export function MessagesPage() {
             <Input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search messages"
-              aria-label="Search messages"
+              placeholder="Search entries"
+              aria-label="Search entries"
               className="h-10 rounded-xl pl-9 shadow-none"
             />
           </div>
@@ -255,22 +255,22 @@ export function MessagesPage() {
         <div className="p-4 sm:p-5">
           {loading ? (
             <PageSpinner />
-          ) : messages.length === 0 ? (
+          ) : entries.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-4 py-12">
               <p className="text-muted-foreground">
-                No messages yet. Send your first message!
+                No entries yet. Send your first entry!
               </p>
-              <MessageInputDialog onSend={handleSendMessage} />
+              <EntryInputDialog onSend={handleCreateEntry} />
             </div>
-          ) : visibleMessages.length === 0 ? (
+          ) : visibleEntries.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-2 py-12 text-center">
-              <p className="font-medium">No messages match this view.</p>
+              <p className="font-medium">No entries match this view.</p>
               <p className="text-sm text-muted-foreground">
                 Try a different status or search term.
               </p>
             </div>
           ) : (
-            <MessageList messages={visibleMessages} />
+            <EntryList entries={visibleEntries} />
           )}
         </div>
       </section>

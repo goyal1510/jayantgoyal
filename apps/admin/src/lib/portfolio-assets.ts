@@ -2,33 +2,33 @@ export const PORTFOLIO_ASSET_BUCKET = "portfolio-assets";
 export const PORTFOLIO_ASSET_MAX_BYTES = 15 * 1024 * 1024;
 
 export type PortfolioAssetKind =
-  | "project-image"
+  | "work-image"
   | "certificate-document"
   | "certificate-preview"
-  | "blog-cover"
+  | "writing-cover"
   | "resume";
 
 const MIME_TYPES: Record<PortfolioAssetKind, readonly string[]> = {
-  "project-image": ["image/png", "image/jpeg", "image/webp"],
+  "work-image": ["image/png", "image/jpeg", "image/webp"],
   "certificate-document": ["application/pdf"],
   "certificate-preview": ["image/png", "image/jpeg", "image/webp"],
-  "blog-cover": ["image/png", "image/jpeg", "image/webp"],
+  "writing-cover": ["image/png", "image/jpeg", "image/webp"],
   resume: ["application/pdf"],
 };
 
 export const PORTFOLIO_ASSET_ACCEPT: Record<PortfolioAssetKind, string> = {
-  "project-image": "image/png,image/jpeg,image/webp",
+  "work-image": "image/png,image/jpeg,image/webp",
   "certificate-document": "application/pdf",
   "certificate-preview": "image/png,image/jpeg,image/webp",
-  "blog-cover": "image/png,image/jpeg,image/webp",
+  "writing-cover": "image/png,image/jpeg,image/webp",
   resume: "application/pdf",
 };
 
 export const PORTFOLIO_ASSET_FOLDER: Record<PortfolioAssetKind, string> = {
-  "project-image": "projects",
+  "work-image": "work",
   "certificate-document": "certificates/documents",
   "certificate-preview": "certificates/previews",
-  "blog-cover": "blog",
+  "writing-cover": "writing",
   resume: "resume",
 };
 

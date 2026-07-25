@@ -1,7 +1,7 @@
 import {
-  PORTFOLIO_BLOG_CMS_SELECT_COLUMNS,
+  PORTFOLIO_WRITING_CMS_SELECT_COLUMNS,
   PORTFOLIO_ADMIN_SELECT_COLUMNS,
-  type PortfolioBlogPostRecord,
+  type PortfolioWritingPostRecord,
   type PortfolioNavigationPublicRow,
   type PortfolioSectionContentPublicRow,
   type PortfolioSectionKey,
@@ -16,7 +16,7 @@ import type {
   Experience,
   Hero,
   NavItem,
-  Project,
+  WorkItem,
   SectionContent,
   Skill,
   SkillCategory,
@@ -137,12 +137,12 @@ export interface ActivityWorkspaceData {
 }
 
 export interface WorkWorkspaceData {
-  projects: Project[];
+  work: WorkItem[];
   editorial: PortfolioWorkspaceEditorial;
 }
 
 export interface WritingWorkspaceData {
-  posts: PortfolioBlogPostRecord[];
+  posts: PortfolioWritingPostRecord[];
   editorial: PortfolioWorkspaceEditorial;
   editorialBySection: PortfolioWorkspaceEditorialMap;
 }
@@ -281,7 +281,7 @@ export async function loadExperienceWorkspace(
   };
 }
 
-/** Load Activity's editable GitHub source and its editorial framing. */
+/** Load GitHub's editable source and its editorial framing. */
 export async function loadActivityWorkspace(
   supabase: AdminSupabaseClient,
 ): Promise<ActivityWorkspaceData> {
@@ -293,7 +293,7 @@ export async function loadActivityWorkspace(
       .maybeSingle(),
     getSectionEditorialContext(supabase, "activity"),
   ]);
-  throwWorkspaceLoadError("Activity", [heroResult.error]);
+  throwWorkspaceLoadError("GitHub", [heroResult.error]);
 
   const hero = castPortfolioRecord<Hero | null>(heroResult.data);
   return {
@@ -302,42 +302,42 @@ export async function loadActivityWorkspace(
   };
 }
 
-/** Load all projects and their Work presentation records. */
+/** Load all work and their Work presentation records. */
 export async function loadWorkWorkspace(
   supabase: AdminSupabaseClient,
 ): Promise<WorkWorkspaceData> {
-  const [projectsResult, editorial] = await Promise.all([
+  const [workResult, editorial] = await Promise.all([
     supabase
       .schema("portfolio")
-      .from("projects")
-      .select(PORTFOLIO_ADMIN_SELECT_COLUMNS.projects)
+      .from("work")
+      .select(PORTFOLIO_ADMIN_SELECT_COLUMNS.work)
       .order("sort_order", { ascending: true }),
     getSectionEditorialContext(supabase, "work"),
   ]);
-  throwWorkspaceLoadError("Work", [projectsResult.error]);
+  throwWorkspaceLoadError("Work", [workResult.error]);
 
   return {
-    projects: castPortfolioRecord<Project[]>(projectsResult.data ?? []),
+    work: castPortfolioRecord<WorkItem[]>(workResult.data ?? []),
     editorial,
   };
 }
 
-/** Load the full CMS Blog rows and Writing presentation records. */
+/** Load the full CMS Writing rows and Writing presentation records. */
 export async function loadWritingWorkspace(
   supabase: AdminSupabaseClient,
 ): Promise<WritingWorkspaceData> {
   const [postsResult, editorialBySection] = await Promise.all([
     supabase
       .schema("jg_app")
-      .from("blog_posts")
-      .select(PORTFOLIO_BLOG_CMS_SELECT_COLUMNS)
+      .from("writing_posts")
+      .select(PORTFOLIO_WRITING_CMS_SELECT_COLUMNS)
       .order("published_at", { ascending: false }),
-    getSectionEditorialContexts(supabase, ["writing", "blog", "article"]),
+    getSectionEditorialContexts(supabase, ["writing", "article"]),
   ]);
   throwWorkspaceLoadError("Writing", [postsResult.error]);
 
   return {
-    posts: castPortfolioRecord<PortfolioBlogPostRecord[]>(
+    posts: castPortfolioRecord<PortfolioWritingPostRecord[]>(
       postsResult.data ?? [],
     ),
     editorial: requireEditorialContext(editorialBySection, "writing"),

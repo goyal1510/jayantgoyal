@@ -1,6 +1,6 @@
-# Jayant Goyal Platform
+# Jayant
 
-Independent Portfolio, Studio, Admin, and Auth applications by **Jayant Goyal**.
+Independent Portfolio, Studio, Admin, and Auth applications by **Jayant**.
 
 [![Portfolio](https://img.shields.io/badge/Portfolio-jayantgoyal.com-000?style=for-the-badge&logo=vercel)](https://jayantgoyal.com)
 [![GitHub](https://img.shields.io/badge/GitHub-goyal1510-181717?style=for-the-badge&logo=github)](https://github.com/goyal1510)
@@ -12,14 +12,14 @@ Independent Portfolio, Studio, Admin, and Auth applications by **Jayant Goyal**.
 
 | Project                                                                   | Description                                     | Tech Highlights                     |
 | ------------------------------------------------------------------------- | ----------------------------------------------- | ----------------------------------- |
-| [**Messenger**](https://studio.jayantgoyal.com/messenger)                 | Real-time chat with instant sync                | Supabase Realtime, Subscriptions    |
+| [**Sync Scratchpad**](https://studio.jayantgoyal.com/scratchpad)          | Private text, code, and note synchronization   | Supabase Realtime, RLS              |
 | [**File Manager**](https://studio.jayantgoyal.com/files)                  | Cloud storage with folders, upload, soft delete | Supabase Storage, Hierarchical data |
 | [**Activity Tracker**](https://studio.jayantgoyal.com/activity-tracker)   | Daily tracking with analytics dashboard         | Recharts, Data visualization        |
 | [**Weather**](https://studio.jayantgoyal.com/weather)                     | City search, geolocation, 5-day forecast        | OpenWeather API, Geolocation        |
-| [**Games**](https://studio.jayantgoyal.com/games)                         | 5 games with AI opponents                       | Game logic, State machines          |
+| [**Games**](https://studio.jayantgoyal.com/games)                         | 9 solo, local, and online games                 | Realtime sessions, Game validation  |
 | [**Calculator**](https://studio.jayantgoyal.com/calculator)               | Cash denomination with history                  | CRUD, Zustand persistence           |
 | [**Custom Calculator**](https://studio.jayantgoyal.com/custom-calculator) | Drag & drop calculator builder                  | React DnD, Dynamic layouts          |
-| [**Dev Tools**](https://studio.jayantgoyal.com/tools)                     | 99+ utilities (UUID, hash, encode, format)      | Crypto APIs, Converters             |
+| [**Dev Tools**](https://studio.jayantgoyal.com/tools)                     | 87 utilities (UUID, hash, encode, format)       | Typed registry, Persisted favorites |
 | [**Admin Panel**](https://admin.jayantgoyal.com)                          | Manage portfolio data                           | Protected routes, RBAC              |
 
 ---
@@ -70,9 +70,11 @@ jayantgoyal/
 
 ## Features Deep Dive
 
-### Messenger
+### Sync Scratchpad
 
-Real-time messaging built on Supabase Realtime subscriptions. Messages sync instantly across tabs/devices. Handles presence, typing indicators, and optimistic updates.
+A private authenticated stream for moving temporary text, links, and notes
+between personal devices. Supabase Realtime keeps the durable scratchpad
+synchronized across tabs and sessions.
 
 ### File Manager
 
@@ -89,7 +91,7 @@ Track daily activities with custom categories. Monthly calendar view, streak tra
 
 ### Dev Tools
 
-99+ developer utilities organized by category:
+87 developer utilities organized by category:
 
 - **Generators**: UUID, ULID, nanoid, RSA keys, tokens
 - **Hash & Crypto**: Bcrypt, SHA, HMAC, AES encrypt/decrypt
@@ -99,13 +101,17 @@ Track daily activities with custom categories. Monthly calendar view, streak tra
 
 ### Games Hub
 
-Five games with polished UI and AI opponents:
+Nine games spanning solo, local, computer, and online room modes:
 
 - **Tic Tac Toe** - Minimax AI, unbeatable mode
 - **Connect Four** - Column-drop mechanics
 - **Memory Match** - Card flip animations
 - **Rock Paper Scissors** - Animated results
 - **Dare X** - Party game with random dares
+- **Wordle** - Solo play and online races
+- **Typing Speed** - Speed and accuracy testing
+- **Chess** - Legal move validation and online rooms
+- **Ludo** - Online room-based board game
 
 ---
 

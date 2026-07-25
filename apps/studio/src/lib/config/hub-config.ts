@@ -138,11 +138,11 @@ const PORTFOLIO_NAV: NavItem[] = [
     url: "/#experience",
   },
   {
-    id: "projects",
-    label: "Projects",
+    id: "work",
+    label: "Work",
     icon: Code2,
     color: "text-rose-500 dark:text-rose-400",
-    url: "/#projects",
+    url: "/#studio",
   },
   {
     id: "certificates",
@@ -288,11 +288,11 @@ export const HUB_APPS: AppConfig[] = [
   createSurfaceApp("activity-tracker", ACTIVITY_TRACKER_NAV),
   createSurfaceApp("currency-calculator", CURRENCY_CALC_NAV),
   createSurfaceApp("file-manager"),
-  createSurfaceApp("messenger"),
+    createSurfaceApp("scratchpad"),
   // --- Public apps (dropdowns first) ---
   createSurfaceApp("portfolio", PORTFOLIO_NAV),
   createSurfaceApp("tech-tools"),
-  createSurfaceApp("blog"),
+    createSurfaceApp("writing"),
   createSurfaceApp("weather"),
   createSurfaceApp("custom-calculator"),
   createSurfaceApp("github-stats"),
@@ -302,14 +302,14 @@ export const HUB_APPS: AppConfig[] = [
 const STUDIO_HOME_APP = createSurfaceApp("studio-home");
 const STUDIO_PRODUCTS_APP = createSurfaceApp("studio-products");
 const PORTFOLIO_EXTERNAL_APP = createSurfaceApp("portfolio");
-const PORTFOLIO_BLOG_EXTERNAL_APP = createSurfaceApp("blog");
+const PORTFOLIO_WRITING_EXTERNAL_APP = createSurfaceApp("writing");
 
 export function getSurfaceApps(): AppConfig[] {
   return [
     STUDIO_HOME_APP,
     STUDIO_PRODUCTS_APP,
-    ...HUB_APPS.filter((app) => app.id !== "portfolio" && app.id !== "blog"),
-    PORTFOLIO_BLOG_EXTERNAL_APP,
+    ...HUB_APPS.filter((app) => app.id !== "portfolio" && app.id !== "writing"),
+    PORTFOLIO_WRITING_EXTERNAL_APP,
     PORTFOLIO_EXTERNAL_APP,
   ];
 }

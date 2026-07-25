@@ -43,7 +43,7 @@ export function PortfolioAssetUpload({
 }) {
   const [uploading, setUploading] = useState(false);
   const isImage =
-    kind.endsWith("image") || kind.endsWith("preview") || kind === "blog-cover";
+    kind.endsWith("image") || kind.endsWith("preview") || kind === "writing-cover";
   const resolvedValue = value ? resolveAssetUrl(value) : "";
 
   async function upload(file: File) {

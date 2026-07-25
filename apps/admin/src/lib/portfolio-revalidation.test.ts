@@ -12,7 +12,7 @@ describe("Portfolio public revalidation contract", () => {
     );
     expect(getPortfolioPublicRevalidationPaths()).toEqual([
       "/",
-      "/blog",
+      "/writing",
       "/resume",
     ]);
   });

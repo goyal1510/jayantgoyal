@@ -10,22 +10,22 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@repo/ui/dialog";
-import { MessageInput } from "@/components/messenger/message-input";
+import { EntryInput } from "@/components/scratchpad/entry-input";
 import { Plus } from "lucide-react";
 
-interface MessageInputDialogProps {
-  onSend: (content: string, messageType: "text" | "code", language?: string) => Promise<boolean>;
+interface EntryInputDialogProps {
+  onSend: (content: string, entryType: "text" | "code", language?: string) => Promise<boolean>;
   trigger?: React.ReactNode;
 }
 
-export function MessageInputDialog({ onSend, trigger }: MessageInputDialogProps) {
+export function EntryInputDialog({ onSend, trigger }: EntryInputDialogProps) {
   const [open, setOpen] = React.useState(false);
   const [isSending, setIsSending] = React.useState(false);
 
   const handleSend = React.useCallback(
-    async (content: string, messageType: "text" | "code", language?: string): Promise<boolean> => {
+    async (content: string, entryType: "text" | "code", language?: string): Promise<boolean> => {
       setIsSending(true);
-      const success = await onSend(content, messageType, language);
+      const success = await onSend(content, entryType, language);
       if (success) {
         setOpen(false);
       }
@@ -38,7 +38,7 @@ export function MessageInputDialog({ onSend, trigger }: MessageInputDialogProps)
   const defaultTrigger = (
     <Button size="icon" className="h-12 w-12 rounded-full shadow-lg">
       <Plus className="h-6 w-6" />
-      <span className="sr-only">New message</span>
+      <span className="sr-only">New entry</span>
     </Button>
   );
 
@@ -49,13 +49,13 @@ export function MessageInputDialog({ onSend, trigger }: MessageInputDialogProps)
       </DialogTrigger>
       <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>New Message</DialogTitle>
+          <DialogTitle>New Entry</DialogTitle>
           <DialogDescription>
-            Send a text message or share code with proper formatting. Indentation will be preserved for code.
+            Send a text entry or share code with proper formatting. Indentation will be preserved for code.
           </DialogDescription>
         </DialogHeader>
         <div className="py-4">
-          <MessageInput onSend={handleSend} disabled={isSending} />
+          <EntryInput onSend={handleSend} disabled={isSending} />
         </div>
       </DialogContent>
     </Dialog>

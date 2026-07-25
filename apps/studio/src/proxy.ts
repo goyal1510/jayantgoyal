@@ -47,6 +47,7 @@ const PUBLIC_PAGES = [
   "/tools",
   "/blogs",
   "/blog",
+  "/writing",
   "/weather",
   "/custom-calculator",
   "/terms-conditions",

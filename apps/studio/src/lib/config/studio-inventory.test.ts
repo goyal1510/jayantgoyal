@@ -21,7 +21,7 @@ describe("Studio product inventory", () => {
   });
 
   it("keeps professional writing outside the Studio product catalog", () => {
-    expect(getStudioProduct("blog")).toBeUndefined();
+    expect(getStudioProduct("writing")).toBeUndefined();
   });
 
   it("features an intentional subset and builds public detail routes", () => {
