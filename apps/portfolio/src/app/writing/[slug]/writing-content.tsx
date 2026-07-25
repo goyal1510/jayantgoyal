@@ -2,7 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element */
 
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import type { Components } from "react-markdown";
 import ReactMarkdown from "react-markdown";
@@ -155,8 +155,6 @@ export function WritingContent({
   profileRole: string;
   articleContent: PortfolioSectionContent;
 }) {
-  const articleRef = useRef<HTMLElement>(null);
-  const [readingProgress, setReadingProgress] = useState(0);
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const content = useMemo(
     () => prepareArticleContent(post.content, post.title),
@@ -170,30 +168,6 @@ export function WritingContent({
   const readingMinutes = Math.max(1, Math.ceil(wordCount / 220));
   const publishedDate = formatEditorialDate(post.published_at);
   const updatedDate = formatEditorialDate(post.updated_at);
-
-  useEffect(() => {
-    const updateProgress = () => {
-      const article = articleRef.current;
-      if (!article) return;
-
-      const start = article.offsetTop;
-      const distance = Math.max(1, article.offsetHeight - window.innerHeight);
-      const progress = Math.min(
-        1,
-        Math.max(0, (window.scrollY - start) / distance),
-      );
-      setReadingProgress(progress);
-    };
-
-    updateProgress();
-    window.addEventListener("scroll", updateProgress, { passive: true });
-    window.addEventListener("resize", updateProgress);
-
-    return () => {
-      window.removeEventListener("scroll", updateProgress);
-      window.removeEventListener("resize", updateProgress);
-    };
-  }, []);
 
   useEffect(() => {
     if (sections.length === 0) return;
@@ -218,13 +192,8 @@ export function WritingContent({
   return (
     <main className="editorial-page">
       <EditorialSubpageHeader brandLabel={brandLabel} navigation={navigation} />
-      <div
-        className="editorial-article__progress"
-        aria-hidden="true"
-        style={{ transform: `scaleX(${readingProgress})` }}
-      />
 
-      <article ref={articleRef} className="shell editorial-article">
+      <article className="shell editorial-article">
         <header className="editorial-article__header">
           <div className="editorial-article__meta">
             <span className="section-index">{articleContent.eyebrow}</span>

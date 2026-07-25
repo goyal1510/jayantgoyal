@@ -6,6 +6,7 @@ import { DM_Sans, Instrument_Serif } from "next/font/google";
 import Script from "next/script";
 import { BRAND_ASSET_PATHS } from "@repo/brand";
 
+import { PageScrollProgress } from "@/components/editorial/page-scroll-progress";
 import { getPortfolioShellData } from "@/lib/portfolio/editorial-server";
 import {
   DEFAULT_OG_IMAGE,
@@ -126,7 +127,10 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
         />
       </head>
-      <body className={`${sans.variable} ${serif.variable}`}>{children}</body>
+      <body className={`${sans.variable} ${serif.variable}`}>
+        <PageScrollProgress />
+        {children}
+      </body>
     </html>
   );
 }

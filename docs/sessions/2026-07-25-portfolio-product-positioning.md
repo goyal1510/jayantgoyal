@@ -17,6 +17,9 @@ for recruiters, engineers, founders, and potential clients.
 - Preserve the existing editorial design language.
 - Document the completed technical, content, project, navigation, homepage, and
   conversion audit in the repository.
+- Measure production bundle composition before changing dependencies or client
+  boundaries. Compare the native Turbopack analyzer with the interactive
+  Webpack treemap rather than treating installed-package size as shipped cost.
 - Implement the work in phased, independently verifiable batches.
 - Start with security and correctness, then public positioning and navigation,
   then case studies and proof.
@@ -30,6 +33,34 @@ for recruiters, engineers, founders, and potential clients.
 
 ## Status
 
+- Started bundle-performance work on `codex/bundle-optimization`.
+- Generated native Turbopack analyzer baselines for Portfolio, Studio, Admin,
+  and Auth. Portfolio currently emits roughly 329 KiB compressed across all
+  client chunks; Studio emits 511 KiB, Admin 371 KiB, and Auth 309 KiB. These
+  are whole-application emitted totals, not per-route initial downloads.
+- Added the version-matched `@next/bundle-analyzer` development tool and an
+  opt-in Portfolio configuration. Normal production builds remain on
+  Turbopack; the alternate analyzer runs only when `ANALYZE=true` and forces a
+  separate Webpack analysis build.
+- Added interactive and static Portfolio analysis commands so the zoomable
+  client, Node.js, and Edge treemaps can be inspected without changing the
+  deployed build path.
+- Declared the two analysis-only environment switches as Turborepo passthrough
+  variables. They are available to the opt-in analyzer without becoming part of
+  normal build cache keys.
+- Removed the legacy even-item rotation from featured and archived Work media.
+  Right-side screenshots now share the same horizontal default alignment as
+  left-side screenshots while retaining the existing hover lift.
+- Promoted scroll progress from the homepage component to the Portfolio root
+  layout so Home, Work, Writing, About, Resume, Contact, and detail routes all
+  receive the same page-level indicator. The lightweight client controller
+  batches scroll work through `requestAnimationFrame`, responds to route and
+  document-height changes, and replaces duplicate article-only listeners.
+- Added focused coverage for complete, partial, overscrolled, and non-scrollable
+  progress calculations.
+- Validated the bundle tooling and progress changes with the complete root test
+  suite (58 files / 288 tests), all 11 lint targets, all 11 type-check targets,
+  `git diff --check`, and a successful Portfolio Turbopack production build.
 - Worktree created from the current `origin/main`.
 - Environment files and non-secret Supabase link metadata copied from the
   protected source clone.
@@ -511,10 +542,10 @@ for recruiters, engineers, founders, and potential clients.
 - Confirmed the public local route smoke set returns 200 for Home, About, Work,
   all four system detail pages, Resume, Contact, and Writing. Confirmed legacy
   route redirects, inline PDF response headers, Portfolio type checks/lint,
-  production build, root test suite (58 files / 287 tests), and `git diff
-  --check`. A linked Supabase schema dump was attempted but could not run
-  because Docker is unavailable in this environment; the applied migration is
-  data-only and does not change schema snapshots.
+  production build, root test suite (58 files / 287 tests), and
+  `git diff --check`. A linked Supabase schema dump was attempted but could not
+  run because Docker is unavailable in this environment; the applied migration
+  is data-only and does not change schema snapshots.
 - Replaced the remaining stale Portfolio Work asset with a fresh local Home
   capture so the visible navigation and hero match the canonical IA; inspected
   all three system evidence images after replacement.

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight, Github } from "lucide-react";
 
@@ -93,38 +93,12 @@ export function CaseStudyContent({
   project: PortfolioWork;
   nextProject: PortfolioWork | null;
 }) {
-  const articleRef = useRef<HTMLElement>(null);
-  const [readingProgress, setReadingProgress] = useState(0);
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const caseStudy = project.caseStudy;
   const sections = useMemo(
     () => (caseStudy ? buildSections(caseStudy) : []),
     [caseStudy],
   );
-
-  useEffect(() => {
-    const updateProgress = () => {
-      const article = articleRef.current;
-      if (!article) return;
-
-      const start = article.offsetTop;
-      const distance = Math.max(1, article.offsetHeight - window.innerHeight);
-      const progress = Math.min(
-        1,
-        Math.max(0, (window.scrollY - start) / distance),
-      );
-      setReadingProgress(progress);
-    };
-
-    updateProgress();
-    window.addEventListener("scroll", updateProgress, { passive: true });
-    window.addEventListener("resize", updateProgress);
-
-    return () => {
-      window.removeEventListener("scroll", updateProgress);
-      window.removeEventListener("resize", updateProgress);
-    };
-  }, []);
 
   useEffect(() => {
     const headings = sections
@@ -151,16 +125,8 @@ export function CaseStudyContent({
   return (
     <main className="editorial-page editorial-case-study editorial-work-article-page">
       <EditorialSubpageHeader brandLabel={brandLabel} navigation={navigation} />
-      <div
-        className="editorial-article__progress"
-        aria-hidden="true"
-        style={{ transform: `scaleX(${readingProgress})` }}
-      />
 
-      <article
-        ref={articleRef}
-        className="shell editorial-article editorial-work-article"
-      >
+      <article className="shell editorial-article editorial-work-article">
         <header className="editorial-article__header">
           <div className="editorial-article__meta">
             <span className="section-index">Work / {project.eyebrow}</span>

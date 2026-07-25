@@ -6,7 +6,6 @@ import {
   motion,
   useReducedMotion,
   useScroll,
-  useSpring,
   useTransform,
 } from "framer-motion";
 import {
@@ -465,11 +464,6 @@ export function PortfolioExperience({
   });
   const [cursorLabel, setCursorLabel] = useState("");
   const { scrollYProgress } = useScroll();
-  const progress = useSpring(scrollYProgress, {
-    stiffness: 120,
-    damping: 28,
-    mass: 0.2,
-  });
   const heroY = useTransform(scrollYProgress, [0, 0.18], [0, -54]);
   useEffect(() => {
     const root = document.documentElement;
@@ -497,7 +491,6 @@ export function PortfolioExperience({
 
   return (
     <main>
-      <motion.div className="scroll-progress" style={{ scaleX: progress }} />
       <div
         className={`cursor-orbit${cursorLabel ? " cursor-orbit--active" : ""}`}
       >
