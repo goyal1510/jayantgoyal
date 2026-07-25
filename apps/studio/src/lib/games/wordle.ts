@@ -4,12 +4,12 @@ import { VALID_GUESSES } from "@/lib/games/words"
 export type WordleSeat = "P1" | "P2"
 export type WordleLetterState = "correct" | "present" | "absent" | "empty" | "tbd"
 
-export type WordleGuess = {
+type WordleGuess = {
   word: string
   states: WordleLetterState[]
 }
 
-export type WordlePlayerState = {
+type WordlePlayerState = {
   guesses: WordleGuess[]
   won: boolean
   done: boolean
@@ -30,13 +30,13 @@ export type WordleState = {
 export const WORDLE_WORD_LENGTH = 5
 export const WORDLE_MAX_GUESSES = 6
 
-export const DEFAULT_WORDLE_PLAYER_STATE: WordlePlayerState = {
+const DEFAULT_WORDLE_PLAYER_STATE: WordlePlayerState = {
   guesses: [],
   won: false,
   done: false,
 }
 
-export const DEFAULT_WORDLE_STATE: WordleState = {
+const DEFAULT_WORDLE_STATE: WordleState = {
   players: {
     P1: DEFAULT_WORDLE_PLAYER_STATE,
     P2: DEFAULT_WORDLE_PLAYER_STATE,

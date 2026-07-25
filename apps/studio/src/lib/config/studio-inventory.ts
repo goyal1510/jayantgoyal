@@ -12,8 +12,8 @@ export const STUDIO_PRODUCT_TYPES = [
 ] as const;
 
 export type StudioProductType = (typeof STUDIO_PRODUCT_TYPES)[number];
-export type StudioProductAccess = "public" | "account" | "external";
-export type StudioProductStatus = "available" | "beta";
+type StudioProductAccess = "public" | "account" | "external";
+type StudioProductStatus = "available" | "beta";
 
 export type StudioProduct = {
   id: string;

@@ -12,7 +12,7 @@ export type ChessState = {
   lastMove: { from: ChessSquare; to: ChessSquare; san: string } | null
 }
 
-export const INITIAL_CHESS_STATE: ChessState = {
+const INITIAL_CHESS_STATE: ChessState = {
   fen: new Chess().fen(),
   pgn: "",
   turn: "w",
@@ -45,7 +45,7 @@ export function colorToSeat(color: ChessColor): ChessSeat {
   return color === "w" ? "W" : "B"
 }
 
-export function getChessStatus(chess: Chess): ChessState["status"] {
+function getChessStatus(chess: Chess): ChessState["status"] {
   if (chess.isCheckmate()) return "checkmate"
   if (chess.isStalemate()) return "stalemate"
   if (chess.isDraw()) return "draw"

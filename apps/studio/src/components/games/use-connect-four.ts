@@ -11,7 +11,7 @@ export const ROWS = 6
 export const COLS = 7
 const WIN_LENGTH = 4
 
-export const DEFAULT_NAMES = {
+const DEFAULT_NAMES = {
   R: "Player Red",
   Y: "Player Yellow",
 }

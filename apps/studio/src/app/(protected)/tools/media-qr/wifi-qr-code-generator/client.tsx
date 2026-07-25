@@ -41,11 +41,25 @@ export default function WiFiQRCodeGeneratorClient() {
     setIsDetecting(true)
 
     try {
+      type NetworkInformation = {
+        type?: string
+        effectiveType?: string
+      }
+      type ExtendedNavigator = Navigator & {
+        getNetworkInformation?: () => Promise<{ ssid?: string }>
+        wifi?: {
+          getCurrentWifiInfo(): Promise<{ ssid?: string }>
+        }
+        connection?: NetworkInformation
+        mozConnection?: NetworkInformation
+        webkitConnection?: NetworkInformation
+      }
+      const extendedNavigator = navigator as ExtendedNavigator
+
       // Try to detect SSID using experimental APIs (limited browser support)
-      if ('getNetworkInformation' in navigator) {
+      if (extendedNavigator.getNetworkInformation) {
         try {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const networkInfo = await (navigator as any).getNetworkInformation()
+          const networkInfo = await extendedNavigator.getNetworkInformation()
           if (networkInfo?.ssid) {
             setSSID(networkInfo.ssid)
             toast.success("WiFi SSID detected successfully")
@@ -58,10 +72,9 @@ export default function WiFiQRCodeGeneratorClient() {
       }
 
       // Try Chrome/Edge experimental API on Android
-      if ('wifi' in navigator) {
+      if (extendedNavigator.wifi) {
         try {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const wifiInfo = await (navigator as any).wifi.getCurrentWifiInfo()
+          const wifiInfo = await extendedNavigator.wifi.getCurrentWifiInfo()
           if (wifiInfo?.ssid) {
             setSSID(wifiInfo.ssid)
             toast.success("WiFi SSID detected successfully")
@@ -74,8 +87,10 @@ export default function WiFiQRCodeGeneratorClient() {
       }
 
       // Check network connection type
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection
+      const connection =
+        extendedNavigator.connection ||
+        extendedNavigator.mozConnection ||
+        extendedNavigator.webkitConnection
 
       if (connection) {
         const isWifi = connection.type === 'wifi' || connection.effectiveType?.includes('wifi')

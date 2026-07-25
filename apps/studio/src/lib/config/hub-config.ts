@@ -314,11 +314,5 @@ export function getSurfaceApps(): AppConfig[] {
   ];
 }
 
-// Get private apps
-export const getPrivateApps = () => HUB_APPS.filter((app) => !app.isPublic);
-
-// Get public apps
-export const getPublicApps = () => HUB_APPS.filter((app) => app.isPublic);
-
 // Get app by ID
 export const getAppById = (id: string) => HUB_APPS.find((app) => app.id === id);

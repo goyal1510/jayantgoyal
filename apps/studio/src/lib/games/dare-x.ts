@@ -1,5 +1,5 @@
 export type DareXAction = "get_dare" | "done" | "not_done"
-export type DareXAttemptStatus = "done" | "not_done"
+type DareXAttemptStatus = "done" | "not_done"
 
 export type DareXHistoryEntry = {
   id: string
@@ -20,7 +20,7 @@ export type DareXState = {
   history: DareXHistoryEntry[]
 }
 
-export const FALLBACK_ONLINE_DARES = [
+const FALLBACK_ONLINE_DARES = [
   "Do 10 jumping jacks.",
   "Sing a line from your favorite song.",
   "Share a fun fact you know.",
@@ -52,7 +52,7 @@ export function isDareXAction(value: unknown): value is DareXAction {
   return value === "get_dare" || value === "done" || value === "not_done"
 }
 
-export function normalizeDares(value: unknown): string[] {
+function normalizeDares(value: unknown): string[] {
   if (!Array.isArray(value)) return [...FALLBACK_ONLINE_DARES]
   const dares = value
     .filter((dare): dare is string => typeof dare === "string")

@@ -68,8 +68,8 @@ describe("standalone Auth application contract", () => {
       actions.match(/export async function \w+Action/g) ?? [];
     const originChecks =
       actions.match(/const context = await actionContext\(\);/g) ?? [];
-    expect(exportedActions.length).toBe(20);
-    expect(originChecks.length).toBe(17);
+    expect(exportedActions.length).toBe(18);
+    expect(originChecks.length).toBe(15);
     expect(actions.match(/await requireProviderMutation\(/g)).toHaveLength(3);
   });
 
@@ -143,7 +143,7 @@ describe("standalone Auth application contract", () => {
     expect(actions).toContain(
       'const currentPassword = rawStringField(formData, "current_password")',
     );
-    expect(actions.match(/const password = rawStringField/g)).toHaveLength(5);
+    expect(actions.match(/const password = rawStringField/g)).toHaveLength(3);
     expect(actions).not.toContain(
       'const password = stringField(formData, "password")',
     );

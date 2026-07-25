@@ -1,4 +1,4 @@
-export const ONLINE_GAME_SLUGS = [
+const ONLINE_GAME_SLUGS = [
   "rock-paper-scissors",
   "tic-tac-toe",
   "dare-x",
@@ -11,8 +11,6 @@ export const ONLINE_GAME_SLUGS = [
 ] as const
 
 export type OnlineGameSlug = (typeof ONLINE_GAME_SLUGS)[number]
-
-export type OnlineSessionStatus = "waiting" | "active" | "completed" | "abandoned"
 
 export type JsonObject = Record<string, unknown>
 

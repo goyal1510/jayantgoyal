@@ -1,9 +1,9 @@
-export type ToolFaq = {
+type ToolFaq = {
   question: string;
   answer: string;
 };
 
-export type ToolSeoContent = {
+type ToolSeoContent = {
   summary: string;
   useCases: string[];
   examples: string[];

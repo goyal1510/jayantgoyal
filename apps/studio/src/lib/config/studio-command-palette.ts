@@ -6,7 +6,7 @@ import {
 } from "./studio-surfaces";
 import { toolCategories } from "@/lib/tools/tools";
 
-export interface StudioCommandPaletteItem {
+interface StudioCommandPaletteItem {
   id: string;
   label: string;
   value: string;

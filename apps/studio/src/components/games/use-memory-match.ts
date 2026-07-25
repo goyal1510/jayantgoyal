@@ -11,7 +11,7 @@ export type CardState = {
   matched: boolean
 }
 
-export const DEFAULT_NAMES = {
+const DEFAULT_NAMES = {
   player1: "Player 1",
   player2: "Player 2",
 }

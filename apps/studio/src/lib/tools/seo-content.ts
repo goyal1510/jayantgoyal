@@ -12,8 +12,6 @@ import { textToolReferences } from "./reference-content/text-tools";
 
 import type { ToolReferenceRegistry } from "./reference-content/types";
 
-export type { ToolFaq, ToolSeoContent } from "./reference-content/types";
-
 export const toolSeoContentByPath: ToolReferenceRegistry = {
   ...generatorToolReferences,
   ...hashEncryptionToolReferences,

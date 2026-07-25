@@ -20,8 +20,8 @@ export interface GameStats {
   guessDistribution: number[]
 }
 
-export const MAX_GUESSES = 6
-export const WORD_LENGTH = 5
+const MAX_GUESSES = 6
+const WORD_LENGTH = 5
 
 export const KEYBOARD_ROWS = [
   ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],

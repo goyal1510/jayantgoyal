@@ -10,7 +10,7 @@ export type TicTacToeState = {
   winningLine: number[]
 }
 
-export const TIC_TAC_TOE_WIN_PATTERNS: ReadonlyArray<[number, number, number]> = [
+const TIC_TAC_TOE_WIN_PATTERNS: ReadonlyArray<[number, number, number]> = [
   [0, 1, 2],
   [3, 4, 5],
   [6, 7, 8],
@@ -30,7 +30,7 @@ export const EMPTY_TIC_TAC_TOE_STATE: TicTacToeState = {
   winningLine: [],
 }
 
-export function createEmptyTicTacToeBoard(): TicTacToeCell[] {
+function createEmptyTicTacToeBoard(): TicTacToeCell[] {
   return Array<TicTacToeCell>(9).fill("")
 }
 

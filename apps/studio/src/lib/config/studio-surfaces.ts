@@ -17,7 +17,7 @@ import {
 
 import { PORTFOLIO_URL, portfolioUrl } from "@/lib/platform/urls";
 
-export type StudioSurfaceSection =
+type StudioSurfaceSection =
   | "discover"
   | "workspace"
   | "experiment"

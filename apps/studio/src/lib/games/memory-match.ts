@@ -2,7 +2,7 @@ import { asJsonObject, type JsonObject } from "@/lib/games/online-sessions"
 
 export type MemoryMatchSeat = "P1" | "P2"
 
-export type MemoryMatchCard = {
+type MemoryMatchCard = {
   id: number
   value: number
   flipped: boolean
@@ -33,7 +33,7 @@ export const MEMORY_MATCH_DIFFICULTIES = {
 
 export type MemoryMatchDifficulty = keyof typeof MEMORY_MATCH_DIFFICULTIES
 
-export const DEFAULT_MEMORY_MATCH_STATE: MemoryMatchState = {
+const DEFAULT_MEMORY_MATCH_STATE: MemoryMatchState = {
   cards: [],
   currentSeat: "P1",
   selectedCards: [],
@@ -45,7 +45,7 @@ export const DEFAULT_MEMORY_MATCH_STATE: MemoryMatchState = {
   difficulty: "medium",
 }
 
-export function isMemoryMatchDifficulty(value: unknown): value is MemoryMatchDifficulty {
+function isMemoryMatchDifficulty(value: unknown): value is MemoryMatchDifficulty {
   return typeof value === "string" && value in MEMORY_MATCH_DIFFICULTIES
 }
 

@@ -58,16 +58,6 @@ export function getDaysInMonth(month: string): string[] {
 }
 
 /**
- * Get number of days in a month
- */
-export function getDaysCount(month: string): number {
-  const [year, monthNum] = month.split("-")
-  const yearNum = parseInt(year!)
-  const monthIndex = parseInt(monthNum!) - 1
-  return new Date(yearNum, monthIndex + 1, 0).getDate()
-}
-
-/**
  * Format a Date object to YYYY-MM-DD using local time (not UTC)
  */
 function formatDateLocal(date: Date): string {
@@ -114,39 +104,4 @@ export function isFutureDate(date: string): boolean {
   checkDate.setHours(0, 0, 0, 0)
 
   return checkDate > today
-}
-
-/**
- * Format date (YYYY-MM-DD) to display format (e.g., "Jan 15" or "Today", "Yesterday")
- * Returns short format for table headers
- * Uses local time, not UTC
- */
-export function formatDate(date: string): string {
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-
-  const yesterday = new Date(today)
-  yesterday.setDate(yesterday.getDate() - 1)
-
-  const dayBeforeYesterday = new Date(today)
-  dayBeforeYesterday.setDate(dayBeforeYesterday.getDate() - 2)
-
-  const todayStr = formatDateLocal(today)
-  const yesterdayStr = formatDateLocal(yesterday)
-  const dayBeforeYesterdayStr = formatDateLocal(dayBeforeYesterday)
-
-  if (date === todayStr) {
-    return "Today"
-  }
-  if (date === yesterdayStr) {
-    return "Yest"
-  }
-  if (date === dayBeforeYesterdayStr) {
-    return "DBY"
-  }
-
-  // Format as "Jan 15" for other dates
-  const [year, month, day] = date.split("-")
-  const dateObj = new Date(parseInt(year!), parseInt(month!) - 1, parseInt(day!))
-  return dateObj.toLocaleDateString("en-US", { month: "short", day: "numeric" })
 }

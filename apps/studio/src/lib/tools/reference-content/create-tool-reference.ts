@@ -1,11 +1,11 @@
 import { getToolByPath } from "@/lib/tools/tools";
 
-import type { ToolReferenceDetails, ToolSeoContent } from "./types";
+import type { ToolReferenceDetails, ToolReferenceRegistry } from "./types";
 
 export function createToolReference(
   path: string,
   details: ToolReferenceDetails,
-): ToolSeoContent {
+): ToolReferenceRegistry[string] {
   const tool = getToolByPath(path);
 
   if (!tool) {

@@ -2,11 +2,11 @@ import type { VercelProjectKey } from "@/lib/types";
 
 const VERCEL_API_BASE = "https://api.vercel.com";
 
-export function getVercelToken(): string | undefined {
+function getVercelToken(): string | undefined {
   return process.env.VERCEL_TOKEN;
 }
 
-export function getTeamId(): string | undefined {
+function getTeamId(): string | undefined {
   return process.env.VERCEL_TEAM_ID;
 }
 

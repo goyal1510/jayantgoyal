@@ -11,7 +11,7 @@ export type PersonalInfo = {
   gender: string
 }
 
-export function calculateAge(dob: string): number | null {
+function calculateAge(dob: string): number | null {
   if (!dob) return null
   const birthDate = new Date(dob)
   const today = new Date()

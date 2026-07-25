@@ -15,10 +15,6 @@ export interface ActivityEntry {
   created_at: string | null
 }
 
-export interface ActivityWithEntries extends Activity {
-  entries: ActivityEntry[]
-}
-
 export interface ActivityStats {
   activity_id: string
   activity_name: string

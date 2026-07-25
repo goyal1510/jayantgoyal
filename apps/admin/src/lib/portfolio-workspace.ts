@@ -28,7 +28,7 @@ type AdminSupabaseClient = Awaited<
   ReturnType<typeof createSupabaseServerClient>
 >;
 
-export async function getSectionEditorialContext(
+async function getSectionEditorialContext(
   supabase: AdminSupabaseClient,
   sectionKey: PortfolioSectionKey,
 ): Promise<{
@@ -68,12 +68,12 @@ export async function getSectionEditorialContext(
   };
 }
 
-export type PortfolioWorkspaceEditorialMap = Partial<
+type PortfolioWorkspaceEditorialMap = Partial<
   Record<PortfolioSectionKey, PortfolioWorkspaceEditorial>
 >;
 
 /** Load multiple normalized presentation rows for one owning workspace. */
-export async function getSectionEditorialContexts(
+async function getSectionEditorialContexts(
   supabase: AdminSupabaseClient,
   sectionKeys: readonly PortfolioSectionKey[],
 ): Promise<PortfolioWorkspaceEditorialMap> {
@@ -101,7 +101,7 @@ function requireEditorialContext(
   return editorial;
 }
 
-export interface PortfolioWorkspaceEditorial {
+interface PortfolioWorkspaceEditorial {
   sectionContent: SectionContent | null;
   navigation: NavItem | null;
 }

@@ -16,7 +16,7 @@ import {
   getWeatherBgColor,
 } from "./weather-utils";
 
-export function WeatherDashboard() {
+function WeatherDashboard() {
   const {
     cityInput,
     setCityInput,

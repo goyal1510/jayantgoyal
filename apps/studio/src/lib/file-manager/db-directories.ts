@@ -1,10 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type {
   DirectoryListingItem,
-  DirectoryTreeItem,
   CreateDirectoryPathParams,
   ListDirectoryParams,
-  GetDirectoryTreeParams,
 } from "./types";
 
 /**
@@ -55,33 +53,6 @@ export async function listDirectory(
 
   if (error) {
     console.error("Error listing directory:", error);
-    return null;
-  }
-
-  return data;
-}
-
-/**
- * Get full directory tree recursively
- * @param supabase - Supabase client instance
- * @param userId - User ID
- * @param parentPath - Parent directory path (default: '/')
- * @returns Array of directory tree items or null if error
- */
-export async function getDirectoryTree(
-  supabase: SupabaseClient,
-  userId: string,
-  parentPath: string = "/"
-): Promise<DirectoryTreeItem[] | null> {
-  const { data, error } = await supabase
-    .schema("jg_app")
-    .rpc("get_directory_tree", {
-      p_user_id: userId,
-      p_parent_path: parentPath,
-    } as GetDirectoryTreeParams);
-
-  if (error) {
-    console.error("Error getting directory tree:", error);
     return null;
   }
 

@@ -16,7 +16,7 @@ import {
 } from "lucide-react"
 import { cn } from "@repo/ui/lib/utils"
 
-export type FileTypeCategory =
+type FileTypeCategory =
   | "image"
   | "video"
   | "audio"
@@ -39,7 +39,7 @@ export interface FileIconProps {
 /**
  * Get file type category from file name/extension
  */
-export function getFileType(fileName: string): FileTypeCategory {
+function getFileType(fileName: string): FileTypeCategory {
   const extension = fileName.split(".").pop()?.toLowerCase() || ""
 
   // Image types
@@ -115,7 +115,7 @@ export function getFileType(fileName: string): FileTypeCategory {
 /**
  * File icon component that displays appropriate icon based on file type
  */
-export function FileIcon({
+function FileIcon({
   type,
   name,
   className,
@@ -143,7 +143,7 @@ export function FileIcon({
 /**
  * Folder icon component
  */
-export function FolderIcon({
+function FolderIcon({
   isOpen = false,
   className,
   size = 20,

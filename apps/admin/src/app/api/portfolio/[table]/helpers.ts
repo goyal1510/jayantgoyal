@@ -10,7 +10,7 @@ import {
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getPortfolioPublicRevalidationPaths } from "@/lib/portfolio-revalidation";
 
-export const ALLOWED_TABLES = PORTFOLIO_TABLES;
+const ALLOWED_TABLES = PORTFOLIO_TABLES;
 
 export const TABLES_WITH_SORT_ORDER = [
   "education",
@@ -22,7 +22,7 @@ export const TABLES_WITH_SORT_ORDER = [
   "nav_items",
 ];
 
-export async function checkAdminAccess() {
+async function checkAdminAccess() {
   const supabase = await createSupabaseServerClient();
 
   const {
@@ -47,7 +47,7 @@ export async function checkAdminAccess() {
   return { authorized: true as const, user };
 }
 
-export function getAdminClient() {
+function getAdminClient() {
   try {
     return createSupabaseServiceRoleClient();
   } catch {

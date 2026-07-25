@@ -6,7 +6,7 @@ const OTP_TYPES = [
   "invite",
 ] as const;
 
-export type AuthOtpType = (typeof OTP_TYPES)[number];
+type AuthOtpType = (typeof OTP_TYPES)[number];
 
 export type AuthCallback =
   | { kind: "provider-error" }

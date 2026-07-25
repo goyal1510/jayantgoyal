@@ -18,7 +18,7 @@ export const PORTFOLIO_LEGACY_ADMIN_ROUTE_TARGETS = {
   "/portfolio/navigation": "/portfolio",
 } as const;
 
-export type LegacyPortfolioAdminRoute =
+type LegacyPortfolioAdminRoute =
   keyof typeof PORTFOLIO_LEGACY_ADMIN_ROUTE_TARGETS;
 
 export function getCanonicalAdminPath(pathname: string): string {

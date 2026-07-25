@@ -50,21 +50,6 @@ export interface FileRecord {
 // File Type Category (matching jg_app.file_manager_type_categories table)
 // ============================================
 
-export interface FileTypeCategoryRecord {
-  type_name: FileTypeCategory;
-  display_name: string;
-  icon: string | null;
-  allowed_mime_types: string[];
-  max_size_bytes: number;
-  can_preview: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-// ============================================
-// Function Return Types
-// ============================================
-
 export interface DirectoryTreeItem {
   id: string;
   file_path: string;
@@ -108,11 +93,6 @@ export interface ListDirectoryParams {
   p_directory_path?: string;
 }
 
-export interface GetDirectoryTreeParams {
-  p_user_id: string;
-  p_parent_path?: string;
-}
-
 export interface GetFileByPathParams {
   p_user_id: string;
   p_file_path: string;
@@ -122,42 +102,6 @@ export interface GenerateStoragePathParams {
   p_user_id: string;
   p_file_path: string;
   p_file_name: string;
-}
-
-export interface MoveFileParams {
-  p_file_id: string;
-  p_new_directory_path: string;
-  p_user_id: string;
-}
-
-export interface CopyFileParams {
-  p_file_id: string;
-  p_target_directory_path: string;
-  p_user_id: string;
-}
-
-// ============================================
-// UI/Application Types
-// ============================================
-
-export type FileItemType = "file" | "directory";
-
-export interface FileItem {
-  id: string;
-  name: string;
-  type: FileItemType;
-  path: string;
-  size?: number;
-  mimeType?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-// Helper type for file upload
-export interface FileUploadData {
-  file: File;
-  directoryPath: string;
-  displayName?: string;
 }
 
 // Helper type for file creation

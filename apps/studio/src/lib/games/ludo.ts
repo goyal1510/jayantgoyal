@@ -10,7 +10,7 @@ export type LudoToken = {
   progress: number
 }
 
-export type LudoLastMove = {
+type LudoLastMove = {
   action: "roll" | "move" | "skip"
   seat: LudoSeat
   diceValue?: number
@@ -31,9 +31,9 @@ export type LudoState = {
   lastMove: LudoLastMove | null
 }
 
-export const LUDO_FINISH_PROGRESS = 57
-export const LUDO_HOME_ENTRY_PROGRESS = 52
-export const LUDO_TOKENS_PER_PLAYER = 4
+const LUDO_FINISH_PROGRESS = 57
+const LUDO_HOME_ENTRY_PROGRESS = 52
+const LUDO_TOKENS_PER_PLAYER = 4
 
 export const LUDO_SEAT_META: Record<LudoSeat, {
   label: string
@@ -71,7 +71,7 @@ const LUDO_HOME_PATH_COORDINATES: Record<LudoSeat, readonly (readonly [number, n
   P4: [[13, 7], [12, 7], [11, 7], [10, 7], [9, 7]],
 }
 
-export const LUDO_YARD_COORDINATES: Record<LudoSeat, readonly (readonly [number, number])[]> = {
+const LUDO_YARD_COORDINATES: Record<LudoSeat, readonly (readonly [number, number])[]> = {
   P1: [[2, 2], [2, 3], [3, 2], [3, 3]],
   P2: [[2, 11], [2, 12], [3, 11], [3, 12]],
   P3: [[11, 11], [11, 12], [12, 11], [12, 12]],
@@ -167,13 +167,13 @@ export function ludoStateToJson(state: LudoState): JsonObject {
   return state as unknown as JsonObject
 }
 
-export function getNextLudoSeat(state: Pick<LudoState, "activeSeats" | "currentSeat">, fromSeat = state.currentSeat): LudoSeat {
+function getNextLudoSeat(state: Pick<LudoState, "activeSeats" | "currentSeat">, fromSeat = state.currentSeat): LudoSeat {
   const currentIndex = state.activeSeats.indexOf(fromSeat)
   const nextIndex = currentIndex < 0 ? 0 : (currentIndex + 1) % state.activeSeats.length
   return state.activeSeats[nextIndex] ?? state.activeSeats[0] ?? "P1"
 }
 
-export function getGlobalIndexForProgress(seat: LudoSeat, progress: number): number | null {
+function getGlobalIndexForProgress(seat: LudoSeat, progress: number): number | null {
   if (progress < 0 || progress >= LUDO_HOME_ENTRY_PROGRESS) return null
   return (LUDO_SEAT_META[seat].startIndex + progress) % LUDO_PATH_COORDINATES.length
 }
@@ -194,7 +194,7 @@ export function getLudoTokenCoordinate(token: LudoToken): readonly [number, numb
   return LUDO_PATH_COORDINATES[globalIndex]!
 }
 
-export function isLegalLudoMove(token: LudoToken, diceValue: number): boolean {
+function isLegalLudoMove(token: LudoToken, diceValue: number): boolean {
   if (!Number.isInteger(diceValue) || diceValue < 1 || diceValue > 6) return false
   if (token.progress < 0) return diceValue === 6
   if (token.progress >= LUDO_FINISH_PROGRESS) return false

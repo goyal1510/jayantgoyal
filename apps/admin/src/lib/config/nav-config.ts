@@ -30,7 +30,7 @@ export interface AdminNavigationDomain {
   roles: readonly UserRole[];
 }
 
-export const portfolioNavItems: NavItem[] = [
+const portfolioNavItems: NavItem[] = [
   { label: "Overview", href: "/portfolio", icon: LayoutDashboard },
   { label: "Home", href: PORTFOLIO_WORKSPACE_ROUTES.home, icon: UserRound },
   { label: "About", href: PORTFOLIO_WORKSPACE_ROUTES.about, icon: UserRound },
@@ -50,11 +50,11 @@ export const portfolioNavItems: NavItem[] = [
   { label: "Contact", href: PORTFOLIO_WORKSPACE_ROUTES.contact, icon: Mail },
 ];
 
-export const systemNavItems: NavItem[] = [
+const systemNavItems: NavItem[] = [
   { label: "Users", href: "/users", icon: Users },
 ];
 
-export const deploymentNavItems: NavItem[] = [
+const deploymentNavItems: NavItem[] = [
   { label: "Deployments", href: "/deployments", icon: Rocket },
 ];
 

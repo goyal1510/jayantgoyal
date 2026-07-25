@@ -22,8 +22,8 @@ export const SITE_DESCRIPTION = STUDIO_BRAND.description;
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/opengraph-image?v=6`;
 export const LAST_SIGNIFICANT_UPDATE = "2026-07-17T00:00:00.000Z";
 
-export const INDEXABLE_EXACT_PATHS = ["/", "/terms-conditions"] as const;
-export const INDEXABLE_PREFIXES = [
+const INDEXABLE_EXACT_PATHS = ["/", "/terms-conditions"] as const;
+const INDEXABLE_PREFIXES = [
   "/products",
   "/tools",
   "/weather",

@@ -1,4 +1,4 @@
-export interface Calculation {
+interface Calculation {
   id: string
   created_at: string | null
   note: string | null
@@ -6,7 +6,7 @@ export interface Calculation {
   user_id: string | null
 }
 
-export interface Denomination {
+interface Denomination {
   id: string
   calculation_id: string | null
   denomination: number

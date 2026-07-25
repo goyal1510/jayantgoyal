@@ -24,7 +24,7 @@ function configuredReturnOrigins(): string[] {
     .filter(Boolean);
 }
 
-export function authReturnOrigins(): string[] {
+function authReturnOrigins(): string[] {
   return [
     applicationOrigin("portfolio", process.env.NEXT_PUBLIC_PORTFOLIO_URL),
     applicationOrigin("studio", process.env.NEXT_PUBLIC_STUDIO_URL),

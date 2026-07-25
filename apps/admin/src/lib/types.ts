@@ -40,16 +40,6 @@ export interface Profile {
   email?: string; // Joined from auth.users
 }
 
-export interface User {
-  id: string;
-  email: string;
-  created_at: string;
-}
-
-export interface ProfileWithUser extends Profile {
-  user?: User;
-}
-
 /**
  * Auth context type
  */
@@ -97,7 +87,7 @@ export type VercelDeploymentState =
   | "READY"
   | "CANCELED";
 
-export type VercelTarget = "production" | "preview" | null;
+type VercelTarget = "production" | "preview" | null;
 
 export interface VercelDeployment {
   uid: string;

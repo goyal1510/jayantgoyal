@@ -10,15 +10,6 @@ export interface TypingTestResult {
   created_at: string | null
 }
 
-export interface NewTypingTestResult {
-  wpm: number
-  accuracy: number
-  duration_seconds: number
-  total_characters: number
-  correct_characters: number
-  text_length: number
-}
-
 export interface PaginatedTypingResults {
   items: TypingTestResult[]
   total: number

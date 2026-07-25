@@ -4,16 +4,12 @@ import {
   PORTFOLIO_WRITING_CMS_SELECT_COLUMNS,
   validatePortfolioWritingWriteInput,
 } from "@repo/portfolio-data";
-import {
-  checkAdminAccess,
-  getAdminClient,
-  authorizeAndGetClient,
-} from "../../portfolio/[table]/helpers";
+import { authorizeAndGetClient } from "../../portfolio/[table]/helpers";
 import { getPortfolioPublicRevalidationPaths } from "@/lib/portfolio-revalidation";
 
-export { checkAdminAccess, getAdminClient, authorizeAndGetClient };
+export { authorizeAndGetClient };
 
-export const ALLOWED_TABLES = ["writing_posts"];
+const ALLOWED_TABLES = ["writing_posts"];
 
 export const TABLES_WITH_SORT_ORDER: string[] = [];
 

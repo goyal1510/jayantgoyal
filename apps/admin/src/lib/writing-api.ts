@@ -12,18 +12,6 @@ export interface WritingApiResponse<T> {
   success?: boolean;
 }
 
-export async function fetchWritingData(
-  table: WritingTable,
-  id?: string
-): Promise<WritingApiResponse<PortfolioWritingPostRecord | PortfolioWritingPostRecord[]>> {
-  const url = id
-    ? `/api/jg-app/${table}?id=${id}`
-    : `/api/jg-app/${table}`;
-
-  const response = await fetch(url);
-  return response.json();
-}
-
 export async function createWritingData(
   table: WritingTable,
   data: PortfolioWritingWriteInput,
