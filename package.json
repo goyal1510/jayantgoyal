@@ -2,6 +2,9 @@
   "name": "with-tailwind",
   "private": true,
   "scripts": {
+    "analyze:portfolio": "ANALYZE=true pnpm --filter portfolio exec next build --webpack",
+    "analyze:portfolio:static": "ANALYZE=true ANALYZE_OPEN=false pnpm --filter portfolio exec next build --webpack",
+    "analyze:portfolio:turbopack": "pnpm --filter portfolio exec next experimental-analyze",
     "build": "turbo run build",
     "check:architecture": "node scripts/check-architecture-boundaries.mjs",
     "check:brand-assets": "node scripts/check-brand-assets.mjs",
@@ -17,6 +20,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "16.2.10",
     "prettier": "^3.6.0",
     "turbo": "^2.6.1",
     "vercel": "^56.3.0",

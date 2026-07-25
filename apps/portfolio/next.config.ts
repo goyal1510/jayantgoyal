@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import { applicationOrigin } from "@repo/platform";
+import { createRequire } from "node:module";
 
 const STUDIO_URL = applicationOrigin(
   "studio",
@@ -224,4 +225,17 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+function configureBundleAnalyzer(config: NextConfig): NextConfig {
+  if (process.env.ANALYZE !== "true") return config;
+
+  const require = createRequire(import.meta.url);
+  const withBundleAnalyzer =
+    require("@next/bundle-analyzer") as typeof import("@next/bundle-analyzer");
+
+  return withBundleAnalyzer({
+    enabled: true,
+    openAnalyzer: process.env.ANALYZE_OPEN !== "false",
+  })(config);
+}
+
+export default configureBundleAnalyzer(nextConfig);
