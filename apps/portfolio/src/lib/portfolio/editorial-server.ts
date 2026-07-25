@@ -3,6 +3,7 @@ import { cache } from "react";
 import {
   isSkillProficiency,
   readPersonalInfo,
+  readWorkCaseStudy,
   readPrinciples,
   readSocialLinks,
   readStringArray,
@@ -15,7 +16,7 @@ import {
   type PortfolioExperiencePublicRow,
   type PortfolioHeroPublicRow,
   type PortfolioNavigationPublicRow,
-  type PortfolioProjectPublicRow,
+  type PortfolioWorkPublicRow,
   type PortfolioSectionContentPublicRow,
   type PortfolioSkillCategoryPublicRow,
   type PortfolioSkillPublicRow,
@@ -27,11 +28,13 @@ import {
   type PortfolioCredential,
   type PortfolioEditorialData,
   type PortfolioNavigationItem,
+  type PortfolioPageContentMap,
+  type PortfolioPageKey,
   type PortfolioProfile,
-  type PortfolioProject,
+  type PortfolioWork,
   type PortfolioSectionContentMap,
   type PortfolioSocialLink,
-  type ProjectTone,
+  type WorkTone,
   type SkillProficiency,
 } from "./editorial-data";
 
@@ -41,7 +44,7 @@ type EducationRow = PortfolioEducationPublicRow;
 type ExperienceRow = PortfolioExperiencePublicRow;
 type SkillCategoryRow = PortfolioSkillCategoryPublicRow;
 type SkillRow = PortfolioSkillPublicRow;
-type ProjectRow = PortfolioProjectPublicRow;
+type WorkRow = PortfolioWorkPublicRow;
 type CertificateRow = PortfolioCertificatePublicRow;
 type ContactRow = PortfolioContactPublicRow;
 type NavigationRow = PortfolioNavigationPublicRow;
@@ -65,8 +68,11 @@ function mapProficiency(value: string): SkillProficiency {
   throw new Error(`Unsupported skill proficiency: ${value}`);
 }
 
-function mapProject(row: ProjectRow, index: number): PortfolioProject {
-  const tones: ProjectTone[] = ["paper", "ink", "signal"];
+function mapWork(row: WorkRow, index: number): PortfolioWork {
+  const tones: WorkTone[] = ["paper", "ink", "signal"];
+  const caseStudy = row.case_study_published
+    ? readWorkCaseStudy(row.case_study)
+    : null;
 
   return {
     id: row.slug,
@@ -82,6 +88,18 @@ function mapProject(row: ProjectRow, index: number): PortfolioProject {
     github: row.github_link,
     tags: readStringArray(row.tags),
     tone: tones[index % tones.length] ?? "paper",
+    caseStudy: caseStudy
+      ? {
+          problem: caseStudy.problem,
+          solution: caseStudy.solution,
+          architecture: caseStudy.architecture,
+          decisions: caseStudy.decisions,
+          security: caseStudy.security,
+          tradeoffs: caseStudy.tradeoffs,
+          outcome: caseStudy.outcome,
+          nextImprovement: caseStudy.next_improvement,
+        }
+      : null,
   };
 }
 
@@ -171,6 +189,37 @@ function mapSectionContent(
   ) as PortfolioSectionContentMap;
 }
 
+const PORTFOLIO_PAGE_KEYS: readonly PortfolioPageKey[] = [
+  "studio",
+  "case-studies",
+  "engineering",
+];
+
+function mapPageContent(rows: SectionContentRow[]): PortfolioPageContentMap {
+  const rowsByKey = new Map(
+    rows.map((row) => [row.section_key as string, row]),
+  );
+
+  return Object.fromEntries(
+    PORTFOLIO_PAGE_KEYS.map((key) => {
+      const row = rowsByKey.get(key);
+      if (!row) throw new Error(`Missing CMS page copy: ${key}`);
+
+      return [
+        key,
+        {
+          eyebrow: row.eyebrow,
+          headline: row.headline ?? "",
+          accent: row.accent ?? "",
+          description: row.description ?? "",
+          supportingText: row.supporting_text ?? "",
+          isVisible: row.is_visible,
+        },
+      ];
+    }),
+  ) as PortfolioPageContentMap;
+}
+
 function throwQueryErrors(
   results: Array<{ error: { message: string } | null }>,
 ): void {
@@ -190,7 +239,7 @@ export const getEditorialPortfolioData = cache(
       experienceResult,
       categoriesResult,
       skillsResult,
-      projectsResult,
+      workResult,
       certificatesResult,
       contactResult,
       navigationResult,
@@ -232,8 +281,8 @@ export const getEditorialPortfolioData = cache(
         .order("sort_order"),
       supabase
         .schema("portfolio")
-        .from("projects")
-        .select(PORTFOLIO_SELECT_COLUMNS.projects)
+        .from("work")
+        .select(PORTFOLIO_SELECT_COLUMNS.work)
         .eq("is_visible", true)
         .order("sort_order"),
       supabase
@@ -266,7 +315,7 @@ export const getEditorialPortfolioData = cache(
       experienceResult,
       categoriesResult,
       skillsResult,
-      projectsResult,
+      workResult,
       certificatesResult,
       contactResult,
       navigationResult,
@@ -280,7 +329,9 @@ export const getEditorialPortfolioData = cache(
     const hero = castData<HeroRow>(heroResult.data);
     const about = castData<AboutRow>(aboutResult.data);
     const contact = castData<ContactRow>(contactResult.data);
-    const categories = castData<SkillCategoryRow[]>(categoriesResult.data ?? []);
+    const categories = castData<SkillCategoryRow[]>(
+      categoriesResult.data ?? [],
+    );
     const skills = castData<SkillRow[]>(skillsResult.data ?? []);
 
     return {
@@ -290,6 +341,9 @@ export const getEditorialPortfolioData = cache(
         castData<NavigationRow[]>(navigationResult.data ?? []),
       ),
       sectionContent: mapSectionContent(
+        castData<SectionContentRow[]>(sectionContentResult.data ?? []),
+      ),
+      pageContent: mapPageContent(
         castData<SectionContentRow[]>(sectionContentResult.data ?? []),
       ),
       education: castData<EducationRow[]>(educationResult.data ?? []).map(
@@ -308,7 +362,7 @@ export const getEditorialPortfolioData = cache(
           period: row.period,
           location: row.location ?? "",
           summary: row.summary ?? "",
-      outcomes: readStringArray(row.bullets),
+          outcomes: readStringArray(row.bullets),
         }),
       ),
       skillGroups: categories.map((category) => ({
@@ -322,12 +376,12 @@ export const getEditorialPortfolioData = cache(
             evidence: skill.evidence,
           })),
       })),
-      projects: castData<ProjectRow[]>(projectsResult.data ?? []).map(mapProject),
+      work: castData<WorkRow[]>(workResult.data ?? []).map(
+        mapWork,
+      ),
       credentials: castData<CertificateRow[]>(
         certificatesResult.data ?? [],
-      ).map(
-        mapCredential,
-      ),
+      ).map(mapCredential),
       principles: readPrinciples(about.principles),
     };
   },
@@ -382,6 +436,9 @@ export const getPortfolioShellData = cache(async () => {
     ),
     profile,
     sectionContent: mapSectionContent(
+      castData<SectionContentRow[]>(sectionContentResult.data ?? []),
+    ),
+    pageContent: mapPageContent(
       castData<SectionContentRow[]>(sectionContentResult.data ?? []),
     ),
   };

@@ -22,7 +22,7 @@ export function EditorialSubpageHeader({
           ariaLabel="Portfolio navigation"
           items={navigation}
         />
-        <Link className="editorial-subpage-header__contact" href="/#contact">
+        <Link className="editorial-subpage-header__contact" href="/contact">
           Let&apos;s talk <ArrowDown aria-hidden="true" />
         </Link>
       </div>

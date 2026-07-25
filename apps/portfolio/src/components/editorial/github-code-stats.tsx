@@ -49,14 +49,14 @@ export function GithubCodeStats({
 
   if (loading) {
     return (
-      <div className="github-code-stats__status">
+      <div className="activity-code-stats__status">
         Computing repository data…
       </div>
     );
   }
   if (!stats || unavailable) {
     return (
-      <div className="github-code-stats__status">
+      <div className="activity-code-stats__status">
         Live repository statistics are temporarily unavailable.
       </div>
     );
@@ -80,8 +80,8 @@ export function GithubCodeStats({
   );
 
   return (
-    <div className="github-code-stats">
-      <div className="github-code-stats__metrics">
+    <div className="activity-code-stats">
+      <div className="activity-code-stats__metrics">
         {metrics.map((metric) => (
           <div key={metric.label}>
             <strong>{metric.value}</strong>
@@ -89,9 +89,9 @@ export function GithubCodeStats({
           </div>
         ))}
       </div>
-      <div className="github-code-stats__languages">
+      <div className="activity-code-stats__languages">
         <div
-          className="github-code-stats__bar"
+          className="activity-code-stats__bar"
           aria-label="Language distribution"
         >
           {visibleLanguages.map((language) => (
@@ -114,7 +114,7 @@ export function GithubCodeStats({
             />
           ) : null}
         </div>
-        <div className="github-code-stats__legend">
+        <div className="activity-code-stats__legend">
           {visibleLanguages.map((language) => (
             <span key={language.name}>
               <i style={{ backgroundColor: language.color }} />

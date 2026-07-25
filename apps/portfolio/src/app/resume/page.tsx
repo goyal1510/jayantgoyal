@@ -23,6 +23,7 @@ export default async function ResumePage() {
   const shell = await getPortfolioShellData();
   const content = shell.sectionContent.resume;
   if (!content.isVisible) notFound();
+  const resumeHref = "/api/resume";
 
   return (
     <main className="editorial-page">
@@ -36,14 +37,25 @@ export default async function ResumePage() {
           <h1>{content.headline}</h1>
           <p>{content.description}</p>
           <div className="editorial-resume__actions">
-            <a href={shell.profile.resume}>
-              Download latest resume <ArrowDownToLine aria-hidden="true" />
+            <a href={resumeHref} download="Jayant_Resume.pdf">
+              Download PDF <ArrowDownToLine aria-hidden="true" />
             </a>
-            <Link href="/#experience">
-              Explore the full story <ArrowUpRight aria-hidden="true" />
+            <Link href="/about#experience">
+              Explore About and experience <ArrowUpRight aria-hidden="true" />
             </Link>
           </div>
         </div>
+      </section>
+      <section className="shell editorial-resume__viewer">
+        <div className="editorial-resume__viewer-heading">
+          <span className="section-index">Resume / In browser</span>
+          <p>Read the current PDF here or download a copy for later.</p>
+        </div>
+        <iframe
+          src={resumeHref}
+          title="Jayant resume PDF"
+          className="editorial-resume__frame"
+        />
       </section>
     </main>
   );

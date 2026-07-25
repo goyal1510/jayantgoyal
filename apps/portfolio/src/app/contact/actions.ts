@@ -20,8 +20,11 @@ export async function submitContactForm(
   const result = await deliverContactSubmission({
     name: getField(formData, "name"),
     email: getField(formData, "email"),
-    subject: getField(formData, "subject"),
-    message: getField(formData, "message"),
+    project: getField(formData, "project"),
+    stage: getField(formData, "stage"),
+    timeline: getField(formData, "timeline"),
+    outcome: getField(formData, "outcome"),
+    context: getField(formData, "context"),
   });
 
   return result.success ? { success: true } : { error: result.error };

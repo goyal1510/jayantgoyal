@@ -34,9 +34,9 @@ import { ContactForm } from "@/components/editorial/contact-form";
 import { GithubCodeStats } from "@/components/editorial/github-code-stats";
 import { GithubContributions } from "@/components/editorial/github-contributions";
 import { PortfolioNavigation } from "@/components/editorial/portfolio-navigation";
-import { FeaturedProjects } from "@/components/editorial/project-showcase";
+import { FeaturedWork } from "@/components/editorial/work-showcase";
 import type {
-  BlogPreview,
+  WritingPreview,
   PortfolioCredential,
   PortfolioEditorialData,
   PortfolioExperience as PortfolioExperienceItem,
@@ -45,6 +45,7 @@ import type {
   PortfolioSectionKey,
   PortfolioSocialLink,
 } from "@/lib/portfolio/editorial-data";
+import { PRODUCT_PROOF_POINTS } from "@/lib/portfolio/product-proof";
 import { getCompactSectionHeading } from "@/lib/portfolio/section-heading";
 import type { GitHubLOCStats } from "@repo/github";
 
@@ -117,6 +118,23 @@ function HeroHeadline({ headline }: { headline: string }) {
       <em>{headline.slice(accentStart, accentEnd)}</em>
       {headline.slice(accentEnd)}
     </>
+  );
+}
+
+function ProductProofStrip() {
+  return (
+    <section className="product-proof" aria-label="Product engineering proof">
+      <div className="shell">
+        <dl className="product-proof__grid">
+          {PRODUCT_PROOF_POINTS.map((point) => (
+            <div key={point.label}>
+              <dt>{point.label}</dt>
+              <dd>{point.value}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
   );
 }
 
@@ -295,7 +313,7 @@ function ExperienceLandscape({
   );
 }
 
-function ActivitySection({
+function GithubSection({
   githubStats,
   profile,
   content,
@@ -317,8 +335,8 @@ function ActivitySection({
           </div>
         </Reveal>
 
-        <div className="github-paper">
-          <div className="github-paper__topline">
+        <div className="activity-paper">
+          <div className="activity-paper__topline">
             <div>
               <Github aria-hidden="true" />
               <span>{profile.github.replace(/^https?:\/\//, "")}</span>
@@ -339,10 +357,10 @@ function ActivitySection({
 }
 
 function WritingSection({
-  blogPosts,
+  writingPosts,
   content,
 }: {
-  blogPosts: BlogPreview[];
+  writingPosts: WritingPreview[];
   content: PortfolioSectionContent;
 }) {
   const heading = getCompactSectionHeading(content.eyebrow, content.headline);
@@ -357,19 +375,19 @@ function WritingSection({
               <h2>{heading.title}</h2>
               <div className="writing-block__heading-meta">
                 <p>{content.description}</p>
-                <Link href="/blog">
+                <Link href="/writing">
                   All articles <ArrowUpRight aria-hidden="true" />
                 </Link>
               </div>
             </div>
           </div>
           <div className="writing-index">
-            {blogPosts.length === 0 ? (
+            {writingPosts.length === 0 ? (
               <div className="editorial-writing-index__empty">
                 <p>No published notes yet.</p>
               </div>
             ) : null}
-            {blogPosts.map((post, index) => (
+            {writingPosts.map((post, index) => (
               <Reveal
                 key={post.slug}
                 className="writing-entry"
@@ -377,7 +395,7 @@ function WritingSection({
               >
                 <Link
                   className="writing-entry__link"
-                  href={`/blog/${post.slug}`}
+                  href={`/writing/${post.slug}`}
                 >
                   <div className="writing-entry__meta">
                     <span>{post.date}</span>
@@ -405,7 +423,66 @@ function WritingSection({
   );
 }
 
-function ContactSection({
+function AboutPreview({
+  about,
+  content,
+}: {
+  about: PortfolioEditorialData["about"];
+  content: PortfolioSectionContent;
+}) {
+  const heading = getCompactSectionHeading(content.eyebrow, about.headline);
+
+  return (
+    <section className="profile-section profile-section--preview">
+      <div className="shell">
+        <Reveal className="section-heading">
+          <span className="section-index">{heading.label}</span>
+          <div>
+            <h2>{heading.title}</h2>
+            <p>{about.objective}</p>
+          </div>
+        </Reveal>
+        <div className="profile-grid">
+          <Reveal className="profile-story">
+            <p className="profile-story__lead">{about.lead}</p>
+            <Link href="/about" className="text-link">
+              About, experience, and education <ArrowUpRight aria-hidden="true" />
+            </Link>
+          </Reveal>
+          <div className="profile-facts">
+            {about.facts.slice(0, 3).map((fact, index) => (
+              <Reveal key={fact.label} delay={index * 0.04}>
+                <article>
+                  <span>{fact.label}</span>
+                  <strong>{fact.value}</strong>
+                </article>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ContactPrompt() {
+  return (
+    <section className="shell home-contact-prompt">
+      <div className="section-heading">
+        <span className="section-index">Contact</span>
+        <div>
+          <h2>Have a product worth making real?</h2>
+          <p>Share the brief, the current stage, and the outcome you need.</p>
+        </div>
+      </div>
+      <Link href="/contact" className="text-link">
+        Start a product conversation <ArrowUpRight aria-hidden="true" />
+      </Link>
+    </section>
+  );
+}
+
+export function ContactSection({
   profile,
   content,
 }: {
@@ -494,11 +571,11 @@ function ContactSection({
 
 export function PortfolioExperience({
   githubStats,
-  blogPosts,
+  writingPosts,
   data,
 }: {
   githubStats: GitHubLOCStats | null;
-  blogPosts: BlogPreview[];
+  writingPosts: WritingPreview[];
   data: PortfolioEditorialData;
 }) {
   const {
@@ -507,12 +584,14 @@ export function PortfolioExperience({
     education,
     experience,
     skillGroups,
-    projects,
+    work,
     credentials,
     principles,
     navigation,
     sectionContent,
   } = data;
+  const showLegacyHomeSections =
+    process.env.NEXT_PUBLIC_SHOW_LEGACY_HOME_SECTIONS === "true";
   const visibleNavigation = navigation.filter((item) => {
     const content = sectionContent[item.key as PortfolioSectionKey];
     return content?.isVisible ?? true;
@@ -582,9 +661,9 @@ export function PortfolioExperience({
             items={visibleNavigation}
           />
           {sectionContent.contact.isVisible ? (
-            <a className="header-contact" href="#contact">
+            <Link className="header-contact" href="/contact">
               Let&apos;s talk <ArrowDown aria-hidden="true" />
-            </a>
+            </Link>
           ) : null}
         </div>
       </header>
@@ -600,11 +679,19 @@ export function PortfolioExperience({
                 <HeroHeadline headline={profile.headline} />
               </h1>
               <p>{profile.introduction}</p>
-              {sectionContent.work.isVisible ? (
-                <a href="#work" className="text-link" data-cursor="Explore">
-                  See the project wall <ArrowDown aria-hidden="true" />
-                </a>
-              ) : null}
+              <div className="hero-actions">
+                <Link href="/work" className="text-link" data-cursor="Explore">
+                  Explore Work <ArrowDown aria-hidden="true" />
+                </Link>
+                <Link href="/resume" className="text-link">
+                  Résumé <FileText aria-hidden="true" />
+                </Link>
+                {sectionContent.contact.isVisible ? (
+                  <Link href="/contact" className="text-link">
+                    Discuss a product <Mail aria-hidden="true" />
+                  </Link>
+                ) : null}
+              </div>
             </motion.div>
 
             <Reveal className="hero-note" delay={0.12}>
@@ -631,7 +718,20 @@ export function PortfolioExperience({
         <div id="top" />
       )}
 
-      {sectionContent.about.isVisible || sectionContent.education.isVisible ? (
+      <ProductProofStrip />
+
+      {sectionContent.work.isVisible ? (
+        <FeaturedWork work={work} content={sectionContent.work} />
+      ) : null}
+      {sectionContent.writing.isVisible ? (
+        <WritingSection
+          writingPosts={writingPosts}
+          content={sectionContent.writing}
+        />
+      ) : null}
+
+      {showLegacyHomeSections &&
+      (sectionContent.about.isVisible || sectionContent.education.isVisible) ? (
         <section id="about" className="profile-section">
           <div className="shell">
             {sectionContent.about.isVisible ? (
@@ -709,8 +809,8 @@ export function PortfolioExperience({
         </section>
       ) : null}
 
-      {sectionContent.skills.isVisible ? (
-        <section id="skills" className="capability-section">
+      {showLegacyHomeSections && sectionContent.skills.isVisible ? (
+        <section id="engineering" className="capability-section">
           <div className="shell">
             <Reveal className="section-heading">
               <span className="section-index">{skillsHeading.label}</span>
@@ -773,8 +873,8 @@ export function PortfolioExperience({
         </section>
       ) : null}
 
-      {sectionContent.experience.isVisible ||
-      sectionContent.credentials.isVisible ? (
+      {showLegacyHomeSections && (sectionContent.experience.isVisible ||
+      sectionContent.credentials.isVisible) ? (
         <ExperienceLandscape
           experience={experience}
           credentials={credentials}
@@ -782,25 +882,20 @@ export function PortfolioExperience({
           credentialContent={sectionContent.credentials}
         />
       ) : null}
-      {sectionContent.activity.isVisible ? (
-        <ActivitySection
+      {showLegacyHomeSections && sectionContent.activity.isVisible ? (
+        <GithubSection
           githubStats={githubStats}
           profile={profile}
           content={sectionContent.activity}
         />
       ) : null}
-      {sectionContent.work.isVisible ? (
-        <FeaturedProjects projects={projects} content={sectionContent.work} />
-      ) : null}
-      {sectionContent.writing.isVisible ? (
-        <WritingSection
-          blogPosts={blogPosts}
-          content={sectionContent.writing}
-        />
-      ) : null}
-      {sectionContent.contact.isVisible ? (
+      {showLegacyHomeSections && sectionContent.contact.isVisible ? (
         <ContactSection profile={profile} content={sectionContent.contact} />
       ) : null}
+      {sectionContent.about.isVisible ? (
+        <AboutPreview about={about} content={sectionContent.about} />
+      ) : null}
+      {sectionContent.contact.isVisible ? <ContactPrompt /> : null}
     </main>
   );
 }

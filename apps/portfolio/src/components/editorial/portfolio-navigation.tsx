@@ -6,28 +6,26 @@ import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 
 import type { PortfolioNavigationItem } from "@/lib/portfolio/editorial-data";
-
-type NavigationSurface = "home" | "subpage";
-
-function getItemHref(key: string, surface: NavigationSurface) {
-  if (surface === "home") return `#${key}`;
-  if (key === "writing") return "/blog";
-  if (key === "work") return "/work";
-  return `/#${key}`;
-}
+import {
+  getPortfolioNavigationHref,
+  isPortfolioNavigationItemCurrent,
+  type PortfolioNavigationSurface,
+} from "@/lib/portfolio/navigation";
 
 export function PortfolioNavigation({
   surface,
   ariaLabel,
   items,
 }: {
-  surface: NavigationSurface;
+  surface: PortfolioNavigationSurface;
   ariaLabel: string;
   items: PortfolioNavigationItem[];
 }) {
   const pathname = usePathname();
   const menuId = useId();
+  const menuLabelId = useId();
   const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
   const firstLinkRef = useRef<HTMLAnchorElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const navigationItems = items;
@@ -49,16 +47,36 @@ export function PortfolioNavigation({
       setMenuOpen(false);
       window.requestAnimationFrame(() => toggleRef.current?.focus());
     };
+    const keepFocusInMenu = (event: KeyboardEvent) => {
+      if (event.key !== "Tab") return;
+
+      const focusable = Array.from(
+        menuRef.current?.querySelectorAll<HTMLAnchorElement>("a[href]") ?? [],
+      );
+      const firstFocusable = focusable[0];
+      const lastFocusable = focusable.at(-1);
+      if (!firstFocusable || !lastFocusable) return;
+
+      if (event.shiftKey && document.activeElement === firstFocusable) {
+        event.preventDefault();
+        lastFocusable.focus();
+      } else if (!event.shiftKey && document.activeElement === lastFocusable) {
+        event.preventDefault();
+        firstFocusable.focus();
+      }
+    };
 
     document.body.style.overflow = "hidden";
     desktopQuery.addEventListener("change", closeOnDesktop);
     window.addEventListener("keydown", closeOnEscape);
+    window.addEventListener("keydown", keepFocusInMenu);
 
     return () => {
       window.cancelAnimationFrame(focusFrame);
       document.body.style.overflow = previousOverflow;
       desktopQuery.removeEventListener("change", closeOnDesktop);
       window.removeEventListener("keydown", closeOnEscape);
+      window.removeEventListener("keydown", keepFocusInMenu);
     };
   }, [menuOpen]);
 
@@ -69,11 +87,10 @@ export function PortfolioNavigation({
           {navigationItems.map((item) => (
             <Link
               key={item.key}
-              href={getItemHref(item.key, surface)}
+              href={getPortfolioNavigationHref(item.key, surface)}
               data-nav-key={item.key}
               aria-current={
-                (item.key === "writing" && pathname.startsWith("/blog")) ||
-                (item.key === "work" && pathname.startsWith("/work"))
+                isPortfolioNavigationItemCurrent(item.key, pathname)
                   ? "page"
                   : undefined
               }
@@ -93,16 +110,23 @@ export function PortfolioNavigation({
           }
           onClick={() => setMenuOpen((current) => !current)}
         >
-          <span />
-          <span />
+          <span aria-hidden="true" />
+          <span aria-hidden="true" />
         </button>
       </nav>
 
       {menuOpen ? (
-        <div id={menuId} className="portfolio-mobile-menu">
+        <div
+          ref={menuRef}
+          id={menuId}
+          className="portfolio-mobile-menu"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={menuLabelId}
+        >
           <div className="shell portfolio-mobile-menu__inner">
             <div className="portfolio-mobile-menu__eyebrow">
-              <span>Navigation / Portfolio</span>
+              <span id={menuLabelId}>Navigation / Portfolio</span>
               <span>
                 {String(navigationItems.length).padStart(2, "0")} sections
               </span>
@@ -110,15 +134,16 @@ export function PortfolioNavigation({
 
             <ol className="portfolio-mobile-menu__list">
               {navigationItems.map((item, index) => {
-                const current =
-                  (item.key === "writing" && pathname.startsWith("/blog")) ||
-                  (item.key === "work" && pathname.startsWith("/work"));
+                const current = isPortfolioNavigationItemCurrent(
+                  item.key,
+                  pathname,
+                );
 
                 return (
                   <li key={item.key}>
                     <Link
                       ref={index === 0 ? firstLinkRef : undefined}
-                      href={getItemHref(item.key, surface)}
+                      href={getPortfolioNavigationHref(item.key, surface)}
                       aria-current={current ? "page" : undefined}
                       onClick={() => setMenuOpen(false)}
                     >

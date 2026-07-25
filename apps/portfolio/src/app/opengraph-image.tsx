@@ -5,7 +5,7 @@ import { ImageResponse } from "next/og";
 
 import { PERSON_BRAND } from "@repo/brand";
 
-export const alt = `${PERSON_BRAND.fullName} — Full-Stack Developer`;
+export const alt = `${PERSON_BRAND.fullName} — Software Engineer`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -45,10 +45,10 @@ export default async function OpenGraphImage() {
             {PERSON_BRAND.fullName}
           </span>
           <span style={{ fontSize: 34, fontWeight: 600 }}>
-            Full-Stack Developer
+            Software Engineer
           </span>
           <span style={{ fontSize: 24 }}>
-            Portfolio · Experience · Projects
+            Portfolio · Experience · Work
           </span>
         </div>
       </div>

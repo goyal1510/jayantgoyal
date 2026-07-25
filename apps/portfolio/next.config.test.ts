@@ -42,14 +42,29 @@ describe("Portfolio compatibility redirects", () => {
     const redirects = await configuredRedirects();
 
     expect(redirects).toContainEqual({
-      source: "/about",
-      destination: "/#about",
+      source: "/home",
+      destination: "/#top",
       permanent: true,
     });
     expect(redirects).toContainEqual({
       source: "/login",
       destination: "https://studio.jayantgoyal.com/welcome",
       permanent: false,
+    });
+  });
+
+  it("keeps historical Studio project URLs pointing at the Studio system page", async () => {
+    const redirects = await configuredRedirects();
+
+    expect(redirects).toContainEqual({
+      source: "/case-studies/tech-tools",
+      destination: "/work/studio",
+      permanent: true,
+    });
+    expect(redirects).toContainEqual({
+      source: "/projects/sync-scratchpad",
+      destination: "/work/studio",
+      permanent: true,
     });
   });
 });

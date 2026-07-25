@@ -42,7 +42,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: profile.seoDescription,
     keywords: [
       profile.name,
-      "full-stack product engineer",
+      "full-stack developer",
       "portfolio",
       "Next.js",
       "React",

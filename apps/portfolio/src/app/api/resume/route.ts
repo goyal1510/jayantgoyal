@@ -1,4 +1,6 @@
 import { createSign } from "node:crypto";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 
 import { NextResponse } from "next/server";
 
@@ -11,6 +13,12 @@ const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const DRIVE_EXPORT_MIME_TYPE = "application/pdf";
 const DRIVE_READONLY_SCOPE = "https://www.googleapis.com/auth/drive.readonly";
 const RESUME_FILE_NAME = "Jayant_Resume.pdf";
+const STATIC_RESUME_PATH = join(
+  process.cwd(),
+  "public",
+  "documents",
+  RESUME_FILE_NAME,
+);
 
 function base64Url(input: string | Buffer): string {
   return Buffer.from(input)
@@ -105,6 +113,22 @@ async function exportResumePdf(
   return response.arrayBuffer();
 }
 
+async function readStaticResume(): Promise<Buffer> {
+  return readFile(STATIC_RESUME_PATH);
+}
+
+function resumeResponse(pdf: Buffer | ArrayBuffer): NextResponse {
+  const bytes = pdf instanceof ArrayBuffer ? new Uint8Array(pdf) : pdf;
+
+  return new NextResponse(bytes as unknown as BodyInit, {
+    headers: {
+      "Content-Type": DRIVE_EXPORT_MIME_TYPE,
+      "Content-Disposition": "inline; filename=\"" + RESUME_FILE_NAME + "\"",
+      "Cache-Control": "public, s-maxage=300, stale-while-revalidate=3600",
+    },
+  });
+}
+
 export async function GET(request: Request) {
   const { profile } = await getPortfolioShellData();
   const documentId = process.env.GOOGLE_RESUME_DOCUMENT_ID;
@@ -112,34 +136,38 @@ export async function GET(request: Request) {
   const privateKey = getPrivateKey();
 
   if (!documentId || !serviceAccountEmail || !privateKey) {
-    const configuredResume = new URL(profile.resume, request.url);
-    if (configuredResume.pathname !== "/api/resume") {
-      return NextResponse.redirect(configuredResume, 307);
-    }
+    try {
+      return resumeResponse(await readStaticResume());
+    } catch (error) {
+      console.error("Static resume fallback failed", error);
+      const configuredResume = new URL(profile.resume, request.url);
+      if (configuredResume.pathname !== "/api/resume") {
+        return NextResponse.redirect(configuredResume, 307);
+      }
 
-    return NextResponse.json(
-      { error: "The CMS resume source is not currently available." },
-      { status: 503 },
-    );
+      return NextResponse.json(
+        { error: "The CMS resume source is not currently available." },
+        { status: 503 },
+      );
+    }
   }
 
   try {
     const accessToken = await getAccessToken(serviceAccountEmail, privateKey);
     const pdf = await exportResumePdf(documentId, accessToken);
 
-    return new NextResponse(pdf, {
-      headers: {
-        "Content-Type": DRIVE_EXPORT_MIME_TYPE,
-        "Content-Disposition": `attachment; filename="${RESUME_FILE_NAME}"`,
-        "Cache-Control": "public, s-maxage=300, stale-while-revalidate=3600",
-      },
-    });
+    return resumeResponse(pdf);
   } catch (error) {
     console.error("Resume export failed", error);
 
-    return NextResponse.json(
-      { error: "Unable to export resume PDF." },
-      { status: 502 },
-    );
+    try {
+      return resumeResponse(await readStaticResume());
+    } catch (fallbackError) {
+      console.error("Static resume fallback failed", fallbackError);
+      return NextResponse.json(
+        { error: "Unable to export resume PDF." },
+        { status: 502 },
+      );
+    }
   }
 }

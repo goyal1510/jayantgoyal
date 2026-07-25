@@ -1,14 +1,14 @@
 import { createClient } from "@supabase/supabase-js";
 import {
-  PORTFOLIO_BLOG_PREVIEW_SELECT_COLUMNS,
+  PORTFOLIO_WRITING_PREVIEW_SELECT_COLUMNS,
   readStringArray,
-  type PortfolioBlogPreviewRow,
+  type PortfolioWritingPreviewRow,
 } from "@repo/portfolio-data";
 
-import { formatEditorialDate } from "@/lib/blog/date";
-import type { BlogPreview } from "@/lib/portfolio/editorial-data";
+import { formatEditorialDate } from "@/lib/writing/date";
+import type { WritingPreview } from "@/lib/portfolio/editorial-data";
 
-export async function getPublishedBlogPreviews(): Promise<BlogPreview[]> {
+export async function getPublishedWritingPreviews(): Promise<WritingPreview[]> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !anonKey) {
@@ -20,16 +20,16 @@ export async function getPublishedBlogPreviews(): Promise<BlogPreview[]> {
   });
   const { data, error } = await supabase
     .schema("jg_app")
-    .from("blog_posts")
-    .select(PORTFOLIO_BLOG_PREVIEW_SELECT_COLUMNS)
+    .from("writing_posts")
+    .select(PORTFOLIO_WRITING_PREVIEW_SELECT_COLUMNS)
     .eq("is_published", true)
     .eq("is_visible", true)
     .order("published_at", { ascending: false })
     .limit(3);
 
-  if (error) throw new Error(`Unable to load Blog previews: ${error.message}`);
+  if (error) throw new Error(`Unable to load Writing previews: ${error.message}`);
 
-  return ((data ?? []) as PortfolioBlogPreviewRow[]).map((post) => ({
+  return ((data ?? []) as PortfolioWritingPreviewRow[]).map((post) => ({
     title: post.title,
     slug: post.slug,
     excerpt: post.excerpt ?? "Read the latest note from the workbench.",

@@ -1,10 +1,10 @@
-# Jayant Goyal Portfolio
+# Jayant Portfolio
 
-> The public professional portfolio of Jayant Goyal, a full-stack developer building reliable products with Next.js, React, TypeScript, and Supabase.
+> The public professional portfolio of Jayant, a software engineer building reliable products with Next.js, React, TypeScript, and Supabase.
 
 ## Portfolio
 - Home: https://jayantgoyal.com
-- Blog: https://jayantgoyal.com/blog
+- Writing: https://jayantgoyal.com/writing
 - Resume: https://jayantgoyal.com/resume
 - GitHub: https://github.com/goyal1510
 

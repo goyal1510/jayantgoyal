@@ -4,17 +4,18 @@ import { ArrowLeft, ArrowUpRight, Github } from "lucide-react";
 import Link from "next/link";
 
 import type {
-  PortfolioProject,
+  PortfolioWork,
   PortfolioSectionContent,
 } from "@/lib/portfolio/editorial-data";
+import { getFeaturedWork } from "@/lib/portfolio/featured-work";
 import { getCompactSectionHeading } from "@/lib/portfolio/section-heading";
 
-function ProjectArtwork({
+function WorkArtwork({
   project,
   eager = false,
   className = "",
 }: {
-  project: PortfolioProject;
+  project: PortfolioWork;
   eager?: boolean;
   className?: string;
 }) {
@@ -33,20 +34,26 @@ function ProjectArtwork({
   );
 }
 
-function ProjectLinks({
+function WorkLinks({
   project,
   className,
 }: {
-  project: PortfolioProject;
+  project: PortfolioWork;
   className: string;
 }) {
-  if (!project.href && !project.github) return null;
+  if (!project.caseStudy && !project.href && !project.github) return null;
 
   return (
     <div className={className}>
+      {project.caseStudy ? (
+        <Link href={`/work/${project.id}`}>
+          Details <ArrowUpRight aria-hidden="true" />
+        </Link>
+      ) : null}
       {project.href ? (
         <a href={project.href} target="_blank" rel="noreferrer">
-          Live product <ArrowUpRight aria-hidden="true" />
+          {project.id === "admin" ? "Private app" : "Open system"}{" "}
+          <ArrowUpRight aria-hidden="true" />
         </a>
       ) : null}
       {project.github ? (
@@ -58,14 +65,14 @@ function ProjectLinks({
   );
 }
 
-export function FeaturedProjects({
-  projects,
+export function FeaturedWork({
+  work,
   content,
 }: {
-  projects: PortfolioProject[];
+  work: PortfolioWork[];
   content: PortfolioSectionContent;
 }) {
-  const featuredProjects = projects.slice(0, 4);
+  const featuredWork = getFeaturedWork(work);
   const heading = getCompactSectionHeading(content.eyebrow, content.headline);
 
   return (
@@ -80,12 +87,12 @@ export function FeaturedProjects({
         </div>
 
         <div className="featured-project-grid">
-          {featuredProjects.map((project, index) => (
+          {featuredWork.map((project, index) => (
             <article
               key={project.id}
               className={`featured-project project-story--${project.tone}`}
             >
-              <ProjectArtwork
+              <WorkArtwork
                 project={project}
                 eager={index < 2}
                 className="featured-project__artwork"
@@ -103,7 +110,7 @@ export function FeaturedProjects({
                       <li key={tag}>{tag}</li>
                     ))}
                   </ul>
-                  <ProjectLinks
+                  <WorkLinks
                     project={project}
                     className="featured-project__links"
                   />
@@ -113,41 +120,41 @@ export function FeaturedProjects({
           ))}
         </div>
 
-        {projects.length > featuredProjects.length ? (
-          <div className="featured-projects__archive-link">
-            <span>
-              {String(projects.length - featuredProjects.length).padStart(
-                2,
-                "0",
-              )}{" "}
-              more projects in the archive
-            </span>
-            <Link href="/work" data-cursor="Explore">
-              View all {projects.length} projects
-              <ArrowUpRight aria-hidden="true" />
-            </Link>
-          </div>
-        ) : null}
+        <div className="featured-projects__archive-link">
+          <span>Four systems, each explained from problem to outcome</span>
+          <Link href="/work" data-cursor="Explore">
+            View all Work
+            <ArrowUpRight aria-hidden="true" />
+          </Link>
+        </div>
       </div>
     </section>
   );
 }
 
-export function ProjectArchive({ projects }: { projects: PortfolioProject[] }) {
+export function WorkArchive({
+  work,
+  backHref = "/",
+  backLabel = "Back to home",
+}: {
+  work: PortfolioWork[];
+  backHref?: string;
+  backLabel?: string;
+}) {
   return (
     <section
       className="project-desk project-desk--archive"
-      aria-label="All projects"
+      aria-label="All work"
     >
       <div className="shell">
         <div className="project-stories project-stories--archive">
-          {projects.map((project, index) => (
+          {work.map((project, index) => (
             <div
               key={project.id}
               className={`project-story project-story--${project.tone}`}
             >
               <article>
-                <ProjectArtwork
+                <WorkArtwork
                   project={project}
                   eager={index < 2}
                   className="project-fragment"
@@ -166,7 +173,7 @@ export function ProjectArchive({ projects }: { projects: PortfolioProject[] }) {
                     ))}
                   </ul>
                   <p className="project-story__role">{project.role}</p>
-                  <ProjectLinks
+                  <WorkLinks
                     project={project}
                     className="project-story__links"
                   />
@@ -176,9 +183,9 @@ export function ProjectArchive({ projects }: { projects: PortfolioProject[] }) {
           ))}
         </div>
 
-        <Link className="project-archive__back" href="/#work">
+        <Link className="project-archive__back" href={backHref}>
           <ArrowLeft aria-hidden="true" />
-          Back to featured work
+          {backLabel}
         </Link>
       </div>
     </section>

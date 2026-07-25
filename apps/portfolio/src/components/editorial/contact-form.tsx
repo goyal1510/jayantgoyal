@@ -3,6 +3,10 @@
 import { Send } from "lucide-react";
 import { useRef, useState } from "react";
 
+import {
+  CONTACT_STAGE_OPTIONS,
+  CONTACT_TIMELINE_OPTIONS,
+} from "@/lib/contact/options";
 import type { FormEvent } from "react";
 
 type FormStatus =
@@ -75,12 +79,44 @@ export function ContactForm() {
         </label>
       </div>
       <label>
-        <span>Subject</span>
-        <input name="subject" required maxLength={200} />
+        <span>What are you building?</span>
+        <textarea name="project" required maxLength={600} rows={3} />
+      </label>
+      <div className="contact-form__row">
+        <label>
+          <span>Current stage</span>
+          <select name="stage" required defaultValue="">
+            <option value="" disabled>
+              Select stage
+            </option>
+            {CONTACT_STAGE_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span>Target timeline</span>
+          <select name="timeline" required defaultValue="">
+            <option value="" disabled>
+              Select timeline
+            </option>
+            {CONTACT_TIMELINE_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <label>
+        <span>What outcome do you need?</span>
+        <textarea name="outcome" required maxLength={1_200} rows={3} />
       </label>
       <label>
-        <span>Message</span>
-        <textarea name="message" required maxLength={5000} rows={6} />
+        <span>Anything else that would help?</span>
+        <textarea name="context" maxLength={3_000} rows={4} />
       </label>
       <div className="contact-form__submit">
         <button type="submit" disabled={pending}>
@@ -98,7 +134,7 @@ export function ContactForm() {
           aria-live="polite"
         >
           {status.type === "idle"
-            ? "Share as much or as little context as you have."
+            ? "A short brief is enough. I normally reply within one business day."
             : status.message}
         </p>
       </div>

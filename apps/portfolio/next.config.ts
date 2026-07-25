@@ -8,12 +8,9 @@ const STUDIO_URL = applicationOrigin(
 
 const portfolioSectionRedirects = [
   ["/home", "/#top"],
-  ["/about", "/#about"],
-  ["/skills", "/#skills"],
-  ["/experience", "/#experience"],
-  ["/projects", "/#work"],
-  ["/certificates", "/#experience"],
-  ["/contact", "/#contact"],
+  ["/skills", "/about"],
+  ["/experience", "/about#experience"],
+  ["/certificates", "/about#experience"],
 ] as const;
 
 const studioPagePrefixes = [
@@ -24,7 +21,7 @@ const studioPagePrefixes = [
   "/games",
   "/github-stats",
   "/loader-preview",
-  "/messenger",
+  "/scratchpad",
   "/tools",
   "/weather",
   "/forgot-password",
@@ -42,7 +39,7 @@ const studioApiPrefixes = [
   "/api/calculator",
   "/api/files",
   "/api/games",
-  "/api/messenger",
+  "/api/scratchpad",
   "/api/tools",
   "/api/typing-test",
 ] as const;
@@ -64,7 +61,9 @@ function buildStudioRedirects(prefixes: readonly string[]) {
 
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
-  { key: "X-Frame-Options", value: "DENY" },
+  // The Resume route renders the first-party PDF inside the Portfolio page.
+  // SAMEORIGIN still blocks external framing while allowing that viewer to work.
+  { key: "X-Frame-Options", value: "SAMEORIGIN" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   {
     key: "Permissions-Policy",
@@ -83,11 +82,11 @@ const securityHeaders = [
       "font-src 'self' data:",
       "img-src 'self' data: blob: https://avatars.githubusercontent.com https://*.supabase.co",
       "connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://api.resend.com https://github-contributions-api.jogruber.de https://api.github.com",
-      "frame-src 'none'",
+      "frame-src 'self'",
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'",
-      "frame-ancestors 'none'",
+      "frame-ancestors 'self'",
     ].join("; "),
   },
 ];
@@ -112,7 +111,71 @@ const nextConfig: NextConfig = {
       })),
       {
         source: "/blogs",
-        destination: "/blog",
+        destination: "/writing",
+        permanent: true,
+      },
+      {
+        source: "/blog/:path*",
+        destination: "/writing/:path*",
+        permanent: true,
+      },
+      {
+        source: "/case-studies",
+        destination: "/work",
+        permanent: true,
+      },
+      ...[
+        "tech-tools",
+        "file-manager",
+        "game-hub",
+        "activity-tracker",
+        "sync-scratchpad",
+        "custom-calculator",
+      ].flatMap((slug) => [
+        {
+          source: `/case-studies/${slug}`,
+          destination: "/work/studio",
+          permanent: true,
+        },
+        {
+          source: `/projects/${slug}`,
+          destination: "/work/studio",
+          permanent: true,
+        },
+      ]),
+      {
+        source: "/case-studies/ecommerce",
+        destination: "/work/portfolio",
+        permanent: true,
+      },
+      {
+        source: "/projects/ecommerce",
+        destination: "/work/portfolio",
+        permanent: true,
+      },
+      {
+        source: "/case-studies/:path*",
+        destination: "/work/:path*",
+        permanent: true,
+      },
+      {
+        source: "/projects",
+        destination: "/work",
+        permanent: true,
+      },
+      {
+        source: "/projects/:path*",
+        destination: "/work/:path*",
+        permanent: true,
+      },
+      {
+        source: "/studio",
+        destination: "/work/studio",
+        permanent: true,
+      },
+      {
+        source: "/engineering",
+        destination: "/work",
         permanent: true,
       },
       {

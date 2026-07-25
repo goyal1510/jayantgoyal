@@ -1,4 +1,4 @@
-export type ProjectTone = "paper" | "ink" | "signal";
+export type WorkTone = "paper" | "ink" | "signal";
 
 export type PortfolioSocialLink = {
   label: string;
@@ -65,7 +65,7 @@ export type PortfolioSkillGroup = {
   items: PortfolioSkill[];
 };
 
-export type PortfolioProject = {
+export type PortfolioWork = {
   id: string;
   title: string;
   eyebrow: string;
@@ -78,7 +78,17 @@ export type PortfolioProject = {
   href: string | null;
   github: string | null;
   tags: string[];
-  tone: ProjectTone;
+  tone: WorkTone;
+  caseStudy: {
+    problem: string;
+    solution: string;
+    architecture: string;
+    decisions: Array<{ title: string; detail: string }>;
+    security: string;
+    tradeoffs: string;
+    outcome: string;
+    nextImprovement: string;
+  } | null;
 };
 
 export type PortfolioCredential = {
@@ -114,11 +124,13 @@ export const PORTFOLIO_SECTION_KEYS = [
   "credentials",
   "activity",
   "work",
-  "writing",
   "contact",
-  "blog",
+  "writing",
   "article",
   "resume",
+  "studio",
+  "case-studies",
+  "engineering",
 ] as const;
 
 export type PortfolioSectionKey = (typeof PORTFOLIO_SECTION_KEYS)[number];
@@ -137,7 +149,17 @@ export type PortfolioSectionContentMap = Record<
   PortfolioSectionContent
 >;
 
-export type BlogPreview = {
+export type PortfolioPageKey =
+  | "studio"
+  | "case-studies"
+  | "engineering";
+
+export type PortfolioPageContentMap = Record<
+  PortfolioPageKey,
+  PortfolioSectionContent
+>;
+
+export type WritingPreview = {
   title: string;
   slug: string;
   excerpt: string;
@@ -150,10 +172,11 @@ export type PortfolioEditorialData = {
   about: PortfolioAbout;
   navigation: PortfolioNavigationItem[];
   sectionContent: PortfolioSectionContentMap;
+  pageContent: PortfolioPageContentMap;
   education: PortfolioEducation[];
   experience: PortfolioExperience[];
   skillGroups: PortfolioSkillGroup[];
-  projects: PortfolioProject[];
+  work: PortfolioWork[];
   credentials: PortfolioCredential[];
   principles: PortfolioPrinciple[];
 };

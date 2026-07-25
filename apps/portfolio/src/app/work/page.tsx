@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { ArrowLeft } from "lucide-react";
-
-import { ProjectArchive } from "@/components/editorial/project-showcase";
+import { WorkArchive } from "@/components/editorial/work-showcase";
 import { EditorialSubpageHeader } from "@/components/editorial/subpage-header";
 import { getEditorialPortfolioData } from "@/lib/portfolio/editorial-server";
 import { buildPublicPageMetadata } from "@/lib/seo/config";
@@ -36,21 +34,18 @@ export default async function WorkPage() {
       <section className="shell editorial-page-hero editorial-work-hero">
         <span className="section-index">{content.eyebrow}</span>
         <div>
-          <h1>All the work, in one place.</h1>
+          <h1>Work I have built and shipped.</h1>
           <p>{content.description}</p>
           <div className="editorial-work-hero__meta">
             <span>
-              {String(portfolio.projects.length).padStart(2, "0")} projects ·
-              newest first
+              {String(portfolio.work.length).padStart(2, "0")} systems ·
+              explained end to end
             </span>
-            <Link href="/#work">
-              <ArrowLeft aria-hidden="true" />
-              Featured work
-            </Link>
+            <Link href="/about">About, experience, and education</Link>
           </div>
         </div>
       </section>
-      <ProjectArchive projects={portfolio.projects} />
+      <WorkArchive work={portfolio.work} />
     </main>
   );
 }

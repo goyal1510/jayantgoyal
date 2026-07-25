@@ -13,7 +13,7 @@ export default function NotFound() {
       </p>
       <div className="mt-7 flex flex-wrap justify-center gap-3">
         <EditorialButton href="/">Return to Portfolio</EditorialButton>
-        <EditorialButton href="/blog">Read the blog</EditorialButton>
+        <EditorialButton href="/writing">Read the writing</EditorialButton>
       </div>
     </div>
   );

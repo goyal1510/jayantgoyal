@@ -1,17 +1,28 @@
 import { Resend } from "resend";
 
+import {
+  CONTACT_STAGE_OPTIONS,
+  CONTACT_TIMELINE_OPTIONS,
+  getContactOptionLabel,
+} from "./options";
 import { getPortfolioContactEmail } from "../portfolio/editorial-server";
 
 const MAX_NAME_LENGTH = 120;
 const MAX_EMAIL_LENGTH = 320;
-const MAX_SUBJECT_LENGTH = 200;
-const MAX_MESSAGE_LENGTH = 5_000;
+const MAX_PROJECT_LENGTH = 600;
+const MAX_OUTCOME_LENGTH = 1_200;
+const MAX_CONTEXT_LENGTH = 3_000;
 
 type ContactSubmission = {
   name: string;
   email: string;
-  subject: string;
-  message: string;
+  project: string;
+  stage: string;
+  stageLabel: string;
+  timeline: string;
+  timelineLabel: string;
+  outcome: string;
+  context: string;
 };
 
 export type ContactDeliveryResult =
@@ -26,11 +37,20 @@ function normalizeField(value: unknown, maxLength: number) {
 function normalizeSubmission(
   input: Record<string, unknown>,
 ): ContactSubmission {
+  const stage = normalizeField(input.stage, 60);
+  const timeline = normalizeField(input.timeline, 60);
+
   return {
     name: normalizeField(input.name, MAX_NAME_LENGTH),
     email: normalizeField(input.email, MAX_EMAIL_LENGTH),
-    subject: normalizeField(input.subject, MAX_SUBJECT_LENGTH),
-    message: normalizeField(input.message, MAX_MESSAGE_LENGTH),
+    project: normalizeField(input.project, MAX_PROJECT_LENGTH),
+    stage,
+    stageLabel: getContactOptionLabel(CONTACT_STAGE_OPTIONS, stage) ?? "",
+    timeline,
+    timelineLabel:
+      getContactOptionLabel(CONTACT_TIMELINE_OPTIONS, timeline) ?? "",
+    outcome: normalizeField(input.outcome, MAX_OUTCOME_LENGTH),
+    context: normalizeField(input.context, MAX_CONTEXT_LENGTH),
   };
 }
 
@@ -51,9 +71,17 @@ export async function deliverContactSubmission(
   input: Record<string, unknown>,
 ): Promise<ContactDeliveryResult> {
   const submission = normalizeSubmission(input);
-  const { name, email, subject, message } = submission;
+  const { name, email, project, stageLabel, timelineLabel, outcome, context } =
+    submission;
 
-  if (!name || !email || !subject || !message) {
+  if (
+    !name ||
+    !email ||
+    !project ||
+    !stageLabel ||
+    !timelineLabel ||
+    !outcome
+  ) {
     return { success: false, error: "All fields are required", status: 400 };
   }
 
@@ -81,7 +109,7 @@ export async function deliverContactSubmission(
       from,
       to: [recipient],
       replyTo: `${name} <${email}>`,
-      subject,
+      subject: `Portfolio enquiry: ${stageLabel} · ${timelineLabel}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #333; border-bottom: 2px solid #007bff; padding-bottom: 10px;">
@@ -90,22 +118,38 @@ export async function deliverContactSubmission(
           <div style="margin-top: 20px;">
             <p><strong>Name:</strong> ${escapeHtml(name)}</p>
             <p><strong>Email:</strong> ${escapeHtml(email)}</p>
-            <p><strong>Subject:</strong> ${escapeHtml(subject)}</p>
+            <p><strong>Stage:</strong> ${escapeHtml(stageLabel)}</p>
+            <p><strong>Timeline:</strong> ${escapeHtml(timelineLabel)}</p>
           </div>
           <div style="margin-top: 20px; padding: 15px; background-color: #f5f5f5; border-radius: 5px;">
-            <strong>Message:</strong>
-            <p style="margin-top: 10px; white-space: pre-wrap;">${escapeHtml(message)}</p>
+            <strong>What they are building:</strong>
+            <p style="margin-top: 10px; white-space: pre-wrap;">${escapeHtml(project)}</p>
+            <strong>Outcome needed:</strong>
+            <p style="margin-top: 10px; white-space: pre-wrap;">${escapeHtml(outcome)}</p>
+            ${
+              context
+                ? `<strong>Additional context:</strong>
+            <p style="margin-top: 10px; white-space: pre-wrap;">${escapeHtml(context)}</p>`
+                : ""
+            }
           </div>
         </div>
       `,
-      text: `New Contact Form Submission
+      text: `New Portfolio Enquiry
 
 Name: ${name}
 Email: ${email}
-Subject: ${subject}
+Stage: ${stageLabel}
+Timeline: ${timelineLabel}
 
-Message:
-${message}`,
+What they are building:
+${project}
+
+Outcome needed:
+${outcome}
+
+Additional context:
+${context || "None provided"}`,
     });
 
     if (error) {

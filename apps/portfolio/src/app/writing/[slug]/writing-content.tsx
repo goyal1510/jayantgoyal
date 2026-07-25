@@ -11,15 +11,15 @@ import remarkGfm from "remark-gfm";
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 
 import { EditorialSubpageHeader } from "@/components/editorial/subpage-header";
-import { formatEditorialDate } from "@/lib/blog/date";
+import { formatEditorialDate } from "@/lib/writing/date";
 import type {
   PortfolioNavigationItem,
   PortfolioSectionContent,
 } from "@/lib/portfolio/editorial-data";
-import type { BlogListPost, BlogPost } from "@/lib/blog/queries";
+import type { WritingListPost, WritingPost } from "@/lib/writing/queries";
 
 type NextPost = Pick<
-  BlogListPost,
+  WritingListPost,
   "title" | "slug" | "excerpt" | "published_at"
 >;
 
@@ -138,7 +138,7 @@ const markdownComponents: Components = {
   td: ({ children }) => <td>{children}</td>,
 };
 
-export function BlogContent({
+export function WritingContent({
   post,
   nextPost,
   brandLabel,
@@ -147,7 +147,7 @@ export function BlogContent({
   profileRole,
   articleContent,
 }: {
-  post: BlogPost;
+  post: WritingPost;
   nextPost: NextPost | null;
   brandLabel: string;
   navigation: PortfolioNavigationItem[];
@@ -225,7 +225,7 @@ export function BlogContent({
       />
 
       <article ref={articleRef} className="shell editorial-article">
-        <Link className="editorial-article__back" href="/blog">
+        <Link className="editorial-article__back" href="/writing">
           <ArrowLeft aria-hidden="true" /> All writing
         </Link>
 
@@ -342,7 +342,7 @@ export function BlogContent({
           {nextPost ? (
             <Link
               className="editorial-article__next"
-              href={`/blog/${nextPost.slug}`}
+              href={`/writing/${nextPost.slug}`}
             >
               <span className="section-index">Continue reading</span>
               <h2>{nextPost.title}</h2>
@@ -352,7 +352,7 @@ export function BlogContent({
               </span>
             </Link>
           ) : (
-            <Link className="editorial-article__next" href="/blog">
+            <Link className="editorial-article__next" href="/writing">
               <span className="section-index">Keep exploring</span>
               <h2>Return to the complete writing index.</h2>
               <span className="editorial-article__next-action">
