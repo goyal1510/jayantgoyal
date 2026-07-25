@@ -565,3 +565,182 @@ for recruiters, engineers, founders, and potential clients.
   Preview as a sensitive variable, and to Development as an encrypted
   development variable. Pulled the Development environment into the ignored
   local `.env.local`; no secret values were committed.
+
+## Editorial UI consistency — 2026-07-26
+
+- Captured and inspected fresh current-state screenshots for the Writing detail,
+  Work index, Studio case study, and Home routes as the evidence set for the
+  visual audit. No Figma or external design workflow was used.
+- Rebuilt published Work detail pages around the Writing detail's reading
+  experience: sticky section rail, centered long-form reading column, project
+  facts rail, progress indicator, consistent footer CTA, and next-case-study
+  navigation.
+- Added a reusable client-side case-study renderer for all four system-level
+  Work records, including active section tracking, project links, engineering
+  decisions, security, tradeoffs, outcome, and next-iteration content.
+- Standardized product evidence images into a single legible screenshot frame
+  across Home and Work previews, made the four Work archive images eager so
+  archive sections do not appear empty during capture, and shifted the Work
+  archive back to the same paper editorial surface as Writing.
+
+## Deployed light-mode evidence and About pass — 2026-07-26
+
+- Captured the four project surfaces from their deployed URLs at a consistent
+  desktop viewport: Portfolio home, Studio home/products, Admin overview, and
+  Auth security/providers. Every capture uses light mode; Studio, Admin, and
+  Auth retain their full expanded sidebars so the application context is part
+  of the evidence.
+- Replaced the four primary project image slots with the inspected deployed
+  captures and added secondary Studio/Auth frames for an automatic, accessible
+  screenshot gallery. The gallery uses a consistent 16:9 rectangle, preserves
+  the product sidebar, and starts from an intentional home/dashboard state.
+- Removed the large top-level “All writing” and “All work” links from detail
+  pages so the reading shell begins with the article header and progress line.
+- Rebuilt the dedicated About page around the stronger profile, experience,
+  education, credentials, resume, and contact sections already used by the
+  homepage, with a clear Work continuation at the end.
+- Replaced all six deployed project screenshot assets after a clean recapture:
+  Portfolio, Studio home/products, Admin overview, and Auth security/providers.
+  The Studio, Admin, and Auth captures were verified in light mode with their
+  sidebars expanded; the Admin capture was taken from the active authorized
+  session with no account-menu overlay.
+- Diagnosed the remaining dark-looking Admin preview as a stale browser cache
+  for the old `admin.png` URL, not a dark deployed capture. Versioned all six
+  curated asset filenames with explicit light-desktop names, updated the CMS
+  mapping and gallery fallback, and changed the surrounding evidence frame to
+  a light rectangle so the screenshot and its presentation cannot be confused
+  with dark mode.
+- Simplified the shared editorial page headers across About, Work, Writing,
+  Case Studies, Studio, and Engineering: the active navigation item is
+  highlighted, repeated eyebrow labels are removed from the body, H1 and
+  description sit in a smaller left/right composition, and the first Work
+  project now enters the initial viewport instead of being pushed below a
+  poster-like hero.
+- Removed the second About introduction (“The person behind the work” plus
+  another large personal statement), so the page now has one H1/summary before
+  moving directly into biography and profile facts. Reduced the shared
+  editorial hero scale and spacing across About, Work, Writing, Case Studies,
+  Studio, and Engineering. Writing article rows now use list-level typography,
+  tighter spacing, and a wider readable title measure instead of presenting
+  every article as a second hero.
+- Brought Resume into the same compact page hierarchy: removed the repeated
+  body eyebrow, replaced its oversized standalone hero with the shared
+  left-title/right-summary composition, shortened the experience action, and
+  renamed the embedded document section to the functional “PDF preview.”
+- Restored the existing image-based certificate deck on the dedicated About
+  page, replacing the temporary clickable text-card grid while preserving the
+  certificate document and verification links. Converted the Experience and
+  certificate surfaces from the dark panel to the shared light editorial
+  palette, including timeline, text, controls, and metadata contrast.
+
+## Repository dead-code cleanup — 2026-07-26
+
+- Started a repository-wide cleanup pass covering unreachable routes,
+  unreferenced components and exports, obsolete styles, unused assets, scripts,
+  and configuration. Deletions will require reference evidence and will be
+  validated incrementally so dynamic Next.js routes, Supabase contracts, and
+  workspace package entrypoints are not removed based on static-analysis
+  guesses alone.
+- Removed unreachable Portfolio implementations for legacy Blog, Projects,
+  Case Studies, Studio, and Engineering routes; the existing Next.js permanent
+  redirects remain the sole compatibility owner. Moved the actual case-study
+  implementation into canonical `/work/[slug]`, removed two unimported
+  modules, eliminated the now-unused public `pageContent` adapter, and narrowed
+  several internal-only exports.
+- Reused the canonical `PortfolioSectionKey` type from the shared
+  `@repo/portfolio-data` contract instead of retaining a second local key list
+  used only for type construction.
+- Removed the unconfigured legacy-home feature branch and its duplicate About,
+  Education, Skills, Experience, Credentials, GitHub Activity, and Contact
+  rendering paths. This also removed the unused GitHub statistics endpoint,
+  contribution/statistics components, their Portfolio dependencies, and the
+  obsolete `githubStats` prop.
+- Removed the orphaned Portfolio stylesheet blocks left behind by those routes
+  and components, including the old scrapbook Work layout, capability matrix,
+  alternate experience/credential layouts, GitHub activity panel, and retired
+  case-study shell. Preserved the selectors used by the current Work gallery,
+  About timeline, certificate deck, Writing pages, and case-study reader.
+- Kept the remaining Portfolio experience model local to its data adapter
+  because no other module consumes it as a public type.
+- Removed the matching orphaned tablet/mobile overrides and retired article
+  back-link and text-only credential-card selectors, leaving responsive rules
+  only for components that still render.
+- Removed four unimported Studio animation components, their orphaned global
+  animation styles, and an unused platform URL re-export. Removed the obsolete
+  Auth login/register forms and actions after confirming both compatibility
+  routes redirect to the unified Welcome form, plus an unused Auth browser
+  Supabase re-export.
+- Removed unused app-level dependencies from Studio, Auth, and Admin. Shared
+  packages retain ownership of Supabase, theme, and toast dependencies where
+  those libraries are actually imported. Narrowed two Auth-only helper types
+  and functions from public exports to module-local declarations.
+- Removed the Studio platform-wrapper test together with its deleted one-line
+  re-export; hostname normalization remains covered at its canonical
+  `@repo/platform` implementation instead of through a production-unused
+  wrapper.
+- Removed duplicated app-level ESLint plugin and Autoprefixer declarations
+  because the shared ESLint package and Tailwind v4 PostCSS configuration own
+  those tools. Removed two unused browser-baseline pins that had no code or
+  configuration consumer.
+- Narrowed Admin's internal table allowlists, authorization helpers, navigation
+  source arrays, workspace loaders, route-map type, and Vercel environment
+  readers so they are no longer exposed as unsupported module APIs. Removed an
+  unused Writing fetch wrapper and two unused user-composition types.
+- Removed unused Studio JSON-LD variants, a dead tool-category lookup, unused
+  public/private app filters, and unused file-manager, activity, and typing
+  model types. Narrowed component helpers and configuration/data types that are
+  used only inside their defining modules instead of exposing them as public
+  APIs.
+- Narrowed Studio game engine constants, parser helpers, hook defaults, SEO
+  path lists, and a tool helper that are implementation details used only
+  inside their defining modules; removed an unused online-session status type.
+- Removed uncalled Studio file-manager RPC wrappers for directory-tree, move,
+  copy, restore, and file-category operations along with their unused parameter
+  models and barrel exports. Removed two unused Activity Tracker date helpers.
+- Removed an unconfigured Prettier plugin, an unused Wrangler CLI dependency,
+  and a redundant PostCSS declaration from the shared Tailwind configuration.
+  Kept the repository-local Vercel CLI and LinkedIn scripts because they are
+  documented operational entrypoints, not application imports.
+- Added `20260725224316_align_work_image_asset_paths.sql` to replace the four
+  CMS paths that still referenced deleted screenshots with the current
+  light-desktop Portfolio, Studio, Admin, and Auth assets. This keeps Admin
+  previews aligned with the public Work evidence and makes the old image
+  deletions safe.
+- Applied `20260725224316_align_work_image_asset_paths.sql` to the verified
+  `jayantgoyal` project (`orwfvyditlguqvxvztkw`) from a disposable linked
+  workdir. The first one-file preflight was rejected before changes because the
+  CLI required historical files; a second preflight included the canonical
+  history, confirmed only this migration was pending, and applied it without
+  repairing history. Verified all four updated URLs and confirmed fresh
+  `jg_account`, `jg_app`, and `portfolio` schema dumps are unchanged.
+- Validation restored the one reference-content result type that has a real
+  cross-module consumer, removed the now-truly-unused Scratchpad recursive JSON
+  type, and updated Auth's action-count contract for the unified Welcome flow.
+  Replaced the Wi-Fi generator's loose Navigator casts with a typed extension
+  contract so Studio returns to zero-warning lint.
+- Expressed the tool-reference factory result through the already-public
+  registry contract, allowing its concrete content shape to remain local
+  without breaking the cross-module type check.
+- Final cleanup validation passes: `pnpm check-types`, `pnpm lint`,
+  `pnpm test` (57 files / 285 tests), all four production builds, architecture
+  boundaries, brand-asset synchronization, service-role boundaries, and
+  `git diff --check`. Repository-wide Knip output is limited to intentional
+  operational/test entrypoints and the shared Next TypeScript plugin reference.
+- Caught and reverted an accidental broad formatter side effect before
+  handoff, then reapplied only the scoped Admin, Auth, and Studio semantic
+  cleanup. This preserved all unrelated source formatting while retaining the
+  reviewed dead-code and dependency removals.
+- The final asset-reference check found the hidden `tech-tools` CMS record
+  still targeting the deleted legacy `studio-tools.png`. Added and applied
+  `20260725225648_align_tech_tools_image_asset_path.sql` to the verified
+  `jayantgoyal` project, repointing it to the retained deployed
+  `studio-products-light-desktop.png` evidence. The remote migration list is
+  aligned, the updated record was verified through the Data API, and refreshed
+  `jg_account`, `jg_app`, and `portfolio` schema dumps remain unchanged.
+- Accounted for every retained public image: application favicons are governed
+  by the shared brand contract, Auth and game art have direct code consumers,
+  visible Work screenshots have public renderer and CMS references, hidden
+  Work thumbnails remain attached to their CMS records, and certificate
+  previews/documents remain attached to the five visible certificate records.
+  The four replaced legacy Work screenshots are the image files removed by
+  this cleanup.
