@@ -348,6 +348,127 @@ $$;
 ALTER FUNCTION "jg_app"."move_file"("p_file_id" "uuid", "p_new_directory_path" "text", "p_user_id" "uuid") OWNER TO "postgres";
 
 
+CREATE OR REPLACE FUNCTION "jg_app"."record_game_hub_action"("p_session_id" "uuid", "p_participant_id" "uuid", "p_move_number" integer, "p_move_payload" "jsonb", "p_resulting_state" "jsonb", "p_next_turn_participant_id" "uuid", "p_winner_participant_id" "uuid", "p_session_status" "jg_app"."game_hub_session_status", "p_completed_at" timestamp with time zone, "p_result_outcome" "text" DEFAULT NULL::"text", "p_result_winner_participant_id" "uuid" DEFAULT NULL::"uuid", "p_result_summary" "jsonb" DEFAULT NULL::"jsonb") RETURNS integer
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  current_session jg_app.game_hub_sessions%rowtype;
+  next_move_number integer;
+begin
+  select *
+  into current_session
+  from jg_app.game_hub_sessions
+  where id = p_session_id
+  for update;
+
+  if not found then
+    raise exception using errcode = 'P0002', message = 'Game session not found';
+  end if;
+
+  if current_session.status <> 'active'::jg_app.game_hub_session_status then
+    raise exception using errcode = 'P0001', message = 'Game session is no longer active';
+  end if;
+
+  if not exists (
+    select 1
+    from jg_app.game_hub_session_participants
+    where id = p_participant_id
+      and session_id = p_session_id
+      and left_at is null
+  ) then
+    raise exception using errcode = '42501', message = 'Participant is not active in this session';
+  end if;
+
+  if p_next_turn_participant_id is not null and not exists (
+    select 1
+    from jg_app.game_hub_session_participants
+    where id = p_next_turn_participant_id
+      and session_id = p_session_id
+      and left_at is null
+  ) then
+    raise exception using errcode = '23503', message = 'Next participant does not belong to this session';
+  end if;
+
+  if p_winner_participant_id is not null and not exists (
+    select 1
+    from jg_app.game_hub_session_participants
+    where id = p_winner_participant_id
+      and session_id = p_session_id
+  ) then
+    raise exception using errcode = '23503', message = 'Winner does not belong to this session';
+  end if;
+
+  if p_result_winner_participant_id is not null and not exists (
+    select 1
+    from jg_app.game_hub_session_participants
+    where id = p_result_winner_participant_id
+      and session_id = p_session_id
+  ) then
+    raise exception using errcode = '23503', message = 'Result winner does not belong to this session';
+  end if;
+
+  select coalesce(max(move_number), 0) + 1
+  into next_move_number
+  from jg_app.game_hub_session_moves
+  where session_id = p_session_id;
+
+  if p_move_number <> next_move_number then
+    raise exception using
+      errcode = 'P0001',
+      message = 'Game state changed before this action was committed';
+  end if;
+
+  insert into jg_app.game_hub_session_moves (
+    session_id,
+    participant_id,
+    move_number,
+    move_payload,
+    resulting_state
+  )
+  values (
+    p_session_id,
+    p_participant_id,
+    p_move_number,
+    p_move_payload,
+    p_resulting_state
+  );
+
+  if p_result_outcome is not null then
+    insert into jg_app.game_hub_session_results (
+      session_id,
+      winner_participant_id,
+      outcome,
+      summary
+    )
+    values (
+      p_session_id,
+      p_result_winner_participant_id,
+      p_result_outcome,
+      coalesce(p_result_summary, '{}'::jsonb)
+    )
+    on conflict (session_id) do update
+      set winner_participant_id = excluded.winner_participant_id,
+          outcome = excluded.outcome,
+          summary = excluded.summary;
+  end if;
+
+  update jg_app.game_hub_sessions
+  set state = p_resulting_state,
+      current_turn_participant_id = p_next_turn_participant_id,
+      winner_participant_id = p_winner_participant_id,
+      status = p_session_status,
+      completed_at = p_completed_at
+  where id = p_session_id;
+
+  return p_move_number;
+end;
+$$;
+
+
+ALTER FUNCTION "jg_app"."record_game_hub_action"("p_session_id" "uuid", "p_participant_id" "uuid", "p_move_number" integer, "p_move_payload" "jsonb", "p_resulting_state" "jsonb", "p_next_turn_participant_id" "uuid", "p_winner_participant_id" "uuid", "p_session_status" "jg_app"."game_hub_session_status", "p_completed_at" timestamp with time zone, "p_result_outcome" "text", "p_result_winner_participant_id" "uuid", "p_result_summary" "jsonb") OWNER TO "postgres";
+
+
 CREATE OR REPLACE FUNCTION "jg_app"."soft_delete_file"("p_file_id" "uuid", "p_user_id" "uuid") RETURNS boolean
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
@@ -445,30 +566,6 @@ CREATE TABLE IF NOT EXISTS "jg_app"."activity_tracker_entries" (
 
 
 ALTER TABLE "jg_app"."activity_tracker_entries" OWNER TO "postgres";
-
-
-CREATE TABLE IF NOT EXISTS "jg_app"."blog_posts" (
-    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
-    "title" "text" NOT NULL,
-    "slug" "text" NOT NULL,
-    "excerpt" "text",
-    "content" "text" DEFAULT ''::"text" NOT NULL,
-    "cover_image" "text",
-    "tags" "text"[] DEFAULT '{}'::"text"[] NOT NULL,
-    "is_visible" boolean DEFAULT true NOT NULL,
-    "is_published" boolean DEFAULT false NOT NULL,
-    "published_at" timestamp with time zone,
-    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
-    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
-    CONSTRAINT "blog_posts_published_at_check" CHECK (((NOT "is_published") OR ("published_at" IS NOT NULL))),
-    CONSTRAINT "blog_posts_published_content_check" CHECK (((NOT "is_published") OR ("btrim"("content") <> ''::"text"))),
-    CONSTRAINT "blog_posts_required_fields_nonblank_check" CHECK ((("btrim"("title") <> ''::"text") AND ("btrim"("slug") <> ''::"text"))),
-    CONSTRAINT "blog_posts_slug_format_check" CHECK (("slug" ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'::"text")),
-    CONSTRAINT "blog_posts_tags_items_check" CHECK ("jg_app"."is_nonblank_text_array"("tags"))
-);
-
-
-ALTER TABLE "jg_app"."blog_posts" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "jg_app"."currency_calculator_calculations" (
@@ -603,20 +700,20 @@ CREATE TABLE IF NOT EXISTS "jg_app"."game_hub_typing_speed_results" (
 ALTER TABLE "jg_app"."game_hub_typing_speed_results" OWNER TO "postgres";
 
 
-CREATE TABLE IF NOT EXISTS "jg_app"."messenger_messages" (
+CREATE TABLE IF NOT EXISTS "jg_app"."scratchpad_entries" (
     "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
     "user_id" "uuid" NOT NULL,
     "content" "text" NOT NULL,
-    "message_type" "text" NOT NULL,
+    "entry_type" "text" NOT NULL,
     "language" "text",
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "is_read" boolean DEFAULT false,
-    CONSTRAINT "messenger_messages_type_check" CHECK (("message_type" = ANY (ARRAY['text'::"text", 'code'::"text"])))
+    CONSTRAINT "scratchpad_entries_type_check" CHECK (("entry_type" = ANY (ARRAY['text'::"text", 'code'::"text"])))
 );
 
 
-ALTER TABLE "jg_app"."messenger_messages" OWNER TO "postgres";
+ALTER TABLE "jg_app"."scratchpad_entries" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "jg_app"."tool_favorites" (
@@ -645,6 +742,30 @@ CREATE TABLE IF NOT EXISTS "jg_app"."tool_history" (
 ALTER TABLE "jg_app"."tool_history" OWNER TO "postgres";
 
 
+CREATE TABLE IF NOT EXISTS "jg_app"."writing_posts" (
+    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
+    "title" "text" NOT NULL,
+    "slug" "text" NOT NULL,
+    "excerpt" "text",
+    "content" "text" DEFAULT ''::"text" NOT NULL,
+    "cover_image" "text",
+    "tags" "text"[] DEFAULT '{}'::"text"[] NOT NULL,
+    "is_visible" boolean DEFAULT true NOT NULL,
+    "is_published" boolean DEFAULT false NOT NULL,
+    "published_at" timestamp with time zone,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    CONSTRAINT "writing_posts_published_at_check" CHECK (((NOT "is_published") OR ("published_at" IS NOT NULL))),
+    CONSTRAINT "writing_posts_published_content_check" CHECK (((NOT "is_published") OR ("btrim"("content") <> ''::"text"))),
+    CONSTRAINT "writing_posts_required_fields_nonblank_check" CHECK ((("btrim"("title") <> ''::"text") AND ("btrim"("slug") <> ''::"text"))),
+    CONSTRAINT "writing_posts_slug_format_check" CHECK (("slug" ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'::"text")),
+    CONSTRAINT "writing_posts_tags_items_check" CHECK ("jg_app"."is_nonblank_text_array"("tags"))
+);
+
+
+ALTER TABLE "jg_app"."writing_posts" OWNER TO "postgres";
+
+
 ALTER TABLE ONLY "jg_app"."activity_tracker_activities"
     ADD CONSTRAINT "activity_tracker_activities_pkey" PRIMARY KEY ("id");
 
@@ -657,16 +778,6 @@ ALTER TABLE ONLY "jg_app"."activity_tracker_entries"
 
 ALTER TABLE ONLY "jg_app"."activity_tracker_entries"
     ADD CONSTRAINT "activity_tracker_entries_pkey" PRIMARY KEY ("id");
-
-
-
-ALTER TABLE ONLY "jg_app"."blog_posts"
-    ADD CONSTRAINT "blog_posts_pkey" PRIMARY KEY ("id");
-
-
-
-ALTER TABLE ONLY "jg_app"."blog_posts"
-    ADD CONSTRAINT "blog_posts_slug_key" UNIQUE ("slug");
 
 
 
@@ -740,8 +851,8 @@ ALTER TABLE ONLY "jg_app"."game_hub_typing_speed_results"
 
 
 
-ALTER TABLE ONLY "jg_app"."messenger_messages"
-    ADD CONSTRAINT "messenger_messages_pkey" PRIMARY KEY ("id");
+ALTER TABLE ONLY "jg_app"."scratchpad_entries"
+    ADD CONSTRAINT "scratchpad_entries_pkey" PRIMARY KEY ("id");
 
 
 
@@ -762,6 +873,16 @@ ALTER TABLE ONLY "jg_app"."tool_history"
 
 ALTER TABLE ONLY "jg_app"."tool_history"
     ADD CONSTRAINT "tool_history_user_tool_key" UNIQUE ("user_id", "tool_id");
+
+
+
+ALTER TABLE ONLY "jg_app"."writing_posts"
+    ADD CONSTRAINT "writing_posts_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "jg_app"."writing_posts"
+    ADD CONSTRAINT "writing_posts_slug_key" UNIQUE ("slug");
 
 
 
@@ -786,10 +907,6 @@ CREATE INDEX "idx_at_entries_user_activity_date" ON "jg_app"."activity_tracker_e
 
 
 CREATE INDEX "idx_at_entries_user_id" ON "jg_app"."activity_tracker_entries" USING "btree" ("user_id");
-
-
-
-CREATE INDEX "idx_blog_published" ON "jg_app"."blog_posts" USING "btree" ("is_published", "is_visible", "published_at" DESC);
 
 
 
@@ -861,11 +978,11 @@ CREATE INDEX "idx_gh_typing_user_id" ON "jg_app"."game_hub_typing_speed_results"
 
 
 
-CREATE INDEX "idx_msg_messages_created_at" ON "jg_app"."messenger_messages" USING "btree" ("created_at" DESC);
+CREATE INDEX "idx_scratchpad_entries_created_at" ON "jg_app"."scratchpad_entries" USING "btree" ("created_at" DESC);
 
 
 
-CREATE INDEX "idx_msg_messages_user_id" ON "jg_app"."messenger_messages" USING "btree" ("user_id");
+CREATE INDEX "idx_scratchpad_entries_user_id" ON "jg_app"."scratchpad_entries" USING "btree" ("user_id");
 
 
 
@@ -877,11 +994,11 @@ CREATE INDEX "idx_tool_history_user_visited" ON "jg_app"."tool_history" USING "b
 
 
 
+CREATE INDEX "idx_writing_published" ON "jg_app"."writing_posts" USING "btree" ("is_published", "is_visible", "published_at" DESC);
+
+
+
 CREATE OR REPLACE TRIGGER "handle_soft_delete_trigger" BEFORE UPDATE ON "jg_app"."file_manager_files" FOR EACH ROW EXECUTE FUNCTION "jg_app"."handle_soft_delete"();
-
-
-
-CREATE OR REPLACE TRIGGER "update_blog_posts_updated_at" BEFORE UPDATE ON "jg_app"."blog_posts" FOR EACH ROW EXECUTE FUNCTION "jg_app"."update_updated_at"();
 
 
 
@@ -897,7 +1014,11 @@ CREATE OR REPLACE TRIGGER "update_game_hub_sessions_updated_at" BEFORE UPDATE ON
 
 
 
-CREATE OR REPLACE TRIGGER "update_messenger_messages_updated_at" BEFORE UPDATE ON "jg_app"."messenger_messages" FOR EACH ROW EXECUTE FUNCTION "jg_app"."update_updated_at"();
+CREATE OR REPLACE TRIGGER "update_scratchpad_entries_updated_at" BEFORE UPDATE ON "jg_app"."scratchpad_entries" FOR EACH ROW EXECUTE FUNCTION "jg_app"."update_updated_at"();
+
+
+
+CREATE OR REPLACE TRIGGER "update_writing_posts_updated_at" BEFORE UPDATE ON "jg_app"."writing_posts" FOR EACH ROW EXECUTE FUNCTION "jg_app"."update_updated_at"();
 
 
 
@@ -990,8 +1111,8 @@ ALTER TABLE ONLY "jg_app"."game_hub_typing_speed_results"
 
 
 
-ALTER TABLE ONLY "jg_app"."messenger_messages"
-    ADD CONSTRAINT "messenger_messages_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
+ALTER TABLE ONLY "jg_app"."scratchpad_entries"
+    ADD CONSTRAINT "scratchpad_entries_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
 
 
 
@@ -1005,11 +1126,11 @@ ALTER TABLE ONLY "jg_app"."tool_history"
 
 
 
-CREATE POLICY "Admins can manage posts" ON "jg_app"."blog_posts" TO "authenticated" USING ("jg_account"."is_admin"()) WITH CHECK ("jg_account"."is_admin"());
+CREATE POLICY "Admins can manage writing" ON "jg_app"."writing_posts" TO "authenticated" USING ("jg_account"."is_admin"()) WITH CHECK ("jg_account"."is_admin"());
 
 
 
-CREATE POLICY "Anyone can read published posts" ON "jg_app"."blog_posts" FOR SELECT USING ((("is_published" = true) AND ("is_visible" = true)));
+CREATE POLICY "Anyone can read published writing" ON "jg_app"."writing_posts" FOR SELECT USING ((("is_published" = true) AND ("is_visible" = true)));
 
 
 
@@ -1065,7 +1186,7 @@ CREATE POLICY "Users can delete own files" ON "jg_app"."file_manager_files" FOR 
 
 
 
-CREATE POLICY "Users can delete own messages" ON "jg_app"."messenger_messages" FOR DELETE USING (("auth"."uid"() = "user_id"));
+CREATE POLICY "Users can delete own scratchpad entries" ON "jg_app"."scratchpad_entries" FOR DELETE USING (("auth"."uid"() = "user_id"));
 
 
 
@@ -1089,11 +1210,11 @@ CREATE POLICY "Users can insert own files" ON "jg_app"."file_manager_files" FOR 
 
 
 
-CREATE POLICY "Users can insert own messages" ON "jg_app"."messenger_messages" FOR INSERT WITH CHECK (("auth"."uid"() = "user_id"));
-
-
-
 CREATE POLICY "Users can insert own results" ON "jg_app"."game_hub_typing_speed_results" FOR INSERT TO "authenticated" WITH CHECK (("auth"."uid"() = "user_id"));
+
+
+
+CREATE POLICY "Users can insert own scratchpad entries" ON "jg_app"."scratchpad_entries" FOR INSERT WITH CHECK (("auth"."uid"() = "user_id"));
 
 
 
@@ -1127,7 +1248,7 @@ CREATE POLICY "Users can update own game participant row" ON "jg_app"."game_hub_
 
 
 
-CREATE POLICY "Users can update own messages" ON "jg_app"."messenger_messages" FOR UPDATE USING (("auth"."uid"() = "user_id")) WITH CHECK (("auth"."uid"() = "user_id"));
+CREATE POLICY "Users can update own scratchpad entries" ON "jg_app"."scratchpad_entries" FOR UPDATE USING (("auth"."uid"() = "user_id")) WITH CHECK (("auth"."uid"() = "user_id"));
 
 
 
@@ -1157,11 +1278,11 @@ CREATE POLICY "Users can view own game participants" ON "jg_app"."game_hub_sessi
 
 
 
-CREATE POLICY "Users can view own messages" ON "jg_app"."messenger_messages" FOR SELECT USING (("auth"."uid"() = "user_id"));
-
-
-
 CREATE POLICY "Users can view own results" ON "jg_app"."game_hub_typing_speed_results" FOR SELECT TO "authenticated" USING (("auth"."uid"() = "user_id"));
+
+
+
+CREATE POLICY "Users can view own scratchpad entries" ON "jg_app"."scratchpad_entries" FOR SELECT USING (("auth"."uid"() = "user_id"));
 
 
 
@@ -1177,9 +1298,6 @@ ALTER TABLE "jg_app"."activity_tracker_activities" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "jg_app"."activity_tracker_entries" ENABLE ROW LEVEL SECURITY;
-
-
-ALTER TABLE "jg_app"."blog_posts" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "jg_app"."currency_calculator_calculations" ENABLE ROW LEVEL SECURITY;
@@ -1229,7 +1347,7 @@ CREATE POLICY "insert_own_denominations" ON "jg_app"."currency_calculator_denomi
 
 
 
-ALTER TABLE "jg_app"."messenger_messages" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "jg_app"."scratchpad_entries" ENABLE ROW LEVEL SECURITY;
 
 
 CREATE POLICY "select_own_calculations" ON "jg_app"."currency_calculator_calculations" FOR SELECT TO "authenticated" USING (("user_id" = "auth"."uid"()));
@@ -1258,6 +1376,9 @@ CREATE POLICY "update_own_denominations" ON "jg_app"."currency_calculator_denomi
    FROM "jg_app"."currency_calculator_calculations"
   WHERE ("currency_calculator_calculations"."user_id" = "auth"."uid"()))));
 
+
+
+ALTER TABLE "jg_app"."writing_posts" ENABLE ROW LEVEL SECURITY;
 
 
 GRANT USAGE ON SCHEMA "jg_app" TO "anon";
@@ -1335,6 +1456,11 @@ GRANT ALL ON FUNCTION "jg_app"."move_file"("p_file_id" "uuid", "p_new_directory_
 
 
 
+REVOKE ALL ON FUNCTION "jg_app"."record_game_hub_action"("p_session_id" "uuid", "p_participant_id" "uuid", "p_move_number" integer, "p_move_payload" "jsonb", "p_resulting_state" "jsonb", "p_next_turn_participant_id" "uuid", "p_winner_participant_id" "uuid", "p_session_status" "jg_app"."game_hub_session_status", "p_completed_at" timestamp with time zone, "p_result_outcome" "text", "p_result_winner_participant_id" "uuid", "p_result_summary" "jsonb") FROM PUBLIC;
+GRANT ALL ON FUNCTION "jg_app"."record_game_hub_action"("p_session_id" "uuid", "p_participant_id" "uuid", "p_move_number" integer, "p_move_payload" "jsonb", "p_resulting_state" "jsonb", "p_next_turn_participant_id" "uuid", "p_winner_participant_id" "uuid", "p_session_status" "jg_app"."game_hub_session_status", "p_completed_at" timestamp with time zone, "p_result_outcome" "text", "p_result_winner_participant_id" "uuid", "p_result_summary" "jsonb") TO "service_role";
+
+
+
 GRANT ALL ON FUNCTION "jg_app"."soft_delete_file"("p_file_id" "uuid", "p_user_id" "uuid") TO "authenticated";
 GRANT ALL ON FUNCTION "jg_app"."soft_delete_file"("p_file_id" "uuid", "p_user_id" "uuid") TO "service_role";
 GRANT ALL ON FUNCTION "jg_app"."soft_delete_file"("p_file_id" "uuid", "p_user_id" "uuid") TO "anon";
@@ -1362,12 +1488,6 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "jg_app"."activity_tracker_activities
 GRANT ALL ON TABLE "jg_app"."activity_tracker_entries" TO "authenticated";
 GRANT ALL ON TABLE "jg_app"."activity_tracker_entries" TO "service_role";
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "jg_app"."activity_tracker_entries" TO "anon";
-
-
-
-GRANT ALL ON TABLE "jg_app"."blog_posts" TO "authenticated";
-GRANT ALL ON TABLE "jg_app"."blog_posts" TO "service_role";
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "jg_app"."blog_posts" TO "anon";
 
 
 
@@ -1419,9 +1539,9 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "jg_app"."game_hub_typing_speed_resul
 
 
 
-GRANT ALL ON TABLE "jg_app"."messenger_messages" TO "authenticated";
-GRANT ALL ON TABLE "jg_app"."messenger_messages" TO "service_role";
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "jg_app"."messenger_messages" TO "anon";
+GRANT ALL ON TABLE "jg_app"."scratchpad_entries" TO "authenticated";
+GRANT ALL ON TABLE "jg_app"."scratchpad_entries" TO "service_role";
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "jg_app"."scratchpad_entries" TO "anon";
 
 
 
@@ -1432,6 +1552,12 @@ GRANT ALL ON TABLE "jg_app"."tool_favorites" TO "service_role";
 
 GRANT ALL ON TABLE "jg_app"."tool_history" TO "authenticated";
 GRANT ALL ON TABLE "jg_app"."tool_history" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "jg_app"."writing_posts" TO "authenticated";
+GRANT ALL ON TABLE "jg_app"."writing_posts" TO "service_role";
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "jg_app"."writing_posts" TO "anon";
 
 
 

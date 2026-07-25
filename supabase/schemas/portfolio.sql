@@ -19,6 +19,81 @@ CREATE SCHEMA IF NOT EXISTS "portfolio";
 ALTER SCHEMA "portfolio" OWNER TO "postgres";
 
 
+CREATE OR REPLACE FUNCTION "portfolio"."consume_contact_rate_limit"("p_key_hash" "text") RETURNS boolean
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $_$
+declare
+  now_at timestamptz := pg_catalog.clock_timestamp();
+  current_attempts integer;
+begin
+  if p_key_hash !~ '^[a-f0-9]{64}$' then
+    raise exception 'Invalid contact rate-limit key';
+  end if;
+
+  insert into portfolio.contact_rate_limits (
+    key_hash,
+    attempts,
+    reset_at,
+    updated_at
+  )
+  values (
+    p_key_hash,
+    1,
+    now_at + interval '15 minutes',
+    now_at
+  )
+  on conflict (key_hash) do update
+  set
+    attempts = case
+      when portfolio.contact_rate_limits.reset_at <= now_at then 1
+      when portfolio.contact_rate_limits.attempts >= 5 then 6
+      else portfolio.contact_rate_limits.attempts + 1
+    end,
+    reset_at = case
+      when portfolio.contact_rate_limits.reset_at <= now_at
+        then now_at + interval '15 minutes'
+      else portfolio.contact_rate_limits.reset_at
+    end,
+    updated_at = now_at
+  returning attempts into current_attempts;
+
+  return current_attempts <= 5;
+end;
+$_$;
+
+
+ALTER FUNCTION "portfolio"."consume_contact_rate_limit"("p_key_hash" "text") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "portfolio"."is_complete_work_case_study"("value" "jsonb") RETURNS boolean
+    LANGUAGE "sql" IMMUTABLE
+    SET "search_path" TO ''
+    AS $$
+  select case
+    when not portfolio.is_work_case_study_shape(value) then false
+    else
+      pg_catalog.btrim(value ->> 'problem') <> ''
+      and pg_catalog.btrim(value ->> 'solution') <> ''
+      and pg_catalog.btrim(value ->> 'architecture') <> ''
+      and pg_catalog.btrim(value ->> 'security') <> ''
+      and pg_catalog.btrim(value ->> 'tradeoffs') <> ''
+      and pg_catalog.btrim(value ->> 'outcome') <> ''
+      and pg_catalog.btrim(value ->> 'next_improvement') <> ''
+      and pg_catalog.jsonb_array_length(value -> 'decisions') >= 2
+      and not exists (
+        select 1
+        from pg_catalog.jsonb_array_elements(value -> 'decisions') as decision
+        where pg_catalog.btrim(decision ->> 'title') = ''
+          or pg_catalog.btrim(decision ->> 'detail') = ''
+      )
+  end;
+$$;
+
+
+ALTER FUNCTION "portfolio"."is_complete_work_case_study"("value" "jsonb") OWNER TO "postgres";
+
+
 CREATE OR REPLACE FUNCTION "portfolio"."is_exact_text_object_array"("value" "jsonb", "required_fields" "text"[]) RETURNS boolean
     LANGUAGE "plpgsql" IMMUTABLE STRICT
     SET "search_path" TO ''
@@ -63,6 +138,110 @@ $$;
 
 
 ALTER FUNCTION "portfolio"."is_exact_text_object_array"("value" "jsonb", "required_fields" "text"[]) OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "portfolio"."is_work_case_study_shape"("value" "jsonb") RETURNS boolean
+    LANGUAGE "sql" IMMUTABLE
+    SET "search_path" TO ''
+    AS $$
+  select
+    value is not null
+    and pg_catalog.jsonb_typeof(value) = 'object'
+    and pg_catalog.jsonb_typeof(value -> 'problem') = 'string'
+    and pg_catalog.jsonb_typeof(value -> 'solution') = 'string'
+    and pg_catalog.jsonb_typeof(value -> 'architecture') = 'string'
+    and pg_catalog.jsonb_typeof(value -> 'security') = 'string'
+    and pg_catalog.jsonb_typeof(value -> 'tradeoffs') = 'string'
+    and pg_catalog.jsonb_typeof(value -> 'outcome') = 'string'
+    and pg_catalog.jsonb_typeof(value -> 'next_improvement') = 'string'
+    and pg_catalog.jsonb_typeof(value -> 'decisions') = 'array'
+    and not exists (
+      select 1
+      from pg_catalog.jsonb_array_elements(value -> 'decisions') as decision
+      where pg_catalog.jsonb_typeof(decision) <> 'object'
+        or pg_catalog.jsonb_typeof(decision -> 'title') <> 'string'
+        or pg_catalog.jsonb_typeof(decision -> 'detail') <> 'string'
+    );
+$$;
+
+
+ALTER FUNCTION "portfolio"."is_work_case_study_shape"("value" "jsonb") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "portfolio"."save_section_presentation"("p_section_key" "text", "p_copy" "jsonb", "p_navigation" "jsonb" DEFAULT NULL::"jsonb") RETURNS "jsonb"
+    LANGUAGE "plpgsql"
+    SET "search_path" TO ''
+    AS $$
+declare
+  saved_copy portfolio.section_content%rowtype;
+  saved_navigation portfolio.nav_items%rowtype;
+begin
+  insert into portfolio.section_content (
+    section_key,
+    eyebrow,
+    headline,
+    accent,
+    description,
+    supporting_text,
+    is_visible
+  )
+  values (
+    p_section_key,
+    p_copy ->> 'eyebrow',
+    p_copy ->> 'headline',
+    p_copy ->> 'accent',
+    p_copy ->> 'description',
+    p_copy ->> 'supporting_text',
+    (p_copy ->> 'is_visible')::boolean
+  )
+  on conflict (section_key) do update
+  set
+    eyebrow = excluded.eyebrow,
+    headline = excluded.headline,
+    accent = excluded.accent,
+    description = excluded.description,
+    supporting_text = excluded.supporting_text,
+    is_visible = excluded.is_visible
+  returning * into saved_copy;
+
+  if p_navigation is not null and p_navigation <> 'null'::jsonb then
+    insert into portfolio.nav_items (
+      section_id,
+      label,
+      note,
+      sort_order,
+      is_visible
+    )
+    values (
+      p_section_key,
+      p_navigation ->> 'label',
+      p_navigation ->> 'note',
+      (p_navigation ->> 'sort_order')::integer,
+      (p_navigation ->> 'is_visible')::boolean
+    )
+    on conflict (section_id) do update
+    set
+      label = excluded.label,
+      note = excluded.note,
+      sort_order = excluded.sort_order,
+      is_visible = excluded.is_visible
+    returning * into saved_navigation;
+  end if;
+
+  return jsonb_build_object(
+    'sectionContent',
+    to_jsonb(saved_copy),
+    'navigation',
+    case
+      when saved_navigation.id is null then null
+      else to_jsonb(saved_navigation)
+    end
+  );
+end;
+$$;
+
+
+ALTER FUNCTION "portfolio"."save_section_presentation"("p_section_key" "text", "p_copy" "jsonb", "p_navigation" "jsonb") OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "portfolio"."update_updated_at_column"() RETURNS "trigger"
@@ -142,6 +321,19 @@ CREATE TABLE IF NOT EXISTS "portfolio"."contact" (
 ALTER TABLE "portfolio"."contact" OWNER TO "postgres";
 
 
+CREATE TABLE IF NOT EXISTS "portfolio"."contact_rate_limits" (
+    "key_hash" "text" NOT NULL,
+    "attempts" integer DEFAULT 1 NOT NULL,
+    "reset_at" timestamp with time zone NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    CONSTRAINT "contact_rate_limits_attempts_check" CHECK ((("attempts" >= 1) AND ("attempts" <= 6))),
+    CONSTRAINT "contact_rate_limits_key_hash_check" CHECK (("key_hash" ~ '^[a-f0-9]{64}$'::"text"))
+);
+
+
+ALTER TABLE "portfolio"."contact_rate_limits" OWNER TO "postgres";
+
+
 CREATE TABLE IF NOT EXISTS "portfolio"."education" (
     "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
     "school" "text" NOT NULL,
@@ -215,40 +407,12 @@ CREATE TABLE IF NOT EXISTS "portfolio"."nav_items" (
     "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "note" "text",
     CONSTRAINT "nav_items_required_fields_nonblank_check" CHECK ((("btrim"("section_id") <> ''::"text") AND ("btrim"("label") <> ''::"text"))),
-    CONSTRAINT "nav_items_section_id_check" CHECK (("section_id" = ANY (ARRAY['about'::"text", 'skills'::"text", 'experience'::"text", 'activity'::"text", 'work'::"text", 'writing'::"text"]))),
+    CONSTRAINT "nav_items_section_id_check" CHECK (("section_id" = ANY (ARRAY['hero'::"text", 'about'::"text", 'skills'::"text", 'education'::"text", 'experience'::"text", 'credentials'::"text", 'activity'::"text", 'work'::"text", 'contact'::"text", 'writing'::"text", 'article'::"text", 'resume'::"text", 'studio'::"text", 'case-studies'::"text", 'engineering'::"text"]))),
     CONSTRAINT "nav_items_sort_order_nonnegative_check" CHECK (("sort_order" >= 0))
 );
 
 
 ALTER TABLE "portfolio"."nav_items" OWNER TO "postgres";
-
-
-CREATE TABLE IF NOT EXISTS "portfolio"."projects" (
-    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
-    "name" "text" NOT NULL,
-    "short_description" "text" NOT NULL,
-    "github_link" "text",
-    "live_link" "text",
-    "sort_order" integer DEFAULT 0 NOT NULL,
-    "is_visible" boolean DEFAULT true NOT NULL,
-    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
-    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
-    "slug" "text" NOT NULL,
-    "eyebrow" "text" NOT NULL,
-    "impact" "text" NOT NULL,
-    "contribution" "text" NOT NULL,
-    "year_label" "text" NOT NULL,
-    "image_alt" "text" NOT NULL,
-    "image_url" "text" NOT NULL,
-    "tags" "text"[] DEFAULT '{}'::"text"[] NOT NULL,
-    CONSTRAINT "projects_required_fields_nonblank_check" CHECK ((("btrim"("name") <> ''::"text") AND ("btrim"("short_description") <> ''::"text") AND ("btrim"("slug") <> ''::"text") AND ("btrim"("eyebrow") <> ''::"text") AND ("btrim"("impact") <> ''::"text") AND ("btrim"("contribution") <> ''::"text") AND ("btrim"("year_label") <> ''::"text") AND ("btrim"("image_alt") <> ''::"text") AND ("btrim"("image_url") <> ''::"text"))),
-    CONSTRAINT "projects_slug_format_check" CHECK (("slug" ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'::"text")),
-    CONSTRAINT "projects_sort_order_nonnegative_check" CHECK (("sort_order" >= 0)),
-    CONSTRAINT "projects_tags_items_check" CHECK ("jg_app"."is_nonblank_text_array"("tags"))
-);
-
-
-ALTER TABLE "portfolio"."projects" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "portfolio"."section_content" (
@@ -263,7 +427,7 @@ CREATE TABLE IF NOT EXISTS "portfolio"."section_content" (
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     CONSTRAINT "section_content_required_fields_nonblank_check" CHECK ((("btrim"("section_key") <> ''::"text") AND ("btrim"("eyebrow") <> ''::"text"))),
-    CONSTRAINT "section_content_section_key_check" CHECK (("section_key" = ANY (ARRAY['hero'::"text", 'about'::"text", 'skills'::"text", 'education'::"text", 'experience'::"text", 'credentials'::"text", 'activity'::"text", 'work'::"text", 'writing'::"text", 'contact'::"text", 'blog'::"text", 'article'::"text", 'resume'::"text"])))
+    CONSTRAINT "section_content_section_key_check" CHECK (("section_key" = ANY (ARRAY['hero'::"text", 'about'::"text", 'skills'::"text", 'education'::"text", 'experience'::"text", 'credentials'::"text", 'activity'::"text", 'work'::"text", 'contact'::"text", 'writing'::"text", 'article'::"text", 'resume'::"text", 'studio'::"text", 'case-studies'::"text", 'engineering'::"text"])))
 );
 
 
@@ -305,6 +469,38 @@ CREATE TABLE IF NOT EXISTS "portfolio"."skills" (
 ALTER TABLE "portfolio"."skills" OWNER TO "postgres";
 
 
+CREATE TABLE IF NOT EXISTS "portfolio"."work" (
+    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
+    "name" "text" NOT NULL,
+    "short_description" "text" NOT NULL,
+    "github_link" "text",
+    "live_link" "text",
+    "sort_order" integer DEFAULT 0 NOT NULL,
+    "is_visible" boolean DEFAULT true NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "slug" "text" NOT NULL,
+    "eyebrow" "text" NOT NULL,
+    "impact" "text" NOT NULL,
+    "contribution" "text" NOT NULL,
+    "year_label" "text" NOT NULL,
+    "image_alt" "text" NOT NULL,
+    "image_url" "text" NOT NULL,
+    "tags" "text"[] DEFAULT '{}'::"text"[] NOT NULL,
+    "case_study" "jsonb",
+    "case_study_published" boolean DEFAULT false NOT NULL,
+    CONSTRAINT "work_case_study_publication_check" CHECK (((NOT "case_study_published") OR "portfolio"."is_complete_work_case_study"("case_study"))),
+    CONSTRAINT "work_case_study_shape_check" CHECK ((("case_study" IS NULL) OR "portfolio"."is_work_case_study_shape"("case_study"))),
+    CONSTRAINT "work_required_fields_nonblank_check" CHECK ((("btrim"("name") <> ''::"text") AND ("btrim"("short_description") <> ''::"text") AND ("btrim"("slug") <> ''::"text") AND ("btrim"("eyebrow") <> ''::"text") AND ("btrim"("impact") <> ''::"text") AND ("btrim"("contribution") <> ''::"text") AND ("btrim"("year_label") <> ''::"text") AND ("btrim"("image_alt") <> ''::"text") AND ("btrim"("image_url") <> ''::"text"))),
+    CONSTRAINT "work_slug_format_check" CHECK (("slug" ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'::"text")),
+    CONSTRAINT "work_sort_order_nonnegative_check" CHECK (("sort_order" >= 0)),
+    CONSTRAINT "work_tags_items_check" CHECK ("jg_app"."is_nonblank_text_array"("tags"))
+);
+
+
+ALTER TABLE "portfolio"."work" OWNER TO "postgres";
+
+
 ALTER TABLE ONLY "portfolio"."about"
     ADD CONSTRAINT "about_pkey" PRIMARY KEY ("id");
 
@@ -317,6 +513,11 @@ ALTER TABLE ONLY "portfolio"."certificates"
 
 ALTER TABLE ONLY "portfolio"."contact"
     ADD CONSTRAINT "contact_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "portfolio"."contact_rate_limits"
+    ADD CONSTRAINT "contact_rate_limits_pkey" PRIMARY KEY ("key_hash");
 
 
 
@@ -340,11 +541,6 @@ ALTER TABLE ONLY "portfolio"."nav_items"
 
 
 
-ALTER TABLE ONLY "portfolio"."projects"
-    ADD CONSTRAINT "projects_pkey" PRIMARY KEY ("id");
-
-
-
 ALTER TABLE ONLY "portfolio"."section_content"
     ADD CONSTRAINT "section_content_pkey" PRIMARY KEY ("id");
 
@@ -357,6 +553,15 @@ ALTER TABLE ONLY "portfolio"."skill_categories"
 
 ALTER TABLE ONLY "portfolio"."skills"
     ADD CONSTRAINT "skills_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "portfolio"."work"
+    ADD CONSTRAINT "work_pkey" PRIMARY KEY ("id");
+
+
+
+CREATE INDEX "contact_rate_limits_reset_at_idx" ON "portfolio"."contact_rate_limits" USING "btree" ("reset_at");
 
 
 
@@ -376,15 +581,15 @@ CREATE INDEX "idx_nav_items_sort_order" ON "portfolio"."nav_items" USING "btree"
 
 
 
-CREATE INDEX "idx_projects_sort_order" ON "portfolio"."projects" USING "btree" ("sort_order");
-
-
-
 CREATE INDEX "idx_skill_categories_sort_order" ON "portfolio"."skill_categories" USING "btree" ("sort_order");
 
 
 
 CREATE INDEX "idx_skills_sort_order" ON "portfolio"."skills" USING "btree" ("sort_order");
+
+
+
+CREATE INDEX "idx_work_sort_order" ON "portfolio"."work" USING "btree" ("sort_order");
 
 
 
@@ -404,10 +609,6 @@ CREATE UNIQUE INDEX "portfolio_nav_items_section_id_key" ON "portfolio"."nav_ite
 
 
 
-CREATE UNIQUE INDEX "portfolio_projects_slug_key" ON "portfolio"."projects" USING "btree" ("slug");
-
-
-
 CREATE UNIQUE INDEX "portfolio_section_content_key_key" ON "portfolio"."section_content" USING "btree" ("section_key");
 
 
@@ -417,6 +618,10 @@ CREATE UNIQUE INDEX "portfolio_skill_categories_title_key" ON "portfolio"."skill
 
 
 CREATE UNIQUE INDEX "portfolio_skills_category_name_key" ON "portfolio"."skills" USING "btree" ("category_id", "lower"(TRIM(BOTH FROM "name")));
+
+
+
+CREATE UNIQUE INDEX "portfolio_work_slug_key" ON "portfolio"."work" USING "btree" ("slug");
 
 
 
@@ -448,10 +653,6 @@ CREATE OR REPLACE TRIGGER "nav_items_updated_at" BEFORE UPDATE ON "portfolio"."n
 
 
 
-CREATE OR REPLACE TRIGGER "projects_updated_at" BEFORE UPDATE ON "portfolio"."projects" FOR EACH ROW EXECUTE FUNCTION "portfolio"."update_updated_at_column"();
-
-
-
 CREATE OR REPLACE TRIGGER "section_content_updated_at" BEFORE UPDATE ON "portfolio"."section_content" FOR EACH ROW EXECUTE FUNCTION "portfolio"."update_updated_at_column"();
 
 
@@ -464,6 +665,10 @@ CREATE OR REPLACE TRIGGER "skills_updated_at" BEFORE UPDATE ON "portfolio"."skil
 
 
 
+CREATE OR REPLACE TRIGGER "work_updated_at" BEFORE UPDATE ON "portfolio"."work" FOR EACH ROW EXECUTE FUNCTION "portfolio"."update_updated_at_column"();
+
+
+
 ALTER TABLE ONLY "portfolio"."nav_items"
     ADD CONSTRAINT "nav_items_section_id_fkey" FOREIGN KEY ("section_id") REFERENCES "portfolio"."section_content"("section_key") ON UPDATE CASCADE ON DELETE RESTRICT;
 
@@ -471,6 +676,10 @@ ALTER TABLE ONLY "portfolio"."nav_items"
 
 ALTER TABLE ONLY "portfolio"."skills"
     ADD CONSTRAINT "skills_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "portfolio"."skill_categories"("id") ON DELETE CASCADE;
+
+
+
+CREATE POLICY "Admin work access" ON "portfolio"."work" USING ("jg_account"."is_admin"()) WITH CHECK ("jg_account"."is_admin"());
 
 
 
@@ -499,10 +708,6 @@ CREATE POLICY "Admin write access" ON "portfolio"."hero" USING ("jg_account"."is
 
 
 CREATE POLICY "Admin write access" ON "portfolio"."nav_items" USING ("jg_account"."is_admin"()) WITH CHECK ("jg_account"."is_admin"());
-
-
-
-CREATE POLICY "Admin write access" ON "portfolio"."projects" USING ("jg_account"."is_admin"()) WITH CHECK ("jg_account"."is_admin"());
 
 
 
@@ -548,11 +753,7 @@ CREATE POLICY "Public read access" ON "portfolio"."nav_items" FOR SELECT USING (
 
 
 
-CREATE POLICY "Public read access" ON "portfolio"."projects" FOR SELECT USING (("is_visible" = true));
-
-
-
-CREATE POLICY "Public read access" ON "portfolio"."section_content" FOR SELECT USING (("is_visible" = true));
+CREATE POLICY "Public read access" ON "portfolio"."section_content" FOR SELECT TO "authenticated", "anon" USING (true);
 
 
 
@@ -566,6 +767,10 @@ CREATE POLICY "Public read access" ON "portfolio"."skills" FOR SELECT USING (("i
 
 
 
+CREATE POLICY "Public work access" ON "portfolio"."work" FOR SELECT USING (("is_visible" = true));
+
+
+
 ALTER TABLE "portfolio"."about" ENABLE ROW LEVEL SECURITY;
 
 
@@ -573,6 +778,9 @@ ALTER TABLE "portfolio"."certificates" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "portfolio"."contact" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "portfolio"."contact_rate_limits" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "portfolio"."education" ENABLE ROW LEVEL SECURITY;
@@ -587,9 +795,6 @@ ALTER TABLE "portfolio"."hero" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "portfolio"."nav_items" ENABLE ROW LEVEL SECURITY;
 
 
-ALTER TABLE "portfolio"."projects" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "portfolio"."section_content" ENABLE ROW LEVEL SECURITY;
 
 
@@ -599,9 +804,36 @@ ALTER TABLE "portfolio"."skill_categories" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "portfolio"."skills" ENABLE ROW LEVEL SECURITY;
 
 
+ALTER TABLE "portfolio"."work" ENABLE ROW LEVEL SECURITY;
+
+
 GRANT USAGE ON SCHEMA "portfolio" TO "anon";
 GRANT USAGE ON SCHEMA "portfolio" TO "authenticated";
 GRANT USAGE ON SCHEMA "portfolio" TO "service_role";
+
+
+
+REVOKE ALL ON FUNCTION "portfolio"."consume_contact_rate_limit"("p_key_hash" "text") FROM PUBLIC;
+GRANT ALL ON FUNCTION "portfolio"."consume_contact_rate_limit"("p_key_hash" "text") TO "anon";
+GRANT ALL ON FUNCTION "portfolio"."consume_contact_rate_limit"("p_key_hash" "text") TO "authenticated";
+GRANT ALL ON FUNCTION "portfolio"."consume_contact_rate_limit"("p_key_hash" "text") TO "service_role";
+
+
+
+REVOKE ALL ON FUNCTION "portfolio"."is_complete_work_case_study"("value" "jsonb") FROM PUBLIC;
+GRANT ALL ON FUNCTION "portfolio"."is_complete_work_case_study"("value" "jsonb") TO "authenticated";
+GRANT ALL ON FUNCTION "portfolio"."is_complete_work_case_study"("value" "jsonb") TO "service_role";
+
+
+
+REVOKE ALL ON FUNCTION "portfolio"."is_work_case_study_shape"("value" "jsonb") FROM PUBLIC;
+GRANT ALL ON FUNCTION "portfolio"."is_work_case_study_shape"("value" "jsonb") TO "authenticated";
+GRANT ALL ON FUNCTION "portfolio"."is_work_case_study_shape"("value" "jsonb") TO "service_role";
+
+
+
+REVOKE ALL ON FUNCTION "portfolio"."save_section_presentation"("p_section_key" "text", "p_copy" "jsonb", "p_navigation" "jsonb") FROM PUBLIC;
+GRANT ALL ON FUNCTION "portfolio"."save_section_presentation"("p_section_key" "text", "p_copy" "jsonb", "p_navigation" "jsonb") TO "service_role";
 
 
 
@@ -629,6 +861,10 @@ GRANT ALL ON TABLE "portfolio"."contact" TO "service_role";
 
 
 
+GRANT ALL ON TABLE "portfolio"."contact_rate_limits" TO "service_role";
+
+
+
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."education" TO "anon";
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."education" TO "authenticated";
 GRANT ALL ON TABLE "portfolio"."education" TO "service_role";
@@ -653,12 +889,6 @@ GRANT ALL ON TABLE "portfolio"."nav_items" TO "service_role";
 
 
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."projects" TO "anon";
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."projects" TO "authenticated";
-GRANT ALL ON TABLE "portfolio"."projects" TO "service_role";
-
-
-
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."section_content" TO "anon";
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."section_content" TO "authenticated";
 GRANT ALL ON TABLE "portfolio"."section_content" TO "service_role";
@@ -674,6 +904,12 @@ GRANT ALL ON TABLE "portfolio"."skill_categories" TO "service_role";
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."skills" TO "anon";
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."skills" TO "authenticated";
 GRANT ALL ON TABLE "portfolio"."skills" TO "service_role";
+
+
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."work" TO "anon";
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."work" TO "authenticated";
+GRANT ALL ON TABLE "portfolio"."work" TO "service_role";
 
 
 

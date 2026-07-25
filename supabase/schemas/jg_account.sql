@@ -92,59 +92,6 @@ $$;
 
 ALTER FUNCTION "jg_account"."is_admin"() OWNER TO "postgres";
 
-
-CREATE OR REPLACE FUNCTION "jg_account"."list_user_sessions"("p_user_id" "uuid") RETURNS TABLE("id" "uuid", "created_at" timestamp with time zone, "updated_at" timestamp with time zone, "user_agent" "text", "ip" "text")
-    LANGUAGE "sql" SECURITY DEFINER
-    SET "search_path" TO ''
-    AS $$
-  SELECT s.id, s.created_at, s.updated_at, s.user_agent, s.ip::text
-  FROM auth.sessions s
-  WHERE s.user_id = p_user_id
-    AND (s.not_after IS NULL OR s.not_after > now())
-  ORDER BY s.updated_at DESC;
-$$;
-
-
-ALTER FUNCTION "jg_account"."list_user_sessions"("p_user_id" "uuid") OWNER TO "postgres";
-
-
-CREATE OR REPLACE FUNCTION "jg_account"."revoke_other_sessions"("p_user_id" "uuid", "p_current_session_id" "uuid") RETURNS integer
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    SET "search_path" TO ''
-    AS $$
-DECLARE
-  deleted_count integer;
-BEGIN
-  DELETE FROM auth.sessions
-  WHERE user_id = p_user_id
-    AND id != p_current_session_id
-    AND (not_after IS NULL OR not_after > now());
-  GET DIAGNOSTICS deleted_count = ROW_COUNT;
-  RETURN deleted_count;
-END;
-$$;
-
-
-ALTER FUNCTION "jg_account"."revoke_other_sessions"("p_user_id" "uuid", "p_current_session_id" "uuid") OWNER TO "postgres";
-
-
-CREATE OR REPLACE FUNCTION "jg_account"."revoke_session"("p_user_id" "uuid", "p_session_id" "uuid") RETURNS boolean
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    SET "search_path" TO ''
-    AS $$
-DECLARE
-  deleted_count integer;
-BEGIN
-  DELETE FROM auth.sessions
-  WHERE id = p_session_id AND user_id = p_user_id;
-  GET DIAGNOSTICS deleted_count = ROW_COUNT;
-  RETURN deleted_count > 0;
-END;
-$$;
-
-
-ALTER FUNCTION "jg_account"."revoke_session"("p_user_id" "uuid", "p_session_id" "uuid") OWNER TO "postgres";
-
 SET default_tablespace = '';
 
 SET default_table_access_method = "heap";
@@ -248,8 +195,8 @@ GRANT USAGE ON SCHEMA "jg_account" TO "service_role";
 
 
 
+REVOKE ALL ON FUNCTION "jg_account"."count_my_sessions"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "jg_account"."count_my_sessions"() TO "authenticated";
-GRANT ALL ON FUNCTION "jg_account"."count_my_sessions"() TO "anon";
 GRANT ALL ON FUNCTION "jg_account"."count_my_sessions"() TO "service_role";
 
 
@@ -269,24 +216,6 @@ GRANT ALL ON FUNCTION "jg_account"."handle_updated_at"() TO "service_role";
 GRANT ALL ON FUNCTION "jg_account"."is_admin"() TO "anon";
 GRANT ALL ON FUNCTION "jg_account"."is_admin"() TO "authenticated";
 GRANT ALL ON FUNCTION "jg_account"."is_admin"() TO "service_role";
-
-
-
-GRANT ALL ON FUNCTION "jg_account"."list_user_sessions"("p_user_id" "uuid") TO "anon";
-GRANT ALL ON FUNCTION "jg_account"."list_user_sessions"("p_user_id" "uuid") TO "authenticated";
-GRANT ALL ON FUNCTION "jg_account"."list_user_sessions"("p_user_id" "uuid") TO "service_role";
-
-
-
-GRANT ALL ON FUNCTION "jg_account"."revoke_other_sessions"("p_user_id" "uuid", "p_current_session_id" "uuid") TO "anon";
-GRANT ALL ON FUNCTION "jg_account"."revoke_other_sessions"("p_user_id" "uuid", "p_current_session_id" "uuid") TO "authenticated";
-GRANT ALL ON FUNCTION "jg_account"."revoke_other_sessions"("p_user_id" "uuid", "p_current_session_id" "uuid") TO "service_role";
-
-
-
-GRANT ALL ON FUNCTION "jg_account"."revoke_session"("p_user_id" "uuid", "p_session_id" "uuid") TO "anon";
-GRANT ALL ON FUNCTION "jg_account"."revoke_session"("p_user_id" "uuid", "p_session_id" "uuid") TO "authenticated";
-GRANT ALL ON FUNCTION "jg_account"."revoke_session"("p_user_id" "uuid", "p_session_id" "uuid") TO "service_role";
 
 
 
