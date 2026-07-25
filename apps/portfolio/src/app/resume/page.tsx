@@ -31,24 +31,25 @@ export default async function ResumePage() {
         brandLabel={shell.brandLabel}
         navigation={shell.navigation}
       />
-      <section className="shell editorial-resume">
-        <span className="section-index">{content.eyebrow}</span>
+      <section className="shell editorial-page-hero editorial-resume-hero">
         <div>
           <h1>{content.headline}</h1>
-          <p>{content.description}</p>
-          <div className="editorial-resume__actions">
-            <a href={resumeHref} download="Jayant_Resume.pdf">
-              Download PDF <ArrowDownToLine aria-hidden="true" />
-            </a>
-            <Link href="/about#experience">
-              Explore About and experience <ArrowUpRight aria-hidden="true" />
-            </Link>
+          <div className="editorial-resume__copy">
+            <p>{content.description}</p>
+            <div className="editorial-resume__actions">
+              <a href={resumeHref} download="Jayant_Resume.pdf">
+                Download PDF <ArrowDownToLine aria-hidden="true" />
+              </a>
+              <Link href="/about#experience">
+                View experience <ArrowUpRight aria-hidden="true" />
+              </Link>
+            </div>
           </div>
         </div>
       </section>
       <section className="shell editorial-resume__viewer">
         <div className="editorial-resume__viewer-heading">
-          <span className="section-index">Resume / In browser</span>
+          <span className="section-index">PDF preview</span>
           <p>Read the current PDF here or download a copy for later.</p>
         </div>
         <iframe

@@ -1,8 +1,7 @@
-/* eslint-disable @next/next/no-img-element */
-
 import { ArrowLeft, ArrowUpRight, Github } from "lucide-react";
 import Link from "next/link";
 
+import { ProjectMediaGallery } from "@/components/editorial/project-media-gallery";
 import type {
   PortfolioWork,
   PortfolioSectionContent,
@@ -23,10 +22,10 @@ function WorkArtwork({
     <div className={`project-artwork ${className}`.trim()}>
       <div className="torn-sheet">
         <div className="torn-sheet__image">
-          <img
-            src={project.image}
+          <ProjectMediaGallery
+            images={project.images}
             alt={project.imageAlt}
-            loading={eager ? "eager" : "lazy"}
+            eager={eager}
           />
         </div>
       </div>
@@ -143,12 +142,13 @@ export function WorkArchive({
 }) {
   return (
     <section
+      id="work-archive"
       className="project-desk project-desk--archive"
-      aria-label="All work"
+      aria-label="Work archive"
     >
       <div className="shell">
         <div className="project-stories project-stories--archive">
-          {work.map((project, index) => (
+          {work.map((project) => (
             <div
               key={project.id}
               className={`project-story project-story--${project.tone}`}
@@ -156,7 +156,7 @@ export function WorkArchive({
               <article>
                 <WorkArtwork
                   project={project}
-                  eager={index < 2}
+                  eager
                   className="project-fragment"
                 />
                 <div className="project-story__copy">

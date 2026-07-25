@@ -38,7 +38,6 @@ export default async function WritingPage() {
         navigation={shell.navigation}
       />
       <section className="shell editorial-page-hero">
-        <span className="section-index">{content.eyebrow}</span>
         <div>
           <h1>{content.headline}</h1>
           <p>{content.description}</p>

@@ -8,7 +8,7 @@ import type { Components } from "react-markdown";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 
 import { EditorialSubpageHeader } from "@/components/editorial/subpage-header";
 import { formatEditorialDate } from "@/lib/writing/date";
@@ -225,10 +225,6 @@ export function WritingContent({
       />
 
       <article ref={articleRef} className="shell editorial-article">
-        <Link className="editorial-article__back" href="/writing">
-          <ArrowLeft aria-hidden="true" /> All writing
-        </Link>
-
         <header className="editorial-article__header">
           <div className="editorial-article__meta">
             <span className="section-index">{articleContent.eyebrow}</span>

@@ -28,8 +28,6 @@ import {
   type PortfolioCredential,
   type PortfolioEditorialData,
   type PortfolioNavigationItem,
-  type PortfolioPageContentMap,
-  type PortfolioPageKey,
   type PortfolioProfile,
   type PortfolioWork,
   type PortfolioSectionContentMap,
@@ -49,6 +47,19 @@ type CertificateRow = PortfolioCertificatePublicRow;
 type ContactRow = PortfolioContactPublicRow;
 type NavigationRow = PortfolioNavigationPublicRow;
 type SectionContentRow = PortfolioSectionContentPublicRow;
+
+const DEPLOYED_WORK_IMAGE_GALLERIES: Record<string, string[]> = {
+  portfolio: ["/images/portfolio-light-desktop.png"],
+  studio: [
+    "/images/studio-home-light-desktop.png",
+    "/images/studio-products-light-desktop.png",
+  ],
+  admin: ["/images/admin-light-desktop.png"],
+  "identity-sso": [
+    "/images/auth-security-light-desktop.png",
+    "/images/auth-providers-light-desktop.png",
+  ],
+};
 
 function castData<T>(value: unknown): T {
   return value as T;
@@ -73,6 +84,7 @@ function mapWork(row: WorkRow, index: number): PortfolioWork {
   const caseStudy = row.case_study_published
     ? readWorkCaseStudy(row.case_study)
     : null;
+  const images = DEPLOYED_WORK_IMAGE_GALLERIES[row.slug] ?? [row.image_url];
 
   return {
     id: row.slug,
@@ -82,7 +94,8 @@ function mapWork(row: WorkRow, index: number): PortfolioWork {
     impact: row.impact,
     role: row.contribution,
     year: row.year_label,
-    image: row.image_url,
+    image: images[0] ?? row.image_url,
+    images,
     imageAlt: row.image_alt,
     href: row.live_link,
     github: row.github_link,
@@ -187,37 +200,6 @@ function mapSectionContent(
       ];
     }),
   ) as PortfolioSectionContentMap;
-}
-
-const PORTFOLIO_PAGE_KEYS: readonly PortfolioPageKey[] = [
-  "studio",
-  "case-studies",
-  "engineering",
-];
-
-function mapPageContent(rows: SectionContentRow[]): PortfolioPageContentMap {
-  const rowsByKey = new Map(
-    rows.map((row) => [row.section_key as string, row]),
-  );
-
-  return Object.fromEntries(
-    PORTFOLIO_PAGE_KEYS.map((key) => {
-      const row = rowsByKey.get(key);
-      if (!row) throw new Error(`Missing CMS page copy: ${key}`);
-
-      return [
-        key,
-        {
-          eyebrow: row.eyebrow,
-          headline: row.headline ?? "",
-          accent: row.accent ?? "",
-          description: row.description ?? "",
-          supportingText: row.supporting_text ?? "",
-          isVisible: row.is_visible,
-        },
-      ];
-    }),
-  ) as PortfolioPageContentMap;
 }
 
 function throwQueryErrors(
@@ -343,9 +325,6 @@ export const getEditorialPortfolioData = cache(
       sectionContent: mapSectionContent(
         castData<SectionContentRow[]>(sectionContentResult.data ?? []),
       ),
-      pageContent: mapPageContent(
-        castData<SectionContentRow[]>(sectionContentResult.data ?? []),
-      ),
       education: castData<EducationRow[]>(educationResult.data ?? []).map(
         (row) => ({
           school: row.school,
@@ -376,9 +355,7 @@ export const getEditorialPortfolioData = cache(
             evidence: skill.evidence,
           })),
       })),
-      work: castData<WorkRow[]>(workResult.data ?? []).map(
-        mapWork,
-      ),
+      work: castData<WorkRow[]>(workResult.data ?? []).map(mapWork),
       credentials: castData<CertificateRow[]>(
         certificatesResult.data ?? [],
       ).map(mapCredential),
@@ -436,9 +413,6 @@ export const getPortfolioShellData = cache(async () => {
     ),
     profile,
     sectionContent: mapSectionContent(
-      castData<SectionContentRow[]>(sectionContentResult.data ?? []),
-    ),
-    pageContent: mapPageContent(
       castData<SectionContentRow[]>(sectionContentResult.data ?? []),
     ),
   };

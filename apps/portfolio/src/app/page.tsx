@@ -42,11 +42,5 @@ export default async function PortfolioPage() {
     getPublishedWritingPreviews(),
   ]);
 
-  return (
-    <PortfolioExperience
-      data={portfolio}
-      githubStats={null}
-      writingPosts={publishedPosts}
-    />
-  );
+  return <PortfolioExperience data={portfolio} writingPosts={publishedPosts} />;
 }

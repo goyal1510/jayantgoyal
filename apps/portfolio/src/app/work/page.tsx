@@ -32,16 +32,15 @@ export default async function WorkPage() {
         navigation={portfolio.navigation}
       />
       <section className="shell editorial-page-hero editorial-work-hero">
-        <span className="section-index">{content.eyebrow}</span>
         <div>
-          <h1>Work I have built and shipped.</h1>
+          <h1>Complete systems, built end to end.</h1>
           <p>{content.description}</p>
           <div className="editorial-work-hero__meta">
             <span>
               {String(portfolio.work.length).padStart(2, "0")} systems ·
               explained end to end
             </span>
-            <Link href="/about">About, experience, and education</Link>
+            <Link href="#work-archive">Browse the systems</Link>
           </div>
         </div>
       </section>

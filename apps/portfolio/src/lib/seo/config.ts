@@ -11,9 +11,7 @@ export const SITE_URL = applicationOrigin(
 );
 export const PERSON_NAME = PERSON_BRAND.fullName;
 export const SITE_NAME = PORTFOLIO_BRAND.publicName;
-export const SITE_TITLE = PORTFOLIO_BRAND.defaultTitle;
 export const SITE_TITLE_TEMPLATE = PORTFOLIO_BRAND.titleTemplate;
-export const SITE_DESCRIPTION = PORTFOLIO_BRAND.description;
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/opengraph-image`;
 export const LAST_SIGNIFICANT_UPDATE = "2026-07-24T00:00:00.000Z";
 

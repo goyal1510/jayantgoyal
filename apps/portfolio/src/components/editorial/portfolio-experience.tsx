@@ -31,15 +31,12 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { ContactForm } from "@/components/editorial/contact-form";
-import { GithubCodeStats } from "@/components/editorial/github-code-stats";
-import { GithubContributions } from "@/components/editorial/github-contributions";
 import { PortfolioNavigation } from "@/components/editorial/portfolio-navigation";
 import { FeaturedWork } from "@/components/editorial/work-showcase";
 import type {
   WritingPreview,
   PortfolioCredential,
   PortfolioEditorialData,
-  PortfolioExperience as PortfolioExperienceItem,
   PortfolioProfile,
   PortfolioSectionContent,
   PortfolioSectionKey,
@@ -47,7 +44,6 @@ import type {
 } from "@/lib/portfolio/editorial-data";
 import { PRODUCT_PROOF_POINTS } from "@/lib/portfolio/product-proof";
 import { getCompactSectionHeading } from "@/lib/portfolio/section-heading";
-import type { GitHubLOCStats } from "@repo/github";
 
 const reveal = {
   hidden: { opacity: 0, y: 28 },
@@ -138,7 +134,7 @@ function ProductProofStrip() {
   );
 }
 
-function CertificateDeck({
+export function CertificateDeck({
   credentials,
   content,
 }: {
@@ -241,121 +237,6 @@ function CertificateDeck({
   );
 }
 
-function ExperienceLandscape({
-  experience,
-  credentials,
-  content,
-  credentialContent,
-}: {
-  experience: PortfolioExperienceItem[];
-  credentials: PortfolioCredential[];
-  content: PortfolioSectionContent;
-  credentialContent: PortfolioSectionContent;
-}) {
-  const heading = getCompactSectionHeading(content.eyebrow, content.headline);
-
-  return (
-    <section id="experience" className="experience-desk">
-      <div className="shell">
-        {content.isVisible ? (
-          <>
-            <Reveal className="section-heading section-heading--light">
-              <span className="section-index">{heading.label}</span>
-              <div>
-                <h2>{heading.title}</h2>
-                <p>{content.description}</p>
-              </div>
-            </Reveal>
-
-            <div className="experience-journey">
-              {experience.map((item, index) => (
-                <Reveal
-                  key={`${item.company}-${item.role}`}
-                  className="experience-stop"
-                  delay={index * 0.05}
-                >
-                  <article>
-                    <span className="experience-stop__period">
-                      {item.period}
-                    </span>
-                    <div className="experience-stop__story">
-                      <h3>{item.company}</h3>
-                      <p className="experience-stop__role">
-                        {item.role} · {item.location}
-                      </p>
-                      {item.outcomes.length > 0 ? (
-                        <ul>
-                          {item.outcomes.slice(0, 2).map((outcome) => (
-                            <li key={outcome}>{outcome}</li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="experience-stop__summary">
-                          {item.summary}
-                        </p>
-                      )}
-                    </div>
-                  </article>
-                </Reveal>
-              ))}
-            </div>
-          </>
-        ) : null}
-
-        {credentialContent.isVisible && credentials.length > 0 ? (
-          <CertificateDeck
-            credentials={credentials}
-            content={credentialContent}
-          />
-        ) : null}
-      </div>
-    </section>
-  );
-}
-
-function GithubSection({
-  githubStats,
-  profile,
-  content,
-}: {
-  githubStats: GitHubLOCStats | null;
-  profile: PortfolioProfile;
-  content: PortfolioSectionContent;
-}) {
-  const heading = getCompactSectionHeading(content.eyebrow, content.headline);
-
-  return (
-    <section id="activity" className="activity-section">
-      <div className="shell">
-        <Reveal className="section-heading">
-          <span className="section-index">{heading.label}</span>
-          <div>
-            <h2>{heading.title}</h2>
-            <p>{content.description}</p>
-          </div>
-        </Reveal>
-
-        <div className="activity-paper">
-          <div className="activity-paper__topline">
-            <div>
-              <Github aria-hidden="true" />
-              <span>{profile.github.replace(/^https?:\/\//, "")}</span>
-            </div>
-            <a href={profile.github} target="_blank" rel="noreferrer">
-              View profile <ArrowUpRight aria-hidden="true" />
-            </a>
-          </div>
-          <GithubContributions username={profile.githubUsername} />
-          <GithubCodeStats
-            username={profile.githubUsername}
-            initialStats={githubStats}
-          />
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function WritingSection({
   writingPosts,
   content,
@@ -446,7 +327,8 @@ function AboutPreview({
           <Reveal className="profile-story">
             <p className="profile-story__lead">{about.lead}</p>
             <Link href="/about" className="text-link">
-              About, experience, and education <ArrowUpRight aria-hidden="true" />
+              About, experience, and education{" "}
+              <ArrowUpRight aria-hidden="true" />
             </Link>
           </Reveal>
           <div className="profile-facts">
@@ -570,28 +452,13 @@ export function ContactSection({
 }
 
 export function PortfolioExperience({
-  githubStats,
   writingPosts,
   data,
 }: {
-  githubStats: GitHubLOCStats | null;
   writingPosts: WritingPreview[];
   data: PortfolioEditorialData;
 }) {
-  const {
-    profile,
-    about,
-    education,
-    experience,
-    skillGroups,
-    work,
-    credentials,
-    principles,
-    navigation,
-    sectionContent,
-  } = data;
-  const showLegacyHomeSections =
-    process.env.NEXT_PUBLIC_SHOW_LEGACY_HOME_SECTIONS === "true";
+  const { profile, about, work, navigation, sectionContent } = data;
   const visibleNavigation = navigation.filter((item) => {
     const content = sectionContent[item.key as PortfolioSectionKey];
     return content?.isVisible ?? true;
@@ -604,19 +471,6 @@ export function PortfolioExperience({
     mass: 0.2,
   });
   const heroY = useTransform(scrollYProgress, [0, 0.18], [0, -54]);
-  const aboutHeading = getCompactSectionHeading(
-    sectionContent.about.eyebrow,
-    about.headline,
-  );
-  const educationHeading = getCompactSectionHeading(
-    sectionContent.education.eyebrow,
-    sectionContent.education.headline,
-  );
-  const skillsHeading = getCompactSectionHeading(
-    sectionContent.skills.eyebrow,
-    sectionContent.skills.headline,
-  );
-
   useEffect(() => {
     const root = document.documentElement;
     const updatePointer = (event: PointerEvent) => {
@@ -730,168 +584,6 @@ export function PortfolioExperience({
         />
       ) : null}
 
-      {showLegacyHomeSections &&
-      (sectionContent.about.isVisible || sectionContent.education.isVisible) ? (
-        <section id="about" className="profile-section">
-          <div className="shell">
-            {sectionContent.about.isVisible ? (
-              <>
-                <Reveal className="section-heading">
-                  <span className="section-index">{aboutHeading.label}</span>
-                  <div>
-                    <h2>{aboutHeading.title}</h2>
-                    <p>{about.objective}</p>
-                  </div>
-                </Reveal>
-
-                <div className="profile-grid">
-                  <Reveal className="profile-story">
-                    <p className="profile-story__lead">{about.lead}</p>
-                    <div className="profile-actions">
-                      <a href={profile.resume} target="_blank" rel="noreferrer">
-                        Résumé <FileText aria-hidden="true" />
-                      </a>
-                      <a href="#contact">
-                        Contact <Mail aria-hidden="true" />
-                      </a>
-                    </div>
-                  </Reveal>
-
-                  <div className="profile-facts">
-                    {about.facts.map((fact, index) => (
-                      <Reveal key={fact.label} delay={index * 0.04}>
-                        <article>
-                          <span>{fact.label}</span>
-                          <strong>{fact.value}</strong>
-                        </article>
-                      </Reveal>
-                    ))}
-                  </div>
-                </div>
-              </>
-            ) : null}
-
-            {sectionContent.education.isVisible ? (
-              <div className="education-block">
-                <div className="education-block__heading">
-                  <span className="section-index">
-                    {educationHeading.label}
-                  </span>
-                  <h3>{educationHeading.title}</h3>
-                </div>
-                <div className="education-journey">
-                  {education.map((item, index) => (
-                    <Reveal
-                      key={`${item.school}-${item.period}`}
-                      className="education-stop"
-                      delay={index * 0.05}
-                    >
-                      <article>
-                        <span className="education-stop__period">
-                          {item.period}
-                        </span>
-                        <div className="education-stop__story">
-                          <h4>{item.school}</h4>
-                          <p className="education-stop__degree">
-                            {item.degree}
-                          </p>
-                          <p className="education-stop__meta">
-                            {item.location} · <strong>{item.detail}</strong>
-                          </p>
-                        </div>
-                      </article>
-                    </Reveal>
-                  ))}
-                </div>
-              </div>
-            ) : null}
-          </div>
-        </section>
-      ) : null}
-
-      {showLegacyHomeSections && sectionContent.skills.isVisible ? (
-        <section id="engineering" className="capability-section">
-          <div className="shell">
-            <Reveal className="section-heading">
-              <span className="section-index">{skillsHeading.label}</span>
-              <div>
-                <h2>{skillsHeading.title}</h2>
-                <p>{sectionContent.skills.description}</p>
-              </div>
-            </Reveal>
-
-            <div className="capability-matrix" aria-label="Capability index">
-              <div className="capability-matrix__labels" aria-hidden="true">
-                <span>Practice</span>
-                <span>What it covers</span>
-                <span>Working set</span>
-              </div>
-              {skillGroups.map((group, index) => (
-                <Reveal
-                  key={group.title}
-                  className="capability-row"
-                  delay={index * 0.04}
-                >
-                  <article>
-                    <div className="capability-row__title">
-                      <span aria-hidden="true">
-                        {String(index + 1).padStart(2, "0")}
-                      </span>
-                      <h3>{group.title}</h3>
-                    </div>
-                    <p className="skill-group__description">
-                      {group.description}
-                    </p>
-                    <ul>
-                      {group.items.map((item) => (
-                        <li
-                          key={item.name}
-                          title={item.evidence}
-                          data-proficiency={item.proficiency}
-                        >
-                          {item.name}
-                          {item.proficiency ? (
-                            <small>{item.proficiency}</small>
-                          ) : null}
-                        </li>
-                      ))}
-                    </ul>
-                  </article>
-                </Reveal>
-              ))}
-            </div>
-
-            <div className="principles-strip">
-              {principles.map((principle) => (
-                <article key={principle.title}>
-                  <h3>{principle.title}</h3>
-                  <p>{principle.copy}</p>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-      ) : null}
-
-      {showLegacyHomeSections && (sectionContent.experience.isVisible ||
-      sectionContent.credentials.isVisible) ? (
-        <ExperienceLandscape
-          experience={experience}
-          credentials={credentials}
-          content={sectionContent.experience}
-          credentialContent={sectionContent.credentials}
-        />
-      ) : null}
-      {showLegacyHomeSections && sectionContent.activity.isVisible ? (
-        <GithubSection
-          githubStats={githubStats}
-          profile={profile}
-          content={sectionContent.activity}
-        />
-      ) : null}
-      {showLegacyHomeSections && sectionContent.contact.isVisible ? (
-        <ContactSection profile={profile} content={sectionContent.contact} />
-      ) : null}
       {sectionContent.about.isVisible ? (
         <AboutPreview about={about} content={sectionContent.about} />
       ) : null}

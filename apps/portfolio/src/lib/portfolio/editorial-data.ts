@@ -34,7 +34,7 @@ export type PortfolioAbout = {
   facts: Array<{ label: string; value: string }>;
 };
 
-export type PortfolioEducation = {
+type PortfolioEducation = {
   period: string;
   school: string;
   degree: string;
@@ -42,7 +42,7 @@ export type PortfolioEducation = {
   detail: string;
 };
 
-export type PortfolioExperience = {
+type PortfolioExperience = {
   period: string;
   company: string;
   role: string;
@@ -53,13 +53,13 @@ export type PortfolioExperience = {
 
 export type SkillProficiency = "core" | "strong" | "working" | "exploring";
 
-export type PortfolioSkill = {
+type PortfolioSkill = {
   name: string;
   proficiency: SkillProficiency;
   evidence: string;
 };
 
-export type PortfolioSkillGroup = {
+type PortfolioSkillGroup = {
   title: string;
   description: string;
   items: PortfolioSkill[];
@@ -74,6 +74,7 @@ export type PortfolioWork = {
   role: string;
   year: string;
   image: string;
+  images: string[];
   imageAlt: string;
   href: string | null;
   github: string | null;
@@ -104,7 +105,7 @@ export type PortfolioCredential = {
   imageAlt: string;
 };
 
-export type PortfolioPrinciple = {
+type PortfolioPrinciple = {
   title: string;
   copy: string;
 };
@@ -114,26 +115,6 @@ export type PortfolioNavigationItem = {
   label: string;
   note: string;
 };
-
-export const PORTFOLIO_SECTION_KEYS = [
-  "hero",
-  "about",
-  "skills",
-  "education",
-  "experience",
-  "credentials",
-  "activity",
-  "work",
-  "contact",
-  "writing",
-  "article",
-  "resume",
-  "studio",
-  "case-studies",
-  "engineering",
-] as const;
-
-export type PortfolioSectionKey = (typeof PORTFOLIO_SECTION_KEYS)[number];
 
 export type PortfolioSectionContent = {
   eyebrow: string;
@@ -146,16 +127,6 @@ export type PortfolioSectionContent = {
 
 export type PortfolioSectionContentMap = Record<
   PortfolioSectionKey,
-  PortfolioSectionContent
->;
-
-export type PortfolioPageKey =
-  | "studio"
-  | "case-studies"
-  | "engineering";
-
-export type PortfolioPageContentMap = Record<
-  PortfolioPageKey,
   PortfolioSectionContent
 >;
 
@@ -172,7 +143,6 @@ export type PortfolioEditorialData = {
   about: PortfolioAbout;
   navigation: PortfolioNavigationItem[];
   sectionContent: PortfolioSectionContentMap;
-  pageContent: PortfolioPageContentMap;
   education: PortfolioEducation[];
   experience: PortfolioExperience[];
   skillGroups: PortfolioSkillGroup[];
@@ -180,3 +150,6 @@ export type PortfolioEditorialData = {
   credentials: PortfolioCredential[];
   principles: PortfolioPrinciple[];
 };
+import type { PortfolioSectionKey } from "@repo/portfolio-data";
+
+export type { PortfolioSectionKey };
