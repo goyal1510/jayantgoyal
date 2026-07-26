@@ -36,10 +36,9 @@ into the worktree.
   compact technology labels; no new database fields or duplicated hardcoded
   stack data were introduced.
 - Replaced the technology pills with semantic bullet lists after review.
-- Arranged the CMS-controlled category headings in a simple two-column desktop
-  grid, with each heading followed by its description and technology list.
-- Collapsed the category grid to one column on mobile while retaining the same
-  content order and list semantics.
+- Kept every CMS-controlled category as one full-width row.
+- Arranged only the skills inside each category as a two-column bullet list on
+  both desktop and mobile.
 
 ## Verification
 

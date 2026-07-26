@@ -1201,17 +1201,16 @@ main footer[id] {
 }
 
 .technology-stack__groups {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: clamp(36px, 6vw, 96px);
   margin-top: clamp(44px, 5vw, 72px);
   border-top: 1px solid var(--line);
 }
 
 .technology-stack__group {
   display: grid;
-  grid-template-columns: 34px minmax(0, 1fr);
-  gap: 20px 14px;
+  grid-template-columns:
+    minmax(44px, 0.16fr) minmax(220px, 0.64fr)
+    minmax(0, 1.2fr);
+  gap: clamp(24px, 4vw, 64px);
   align-items: start;
   padding: clamp(28px, 3.5vw, 48px) 0;
   border-bottom: 1px solid var(--line);
@@ -1242,8 +1241,8 @@ main footer[id] {
 
 .technology-stack__group ul {
   display: grid;
-  grid-column: 2;
-  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px clamp(18px, 3vw, 36px);
   margin: 4px 0 0;
   padding-left: 18px;
   list-style: disc;
@@ -3500,11 +3499,14 @@ main footer[id] {
   }
 
   .technology-stack__group {
+    grid-template-columns: 34px minmax(0, 1fr);
     gap: 18px 14px;
   }
 
-  .technology-stack__groups {
-    grid-template-columns: 1fr;
+  .technology-stack__group ul {
+    grid-column: 2;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 18px;
   }
 
   .education-block {
