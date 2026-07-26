@@ -129,10 +129,16 @@ main footer[id] {
 }
 
 .monogram {
+  display: inline-flex;
   width: max-content;
-  font-family: var(--font-serif), serif;
-  font-size: 1.75rem;
+  font-family: var(--font-wordmark), sans-serif;
+  font-size: 1.4rem;
+  font-weight: 400;
+  font-kerning: none;
+  letter-spacing: 0.34em;
   line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .site-header nav {

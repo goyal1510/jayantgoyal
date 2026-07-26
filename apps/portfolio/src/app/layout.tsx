@@ -2,7 +2,7 @@ import "./globals.css";
 
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { DM_Sans, Instrument_Serif } from "next/font/google";
+import { DM_Sans, Instrument_Serif, Jost } from "next/font/google";
 import Script from "next/script";
 import { BRAND_ASSET_PATHS } from "@repo/brand";
 
@@ -28,6 +28,13 @@ const serif = Instrument_Serif({
   weight: "400",
   display: "swap",
   variable: "--font-serif",
+});
+
+const wordmark = Jost({
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+  variable: "--font-wordmark",
 });
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -128,7 +135,9 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
         />
       </head>
-      <body className={`${sans.variable} ${serif.variable}`}>
+      <body
+        className={`${sans.variable} ${serif.variable} ${wordmark.variable}`}
+      >
         <PortfolioAnalytics />
         <PageScrollProgress />
         {children}
