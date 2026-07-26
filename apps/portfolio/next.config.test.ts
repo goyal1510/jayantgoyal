@@ -108,4 +108,14 @@ describe("Portfolio compatibility redirects", () => {
       permanent: true,
     });
   });
+
+  it("keeps the retired identity case-study URL pointed at Auth", async () => {
+    const redirects = await configuredRedirects();
+
+    expect(redirects).toContainEqual({
+      source: "/work/identity-sso",
+      destination: "/work/auth",
+      permanent: true,
+    });
+  });
 });

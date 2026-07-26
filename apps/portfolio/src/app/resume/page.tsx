@@ -37,7 +37,14 @@ export default async function ResumePage() {
           <div className="editorial-resume__copy">
             <p>{content.description}</p>
             <div className="editorial-resume__actions">
-              <a href={resumeHref} download="Jayant_Resume.pdf">
+              <a
+                href={resumeHref}
+                download="Jayant_Resume.pdf"
+                data-analytics-event="file_download"
+                data-analytics-source="resume_page"
+                data-analytics-content-type="resume_pdf"
+                data-analytics-item-name="Jayant resume"
+              >
                 Download PDF <ArrowDownToLine aria-hidden="true" />
               </a>
               <Link href="/about#experience">

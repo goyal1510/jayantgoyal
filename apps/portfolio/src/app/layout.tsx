@@ -7,6 +7,7 @@ import Script from "next/script";
 import { BRAND_ASSET_PATHS } from "@repo/brand";
 
 import { PageScrollProgress } from "@/components/editorial/page-scroll-progress";
+import { PortfolioAnalytics } from "@/components/editorial/portfolio-analytics";
 import { getPortfolioShellData } from "@/lib/portfolio/editorial-server";
 import {
   DEFAULT_OG_IMAGE,
@@ -128,6 +129,7 @@ export default async function RootLayout({
         />
       </head>
       <body className={`${sans.variable} ${serif.variable}`}>
+        <PortfolioAnalytics />
         <PageScrollProgress />
         {children}
       </body>

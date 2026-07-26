@@ -7,6 +7,7 @@ import {
   CONTACT_STAGE_OPTIONS,
   CONTACT_TIMELINE_OPTIONS,
 } from "@/lib/contact/options";
+import { trackPortfolioEvent } from "@/lib/analytics/events";
 import type { FormEvent } from "react";
 
 type FormStatus =
@@ -14,7 +15,13 @@ type FormStatus =
   | { type: "success"; message: string }
   | { type: "error"; message: string };
 
-export function ContactForm() {
+export function ContactForm({
+  initialProject,
+  leadSource = "direct",
+}: {
+  initialProject?: string;
+  leadSource?: string;
+}) {
   const formRef = useRef<HTMLFormElement>(null);
   const [pending, setPending] = useState(false);
   const [status, setStatus] = useState<FormStatus>({ type: "idle" });
@@ -43,6 +50,12 @@ export function ContactForm() {
       }
 
       formRef.current?.reset();
+      const projectField = formRef.current?.elements.namedItem("project");
+      if (projectField instanceof HTMLTextAreaElement) projectField.value = "";
+      trackPortfolioEvent("generate_lead", {
+        form_name: "portfolio_contact",
+        lead_source: leadSource,
+      });
       setStatus({
         type: "success",
         message: "Message sent. I’ll get back to you as soon as possible.",
@@ -80,7 +93,13 @@ export function ContactForm() {
       </div>
       <label>
         <span>What are you building?</span>
-        <textarea name="project" required maxLength={600} rows={3} />
+        <textarea
+          name="project"
+          required
+          maxLength={600}
+          rows={3}
+          defaultValue={initialProject}
+        />
       </label>
       <div className="contact-form__row">
         <label>

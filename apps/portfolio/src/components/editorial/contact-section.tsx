@@ -14,6 +14,7 @@ import {
 
 import { ContactForm } from "@/components/editorial/contact-form";
 import { EditorialReveal } from "@/components/editorial/editorial-reveal";
+import type { ContactContext } from "@/lib/contact/context";
 import type {
   PortfolioProfile,
   PortfolioSectionContent,
@@ -43,10 +44,12 @@ function SocialIcon({ social }: { social: PortfolioSocialLink }) {
 export function ContactSection({
   profile,
   content,
+  contactContext = { leadSource: "direct" },
   headingLevel = "h2",
 }: {
   profile: PortfolioProfile;
   content: PortfolioSectionContent;
+  contactContext?: ContactContext;
   headingLevel?: "h1" | "h2";
 }) {
   const heading = getCompactSectionHeading(content.eyebrow, content.headline);
@@ -66,14 +69,24 @@ export function ContactSection({
         <div className="contact-section__grid">
           <EditorialReveal className="contact-section__copy">
             <div className="contact-details">
-              <a href={`mailto:${profile.email}`}>
+              <a
+                href={`mailto:${profile.email}`}
+                data-analytics-event="contact_intent"
+                data-analytics-source="contact_page"
+                data-analytics-destination="email"
+              >
                 <Mail aria-hidden="true" />
                 <span>
                   <small>Email</small>
                   {profile.email}
                 </span>
               </a>
-              <a href={`tel:${profile.phone.replaceAll(" ", "")}`}>
+              <a
+                href={`tel:${profile.phone.replaceAll(" ", "")}`}
+                data-analytics-event="contact_intent"
+                data-analytics-source="contact_page"
+                data-analytics-destination="phone"
+              >
                 <Phone aria-hidden="true" />
                 <span>
                   <small>Phone</small>
@@ -99,7 +112,10 @@ export function ContactSection({
               <span>New message</span>
               <p>{content.supportingText}</p>
             </div>
-            <ContactForm />
+            <ContactForm
+              initialProject={contactContext.initialProject}
+              leadSource={contactContext.leadSource}
+            />
           </EditorialReveal>
         </div>
 

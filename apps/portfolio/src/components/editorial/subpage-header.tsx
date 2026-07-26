@@ -22,7 +22,13 @@ export function EditorialSubpageHeader({
           ariaLabel="Portfolio navigation"
           items={navigation}
         />
-        <Link className="editorial-subpage-header__contact" href="/contact">
+        <Link
+          className="editorial-subpage-header__contact"
+          href="/contact"
+          data-analytics-event="contact_intent"
+          data-analytics-source="subpage_header"
+          data-analytics-destination="contact_form"
+        >
           Let&apos;s talk <ArrowDown aria-hidden="true" />
         </Link>
       </div>

@@ -45,18 +45,43 @@ function WorkLinks({
   return (
     <div className={className}>
       {project.caseStudy ? (
-        <Link href={`/work/${project.id}`}>
+        <Link
+          href={`/work/${project.id}`}
+          data-analytics-event="select_content"
+          data-analytics-source="work_card"
+          data-analytics-content-type="work_case_study"
+          data-analytics-item-id={project.id}
+          data-analytics-item-name={project.title}
+        >
           Details <ArrowUpRight aria-hidden="true" />
         </Link>
       ) : null}
       {project.href ? (
-        <a href={project.href} target="_blank" rel="noreferrer">
+        <a
+          href={project.href}
+          target="_blank"
+          rel="noreferrer"
+          data-analytics-event="select_content"
+          data-analytics-source="work_card"
+          data-analytics-content-type="live_product"
+          data-analytics-item-id={project.id}
+          data-analytics-item-name={project.title}
+        >
           {project.id === "admin" ? "Private app" : "Open system"}{" "}
           <ArrowUpRight aria-hidden="true" />
         </a>
       ) : null}
       {project.github ? (
-        <a href={project.github} target="_blank" rel="noreferrer">
+        <a
+          href={project.github}
+          target="_blank"
+          rel="noreferrer"
+          data-analytics-event="select_content"
+          data-analytics-source="work_card"
+          data-analytics-content-type="source_code"
+          data-analytics-item-id={project.id}
+          data-analytics-item-name={project.title}
+        >
           Source <Github aria-hidden="true" />
         </a>
       ) : null}

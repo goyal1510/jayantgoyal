@@ -56,6 +56,10 @@ const DEPLOYED_WORK_IMAGE_GALLERIES: Record<string, string[]> = {
     "/images/studio-products-light-desktop.png",
   ],
   admin: ["/images/admin-light-desktop.png"],
+  auth: [
+    "/images/auth-security-light-desktop.png",
+    "/images/auth-providers-light-desktop.png",
+  ],
   "identity-sso": [
     "/images/auth-security-light-desktop.png",
     "/images/auth-providers-light-desktop.png",

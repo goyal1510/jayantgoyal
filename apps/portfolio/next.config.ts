@@ -85,7 +85,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline'",
       "font-src 'self' data:",
       "img-src 'self' data: blob: https://avatars.githubusercontent.com https://*.supabase.co",
-      "connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://api.resend.com https://github-contributions-api.jogruber.de https://api.github.com",
+      "connect-src 'self' https://*.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://api.resend.com https://github-contributions-api.jogruber.de https://api.github.com",
       "frame-src 'self'",
       "object-src 'none'",
       "base-uri 'self'",
@@ -157,6 +157,11 @@ const nextConfig: NextConfig = {
       {
         source: "/case-studies",
         destination: "/work",
+        permanent: true,
+      },
+      {
+        source: "/work/identity-sso",
+        destination: "/work/auth",
         permanent: true,
       },
       ...[

@@ -6,6 +6,7 @@ import { ArrowRight, ArrowUpRight, Github } from "lucide-react";
 
 import { ProjectMediaGallery } from "@/components/editorial/project-media-gallery";
 import { EditorialSubpageHeader } from "@/components/editorial/subpage-header";
+import { trackPortfolioEvent } from "@/lib/analytics/events";
 import type {
   PortfolioNavigationItem,
   PortfolioWork,
@@ -119,6 +120,16 @@ export function CaseStudyContent({
 
     return () => observer.disconnect();
   }, [sections]);
+
+  useEffect(() => {
+    if (!caseStudy) return;
+
+    trackPortfolioEvent("view_item", {
+      content_type: "work_case_study",
+      item_id: project.id,
+      item_name: project.title,
+    });
+  }, [caseStudy, project.id, project.title]);
 
   if (!caseStudy) return null;
 
@@ -237,13 +248,31 @@ export function CaseStudyContent({
               </dl>
               <div className="editorial-work-article__links">
                 {project.href ? (
-                  <a href={project.href} target="_blank" rel="noreferrer">
+                  <a
+                    href={project.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    data-analytics-event="select_content"
+                    data-analytics-source="work_case_study"
+                    data-analytics-content-type="live_product"
+                    data-analytics-item-id={project.id}
+                    data-analytics-item-name={project.title}
+                  >
                     {project.id === "admin" ? "Private app" : "Open product"}{" "}
                     <ArrowUpRight aria-hidden="true" />
                   </a>
                 ) : null}
                 {project.github ? (
-                  <a href={project.github} target="_blank" rel="noreferrer">
+                  <a
+                    href={project.github}
+                    target="_blank"
+                    rel="noreferrer"
+                    data-analytics-event="select_content"
+                    data-analytics-source="work_case_study"
+                    data-analytics-content-type="source_code"
+                    data-analytics-item-id={project.id}
+                    data-analytics-item-name={project.title}
+                  >
                     Source <Github aria-hidden="true" />
                   </a>
                 ) : null}
@@ -260,15 +289,39 @@ export function CaseStudyContent({
               {project.impact} Start with the constraints, then make the system
               dependable.
             </p>
-            <Link href="/contact">
-              Discuss a product <ArrowUpRight aria-hidden="true" />
-            </Link>
+            <div className="editorial-article__signoff-actions">
+              <Link
+                href={`/contact?source=work-case-study&project=${encodeURIComponent(project.id)}`}
+                data-analytics-event="contact_intent"
+                data-analytics-source="work_case_study"
+                data-analytics-content-type="contact_form"
+                data-analytics-item-id={project.id}
+                data-analytics-item-name={project.title}
+              >
+                Discuss a product <ArrowUpRight aria-hidden="true" />
+              </Link>
+              <Link
+                href="/resume"
+                data-analytics-event="select_content"
+                data-analytics-source="work_case_study"
+                data-analytics-content-type="resume"
+                data-analytics-item-id={project.id}
+                data-analytics-item-name={project.title}
+              >
+                View résumé <ArrowUpRight aria-hidden="true" />
+              </Link>
+            </div>
           </div>
 
           {nextProject ? (
             <Link
               className="editorial-article__next"
               href={`/work/${nextProject.id}`}
+              data-analytics-event="select_content"
+              data-analytics-source="work_case_study"
+              data-analytics-content-type="next_case_study"
+              data-analytics-item-id={nextProject.id}
+              data-analytics-item-name={nextProject.title}
             >
               <span className="section-index">Continue through the work</span>
               <h2>{nextProject.title}</h2>

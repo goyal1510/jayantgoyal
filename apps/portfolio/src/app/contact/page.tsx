@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { ContactSection } from "@/components/editorial/contact-section";
 import { EditorialSubpageHeader } from "@/components/editorial/subpage-header";
+import { resolveContactContext } from "@/lib/contact/context";
 import { getEditorialPortfolioData } from "@/lib/portfolio/editorial-server";
 import { buildPublicPageMetadata } from "@/lib/seo/config";
 
@@ -16,8 +17,19 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-export default async function ContactPage() {
+export default async function ContactPage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    project?: string | string[];
+    source?: string | string[];
+  }>;
+}) {
   const portfolio = await getEditorialPortfolioData();
+  const contactContext = resolveContactContext(
+    await searchParams,
+    portfolio.work,
+  );
 
   return (
     <main className="editorial-page">
@@ -28,6 +40,7 @@ export default async function ContactPage() {
       <ContactSection
         profile={portfolio.profile}
         content={portfolio.sectionContent.contact}
+        contactContext={contactContext}
         headingLevel="h1"
       />
     </main>

@@ -2604,7 +2604,7 @@ main footer[id] {
 }
 
 .editorial-article__facts a,
-.editorial-article__signoff > a {
+.editorial-article__signoff-actions a {
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -2615,9 +2615,15 @@ main footer[id] {
 }
 
 .editorial-article__facts svg,
-.editorial-article__signoff svg {
+.editorial-article__signoff-actions svg {
   width: 14px;
   height: 14px;
+}
+
+.editorial-article__signoff-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
 }
 
 .editorial-prose {
