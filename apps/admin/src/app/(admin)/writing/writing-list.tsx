@@ -16,13 +16,21 @@ import {
   getWritingPublicationState,
   isPublicWritingPost,
 } from "@repo/portfolio-data";
-import { createWritingData, updateWritingData, deleteWritingData } from "@/lib/writing-api";
+import {
+  createWritingData,
+  updateWritingData,
+  deleteWritingData,
+} from "@/lib/writing-api";
 import { Button } from "@repo/ui/button";
 import { ConfirmationDialog } from "@repo/ui/confirmation-dialog";
 import { IconAction } from "@repo/ui/icon-action";
 import { StatusBadge } from "@repo/ui/status-badge";
 import type { WritingPost } from "@/lib/types";
-import { WritingDialog, emptyWritingForm, type WritingFormData } from "./writing-dialog";
+import {
+  WritingDialog,
+  emptyWritingForm,
+  type WritingFormData,
+} from "./writing-dialog";
 
 interface WritingListProps {
   initialData: WritingPost[];
@@ -76,10 +84,6 @@ export function WritingList({ initialData }: WritingListProps) {
 
     try {
       const payload = { ...formData };
-      if (payload.is_published && !payload.published_at) {
-        payload.published_at = new Date().toISOString();
-      }
-
       const sanitized = {
         ...payload,
         excerpt: payload.excerpt || null,
@@ -123,7 +127,9 @@ export function WritingList({ initialData }: WritingListProps) {
       router.refresh();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to delete writing post",
+        error instanceof Error
+          ? error.message
+          : "Failed to delete writing post",
       );
     } finally {
       setDeleting(null);

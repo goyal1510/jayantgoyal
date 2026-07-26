@@ -23,7 +23,10 @@ import { PortfolioAssetUpload } from "@/components/portfolio/asset-upload";
 import { MarkdownPreview } from "@/components/portfolio/markdown-preview";
 import { AccessibleForm } from "@/components/accessible-form";
 
-export type WritingFormData = Omit<WritingPost, "id" | "created_at" | "updated_at">;
+export type WritingFormData = Omit<
+  WritingPost,
+  "id" | "created_at" | "updated_at"
+>;
 
 export const emptyWritingForm: WritingFormData = {
   title: "",
@@ -248,6 +251,7 @@ export function WritingDialog({
                 id="published_at"
                 type="datetime-local"
                 value={toDatetimeLocalValue(formData.published_at)}
+                required={formData.is_published}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
@@ -257,6 +261,10 @@ export function WritingDialog({
                   })
                 }
               />
+              <p className="text-xs text-muted-foreground">
+                Choose this date manually. Published posts are never assigned
+                today&apos;s date automatically.
+              </p>
             </div>
 
             <div className="flex items-center gap-6">
