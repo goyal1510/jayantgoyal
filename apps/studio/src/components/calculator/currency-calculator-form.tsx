@@ -77,6 +77,8 @@ export function CurrencyCalculatorForm() {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    let previousNote: string | undefined;
+    let previousDenominations: DenominationInput[] | undefined;
 
     try {
       const validDenominations = validateAndParseDenominations();
@@ -86,6 +88,8 @@ export function CurrencyCalculatorForm() {
       }
 
       setIsSubmitting(true);
+      previousNote = note;
+      previousDenominations = denominations;
 
       const now = new Date();
       const istDate = new Date(
@@ -99,12 +103,6 @@ export function CurrencyCalculatorForm() {
       const seconds = String(istDate.getSeconds()).padStart(2, "0");
       const istTimestamp = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
 
-      await createCalculation({
-        note: note || undefined,
-        ist_timestamp: istTimestamp,
-        denominations: validDenominations,
-      });
-
       setNote("");
       setDenominations(
         CURRENCY_DENOMINATIONS.map((currency) => ({
@@ -113,8 +111,21 @@ export function CurrencyCalculatorForm() {
           total: 0,
         })),
       );
+
+      await createCalculation({
+        note: previousNote || undefined,
+        ist_timestamp: istTimestamp,
+        denominations: validDenominations,
+      });
+
       router.refresh();
     } catch (error) {
+      if (typeof previousNote !== "undefined") {
+        setNote(previousNote);
+      }
+      if (typeof previousDenominations !== "undefined") {
+        setDenominations(previousDenominations);
+      }
       console.error("Error creating calculation:", error);
       alert(
         error instanceof Error

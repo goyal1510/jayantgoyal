@@ -41,13 +41,16 @@ export default function DashboardClient() {
   };
 
   const handleCreateActivity = async () => {
-    if (!newActivityName.trim()) {
+    const activityName = newActivityName.trim();
+    if (!activityName) {
       toast.error("Activity name is required.");
       return;
     }
 
     try {
       setIsCreating(true);
+      setNewActivityName("");
+      setIsCreateDialogOpen(false);
 
       const response = await fetch("/api/activity-tracker", {
         method: "POST",
@@ -55,7 +58,7 @@ export default function DashboardClient() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: newActivityName.trim(),
+          name: activityName,
         }),
       });
 
@@ -64,10 +67,10 @@ export default function DashboardClient() {
       }
 
       toast.success("Activity created successfully!");
-      setNewActivityName("");
-      setIsCreateDialogOpen(false);
       setRefreshKey((prev) => prev + 1); // Trigger re-render of ActivityStats
     } catch {
+      setNewActivityName(activityName);
+      setIsCreateDialogOpen(true);
       toast.error("Unable to create activity.");
     } finally {
       setIsCreating(false);

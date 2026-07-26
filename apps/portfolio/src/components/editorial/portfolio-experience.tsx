@@ -1,103 +1,18 @@
-"use client";
-
-/* eslint-disable @next/next/no-img-element */
-
-import {
-  motion,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-} from "framer-motion";
-import {
-  ArrowDown,
-  ArrowLeft,
-  ArrowRight,
-  ArrowUpRight,
-  FileText,
-  Facebook,
-  Globe2,
-  Github,
-  Instagram,
-  Linkedin,
-  Mail,
-  MapPin,
-  Phone,
-  Twitter,
-  Youtube,
-  type LucideIcon,
-} from "lucide-react";
+import { ArrowDown, ArrowUpRight, FileText, Mail } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
-import { ContactForm } from "@/components/editorial/contact-form";
+import { CursorOrbit } from "@/components/editorial/cursor-orbit";
+import { EditorialReveal } from "@/components/editorial/editorial-reveal";
 import { PortfolioNavigation } from "@/components/editorial/portfolio-navigation";
 import { FeaturedWork } from "@/components/editorial/work-showcase";
 import type {
   WritingPreview,
-  PortfolioCredential,
   PortfolioEditorialData,
-  PortfolioProfile,
   PortfolioSectionContent,
   PortfolioSectionKey,
-  PortfolioSocialLink,
 } from "@/lib/portfolio/editorial-data";
 import { PRODUCT_PROOF_POINTS } from "@/lib/portfolio/product-proof";
 import { getCompactSectionHeading } from "@/lib/portfolio/section-heading";
-
-const reveal = {
-  hidden: { opacity: 0, y: 28 },
-  visible: { opacity: 1, y: 0 },
-};
-
-const SOCIAL_ICON_MAP: Record<string, LucideIcon> = {
-  facebook: Facebook,
-  github: Github,
-  instagram: Instagram,
-  linkedin: Linkedin,
-  twitter: Twitter,
-  x: Twitter,
-  youtube: Youtube,
-};
-
-function SocialIcon({ social }: { social: PortfolioSocialLink }) {
-  const identity = `${social.iconKey} ${social.label}`.toLowerCase();
-  const key = Object.keys(SOCIAL_ICON_MAP).find((candidate) =>
-    identity.includes(candidate),
-  );
-  const Icon = key ? SOCIAL_ICON_MAP[key] : Globe2;
-  return Icon ? <Icon aria-hidden="true" /> : null;
-}
-
-function Reveal({
-  children,
-  className,
-  delay = 0,
-  animate = true,
-}: {
-  children: React.ReactNode;
-  className?: string;
-  delay?: number;
-  animate?: boolean;
-}) {
-  const reduceMotion = useReducedMotion();
-
-  return (
-    <motion.div
-      className={className}
-      variants={reveal}
-      initial={reduceMotion || !animate ? false : "hidden"}
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.12 }}
-      transition={{
-        duration: reduceMotion ? 0 : 0.68,
-        delay: reduceMotion ? 0 : delay,
-        ease: [0.22, 1, 0.36, 1],
-      }}
-    >
-      {children}
-    </motion.div>
-  );
-}
 
 function HeroHeadline({ headline }: { headline: string }) {
   const accentPhrase = "ambitious";
@@ -133,109 +48,6 @@ function ProductProofStrip() {
   );
 }
 
-export function CertificateDeck({
-  credentials,
-  content,
-}: {
-  credentials: PortfolioCredential[];
-  content: PortfolioSectionContent;
-}) {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const activeCertificate = credentials[activeIndex] ?? credentials[0];
-  const heading = getCompactSectionHeading(content.eyebrow, content.headline);
-
-  if (!activeCertificate) return null;
-
-  function showPrevious() {
-    setActiveIndex((current) =>
-      current === 0 ? credentials.length - 1 : current - 1,
-    );
-  }
-
-  function showNext() {
-    setActiveIndex((current) => (current + 1) % credentials.length);
-  }
-
-  return (
-    <div className="credential-gallery">
-      <div className="credential-gallery__heading">
-        <span className="section-index">{heading.label}</span>
-        <div>
-          <h3>{heading.title}</h3>
-          <p>{content.description}</p>
-        </div>
-      </div>
-
-      <div className="certificate-deck">
-        <div className="certificate-deck__stage">
-          <span className="certificate-deck__back certificate-deck__back--left" />
-          <span className="certificate-deck__back certificate-deck__back--right" />
-          <a
-            className="certificate-deck__active"
-            href={activeCertificate.href}
-            target="_blank"
-            rel="noreferrer"
-            key={activeCertificate.name}
-          >
-            <img
-              src={activeCertificate.image}
-              alt={activeCertificate.imageAlt}
-            />
-          </a>
-        </div>
-
-        <div className="certificate-deck__controls">
-          <button
-            type="button"
-            onClick={showPrevious}
-            aria-label="Previous certificate"
-          >
-            <ArrowLeft aria-hidden="true" />
-          </button>
-          <div aria-live="polite">
-            <span>
-              {activeCertificate.category} · {activeCertificate.issuer}
-            </span>
-            <strong>{activeCertificate.name}</strong>
-            {activeCertificate.description ? (
-              <p className="certificate-deck__description">
-                {activeCertificate.description}
-              </p>
-            ) : null}
-            {activeCertificate.issuedAt || activeCertificate.credentialId ? (
-              <div className="certificate-deck__metadata">
-                {activeCertificate.issuedAt ? (
-                  <span>Issued {activeCertificate.issuedAt}</span>
-                ) : null}
-                {activeCertificate.credentialId ? (
-                  <span>ID {activeCertificate.credentialId}</span>
-                ) : null}
-              </div>
-            ) : null}
-            {activeCertificate.credentialUrl ? (
-              <a
-                className="certificate-deck__verify"
-                href={activeCertificate.credentialUrl}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Verify credential <ArrowUpRight aria-hidden="true" />
-              </a>
-            ) : null}
-          </div>
-          <button
-            type="button"
-            onClick={showNext}
-            aria-label="Next certificate"
-          >
-            <ArrowRight aria-hidden="true" />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function WritingSection({
   writingPosts,
   content,
@@ -267,12 +79,8 @@ function WritingSection({
                 <p>No published notes yet.</p>
               </div>
             ) : null}
-            {writingPosts.map((post, index) => (
-              <Reveal
-                key={post.slug}
-                className="writing-entry"
-                delay={index * 0.06}
-              >
+            {writingPosts.map((post) => (
+              <EditorialReveal key={post.slug} className="writing-entry">
                 <Link
                   className="writing-entry__link"
                   href={`/writing/${post.slug}`}
@@ -294,7 +102,7 @@ function WritingSection({
                     Read article <ArrowUpRight aria-hidden="true" />
                   </span>
                 </Link>
-              </Reveal>
+              </EditorialReveal>
             ))}
           </div>
         </div>
@@ -315,29 +123,29 @@ function AboutPreview({
   return (
     <section className="profile-section profile-section--preview">
       <div className="shell">
-        <Reveal className="section-heading">
+        <EditorialReveal className="section-heading">
           <span className="section-index">{heading.label}</span>
           <div>
             <h2>{heading.title}</h2>
             <p>{about.objective}</p>
           </div>
-        </Reveal>
+        </EditorialReveal>
         <div className="profile-grid">
-          <Reveal className="profile-story">
+          <EditorialReveal className="profile-story">
             <p className="profile-story__lead">{about.lead}</p>
             <Link href="/about" className="text-link">
               About, experience, and education{" "}
               <ArrowUpRight aria-hidden="true" />
             </Link>
-          </Reveal>
+          </EditorialReveal>
           <div className="profile-facts">
-            {about.facts.slice(0, 3).map((fact, index) => (
-              <Reveal key={fact.label} delay={index * 0.04}>
+            {about.facts.slice(0, 3).map((fact) => (
+              <EditorialReveal key={fact.label}>
                 <article>
                   <span>{fact.label}</span>
                   <strong>{fact.value}</strong>
                 </article>
-              </Reveal>
+              </EditorialReveal>
             ))}
           </div>
         </div>
@@ -363,93 +171,6 @@ function ContactPrompt() {
   );
 }
 
-export function ContactSection({
-  profile,
-  content,
-}: {
-  profile: PortfolioProfile;
-  content: PortfolioSectionContent;
-}) {
-  const heading = getCompactSectionHeading(content.eyebrow, content.headline);
-
-  return (
-    <footer id="contact" className="contact-section">
-      <div className="shell">
-        <Reveal className="section-heading section-heading--contact">
-          <span className="section-index">{heading.label}</span>
-          <div>
-            <h2>{heading.title}</h2>
-            <p>{content.description}</p>
-          </div>
-        </Reveal>
-
-        <div className="contact-section__grid">
-          <Reveal className="contact-section__copy">
-            <div className="contact-details">
-              <a href={`mailto:${profile.email}`}>
-                <Mail aria-hidden="true" />
-                <span>
-                  <small>Email</small>
-                  {profile.email}
-                </span>
-              </a>
-              <a href={`tel:${profile.phone.replaceAll(" ", "")}`}>
-                <Phone aria-hidden="true" />
-                <span>
-                  <small>Phone</small>
-                  {profile.phone}
-                </span>
-              </a>
-              <a
-                href={`https://maps.google.com/?q=${encodeURIComponent(profile.location)}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <MapPin aria-hidden="true" />
-                <span>
-                  <small>Location</small>
-                  {profile.location}
-                </span>
-              </a>
-            </div>
-          </Reveal>
-
-          <Reveal className="contact-form-paper" delay={0.08}>
-            <div className="contact-form-paper__heading">
-              <span>New message</span>
-              <p>{content.supportingText}</p>
-            </div>
-            <ContactForm />
-          </Reveal>
-        </div>
-
-        <div className="contact-section__footer">
-          <span>
-            {profile.name} © {new Date().getFullYear()}
-          </span>
-          <span>{profile.location}</span>
-          <div>
-            {profile.socials.map((social) => (
-              <a
-                key={`${social.label}-${social.href}`}
-                href={social.href}
-                target="_blank"
-                rel="noreferrer"
-                aria-label={social.label}
-              >
-                <SocialIcon social={social} />
-              </a>
-            ))}
-            <a href={`mailto:${profile.email}`} aria-label="Email">
-              <Mail aria-hidden="true" />
-            </a>
-          </div>
-        </div>
-      </div>
-    </footer>
-  );
-}
-
 export function PortfolioExperience({
   writingPosts,
   data,
@@ -462,40 +183,10 @@ export function PortfolioExperience({
     const content = sectionContent[item.key as PortfolioSectionKey];
     return content?.isVisible ?? true;
   });
-  const [cursorLabel, setCursorLabel] = useState("");
-  const { scrollYProgress } = useScroll();
-  const heroY = useTransform(scrollYProgress, [0, 0.18], [0, -54]);
-  useEffect(() => {
-    const root = document.documentElement;
-    const updatePointer = (event: PointerEvent) => {
-      root.style.setProperty("--pointer-x", `${event.clientX}px`);
-      root.style.setProperty("--pointer-y", `${event.clientY}px`);
-    };
-    const updateCursorLabel = (event: PointerEvent) => {
-      const target = event.target;
-      if (!(target instanceof Element)) return;
-      setCursorLabel(
-        target.closest<HTMLElement>("[data-cursor]")?.dataset.cursor ?? "",
-      );
-    };
-
-    window.addEventListener("pointermove", updatePointer, { passive: true });
-    document.addEventListener("pointerover", updateCursorLabel, {
-      passive: true,
-    });
-    return () => {
-      window.removeEventListener("pointermove", updatePointer);
-      document.removeEventListener("pointerover", updateCursorLabel);
-    };
-  }, []);
 
   return (
     <main>
-      <div
-        className={`cursor-orbit${cursorLabel ? " cursor-orbit--active" : ""}`}
-      >
-        <span>{cursorLabel}</span>
-      </div>
+      <CursorOrbit />
 
       <header className="site-header">
         <div className="shell site-header__inner">
@@ -518,7 +209,7 @@ export function PortfolioExperience({
       {sectionContent.hero.isVisible ? (
         <section id="top" className="hero">
           <div className="shell hero__grid">
-            <motion.div className="hero__type" style={{ y: heroY }}>
+            <div className="hero__type">
               <span className="section-index">
                 {sectionContent.hero.eyebrow}
               </span>
@@ -539,9 +230,9 @@ export function PortfolioExperience({
                   </Link>
                 ) : null}
               </div>
-            </motion.div>
+            </div>
 
-            <Reveal className="hero-note" delay={0.12}>
+            <EditorialReveal className="hero-note">
               <span>{sectionContent.hero.supportingText}</span>
               <p>{profile.availability}</p>
               <dl>
@@ -558,7 +249,7 @@ export function PortfolioExperience({
                   <dd>{profile.location}</dd>
                 </div>
               </dl>
-            </Reveal>
+            </EditorialReveal>
           </div>
         </section>
       ) : (

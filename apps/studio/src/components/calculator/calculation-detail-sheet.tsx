@@ -1,24 +1,25 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Calendar, ChevronLeft, ChevronRight, Download, History, Trash2 } from "lucide-react"
-import { toast } from "sonner"
-
-import { generateCalculationPDF } from "@/lib/calculator/generate-pdf"
-import type { CalculationWithDenominations } from "@/lib/calculator/database"
-import { Button } from "@repo/ui/button"
+import * as React from "react";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@repo/ui/sheet"
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  History,
+  Trash2,
+} from "lucide-react";
+import { toast } from "sonner";
+
+import type { CalculationWithDenominations } from "@/lib/calculator/database";
+import { Button } from "@repo/ui/button";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@repo/ui/sheet";
 import {
   formatDateDisplay,
   formatTimeDisplay,
   formatDateKeyLabel,
   getTotalAmount,
-} from "./calculations-utils"
+} from "./calculations-utils";
 
 function EmptyState() {
   return (
@@ -29,20 +30,20 @@ function EmptyState() {
         Add a new calculation to see it appear in your timeline.
       </p>
     </div>
-  )
+  );
 }
 
 interface CalculationDetailSheetProps {
-  isDetailOpen: boolean
-  setIsDetailOpen: (open: boolean) => void
-  currentEntry: CalculationWithDenominations | null
-  selectedDate: string | null
-  canGoOlder: boolean
-  canGoNewer: boolean
-  loading: boolean
-  deletingId: string | null
-  navigateEntry: (direction: "prev" | "next") => void
-  handleDelete: (id: string) => void
+  isDetailOpen: boolean;
+  setIsDetailOpen: (open: boolean) => void;
+  currentEntry: CalculationWithDenominations | null;
+  selectedDate: string | null;
+  canGoOlder: boolean;
+  canGoNewer: boolean;
+  loading: boolean;
+  deletingId: string | null;
+  navigateEntry: (direction: "prev" | "next") => void;
+  handleDelete: (id: string) => void;
 }
 
 export function CalculationDetailSheet({
@@ -57,20 +58,42 @@ export function CalculationDetailSheet({
   navigateEntry,
   handleDelete,
 }: CalculationDetailSheetProps) {
+  const [isDownloading, setIsDownloading] = React.useState(false);
   const uniqueDenominationsUsed = currentEntry
     ? currentEntry.denominations.filter((denom) => denom.count !== 0).length
-    : 0
+    : 0;
 
   const totalNotesCount = currentEntry
     ? currentEntry.denominations.reduce((sum, denom) => sum + denom.count, 0)
-    : 0
+    : 0;
 
   const noteCountBadge =
-    totalNotesCount >= 0 ? "text-emerald-600" : "text-destructive"
+    totalNotesCount >= 0 ? "text-emerald-600" : "text-destructive";
+
+  const handleDownload = async () => {
+    if (!currentEntry || isDownloading) return;
+
+    setIsDownloading(true);
+    try {
+      const { generateCalculationPDF } = await import(
+        "@/lib/calculator/generate-pdf"
+      );
+      generateCalculationPDF(currentEntry);
+      toast.success("PDF downloaded");
+    } catch (error) {
+      console.error("Failed to generate calculation PDF:", error);
+      toast.error("Could not generate PDF");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   return (
     <Sheet open={isDetailOpen} onOpenChange={setIsDetailOpen}>
-      <SheetContent side="right" className="flex h-full w-full flex-col sm:max-w-xl">
+      <SheetContent
+        side="right"
+        className="flex h-full w-full flex-col sm:max-w-xl"
+      >
         {!currentEntry ? (
           <EmptyState />
         ) : (
@@ -85,10 +108,14 @@ export function CalculationDetailSheet({
                 </SheetTitle>
                 <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                   <span className="rounded-full bg-muted px-2 py-0.5">
-                    {formatDateDisplay(currentEntry.ist_timestamp || currentEntry.created_at)}
+                    {formatDateDisplay(
+                      currentEntry.ist_timestamp || currentEntry.created_at,
+                    )}
                   </span>
                   <span className="rounded-full bg-muted px-2 py-0.5">
-                    {formatTimeDisplay(currentEntry.ist_timestamp || currentEntry.created_at)}{" "}
+                    {formatTimeDisplay(
+                      currentEntry.ist_timestamp || currentEntry.created_at,
+                    )}{" "}
                     IST
                   </span>
                   {selectedDate ? (
@@ -111,15 +138,24 @@ export function CalculationDetailSheet({
                         : "text-destructive"
                     }`}
                   >
-                    ₹{getTotalAmount(currentEntry.denominations).toLocaleString()}
+                    ₹
+                    {getTotalAmount(
+                      currentEntry.denominations,
+                    ).toLocaleString()}
                   </p>
                 </div>
                 <div className="rounded-lg border bg-muted/40 p-3">
-                  <p className="text-xs text-muted-foreground">Unique denominations</p>
-                  <p className="text-xl font-semibold">{uniqueDenominationsUsed}</p>
+                  <p className="text-xs text-muted-foreground">
+                    Unique denominations
+                  </p>
+                  <p className="text-xl font-semibold">
+                    {uniqueDenominationsUsed}
+                  </p>
                 </div>
                 <div className="rounded-lg border bg-muted/40 p-3">
-                  <p className="text-xs text-muted-foreground">Total notes counted</p>
+                  <p className="text-xs text-muted-foreground">
+                    Total notes counted
+                  </p>
                   <p className={`text-xl font-semibold ${noteCountBadge}`}>
                     {totalNotesCount}
                   </p>
@@ -192,7 +228,10 @@ export function CalculationDetailSheet({
                                     : "text-destructive"
                                 }`}
                               >
-                                ₹{(denom.denomination * denom.count).toLocaleString()}
+                                ₹
+                                {(
+                                  denom.denomination * denom.count
+                                ).toLocaleString()}
                               </div>
                             </td>
                           </tr>
@@ -228,14 +267,12 @@ export function CalculationDetailSheet({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => {
-                    generateCalculationPDF(currentEntry)
-                    toast.success("PDF downloaded")
-                  }}
+                  onClick={handleDownload}
+                  disabled={isDownloading}
                   className="gap-1"
                 >
                   <Download className="h-4 w-4" />
-                  PDF
+                  {isDownloading ? "Preparing…" : "PDF"}
                 </Button>
                 <Button
                   variant="destructive"
@@ -253,5 +290,5 @@ export function CalculationDetailSheet({
         )}
       </SheetContent>
     </Sheet>
-  )
+  );
 }

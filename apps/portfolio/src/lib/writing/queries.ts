@@ -4,12 +4,14 @@ import {
   type PortfolioWritingDetailRecord,
   type PortfolioWritingListRecord,
 } from "@repo/portfolio-data";
+import { cache } from "react";
+import { unstable_cache } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export type WritingPost = PortfolioWritingDetailRecord;
 export type WritingListPost = PortfolioWritingListRecord;
 
-export async function getPublishedWritingPosts(): Promise<WritingListPost[]> {
+async function loadPublishedWritingPosts(): Promise<WritingListPost[]> {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
     .schema("jg_app")
@@ -23,7 +25,15 @@ export async function getPublishedWritingPosts(): Promise<WritingListPost[]> {
   return (data ?? []) as WritingListPost[];
 }
 
-export async function getWritingPostBySlug(
+const getCachedPublishedWritingPosts = unstable_cache(
+  loadPublishedWritingPosts,
+  ["portfolio-published-writing"],
+  { revalidate: 60, tags: ["portfolio-writing"] },
+);
+
+export const getPublishedWritingPosts = cache(getCachedPublishedWritingPosts);
+
+async function loadWritingPostBySlug(
   slug: string,
 ): Promise<WritingPost | null> {
   const supabase = await createSupabaseServerClient();
@@ -39,3 +49,11 @@ export async function getWritingPostBySlug(
   if (error) throw new Error(`Unable to load Writing post: ${error.message}`);
   return (data as WritingPost | null) ?? null;
 }
+
+const getCachedWritingPostBySlug = unstable_cache(
+  loadWritingPostBySlug,
+  ["portfolio-writing-detail"],
+  { revalidate: 60, tags: ["portfolio-writing"] },
+);
+
+export const getWritingPostBySlug = cache(getCachedWritingPostBySlug);

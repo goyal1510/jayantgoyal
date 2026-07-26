@@ -1,43 +1,41 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getVerifiedRequestUserId } from "@/lib/auth/verified-request-user";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
+const SCRATCHPAD_SELECT_COLUMNS =
+  "id,user_id,content,entry_type,language,created_at,updated_at,is_read";
+
 // GET /api/entries - Fetch all entries for the authenticated user
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const supabase = await createSupabaseServerClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const userId = await getVerifiedRequestUserId(request, supabase);
 
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { data: entries, error } = await supabase
       .schema("jg_app")
       .from("scratchpad_entries")
-      .select("*")
-      .eq("user_id", user.id)
+      .select(SCRATCHPAD_SELECT_COLUMNS)
+      .eq("user_id", userId)
       .order("created_at", { ascending: false });
 
     if (error) {
       console.error("Error fetching entries:", error);
       return NextResponse.json(
         { error: error.message || "Failed to fetch entries" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
-    return NextResponse.json({ entries: entries || [] });
+    return NextResponse.json({ entries: entries || [], userId });
   } catch (error) {
     console.error("Error in GET /api/entries:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -46,16 +44,10 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createSupabaseServerClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const userId = await getVerifiedRequestUserId(request, supabase);
 
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -64,14 +56,14 @@ export async function POST(request: NextRequest) {
     if (!content || !entry_type) {
       return NextResponse.json(
         { error: "Content and entry_type are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (entry_type !== "text" && entry_type !== "code") {
       return NextResponse.json(
         { error: "entry_type must be 'text' or 'code'" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -79,19 +71,19 @@ export async function POST(request: NextRequest) {
       .schema("jg_app")
       .from("scratchpad_entries")
       .insert({
-        user_id: user.id,
+        user_id: userId,
         content: content.trim(),
         entry_type,
         language: entry_type === "code" ? language || null : null,
       })
-      .select()
+      .select(SCRATCHPAD_SELECT_COLUMNS)
       .single();
 
     if (error) {
       console.error("Error creating entry:", error);
       return NextResponse.json(
         { error: error.message || "Failed to create entry" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -100,7 +92,7 @@ export async function POST(request: NextRequest) {
     console.error("Error in POST /api/entries:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

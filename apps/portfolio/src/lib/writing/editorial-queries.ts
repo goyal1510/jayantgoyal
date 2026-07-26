@@ -1,4 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
+import { cache } from "react";
+import { unstable_cache } from "next/cache";
 import {
   PORTFOLIO_WRITING_PREVIEW_SELECT_COLUMNS,
   readStringArray,
@@ -8,7 +10,7 @@ import {
 import { formatEditorialDate } from "@/lib/writing/date";
 import type { WritingPreview } from "@/lib/portfolio/editorial-data";
 
-export async function getPublishedWritingPreviews(): Promise<WritingPreview[]> {
+async function loadPublishedWritingPreviews(): Promise<WritingPreview[]> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !anonKey) {
@@ -27,7 +29,8 @@ export async function getPublishedWritingPreviews(): Promise<WritingPreview[]> {
     .order("published_at", { ascending: false })
     .limit(3);
 
-  if (error) throw new Error(`Unable to load Writing previews: ${error.message}`);
+  if (error)
+    throw new Error(`Unable to load Writing previews: ${error.message}`);
 
   return ((data ?? []) as PortfolioWritingPreviewRow[]).map((post) => ({
     title: post.title,
@@ -37,3 +40,13 @@ export async function getPublishedWritingPreviews(): Promise<WritingPreview[]> {
     tags: readStringArray(post.tags),
   }));
 }
+
+const getCachedPublishedWritingPreviews = unstable_cache(
+  loadPublishedWritingPreviews,
+  ["portfolio-writing-previews"],
+  { revalidate: 60, tags: ["portfolio-writing"] },
+);
+
+export const getPublishedWritingPreviews = cache(
+  getCachedPublishedWritingPreviews,
+);

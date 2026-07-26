@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { unstable_cache } from "next/cache";
 
 import {
   isSkillProficiency,
@@ -211,7 +212,7 @@ function throwQueryErrors(
   if (messages.length > 0) throw new Error(messages.join("; "));
 }
 
-export const getEditorialPortfolioData = cache(
+const loadEditorialPortfolioData =
   async (): Promise<PortfolioEditorialData> => {
     const supabase = await createSupabaseServerClient();
     const [
@@ -361,10 +362,17 @@ export const getEditorialPortfolioData = cache(
       ).map(mapCredential),
       principles: readPrinciples(about.principles),
     };
-  },
+  };
+
+const getCachedEditorialPortfolioData = unstable_cache(
+  loadEditorialPortfolioData,
+  ["portfolio-editorial-data"],
+  { revalidate: 60, tags: ["portfolio-content"] },
 );
 
-export const getPortfolioShellData = cache(async () => {
+export const getEditorialPortfolioData = cache(getCachedEditorialPortfolioData);
+
+const loadPortfolioShellData = async () => {
   const supabase = await createSupabaseServerClient();
   const [heroResult, contactResult, navigationResult, sectionContentResult] =
     await Promise.all([
@@ -416,9 +424,17 @@ export const getPortfolioShellData = cache(async () => {
       castData<SectionContentRow[]>(sectionContentResult.data ?? []),
     ),
   };
-});
+};
 
-export const getPortfolioContactEmail = cache(async (): Promise<string> => {
+const getCachedPortfolioShellData = unstable_cache(
+  loadPortfolioShellData,
+  ["portfolio-shell-data"],
+  { revalidate: 60, tags: ["portfolio-content"] },
+);
+
+export const getPortfolioShellData = cache(getCachedPortfolioShellData);
+
+const loadPortfolioContactEmail = async (): Promise<string> => {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
     .schema("portfolio")
@@ -430,4 +446,12 @@ export const getPortfolioContactEmail = cache(async (): Promise<string> => {
   const email = (data as { email?: string } | null)?.email;
   if (!email) throw new Error("Portfolio contact recipient is missing");
   return email;
-});
+};
+
+const getCachedPortfolioContactEmail = unstable_cache(
+  loadPortfolioContactEmail,
+  ["portfolio-contact-email"],
+  { revalidate: 60, tags: ["portfolio-content"] },
+);
+
+export const getPortfolioContactEmail = cache(getCachedPortfolioContactEmail);

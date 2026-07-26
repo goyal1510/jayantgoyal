@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { ContactSection } from "@/components/editorial/portfolio-experience";
+import { ContactSection } from "@/components/editorial/contact-section";
 import { EditorialSubpageHeader } from "@/components/editorial/subpage-header";
 import { getEditorialPortfolioData } from "@/lib/portfolio/editorial-server";
 import { buildPublicPageMetadata } from "@/lib/seo/config";
@@ -25,7 +25,10 @@ export default async function ContactPage() {
         brandLabel={portfolio.profile.displayName}
         navigation={portfolio.navigation}
       />
-      <ContactSection profile={portfolio.profile} content={portfolio.sectionContent.contact} />
+      <ContactSection
+        profile={portfolio.profile}
+        content={portfolio.sectionContent.contact}
+      />
     </main>
   );
 }

@@ -50,32 +50,23 @@ export function ActivityTracker({ currentMonth }: ActivityTrackerProps) {
     try {
       setIsLoading(true);
 
-      const activitiesResponse = await fetch(
-        `/api/activity-tracker?month=${month}`,
-        {
+      const [activitiesResponse, entriesResponse] = await Promise.all([
+        fetch(`/api/activity-tracker?month=${month}`, {
           cache: "no-store",
-        },
-      );
+        }),
+        fetch(`/api/activity-tracker/entries?month=${month}`, {
+          cache: "no-store",
+        }),
+      ]);
 
-      if (!activitiesResponse.ok) {
+      if (!activitiesResponse.ok || !entriesResponse.ok) {
         throw new Error("Failed to load activities.");
       }
 
-      const activitiesData =
-        (await activitiesResponse.json()) as ActivitiesResponse;
-
-      const entriesResponse = await fetch(
-        `/api/activity-tracker/entries?month=${month}`,
-        {
-          cache: "no-store",
-        },
-      );
-
-      if (!entriesResponse.ok) {
-        throw new Error("Failed to load entries.");
-      }
-
-      const entriesData = (await entriesResponse.json()) as EntriesResponse;
+      const [activitiesData, entriesData] = await Promise.all([
+        activitiesResponse.json() as Promise<ActivitiesResponse>,
+        entriesResponse.json() as Promise<EntriesResponse>,
+      ]);
 
       setActivities(activitiesData.activities || []);
       setEntries(entriesData.entries || []);
@@ -104,9 +95,42 @@ export function ActivityTracker({ currentMonth }: ActivityTrackerProps) {
 
     const entryKey = `${activityId}-${date}`;
     if (updatingEntries.has(entryKey)) return;
+    const nextCompleted = !currentCompleted;
+    const previousEntry = entries.find(
+      (entry) => entry.activity_id === activityId && entry.date === date,
+    );
 
     try {
       setUpdatingEntries((prev) => new Set(prev).add(entryKey));
+      setEntries((prev) => {
+        const existingIndex = prev.findIndex(
+          (entry) => entry.activity_id === activityId && entry.date === date,
+        );
+
+        if (existingIndex >= 0) {
+          const updated = [...prev];
+          const existing = updated[existingIndex];
+          if (existing) {
+            updated[existingIndex] = {
+              ...existing,
+              completed: nextCompleted,
+            };
+          }
+          return updated;
+        }
+
+        return [
+          ...prev,
+          {
+            id: `optimistic-${entryKey}`,
+            activity_id: activityId,
+            date,
+            completed: nextCompleted,
+            user_id: null,
+            created_at: new Date().toISOString(),
+          },
+        ];
+      });
 
       const response = await fetch("/api/activity-tracker/entries", {
         method: "POST",
@@ -116,7 +140,7 @@ export function ActivityTracker({ currentMonth }: ActivityTrackerProps) {
         body: JSON.stringify({
           activity_id: activityId,
           date,
-          completed: !currentCompleted,
+          completed: nextCompleted,
         }),
       });
 
@@ -140,6 +164,20 @@ export function ActivityTracker({ currentMonth }: ActivityTrackerProps) {
         }
       });
     } catch {
+      setEntries((prev) => {
+        if (!previousEntry) {
+          return prev.filter(
+            (entry) =>
+              !(entry.activity_id === activityId && entry.date === date),
+          );
+        }
+
+        return prev.map((entry) =>
+          entry.activity_id === activityId && entry.date === date
+            ? previousEntry
+            : entry,
+        );
+      });
       toast.error("Unable to update activity entry.");
     } finally {
       setUpdatingEntries((prev) => {

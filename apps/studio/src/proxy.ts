@@ -1,6 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { createSupabaseRequestClient } from "@repo/auth/server";
+import {
+  copyAuthCacheHeaders,
+  createSupabaseRequestClient,
+} from "@repo/auth/server";
 import {
   hasAuthSessionCookie,
   resolveAuthSessionMode,
@@ -79,6 +82,22 @@ function matchPath(pathname: string, paths: string[]): boolean {
     if (EXACT_MATCH.has(p)) return pathname === p;
     return matchesPathOrChild(pathname, p);
   });
+}
+
+function forwardVerifiedRequestHeaders(
+  requestHeaders: Headers,
+  authResponse: NextResponse,
+) {
+  const response = NextResponse.next({
+    request: { headers: requestHeaders },
+  });
+
+  authResponse.cookies.getAll().forEach(({ name, value, ...options }) => {
+    response.cookies.set(name, value, options);
+  });
+  copyAuthCacheHeaders(authResponse.headers, response.headers);
+
+  return response;
 }
 
 export default async function proxy(request: NextRequest) {
@@ -208,12 +227,16 @@ export default async function proxy(request: NextRequest) {
     if (user.email) requestHeaders.set("x-user-email", user.email);
   }
 
+  const protectedResponse = forwardVerifiedRequestHeaders(
+    requestHeaders,
+    response,
+  );
   const isPublic =
     !pathname.startsWith("/api/") || matchPath(pathname, AUTH_PUBLIC_PATHS);
 
   const ctx: ProxyContext = {
     request,
-    response,
+    response: protectedResponse,
     supabase,
     user,
     pathname,

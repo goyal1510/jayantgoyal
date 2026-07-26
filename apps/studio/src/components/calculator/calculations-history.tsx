@@ -189,18 +189,32 @@ export function CalculationsHistory() {
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this calculation?")) return;
+    const previousEntries = entries;
+    const previousTotal = totalEntries;
+    const previousActiveEntryId = activeEntryId;
+    const remainingEntries = entries.filter((entry) => entry.id !== id);
+
     try {
       setDeletingId(id);
+      setEntries(remainingEntries);
+      setTotalEntries((current) => Math.max(0, current - 1));
+      if (activeEntryId === id) {
+        setActiveEntryId(remainingEntries[0]?.id ?? null);
+      }
+
       await deleteCalculation(id);
-      const nextPage =
-        page > 0 && filteredEntries.length === 1 ? page - 1 : page;
-      pendingNavigationRef.current = {
-        target: "first",
-        keepDetailOpen: isDetailOpen,
-      };
-      setPage(nextPage);
+      if (page > 0 && remainingEntries.length === 0) {
+        pendingNavigationRef.current = {
+          target: "first",
+          keepDetailOpen: isDetailOpen,
+        };
+        setPage(page - 1);
+      }
     } catch (error) {
       console.error("Error deleting calculation:", error);
+      setEntries(previousEntries);
+      setTotalEntries(previousTotal);
+      setActiveEntryId(previousActiveEntryId);
     } finally {
       setDeletingId(null);
     }

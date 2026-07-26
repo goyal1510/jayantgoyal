@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpRight, FileText, Mail } from "lucide-react";
 
-import { CertificateDeck } from "@/components/editorial/portfolio-experience";
+import { CertificateDeck } from "@/components/editorial/certificate-deck";
 import { EditorialSubpageHeader } from "@/components/editorial/subpage-header";
 import { getEditorialPortfolioData } from "@/lib/portfolio/editorial-server";
 import { buildPublicPageMetadata } from "@/lib/seo/config";

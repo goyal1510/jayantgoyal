@@ -14,7 +14,7 @@ import {
 import { Switch } from "@repo/ui/switch";
 import { Activity } from "@/lib/activity-tracker/database";
 import { toast } from "sonner";
-import { ListChecks, Pencil } from "lucide-react";
+import { ListChecks, Pencil, Trash2 } from "lucide-react";
 
 import { EditActivityDialog } from "./edit-activity-dialog";
 import { WorkspaceHeader } from "@repo/ui/workspace-header";
@@ -69,6 +69,13 @@ export default function ManagementClient() {
 
     try {
       setUpdatingActivities((prev) => new Set(prev).add(activityId));
+      setActivities((prev) =>
+        prev.map((activity) =>
+          activity.id === activityId
+            ? { ...activity, is_active: !currentIsActive }
+            : activity,
+        ),
+      );
 
       const response = await fetch(`/api/activity-tracker/${activityId}`, {
         method: "PATCH",
@@ -87,21 +94,64 @@ export default function ManagementClient() {
       toast.success(
         `Activity ${!currentIsActive ? "activated" : "deactivated"} successfully!`,
       );
-
+    } catch {
       setActivities((prev) =>
         prev.map((activity) =>
           activity.id === activityId
-            ? { ...activity, is_active: !currentIsActive }
+            ? { ...activity, is_active: currentIsActive }
             : activity,
         ),
       );
-    } catch {
       toast.error("Unable to update activity.");
     } finally {
       setUpdatingActivities((prev) => {
         const newSet = new Set(prev);
         newSet.delete(activityId);
         return newSet;
+      });
+    }
+  };
+
+  const handleDeleteActivity = async (activity: Activity) => {
+    if (
+      !confirm(
+        `Delete "${activity.name}" and all of its tracked entries? This cannot be undone.`,
+      )
+    ) {
+      return;
+    }
+    if (updatingActivities.has(activity.id)) return;
+
+    const previousIndex = activities.findIndex(
+      (item) => item.id === activity.id,
+    );
+
+    try {
+      setUpdatingActivities((prev) => new Set(prev).add(activity.id));
+      setActivities((prev) => prev.filter((item) => item.id !== activity.id));
+
+      const response = await fetch(`/api/activity-tracker/${activity.id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete activity.");
+      }
+
+      toast.success("Activity deleted.");
+    } catch {
+      setActivities((prev) => {
+        if (prev.some((item) => item.id === activity.id)) return prev;
+        const restored = [...prev];
+        restored.splice(Math.max(0, previousIndex), 0, activity);
+        return restored;
+      });
+      toast.error("Unable to delete activity.");
+    } finally {
+      setUpdatingActivities((prev) => {
+        const next = new Set(prev);
+        next.delete(activity.id);
+        return next;
       });
     }
   };
@@ -135,7 +185,7 @@ export default function ManagementClient() {
 
   return (
     <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-5">
-        <WorkspaceHeader
+      <WorkspaceHeader
         icon={ListChecks}
         title="Manage activities"
         description="Rename routines and control which activities appear in your monthly tracker."
@@ -212,6 +262,16 @@ export default function ManagementClient() {
                                 className="h-8 w-8"
                               >
                                 <Pencil className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleDeleteActivity(activity)}
+                                disabled={updatingActivities.has(activity.id)}
+                                className="h-8 w-8 text-destructive hover:text-destructive"
+                                aria-label={`Delete ${activity.name}`}
+                              >
+                                <Trash2 className="h-4 w-4" />
                               </Button>
                             </div>
                           </TableCell>

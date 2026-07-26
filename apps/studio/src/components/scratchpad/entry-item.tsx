@@ -2,9 +2,7 @@
 
 import * as React from "react";
 import { Card } from "@repo/ui/card";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { vs } from "react-syntax-highlighter/dist/esm/styles/prism";
+import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
 import {
   ChevronDown,
@@ -13,6 +11,7 @@ import {
   MessageSquare,
   Copy,
   Check,
+  Trash2,
 } from "lucide-react";
 import {
   Collapsible,
@@ -26,12 +25,32 @@ type Entry = Database["scratchpad"]["Tables"]["entries"]["Row"];
 
 interface EntryItemProps {
   entry: Entry;
+  isUpdating: boolean;
+  onToggleRead: (entryId: string, nextIsRead: boolean) => void;
+  onDelete: (entryId: string) => void;
 }
 
-export function EntryItem({ entry }: EntryItemProps) {
+const CodeEntryContent = dynamic(
+  () =>
+    import("./code-entry-content").then((module) => module.CodeEntryContent),
+  {
+    ssr: false,
+    loading: () => (
+      <pre className="m-0 overflow-x-auto rounded-md bg-muted p-4 font-mono text-sm">
+        Loading syntax highlighting…
+      </pre>
+    ),
+  },
+);
+
+export function EntryItem({
+  entry,
+  isUpdating,
+  onToggleRead,
+  onDelete,
+}: EntryItemProps) {
   const { theme } = useTheme();
   const [isOpen, setIsOpen] = React.useState(false);
-  const [isUpdating, setIsUpdating] = React.useState(false);
   const [isCopied, setIsCopied] = React.useState(false);
   const isDark =
     theme === "dark" ||
@@ -58,27 +77,10 @@ export function EntryItem({ entry }: EntryItemProps) {
 
   const preview = getPreview();
 
-  const handleToggleRead = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleToggleRead = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.stopPropagation();
     if (isUpdating) return;
-
-    try {
-      setIsUpdating(true);
-      await fetch(`/api/scratchpad/${entry.id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          is_read: !entry.is_read,
-        }),
-      });
-      // Realtime subscription will update the entry in the list.
-    } catch (error) {
-      console.error("Failed to update is_read:", error);
-    } finally {
-      setIsUpdating(false);
-    }
+    onToggleRead(entry.id, !entry.is_read);
   };
 
   const handleCopy = async (e: React.MouseEvent) => {
@@ -106,9 +108,7 @@ export function EntryItem({ entry }: EntryItemProps) {
           <input
             type="checkbox"
             aria-label={
-              entry.is_read
-                ? "Mark entry as unread"
-                : "Mark entry as read"
+              entry.is_read ? "Mark entry as unread" : "Mark entry as read"
             }
             className="mt-1 h-4 w-4 cursor-pointer accent-primary"
             checked={!!entry.is_read}
@@ -170,6 +170,19 @@ export function EntryItem({ entry }: EntryItemProps) {
                       <Copy className="h-4 w-4 text-muted-foreground" />
                     )}
                   </button>
+                  <button
+                    type="button"
+                    aria-label="Delete entry"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onDelete(entry.id);
+                    }}
+                    disabled={isUpdating}
+                    className="cursor-pointer rounded-lg p-1.5 text-destructive transition-colors hover:bg-destructive/10 disabled:cursor-not-allowed disabled:opacity-50"
+                    title="Delete entry"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
                   {isOpen ? (
                     <ChevronUp className="h-4 w-4 text-muted-foreground" />
                   ) : (
@@ -183,18 +196,11 @@ export function EntryItem({ entry }: EntryItemProps) {
               <div className="mt-3 border-t border-border/70 pt-3">
                 {entry.entry_type === "code" ? (
                   <div className="overflow-x-auto rounded-md">
-                    <SyntaxHighlighter
+                    <CodeEntryContent
+                      content={entry.content}
                       language={entry.language || "text"}
-                      style={isDark ? vscDarkPlus : vs}
-                      customStyle={{
-                        margin: 0,
-                        borderRadius: "0.375rem",
-                        fontSize: "0.875rem",
-                      }}
-                      showLineNumbers
-                    >
-                      {entry.content}
-                    </SyntaxHighlighter>
+                      isDark={isDark}
+                    />
                   </div>
                 ) : (
                   <div className="whitespace-pre-wrap break-words text-sm">

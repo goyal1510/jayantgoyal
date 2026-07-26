@@ -10,6 +10,7 @@ import { WorkspaceHeader } from "@repo/ui/workspace-header";
 import { Button } from "@repo/ui/button";
 import { Input } from "@repo/ui/input";
 import { MessageSquareText, Plus, Search } from "lucide-react";
+import { toast } from "sonner";
 
 type Entry = Database["scratchpad"]["Tables"]["entries"]["Row"];
 type EntryFilter = "all" | "unread" | "read";
@@ -22,41 +23,44 @@ export function ScratchpadPage() {
   const [userId, setUserId] = React.useState<string | null>(null);
   const [filter, setFilter] = React.useState<EntryFilter>("all");
   const [query, setQuery] = React.useState("");
+  const [updatingEntryIds, setUpdatingEntryIds] = React.useState<Set<string>>(
+    new Set(),
+  );
 
-  // Get user ID
+  // Fetch the initial entries and verified user ID in one authenticated request.
   React.useEffect(() => {
-    async function getUser() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (user) {
-        setUserId(user.id);
-      }
-    }
-    getUser();
-  }, [supabase]);
-
-  // Fetch initial entries using API route
-  React.useEffect(() => {
-    if (!userId) return;
-
     async function fetchEntries() {
       try {
         const response = await fetch("/api/scratchpad");
         if (!response.ok) {
           throw new Error("Failed to fetch entries");
         }
-        const { entries: fetchedEntries } = await response.json();
+        const { entries: fetchedEntries, userId: verifiedUserId } =
+          await response.json();
         // API already returns newest first, so use as-is
         setEntries(fetchedEntries || []);
+        setUserId(verifiedUserId);
       } catch (error) {
         console.error("Error fetching entries:", error);
-        // Fallback to direct Supabase call (also newest first)
+        // Fallback to a direct authenticated Supabase query (also newest first).
+        const {
+          data: { user },
+          error: userError,
+        } = await supabase.auth.getUser();
+        if (userError || !user) {
+          console.error("Supabase fallback auth error:", userError);
+          setLoading(false);
+          return;
+        }
+
+        setUserId(user.id);
         const { data, error: supabaseError } = await supabase
           .schema("jg_app")
           .from("scratchpad_entries")
-          .select("*")
-          .eq("user_id", userId)
+          .select(
+            "id,user_id,content,entry_type,language,created_at,updated_at,is_read",
+          )
+          .eq("user_id", user.id)
           .order("created_at", { ascending: false });
 
         if (supabaseError) {
@@ -69,7 +73,7 @@ export function ScratchpadPage() {
     }
 
     fetchEntries();
-  }, [userId, supabase]);
+  }, [supabase]);
 
   // Subscribe to real-time updates
   React.useEffect(() => {
@@ -107,9 +111,7 @@ export function ScratchpadPage() {
           const updatedEntry = payload.new as Entry;
           setEntries((prev) =>
             prev.map((item) =>
-              item.id === updatedEntry.id
-                ? { ...item, ...updatedEntry }
-                : item,
+              item.id === updatedEntry.id ? { ...item, ...updatedEntry } : item,
             ),
           );
         },
@@ -135,48 +137,150 @@ export function ScratchpadPage() {
   }, [userId, supabase]);
 
   const handleCreateEntry = React.useCallback(
-    async (
-      content: string,
-      entryType: "text" | "code",
-      language?: string,
-    ) => {
+    async (content: string, entryType: "text" | "code", language?: string) => {
+      const optimisticId = `optimistic-${crypto.randomUUID()}`;
+      const now = new Date().toISOString();
+      const optimisticEntry: Entry = {
+        id: optimisticId,
+        user_id: userId ?? "",
+        content: content.trim(),
+        entry_type: entryType,
+        language: entryType === "code" ? language || null : null,
+        created_at: now,
+        updated_at: now,
+        is_read: false,
+      };
+
+      setEntries((prev) => [optimisticEntry, ...prev]);
+
+      void (async () => {
+        try {
+          const response = await fetch("/api/scratchpad", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              content,
+              entry_type: entryType,
+              language: entryType === "code" ? language : null,
+            }),
+          });
+
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || "Failed to send entry");
+          }
+
+          const { entry } = (await response.json()) as { entry?: Entry };
+          if (entry) {
+            setEntries((prev) => [
+              entry,
+              ...prev.filter(
+                (item) => item.id !== optimisticId && item.id !== entry.id,
+              ),
+            ]);
+          }
+        } catch (error) {
+          console.error("Error sending entry:", error);
+          setEntries((prev) =>
+            prev.filter((entry) => entry.id !== optimisticId),
+          );
+          toast.error("Unable to save the scratchpad entry.");
+        }
+      })();
+
+      return true;
+    },
+    [userId],
+  );
+
+  const handleToggleRead = React.useCallback(
+    async (entryId: string, nextIsRead: boolean) => {
+      if (updatingEntryIds.has(entryId)) return;
+      const previousEntry = entries.find((entry) => entry.id === entryId);
+      if (!previousEntry) return;
+
+      setUpdatingEntryIds((prev) => new Set(prev).add(entryId));
+      setEntries((prev) =>
+        prev.map((entry) =>
+          entry.id === entryId ? { ...entry, is_read: nextIsRead } : entry,
+        ),
+      );
+
       try {
-        const response = await fetch("/api/scratchpad", {
-          method: "POST",
+        const response = await fetch(`/api/scratchpad/${entryId}`, {
+          method: "PATCH",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            content,
-            entry_type: entryType,
-            language: entryType === "code" ? language : null,
-          }),
+          body: JSON.stringify({ is_read: nextIsRead }),
         });
 
         if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.error || "Failed to send entry");
+          throw new Error("Failed to update entry.");
         }
 
-        // Add the new entry to state immediately
-        const { entry } = await response.json();
+        const { entry } = (await response.json()) as { entry?: Entry };
         if (entry) {
-          setEntries((prev) => {
-            // Avoid duplicates if realtime already added it
-            if (prev.some((item) => item.id === entry.id)) {
-              return prev;
-            }
-            return [entry, ...prev];
-          });
+          setEntries((prev) =>
+            prev.map((item) => (item.id === entryId ? entry : item)),
+          );
         }
-
-        return true;
       } catch (error) {
-        console.error("Error sending entry:", error);
-        return false;
+        console.error("Failed to update is_read:", error);
+        setEntries((prev) =>
+          prev.map((entry) => (entry.id === entryId ? previousEntry : entry)),
+        );
+        toast.error("Unable to update the scratchpad entry.");
+      } finally {
+        setUpdatingEntryIds((prev) => {
+          const next = new Set(prev);
+          next.delete(entryId);
+          return next;
+        });
       }
     },
-    [],
+    [entries, updatingEntryIds],
+  );
+
+  const handleDeleteEntry = React.useCallback(
+    async (entryId: string) => {
+      if (!confirm("Delete this scratchpad entry?")) return;
+      if (updatingEntryIds.has(entryId)) return;
+
+      const previousIndex = entries.findIndex((entry) => entry.id === entryId);
+      const previousEntry = entries[previousIndex];
+      if (!previousEntry) return;
+
+      setUpdatingEntryIds((prev) => new Set(prev).add(entryId));
+      setEntries((prev) => prev.filter((entry) => entry.id !== entryId));
+
+      try {
+        const response = await fetch(`/api/scratchpad/${entryId}`, {
+          method: "DELETE",
+        });
+        if (!response.ok) {
+          throw new Error("Failed to delete entry.");
+        }
+      } catch (error) {
+        console.error("Failed to delete entry:", error);
+        setEntries((prev) => {
+          if (prev.some((entry) => entry.id === entryId)) return prev;
+          const restored = [...prev];
+          restored.splice(previousIndex, 0, previousEntry);
+          return restored;
+        });
+        toast.error("Unable to delete the scratchpad entry.");
+      } finally {
+        setUpdatingEntryIds((prev) => {
+          const next = new Set(prev);
+          next.delete(entryId);
+          return next;
+        });
+      }
+    },
+    [entries, updatingEntryIds],
   );
 
   const unreadCount = entries.filter((entry) => !entry.is_read).length;
@@ -270,7 +374,12 @@ export function ScratchpadPage() {
               </p>
             </div>
           ) : (
-            <EntryList entries={visibleEntries} />
+            <EntryList
+              entries={visibleEntries}
+              updatingEntryIds={updatingEntryIds}
+              onToggleRead={handleToggleRead}
+              onDelete={handleDeleteEntry}
+            />
           )}
         </div>
       </section>

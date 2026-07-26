@@ -1,185 +1,149 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server";
 
-import { createSupabaseServerClient } from "@/lib/supabase/server"
+import { getVerifiedRequestUserId } from "@/lib/auth/verified-request-user";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+
+const MONTH_PATTERN = /^(\d{4})-(\d{2})$/;
+
+function getMonthRange(value: string | null) {
+  const currentMonth = new Date().toISOString().slice(0, 7);
+  const month = value?.trim() || currentMonth;
+  const match = MONTH_PATTERN.exec(month);
+  const year = Number(match?.[1]);
+  const monthNumber = Number(match?.[2]);
+
+  if (!match || monthNumber < 1 || monthNumber > 12) {
+    return null;
+  }
+
+  const daysInMonth = new Date(year, monthNumber, 0).getDate();
+  return {
+    daysInMonth,
+    startDate: `${month}-01`,
+    endDate: `${month}-${String(daysInMonth).padStart(2, "0")}`,
+  };
+}
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createSupabaseServerClient()
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+    const supabase = await createSupabaseServerClient();
+    const userId = await getVerifiedRequestUserId(request, supabase);
 
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const url = new URL(request.url)
-    const month = url.searchParams.get("month")?.trim() || "2025-01" // Default to January 2025
-
-    // Calculate days in the month
-    const year = parseInt(month.split("-")[0]!)
-    const monthNum = parseInt(month.split("-")[1]!)
-    const daysInMonth = new Date(year, monthNum, 0).getDate()
-    const startDate = `${month}-01`
-    const endDate = `${month}-${daysInMonth.toString().padStart(2, "0")}`
-
-    // Get all entries for the month first
-    const { data: entries, error: entriesError } = await supabase
-      .schema("jg_app")
-      .from("activity_tracker_entries")
-      .select("*")
-      .eq("user_id", user.id)
-      .gte("date", startDate)
-      .lte("date", endDate)
-
-    if (entriesError) {
-      console.error("Error fetching entries:", entriesError)
+    const range = getMonthRange(request.nextUrl.searchParams.get("month"));
+    if (!range) {
       return NextResponse.json(
-        { error: entriesError.message || "Unable to fetch entries." },
-        { status: 500 }
-      )
+        { error: "Month must use the YYYY-MM format." },
+        { status: 400 },
+      );
     }
 
-    // Get activities that have entries in this month
-    const activityIdsWithEntries = new Set(
-      (entries || []).map((e) => e.activity_id).filter(Boolean)
-    )
+    const [entriesResult, activitiesResult] = await Promise.all([
+      supabase
+        .schema("jg_app")
+        .from("activity_tracker_entries")
+        .select("activity_id,date,completed")
+        .eq("user_id", userId)
+        .gte("date", range.startDate)
+        .lte("date", range.endDate),
+      supabase
+        .schema("jg_app")
+        .from("activity_tracker_activities")
+        .select("id,name,is_active,created_at")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: true }),
+    ]);
 
-    // Fetch activities based on visibility logic:
-    // - Show activities that have entries in this month (regardless of is_active), OR
-    // - Show only active activities (for months with no entries yet)
-    const activitiesQuery = supabase
-      .schema("jg_app")
-      .from("activity_tracker_activities")
-      .select("*")
-      .eq("user_id", user.id)
-
-    if (activityIdsWithEntries.size > 0) {
-      // Fetch all activities, then filter in memory
-      const { data: allActivities, error: activitiesError } = await activitiesQuery
-        .order("created_at", { ascending: true })
-
-      if (activitiesError) {
-        console.error("Error fetching activities:", activitiesError)
-        return NextResponse.json(
-          { error: activitiesError.message || "Unable to fetch activities." },
-          { status: 500 }
-        )
-      }
-
-      // Filter activities: show those with entries OR active ones
-      const activities =
-        allActivities?.filter(
-          (activity) =>
-            activityIdsWithEntries.has(activity.id) || activity.is_active === true
-        ) || []
-
-      if (activities.length === 0) {
-        return NextResponse.json({ stats: [] })
-      }
-
-      // Continue with filtered activities
-      const stats = activities.map((activity) => {
-        const activityEntries = (entries || []).filter(
-          (entry) => entry.activity_id === activity.id && entry.completed
-        )
-        const completedDays = activityEntries.length
-        const completionRate =
-          daysInMonth > 0 ? (completedDays / daysInMonth) * 100 : 0
-
-        return {
-          activity_id: activity.id,
-          activity_name: activity.name,
-          total_days: daysInMonth,
-          completed_days: completedDays,
-          completion_rate: Math.round(completionRate * 100) / 100,
-        }
-      })
-
-      // Calculate overall stats
-      const totalActivities = activities.length
-      const totalPossibleDays = totalActivities * daysInMonth
-      const completedEntries = (entries || []).filter((e) => e.completed)
-      const uniqueCompletedDays = new Set(completedEntries.map((e) => e.date)).size
-      const totalCompletedEntries = completedEntries.length
-      const overallCompletionRate =
-        totalPossibleDays > 0
-          ? (totalCompletedEntries / totalPossibleDays) * 100
-          : 0
-
-      return NextResponse.json({
-        stats,
-        overall: {
-          total_activities: totalActivities,
-          total_days: daysInMonth,
-          total_completed_days: totalCompletedEntries,
-          unique_completed_days: uniqueCompletedDays,
-          overall_completion_rate: Math.round(overallCompletionRate * 100) / 100,
+    if (entriesResult.error) {
+      console.error("Error fetching entries:", entriesResult.error);
+      return NextResponse.json(
+        {
+          error: entriesResult.error.message || "Unable to fetch entries.",
         },
-      })
-    } else {
-      // No entries in this month, only show active activities
-      const { data: activities, error: activitiesError } = await activitiesQuery
-        .eq("is_active", true)
-        .order("created_at", { ascending: true })
-
-      if (activitiesError) {
-        console.error("Error fetching activities:", activitiesError)
-        return NextResponse.json(
-          { error: activitiesError.message || "Unable to fetch activities." },
-          { status: 500 }
-        )
-      }
-
-      if (!activities || activities.length === 0) {
-        return NextResponse.json({ stats: [] })
-      }
-
-      // Calculate stats for each activity
-      const stats = activities.map((activity) => {
-        const activityEntries = (entries || []).filter(
-          (entry) => entry.activity_id === activity.id && entry.completed
-        )
-        const completedDays = activityEntries.length
-        const completionRate =
-          daysInMonth > 0 ? (completedDays / daysInMonth) * 100 : 0
-
-        return {
-          activity_id: activity.id,
-          activity_name: activity.name,
-          total_days: daysInMonth,
-          completed_days: completedDays,
-          completion_rate: Math.round(completionRate * 100) / 100,
-        }
-      })
-
-      // Calculate overall stats
-      const totalActivities = activities.length
-      const totalPossibleDays = totalActivities * daysInMonth
-      const completedEntries = (entries || []).filter((e) => e.completed)
-      const uniqueCompletedDays = new Set(completedEntries.map((e) => e.date)).size
-      const totalCompletedEntries = completedEntries.length
-      const overallCompletionRate =
-        totalPossibleDays > 0
-          ? (totalCompletedEntries / totalPossibleDays) * 100
-          : 0
-
-      return NextResponse.json({
-        stats,
-        overall: {
-          total_activities: totalActivities,
-          total_days: daysInMonth,
-          total_completed_days: totalCompletedEntries,
-          unique_completed_days: uniqueCompletedDays,
-          overall_completion_rate: Math.round(overallCompletionRate * 100) / 100,
-        },
-      })
+        { status: 500 },
+      );
     }
+
+    if (activitiesResult.error) {
+      console.error("Error fetching activities:", activitiesResult.error);
+      return NextResponse.json(
+        {
+          error:
+            activitiesResult.error.message || "Unable to fetch activities.",
+        },
+        { status: 500 },
+      );
+    }
+
+    const activityIdsWithEntries = new Set<string>();
+    const completedByActivity = new Map<string, number>();
+    const uniqueCompletedDays = new Set<string>();
+    let totalCompletedEntries = 0;
+
+    for (const entry of entriesResult.data ?? []) {
+      if (entry.activity_id) {
+        activityIdsWithEntries.add(entry.activity_id);
+      }
+
+      if (!entry.completed || !entry.activity_id) {
+        continue;
+      }
+
+      completedByActivity.set(
+        entry.activity_id,
+        (completedByActivity.get(entry.activity_id) ?? 0) + 1,
+      );
+      uniqueCompletedDays.add(entry.date);
+      totalCompletedEntries += 1;
+    }
+
+    const activities = (activitiesResult.data ?? []).filter(
+      (activity) =>
+        activity.is_active || activityIdsWithEntries.has(activity.id),
+    );
+
+    if (activities.length === 0) {
+      return NextResponse.json({ stats: [] });
+    }
+
+    const stats = activities.map((activity) => {
+      const completedDays = completedByActivity.get(activity.id) ?? 0;
+      const completionRate =
+        range.daysInMonth > 0 ? (completedDays / range.daysInMonth) * 100 : 0;
+
+      return {
+        activity_id: activity.id,
+        activity_name: activity.name,
+        total_days: range.daysInMonth,
+        completed_days: completedDays,
+        completion_rate: Math.round(completionRate * 100) / 100,
+      };
+    });
+
+    const totalPossibleDays = activities.length * range.daysInMonth;
+    const overallCompletionRate =
+      totalPossibleDays > 0
+        ? (totalCompletedEntries / totalPossibleDays) * 100
+        : 0;
+
+    return NextResponse.json({
+      stats,
+      overall: {
+        total_activities: activities.length,
+        total_days: range.daysInMonth,
+        total_completed_days: totalCompletedEntries,
+        unique_completed_days: uniqueCompletedDays.size,
+        overall_completion_rate: Math.round(overallCompletionRate * 100) / 100,
+      },
+    });
   } catch (error) {
-    console.error("Error in GET /api/activity-tracker/stats:", error)
+    console.error("Error in GET /api/activity-tracker/stats:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }
