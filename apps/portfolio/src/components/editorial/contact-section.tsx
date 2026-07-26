@@ -43,11 +43,14 @@ function SocialIcon({ social }: { social: PortfolioSocialLink }) {
 export function ContactSection({
   profile,
   content,
+  headingLevel = "h2",
 }: {
   profile: PortfolioProfile;
   content: PortfolioSectionContent;
+  headingLevel?: "h1" | "h2";
 }) {
   const heading = getCompactSectionHeading(content.eyebrow, content.headline);
+  const Heading = headingLevel;
 
   return (
     <footer id="contact" className="contact-section">
@@ -55,7 +58,7 @@ export function ContactSection({
         <EditorialReveal className="section-heading section-heading--contact">
           <span className="section-index">{heading.label}</span>
           <div>
-            <h2>{heading.title}</h2>
+            <Heading>{heading.title}</Heading>
             <p>{content.description}</p>
           </div>
         </EditorialReveal>

@@ -14,7 +14,7 @@ const portfolioSectionRedirects = [
   ["/certificates", "/about#experience"],
 ] as const;
 
-const studioPagePrefixes = [
+const studioPublicPagePrefixes = [
   "/activity-tracker",
   "/calculator",
   "/custom-calculator",
@@ -25,10 +25,13 @@ const studioPagePrefixes = [
   "/scratchpad",
   "/tools",
   "/weather",
+  "/terms-conditions",
+] as const;
+
+const studioSessionPagePrefixes = [
   "/forgot-password",
   "/mfa-verify",
   "/reset-password",
-  "/terms-conditions",
   "/welcome",
   "/auth",
   "/.well-known",
@@ -45,17 +48,17 @@ const studioApiPrefixes = [
   "/api/typing-test",
 ] as const;
 
-function buildStudioRedirects(prefixes: readonly string[]) {
+function buildStudioRedirects(prefixes: readonly string[], permanent: boolean) {
   return prefixes.flatMap((prefix) => [
     {
       source: prefix,
       destination: `${STUDIO_URL}${prefix}`,
-      permanent: false,
+      permanent,
     },
     {
       source: `${prefix}/:path*`,
       destination: `${STUDIO_URL}${prefix}/:path*`,
-      permanent: false,
+      permanent,
     },
   ]);
 }
@@ -116,8 +119,39 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
+        source: "/blog",
+        destination: "/writing",
+        permanent: true,
+      },
+      ...[
+        "how-i-built-a-live-resume-download-with-google-docs-next-js-and-vercel",
+        "fixing-google-indexing-seo",
+        "introducing-jayantgoyal-com",
+      ].flatMap((slug) => [
+        {
+          source: `/blog/${slug}`,
+          destination: "/writing",
+          permanent: true,
+        },
+        {
+          source: `/writing/${slug}`,
+          destination: "/writing",
+          permanent: true,
+        },
+      ]),
+      {
         source: "/blog/:path*",
         destination: "/writing/:path*",
+        permanent: true,
+      },
+      {
+        source: "/portfolio",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/assets/Jayant_Resume.pdf",
+        destination: "/resume",
         permanent: true,
       },
       {
@@ -189,8 +223,9 @@ const nextConfig: NextConfig = {
         destination: `${STUDIO_URL}/welcome`,
         permanent: false,
       },
-      ...buildStudioRedirects(studioPagePrefixes),
-      ...buildStudioRedirects(studioApiPrefixes),
+      ...buildStudioRedirects(studioPublicPagePrefixes, true),
+      ...buildStudioRedirects(studioSessionPagePrefixes, false),
+      ...buildStudioRedirects(studioApiPrefixes, false),
     ];
   },
   async headers() {

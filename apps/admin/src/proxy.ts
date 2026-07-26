@@ -40,6 +40,10 @@ export default async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  if (pathname === "/robots.txt") {
+    return NextResponse.next();
+  }
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -48,7 +52,7 @@ export default async function proxy(request: NextRequest) {
   // Public paths that don't require authentication
   const publicPaths = ["/welcome", "/unauthorized", "/auth/callback"];
 
-  const isPublic = publicPaths.some((path) => pathname.startsWith(path));
+  const isPublic = publicPaths.includes(pathname);
 
   // If Supabase config is missing, allow public pages and block protected ones.
   if (!supabaseUrl || !supabaseAnonKey) {

@@ -3,7 +3,10 @@ import { notFound } from "next/navigation";
 
 import { formatAppPageTitle } from "@repo/brand";
 
-import { getWritingPostBySlug, getPublishedWritingPosts } from "@/lib/writing/queries";
+import {
+  getWritingPostBySlug,
+  getPublishedWritingPosts,
+} from "@/lib/writing/queries";
 import { getPortfolioShellData } from "@/lib/portfolio/editorial-server";
 import { DEFAULT_OG_IMAGE, PERSON_NAME, SITE_URL } from "@/lib/seo/config";
 
@@ -19,7 +22,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const post = await getWritingPostBySlug(slug);
 
-  if (!post) return { title: "Post Not Found" };
+  if (!post) notFound();
 
   const url = `${SITE_URL}/writing/${slug}`;
   const description = post.excerpt ?? undefined;

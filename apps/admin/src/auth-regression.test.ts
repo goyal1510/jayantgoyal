@@ -18,6 +18,7 @@ vi.mock("@repo/auth/server", async () => {
 });
 
 import { GET as authCallback } from "./app/auth/callback/route";
+import buildRobotsPolicy from "./app/robots";
 import adminProxy from "./proxy";
 
 type SupabaseScenario = {
@@ -92,6 +93,18 @@ afterAll(() => {
 });
 
 describe("Admin Proxy authentication contract", () => {
+  it("serves the crawler policy without authentication", async () => {
+    const response = await adminProxy(
+      new NextRequest("https://admin.jayantgoyal.com/robots.txt"),
+    );
+
+    expect(response.headers.get("location")).toBeNull();
+    expect(createRequestClientMock).not.toHaveBeenCalled();
+    expect(buildRobotsPolicy()).toEqual({
+      rules: { userAgent: "*", disallow: "/" },
+    });
+  });
+
   it("switches account navigation through the shared owner contract", () => {
     const topbar = readFileSync(
       new URL("./components/header/topbar-user-menu.tsx", import.meta.url),

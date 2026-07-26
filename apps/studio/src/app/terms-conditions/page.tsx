@@ -1,14 +1,21 @@
-import { TermsContent, TERMS_LAST_UPDATED } from "@/components/auth/terms-content"
-import { Button } from "@repo/ui/button"
-import { ScrollArea } from "@repo/ui/scroll-area"
-import { FileText } from "lucide-react"
-import type { Metadata } from "next"
-import Link from "next/link"
-import { portfolioUrl } from "@/lib/platform/urls"
+import {
+  TermsContent,
+  TERMS_LAST_UPDATED,
+} from "@/components/auth/terms-content";
+import { Button } from "@repo/ui/button";
+import { ScrollArea } from "@repo/ui/scroll-area";
+import { FileText } from "lucide-react";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { portfolioUrl } from "@/lib/platform/urls";
+import { buildPublicPageMetadata } from "@/lib/seo/config";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPublicPageMetadata({
   title: "Terms & Conditions",
-}
+  description:
+    "Read the terms that apply when using Studio apps, developer tools, games, and account-based workspaces.",
+  pathname: "/terms-conditions",
+});
 
 export default function TermsConditionsPage() {
   return (
@@ -52,5 +59,5 @@ export default function TermsConditionsPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -6,7 +6,7 @@ import {
   STUDIO_PRODUCTS,
   getStudioProduct,
 } from "@/lib/config/studio-inventory";
-import { buildPublicPageMetadata } from "@/lib/seo/config";
+import { buildStudioProductMetadata } from "@/lib/seo/product-metadata";
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>;
@@ -24,11 +24,7 @@ export async function generateMetadata({
 
   if (!product) return { title: "Product not found" };
 
-  return buildPublicPageMetadata({
-    title: product.name,
-    description: product.description,
-    pathname: `/products/${product.id}`,
-  });
+  return buildStudioProductMetadata(product);
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {

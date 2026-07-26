@@ -28,6 +28,7 @@ export default async function ContactPage() {
       <ContactSection
         profile={portfolio.profile}
         content={portfolio.sectionContent.contact}
+        headingLevel="h1"
       />
     </main>
   );

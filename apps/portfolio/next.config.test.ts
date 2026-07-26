@@ -8,17 +8,27 @@ async function configuredRedirects() {
 }
 
 describe("Portfolio compatibility redirects", () => {
-  it("keeps exact and nested Studio redirects separate and temporary", async () => {
+  it("consolidates public Studio pages with permanent redirects", async () => {
     const redirects = await configuredRedirects();
 
     expect(redirects).toContainEqual({
       source: "/tools",
       destination: "https://studio.jayantgoyal.com/tools",
-      permanent: false,
+      permanent: true,
     });
     expect(redirects).toContainEqual({
       source: "/tools/:path*",
       destination: "https://studio.jayantgoyal.com/tools/:path*",
+      permanent: true,
+    });
+  });
+
+  it("keeps Studio APIs and session routes temporary", async () => {
+    const redirects = await configuredRedirects();
+
+    expect(redirects).toContainEqual({
+      source: "/welcome",
+      destination: "https://studio.jayantgoyal.com/welcome",
       permanent: false,
     });
     expect(redirects).toContainEqual({
@@ -50,6 +60,37 @@ describe("Portfolio compatibility redirects", () => {
       source: "/login",
       destination: "https://studio.jayantgoyal.com/welcome",
       permanent: false,
+    });
+    expect(redirects).toContainEqual({
+      source: "/portfolio",
+      destination: "/",
+      permanent: true,
+    });
+    expect(redirects).toContainEqual({
+      source: "/assets/Jayant_Resume.pdf",
+      destination: "/resume",
+      permanent: true,
+    });
+  });
+
+  it("retires deleted Writing URLs without leaving soft 404s", async () => {
+    const redirects = await configuredRedirects();
+
+    expect(redirects).toContainEqual({
+      source: "/blog",
+      destination: "/writing",
+      permanent: true,
+    });
+    expect(redirects).toContainEqual({
+      source:
+        "/writing/how-i-built-a-live-resume-download-with-google-docs-next-js-and-vercel",
+      destination: "/writing",
+      permanent: true,
+    });
+    expect(redirects).toContainEqual({
+      source: "/blog/fixing-google-indexing-seo",
+      destination: "/writing",
+      permanent: true,
     });
   });
 
