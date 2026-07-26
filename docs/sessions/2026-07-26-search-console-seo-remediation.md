@@ -77,3 +77,20 @@ several metadata and soft-404 issues.
   Admin robots output with no auth redirect, warning-free Studio robots output,
   About metadata fallback, a Contact H1, distinct Studio product titles, and
   the terms description.
+
+## Deployment and Search Console
+
+- Implementation commit `0f3268e` and this session record were pushed directly
+  to `main`; all four Vercel production checks completed successfully.
+- Production verification confirmed the new 308 redirects, both sitemap 200
+  responses, canonical metadata, and the Admin/Studio robots output.
+- Submitted `https://jayantgoyal.com/sitemap.xml`; Google processed it
+  successfully and discovered all 18 Portfolio URLs.
+- Retained the successful Studio sitemap with 104 discovered URLs.
+- Removed the obsolete `www`, Admin, and Auth sitemap submissions, leaving only
+  the two canonical public sitemap sources.
+- Requested indexing for Writing and Work. Studio and the highest-impression
+  crontab tool both show an existing priority-crawl request.
+- Google accepted the Admin robots recrawl. Two Studio robots recrawl attempts
+  returned a temporary unknown error; the live file is valid and remains
+  discoverable through the successful Studio sitemap.
