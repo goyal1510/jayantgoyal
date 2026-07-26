@@ -67,8 +67,11 @@ résumé, reviewing source code, or opening the live product.
 - Local production smoke checks passed for `/work`, all canonical case studies,
   the contextual Contact form, the Auth compatibility redirect, and analytics
   CSP headers.
+- Production deployment `dpl_2wZnhipsF5y6qEnWvQYy5K4fuaes` reached Ready.
+- Production smoke checks passed on `jayantgoyal.com` for the canonical Work
+  archive, Auth and Portfolio studies, contextual Contact form, analytics
+  annotations and CSP, and the `/work/identity-sso` compatibility redirect.
 
 ## Status
 
-Validated locally; pending commit, production deployment, and production smoke
-verification.
+Complete and verified in production.
