@@ -21,6 +21,9 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function AboutPage() {
   const portfolio = await getEditorialPortfolioData();
   const { about, sectionContent } = portfolio;
+  const technologyGroups = portfolio.skillGroups.filter(
+    (group) => group.items.length > 0,
+  );
 
   return (
     <main className="editorial-page editorial-about-page">
@@ -69,6 +72,45 @@ export default async function AboutPage() {
           </div>
         </div>
       </section>
+
+      {sectionContent.skills.isVisible && technologyGroups.length > 0 ? (
+        <section
+          className="shell technology-stack"
+          id="technology-stack"
+          aria-labelledby="technology-stack-title"
+        >
+          <div className="section-heading">
+            <span className="section-index">
+              {sectionContent.skills.eyebrow}
+            </span>
+            <div>
+              <h2 id="technology-stack-title">
+                {sectionContent.skills.headline}
+              </h2>
+              <p>{sectionContent.skills.description}</p>
+            </div>
+          </div>
+
+          <div className="technology-stack__groups">
+            {technologyGroups.map((group, index) => (
+              <article className="technology-stack__group" key={group.title}>
+                <span className="technology-stack__index" aria-hidden="true">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <div className="technology-stack__copy">
+                  <h3>{group.title}</h3>
+                  <p>{group.description}</p>
+                </div>
+                <ul aria-label={`${group.title} technologies`}>
+                  {group.items.map((technology) => (
+                    <li key={technology.name}>{technology.name}</li>
+                  ))}
+                </ul>
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <section className="experience-desk" id="experience">
         <div className="shell">
