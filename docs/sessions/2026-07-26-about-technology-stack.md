@@ -35,6 +35,11 @@ into the worktree.
 - Added responsive editorial styling with one readable row per category and
   compact technology labels; no new database fields or duplicated hardcoded
   stack data were introduced.
+- Replaced the technology pills with semantic bullet lists after review.
+- Arranged the CMS-controlled category headings in a simple two-column desktop
+  grid, with each heading followed by its description and technology list.
+- Collapsed the category grid to one column on mobile while retaining the same
+  content order and list semantics.
 
 ## Verification
 
