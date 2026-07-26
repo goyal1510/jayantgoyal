@@ -160,29 +160,29 @@ CREATE POLICY "Admins can read all profiles" ON "jg_account"."profiles" FOR SELE
 
 CREATE POLICY "Super admins can delete profiles" ON "jg_account"."profiles" FOR DELETE TO "authenticated" USING ((EXISTS ( SELECT 1
    FROM "jg_account"."profiles" "profiles_1"
-  WHERE (("profiles_1"."user_id" = "auth"."uid"()) AND ("profiles_1"."role" = 'super_admin'::"jg_account"."user_role")))));
+  WHERE (("profiles_1"."user_id" = ( SELECT "auth"."uid"() AS "uid")) AND ("profiles_1"."role" = 'super_admin'::"jg_account"."user_role")))));
 
 
 
 CREATE POLICY "Super admins can insert profiles" ON "jg_account"."profiles" FOR INSERT TO "authenticated" WITH CHECK ((EXISTS ( SELECT 1
    FROM "jg_account"."profiles" "profiles_1"
-  WHERE (("profiles_1"."user_id" = "auth"."uid"()) AND ("profiles_1"."role" = 'super_admin'::"jg_account"."user_role")))));
+  WHERE (("profiles_1"."user_id" = ( SELECT "auth"."uid"() AS "uid")) AND ("profiles_1"."role" = 'super_admin'::"jg_account"."user_role")))));
 
 
 
 CREATE POLICY "Super admins can update any profile" ON "jg_account"."profiles" FOR UPDATE TO "authenticated" USING ((EXISTS ( SELECT 1
    FROM "jg_account"."profiles" "profiles_1"
-  WHERE (("profiles_1"."user_id" = "auth"."uid"()) AND ("profiles_1"."role" = 'super_admin'::"jg_account"."user_role")))));
+  WHERE (("profiles_1"."user_id" = ( SELECT "auth"."uid"() AS "uid")) AND ("profiles_1"."role" = 'super_admin'::"jg_account"."user_role")))));
 
 
 
-CREATE POLICY "Users can read own profile" ON "jg_account"."profiles" FOR SELECT TO "authenticated" USING (("auth"."uid"() = "user_id"));
+CREATE POLICY "Users can read own profile" ON "jg_account"."profiles" FOR SELECT TO "authenticated" USING ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
 
 
 
-CREATE POLICY "Users can update own profile" ON "jg_account"."profiles" FOR UPDATE TO "authenticated" USING (("auth"."uid"() = "user_id")) WITH CHECK ((("auth"."uid"() = "user_id") AND ("role" = ( SELECT "profiles_1"."role"
+CREATE POLICY "Users can update own profile" ON "jg_account"."profiles" FOR UPDATE TO "authenticated" USING ((( SELECT "auth"."uid"() AS "uid") = "user_id")) WITH CHECK (((( SELECT "auth"."uid"() AS "uid") = "user_id") AND ("role" = ( SELECT "profiles_1"."role"
    FROM "jg_account"."profiles" "profiles_1"
-  WHERE ("profiles_1"."user_id" = "auth"."uid"())))));
+  WHERE ("profiles_1"."user_id" = ( SELECT "auth"."uid"() AS "uid"))))));
 
 
 

@@ -910,6 +910,14 @@ CREATE INDEX "idx_at_entries_user_id" ON "jg_app"."activity_tracker_entries" USI
 
 
 
+CREATE INDEX "idx_currency_calculations_user_created" ON "jg_app"."currency_calculator_calculations" USING "btree" ("user_id", "created_at" DESC);
+
+
+
+CREATE INDEX "idx_currency_denominations_calculation" ON "jg_app"."currency_calculator_denominations" USING "btree" ("calculation_id");
+
+
+
 CREATE INDEX "idx_fm_files_created_at" ON "jg_app"."file_manager_files" USING "btree" ("created_at");
 
 
@@ -979,6 +987,10 @@ CREATE INDEX "idx_gh_typing_user_id" ON "jg_app"."game_hub_typing_speed_results"
 
 
 CREATE INDEX "idx_scratchpad_entries_created_at" ON "jg_app"."scratchpad_entries" USING "btree" ("created_at" DESC);
+
+
+
+CREATE INDEX "idx_scratchpad_entries_user_created" ON "jg_app"."scratchpad_entries" USING "btree" ("user_id", "created_at" DESC);
 
 
 
@@ -1139,158 +1151,158 @@ CREATE POLICY "Anyone can view file types" ON "jg_app"."file_manager_type_catego
 
 
 CREATE POLICY "Participants can insert game results" ON "jg_app"."game_hub_session_results" FOR INSERT TO "authenticated" WITH CHECK ((EXISTS ( SELECT 1
-   FROM "jg_app"."game_hub_session_participants" "p"
-  WHERE (("p"."session_id" = "game_hub_session_results"."session_id") AND ("p"."user_id" = "auth"."uid"()) AND ("p"."left_at" IS NULL)))));
+   FROM "jg_app"."game_hub_session_participants" "participant"
+  WHERE (("participant"."session_id" = "game_hub_session_results"."session_id") AND ("participant"."user_id" = ( SELECT "auth"."uid"() AS "uid")) AND ("participant"."left_at" IS NULL)))));
 
 
 
 CREATE POLICY "Participants can insert own game moves" ON "jg_app"."game_hub_session_moves" FOR INSERT TO "authenticated" WITH CHECK ((EXISTS ( SELECT 1
-   FROM "jg_app"."game_hub_session_participants" "p"
-  WHERE (("p"."id" = "game_hub_session_moves"."participant_id") AND ("p"."session_id" = "game_hub_session_moves"."session_id") AND ("p"."user_id" = "auth"."uid"()) AND ("p"."left_at" IS NULL)))));
+   FROM "jg_app"."game_hub_session_participants" "participant"
+  WHERE (("participant"."id" = "game_hub_session_moves"."participant_id") AND ("participant"."session_id" = "game_hub_session_moves"."session_id") AND ("participant"."user_id" = ( SELECT "auth"."uid"() AS "uid")) AND ("participant"."left_at" IS NULL)))));
 
 
 
 CREATE POLICY "Participants can view game moves" ON "jg_app"."game_hub_session_moves" FOR SELECT TO "authenticated" USING ((EXISTS ( SELECT 1
-   FROM "jg_app"."game_hub_session_participants" "p"
-  WHERE (("p"."session_id" = "game_hub_session_moves"."session_id") AND ("p"."user_id" = "auth"."uid"()) AND ("p"."left_at" IS NULL)))));
+   FROM "jg_app"."game_hub_session_participants" "participant"
+  WHERE (("participant"."session_id" = "game_hub_session_moves"."session_id") AND ("participant"."user_id" = ( SELECT "auth"."uid"() AS "uid")) AND ("participant"."left_at" IS NULL)))));
 
 
 
 CREATE POLICY "Participants can view game results" ON "jg_app"."game_hub_session_results" FOR SELECT TO "authenticated" USING ((EXISTS ( SELECT 1
-   FROM "jg_app"."game_hub_session_participants" "p"
-  WHERE (("p"."session_id" = "game_hub_session_results"."session_id") AND ("p"."user_id" = "auth"."uid"()) AND ("p"."left_at" IS NULL)))));
+   FROM "jg_app"."game_hub_session_participants" "participant"
+  WHERE (("participant"."session_id" = "game_hub_session_results"."session_id") AND ("participant"."user_id" = ( SELECT "auth"."uid"() AS "uid")) AND ("participant"."left_at" IS NULL)))));
 
 
 
-CREATE POLICY "Session participants can update game sessions" ON "jg_app"."game_hub_sessions" FOR UPDATE TO "authenticated" USING ((("created_by" = "auth"."uid"()) OR (EXISTS ( SELECT 1
-   FROM "jg_app"."game_hub_session_participants" "p"
-  WHERE (("p"."session_id" = "game_hub_sessions"."id") AND ("p"."user_id" = "auth"."uid"()) AND ("p"."left_at" IS NULL)))))) WITH CHECK ((("created_by" = "auth"."uid"()) OR (EXISTS ( SELECT 1
-   FROM "jg_app"."game_hub_session_participants" "p"
-  WHERE (("p"."session_id" = "game_hub_sessions"."id") AND ("p"."user_id" = "auth"."uid"()) AND ("p"."left_at" IS NULL))))));
+CREATE POLICY "Session participants can update game sessions" ON "jg_app"."game_hub_sessions" FOR UPDATE TO "authenticated" USING ((("created_by" = ( SELECT "auth"."uid"() AS "uid")) OR (EXISTS ( SELECT 1
+   FROM "jg_app"."game_hub_session_participants" "participant"
+  WHERE (("participant"."session_id" = "game_hub_sessions"."id") AND ("participant"."user_id" = ( SELECT "auth"."uid"() AS "uid")) AND ("participant"."left_at" IS NULL)))))) WITH CHECK ((("created_by" = ( SELECT "auth"."uid"() AS "uid")) OR (EXISTS ( SELECT 1
+   FROM "jg_app"."game_hub_session_participants" "participant"
+  WHERE (("participant"."session_id" = "game_hub_sessions"."id") AND ("participant"."user_id" = ( SELECT "auth"."uid"() AS "uid")) AND ("participant"."left_at" IS NULL))))));
 
 
 
-CREATE POLICY "Users can create owned game sessions" ON "jg_app"."game_hub_sessions" FOR INSERT TO "authenticated" WITH CHECK (("created_by" = "auth"."uid"()));
+CREATE POLICY "Users can create owned game sessions" ON "jg_app"."game_hub_sessions" FOR INSERT TO "authenticated" WITH CHECK (("created_by" = ( SELECT "auth"."uid"() AS "uid")));
 
 
 
-CREATE POLICY "Users can delete own activities" ON "jg_app"."activity_tracker_activities" FOR DELETE USING (("auth"."uid"() = "user_id"));
+CREATE POLICY "Users can delete own activities" ON "jg_app"."activity_tracker_activities" FOR DELETE USING ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
 
 
 
-CREATE POLICY "Users can delete own entries" ON "jg_app"."activity_tracker_entries" FOR DELETE USING (("auth"."uid"() = "user_id"));
+CREATE POLICY "Users can delete own entries" ON "jg_app"."activity_tracker_entries" FOR DELETE USING ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
 
 
 
-CREATE POLICY "Users can delete own files" ON "jg_app"."file_manager_files" FOR DELETE USING (("user_id" = "auth"."uid"()));
+CREATE POLICY "Users can delete own files" ON "jg_app"."file_manager_files" FOR DELETE USING (("user_id" = ( SELECT "auth"."uid"() AS "uid")));
 
 
 
-CREATE POLICY "Users can delete own scratchpad entries" ON "jg_app"."scratchpad_entries" FOR DELETE USING (("auth"."uid"() = "user_id"));
+CREATE POLICY "Users can delete own scratchpad entries" ON "jg_app"."scratchpad_entries" FOR DELETE USING ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
 
 
 
-CREATE POLICY "Users can delete own tool favorites" ON "jg_app"."tool_favorites" FOR DELETE TO "authenticated" USING (("auth"."uid"() = "user_id"));
+CREATE POLICY "Users can delete own tool favorites" ON "jg_app"."tool_favorites" FOR DELETE TO "authenticated" USING ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
 
 
 
-CREATE POLICY "Users can delete own tool history" ON "jg_app"."tool_history" FOR DELETE TO "authenticated" USING (("auth"."uid"() = "user_id"));
+CREATE POLICY "Users can delete own tool history" ON "jg_app"."tool_history" FOR DELETE TO "authenticated" USING ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
 
 
 
-CREATE POLICY "Users can insert own activities" ON "jg_app"."activity_tracker_activities" FOR INSERT WITH CHECK (("auth"."uid"() = "user_id"));
+CREATE POLICY "Users can insert own activities" ON "jg_app"."activity_tracker_activities" FOR INSERT WITH CHECK ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
 
 
 
-CREATE POLICY "Users can insert own entries" ON "jg_app"."activity_tracker_entries" FOR INSERT WITH CHECK (("auth"."uid"() = "user_id"));
+CREATE POLICY "Users can insert own entries" ON "jg_app"."activity_tracker_entries" FOR INSERT WITH CHECK ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
 
 
 
-CREATE POLICY "Users can insert own files" ON "jg_app"."file_manager_files" FOR INSERT WITH CHECK (("user_id" = "auth"."uid"()));
+CREATE POLICY "Users can insert own files" ON "jg_app"."file_manager_files" FOR INSERT WITH CHECK (("user_id" = ( SELECT "auth"."uid"() AS "uid")));
 
 
 
-CREATE POLICY "Users can insert own results" ON "jg_app"."game_hub_typing_speed_results" FOR INSERT TO "authenticated" WITH CHECK (("auth"."uid"() = "user_id"));
+CREATE POLICY "Users can insert own results" ON "jg_app"."game_hub_typing_speed_results" FOR INSERT TO "authenticated" WITH CHECK ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
 
 
 
-CREATE POLICY "Users can insert own scratchpad entries" ON "jg_app"."scratchpad_entries" FOR INSERT WITH CHECK (("auth"."uid"() = "user_id"));
+CREATE POLICY "Users can insert own scratchpad entries" ON "jg_app"."scratchpad_entries" FOR INSERT WITH CHECK ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
 
 
 
-CREATE POLICY "Users can insert own tool favorites" ON "jg_app"."tool_favorites" FOR INSERT TO "authenticated" WITH CHECK (("auth"."uid"() = "user_id"));
+CREATE POLICY "Users can insert own tool favorites" ON "jg_app"."tool_favorites" FOR INSERT TO "authenticated" WITH CHECK ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
 
 
 
-CREATE POLICY "Users can insert own tool history" ON "jg_app"."tool_history" FOR INSERT TO "authenticated" WITH CHECK (("auth"."uid"() = "user_id"));
+CREATE POLICY "Users can insert own tool history" ON "jg_app"."tool_history" FOR INSERT TO "authenticated" WITH CHECK ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
 
 
 
-CREATE POLICY "Users can join game sessions as themselves" ON "jg_app"."game_hub_session_participants" FOR INSERT TO "authenticated" WITH CHECK ((("user_id" = "auth"."uid"()) AND (EXISTS ( SELECT 1
-   FROM "jg_app"."game_hub_sessions" "s"
-  WHERE (("s"."id" = "game_hub_session_participants"."session_id") AND ("s"."status" = ANY (ARRAY['waiting'::"jg_app"."game_hub_session_status", 'active'::"jg_app"."game_hub_session_status"])) AND ("s"."expires_at" > "now"()))))));
+CREATE POLICY "Users can join game sessions as themselves" ON "jg_app"."game_hub_session_participants" FOR INSERT TO "authenticated" WITH CHECK ((("user_id" = ( SELECT "auth"."uid"() AS "uid")) AND (EXISTS ( SELECT 1
+   FROM "jg_app"."game_hub_sessions" "session"
+  WHERE (("session"."id" = "game_hub_session_participants"."session_id") AND ("session"."status" = ANY (ARRAY['waiting'::"jg_app"."game_hub_session_status", 'active'::"jg_app"."game_hub_session_status"])) AND ("session"."expires_at" > "now"()))))));
 
 
 
-CREATE POLICY "Users can update own activities" ON "jg_app"."activity_tracker_activities" FOR UPDATE USING (("auth"."uid"() = "user_id"));
+CREATE POLICY "Users can update own activities" ON "jg_app"."activity_tracker_activities" FOR UPDATE USING ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
 
 
 
-CREATE POLICY "Users can update own entries" ON "jg_app"."activity_tracker_entries" FOR UPDATE USING (("auth"."uid"() = "user_id"));
+CREATE POLICY "Users can update own entries" ON "jg_app"."activity_tracker_entries" FOR UPDATE USING ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
 
 
 
-CREATE POLICY "Users can update own files" ON "jg_app"."file_manager_files" FOR UPDATE USING (("user_id" = "auth"."uid"())) WITH CHECK (("user_id" = "auth"."uid"()));
+CREATE POLICY "Users can update own files" ON "jg_app"."file_manager_files" FOR UPDATE USING (("user_id" = ( SELECT "auth"."uid"() AS "uid"))) WITH CHECK (("user_id" = ( SELECT "auth"."uid"() AS "uid")));
 
 
 
-CREATE POLICY "Users can update own game participant row" ON "jg_app"."game_hub_session_participants" FOR UPDATE TO "authenticated" USING (("user_id" = "auth"."uid"())) WITH CHECK (("user_id" = "auth"."uid"()));
+CREATE POLICY "Users can update own game participant row" ON "jg_app"."game_hub_session_participants" FOR UPDATE TO "authenticated" USING (("user_id" = ( SELECT "auth"."uid"() AS "uid"))) WITH CHECK (("user_id" = ( SELECT "auth"."uid"() AS "uid")));
 
 
 
-CREATE POLICY "Users can update own scratchpad entries" ON "jg_app"."scratchpad_entries" FOR UPDATE USING (("auth"."uid"() = "user_id")) WITH CHECK (("auth"."uid"() = "user_id"));
+CREATE POLICY "Users can update own scratchpad entries" ON "jg_app"."scratchpad_entries" FOR UPDATE USING ((( SELECT "auth"."uid"() AS "uid") = "user_id")) WITH CHECK ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
 
 
 
-CREATE POLICY "Users can update own tool history" ON "jg_app"."tool_history" FOR UPDATE TO "authenticated" USING (("auth"."uid"() = "user_id")) WITH CHECK (("auth"."uid"() = "user_id"));
+CREATE POLICY "Users can update own tool history" ON "jg_app"."tool_history" FOR UPDATE TO "authenticated" USING ((( SELECT "auth"."uid"() AS "uid") = "user_id")) WITH CHECK ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
 
 
 
-CREATE POLICY "Users can view joinable or joined game sessions" ON "jg_app"."game_hub_sessions" FOR SELECT TO "authenticated" USING ((("created_by" = "auth"."uid"()) OR ("status" = 'waiting'::"jg_app"."game_hub_session_status") OR (EXISTS ( SELECT 1
-   FROM "jg_app"."game_hub_session_participants" "p"
-  WHERE (("p"."session_id" = "game_hub_sessions"."id") AND ("p"."user_id" = "auth"."uid"()) AND ("p"."left_at" IS NULL))))));
+CREATE POLICY "Users can view joinable or joined game sessions" ON "jg_app"."game_hub_sessions" FOR SELECT TO "authenticated" USING ((("created_by" = ( SELECT "auth"."uid"() AS "uid")) OR ("status" = 'waiting'::"jg_app"."game_hub_session_status") OR (EXISTS ( SELECT 1
+   FROM "jg_app"."game_hub_session_participants" "participant"
+  WHERE (("participant"."session_id" = "game_hub_sessions"."id") AND ("participant"."user_id" = ( SELECT "auth"."uid"() AS "uid")) AND ("participant"."left_at" IS NULL))))));
 
 
 
-CREATE POLICY "Users can view own activities" ON "jg_app"."activity_tracker_activities" FOR SELECT USING (("auth"."uid"() = "user_id"));
+CREATE POLICY "Users can view own activities" ON "jg_app"."activity_tracker_activities" FOR SELECT USING ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
 
 
 
-CREATE POLICY "Users can view own entries" ON "jg_app"."activity_tracker_entries" FOR SELECT USING (("auth"."uid"() = "user_id"));
+CREATE POLICY "Users can view own entries" ON "jg_app"."activity_tracker_entries" FOR SELECT USING ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
 
 
 
-CREATE POLICY "Users can view own files" ON "jg_app"."file_manager_files" FOR SELECT USING ((("user_id" = "auth"."uid"()) AND (NOT "is_deleted")));
+CREATE POLICY "Users can view own files" ON "jg_app"."file_manager_files" FOR SELECT USING ((("user_id" = ( SELECT "auth"."uid"() AS "uid")) AND (NOT "is_deleted")));
 
 
 
-CREATE POLICY "Users can view own game participants" ON "jg_app"."game_hub_session_participants" FOR SELECT TO "authenticated" USING (("user_id" = "auth"."uid"()));
+CREATE POLICY "Users can view own game participants" ON "jg_app"."game_hub_session_participants" FOR SELECT TO "authenticated" USING (("user_id" = ( SELECT "auth"."uid"() AS "uid")));
 
 
 
-CREATE POLICY "Users can view own results" ON "jg_app"."game_hub_typing_speed_results" FOR SELECT TO "authenticated" USING (("auth"."uid"() = "user_id"));
+CREATE POLICY "Users can view own results" ON "jg_app"."game_hub_typing_speed_results" FOR SELECT TO "authenticated" USING ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
 
 
 
-CREATE POLICY "Users can view own scratchpad entries" ON "jg_app"."scratchpad_entries" FOR SELECT USING (("auth"."uid"() = "user_id"));
+CREATE POLICY "Users can view own scratchpad entries" ON "jg_app"."scratchpad_entries" FOR SELECT USING ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
 
 
 
-CREATE POLICY "Users can view own tool favorites" ON "jg_app"."tool_favorites" FOR SELECT TO "authenticated" USING (("auth"."uid"() = "user_id"));
+CREATE POLICY "Users can view own tool favorites" ON "jg_app"."tool_favorites" FOR SELECT TO "authenticated" USING ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
 
 
 
-CREATE POLICY "Users can view own tool history" ON "jg_app"."tool_history" FOR SELECT TO "authenticated" USING (("auth"."uid"() = "user_id"));
+CREATE POLICY "Users can view own tool history" ON "jg_app"."tool_history" FOR SELECT TO "authenticated" USING ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
 
 
 
@@ -1306,13 +1318,13 @@ ALTER TABLE "jg_app"."currency_calculator_calculations" ENABLE ROW LEVEL SECURIT
 ALTER TABLE "jg_app"."currency_calculator_denominations" ENABLE ROW LEVEL SECURITY;
 
 
-CREATE POLICY "delete_own_calculations" ON "jg_app"."currency_calculator_calculations" FOR DELETE TO "authenticated" USING (("user_id" = "auth"."uid"()));
+CREATE POLICY "delete_own_calculations" ON "jg_app"."currency_calculator_calculations" FOR DELETE TO "authenticated" USING (("user_id" = ( SELECT "auth"."uid"() AS "uid")));
 
 
 
-CREATE POLICY "delete_own_denominations" ON "jg_app"."currency_calculator_denominations" FOR DELETE TO "authenticated" USING (("calculation_id" IN ( SELECT "currency_calculator_calculations"."id"
-   FROM "jg_app"."currency_calculator_calculations"
-  WHERE ("currency_calculator_calculations"."user_id" = "auth"."uid"()))));
+CREATE POLICY "delete_own_denominations" ON "jg_app"."currency_calculator_denominations" FOR DELETE TO "authenticated" USING (("calculation_id" IN ( SELECT "calculations"."id"
+   FROM "jg_app"."currency_calculator_calculations" "calculations"
+  WHERE ("calculations"."user_id" = ( SELECT "auth"."uid"() AS "uid")))));
 
 
 
@@ -1337,26 +1349,26 @@ ALTER TABLE "jg_app"."game_hub_sessions" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "jg_app"."game_hub_typing_speed_results" ENABLE ROW LEVEL SECURITY;
 
 
-CREATE POLICY "insert_own_calculations" ON "jg_app"."currency_calculator_calculations" FOR INSERT TO "authenticated" WITH CHECK (("user_id" = "auth"."uid"()));
+CREATE POLICY "insert_own_calculations" ON "jg_app"."currency_calculator_calculations" FOR INSERT TO "authenticated" WITH CHECK (("user_id" = ( SELECT "auth"."uid"() AS "uid")));
 
 
 
-CREATE POLICY "insert_own_denominations" ON "jg_app"."currency_calculator_denominations" FOR INSERT TO "authenticated" WITH CHECK (("calculation_id" IN ( SELECT "currency_calculator_calculations"."id"
-   FROM "jg_app"."currency_calculator_calculations"
-  WHERE ("currency_calculator_calculations"."user_id" = "auth"."uid"()))));
+CREATE POLICY "insert_own_denominations" ON "jg_app"."currency_calculator_denominations" FOR INSERT TO "authenticated" WITH CHECK (("calculation_id" IN ( SELECT "calculations"."id"
+   FROM "jg_app"."currency_calculator_calculations" "calculations"
+  WHERE ("calculations"."user_id" = ( SELECT "auth"."uid"() AS "uid")))));
 
 
 
 ALTER TABLE "jg_app"."scratchpad_entries" ENABLE ROW LEVEL SECURITY;
 
 
-CREATE POLICY "select_own_calculations" ON "jg_app"."currency_calculator_calculations" FOR SELECT TO "authenticated" USING (("user_id" = "auth"."uid"()));
+CREATE POLICY "select_own_calculations" ON "jg_app"."currency_calculator_calculations" FOR SELECT TO "authenticated" USING (("user_id" = ( SELECT "auth"."uid"() AS "uid")));
 
 
 
-CREATE POLICY "select_own_denominations" ON "jg_app"."currency_calculator_denominations" FOR SELECT TO "authenticated" USING (("calculation_id" IN ( SELECT "currency_calculator_calculations"."id"
-   FROM "jg_app"."currency_calculator_calculations"
-  WHERE ("currency_calculator_calculations"."user_id" = "auth"."uid"()))));
+CREATE POLICY "select_own_denominations" ON "jg_app"."currency_calculator_denominations" FOR SELECT TO "authenticated" USING (("calculation_id" IN ( SELECT "calculations"."id"
+   FROM "jg_app"."currency_calculator_calculations" "calculations"
+  WHERE ("calculations"."user_id" = ( SELECT "auth"."uid"() AS "uid")))));
 
 
 
@@ -1366,15 +1378,15 @@ ALTER TABLE "jg_app"."tool_favorites" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "jg_app"."tool_history" ENABLE ROW LEVEL SECURITY;
 
 
-CREATE POLICY "update_own_calculations" ON "jg_app"."currency_calculator_calculations" FOR UPDATE TO "authenticated" USING (("user_id" = "auth"."uid"())) WITH CHECK (("user_id" = "auth"."uid"()));
+CREATE POLICY "update_own_calculations" ON "jg_app"."currency_calculator_calculations" FOR UPDATE TO "authenticated" USING (("user_id" = ( SELECT "auth"."uid"() AS "uid"))) WITH CHECK (("user_id" = ( SELECT "auth"."uid"() AS "uid")));
 
 
 
-CREATE POLICY "update_own_denominations" ON "jg_app"."currency_calculator_denominations" FOR UPDATE TO "authenticated" USING (("calculation_id" IN ( SELECT "currency_calculator_calculations"."id"
-   FROM "jg_app"."currency_calculator_calculations"
-  WHERE ("currency_calculator_calculations"."user_id" = "auth"."uid"())))) WITH CHECK (("calculation_id" IN ( SELECT "currency_calculator_calculations"."id"
-   FROM "jg_app"."currency_calculator_calculations"
-  WHERE ("currency_calculator_calculations"."user_id" = "auth"."uid"()))));
+CREATE POLICY "update_own_denominations" ON "jg_app"."currency_calculator_denominations" FOR UPDATE TO "authenticated" USING (("calculation_id" IN ( SELECT "calculations"."id"
+   FROM "jg_app"."currency_calculator_calculations" "calculations"
+  WHERE ("calculations"."user_id" = ( SELECT "auth"."uid"() AS "uid"))))) WITH CHECK (("calculation_id" IN ( SELECT "calculations"."id"
+   FROM "jg_app"."currency_calculator_calculations" "calculations"
+  WHERE ("calculations"."user_id" = ( SELECT "auth"."uid"() AS "uid")))));
 
 
 
