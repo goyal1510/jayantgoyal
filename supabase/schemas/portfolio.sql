@@ -365,13 +365,25 @@ CREATE TABLE IF NOT EXISTS "portfolio"."experience" (
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "bullets" "text"[] DEFAULT '{}'::"text"[] NOT NULL,
+    "company_url" "text",
+    "company_linkedin_url" "text",
     CONSTRAINT "experience_bullets_items_check" CHECK ("jg_app"."is_nonblank_text_array"("bullets")),
+    CONSTRAINT "experience_company_linkedin_url_check" CHECK ((("company_linkedin_url" IS NULL) OR (("company_linkedin_url" = "btrim"("company_linkedin_url")) AND ("company_linkedin_url" ~* '^https://([[:alnum:]-]+\.)?linkedin\.com/(company|in)/[^[:space:]]+/?$'::"text")))),
+    CONSTRAINT "experience_company_url_public_check" CHECK ((("company_url" IS NULL) OR (("company_url" = "btrim"("company_url")) AND ("company_url" ~* '^https?://[^[:space:]]+$'::"text")))),
     CONSTRAINT "experience_required_fields_nonblank_check" CHECK ((("btrim"("company") <> ''::"text") AND ("btrim"("role") <> ''::"text") AND ("btrim"("period") <> ''::"text"))),
     CONSTRAINT "experience_sort_order_nonnegative_check" CHECK (("sort_order" >= 0))
 );
 
 
 ALTER TABLE "portfolio"."experience" OWNER TO "postgres";
+
+
+COMMENT ON COLUMN "portfolio"."experience"."company_url" IS 'Public website for the employer or the customer-facing product associated with the role.';
+
+
+
+COMMENT ON COLUMN "portfolio"."experience"."company_linkedin_url" IS 'LinkedIn company page or organization profile associated with the experience.';
+
 
 
 CREATE TABLE IF NOT EXISTS "portfolio"."hero" (

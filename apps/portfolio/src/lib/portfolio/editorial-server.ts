@@ -342,6 +342,8 @@ const loadEditorialPortfolioData =
       experience: castData<ExperienceRow[]>(experienceResult.data ?? []).map(
         (row) => ({
           company: row.company,
+          companyUrl: row.company_url,
+          companyLinkedInUrl: row.company_linkedin_url,
           role: row.role,
           period: row.period,
           location: row.location ?? "",

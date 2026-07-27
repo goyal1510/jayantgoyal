@@ -70,6 +70,8 @@ export function ExperienceList({ initialData }: ExperienceListProps) {
     setEditingItem(item);
     setFormData({
       company: item.company,
+      company_url: item.company_url,
+      company_linkedin_url: item.company_linkedin_url,
       role: item.role,
       period: item.period,
       location: item.location ?? "",

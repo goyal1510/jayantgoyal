@@ -104,6 +104,8 @@ export type PortfolioEducationPublicRow = Pick<
 export interface PortfolioExperienceRecord {
   id: string;
   company: string;
+  company_url: string | null;
+  company_linkedin_url: string | null;
   role: string;
   period: string;
   location: string | null;
@@ -117,7 +119,14 @@ export interface PortfolioExperienceRecord {
 
 export type PortfolioExperiencePublicRow = Pick<
   PortfolioExperienceRecord,
-  "company" | "role" | "period" | "location" | "summary" | "bullets"
+  | "company"
+  | "company_url"
+  | "company_linkedin_url"
+  | "role"
+  | "period"
+  | "location"
+  | "summary"
+  | "bullets"
 >;
 
 export interface PortfolioSkillCategoryRecord {
@@ -343,7 +352,8 @@ export const PORTFOLIO_SELECT_COLUMNS: Record<PortfolioTable, string> = {
   hero: "name, display_name, role, tagline, blurb, headline, current_title, availability, resume_url, github_username, seo_title, seo_description",
   about: "headline, objective, summary, story, personal, principles",
   education: "school, degree, period, location, detail",
-  experience: "company, role, period, location, summary, bullets",
+  experience:
+    "company, company_url, company_linkedin_url, role, period, location, summary, bullets",
   skill_categories: "id, title, description",
   skills: "category_id, name, proficiency, evidence",
   work:
@@ -364,7 +374,7 @@ export const PORTFOLIO_ADMIN_SELECT_COLUMNS: Record<PortfolioTable, string> = {
   education:
     "id, school, degree, period, location, detail, sort_order, is_visible, created_at, updated_at",
   experience:
-    "id, company, role, period, location, summary, bullets, sort_order, is_visible, created_at, updated_at",
+    "id, company, company_url, company_linkedin_url, role, period, location, summary, bullets, sort_order, is_visible, created_at, updated_at",
   skill_categories:
     "id, title, description, sort_order, is_visible, created_at, updated_at",
   skills:

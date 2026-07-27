@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   isPortfolioSectionKey,
+  isValidLinkedInProfileUrl,
   isValidPublicUrl,
   isSkillProficiency,
   readPersonalInfo,
@@ -165,6 +166,17 @@ describe("portfolio data guards", () => {
     expect(isValidPublicUrl("/uploads/image.png")).toBe(true);
     expect(isValidPublicUrl("//evil.example/image.png")).toBe(false);
     expect(isValidPublicUrl("javascript:alert(1)")).toBe(false);
+    expect(
+      isValidLinkedInProfileUrl("https://www.linkedin.com/company/codesyncai/"),
+    ).toBe(true);
+    expect(
+      isValidLinkedInProfileUrl(
+        "https://in.linkedin.com/in/desire-foundation-915599106/",
+      ),
+    ).toBe(true);
+    expect(isValidLinkedInProfileUrl("https://example.com/company/acme")).toBe(
+      false,
+    );
 
     expect(
       validatePortfolioWriteInput(
@@ -212,6 +224,42 @@ describe("portfolio data guards", () => {
         "update",
       ),
     ).toEqual(["live_link must be a valid http(s) URL or site path"]);
+
+    expect(
+      validatePortfolioWriteInput(
+        "experience",
+        { company_url: "javascript:alert(1)" },
+        "update",
+      ),
+    ).toEqual(["company_url must be a valid http(s) URL or site path"]);
+
+    expect(
+      validatePortfolioWriteInput(
+        "experience",
+        { company_url: "https://www.codesync.ai/" },
+        "update",
+      ),
+    ).toEqual([]);
+
+    expect(
+      validatePortfolioWriteInput(
+        "experience",
+        { company_linkedin_url: "https://example.com/company/codesyncai" },
+        "update",
+      ),
+    ).toEqual([
+      "company_linkedin_url must be a valid LinkedIn company or profile URL",
+    ]);
+
+    expect(
+      validatePortfolioWriteInput(
+        "experience",
+        {
+          company_linkedin_url: "https://www.linkedin.com/company/codesyncai/",
+        },
+        "update",
+      ),
+    ).toEqual([]);
 
     expect(
       validatePortfolioWriteInput(

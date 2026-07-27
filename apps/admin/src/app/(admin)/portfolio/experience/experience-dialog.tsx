@@ -26,6 +26,8 @@ export type ExperienceFormData = Omit<
 
 export const emptyExperienceForm: ExperienceFormData = {
   company: "",
+  company_url: null,
+  company_linkedin_url: null,
   role: "",
   period: "",
   location: "",
@@ -114,6 +116,38 @@ export function ExperienceDialog({
                   }
                   placeholder="Senior Software Engineer"
                   required
+                />
+              </div>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="company_url">Company or product website</Label>
+                <Input
+                  id="company_url"
+                  type="url"
+                  value={formData.company_url ?? ""}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      company_url: e.target.value || null,
+                    })
+                  }
+                  placeholder="https://www.example.com/"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="company_linkedin_url">LinkedIn profile</Label>
+                <Input
+                  id="company_linkedin_url"
+                  type="url"
+                  value={formData.company_linkedin_url ?? ""}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      company_linkedin_url: e.target.value || null,
+                    })
+                  }
+                  placeholder="https://www.linkedin.com/company/example/"
                 />
               </div>
             </div>
