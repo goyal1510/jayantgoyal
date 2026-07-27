@@ -1509,6 +1509,60 @@ main footer[id] {
   line-height: 0.88;
 }
 
+.experience-stop__company-link {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.18em;
+  color: inherit;
+  text-decoration: none;
+  text-decoration-color: var(--signal);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.12em;
+}
+
+.experience-stop__company-link:hover,
+.experience-stop__company-link:focus-visible {
+  text-decoration-line: underline;
+}
+
+.experience-stop__company-link svg {
+  width: 0.42em;
+  height: 0.42em;
+  flex: 0 0 auto;
+  margin-top: 0.12em;
+  color: var(--signal);
+  transition: transform 160ms ease;
+}
+
+.experience-stop__company-link:hover svg,
+.experience-stop__company-link:focus-visible svg {
+  transform: translate(2px, -2px);
+}
+
+.experience-stop__linkedin-link {
+  display: inline-flex;
+  width: 0.52em;
+  height: 0.52em;
+  margin-left: 0.2em;
+  color: var(--signal);
+  text-decoration: none;
+  vertical-align: 0.04em;
+  transition:
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.experience-stop__linkedin-link:hover,
+.experience-stop__linkedin-link:focus-visible {
+  color: var(--ink);
+  transform: translateY(-2px);
+}
+
+.experience-stop__linkedin-link svg {
+  width: 100%;
+  height: 100%;
+}
+
 .experience-stop__role {
   margin: 0;
   color: var(--signal);
