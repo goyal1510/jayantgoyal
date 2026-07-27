@@ -47,6 +47,8 @@ const PORTFOLIO_WRITE_KEYS: Record<PortfolioTable, readonly string[]> = {
   ],
   experience: [
     "company",
+    "company_url",
+    "company_linkedin_url",
     "role",
     "period",
     "location",
@@ -157,6 +159,7 @@ const PORTFOLIO_REQUIRED_CREATE_KEYS: Partial<
 
 const PORTFOLIO_URL_KEYS: Partial<Record<PortfolioTable, readonly string[]>> = {
   hero: ["resume_url"],
+  experience: ["company_url"],
   work: ["image_url", "github_link", "live_link"],
   certificates: ["credential_url", "document_url", "preview_url"],
 };
@@ -172,6 +175,19 @@ export function isValidPublicUrl(value: unknown): value is string {
   } catch {
     return false;
   }
+}
+
+export function isValidLinkedInProfileUrl(value: unknown): value is string {
+  if (!isValidPublicUrl(value) || value.startsWith("/")) return false;
+
+  const url = new URL(value);
+  const hostname = url.hostname.toLowerCase();
+
+  return (
+    url.protocol === "https:" &&
+    (hostname === "linkedin.com" || hostname.endsWith(".linkedin.com")) &&
+    /^\/(?:company|in)\/[^/]+\/?$/.test(url.pathname)
+  );
 }
 
 export function isStringArray(value: unknown): value is string[] {
@@ -240,6 +256,20 @@ export function validatePortfolioWriteInput(
     if (field === undefined || field === null || field === "") continue;
     if (!isValidPublicUrl(field)) {
       errors.push(`${key} must be a valid http(s) URL or site path`);
+    }
+  }
+
+  if (portfolioTable === "experience") {
+    const linkedInUrl = value.company_linkedin_url;
+    if (
+      linkedInUrl !== undefined &&
+      linkedInUrl !== null &&
+      linkedInUrl !== "" &&
+      !isValidLinkedInProfileUrl(linkedInUrl)
+    ) {
+      errors.push(
+        "company_linkedin_url must be a valid LinkedIn company or profile URL",
+      );
     }
   }
 

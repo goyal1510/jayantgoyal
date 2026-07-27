@@ -45,6 +45,8 @@ type PortfolioEducation = {
 type PortfolioExperience = {
   period: string;
   company: string;
+  companyUrl: string | null;
+  companyLinkedInUrl: string | null;
   role: string;
   location: string;
   summary: string;
