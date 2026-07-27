@@ -1501,7 +1501,7 @@ main footer[id] {
 }
 
 .experience-stop h3 {
-  margin: 0 0 12px;
+  margin: 0 0 10px;
   font-family: var(--font-serif), serif;
   font-size: clamp(2.8rem, 3.6vw, 4.8rem);
   font-weight: 400;
@@ -1509,58 +1509,49 @@ main footer[id] {
   line-height: 0.88;
 }
 
-.experience-stop__company-link {
+.experience-stop__company-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  align-items: center;
+  margin: 0 0 14px;
+}
+
+.experience-stop:nth-child(odd) .experience-stop__company-links {
+  justify-content: flex-end;
+}
+
+.experience-stop__company-links a {
   display: inline-flex;
-  align-items: flex-start;
-  gap: 0.18em;
-  color: inherit;
-  text-decoration: none;
-  text-decoration-color: var(--signal);
-  text-decoration-thickness: 2px;
-  text-underline-offset: 0.12em;
+  gap: 5px;
+  align-items: center;
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--line);
+  color: var(--folio-muted);
+  font-size: 0.72rem;
+  font-weight: 620;
+  letter-spacing: 0.035em;
+  line-height: 1.2;
+  transition:
+    border-color 160ms ease,
+    color 160ms ease;
 }
 
-.experience-stop__company-link:hover,
-.experience-stop__company-link:focus-visible {
-  text-decoration-line: underline;
-}
-
-.experience-stop__company-link svg {
-  width: 0.42em;
-  height: 0.42em;
-  flex: 0 0 auto;
-  margin-top: 0.12em;
+.experience-stop__company-links a:hover,
+.experience-stop__company-links a:focus-visible {
+  border-color: var(--signal);
   color: var(--signal);
+}
+
+.experience-stop__company-links svg {
+  width: 12px;
+  height: 12px;
   transition: transform 160ms ease;
 }
 
-.experience-stop__company-link:hover svg,
-.experience-stop__company-link:focus-visible svg {
+.experience-stop__company-links a:hover svg,
+.experience-stop__company-links a:focus-visible svg {
   transform: translate(2px, -2px);
-}
-
-.experience-stop__linkedin-link {
-  display: inline-flex;
-  width: 0.52em;
-  height: 0.52em;
-  margin-left: 0.2em;
-  color: var(--signal);
-  text-decoration: none;
-  vertical-align: 0.04em;
-  transition:
-    color 160ms ease,
-    transform 160ms ease;
-}
-
-.experience-stop__linkedin-link:hover,
-.experience-stop__linkedin-link:focus-visible {
-  color: var(--ink);
-  transform: translateY(-2px);
-}
-
-.experience-stop__linkedin-link svg {
-  width: 100%;
-  height: 100%;
 }
 
 .experience-stop__role {
@@ -3650,6 +3641,10 @@ main footer[id] {
 
   .experience-stop h3 {
     font-size: clamp(2.55rem, 11vw, 3.4rem);
+  }
+
+  .experience-stop:nth-child(n) .experience-stop__company-links {
+    justify-content: flex-start;
   }
 
   .experience-stop:nth-child(odd) li {

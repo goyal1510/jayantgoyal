@@ -5,8 +5,9 @@
 - Problem: Experience entries show company names as plain text, so visitors
   cannot open the corresponding company or product websites.
 - Current approach: Add a database-backed company URL to experience records,
-  render company names as safe external links, expose the field in Admin, and
-  populate CodeSync.ai, HighRadius, and Desire Foundation URLs.
+  render dedicated website and LinkedIn actions below each company name, expose
+  the fields in Admin, and populate CodeSync.ai, HighRadius, and Desire
+  Foundation URLs.
 - Key decision: Keep `Neuraoak Technologies Private Limited` as the official
   employer name while linking it to `https://www.codesync.ai/`, the product
   platform Jayant works on.
@@ -19,8 +20,8 @@
     one-row updates in the migration.
   - Added the field to shared CMS contracts, Admin validation/selects, and the
     Experience editor.
-  - Rendered company names as accessible external links with a visible
-    directional affordance while retaining plain text when no URL exists.
+  - Rendered accessible external actions below each company name while
+    retaining plain text when no URL exists.
 - LinkedIn audit: The CodeSync company page currently has 8 followers, no
   posts, a one-line overview, and a medical-coding-only tagline that does not
   represent the end-to-end RCM positioning on `codesync.ai`.
@@ -40,6 +41,10 @@
 - Shipping preparation: Reviewed the complete diff for unrelated formatting,
   generated artifacts, credentials, service-role exposure, unsafe URLs, and
   database scope before creating the commit series.
+- Link presentation revision: Kept each company name as a plain heading and
+  moved the destinations to a dedicated row immediately below it. The row uses
+  the explicit text actions `About Company` and `LinkedIn`, each with a small
+  external-link arrow, so neither destination competes with the employer name.
 - Validation: Ran the repository formatter across every changed TypeScript,
   TSX, CSS, and session file. The migration remains intentionally reviewed as
   SQL because the repository formatter has no SQL parser.

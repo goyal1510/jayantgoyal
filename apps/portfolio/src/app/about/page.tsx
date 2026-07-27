@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowUpRight, FileText, Linkedin, Mail } from "lucide-react";
+import { ArrowUpRight, FileText, Mail } from "lucide-react";
 
 import { CertificateDeck } from "@/components/editorial/certificate-deck";
 import { EditorialSubpageHeader } from "@/components/editorial/subpage-header";
@@ -133,33 +133,36 @@ export default async function AboutPage() {
                 <article>
                   <span className="experience-stop__period">{item.period}</span>
                   <div className="experience-stop__story">
-                    <h3>
-                      {item.companyUrl ? (
-                        <a
-                          className="experience-stop__company-link"
-                          href={item.companyUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          aria-label={`${item.company} website (opens in a new tab)`}
-                        >
-                          <span>{item.company}</span>
-                          <ArrowUpRight aria-hidden="true" />
-                        </a>
-                      ) : (
-                        item.company
-                      )}
-                      {item.companyLinkedInUrl ? (
-                        <a
-                          className="experience-stop__linkedin-link"
-                          href={item.companyLinkedInUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          aria-label={`${item.company} LinkedIn profile (opens in a new tab)`}
-                        >
-                          <Linkedin aria-hidden="true" />
-                        </a>
-                      ) : null}
-                    </h3>
+                    <h3>{item.company}</h3>
+                    {item.companyUrl || item.companyLinkedInUrl ? (
+                      <div
+                        className="experience-stop__company-links"
+                        aria-label={`${item.company} links`}
+                      >
+                        {item.companyUrl ? (
+                          <a
+                            href={item.companyUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            aria-label={`About ${item.company} (opens in a new tab)`}
+                          >
+                            <span>About Company</span>
+                            <ArrowUpRight aria-hidden="true" />
+                          </a>
+                        ) : null}
+                        {item.companyLinkedInUrl ? (
+                          <a
+                            href={item.companyLinkedInUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            aria-label={`${item.company} on LinkedIn (opens in a new tab)`}
+                          >
+                            <span>LinkedIn</span>
+                            <ArrowUpRight aria-hidden="true" />
+                          </a>
+                        ) : null}
+                      </div>
+                    ) : null}
                     <p className="experience-stop__role">
                       {item.role} · {item.location}
                     </p>
