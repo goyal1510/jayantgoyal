@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { StudioInventory } from "@/components/studio/studio-inventory";
 import {
   DEFAULT_OG_IMAGE,
+  DEFAULT_OG_IMAGE_METADATA,
   SITE_DESCRIPTION,
   SITE_TITLE,
   SITE_URL,
@@ -19,10 +20,10 @@ export const metadata: Metadata = {
     images: [
       {
         url: DEFAULT_OG_IMAGE,
-        width: 1200,
-        height: 630,
-        alt: SITE_TITLE,
-        type: "image/png",
+        width: DEFAULT_OG_IMAGE_METADATA.width,
+        height: DEFAULT_OG_IMAGE_METADATA.height,
+        alt: DEFAULT_OG_IMAGE_METADATA.alt,
+        type: DEFAULT_OG_IMAGE_METADATA.type,
       },
     ],
   },

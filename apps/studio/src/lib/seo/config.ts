@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 
-import { APP_BRANDS, PERSON_BRAND } from "@repo/brand";
+import {
+  APP_BRANDS,
+  APP_SOCIAL_PREVIEW_IMAGES,
+  PERSON_BRAND,
+} from "@repo/brand";
 import {
   buildPublicPageMetadata as buildSharedPageMetadata,
   isCanonicalApplicationHost,
@@ -19,7 +23,8 @@ export const SITE_NAME = STUDIO_BRAND.publicName;
 export const SITE_TITLE = STUDIO_BRAND.defaultTitle;
 export const SITE_TITLE_TEMPLATE = STUDIO_BRAND.titleTemplate;
 export const SITE_DESCRIPTION = STUDIO_BRAND.description;
-export const DEFAULT_OG_IMAGE = `${SITE_URL}/opengraph-image?v=6`;
+export const DEFAULT_OG_IMAGE = APP_SOCIAL_PREVIEW_IMAGES.studio.url;
+export const DEFAULT_OG_IMAGE_METADATA = APP_SOCIAL_PREVIEW_IMAGES.studio;
 export const LAST_SIGNIFICANT_UPDATE = "2026-07-17T00:00:00.000Z";
 
 const INDEXABLE_EXACT_PATHS = ["/", "/terms-conditions"] as const;
@@ -66,9 +71,9 @@ export function buildPublicPageMetadata({
     pathname,
     image: DEFAULT_OG_IMAGE,
     imageMetadata: {
-      width: 1200,
-      height: 630,
-      type: "image/png",
+      width: DEFAULT_OG_IMAGE_METADATA.width,
+      height: DEFAULT_OG_IMAGE_METADATA.height,
+      type: DEFAULT_OG_IMAGE_METADATA.type,
     },
   });
 }

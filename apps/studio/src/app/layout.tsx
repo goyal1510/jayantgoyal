@@ -14,6 +14,7 @@ import { ToastSoundProvider } from "@/components/providers/toast-sound-provider"
 import { PORTFOLIO_URL } from "@/lib/platform/urls";
 import {
   DEFAULT_OG_IMAGE,
+  DEFAULT_OG_IMAGE_METADATA,
   isIndexablePath,
   isProductionStudioHost,
   normalizePathname,
@@ -57,10 +58,10 @@ const baseMetadata: Metadata = {
     images: [
       {
         url: DEFAULT_OG_IMAGE,
-        width: 1200,
-        height: 630,
-        alt: SITE_TITLE,
-        type: "image/png",
+        width: DEFAULT_OG_IMAGE_METADATA.width,
+        height: DEFAULT_OG_IMAGE_METADATA.height,
+        alt: DEFAULT_OG_IMAGE_METADATA.alt,
+        type: DEFAULT_OG_IMAGE_METADATA.type,
       },
     ],
   },

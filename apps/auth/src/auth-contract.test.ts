@@ -171,4 +171,26 @@ describe("standalone Auth application contract", () => {
     expect(configuration).not.toContain("googletagmanager");
     expect(configuration).not.toContain("google-analytics");
   });
+
+  it("serves public landing previews without indexing security routes", () => {
+    const homePage = readFileSync(`${sourceRoot}/app/page.tsx`, "utf8");
+    const configuration = readFileSync(`${appRoot}/next.config.ts`, "utf8");
+    const robots = readFileSync(`${sourceRoot}/app/robots.ts`, "utf8");
+
+    expect(homePage).toContain('if (user) redirect("/account/security")');
+    expect(homePage).toContain("<AuthWelcomeShell>");
+    expect(homePage).toContain("<WelcomeForm");
+    expect(configuration).toContain(
+      '{ key: "X-Robots-Tag", value: "index, follow" }',
+    );
+    expect(configuration).toContain(
+      '{ source: "/", headers: publicPreviewHeaders }',
+    );
+    expect(configuration).toContain(
+      '{ source: "/welcome", headers: publicPreviewHeaders }',
+    );
+    expect(robots).toContain('allow: ["/", "/welcome"]');
+    expect(robots).toContain('"/account/"');
+    expect(robots).toContain('"/callback"');
+  });
 });

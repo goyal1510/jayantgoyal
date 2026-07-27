@@ -46,6 +46,39 @@ export const APP_BRANDS = {
   },
 } as const;
 
+const SOCIAL_PREVIEW_VERSION = "20260727";
+
+export const APP_SOCIAL_PREVIEW_IMAGES = {
+  portfolio: {
+    url: `${PERSON_BRAND.canonicalUrl}/images/social/portfolio-preview.jpg?v=${SOCIAL_PREVIEW_VERSION}`,
+    width: 1200,
+    height: 630,
+    type: "image/jpeg",
+    alt: `${PERSON_BRAND.fullName}'s Software Engineer portfolio`,
+  },
+  studio: {
+    url: `${PERSON_BRAND.canonicalUrl}/images/social/studio-preview.jpg?v=${SOCIAL_PREVIEW_VERSION}`,
+    width: 1200,
+    height: 630,
+    type: "image/jpeg",
+    alt: `Studio apps, tools, and experiments by ${PERSON_BRAND.fullName}`,
+  },
+  admin: {
+    url: `${PERSON_BRAND.canonicalUrl}/images/social/admin-preview.jpg?v=${SOCIAL_PREVIEW_VERSION}`,
+    width: 1200,
+    height: 630,
+    type: "image/jpeg",
+    alt: `Admin content management system by ${PERSON_BRAND.fullName}`,
+  },
+  auth: {
+    url: `${PERSON_BRAND.canonicalUrl}/images/social/auth-preview.jpg?v=${SOCIAL_PREVIEW_VERSION}`,
+    width: 1200,
+    height: 630,
+    type: "image/jpeg",
+    alt: `Auth account security application by ${PERSON_BRAND.fullName}`,
+  },
+} as const;
+
 export type AppBrandId = keyof typeof APP_BRANDS;
 export type AppBrand = (typeof APP_BRANDS)[AppBrandId];
 

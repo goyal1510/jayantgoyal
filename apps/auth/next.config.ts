@@ -40,6 +40,8 @@ const securityHeaders = [
   },
 ];
 
+const publicPreviewHeaders = [{ key: "X-Robots-Tag", value: "index, follow" }];
+
 const nextConfig: NextConfig = {
   allowedDevOrigins,
   transpilePackages: [
@@ -50,7 +52,11 @@ const nextConfig: NextConfig = {
   ],
   typescript: { ignoreBuildErrors: true },
   async headers() {
-    return [{ source: "/(.*)", headers: securityHeaders }];
+    return [
+      { source: "/(.*)", headers: securityHeaders },
+      { source: "/", headers: publicPreviewHeaders },
+      { source: "/welcome", headers: publicPreviewHeaders },
+    ];
   },
 };
 

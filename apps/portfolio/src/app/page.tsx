@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { PortfolioExperience } from "@/components/editorial/portfolio-experience";
 import { getPublishedWritingPreviews } from "@/lib/writing/editorial-queries";
 import { getEditorialPortfolioData } from "@/lib/portfolio/editorial-server";
-import { DEFAULT_OG_IMAGE } from "@/lib/seo/config";
+import { DEFAULT_OG_IMAGE, DEFAULT_OG_IMAGE_METADATA } from "@/lib/seo/config";
 
 export const dynamic = "force-dynamic";
 
@@ -21,9 +21,10 @@ export async function generateMetadata(): Promise<Metadata> {
       images: [
         {
           url: DEFAULT_OG_IMAGE,
-          width: 1200,
-          height: 630,
-          alt: profile.seoTitle,
+          width: DEFAULT_OG_IMAGE_METADATA.width,
+          height: DEFAULT_OG_IMAGE_METADATA.height,
+          type: DEFAULT_OG_IMAGE_METADATA.type,
+          alt: DEFAULT_OG_IMAGE_METADATA.alt,
         },
       ],
     },

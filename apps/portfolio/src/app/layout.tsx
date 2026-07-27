@@ -11,6 +11,7 @@ import { PortfolioAnalytics } from "@/components/editorial/portfolio-analytics";
 import { getPortfolioShellData } from "@/lib/portfolio/editorial-server";
 import {
   DEFAULT_OG_IMAGE,
+  DEFAULT_OG_IMAGE_METADATA,
   isCanonicalProductionHost,
   SITE_NAME,
   SITE_TITLE_TEMPLATE,
@@ -71,9 +72,10 @@ export async function generateMetadata(): Promise<Metadata> {
       images: [
         {
           url: DEFAULT_OG_IMAGE,
-          width: 1200,
-          height: 630,
-          alt: profile.seoTitle,
+          width: DEFAULT_OG_IMAGE_METADATA.width,
+          height: DEFAULT_OG_IMAGE_METADATA.height,
+          type: DEFAULT_OG_IMAGE_METADATA.type,
+          alt: DEFAULT_OG_IMAGE_METADATA.alt,
         },
       ],
     },

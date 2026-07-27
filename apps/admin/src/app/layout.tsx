@@ -1,11 +1,17 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, Manrope } from "next/font/google";
-import { APP_BRANDS, BRAND_ASSET_PATHS } from "@repo/brand";
+import {
+  APP_BRANDS,
+  APP_SOCIAL_PREVIEW_IMAGES,
+  BRAND_ASSET_PATHS,
+  PERSON_BRAND,
+} from "@repo/brand";
 import { ThemeProvider } from "@repo/ui/theme-provider";
 import { Toaster } from "@repo/ui/sonner";
 
 const ADMIN_BRAND = APP_BRANDS.admin;
+const ADMIN_PREVIEW = APP_SOCIAL_PREVIEW_IMAGES.admin;
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -21,11 +27,31 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(ADMIN_BRAND.canonicalUrl),
   title: {
     default: ADMIN_BRAND.defaultTitle,
     template: ADMIN_BRAND.titleTemplate,
   },
   description: ADMIN_BRAND.description,
+  applicationName: ADMIN_BRAND.publicName,
+  authors: [{ name: PERSON_BRAND.fullName, url: PERSON_BRAND.canonicalUrl }],
+  creator: PERSON_BRAND.fullName,
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "/",
+    siteName: PERSON_BRAND.fullName,
+    title: ADMIN_BRAND.defaultTitle,
+    description: ADMIN_BRAND.description,
+    images: [ADMIN_PREVIEW],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: ADMIN_BRAND.defaultTitle,
+    description: ADMIN_BRAND.description,
+    images: [ADMIN_PREVIEW.url],
+  },
   robots: {
     index: false,
     follow: false,

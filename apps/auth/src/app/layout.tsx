@@ -3,11 +3,17 @@ import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Mono, Instrument_Serif, Manrope } from "next/font/google";
 
-import { APP_BRANDS, BRAND_ASSET_PATHS, PERSON_BRAND } from "@repo/brand";
+import {
+  APP_BRANDS,
+  APP_SOCIAL_PREVIEW_IMAGES,
+  BRAND_ASSET_PATHS,
+  PERSON_BRAND,
+} from "@repo/brand";
 import { Toaster } from "@repo/ui/sonner";
 import { ThemeProvider } from "@repo/ui/theme-provider";
 
 const AUTH_BRAND = APP_BRANDS.auth;
+const AUTH_PREVIEW = APP_SOCIAL_PREVIEW_IMAGES.auth;
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -40,28 +46,21 @@ export const metadata: Metadata = {
   authors: [{ name: PERSON_BRAND.fullName, url: PERSON_BRAND.canonicalUrl }],
   creator: PERSON_BRAND.fullName,
   keywords: ["secure sign in", "account security", "Jayant"],
-  alternates: { canonical: "/welcome" },
+  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "/welcome",
+    url: "/",
     siteName: PERSON_BRAND.fullName,
     title: AUTH_BRAND.defaultTitle,
     description: AUTH_BRAND.description,
-    images: [
-      {
-        url: "/assets/auth-welcome-art.png",
-        width: 1122,
-        height: 1402,
-        alt: "Abstract folded paper sculpture on a dark architectural plinth",
-      },
-    ],
+    images: [AUTH_PREVIEW],
   },
   twitter: {
     card: "summary_large_image",
     title: AUTH_BRAND.defaultTitle,
     description: AUTH_BRAND.description,
-    images: ["/assets/auth-welcome-art.png"],
+    images: [AUTH_PREVIEW.url],
   },
   icons: {
     icon: [

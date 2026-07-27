@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { APP_BRANDS, formatAppPageTitle, PERSON_BRAND } from "./index";
+import {
+  APP_BRANDS,
+  APP_SOCIAL_PREVIEW_IMAGES,
+  formatAppPageTitle,
+  PERSON_BRAND,
+} from "./index";
 
 describe("canonical platform branding", () => {
   it("uses the full public identity in app-level metadata", () => {
@@ -41,5 +46,16 @@ describe("canonical platform branding", () => {
     expect(APP_BRANDS.auth.titleTemplate).toBe("%s | Auth");
     expect(formatAppPageTitle("studio", "Weather")).not.toContain(" by ");
     expect(formatAppPageTitle("admin", "Deployments")).not.toContain(" by ");
+  });
+
+  it("uses canonical screenshot crops for application link previews", () => {
+    for (const preview of Object.values(APP_SOCIAL_PREVIEW_IMAGES)) {
+      expect(preview.url).toMatch(
+        /^https:\/\/jayantgoyal\.com\/images\/social\/.+-preview\.jpg\?v=\d+$/,
+      );
+      expect(preview.width).toBe(1200);
+      expect(preview.height).toBe(630);
+      expect(preview.type).toBe("image/jpeg");
+    }
   });
 });
