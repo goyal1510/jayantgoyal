@@ -70,7 +70,7 @@ main footer[id] {
 }
 
 .shell {
-  width: min(calc(100% - 48px), 1440px);
+  width: calc(100% - clamp(48px, 8vw, 160px));
   margin-inline: auto;
 }
 
@@ -305,6 +305,9 @@ main footer[id] {
 
 .hero-note {
   position: relative;
+  width: 100%;
+  max-width: 560px;
+  justify-self: end;
   padding: clamp(30px, 3.2vw, 48px);
   background: var(--signal-soft);
   box-shadow: 0 22px 60px rgba(80, 35, 24, 0.16);
@@ -3058,7 +3061,7 @@ main footer[id] {
 
 @media (max-width: 760px) {
   .shell {
-    width: min(calc(100% - 32px), 1440px);
+    width: calc(100% - 32px);
   }
 
   .editorial-page-hero > div {
@@ -3771,7 +3774,7 @@ main footer[id] {
 
 @media (max-width: 420px) {
   .shell {
-    width: min(calc(100% - 24px), 1440px);
+    width: calc(100% - 24px);
   }
 
   .hero__type h1 {
