@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { CursorOrbit } from "@/components/editorial/cursor-orbit";
 import { EditorialReveal } from "@/components/editorial/editorial-reveal";
+import { GithubActivity } from "@/components/editorial/github-activity";
 import { PortfolioNavigation } from "@/components/editorial/portfolio-navigation";
 import { FeaturedWork } from "@/components/editorial/work-showcase";
 import type {
@@ -260,6 +261,9 @@ export function PortfolioExperience({
 
       {sectionContent.work.isVisible ? (
         <FeaturedWork work={work} content={sectionContent.work} />
+      ) : null}
+      {sectionContent.activity.isVisible ? (
+        <GithubActivity profile={profile} content={sectionContent.activity} />
       ) : null}
       {sectionContent.writing.isVisible ? (
         <WritingSection
