@@ -7,6 +7,11 @@ async function configuredRedirects() {
   return nextConfig.redirects();
 }
 
+async function configuredHeaders() {
+  if (!nextConfig.headers) throw new Error("Headers are not configured");
+  return nextConfig.headers();
+}
+
 describe("Portfolio compatibility redirects", () => {
   it("consolidates public Studio pages with permanent redirects", async () => {
     const redirects = await configuredRedirects();
@@ -44,6 +49,7 @@ describe("Portfolio compatibility redirects", () => {
 
     expect(sources).not.toContain("/api/contact");
     expect(sources).not.toContain("/api/github-stats");
+    expect(sources).not.toContain("/api/github-contributions");
     expect(sources).not.toContain("/api/github-loc");
     expect(sources).not.toContain("/api/resume");
   });
@@ -117,5 +123,20 @@ describe("Portfolio compatibility redirects", () => {
       destination: "/work/auth",
       permanent: true,
     });
+  });
+});
+
+describe("Portfolio security headers", () => {
+  it("allows the Cloudflare Web Analytics beacon without exposing GitHub APIs to the browser", async () => {
+    const headers = await configuredHeaders();
+    const globalHeaders = headers.find((entry) => entry.source === "/(.*)");
+    const csp = globalHeaders?.headers.find(
+      (header) => header.key === "Content-Security-Policy",
+    )?.value;
+
+    expect(csp).toContain("https://static.cloudflareinsights.com");
+    expect(csp).toContain("https://cloudflareinsights.com");
+    expect(csp).not.toContain("github-contributions-api.jogruber.de");
+    expect(csp).not.toContain("https://api.github.com");
   });
 });

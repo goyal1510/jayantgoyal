@@ -81,11 +81,11 @@ const securityHeaders = [
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://static.cloudflareinsights.com",
       "style-src 'self' 'unsafe-inline'",
       "font-src 'self' data:",
       "img-src 'self' data: blob: https://avatars.githubusercontent.com https://*.supabase.co",
-      "connect-src 'self' https://*.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://api.resend.com https://github-contributions-api.jogruber.de https://api.github.com",
+      "connect-src 'self' https://*.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://api.resend.com https://cloudflareinsights.com",
       "frame-src 'self'",
       "object-src 'none'",
       "base-uri 'self'",
