@@ -70,3 +70,18 @@
 - Final validation passed: Portfolio build, type checking, zero-warning lint, focused Prettier check, and the full 63-file/305-test Vitest suite.
 - Completed the required side-by-side design QA loop; the first spacing mismatch was corrected and `design-qa.md` records a final passed result with only optional P3 polish remaining.
 - Regenerated the workspace lockfile offline after formatting had caused unrelated churn; its final diff is limited to the two restored Portfolio dependencies. The lockfile retains pnpm's repository-native YAML style, so it is intentionally excluded from the Prettier check.
+
+## Production follow-up — 2026-08-12
+
+- Production reported two console failures: Cloudflare's automatically injected Web Analytics beacon was blocked by Portfolio CSP, and the browser-side `jogruber.de` contribution API returned HTTP 500.
+- Added Cloudflare's documented Web Analytics script and collection origins to `script-src` and `connect-src`.
+- Removed third-party contribution and GitHub API origins from browser `connect-src` because GitHub data now stays behind same-origin server routes.
+- Replaced the visitor-side contribution request with a cached `/api/github-contributions` route backed by GitHub's official GraphQL `contributionsCollection` and the server-only `GITHUB_TOKEN`.
+- Switched the UI from `react-github-calendar` to the data-only `react-activity-calendar`, preserving the selected design while rendering same-origin API data.
+- Provider or token failures now return a cache-disabled, HTTP 200 unavailable state so the section degrades without producing another failed-resource console error.
+- Added focused period, contribution-level mapping, authenticated GraphQL request, and CSP regression tests.
+- Added the contribution route to the compatibility-redirect regression coverage so it remains Portfolio-owned.
+- Typed the GraphQL fetch mock against the native `fetch` signature after the first type-check exposed an untyped Vitest call tuple; focused tests and lint already passed.
+- Final validation passed: Portfolio build, type checking, zero-warning lint, and the full 64-file/309-test suite; the production build includes `/api/github-contributions` as a dynamic route.
+- Local API and browser QA returned 764 rolling-year contributions and 282 contributions for 2025 from the authenticated GraphQL calendar, preserved the period interaction, rejected malformed usernames with HTTP 400, emitted the updated CSP, and produced no browser console warnings or errors.
+- GitHub's public HTML summary currently reports 289 for 2025 while the official GraphQL calendar returns 282 despite the token authenticating as `goyal1510`; GraphQL also reports restricted contributions for the period. The UI intentionally renders the provider's day-level GraphQL total so its summary remains consistent with the displayed cells, and no token value was logged.
