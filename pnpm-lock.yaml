@@ -211,12 +211,12 @@ importers:
       react:
         specifier: ^19.2.1
         version: 19.2.1
+      react-activity-calendar:
+        specifier: ^3.0.5
+        version: 3.0.5(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       react-dom:
         specifier: ^19.2.1
         version: 19.2.1(react@19.2.1)
-      react-github-calendar:
-        specifier: ^5.0.4
-        version: 5.0.4(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       react-markdown:
         specifier: ^10.1.0
         version: 10.1.0(@types/react@19.2.2)(react@19.2.1)
