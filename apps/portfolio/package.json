@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@repo/brand": "workspace:*",
+    "@repo/github": "workspace:*",
     "@repo/platform": "workspace:*",
     "@repo/portfolio-data": "workspace:*",
     "@repo/seo": "workspace:*",
@@ -20,6 +21,7 @@
     "next": "^16.2.10",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
+    "react-github-calendar": "^5.0.4",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
     "resend": "^6.17.2"
