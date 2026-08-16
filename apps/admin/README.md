@@ -1,136 +1,81 @@
-# Admin Panel
+# Admin
 
-Administrative dashboard for managing portfolio data and users.
+Private administration application for Portfolio content, accounts, and Vercel
+operations.
 
-**Live**: [admin.jayantgoyal.com](https://admin.jayantgoyal.com)
+- Production: [admin.jayantgoyal.com](https://admin.jayantgoyal.com)
+- Package/filter: `admin`
+- Local port: `3002`
+- Access: `admin` or `super_admin`
 
-## Features
+## Active Workspaces
 
-- Manage all portfolio sections from a single dashboard
-- User management with role-based access
-- Real-time data updates
-- Dark/light theme support
-- Responsive sidebar navigation
+| Workspace          | Route                   | Ownership                                       |
+| ------------------ | ----------------------- | ----------------------------------------------- |
+| Portfolio overview | `/portfolio`            | Editorial state and workspace entry points      |
+| Home               | `/portfolio/home`       | Identity, hero, Resume, and home presentation   |
+| About              | `/portfolio/about`      | About content and education                     |
+| Skills             | `/portfolio/skills`     | Skill categories, proficiency, and evidence     |
+| Experience         | `/portfolio/experience` | Experience and credentials                      |
+| Activity           | `/portfolio/activity`   | GitHub identity and activity presentation       |
+| Work               | `/portfolio/work`       | Work records, media, and case studies           |
+| Writing            | `/portfolio/writing`    | Writing posts and article/list presentation     |
+| Contact            | `/portfolio/contact`    | Contact details, social links, and presentation |
+| Users              | `/users`                | Profile and role administration (`super_admin`) |
+| Deployments        | `/deployments`          | Vercel deployment operations (`super_admin`)    |
 
-## Portfolio Management
+Older granular Portfolio URLs remain as compatibility redirects in
+`src/lib/config/portfolio-route-map.ts`; they are not separate active
+workspaces.
 
-| Workspace        | Description                                                              |
-| ---------------- | ------------------------------------------------------------------------ |
-| **Overview**     | Editorial health, publishing state, and shortcuts into each workspace   |
-| **Home**         | Public identity, headline, SEO, GitHub username, and Resume             |
-| **About**        | Story, education, personal facts, and product principles                |
-| **Skills**       | Capability groups, proficiency labels, and evidence                     |
-| **Experience**   | Work history and credentials, with role, dates, and verification         |
-| **Activity**     | GitHub identity and contribution/activity presentation                   |
-| **Work**         | Work stories, full-width screenshots, links, and technologies            |
-| **Writing**      | Published articles, cover images, tags, and publication state            |
-| **Contact**      | Contact details, social links, and the Resend recipient                 |
+## Access Control
 
-Section copy and navigation metadata are edited inside the workspace that
-owns the public section. They are not separate Admin destinations. Account
-profile, password, MFA, providers, and logout are owned by the shared Auth
-account surface reached from the top-right user menu; the retired
-application-local settings sheets are no longer part of Admin.
+`src/proxy.ts` authenticates requests, enforces enrolled MFA, loads the
+`jg_account.profiles` role, and rejects non-admin users. The protected layout
+rechecks authentication and role before rendering.
 
-## Tech Stack
+- `admin`: Portfolio editing.
+- `super_admin`: Portfolio editing, user administration, and deployments.
 
-- **Next.js 16** - React framework with App Router
-- **React 19** - UI library
-- **TypeScript** - Type safety
-- **Supabase** - Auth and database
-- **@repo/ui** - Shared component library
-- **TanStack Table** - Data tables
-- **Tailwind CSS v4** - Styling
+Every service-role route must authorize the caller before bypassing RLS.
 
-## Project Structure
+## Data and APIs
 
-```
-apps/admin/
-├── src/
-│   ├── app/
-│   │   ├── (admin)/              # Protected admin routes
-│   │   │   ├── layout.tsx        # Admin layout with sidebar
-│   │   │   ├── page.tsx          # Dashboard home
-│   │   │   ├── portfolio/        # Portfolio management
-│   │   │   │   ├── home/
-│   │   │   │   ├── about/
-│   │   │   │   ├── skills/
-│   │   │   │   ├── experience/
-│   │   │   │   ├── activity/
-│   │   │   │   ├── work/
-│   │   │   │   ├── writing/
-│   │   │   │   └── contact/
-│   │   │   ├── writing/          # Canonical Writing workspace redirect
-│   │   │   └── users/            # User management
-│   │   ├── api/
-│   │   │   ├── portfolio/[table]/ # Generic CRUD for portfolio tables
-│   │   │   ├── portfolio/assets/ # Authenticated public media uploads
-│   │   │   └── users/            # User API
-│   │   ├── auth/callback/        # OAuth callback
-│   │   ├── welcome/              # Login and authentication entry
-│   │   └── unauthorized/         # Access denied page
-│   ├── components/
-│   │   ├── header/               # Shared top-bar controls
-│   │   ├── portfolio/            # Workspace/editorial primitives
-│   │   └── sidebar/              # Shared-shell navigation adapter
-│   └── lib/
-│       ├── supabase/             # Supabase clients
-│       ├── portfolio-api.ts      # Portfolio data operations
-│       ├── types.ts              # TypeScript types
-│       ├── config/nav-config.ts  # Sidebar navigation config
-│       ├── config/portfolio-route-map.ts
-│       └── portfolio-workspace.ts # Section-owned CMS loaders
-└── public/
-```
+Admin edits the same contracts consumed by public applications:
 
-## Key Patterns
+- `portfolio` tables through `/api/portfolio/[table]`.
+- `jg_app.writing_posts` through the Writing workspace.
+- Section copy and navigation transactionally through
+  `/api/portfolio/section-presentation`.
+- Public media through `/api/portfolio/assets` and the `portfolio-assets`
+  bucket.
+- Account profiles through `/api/users`.
+- Vercel deployments through `/api/vercel/deployments/*`.
 
-### Dynamic Portfolio API
+`@repo/portfolio-data` owns the shared Portfolio/Admin runtime and type
+contracts. `src/lib/portfolio-workspace.ts` composes database records into the
+eight active editorial workspaces.
 
-Single API route handles all portfolio tables:
+## Environment
 
-```typescript
-// POST /api/portfolio/[table]
-// GET /api/portfolio/[table]
-// PUT /api/portfolio/[table]
-// DELETE /api/portfolio/[table]
-```
+Use `.env.example` as the contract. Admin requires:
 
-### Form Components
+- Supabase URL, anonymous key, and server-only service-role key.
+- Cross-application Auth session, cookie, owner, and origin settings.
+- Vercel token, team ID, Studio project ID, and Admin project ID.
 
-Each portfolio section has a dedicated form/list component:
-
-- `hero-form.tsx` - Single record form
-- `education-list.tsx` - CRUD list with add/edit/delete
-- `skills-manager.tsx` - Nested category + items management
-
-### Route Groups
-
-- `(admin)/` - Protected routes requiring authentication
-- Public routes: `/welcome`, `/unauthorized`, `/auth/callback`
-
-## Environment Variables
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
-```
+Never expose service-role or Vercel credentials to client components.
 
 ## Development
 
 ```bash
-# Run admin panel (from monorepo root)
-pnpm dev --filter admin
-
-# Or run all apps
-pnpm dev
+pnpm --filter admin dev
+pnpm --filter admin lint
+pnpm --filter admin check-types
+pnpm --filter admin build
+pnpm test
 ```
 
-The admin panel runs on port 3001 by default when running alongside the main app.
-
-## Access Control
-
-- Only authenticated users can access admin routes
-- Role-based permissions for different operations
-- Unauthorized users redirected to `/unauthorized`
+Admin is intentionally `noindex`. Portfolio CMS writes must preserve shared
+validation, revalidate affected public routes, and remain compatible with the
+public Portfolio read contract.

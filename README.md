@@ -1,185 +1,196 @@
 # Jayant
 
-Independent Portfolio, Studio, Admin, and Auth applications by **Jayant**.
+Product-first web applications by Jayant. `jayantgoyal.com` is the domain;
+**Jayant** is the repository and product identity.
 
-[![Portfolio](https://img.shields.io/badge/Portfolio-jayantgoyal.com-000?style=for-the-badge&logo=vercel)](https://jayantgoyal.com)
-[![GitHub](https://img.shields.io/badge/GitHub-goyal1510-181717?style=for-the-badge&logo=github)](https://github.com/goyal1510)
-[![Email](https://img.shields.io/badge/Email-goyal151002%40gmail.com-EA4335?style=for-the-badge&logo=gmail)](mailto:goyal151002@gmail.com)
+This is a Turborepo monorepo containing four independently deployed Next.js
+applications and the packages they genuinely share. Every implementation in
+this repository is currently a web client. There is no iOS, Android, macOS, or
+Windows client yet.
 
----
+## Applications
 
-## Live Projects
+| Application | Source           | Production                                               | Local  | Responsibility                                                             |
+| ----------- | ---------------- | -------------------------------------------------------- | ------ | -------------------------------------------------------------------------- |
+| Portfolio   | `apps/portfolio` | [jayantgoyal.com](https://jayantgoyal.com)               | `3000` | Public profile, About, Work, Writing, Resume, and Contact                  |
+| Studio      | `apps/studio`    | [studio.jayantgoyal.com](https://studio.jayantgoyal.com) | `3001` | Product discovery, public utilities, games, and private workspaces         |
+| Admin       | `apps/admin`     | [admin.jayantgoyal.com](https://admin.jayantgoyal.com)   | `3002` | Portfolio CMS, user administration, and Vercel deployment operations       |
+| Auth        | `apps/auth`      | [auth.jayantgoyal.com](https://auth.jayantgoyal.com)     | `3003` | Sign-in, recovery, MFA, connected providers, profile, and account security |
 
-| Project                                                                   | Description                                     | Tech Highlights                     |
-| ------------------------------------------------------------------------- | ----------------------------------------------- | ----------------------------------- |
-| [**Sync Scratchpad**](https://studio.jayantgoyal.com/scratchpad)          | Private text, code, and note synchronization   | Supabase Realtime, RLS              |
-| [**File Manager**](https://studio.jayantgoyal.com/files)                  | Cloud storage with folders, upload, soft delete | Supabase Storage, Hierarchical data |
-| [**Activity Tracker**](https://studio.jayantgoyal.com/activity-tracker)   | Daily tracking with analytics dashboard         | Recharts, Data visualization        |
-| [**Weather**](https://studio.jayantgoyal.com/weather)                     | City search, geolocation, 5-day forecast        | OpenWeather API, Geolocation        |
-| [**Games**](https://studio.jayantgoyal.com/games)                         | 9 solo, local, and online games                 | Realtime sessions, Game validation  |
-| [**Calculator**](https://studio.jayantgoyal.com/calculator)               | Cash denomination with history                  | CRUD, Zustand persistence           |
-| [**Custom Calculator**](https://studio.jayantgoyal.com/custom-calculator) | Drag & drop calculator builder                  | React DnD, Dynamic layouts          |
-| [**Dev Tools**](https://studio.jayantgoyal.com/tools)                     | 87 utilities (UUID, hash, encode, format)       | Typed registry, Persisted favorites |
-| [**Admin Panel**](https://admin.jayantgoyal.com)                          | Manage portfolio data                           | Protected routes, RBAC              |
+Studio's code-owned registries currently expose:
 
----
+- 10 catalog entries, including one external E-commerce experiment.
+- 87 browser-based developer tools across 11 categories.
+- 9 games with solo, local, or authenticated online modes depending on the
+  game.
+- Account-backed Activity Tracker, Currency Calculator, File Manager, Sync
+  Scratchpad, and Game Hub workspaces.
 
-## Tech Stack
+The canonical registries are
+`apps/studio/src/lib/config/studio-inventory.ts`,
+`apps/studio/src/lib/tools/tools.ts`, and
+`apps/studio/src/lib/games/config.ts`.
 
-```
-Frontend     Next.js 16 · React 19 · TypeScript 5.9 · Tailwind CSS v4
-Backend      Supabase (Auth, Database, Realtime, Storage)
-Monorepo     Turborepo · pnpm Workspaces
-UI/UX        Radix UI · Framer Motion · Lucide Icons · Sonner
-State        Zustand (persisted stores)
-```
+## Repository Structure
 
----
-
-## Architecture
-
-```
+```text
 jayantgoyal/
 ├── apps/
-│   ├── portfolio/          # Public portfolio, blog, resume, contact
-│   ├── studio/             # Products, tools, games, and workspaces
-│   ├── admin/              # Administration and content operations
-│   └── auth/               # Sign-in, recovery, MFA, and account security
-│
+│   ├── portfolio/          # Public professional and editorial content
+│   ├── studio/             # Products, utilities, games, and workspaces
+│   ├── admin/              # CMS, users, and deployment operations
+│   └── auth/               # Shared account entry and security surface
 ├── packages/
-│   ├── auth/               # Shared Supabase SSR and session contracts
-│   ├── brand/              # Shared names and metadata identity
+│   ├── auth/               # Supabase session and auth contracts
+│   ├── brand/              # Jayant and application identity
+│   ├── github/             # GitHub API client and statistics
 │   ├── platform/           # Canonical application hosts and URLs
-│   ├── seo/                # Shared public metadata contracts
-│   ├── ui/                 # Shared component library (React 19 + Tailwind v4)
-│   ├── tailwind-config/    # Shared Tailwind configuration
-│   ├── eslint-config/      # Flat ESLint configs (base, next, react)
-│   └── typescript-config/  # Strict TS configs
-│
-└── turbo.json              # Build pipeline
+│   ├── portfolio-data/     # Portfolio/Admin data and validation contracts
+│   ├── seo/                # Shared web metadata and indexability helpers
+│   ├── ui/                 # Studio/Admin/Auth React UI and app shell
+│   ├── tailwind-config/    # Shared Tailwind CSS source and PostCSS config
+│   ├── eslint-config/      # Shared flat ESLint configurations
+│   └── typescript-config/  # Shared strict TypeScript configurations
+├── scripts/                # Architecture, security, build, and DB checks
+├── supabase/
+│   ├── migrations/         # Ordered database changes
+│   └── schemas/            # Canonical schema snapshots
+├── package.json
+├── pnpm-workspace.yaml
+└── turbo.json
 ```
 
-**Why Monorepo?**
+## Ownership Rules
 
-- Shared UI components across apps via `@repo/ui`
-- Consistent linting, formatting, and TypeScript configs
-- Single `pnpm install`, parallel builds with Turborepo
-- Code reuse without npm publishing overhead
+The repository follows three ownership levels:
 
----
+1. Client-specific code stays in its application.
+2. Product-specific data, business rules, routes, and UI stay with the product.
+3. A package is shared only when multiple applications use a stable
+   responsibility.
 
-## Features Deep Dive
+Product and platform are separate concepts. A future native client should be
+added only when a real product needs it; the repository does not maintain empty
+platform folders or speculative universal abstractions.
 
-### Sync Scratchpad
+Shared-package dependency direction is intentionally small:
 
-A private authenticated stream for moving temporary text, links, and notes
-between personal devices. Supabase Realtime keeps the durable scratchpad
-synchronized across tabs and sessions.
+```text
+brand ──> platform ──> seo
+  │           │          │
+  └────────── applications
 
-### File Manager
+auth, github, portfolio-data, and ui ──> consuming applications
+applications -/-> other application source
+shared packages -/-> application source
+```
 
-Full cloud file system with:
+| Package                   | Responsibility                                                                              | Direct application consumers |
+| ------------------------- | ------------------------------------------------------------------------------------------- | ---------------------------- |
+| `@repo/auth`              | Supabase clients, cookie/session modes, safe returns, password policy, profiles, and logout | Studio, Admin, Auth          |
+| `@repo/brand`             | Person identity, application names, metadata, and synchronized asset paths                  | All four apps                |
+| `@repo/github`            | GitHub API access, caching, proxying, and statistics                                        | Portfolio, Studio            |
+| `@repo/platform`          | Application origins, host checks, and cross-app URL rewriting                               | Portfolio, Studio, Auth      |
+| `@repo/portfolio-data`    | Portfolio CMS types, field lists, validation, presentation, and Writing contracts           | Portfolio, Admin             |
+| `@repo/seo`               | Next.js metadata and public path helpers                                                    | Portfolio, Studio            |
+| `@repo/ui`                | React components and shared application shell                                               | Studio, Admin, Auth          |
+| `@repo/tailwind-config`   | Shared web styling and PostCSS setup                                                        | All four apps                |
+| `@repo/eslint-config`     | Base, Next.js, and internal React lint rules                                                | All apps and source packages |
+| `@repo/typescript-config` | Strict base, Next.js, and React-library compiler settings                                   | All apps and source packages |
 
-- Hierarchical folder structure
-- Drag & drop uploads
-- Copy, move, rename operations
-- Soft delete with trash/restore
+Portfolio deliberately owns its editorial UI and does not consume the shared
+product application shell.
 
-### Activity Tracker
+## Data and Authentication
 
-Track daily activities with custom categories. Monthly calendar view, streak tracking, and analytics dashboard with charts.
+Supabase owns authentication, Postgres, Realtime, and Storage. The active
+database is organized by responsibility:
 
-### Dev Tools
+| Schema       | Ownership                                                         |
+| ------------ | ----------------------------------------------------------------- |
+| `jg_account` | Profiles, roles, terms acceptance, and account helpers            |
+| `portfolio`  | Public Portfolio CMS records and contact rate limiting            |
+| `jg_app`     | Studio workspaces, games, tool usage, and Portfolio Writing posts |
 
-87 developer utilities organized by category:
+Canonical schema snapshots are
+`supabase/schemas/jg_account.sql`, `supabase/schemas/portfolio.sql`, and
+`supabase/schemas/jg_app.sql`. Active storage buckets include `private-files`,
+`portfolio-assets`, and `profile-avatars`.
 
-- **Generators**: UUID, ULID, nanoid, RSA keys, tokens
-- **Hash & Crypto**: Bcrypt, SHA, HMAC, AES encrypt/decrypt
-- **Converters**: JSON/YAML/TOML/XML, Base64, colors, timestamps
-- **Formatters**: JSON, SQL, code beautifiers
-- **Validators**: JSON, regex, JWT decoder
+Auth is the default owner of sign-in and account-security flows. Studio and
+Admin keep compatibility entry routes for rollback, while the shared
+`@repo/auth` package owns the cross-application session-cookie contract.
+Service-role access is server-only and limited to authorized Studio/Admin
+operations; Portfolio and Auth do not require a service-role credential.
 
-### Games Hub
+## Technology
 
-Nine games spanning solo, local, computer, and online room modes:
+- Next.js 16, React 19, and TypeScript 5.9
+- Tailwind CSS v4, Radix UI, Framer Motion, and Lucide
+- Supabase Auth, Postgres, Realtime, and Storage
+- Turborepo with pnpm workspaces
+- Vitest, ESLint, and Prettier
+- Vercel deployments with application-aware ignored-build checks
 
-- **Tic Tac Toe** - Minimax AI, unbeatable mode
-- **Connect Four** - Column-drop mechanics
-- **Memory Match** - Card flip animations
-- **Rock Paper Scissors** - Animated results
-- **Dare X** - Party game with random dares
-- **Wordle** - Solo play and online races
-- **Typing Speed** - Speed and accuracy testing
-- **Chess** - Legal move validation and online rooms
-- **Ludo** - Online room-based board game
+## Getting Started
 
----
+Requirements:
 
-## Quick Start
+- Node.js 22 or newer
+- pnpm 10.32.1 (the version pinned in `package.json`)
 
 ```bash
-# Clone
-git clone https://github.com/goyal1510/jayantgoyal.git
+git clone git@github.com:goyal1510/jayantgoyal.git
 cd jayantgoyal
-
-# Install (requires pnpm 10.24+, Node 22+)
 pnpm install
 
-# Set up the application environments
 cp apps/portfolio/.env.example apps/portfolio/.env.local
 cp apps/studio/.env.example apps/studio/.env.local
 cp apps/admin/.env.example apps/admin/.env.local
 cp apps/auth/.env.example apps/auth/.env.local
-
-# Run Studio
-pnpm --filter studio dev
 ```
 
-### Environment Variables
+Each application owns its environment contract. Read its `.env.example`; do
+not copy the union of every variable into every deployment.
 
-```env
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
-NEXT_PUBLIC_OPENWEATHER_API_KEY=
-RESEND_API_KEY=
+```bash
+pnpm --filter portfolio dev  # http://localhost:3000
+pnpm --filter studio dev     # http://localhost:3001
+pnpm --filter admin dev      # http://localhost:3002
+pnpm --filter auth dev       # http://localhost:3003
+pnpm dev                     # all applications
 ```
 
----
+## Validation and Operations
 
-## Commands
+| Command                     | Purpose                                                       |
+| --------------------------- | ------------------------------------------------------------- |
+| `pnpm build`                | Build all applications and packages through Turborepo         |
+| `pnpm lint`                 | Run ESLint with zero warnings                                 |
+| `pnpm check-types`          | Generate Next.js route types and run strict TypeScript checks |
+| `pnpm test`                 | Run the cross-repository Vitest regression suite              |
+| `pnpm check:architecture`   | Enforce application/package dependency boundaries             |
+| `pnpm check:brand-assets`   | Verify shared brand assets match across apps                  |
+| `pnpm check:service-role`   | Prevent client-side and Portfolio service-role usage          |
+| `pnpm check:bundle-budgets` | Build and verify whole-client and route bundle budgets        |
+| `pnpm db:migrations:check`  | Compare local migrations with the linked Supabase project     |
+| `pnpm test:db:linked`       | Verify linked database boundaries and schema invariants       |
+| `pnpm format`               | Format TypeScript and Markdown files                          |
 
-| Command                       | Description                         |
-| ----------------------------- | ----------------------------------- |
-| `pnpm dev`                    | Run all apps                        |
-| `pnpm --filter portfolio dev` | Run Portfolio on port 3000          |
-| `pnpm --filter studio dev`    | Run Studio on port 3001             |
-| `pnpm --filter admin dev`     | Run Admin on port 3002              |
-| `pnpm --filter auth dev`      | Run Auth on port 3003               |
-| `pnpm build`                  | Build all                           |
-| `pnpm lint`                   | Lint (zero warnings)                |
-| `pnpm check-types`            | Type check                          |
-| `pnpm test`                   | Run focused Vitest regression tests |
-| `pnpm format`                 | Format with Prettier                |
+GitHub Actions runs architecture, brand, service-role, lint, type, and test
+checks on pull requests and pushes to `main`. Vercel deploys each application
+independently and skips builds when a commit does not affect that application
+or a shared dependency.
 
----
+## Maintained Documentation
 
-## Key Patterns
+Documentation is deliberately colocated and small:
 
-- **Server → Client**: Pages are server components that render client components
-- **Auth**: Supabase SSR with email/password, magic link, OAuth, guest login
-- **State**: Zustand stores with `persist` middleware + manual hydration
-- **Styling**: Tailwind v4 + CVA for variants + `cn()` for class merging
-- **Application boundaries**: Portfolio content, Studio products, Admin operations, and Auth account flows deploy independently
+- `README.md` describes the repository and current architecture.
+- `AGENTS.md` contains implementation and safety rules for coding agents.
+- `apps/*/README.md` describes each deployed application's owned surface.
 
----
-
-## Connect
-
-- **Portfolio**: [jayantgoyal.com](https://jayantgoyal.com)
-- **GitHub**: [@goyal1510](https://github.com/goyal1510)
-- **Email**: [goyal151002@gmail.com](mailto:goyal151002@gmail.com)
-
----
-
-Built with Next.js 16, React 19, TypeScript, Supabase, and Turborepo
+Feature registries, package manifests, route files, and schema snapshots remain
+the detailed source of truth. The repository does not maintain a central
+`docs/` tree, architecture-history ledger, session log, or completed-work QA
+archive.
