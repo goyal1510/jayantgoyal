@@ -4,7 +4,6 @@ import {
   Github,
   Instagram,
   Linkedin,
-  Mail,
   MapPin,
   Phone,
   Twitter,
@@ -14,6 +13,7 @@ import {
 
 import { ContactForm } from "@/components/editorial/contact-form";
 import { EditorialReveal } from "@/components/editorial/editorial-reveal";
+import { HydratedEmailLink } from "@/components/editorial/hydrated-email-link";
 import type { ContactContext } from "@/lib/contact/context";
 import type {
   PortfolioProfile,
@@ -54,6 +54,9 @@ export function ContactSection({
 }) {
   const heading = getCompactSectionHeading(content.eyebrow, content.headline);
   const Heading = headingLevel;
+  const emailCodePoints = Array.from(profile.email, (character) =>
+    character.codePointAt(0),
+  ).filter((codePoint): codePoint is number => codePoint !== undefined);
 
   return (
     <footer id="contact" className="contact-section">
@@ -69,18 +72,10 @@ export function ContactSection({
         <div className="contact-section__grid">
           <EditorialReveal className="contact-section__copy">
             <div className="contact-details">
-              <a
-                href={`mailto:${profile.email}`}
-                data-analytics-event="contact_intent"
-                data-analytics-source="contact_page"
-                data-analytics-destination="email"
-              >
-                <Mail aria-hidden="true" />
-                <span>
-                  <small>Email</small>
-                  {profile.email}
-                </span>
-              </a>
+              <HydratedEmailLink
+                emailCodePoints={emailCodePoints}
+                variant="detail"
+              />
               <a
                 href={`tel:${profile.phone.replaceAll(" ", "")}`}
                 data-analytics-event="contact_intent"
@@ -136,9 +131,10 @@ export function ContactSection({
                 <SocialIcon social={social} />
               </a>
             ))}
-            <a href={`mailto:${profile.email}`} aria-label="Email">
-              <Mail aria-hidden="true" />
-            </a>
+            <HydratedEmailLink
+              emailCodePoints={emailCodePoints}
+              variant="icon"
+            />
           </div>
         </div>
       </div>
