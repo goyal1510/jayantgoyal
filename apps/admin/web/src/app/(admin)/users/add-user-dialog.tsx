@@ -1,8 +1,8 @@
 "use client";
 
 import { Loader2, Plus } from "lucide-react";
-import { Button } from "@jayant/web-ui/button";
-import { Label } from "@jayant/web-ui/label";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Label } from "@jayantgoyal/web-ui/label";
 import {
   Dialog,
   DialogContent,
@@ -10,14 +10,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@jayant/web-ui/dialog";
+} from "@jayantgoyal/web-ui/dialog";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@jayant/web-ui/select";
+} from "@jayantgoyal/web-ui/select";
 import type { UserRole } from "@/lib/types";
 import { AccessibleForm } from "@/components/accessible-form";
 

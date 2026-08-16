@@ -4,17 +4,18 @@ import { useEffect } from "react";
 import { useActionState } from "react";
 import { useRouter } from "next/navigation";
 
-import {
-  removeAvatarAction,
-  uploadAvatarAction,
-} from "@/app/actions/account";
+import { removeAvatarAction, uploadAvatarAction } from "@/app/actions/account";
 import { ActionMessage } from "@/components/auth/action-message";
 import { SubmitButton } from "@/components/auth/submit-button";
 import type { AuthActionState } from "@/lib/auth/action-support";
-import { Avatar, AvatarFallback, AvatarImage } from "@jayant/web-ui/avatar";
-import { Button } from "@jayant/web-ui/button";
-import { Input } from "@jayant/web-ui/input";
-import { Label } from "@jayant/web-ui/label";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@jayantgoyal/web-ui/avatar";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
 
 const initialState: AuthActionState = {};
 

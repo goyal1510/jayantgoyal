@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   BreadcrumbTrail,
   type BreadcrumbTrailItem,
-} from "@jayant/web-ui/application-shell";
+} from "@jayantgoyal/web-ui/application-shell";
 import { getAdminNavigationContext } from "@/lib/config/nav-config";
 
 export function DynamicBreadcrumb() {

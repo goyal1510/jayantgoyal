@@ -1,82 +1,122 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 function prettifySQL(sql: string): string {
   // Simple SQL formatter
   const keywords = [
-    "SELECT", "FROM", "WHERE", "JOIN", "INNER JOIN", "LEFT JOIN", "RIGHT JOIN",
-    "GROUP BY", "ORDER BY", "HAVING", "INSERT", "UPDATE", "DELETE", "CREATE",
-    "ALTER", "DROP", "TABLE", "INDEX", "VIEW", "AS", "ON", "AND", "OR", "NOT",
-    "IN", "EXISTS", "UNION", "ALL", "DISTINCT", "COUNT", "SUM", "AVG", "MAX", "MIN"
-  ]
+    "SELECT",
+    "FROM",
+    "WHERE",
+    "JOIN",
+    "INNER JOIN",
+    "LEFT JOIN",
+    "RIGHT JOIN",
+    "GROUP BY",
+    "ORDER BY",
+    "HAVING",
+    "INSERT",
+    "UPDATE",
+    "DELETE",
+    "CREATE",
+    "ALTER",
+    "DROP",
+    "TABLE",
+    "INDEX",
+    "VIEW",
+    "AS",
+    "ON",
+    "AND",
+    "OR",
+    "NOT",
+    "IN",
+    "EXISTS",
+    "UNION",
+    "ALL",
+    "DISTINCT",
+    "COUNT",
+    "SUM",
+    "AVG",
+    "MAX",
+    "MIN",
+  ];
 
-  let formatted = sql.trim()
+  let formatted = sql.trim();
 
   // Add newlines before keywords
   keywords.forEach((keyword) => {
-    const regex = new RegExp(`\\b${keyword}\\b`, "gi")
-    formatted = formatted.replace(regex, `\n${keyword}`)
-  })
+    const regex = new RegExp(`\\b${keyword}\\b`, "gi");
+    formatted = formatted.replace(regex, `\n${keyword}`);
+  });
 
   // Clean up multiple newlines
-  formatted = formatted.replace(/\n\s*\n/g, "\n")
+  formatted = formatted.replace(/\n\s*\n/g, "\n");
 
   // Add proper indentation
-  const lines = formatted.split("\n")
-  let indent = 0
+  const lines = formatted.split("\n");
+  let indent = 0;
   const formattedLines = lines.map((line) => {
-    const trimmed = line.trim()
-    if (!trimmed) return ""
+    const trimmed = line.trim();
+    if (!trimmed) return "";
 
     // Decrease indent for closing keywords
     if (trimmed.match(/^(END|ELSE|ELSEIF)/i)) {
-      indent = Math.max(0, indent - 1)
+      indent = Math.max(0, indent - 1);
     }
 
-    const indented = "  ".repeat(indent) + trimmed
+    const indented = "  ".repeat(indent) + trimmed;
 
     // Increase indent for opening keywords
-    if (trimmed.match(/^(SELECT|FROM|WHERE|JOIN|INSERT|UPDATE|DELETE|CREATE|ALTER|IF|CASE)/i)) {
-      indent++
+    if (
+      trimmed.match(
+        /^(SELECT|FROM|WHERE|JOIN|INSERT|UPDATE|DELETE|CREATE|ALTER|IF|CASE)/i,
+      )
+    ) {
+      indent++;
     }
 
-    return indented
-  })
+    return indented;
+  });
 
-  return formattedLines.filter(l => l).join("\n")
+  return formattedLines.filter((l) => l).join("\n");
 }
 
 export default function SQLPrettifyClient() {
-  const [input, setInput] = React.useState("")
-  const [output, setOutput] = React.useState("")
+  const [input, setInput] = React.useState("");
+  const [output, setOutput] = React.useState("");
 
   const prettify = React.useCallback(() => {
     if (!input.trim()) {
-      setOutput("")
-      return
+      setOutput("");
+      return;
     }
 
     try {
-      const formatted = prettifySQL(input)
-      setOutput(formatted)
+      const formatted = prettifySQL(input);
+      setOutput(formatted);
     } catch {
-      setOutput("Failed to prettify SQL")
+      setOutput("Failed to prettify SQL");
     }
-  }, [input])
+  }, [input]);
 
   React.useEffect(() => {
-    prettify()
-  }, [prettify])
+    prettify();
+  }, [prettify]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(output)
-    toast.success("Formatted SQL copied to clipboard")
-  }
+    navigator.clipboard.writeText(output);
+    toast.success("Formatted SQL copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -121,5 +161,5 @@ export default function SQLPrettifyClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

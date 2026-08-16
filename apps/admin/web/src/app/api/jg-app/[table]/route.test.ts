@@ -9,7 +9,7 @@ const { authorizeAndGetClientMock, revalidateMock } = vi.hoisted(() => ({
 vi.mock("./helpers", async () => {
   const { NextResponse } = await import("next/server");
   const { validatePortfolioWritingWriteInput } = await import(
-    "@jayant/portfolio-contracts"
+    "@jayantgoyal/portfolio-contracts"
   );
 
   function validateTable(table: string) {

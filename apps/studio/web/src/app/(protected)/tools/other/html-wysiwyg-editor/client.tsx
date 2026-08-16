@@ -1,29 +1,35 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 export default function HTMLWYSIWYGEditorClient() {
-  const [html, setHtml] = React.useState("<p>Start editing...</p>")
-  const contentEditableRef = React.useRef<HTMLDivElement>(null)
+  const [html, setHtml] = React.useState("<p>Start editing...</p>");
+  const contentEditableRef = React.useRef<HTMLDivElement>(null);
 
   const getHTML = () => {
-    return contentEditableRef.current?.innerHTML || ""
-  }
+    return contentEditableRef.current?.innerHTML || "";
+  };
 
   const copyToClipboard = () => {
-    const htmlContent = getHTML()
-    navigator.clipboard.writeText(htmlContent)
-    toast.success("HTML copied to clipboard")
-  }
+    const htmlContent = getHTML();
+    navigator.clipboard.writeText(htmlContent);
+    toast.success("HTML copied to clipboard");
+  };
 
   const formatText = (command: string, value?: string) => {
-    document.execCommand(command, false, value)
-    contentEditableRef.current?.focus()
-  }
+    document.execCommand(command, false, value);
+    contentEditableRef.current?.focus();
+  };
 
   return (
     <div className="space-y-6">
@@ -39,31 +45,69 @@ export default function HTMLWYSIWYGEditorClient() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-2 border-b pb-2">
-            <Button variant="outline" size="sm" onClick={() => formatText("bold")}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => formatText("bold")}
+            >
               <strong>B</strong>
             </Button>
-            <Button variant="outline" size="sm" onClick={() => formatText("italic")}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => formatText("italic")}
+            >
               <em>I</em>
             </Button>
-            <Button variant="outline" size="sm" onClick={() => formatText("underline")}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => formatText("underline")}
+            >
               <u>U</u>
             </Button>
-            <Button variant="outline" size="sm" onClick={() => formatText("formatBlock", "<h1>")}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => formatText("formatBlock", "<h1>")}
+            >
               H1
             </Button>
-            <Button variant="outline" size="sm" onClick={() => formatText("formatBlock", "<h2>")}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => formatText("formatBlock", "<h2>")}
+            >
               H2
             </Button>
-            <Button variant="outline" size="sm" onClick={() => formatText("formatBlock", "<p>")}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => formatText("formatBlock", "<p>")}
+            >
               P
             </Button>
-            <Button variant="outline" size="sm" onClick={() => formatText("insertUnorderedList")}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => formatText("insertUnorderedList")}
+            >
               * List
             </Button>
-            <Button variant="outline" size="sm" onClick={() => formatText("insertOrderedList")}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => formatText("insertOrderedList")}
+            >
               1. List
             </Button>
-            <Button variant="outline" size="sm" onClick={() => formatText("createLink", prompt("Enter URL:") || undefined)}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                formatText("createLink", prompt("Enter URL:") || undefined)
+              }
+            >
               Link
             </Button>
           </div>
@@ -96,9 +140,9 @@ export default function HTMLWYSIWYGEditorClient() {
           <textarea
             value={html}
             onChange={(e) => {
-              setHtml(e.target.value)
+              setHtml(e.target.value);
               if (contentEditableRef.current) {
-                contentEditableRef.current.innerHTML = e.target.value
+                contentEditableRef.current.innerHTML = e.target.value;
               }
             }}
             className="w-full min-h-[200px] rounded-md border border-input bg-transparent px-3 py-2 text-sm font-mono"
@@ -106,5 +150,5 @@ export default function HTMLWYSIWYGEditorClient() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

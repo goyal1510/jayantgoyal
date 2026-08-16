@@ -59,7 +59,7 @@ archived QA evidence.
 1. Determine whether the failure is a Supabase query, missing required
    singleton, contract validation, or rendering error.
 2. Check `portfolio` RLS and selected columns against
-   `@jayant/portfolio-contracts` and the current snapshot.
+   `@jayantgoyal/portfolio-contracts` and the current snapshot.
 3. Confirm `hero`, `about`, and `contact` singleton records exist without
    printing their content.
 4. Validate Admin writes and revalidation only after authorization.

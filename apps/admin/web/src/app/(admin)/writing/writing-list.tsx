@@ -15,16 +15,17 @@ import {
 import {
   getWritingPublicationState,
   isPublicWritingPost,
-} from "@jayant/portfolio-contracts";
+} from "@jayantgoyal/portfolio-contracts";
 import {
   createWritingData,
   updateWritingData,
   deleteWritingData,
 } from "@/lib/writing-api";
-import { Button } from "@jayant/web-ui/button";
-import { ConfirmationDialog } from "@jayant/web-ui/confirmation-dialog";
-import { IconAction } from "@jayant/web-ui/icon-action";
-import { StatusBadge } from "@jayant/web-ui/status-badge";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { ConfirmationDialog } from "@jayantgoyal/web-ui/confirmation-dialog";
+import { IconAction } from "@jayantgoyal/web-ui/icon-action";
+import { StatusBadge } from "@jayantgoyal/web-ui/status-badge";
+import { applicationOrigin, applicationUrl } from "@jayantgoyal/web-urls";
 import type { WritingPost } from "@/lib/types";
 import {
   WritingDialog,
@@ -35,6 +36,11 @@ import {
 interface WritingListProps {
   initialData: WritingPost[];
 }
+
+const PORTFOLIO_ORIGIN = applicationOrigin(
+  "portfolio",
+  process.env.NEXT_PUBLIC_PORTFOLIO_URL,
+);
 
 export function WritingList({ initialData }: WritingListProps) {
   const router = useRouter();
@@ -203,7 +209,11 @@ export function WritingList({ initialData }: WritingListProps) {
               )}
               {isPublicWritingPost(item) ? (
                 <a
-                  href={`${process.env.NEXT_PUBLIC_PORTFOLIO_URL ?? "https://jayantgoyal.com"}/writing/${item.slug}`}
+                  href={applicationUrl(
+                    "portfolio",
+                    `/writing/${item.slug}`,
+                    PORTFOLIO_ORIGIN,
+                  )}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex shrink-0 items-center gap-1 text-xs text-muted-foreground hover:text-foreground"

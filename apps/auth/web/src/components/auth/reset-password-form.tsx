@@ -5,9 +5,9 @@ import { useActionState, useState } from "react";
 import { resetPasswordAction } from "@/app/actions/recovery";
 import { ActionMessage } from "@/components/auth/action-message";
 import { SubmitButton } from "@/components/auth/submit-button";
-import { AuthCard, PasswordField } from "@jayant/web-ui/auth-presentation";
-import { Label } from "@jayant/web-ui/label";
-import { Switch } from "@jayant/web-ui/switch";
+import { AuthCard, PasswordField } from "@jayantgoyal/web-ui/auth-presentation";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Switch } from "@jayantgoyal/web-ui/switch";
 
 const initialState = {};
 

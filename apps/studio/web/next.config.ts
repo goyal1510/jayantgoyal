@@ -1,5 +1,5 @@
 import type { NextConfig } from "next";
-import { applicationOrigin } from "@jayant/web-urls";
+import { applicationOrigin } from "@jayantgoyal/web-urls";
 
 const localCookieDomain = process.env.NEXT_PUBLIC_AUTH_COOKIE_DOMAIN?.trim()
   .toLowerCase()
@@ -32,7 +32,11 @@ const noindexHeaders = [
 
 const nextConfig: NextConfig = {
   allowedDevOrigins,
-  transpilePackages: ["@jayant/web-urls", "@jayant/web-seo", "@jayant/web-ui"],
+  transpilePackages: [
+    "@jayantgoyal/web-urls",
+    "@jayantgoyal/web-seo",
+    "@jayantgoyal/web-ui",
+  ],
   typescript: {
     ignoreBuildErrors: true,
   },

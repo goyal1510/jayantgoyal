@@ -10,15 +10,15 @@ import {
   RotateCcw,
   Rocket,
 } from "lucide-react";
-import { Button } from "@jayant/web-ui/button";
-import { Badge } from "@jayant/web-ui/badge";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Badge } from "@jayantgoyal/web-ui/badge";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@jayant/web-ui/card";
+} from "@jayantgoyal/web-ui/card";
 import {
   getDeployment,
   getBuildLogs,
@@ -54,12 +54,16 @@ interface DeploymentDetailProps {
 }
 
 export function DeploymentDetail({ deploymentId }: DeploymentDetailProps) {
-  const [deployment, setDeployment] = useState<DeploymentDetailType | null>(null);
+  const [deployment, setDeployment] = useState<DeploymentDetailType | null>(
+    null,
+  );
   const [logs, setLogs] = useState<VercelBuildLogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [logsLoading, setLogsLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
-  const [confirmAction, setConfirmAction] = useState<"redeploy" | "rollback" | null>(null);
+  const [confirmAction, setConfirmAction] = useState<
+    "redeploy" | "rollback" | null
+  >(null);
 
   const fetchDetail = useCallback(async () => {
     setLoading(true);
@@ -67,7 +71,9 @@ export function DeploymentDetail({ deploymentId }: DeploymentDetailProps) {
       const data = await getDeployment(deploymentId);
       setDeployment(data);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to fetch deployment");
+      toast.error(
+        err instanceof Error ? err.message : "Failed to fetch deployment",
+      );
     } finally {
       setLoading(false);
     }
@@ -79,7 +85,9 @@ export function DeploymentDetail({ deploymentId }: DeploymentDetailProps) {
       const data = await getBuildLogs(deploymentId);
       setLogs(Array.isArray(data) ? data : []);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to fetch build logs");
+      toast.error(
+        err instanceof Error ? err.message : "Failed to fetch build logs",
+      );
     } finally {
       setLogsLoading(false);
     }
@@ -98,7 +106,11 @@ export function DeploymentDetail({ deploymentId }: DeploymentDetailProps) {
         ? ("admin" as const)
         : ("studio" as const);
       if (confirmAction === "redeploy") {
-        await redeployDeployment(deployment.uid, project, deployment.target || "production");
+        await redeployDeployment(
+          deployment.uid,
+          project,
+          deployment.target || "production",
+        );
         toast.success("Redeploy triggered");
       } else {
         await rollbackDeployment(deployment.uid, project);
@@ -107,7 +119,9 @@ export function DeploymentDetail({ deploymentId }: DeploymentDetailProps) {
       setConfirmAction(null);
       fetchDetail();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : `${confirmAction} failed`);
+      toast.error(
+        err instanceof Error ? err.message : `${confirmAction} failed`,
+      );
     } finally {
       setActionLoading(false);
     }
@@ -148,16 +162,18 @@ export function DeploymentDetail({ deploymentId }: DeploymentDetailProps) {
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle className="flex items-center gap-2">
-              <Badge variant={stateBadgeVariant[deployment.readyState || deployment.state]}>
+              <Badge
+                variant={
+                  stateBadgeVariant[deployment.readyState || deployment.state]
+                }
+              >
                 {deployment.readyState || deployment.state}
               </Badge>
               {deployment.target === "production" && (
                 <Badge variant="outline">production</Badge>
               )}
             </CardTitle>
-            <CardDescription className="mt-1">
-              {deployment.url}
-            </CardDescription>
+            <CardDescription className="mt-1">{deployment.url}</CardDescription>
           </div>
           <div className="flex items-center gap-2">
             {deployment.inspectorUrl && (
@@ -181,17 +197,18 @@ export function DeploymentDetail({ deploymentId }: DeploymentDetailProps) {
               <Rocket className="h-4 w-4 mr-2" />
               Redeploy
             </Button>
-            {deployment.state === "READY" && deployment.target === "production" && (
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => setConfirmAction("rollback")}
-                disabled={actionLoading}
-              >
-                <RotateCcw className="h-4 w-4 mr-2" />
-                Rollback
-              </Button>
-            )}
+            {deployment.state === "READY" &&
+              deployment.target === "production" && (
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => setConfirmAction("rollback")}
+                  disabled={actionLoading}
+                >
+                  <RotateCcw className="h-4 w-4 mr-2" />
+                  Rollback
+                </Button>
+              )}
           </div>
         </CardHeader>
         <CardContent>
@@ -233,7 +250,9 @@ export function DeploymentDetail({ deploymentId }: DeploymentDetailProps) {
             {deployment.meta?.githubCommitAuthorName && (
               <div>
                 <span className="text-muted-foreground">Author</span>
-                <p className="mt-0.5">{deployment.meta.githubCommitAuthorName}</p>
+                <p className="mt-0.5">
+                  {deployment.meta.githubCommitAuthorName}
+                </p>
               </div>
             )}
           </div>

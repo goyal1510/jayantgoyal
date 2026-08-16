@@ -1,6 +1,8 @@
-export const BRAND_ASSET_DIRECTORY = "assets/Jayant_favicon_io";
+export const BRAND_ASSET_DIRECTORY = "assets/brand";
 
 export const BRAND_ASSET_SOURCE_DIRECTORY = "assets/brand/web";
+
+export const BRAND_SOCIAL_ASSET_SOURCE_DIRECTORY = "assets/brand/social";
 
 export const BRAND_ASSET_FILES = [
   "favicon.ico",

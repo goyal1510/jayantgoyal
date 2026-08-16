@@ -18,7 +18,7 @@ import type {
   PortfolioSkillCategoryRecord,
   PortfolioSkillRecord,
   PortfolioSocialLink,
-} from "@jayant/portfolio-contracts";
+} from "@jayantgoyal/portfolio-contracts";
 
 export type UserRole = "user" | "admin" | "super_admin";
 

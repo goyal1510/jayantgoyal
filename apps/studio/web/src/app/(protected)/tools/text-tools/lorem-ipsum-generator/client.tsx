@@ -1,70 +1,134 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
-import { Copy, RefreshCw } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Copy, RefreshCw } from "lucide-react";
+import { toast } from "sonner";
 
 const loremWords = [
-  "lorem", "ipsum", "dolor", "sit", "amet", "consectetur", "adipiscing", "elit",
-  "sed", "do", "eiusmod", "tempor", "incididunt", "ut", "labore", "et", "dolore",
-  "magna", "aliqua", "enim", "ad", "minim", "veniam", "quis", "nostrud",
-  "exercitation", "ullamco", "laboris", "nisi", "aliquip", "ex", "ea", "commodo",
-  "consequat", "duis", "aute", "irure", "in", "reprehenderit", "voluptate",
-  "velit", "esse", "cillum", "fugiat", "nulla", "pariatur", "excepteur", "sint",
-  "occaecat", "cupidatat", "non", "proident", "sunt", "culpa", "qui", "officia",
-  "deserunt", "mollit", "anim", "id", "est", "laborum"
-]
+  "lorem",
+  "ipsum",
+  "dolor",
+  "sit",
+  "amet",
+  "consectetur",
+  "adipiscing",
+  "elit",
+  "sed",
+  "do",
+  "eiusmod",
+  "tempor",
+  "incididunt",
+  "ut",
+  "labore",
+  "et",
+  "dolore",
+  "magna",
+  "aliqua",
+  "enim",
+  "ad",
+  "minim",
+  "veniam",
+  "quis",
+  "nostrud",
+  "exercitation",
+  "ullamco",
+  "laboris",
+  "nisi",
+  "aliquip",
+  "ex",
+  "ea",
+  "commodo",
+  "consequat",
+  "duis",
+  "aute",
+  "irure",
+  "in",
+  "reprehenderit",
+  "voluptate",
+  "velit",
+  "esse",
+  "cillum",
+  "fugiat",
+  "nulla",
+  "pariatur",
+  "excepteur",
+  "sint",
+  "occaecat",
+  "cupidatat",
+  "non",
+  "proident",
+  "sunt",
+  "culpa",
+  "qui",
+  "officia",
+  "deserunt",
+  "mollit",
+  "anim",
+  "id",
+  "est",
+  "laborum",
+];
 
-function generateLoremIpsum(paragraphs: number, sentencesPerParagraph: number): string {
-  const result: string[] = []
+function generateLoremIpsum(
+  paragraphs: number,
+  sentencesPerParagraph: number,
+): string {
+  const result: string[] = [];
 
   for (let p = 0; p < paragraphs; p++) {
-    const sentences: string[] = []
+    const sentences: string[] = [];
 
     for (let s = 0; s < sentencesPerParagraph; s++) {
-      const words: string[] = []
-      const wordCount = Math.floor(Math.random() * 15) + 8
+      const words: string[] = [];
+      const wordCount = Math.floor(Math.random() * 15) + 8;
 
       for (let w = 0; w < wordCount; w++) {
-        const randomWord = loremWords[Math.floor(Math.random() * loremWords.length)] ?? "lorem"
+        const randomWord =
+          loremWords[Math.floor(Math.random() * loremWords.length)] ?? "lorem";
         if (w === 0) {
-          words.push(randomWord.charAt(0).toUpperCase() + randomWord.slice(1))
+          words.push(randomWord.charAt(0).toUpperCase() + randomWord.slice(1));
         } else {
-          words.push(randomWord)
+          words.push(randomWord);
         }
       }
 
-      sentences.push(words.join(" ") + ".")
+      sentences.push(words.join(" ") + ".");
     }
 
-    result.push(sentences.join(" "))
+    result.push(sentences.join(" "));
   }
 
-  return result.join("\n\n")
+  return result.join("\n\n");
 }
 
 export default function LoremIpsumGeneratorClient() {
-  const [paragraphs, setParagraphs] = React.useState(3)
-  const [sentencesPerParagraph, setSentencesPerParagraph] = React.useState(3)
-  const [text, setText] = React.useState("")
+  const [paragraphs, setParagraphs] = React.useState(3);
+  const [sentencesPerParagraph, setSentencesPerParagraph] = React.useState(3);
+  const [text, setText] = React.useState("");
 
   const generate = React.useCallback(() => {
-    const generated = generateLoremIpsum(paragraphs, sentencesPerParagraph)
-    setText(generated)
-  }, [paragraphs, sentencesPerParagraph])
+    const generated = generateLoremIpsum(paragraphs, sentencesPerParagraph);
+    setText(generated);
+  }, [paragraphs, sentencesPerParagraph]);
 
   React.useEffect(() => {
-    generate()
-  }, [generate])
+    generate();
+  }, [generate]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(text)
-    toast.success("Lorem ipsum copied to clipboard")
-  }
+    navigator.clipboard.writeText(text);
+    toast.success("Lorem ipsum copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -83,7 +147,11 @@ export default function LoremIpsumGeneratorClient() {
                 min="1"
                 max="20"
                 value={paragraphs}
-                onChange={(e) => setParagraphs(Math.max(1, Math.min(20, parseInt(e.target.value) || 1)))}
+                onChange={(e) =>
+                  setParagraphs(
+                    Math.max(1, Math.min(20, parseInt(e.target.value) || 1)),
+                  )
+                }
               />
             </div>
 
@@ -95,7 +163,11 @@ export default function LoremIpsumGeneratorClient() {
                 min="1"
                 max="10"
                 value={sentencesPerParagraph}
-                onChange={(e) => setSentencesPerParagraph(Math.max(1, Math.min(10, parseInt(e.target.value) || 1)))}
+                onChange={(e) =>
+                  setSentencesPerParagraph(
+                    Math.max(1, Math.min(10, parseInt(e.target.value) || 1)),
+                  )
+                }
               />
             </div>
 
@@ -130,5 +202,5 @@ export default function LoremIpsumGeneratorClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

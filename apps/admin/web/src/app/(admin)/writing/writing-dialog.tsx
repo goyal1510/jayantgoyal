@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { Loader2, X, Wand2 } from "lucide-react";
-import { Button } from "@jayant/web-ui/button";
-import { FormMessage } from "@jayant/web-ui/form-message";
-import { IconAction } from "@jayant/web-ui/icon-action";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { FormMessage } from "@jayantgoyal/web-ui/form-message";
+import { IconAction } from "@jayantgoyal/web-ui/icon-action";
 import {
   Dialog,
   DialogContent,
@@ -12,12 +12,12 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@jayant/web-ui/dialog";
-import { Input } from "@jayant/web-ui/input";
-import { Label } from "@jayant/web-ui/label";
-import { Textarea } from "@jayant/web-ui/textarea";
-import { Switch } from "@jayant/web-ui/switch";
-import { Badge } from "@jayant/web-ui/badge";
+} from "@jayantgoyal/web-ui/dialog";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Textarea } from "@jayantgoyal/web-ui/textarea";
+import { Switch } from "@jayantgoyal/web-ui/switch";
+import { Badge } from "@jayantgoyal/web-ui/badge";
 import type { WritingPost } from "@/lib/types";
 import { PortfolioAssetUpload } from "@/components/portfolio/asset-upload";
 import { MarkdownPreview } from "@/components/portfolio/markdown-preview";

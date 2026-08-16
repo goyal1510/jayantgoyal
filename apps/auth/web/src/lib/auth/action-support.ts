@@ -5,7 +5,7 @@ import {
   requestOriginFromHeaders,
 } from "@/lib/auth/origin";
 import { AUTH_ORIGIN } from "@/lib/auth/returns";
-import { isValidPassword } from "@jayant/web-auth/password";
+import { isValidPassword } from "@jayantgoyal/web-auth/password";
 
 export type AuthActionState = {
   error?: string;

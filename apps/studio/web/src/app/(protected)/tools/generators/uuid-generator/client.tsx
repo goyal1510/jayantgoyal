@@ -1,42 +1,48 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
-import { Copy, RefreshCw } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Copy, RefreshCw } from "lucide-react";
+import { toast } from "sonner";
 
 function generateUUID(): string {
-  return crypto.randomUUID()
+  return crypto.randomUUID();
 }
 
 export default function UUIDGeneratorClient() {
-  const [uuids, setUuids] = React.useState<string[]>([])
-  const [count, setCount] = React.useState(1)
+  const [uuids, setUuids] = React.useState<string[]>([]);
+  const [count, setCount] = React.useState(1);
 
   const generateUUIDs = React.useCallback(() => {
-    const newUUIDs: string[] = []
+    const newUUIDs: string[] = [];
     for (let i = 0; i < count; i++) {
-      newUUIDs.push(generateUUID())
+      newUUIDs.push(generateUUID());
     }
-    setUuids(newUUIDs)
-  }, [count])
+    setUuids(newUUIDs);
+  }, [count]);
 
   React.useEffect(() => {
-    generateUUIDs()
-  }, [generateUUIDs])
+    generateUUIDs();
+  }, [generateUUIDs]);
 
   const copyToClipboard = (uuid: string) => {
-    navigator.clipboard.writeText(uuid)
-    toast.success("UUID copied to clipboard")
-  }
+    navigator.clipboard.writeText(uuid);
+    toast.success("UUID copied to clipboard");
+  };
 
   const copyAllToClipboard = () => {
-    navigator.clipboard.writeText(uuids.join("\n"))
-    toast.success("All UUIDs copied to clipboard")
-  }
+    navigator.clipboard.writeText(uuids.join("\n"));
+    toast.success("All UUIDs copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -55,7 +61,11 @@ export default function UUIDGeneratorClient() {
                 min="1"
                 max="100"
                 value={count}
-                onChange={(e) => setCount(Math.max(1, Math.min(100, parseInt(e.target.value) || 1)))}
+                onChange={(e) =>
+                  setCount(
+                    Math.max(1, Math.min(100, parseInt(e.target.value) || 1)),
+                  )
+                }
               />
             </div>
 
@@ -71,10 +81,16 @@ export default function UUIDGeneratorClient() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle>Generated UUIDs</CardTitle>
-                <CardDescription>{uuids.length} UUID{uuids.length !== 1 ? "s" : ""} generated</CardDescription>
+                <CardDescription>
+                  {uuids.length} UUID{uuids.length !== 1 ? "s" : ""} generated
+                </CardDescription>
               </div>
               {uuids.length > 0 && (
-                <Button variant="outline" size="sm" onClick={copyAllToClipboard}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={copyAllToClipboard}
+                >
                   <Copy className="h-4 w-4 mr-2" />
                   Copy All
                 </Button>
@@ -84,10 +100,15 @@ export default function UUIDGeneratorClient() {
           <CardContent>
             <div className="space-y-2 max-h-[400px] overflow-y-auto">
               {uuids.length === 0 ? (
-                <p className="text-muted-foreground text-sm">No UUIDs generated yet</p>
+                <p className="text-muted-foreground text-sm">
+                  No UUIDs generated yet
+                </p>
               ) : (
                 uuids.map((uuid, index) => (
-                  <div key={index} className="flex items-center gap-2 p-2 rounded border">
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 p-2 rounded border"
+                  >
                     <code className="flex-1 font-mono text-sm">{uuid}</code>
                     <Button
                       variant="ghost"
@@ -105,5 +126,5 @@ export default function UUIDGeneratorClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

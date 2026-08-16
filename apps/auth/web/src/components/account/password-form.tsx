@@ -5,7 +5,7 @@ import { useActionState } from "react";
 import { changePasswordAction } from "@/app/actions/account";
 import { ActionMessage } from "@/components/auth/action-message";
 import { SubmitButton } from "@/components/auth/submit-button";
-import { PasswordField } from "@jayant/web-ui/auth-presentation";
+import { PasswordField } from "@jayantgoyal/web-ui/auth-presentation";
 
 const initialState = {};
 

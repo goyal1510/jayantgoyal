@@ -1,31 +1,39 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
 
 export default function PercentageCalculatorClient() {
-  const [value1, setValue1] = React.useState("")
-  const [value2, setValue2] = React.useState("")
-  const [percentage, setPercentage] = React.useState<number | null>(null)
+  const [value1, setValue1] = React.useState("");
+  const [value2, setValue2] = React.useState("");
+  const [percentage, setPercentage] = React.useState<number | null>(null);
 
   React.useEffect(() => {
-    const v1 = parseFloat(value1)
-    const v2 = parseFloat(value2)
+    const v1 = parseFloat(value1);
+    const v2 = parseFloat(value2);
     if (!isNaN(v1) && !isNaN(v2) && v2 !== 0) {
-      setPercentage((v1 / v2) * 100)
+      setPercentage((v1 / v2) * 100);
     } else {
-      setPercentage(null)
+      setPercentage(null);
     }
-  }, [value1, value2])
+  }, [value1, value2]);
 
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
           <CardTitle>Calculate Percentage</CardTitle>
-          <CardDescription>Enter two values to calculate percentage</CardDescription>
+          <CardDescription>
+            Enter two values to calculate percentage
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -60,9 +68,7 @@ export default function PercentageCalculatorClient() {
             <CardDescription>Percentage calculation</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">
-              {percentage.toFixed(2)}%
-            </p>
+            <p className="text-3xl font-bold">{percentage.toFixed(2)}%</p>
             <p className="text-sm text-muted-foreground mt-2">
               {value1} is {percentage.toFixed(2)}% of {value2}
             </p>
@@ -70,5 +76,5 @@ export default function PercentageCalculatorClient() {
         </Card>
       )}
     </div>
-  )
+  );
 }

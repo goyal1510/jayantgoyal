@@ -5,8 +5,8 @@ import { useActionState } from "react";
 import { updateProfileAction } from "@/app/actions/account";
 import { ActionMessage } from "@/components/auth/action-message";
 import { SubmitButton } from "@/components/auth/submit-button";
-import { Input } from "@jayant/web-ui/input";
-import { Label } from "@jayant/web-ui/label";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
 
 const initialState = {};
 

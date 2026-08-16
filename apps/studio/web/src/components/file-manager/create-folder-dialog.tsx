@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,17 +8,17 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@jayant/web-ui/dialog"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
-import { FolderPlus } from "lucide-react"
+} from "@jayantgoyal/web-ui/dialog";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { FolderPlus } from "lucide-react";
 
 interface CreateFolderDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  parentPath: string
-  onSuccess?: () => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  parentPath: string;
+  onSuccess?: () => void;
 }
 
 export function CreateFolderDialog({
@@ -27,22 +27,22 @@ export function CreateFolderDialog({
   parentPath,
   onSuccess,
 }: CreateFolderDialogProps) {
-  const [folderName, setFolderName] = React.useState("")
-  const [loading, setLoading] = React.useState(false)
-  const [error, setError] = React.useState<string | null>(null)
+  const [folderName, setFolderName] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
 
   // Reset form when dialog opens/closes
   React.useEffect(() => {
     if (open) {
-      setFolderName("")
-      setError(null)
+      setFolderName("");
+      setError(null);
     }
-  }, [open])
+  }, [open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
-    setLoading(true)
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
 
     try {
       const response = await fetch("/api/files/folder", {
@@ -54,26 +54,26 @@ export function CreateFolderDialog({
           name: folderName,
           parentPath,
         }),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to create folder")
+        throw new Error(data.error || "Failed to create folder");
       }
 
       // Success
-      onOpenChange(false)
-      setFolderName("")
+      onOpenChange(false);
+      setFolderName("");
       if (onSuccess) {
-        onSuccess()
+        onSuccess();
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
+      setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -100,9 +100,7 @@ export function CreateFolderDialog({
                 autoFocus
                 required
               />
-              {error && (
-                <p className="text-sm text-destructive">{error}</p>
-              )}
+              {error && <p className="text-sm text-destructive">{error}</p>}
             </div>
           </div>
           <DialogFooter className="flex-col-reverse sm:flex-row gap-2">
@@ -115,12 +113,16 @@ export function CreateFolderDialog({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={loading || !folderName.trim()} className="w-full sm:w-auto">
+            <Button
+              type="submit"
+              disabled={loading || !folderName.trim()}
+              className="w-full sm:w-auto"
+            >
               {loading ? "Creating..." : "Create"}
             </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

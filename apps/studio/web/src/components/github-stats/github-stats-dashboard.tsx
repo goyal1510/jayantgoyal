@@ -4,23 +4,23 @@ import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import dynamic from "next/dynamic";
 import { Github, Search, X } from "lucide-react";
 import { m } from "framer-motion";
-import { Input } from "@jayant/web-ui/input";
-import { Button } from "@jayant/web-ui/button";
-import { Skeleton } from "@jayant/web-ui/skeleton";
-import { Card, CardContent } from "@jayant/web-ui/card";
-import { PageSpinner } from "@jayant/web-ui/page-spinner";
-import { createGitHubProxyClient } from "@jayant/github/proxy";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Skeleton } from "@jayantgoyal/web-ui/skeleton";
+import { Card, CardContent } from "@jayantgoyal/web-ui/card";
+import { PageSpinner } from "@jayantgoyal/web-ui/page-spinner";
+import { createGitHubProxyClient } from "@jayantgoyal/github/proxy";
 import {
   computeStats,
   computeLanguageDistribution,
   getTopReposByStars,
-} from "@jayant/github";
-import type { GitHubUser, GitHubRepo } from "@jayant/github";
+} from "@jayantgoyal/github";
+import type { GitHubUser, GitHubRepo } from "@jayantgoyal/github";
 import { ProfileCard } from "./profile-card";
 import { StatsCards } from "./stats-cards";
 import { ContributionCalendar } from "./contribution-calendar";
 import { RepositoryTable } from "./repository-table";
-import { WorkspaceHeader } from "@jayant/web-ui/workspace-header";
+import { WorkspaceHeader } from "@jayantgoyal/web-ui/workspace-header";
 
 const LanguagePieChart = dynamic(
   () =>

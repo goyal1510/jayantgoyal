@@ -1,42 +1,48 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 function generateNumeronym(word: string): string {
-  const trimmed = word.trim()
-  if (trimmed.length <= 3) return trimmed
+  const trimmed = word.trim();
+  if (trimmed.length <= 3) return trimmed;
 
-  const first = trimmed[0]
-  const last = trimmed[trimmed.length - 1]
-  const middle = trimmed.length - 2
+  const first = trimmed[0];
+  const last = trimmed[trimmed.length - 1];
+  const middle = trimmed.length - 2;
 
-  return `${first}${middle}${last}`
+  return `${first}${middle}${last}`;
 }
 
 export default function NumeronymGeneratorClient() {
-  const [input, setInput] = React.useState("")
-  const [output, setOutput] = React.useState("")
+  const [input, setInput] = React.useState("");
+  const [output, setOutput] = React.useState("");
 
   React.useEffect(() => {
     if (!input.trim()) {
-      setOutput("")
-      return
+      setOutput("");
+      return;
     }
 
-    const words = input.split(/\s+/)
-    const numeronyms = words.map(word => generateNumeronym(word))
-    setOutput(numeronyms.join(" "))
-  }, [input])
+    const words = input.split(/\s+/);
+    const numeronyms = words.map((word) => generateNumeronym(word));
+    setOutput(numeronyms.join(" "));
+  }, [input]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(output)
-    toast.success("Numeronym copied to clipboard")
-  }
+    navigator.clipboard.writeText(output);
+    toast.success("Numeronym copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -73,14 +79,10 @@ export default function NumeronymGeneratorClient() {
             </div>
           </CardHeader>
           <CardContent>
-            <Input
-              value={output}
-              readOnly
-              className="font-mono text-lg"
-            />
+            <Input value={output} readOnly className="font-mono text-lg" />
           </CardContent>
         </Card>
       </div>
     </div>
-  )
+  );
 }

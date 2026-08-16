@@ -7,9 +7,9 @@ import { useRouter } from "next/navigation";
 
 import { createCalculation } from "@/lib/calculator/client-calculations";
 import { CURRENCY_DENOMINATIONS } from "@/lib/calculator/database";
-import { Button } from "@jayant/web-ui/button";
-import { Input } from "@jayant/web-ui/input";
-import { WorkspaceHeader } from "@jayant/web-ui/workspace-header";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { WorkspaceHeader } from "@jayantgoyal/web-ui/workspace-header";
 
 interface DenominationInput {
   denomination: number;

@@ -1,70 +1,78 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
-import { Download, Wifi, RefreshCw } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Download, Wifi, RefreshCw } from "lucide-react";
+import { toast } from "sonner";
 
 export default function WiFiQRCodeGeneratorClient() {
-  const [ssid, setSSID] = React.useState("")
-  const [password, setPassword] = React.useState("")
-  const [security, setSecurity] = React.useState("WPA")
-  const [hidden, setHidden] = React.useState(false)
-  const [qrUrl, setQrUrl] = React.useState("")
-  const [isDetecting, setIsDetecting] = React.useState(false)
+  const [ssid, setSSID] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [security, setSecurity] = React.useState("WPA");
+  const [hidden, setHidden] = React.useState(false);
+  const [qrUrl, setQrUrl] = React.useState("");
+  const [isDetecting, setIsDetecting] = React.useState(false);
 
   React.useEffect(() => {
     if (!ssid.trim()) {
-      setQrUrl("")
-      return
+      setQrUrl("");
+      return;
     }
 
     // WiFi QR code format: WIFI:T:WPA;S:SSID;P:Password;H:true;;
-    const wifiString = `WIFI:T:${security};S:${ssid};P:${password};H:${hidden ? "true" : "false"};;`
-    const encoded = encodeURIComponent(wifiString)
-    setQrUrl(`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encoded}`)
-  }, [ssid, password, security, hidden])
+    const wifiString = `WIFI:T:${security};S:${ssid};P:${password};H:${hidden ? "true" : "false"};;`;
+    const encoded = encodeURIComponent(wifiString);
+    setQrUrl(
+      `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encoded}`,
+    );
+  }, [ssid, password, security, hidden]);
 
   const downloadQR = () => {
-    if (!qrUrl) return
-    const link = document.createElement("a")
-    link.href = qrUrl
-    link.download = "wifi-qrcode.png"
-    link.click()
-    toast.success("WiFi QR code downloaded")
-  }
+    if (!qrUrl) return;
+    const link = document.createElement("a");
+    link.href = qrUrl;
+    link.download = "wifi-qrcode.png";
+    link.click();
+    toast.success("WiFi QR code downloaded");
+  };
 
   const detectCurrentWiFi = async () => {
-    setIsDetecting(true)
+    setIsDetecting(true);
 
     try {
       type NetworkInformation = {
-        type?: string
-        effectiveType?: string
-      }
+        type?: string;
+        effectiveType?: string;
+      };
       type ExtendedNavigator = Navigator & {
-        getNetworkInformation?: () => Promise<{ ssid?: string }>
+        getNetworkInformation?: () => Promise<{ ssid?: string }>;
         wifi?: {
-          getCurrentWifiInfo(): Promise<{ ssid?: string }>
-        }
-        connection?: NetworkInformation
-        mozConnection?: NetworkInformation
-        webkitConnection?: NetworkInformation
-      }
-      const extendedNavigator = navigator as ExtendedNavigator
+          getCurrentWifiInfo(): Promise<{ ssid?: string }>;
+        };
+        connection?: NetworkInformation;
+        mozConnection?: NetworkInformation;
+        webkitConnection?: NetworkInformation;
+      };
+      const extendedNavigator = navigator as ExtendedNavigator;
 
       // Try to detect SSID using experimental APIs (limited browser support)
       if (extendedNavigator.getNetworkInformation) {
         try {
-          const networkInfo = await extendedNavigator.getNetworkInformation()
+          const networkInfo = await extendedNavigator.getNetworkInformation();
           if (networkInfo?.ssid) {
-            setSSID(networkInfo.ssid)
-            toast.success("WiFi SSID detected successfully")
-            setIsDetecting(false)
-            return
+            setSSID(networkInfo.ssid);
+            toast.success("WiFi SSID detected successfully");
+            setIsDetecting(false);
+            return;
           }
         } catch {
           // API not available
@@ -74,12 +82,12 @@ export default function WiFiQRCodeGeneratorClient() {
       // Try Chrome/Edge experimental API on Android
       if (extendedNavigator.wifi) {
         try {
-          const wifiInfo = await extendedNavigator.wifi.getCurrentWifiInfo()
+          const wifiInfo = await extendedNavigator.wifi.getCurrentWifiInfo();
           if (wifiInfo?.ssid) {
-            setSSID(wifiInfo.ssid)
-            toast.success("WiFi SSID detected successfully")
-            setIsDetecting(false)
-            return
+            setSSID(wifiInfo.ssid);
+            toast.success("WiFi SSID detected successfully");
+            setIsDetecting(false);
+            return;
           }
         } catch {
           // API not available
@@ -90,28 +98,33 @@ export default function WiFiQRCodeGeneratorClient() {
       const connection =
         extendedNavigator.connection ||
         extendedNavigator.mozConnection ||
-        extendedNavigator.webkitConnection
+        extendedNavigator.webkitConnection;
 
       if (connection) {
-        const isWifi = connection.type === 'wifi' || connection.effectiveType?.includes('wifi')
+        const isWifi =
+          connection.type === "wifi" ||
+          connection.effectiveType?.includes("wifi");
 
         if (isWifi) {
           // WiFi detected but SSID not accessible
-          toast.info("WiFi connection detected. Please enter the network name (SSID) manually.")
+          toast.info(
+            "WiFi connection detected. Please enter the network name (SSID) manually.",
+          );
         } else {
-          toast.info("Unable to detect WiFi network. Please enter the network details manually.")
+          toast.info(
+            "Unable to detect WiFi network. Please enter the network details manually.",
+          );
         }
       } else {
         // No connection info available
-        toast.info("Please enter your WiFi network name (SSID) manually.")
+        toast.info("Please enter your WiFi network name (SSID) manually.");
       }
-
     } catch {
-      toast.info("Please enter your WiFi network details manually.")
+      toast.info("Please enter your WiFi network details manually.");
     } finally {
-      setIsDetecting(false)
+      setIsDetecting(false);
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -151,7 +164,8 @@ export default function WiFiQRCodeGeneratorClient() {
               placeholder="MyWiFiNetwork"
             />
             <p className="text-xs text-muted-foreground">
-              WiFi detection may not work on all browsers. Passwords must be entered manually for security.
+              WiFi detection may not work on all browsers. Passwords must be
+              entered manually for security.
             </p>
           </div>
           <div className="space-y-2">
@@ -210,5 +224,5 @@ export default function WiFiQRCodeGeneratorClient() {
         </Card>
       )}
     </div>
-  )
+  );
 }

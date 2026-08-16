@@ -6,37 +6,38 @@ manifests and export maps remain executable sources of truth.
 
 ## Product-owned contract
 
-### `@jayant/portfolio-contracts`
+### `@jayantgoyal/portfolio-contracts`
 
 - Location: `apps/portfolio/contracts`
 - Owner: Portfolio
-- Consumers: `@jayant/portfolio-web`, `@jayant/admin-web`
+- Consumers: `@jayantgoyal/portfolio-web`, `@jayantgoyal/admin-web`
 - Public exports: `.`, `./writing`, `./guards`, `./portfolio`,
   `./presentation`, `./sections`
 - Responsibility: selected public/Admin columns, table and section vocabulary,
   runtime readers/validators, Work case-study shape, Writing shape, and
   transactional section-presentation contract.
 - Decision: remain product-owned and shared. Admin consumption does not make it
-  ecosystem-neutral. It has no web-client dependency.
+  product-neutral. It has no web-client dependency.
 
-## Ecosystem package
+## Foundation package
 
-### `@jayant/identity`
+### `@jayantgoyal/identity`
 
-- Location: `packages/ecosystem/identity`
-- Consumer: `@jayant/web-brand`
+- Location: `packages/foundation/identity`
+- Consumers: `@jayantgoyal/web-brand`, `@jayantgoyal/web-urls`,
+  `@jayantgoyal/web-auth`
 - Public export: `.`
-- Responsibility: framework-neutral person name, product identifiers, and
-  public product naming inputs.
-- Decision: remain ecosystem-shared. It is dependency-free at runtime and does
-  not contain URLs, Next.js metadata, or visual assets.
+- Responsibility: framework-neutral person identity, technical namespace,
+  product identifiers/names, canonical hosts/origins, and development origins.
+- Decision: remain shared and dependency-free. It contains no Next.js metadata
+  or visual assets; web projections remain downstream.
 
 ## Integration package
 
-### `@jayant/github`
+### `@jayantgoyal/github`
 
 - Location: `packages/integrations/github`
-- Consumers: `@jayant/portfolio-web`, `@jayant/studio-web`
+- Consumers: `@jayantgoyal/portfolio-web`, `@jayantgoyal/studio-web`
 - Public exports: `.`, `./proxy`, `./server`
 - Responsibility: typed GitHub client errors, public/proxy contracts, and
   server statistics client shared by two products.
@@ -45,7 +46,7 @@ manifests and export maps remain executable sources of truth.
 
 ## Web packages
 
-### `@jayant/web-auth`
+### `@jayantgoyal/web-auth`
 
 - Location: `packages/web/auth`
 - Consumers: Studio, Admin, Auth web clients
@@ -55,43 +56,46 @@ manifests and export maps remain executable sources of truth.
 - Responsibility: Supabase SSR client construction, shared cookie modes,
   entry/return helpers, password/profile/provider primitives, logout scope,
   Auth surface vocabulary, and server-only service-role factory.
+- Internal dependency: `@jayantgoyal/identity` for trusted production hosts,
+  cookie-domain policy, and the canonical Auth origin.
 - Decision: remain web-shared. It intentionally depends on web cookies and
   Supabase SSR; it does not own product authorization or Auth page UI.
 
-### `@jayant/web-brand`
+### `@jayantgoyal/web-brand`
 
 - Location: `packages/web/brand`
-- Consumers: all four web clients, `@jayant/web-seo`, `@jayant/web-urls`
-- Internal dependency: `@jayant/identity`
+- Consumers: all four web clients and `@jayantgoyal/web-seo`
+- Internal dependency: `@jayantgoyal/identity`
 - Public export: `.`
 - Responsibility: web-facing app names, descriptions, title templates,
-  manifests, metadata defaults, and synchronized asset paths.
+  public labels, canonical asset paths, and social-preview descriptors.
 - Decision: remain web-shared. Framework-neutral identity stays in
-  `@jayant/identity`; web projection belongs here.
+  `@jayantgoyal/identity`; web projection belongs here.
 
-### `@jayant/web-urls`
+### `@jayantgoyal/web-urls`
 
 - Location: `packages/web/urls`
-- Consumers: Auth, Portfolio, Studio, `@jayant/web-seo`
-- Internal dependency: `@jayant/web-brand`
+- Consumers: Auth, Portfolio, Studio, Admin, `@jayantgoyal/web-seo`
+- Internal dependency: `@jayantgoyal/identity`
 - Public export: `.`
 - Responsibility: canonical application origins, environment-aware origin
   selection, host checks, and URL construction/rewriting.
 - Decision: remain web-shared. It represents web deployment origins, not
   product/platform identity in general.
 
-### `@jayant/web-seo`
+### `@jayantgoyal/web-seo`
 
 - Location: `packages/web/seo`
-- Consumers: Portfolio and Studio
-- Internal dependencies: `@jayant/web-brand`, `@jayant/web-urls`
+- Consumers: Portfolio, Studio, Admin, and Auth
+- Internal dependencies: `@jayantgoyal/web-brand`, `@jayantgoyal/web-urls`
 - Public export: `.`
-- Responsibility: Next.js metadata builders, canonical/social preview data,
-  host-aware indexability, and shared path normalization.
+- Responsibility: Next.js root/page/article metadata builders, web manifests,
+  canonical/social preview data, host-aware indexability, and shared path
+  normalization.
 - Decision: remain web-shared. SEO is intentionally web/Next.js-specific and
   does not need to become a universal package.
 
-### `@jayant/web-ui`
+### `@jayantgoyal/web-ui`
 
 - Location: `packages/web/ui`
 - Consumers: Studio, Admin, Auth
@@ -102,7 +106,7 @@ manifests and export maps remain executable sources of truth.
 - Decision: remain web-shared. Portfolio's editorial system stays local because
   its composition and visual responsibility differ.
 
-### `@jayant/tailwind-config`
+### `@jayantgoyal/tailwind-config`
 
 - Location: `packages/web/tailwind-config`
 - Consumers: all four web clients
@@ -113,7 +117,7 @@ manifests and export maps remain executable sources of truth.
 
 ## Tooling packages
 
-### `@jayant/eslint-config`
+### `@jayantgoyal/eslint-config`
 
 - Location: `packages/tooling/eslint-config`
 - Consumers: every application, product contract, and source package
@@ -122,7 +126,7 @@ manifests and export maps remain executable sources of truth.
   and internal React packages.
 - Decision: remain tooling-shared. It has no application runtime role.
 
-### `@jayant/typescript-config`
+### `@jayantgoyal/typescript-config`
 
 - Location: `packages/tooling/typescript-config`
 - Consumers: every application, product contract, and source package
@@ -132,12 +136,12 @@ manifests and export maps remain executable sources of truth.
 
 ## Application dependency summary
 
-| Application             | Internal runtime packages                         |
-| ----------------------- | ------------------------------------------------- |
-| `@jayant/portfolio-web` | web brand, URLs, SEO; Portfolio contracts; GitHub |
-| `@jayant/studio-web`    | web auth, brand, URLs, SEO, UI; GitHub            |
-| `@jayant/admin-web`     | web auth, brand, UI; Portfolio contracts          |
-| `@jayant/auth-web`      | web auth, brand, URLs, UI                         |
+| Application                  | Internal runtime packages                                     |
+| ---------------------------- | ------------------------------------------------------------- |
+| `@jayantgoyal/portfolio-web` | web brand, URLs, SEO; Portfolio contracts; GitHub             |
+| `@jayantgoyal/studio-web`    | web auth, brand, URLs, SEO, UI; GitHub                        |
+| `@jayantgoyal/admin-web`     | identity; web auth, brand, URLs, SEO, UI; Portfolio contracts |
+| `@jayantgoyal/auth-web`      | web auth, brand, URLs, SEO, UI                                |
 
 All applications also consume shared web styling and tooling configuration.
 No application imports another application's source.

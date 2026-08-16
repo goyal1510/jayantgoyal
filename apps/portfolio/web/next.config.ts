@@ -1,5 +1,5 @@
 import type { NextConfig } from "next";
-import { applicationOrigin } from "@jayant/web-urls";
+import { applicationOrigin } from "@jayantgoyal/web-urls";
 import { createRequire } from "node:module";
 
 const STUDIO_URL = applicationOrigin(
@@ -96,7 +96,7 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@jayant/web-urls", "@jayant/web-seo"],
+  transpilePackages: ["@jayantgoyal/web-urls", "@jayantgoyal/web-seo"],
   images: {
     qualities: [75, 92],
     remotePatterns: [

@@ -1,5 +1,5 @@
 {
-  "extends": "@jayant/typescript-config/react-library.json",
+  "extends": "@jayantgoyal/typescript-config/react-library.json",
   "compilerOptions": {
     "noEmit": true,
     "module": "ESNext",

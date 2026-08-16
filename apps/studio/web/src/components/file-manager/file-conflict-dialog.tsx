@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   Dialog,
@@ -7,30 +7,30 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@jayant/web-ui/dialog"
-import { Button } from "@jayant/web-ui/button"
-import { AlertCircle, Replace, SkipForward, Copy } from "lucide-react"
-import { formatFileSize } from "@/lib/file-manager/format-utils"
+} from "@jayantgoyal/web-ui/dialog";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { AlertCircle, Replace, SkipForward, Copy } from "lucide-react";
+import { formatFileSize } from "@/lib/file-manager/format-utils";
 
 export interface FileConflictInfo {
   existingFile: {
-    id: string
-    name: string
-    fileName: string
-    path: string
-    size: number
-    updated_at: string
-    is_directory?: boolean
-  }
+    id: string;
+    name: string;
+    fileName: string;
+    path: string;
+    size: number;
+    updated_at: string;
+    is_directory?: boolean;
+  };
 }
 
-export type FileConflictResolution = "replace" | "skip" | "rename"
+export type FileConflictResolution = "replace" | "skip" | "rename";
 
 interface FileConflictDialogProps {
-  conflict: FileConflictInfo | null
-  fileName: string
-  action: "move" | "copy"
-  onResolve: (resolution: FileConflictResolution | null) => void
+  conflict: FileConflictInfo | null;
+  fileName: string;
+  action: "move" | "copy";
+  onResolve: (resolution: FileConflictResolution | null) => void;
 }
 
 export function FileConflictDialog({
@@ -39,14 +39,14 @@ export function FileConflictDialog({
   action,
   onResolve,
 }: FileConflictDialogProps) {
-  if (!conflict) return null
+  if (!conflict) return null;
 
   const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleString()
-  }
+    return new Date(dateString).toLocaleString();
+  };
 
-  const isDirectory = conflict.existingFile.is_directory
-  const entityType = isDirectory ? "folder" : "file"
+  const isDirectory = conflict.existingFile.is_directory;
+  const entityType = isDirectory ? "folder" : "file";
 
   return (
     <Dialog open={!!conflict} onOpenChange={() => onResolve(null)}>
@@ -57,18 +57,25 @@ export function FileConflictDialog({
             File Already Exists
           </DialogTitle>
           <DialogDescription>
-            A {entityType} named <span className="font-medium">{fileName}</span> already exists at the destination.
+            A {entityType} named <span className="font-medium">{fileName}</span>{" "}
+            already exists at the destination.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-3 py-2">
           <div className="rounded-md border p-3 space-y-1">
-            <p className="text-sm font-medium">Existing {entityType}: <span className="font-normal">{conflict.existingFile.fileName}</span></p>
+            <p className="text-sm font-medium">
+              Existing {entityType}:{" "}
+              <span className="font-normal">
+                {conflict.existingFile.fileName}
+              </span>
+            </p>
             <p className="text-xs text-muted-foreground">
               Path: {conflict.existingFile.path}
             </p>
             <p className="text-xs text-muted-foreground">
-              {!isDirectory && `Size: ${formatFileSize(conflict.existingFile.size)} • `}
+              {!isDirectory &&
+                `Size: ${formatFileSize(conflict.existingFile.size)} • `}
               Modified: {formatDate(conflict.existingFile.updated_at)}
             </p>
           </div>
@@ -101,5 +108,5 @@ export function FileConflictDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

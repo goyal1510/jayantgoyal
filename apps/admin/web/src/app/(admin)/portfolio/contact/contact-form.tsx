@@ -4,27 +4,27 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2, Save, Plus, X } from "lucide-react";
-import { PORTFOLIO_SOCIAL_ICON_OPTIONS } from "@jayant/portfolio-contracts";
+import { PORTFOLIO_SOCIAL_ICON_OPTIONS } from "@jayantgoyal/portfolio-contracts";
 import { createPortfolioData, updatePortfolioData } from "@/lib/portfolio-api";
-import { Button } from "@jayant/web-ui/button";
-import { IconAction } from "@jayant/web-ui/icon-action";
-import { FormMessage } from "@jayant/web-ui/form-message";
-import { Input } from "@jayant/web-ui/input";
-import { Label } from "@jayant/web-ui/label";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { IconAction } from "@jayantgoyal/web-ui/icon-action";
+import { FormMessage } from "@jayantgoyal/web-ui/form-message";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@jayant/web-ui/select";
+} from "@jayantgoyal/web-ui/select";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@jayant/web-ui/card";
+} from "@jayantgoyal/web-ui/card";
 import type { Contact, SocialLink } from "@/lib/types";
 import { useUnsavedChangesGuard } from "@/lib/use-unsaved-changes-guard";
 import { AccessibleForm } from "@/components/accessible-form";

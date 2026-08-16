@@ -6,10 +6,10 @@ const { createRequestClientMock } = vi.hoisted(() => ({
   createRequestClientMock: vi.fn(),
 }));
 
-vi.mock("@jayant/web-auth/server", async () => {
+vi.mock("@jayantgoyal/web-auth/server", async () => {
   const actual = await vi.importActual<
-    typeof import("@jayant/web-auth/server")
-  >("@jayant/web-auth/server");
+    typeof import("@jayantgoyal/web-auth/server")
+  >("@jayantgoyal/web-auth/server");
   return {
     ...actual,
     createSupabaseRequestClient: createRequestClientMock,

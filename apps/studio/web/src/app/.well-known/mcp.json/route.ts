@@ -1,11 +1,11 @@
-import { NextResponse } from "next/server"
+import { NextResponse } from "next/server";
 
-import { SITE_URL } from "@/lib/seo/config"
+import { SITE_URL } from "@/lib/seo/config";
 
 export async function GET() {
   return NextResponse.json({
     serverInfo: {
-      name: "studio.jayantgoyal.com",
+      name: new URL(SITE_URL).hostname,
       version: "1.0.0",
     },
     description:
@@ -15,5 +15,5 @@ export async function GET() {
       tools: true,
       resources: true,
     },
-  })
+  });
 }

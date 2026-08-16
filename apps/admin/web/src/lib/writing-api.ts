@@ -2,7 +2,7 @@ import type {
   PortfolioWritingPostRecord,
   PortfolioWritingUpdateInput,
   PortfolioWritingWriteInput,
-} from "@jayant/portfolio-contracts";
+} from "@jayantgoyal/portfolio-contracts";
 
 type WritingTable = "writing_posts";
 
@@ -39,7 +39,7 @@ export async function updateWritingData(
 
 export async function deleteWritingData(
   table: WritingTable,
-  id: string
+  id: string,
 ): Promise<WritingApiResponse<void>> {
   const response = await fetch(`/api/jg-app/${table}?id=${id}`, {
     method: "DELETE",

@@ -1,24 +1,28 @@
 # Design and brand
 
-Jayant has one identity with product-specific presentations. Shared brand
-contracts prevent naming and metadata drift; they do not force every product
-into one visual system.
+Jayant is the public person identity, while each product has its own
+presentation. The repository/domain slug and `jg` mark remain technical and
+visual identifiers rather than additional personal or umbrella-product names.
+See the [naming contract](naming-contract.md) for the complete rules.
 
 ## Ownership
 
-- `@jayant/identity` owns framework-neutral person and product names.
-- `@jayant/web-brand` owns web metadata labels, title templates, manifests,
-  and canonical deployable asset paths.
+- `@jayantgoyal/identity` owns person/technical identity, product names,
+  canonical hosts/origins, and development origins.
+- `@jayantgoyal/web-brand` owns web labels, descriptions, title templates,
+  social-preview records, and deployable asset paths.
+- `@jayantgoyal/web-seo` owns complete root/page/article metadata and manifest
+  builders.
 - `assets/brand/web` is the canonical web favicon source.
-- `@jayant/web-ui` owns reusable application-surface components used by Studio,
+- `assets/brand/social` is the canonical product social-preview source.
+- `@jayantgoyal/web-ui` owns reusable application-surface components used by Studio,
   Admin, and Auth.
 - Portfolio owns its public editorial component and stylesheet system.
-- `@jayant/tailwind-config` owns shared web styling foundations.
+- `@jayantgoyal/tailwind-config` owns shared web styling foundations.
 
 Run `pnpm check:brand-assets` after changing canonical assets or deployable
-copies. New clients should project the same ecosystem identity into their own
-platform-native asset formats rather than treating the web asset directory as
-universal.
+copies. New clients should project the same identity foundation into their own
+client-native asset formats rather than treating web paths as universal.
 
 Shared components should encode stable behavior and accessibility, not erase
 meaningful product identity. Promote a component only after reuse is real;
@@ -26,21 +30,22 @@ keep page-specific composition inside the owning client.
 
 ## Identity layers
 
-| Layer                | Examples                                                      | Owner               |
-| -------------------- | ------------------------------------------------------------- | ------------------- |
-| Ecosystem identity   | Jayant/person name and product IDs                            | `@jayant/identity`  |
-| Web identity         | Titles, descriptions, manifests, social previews, asset paths | `@jayant/web-brand` |
-| Web origin           | Canonical/Preview/local URLs and host checks                  | `@jayant/web-urls`  |
-| Application surface  | Sidebar, dialogs, inputs, navigation/loading primitives       | `@jayant/web-ui`    |
-| Product presentation | Portfolio editorial system; Studio/Admin/Auth composition     | Owning web client   |
+| Layer                | Examples                                                  | Owner                    |
+| -------------------- | --------------------------------------------------------- | ------------------------ |
+| Identity foundation  | Person, technical namespace, products, origins/hosts      | `@jayantgoyal/identity`  |
+| Web brand            | Titles, descriptions, social previews, asset paths        | `@jayantgoyal/web-brand` |
+| Web URL              | Overrides, URL construction, normalization, host checks   | `@jayantgoyal/web-urls`  |
+| Web SEO              | Root/page/article metadata and installable manifests      | `@jayantgoyal/web-seo`   |
+| Application surface  | Sidebar, dialogs, inputs, navigation/loading primitives   | `@jayantgoyal/web-ui`    |
+| Product presentation | Portfolio editorial system; Studio/Admin/Auth composition | Owning web client        |
 
-The domain `jayantgoyal.com` identifies the public host family; it does not
-rename the ecosystem. Product display names come from shared brand contracts,
-while route-specific copy remains product content.
+The domain `jayantgoyal.com` identifies the public host family. It is not a
+personal full name or product brand. Product display names come from shared
+contracts, while route-specific copy remains product content.
 
 ## Shared UI extraction
 
-A component belongs in `@jayant/web-ui` when multiple application-style web
+A component belongs in `@jayantgoyal/web-ui` when multiple application-style web
 clients need the same semantics, interaction, accessibility, variants, and
 maintenance owner. A similar-looking page section stays local when content,
 layout, or lifecycle differs. Portfolio deliberately does not depend on the
@@ -60,8 +65,9 @@ optional page decoration.
 
 ## Asset change workflow
 
-1. Update the canonical source in `assets/brand/web`.
-2. Update each web client's deployable public copy.
+1. Update the relevant source in `assets/brand/web` or `assets/brand/social`.
+2. Update each owning web client's deployable public copy and any special
+   `src/app/favicon.ico` file.
 3. Update manifest/metadata dimensions or types when the asset contract changes.
 4. Run `pnpm check:brand-assets`, client metadata tests, and affected builds.
 5. For a future native client, generate native formats from the identity source

@@ -4,7 +4,7 @@ import * as React from "react";
 import { ChevronLeft, ChevronRight, Clock, History } from "lucide-react";
 
 import type { CalculationWithDenominations } from "@/lib/calculator/database";
-import { Button } from "@jayant/web-ui/button";
+import { Button } from "@jayantgoyal/web-ui/button";
 
 import {
   formatDateDisplay,

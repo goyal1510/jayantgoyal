@@ -21,7 +21,8 @@ import {
   type PortfolioSectionContentPublicRow,
   type PortfolioSkillCategoryPublicRow,
   type PortfolioSkillPublicRow,
-} from "@jayant/portfolio-contracts";
+} from "@jayantgoyal/portfolio-contracts";
+import { PERSON_BRAND } from "@jayantgoyal/web-brand";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 import {
@@ -144,8 +145,8 @@ function mapProfile(hero: HeroRow, contact: ContactRow): PortfolioProfile {
     )?.href ?? `https://github.com/${hero.github_username}`;
 
   return {
-    name: hero.name,
-    displayName: hero.display_name,
+    name: PERSON_BRAND.displayName,
+    displayName: PERSON_BRAND.displayName,
     role: hero.role,
     headline: hero.headline,
     introduction: hero.blurb,
@@ -155,7 +156,7 @@ function mapProfile(hero: HeroRow, contact: ContactRow): PortfolioProfile {
     resume: hero.resume_url,
     githubUsername: hero.github_username,
     github,
-    seoTitle: hero.seo_title,
+    seoTitle: `${PERSON_BRAND.displayName} | ${hero.role}`,
     seoDescription: hero.seo_description,
     location: contact.location,
     email: contact.email,

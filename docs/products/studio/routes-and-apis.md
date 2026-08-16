@@ -5,16 +5,17 @@ such as `(protected)` do not appear in public URLs.
 
 ## Public discovery and utility pages
 
-| Route                | Purpose                                 |
-| -------------------- | --------------------------------------- |
-| `/`                  | Studio home and featured inventory      |
-| `/products`          | Complete product catalog                |
-| `/products/[slug]`   | Product detail generated from inventory |
-| `/tools`             | Tool catalog                            |
-| `/weather`           | Current conditions and forecast         |
-| `/github-stats`      | Public GitHub profile statistics        |
-| `/custom-calculator` | Calculator Builder beta                 |
-| `/terms-conditions`  | Studio account terms                    |
+| Route                | Purpose                                    |
+| -------------------- | ------------------------------------------ |
+| `/`                  | Studio home and featured inventory         |
+| `/products`          | Complete product catalog                   |
+| `/products/[slug]`   | Product detail generated from inventory    |
+| `/tools`             | Tool catalog                               |
+| `/weather`           | Current conditions and forecast            |
+| `/github-stats`      | Public GitHub profile statistics           |
+| `/custom-calculator` | Calculator Builder beta                    |
+| `/terms-conditions`  | Studio account terms                       |
+| `GET /llms.txt`      | Generated product/tool/game discovery text |
 
 All 87 `/tools/<category>/<slug>` pages are listed in the [capability
 catalog](capability-catalog.md) and generated into Studio's sitemap. The proxy

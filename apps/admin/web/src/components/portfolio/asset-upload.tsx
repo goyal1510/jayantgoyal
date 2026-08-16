@@ -6,21 +6,24 @@ import { useState } from "react";
 import { ExternalLink, Loader2, Upload } from "lucide-react";
 import { toast } from "sonner";
 
-import { Button } from "@jayant/web-ui/button";
-import { Input } from "@jayant/web-ui/input";
-import { Label } from "@jayant/web-ui/label";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { applicationOrigin, applicationUrl } from "@jayantgoyal/web-urls";
 
 import {
   PORTFOLIO_ASSET_ACCEPT,
   type PortfolioAssetKind,
 } from "@/lib/portfolio-assets";
 
-const PORTFOLIO_ORIGIN =
-  process.env.NEXT_PUBLIC_PORTFOLIO_URL ?? "https://jayantgoyal.com";
+const PORTFOLIO_ORIGIN = applicationOrigin(
+  "portfolio",
+  process.env.NEXT_PUBLIC_PORTFOLIO_URL,
+);
 
 function resolveAssetUrl(value: string) {
   if (value.startsWith("/") && !value.startsWith("//")) {
-    return `${PORTFOLIO_ORIGIN}${value}`;
+    return applicationUrl("portfolio", value, PORTFOLIO_ORIGIN);
   }
 
   return value;
@@ -43,7 +46,9 @@ export function PortfolioAssetUpload({
 }) {
   const [uploading, setUploading] = useState(false);
   const isImage =
-    kind.endsWith("image") || kind.endsWith("preview") || kind === "writing-cover";
+    kind.endsWith("image") ||
+    kind.endsWith("preview") ||
+    kind === "writing-cover";
   const resolvedValue = value ? resolveAssetUrl(value) : "";
 
   async function upload(file: File) {

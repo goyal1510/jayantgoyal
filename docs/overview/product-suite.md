@@ -1,7 +1,9 @@
-# Ecosystem overview
+# Product suite
 
-**Jayant** is the identity of this product ecosystem and repository.
-`jayantgoyal.com` is its primary public domain. It is not the platform name.
+Jayant is the public person and author identity. `jayantgoyal` is the technical
+repository slug, `jayantgoyal.com` is the primary domain, and `jg` is the short
+visual mark. None of those technical identifiers creates an umbrella product
+name.
 
 The monorepo currently contains four products with one web client each:
 
@@ -18,7 +20,7 @@ Turborepo coordinate packages, validation, and builds.
 
 The architecture is product-first: the product owns its clients, business
 rules, and contracts. A platform label describes a delivery technology such as
-web; it is not a replacement name for the ecosystem. Shared packages exist only
+web; it is not a replacement name for the repository. Shared packages exist only
 for stable responsibilities used across products.
 
 Current product routes and feature registries remain more precise than prose.

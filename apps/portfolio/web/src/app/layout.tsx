@@ -4,17 +4,14 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { DM_Sans, Instrument_Serif, Jost } from "next/font/google";
 import Script from "next/script";
-import { BRAND_ASSET_PATHS } from "@jayant/web-brand";
+import { buildAppRootMetadata } from "@jayantgoyal/web-seo";
 
 import { PageScrollProgress } from "@/components/editorial/page-scroll-progress";
 import { PortfolioAnalytics } from "@/components/editorial/portfolio-analytics";
 import { getPortfolioShellData } from "@/lib/portfolio/editorial-server";
 import {
-  DEFAULT_OG_IMAGE,
-  DEFAULT_OG_IMAGE_METADATA,
   isCanonicalProductionHost,
-  SITE_NAME,
-  SITE_TITLE_TEMPLATE,
+  PERSON_NAME,
   SITE_URL,
 } from "@/lib/seo/config";
 
@@ -43,15 +40,15 @@ export async function generateMetadata(): Promise<Metadata> {
   const shouldIndex = isCanonicalProductionHost(requestHeaders.get("host"));
   const { profile } = await getPortfolioShellData();
 
-  return {
-    metadataBase: new URL(SITE_URL),
-    title: {
-      default: profile.seoTitle,
-      template: SITE_TITLE_TEMPLATE,
-    },
+  return buildAppRootMetadata({
+    appId: "portfolio",
+    siteUrl: SITE_URL,
+    canonicalUrl: SITE_URL,
+    title: profile.seoTitle,
     description: profile.seoDescription,
+    type: "profile",
     keywords: [
-      profile.name,
+      PERSON_NAME,
       "full-stack developer",
       "portfolio",
       "Next.js",
@@ -59,53 +56,11 @@ export async function generateMetadata(): Promise<Metadata> {
       "TypeScript",
       "Supabase",
     ],
-    authors: [{ name: profile.name, url: SITE_URL }],
-    creator: profile.name,
-    alternates: { canonical: "/" },
-    openGraph: {
-      type: "profile",
-      locale: "en_US",
-      url: "/",
-      siteName: SITE_NAME,
-      title: profile.seoTitle,
-      description: profile.seoDescription,
-      images: [
-        {
-          url: DEFAULT_OG_IMAGE,
-          width: DEFAULT_OG_IMAGE_METADATA.width,
-          height: DEFAULT_OG_IMAGE_METADATA.height,
-          type: DEFAULT_OG_IMAGE_METADATA.type,
-          alt: DEFAULT_OG_IMAGE_METADATA.alt,
-        },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: profile.seoTitle,
-      description: profile.seoDescription,
-      images: [DEFAULT_OG_IMAGE],
-    },
     robots: {
       index: shouldIndex,
       follow: shouldIndex,
     },
-    icons: {
-      icon: [
-        { url: BRAND_ASSET_PATHS.favicon },
-        {
-          url: BRAND_ASSET_PATHS.favicon32,
-          sizes: "32x32",
-          type: "image/png",
-        },
-        {
-          url: BRAND_ASSET_PATHS.favicon16,
-          sizes: "16x16",
-          type: "image/png",
-        },
-      ],
-      apple: BRAND_ASSET_PATHS.appleTouchIcon,
-    },
-  };
+  });
 }
 
 export default async function RootLayout({
@@ -115,7 +70,7 @@ export default async function RootLayout({
   const personJsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
-    name: profile.name,
+    name: PERSON_NAME,
     url: SITE_URL,
     jobTitle: profile.role,
     sameAs: profile.socials.map((social) => social.href),

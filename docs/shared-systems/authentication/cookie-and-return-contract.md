@@ -9,7 +9,7 @@ would use its platform's secure session storage and callback mechanisms.
 | Concern                                      | Owner                                           |
 | -------------------------------------------- | ----------------------------------------------- |
 | Credential, OAuth, recovery, MFA, account UI | Auth web client                                 |
-| Supabase SSR client and cookie mechanics     | `@jayant/web-auth`                              |
+| Supabase SSR client and cookie mechanics     | `@jayantgoyal/web-auth`                         |
 | Allowed cross-product returns                | Auth web client plus shared safe-return helpers |
 | Studio public/protected/terms policy         | Studio web client                               |
 | Admin role and privileged policy             | Admin web client                                |
@@ -26,7 +26,7 @@ would use its platform's secure session storage and callback mechanisms.
 | `legacy`        | Supabase host-specific cookie only                      | Emergency rollback compatibility |
 
 The word `platform` is retained in this runtime enum for cookie rollout
-compatibility. It is not the ecosystem or product name.
+compatibility. It is not the product suite or product name.
 
 ## Cookie behavior
 

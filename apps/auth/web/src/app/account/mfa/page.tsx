@@ -3,7 +3,13 @@ import type { Metadata } from "next";
 import { AccountWorkspaceHeader } from "@/components/account/account-workspace-header";
 import { MfaManager } from "@/components/account/mfa-manager";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
 
 export const metadata: Metadata = { title: "Multi-factor authentication" };
 

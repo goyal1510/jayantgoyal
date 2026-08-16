@@ -4,13 +4,13 @@ import * as React from "react";
 import { usePathname } from "next/navigation";
 import { Shield } from "lucide-react";
 
-import { APP_BRANDS } from "@jayant/web-brand";
+import { APP_BRANDS } from "@jayantgoyal/web-brand";
 import {
   ApplicationSidebarFrame,
   ApplicationSidebarSection,
   type ApplicationNavigationItem,
   type ApplicationNavigationSection,
-} from "@jayant/web-ui/application-shell";
+} from "@jayantgoyal/web-ui/application-shell";
 
 import {
   getVisibleAdminNavigationDomains,

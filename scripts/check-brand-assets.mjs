@@ -14,6 +14,10 @@ const files = [
   "android-chrome-512x512.png",
 ];
 
+async function digest(path) {
+  return createHash("sha256").update(await readFile(path)).digest("hex");
+}
+
 const canonicalDirectory = resolve(root, "assets", "brand", "web");
 for (const app of apps) {
   for (const file of files) {
@@ -25,16 +29,12 @@ for (const app of apps) {
       "web",
       "public",
       "assets",
-      "Jayant_favicon_io",
+      "brand",
       file,
     );
     try {
-      const canonicalDigest = createHash("sha256")
-        .update(await readFile(canonicalPath))
-        .digest("hex");
-      const appDigest = createHash("sha256")
-        .update(await readFile(appPath))
-        .digest("hex");
+      const canonicalDigest = await digest(canonicalPath);
+      const appDigest = await digest(appPath);
       if (canonicalDigest !== appDigest) {
         throw new Error(`${file} differs from assets/brand/web/${file}`);
       }
@@ -44,8 +44,42 @@ for (const app of apps) {
       );
     }
   }
+
+  const canonicalFavicon = resolve(canonicalDirectory, "favicon.ico");
+  const specialFavicon = resolve(
+    root,
+    "apps",
+    app,
+    "web",
+    "src",
+    "app",
+    "favicon.ico",
+  );
+  if ((await digest(canonicalFavicon)) !== (await digest(specialFavicon))) {
+    throw new Error(
+      `Brand asset check failed for ${app}/src/app/favicon.ico: it differs from assets/brand/web/favicon.ico`,
+    );
+  }
+
+  const socialFile = `${app}-preview.jpg`;
+  const canonicalSocial = resolve(root, "assets", "brand", "social", socialFile);
+  const appSocial = resolve(
+    root,
+    "apps",
+    app,
+    "web",
+    "public",
+    "images",
+    "social",
+    socialFile,
+  );
+  if ((await digest(canonicalSocial)) !== (await digest(appSocial))) {
+    throw new Error(
+      `Brand asset check failed for ${app}/${socialFile}: it differs from assets/brand/social/${socialFile}`,
+    );
+  }
 }
 
 console.log(
-  `Brand assets match the canonical assets/brand/web source across ${apps.length} web clients (${files.length} files).`,
+  `Brand icons and social previews match their canonical sources across ${apps.length} web clients.`,
 );

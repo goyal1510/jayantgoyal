@@ -5,18 +5,18 @@ layers.
 
 ## Threat and control map
 
-| Risk                           | Primary controls                                                                     | Owner                       |
-| ------------------------------ | ------------------------------------------------------------------------------------ | --------------------------- |
-| Account takeover               | Password policy, provider security, TOTP, recent sign-in, local/global logout        | Auth                        |
-| Open redirect / callback abuse | Relative-path validation and exact allowed origins                                   | `@jayant/web-auth` and Auth |
-| Cross-host cookie leakage      | Trusted production host list, secure domain cookie, host-only Preview/local behavior | `@jayant/web-auth`          |
-| Internal header spoofing       | Strip/recreate verified request headers in product proxies                           | Studio/Admin                |
-| Privilege escalation           | Live user lookup, MFA, profile role, route-specific role check                       | Admin                       |
-| Cross-account data access      | `auth.uid()` RLS, object ownership, API validation                                   | Supabase and owning product |
-| Service-role misuse            | Server-only factory, caller authorization, service-role source check                 | Studio/Admin/root tooling   |
-| File/object abuse              | Private buckets, owner prefixes, signed URLs, MIME/size/path checks                  | Studio/Auth/Admin           |
-| Public endpoint cost abuse     | Contact database limiter, input bounds, zero-cost allowlist, provider caching        | Owning product              |
-| Secret/supply-chain exposure   | Client/server boundary, ignored local files, frozen lockfile, overrides, diff review | Repository                  |
+| Risk                           | Primary controls                                                                     | Owner                            |
+| ------------------------------ | ------------------------------------------------------------------------------------ | -------------------------------- |
+| Account takeover               | Password policy, provider security, TOTP, recent sign-in, local/global logout        | Auth                             |
+| Open redirect / callback abuse | Relative-path validation and exact allowed origins                                   | `@jayantgoyal/web-auth` and Auth |
+| Cross-host cookie leakage      | Trusted production host list, secure domain cookie, host-only Preview/local behavior | `@jayantgoyal/web-auth`          |
+| Internal header spoofing       | Strip/recreate verified request headers in product proxies                           | Studio/Admin                     |
+| Privilege escalation           | Live user lookup, MFA, profile role, route-specific role check                       | Admin                            |
+| Cross-account data access      | `auth.uid()` RLS, object ownership, API validation                                   | Supabase and owning product      |
+| Service-role misuse            | Server-only factory, caller authorization, service-role source check                 | Studio/Admin/root tooling        |
+| File/object abuse              | Private buckets, owner prefixes, signed URLs, MIME/size/path checks                  | Studio/Auth/Admin                |
+| Public endpoint cost abuse     | Contact database limiter, input bounds, zero-cost allowlist, provider caching        | Owning product                   |
+| Secret/supply-chain exposure   | Client/server boundary, ignored local files, frozen lockfile, overrides, diff review | Repository                       |
 
 ## Credentials
 

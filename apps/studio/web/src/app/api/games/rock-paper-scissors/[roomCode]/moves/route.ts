@@ -17,7 +17,7 @@ import {
   resolveRpsRound,
   type RpsSeat,
 } from "@/lib/games/rock-paper-scissors";
-import { createSupabaseServiceRoleClient } from "@jayant/web-auth/service-role";
+import { createSupabaseServiceRoleClient } from "@jayantgoyal/web-auth/service-role";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function POST(

@@ -10,8 +10,6 @@ export const PORTFOLIO_GENERATED_KEYS = [
 /** Explicit writable-column allowlist for every Portfolio CMS table. */
 export const PORTFOLIO_WRITE_KEYS: Record<PortfolioTable, readonly string[]> = {
   hero: [
-    "name",
-    "display_name",
     "role",
     "tagline",
     "blurb",
@@ -20,7 +18,6 @@ export const PORTFOLIO_WRITE_KEYS: Record<PortfolioTable, readonly string[]> = {
     "availability",
     "resume_url",
     "github_username",
-    "seo_title",
     "seo_description",
   ],
   about: [
@@ -111,8 +108,6 @@ export const PORTFOLIO_REQUIRED_CREATE_KEYS: Partial<
   Record<PortfolioTable, readonly string[]>
 > = {
   hero: [
-    "name",
-    "display_name",
     "role",
     "tagline",
     "blurb",
@@ -121,7 +116,6 @@ export const PORTFOLIO_REQUIRED_CREATE_KEYS: Partial<
     "availability",
     "resume_url",
     "github_username",
-    "seo_title",
     "seo_description",
   ],
   about: ["summary", "headline", "objective"],

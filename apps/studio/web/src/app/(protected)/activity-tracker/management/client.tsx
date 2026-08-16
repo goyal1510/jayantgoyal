@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { Button } from "@jayant/web-ui/button";
-import { PageSpinner } from "@jayant/web-ui/page-spinner";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { PageSpinner } from "@jayantgoyal/web-ui/page-spinner";
 import {
   Table,
   TableBody,
@@ -10,14 +10,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@jayant/web-ui/table";
-import { Switch } from "@jayant/web-ui/switch";
+} from "@jayantgoyal/web-ui/table";
+import { Switch } from "@jayantgoyal/web-ui/switch";
 import { Activity } from "@/lib/activity-tracker/database";
 import { toast } from "sonner";
 import { ListChecks, Pencil, Trash2 } from "lucide-react";
 
 import { EditActivityDialog } from "./edit-activity-dialog";
-import { WorkspaceHeader } from "@jayant/web-ui/workspace-header";
+import { WorkspaceHeader } from "@jayantgoyal/web-ui/workspace-header";
 
 interface ActivitiesResponse {
   activities: Activity[];

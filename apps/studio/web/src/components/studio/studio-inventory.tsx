@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { ArrowRight, Compass, Search } from "lucide-react";
 
-import { APP_BRANDS } from "@jayant/web-brand";
-import { Button } from "@jayant/web-ui/button";
+import { APP_BRANDS } from "@jayantgoyal/web-brand";
+import { Button } from "@jayantgoyal/web-ui/button";
 
 import {
   getStudioProduct,

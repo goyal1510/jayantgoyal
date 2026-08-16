@@ -1,43 +1,53 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
-function obfuscateString(text: string, keepStart: number = 2, keepEnd: number = 2): string {
+function obfuscateString(
+  text: string,
+  keepStart: number = 2,
+  keepEnd: number = 2,
+): string {
   if (text.length <= keepStart + keepEnd) {
-    return "*".repeat(text.length)
+    return "*".repeat(text.length);
   }
 
-  const start = text.slice(0, keepStart)
-  const end = text.slice(-keepEnd)
-  const middle = "*".repeat(Math.max(4, text.length - keepStart - keepEnd))
+  const start = text.slice(0, keepStart);
+  const end = text.slice(-keepEnd);
+  const middle = "*".repeat(Math.max(4, text.length - keepStart - keepEnd));
 
-  return `${start}${middle}${end}`
+  return `${start}${middle}${end}`;
 }
 
 export default function StringObfuscatorClient() {
-  const [input, setInput] = React.useState("")
-  const [keepStart, setKeepStart] = React.useState(2)
-  const [keepEnd, setKeepEnd] = React.useState(2)
-  const [output, setOutput] = React.useState("")
+  const [input, setInput] = React.useState("");
+  const [keepStart, setKeepStart] = React.useState(2);
+  const [keepEnd, setKeepEnd] = React.useState(2);
+  const [output, setOutput] = React.useState("");
 
   React.useEffect(() => {
     if (!input.trim()) {
-      setOutput("")
-      return
+      setOutput("");
+      return;
     }
-    setOutput(obfuscateString(input, keepStart, keepEnd))
-  }, [input, keepStart, keepEnd])
+    setOutput(obfuscateString(input, keepStart, keepEnd));
+  }, [input, keepStart, keepEnd]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(output)
-    toast.success("Obfuscated string copied to clipboard")
-  }
+    navigator.clipboard.writeText(output);
+    toast.success("Obfuscated string copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -67,7 +77,11 @@ export default function StringObfuscatorClient() {
                   min="0"
                   max="10"
                   value={keepStart}
-                  onChange={(e) => setKeepStart(Math.max(0, Math.min(10, parseInt(e.target.value) || 0)))}
+                  onChange={(e) =>
+                    setKeepStart(
+                      Math.max(0, Math.min(10, parseInt(e.target.value) || 0)),
+                    )
+                  }
                 />
               </div>
               <div className="space-y-2">
@@ -78,7 +92,11 @@ export default function StringObfuscatorClient() {
                   min="0"
                   max="10"
                   value={keepEnd}
-                  onChange={(e) => setKeepEnd(Math.max(0, Math.min(10, parseInt(e.target.value) || 0)))}
+                  onChange={(e) =>
+                    setKeepEnd(
+                      Math.max(0, Math.min(10, parseInt(e.target.value) || 0)),
+                    )
+                  }
                 />
               </div>
             </div>
@@ -100,17 +118,14 @@ export default function StringObfuscatorClient() {
             </div>
           </CardHeader>
           <CardContent>
-            <Input
-              value={output}
-              readOnly
-              className="font-mono"
-            />
+            <Input value={output} readOnly className="font-mono" />
             <p className="text-sm text-muted-foreground mt-2">
-              Useful for sharing secrets, tokens, or sensitive data without revealing the full value
+              Useful for sharing secrets, tokens, or sensitive data without
+              revealing the full value
             </p>
           </CardContent>
         </Card>
       </div>
     </div>
-  )
+  );
 }

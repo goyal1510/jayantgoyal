@@ -1,5 +1,5 @@
-import { isAllowedGitHubProxyPath } from "@jayant/github/proxy";
-import { githubServerClient } from "@jayant/github/server";
+import { isAllowedGitHubProxyPath } from "@jayantgoyal/github/proxy";
+import { githubServerClient } from "@jayantgoyal/github/server";
 import { NextResponse, type NextRequest } from "next/server";
 
 /**
@@ -14,7 +14,10 @@ export async function GET(request: NextRequest) {
   const path = searchParams.get("path");
 
   if (!path) {
-    return NextResponse.json({ error: "Missing 'path' parameter" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Missing 'path' parameter" },
+      { status: 400 },
+    );
   }
 
   if (!isAllowedGitHubProxyPath(path)) {

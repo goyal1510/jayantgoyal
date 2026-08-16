@@ -15,10 +15,10 @@ import {
   GithubIcon,
   GoogleIcon,
   PasswordField,
-} from "@jayant/web-ui/auth-presentation";
-import { Button } from "@jayant/web-ui/button";
-import { Input } from "@jayant/web-ui/input";
-import { Label } from "@jayant/web-ui/label";
+} from "@jayantgoyal/web-ui/auth-presentation";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
 
 const initialState = {};
 

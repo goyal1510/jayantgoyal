@@ -1,15 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import {
-  Loader2,
-  ExternalLink,
-  RotateCcw,
-  Rocket,
-} from "lucide-react";
-import { Button } from "@jayant/web-ui/button";
-import { Badge } from "@jayant/web-ui/badge";
-import { IconAction } from "@jayant/web-ui/icon-action";
+import { Loader2, ExternalLink, RotateCcw, Rocket } from "lucide-react";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Badge } from "@jayantgoyal/web-ui/badge";
+import { IconAction } from "@jayantgoyal/web-ui/icon-action";
 import type { VercelDeployment, VercelDeploymentState } from "@/lib/types";
 
 const stateBadgeVariant: Record<
@@ -94,7 +89,10 @@ export function DeploymentsTable({
                 <td className="py-3 pr-4 text-muted-foreground max-w-[200px] truncate">
                   {d.meta?.githubCommitMessage || "—"}
                 </td>
-                <td className="py-3 pr-4 text-muted-foreground whitespace-nowrap" title={formatDate(d.created)}>
+                <td
+                  className="py-3 pr-4 text-muted-foreground whitespace-nowrap"
+                  title={formatDate(d.created)}
+                >
                   {formatRelative(d.created)}
                 </td>
                 <td className="py-3 text-right">
@@ -108,13 +106,18 @@ export function DeploymentsTable({
                           aria-label="Open deployment in Vercel"
                           title="Open in Vercel"
                         >
-                          <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                          <ExternalLink
+                            className="h-3.5 w-3.5"
+                            aria-hidden="true"
+                          />
                         </a>
                       </Button>
                     )}
                     <IconAction
                       icon={isLoading ? Loader2 : Rocket}
-                      iconClassName={isLoading ? "size-3.5 animate-spin" : "size-3.5"}
+                      iconClassName={
+                        isLoading ? "size-3.5 animate-spin" : "size-3.5"
+                      }
                       label={`Redeploy ${d.uid.slice(0, 12)}`}
                       variant="ghost"
                       onClick={() => onRedeploy(d)}

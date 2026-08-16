@@ -10,8 +10,13 @@ import {
   Zap,
 } from "lucide-react";
 
-import { Button } from "@jayant/web-ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@jayant/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
 
 import {
   useTypingSpeedTest,

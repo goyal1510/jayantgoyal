@@ -2,15 +2,15 @@
 
 import { X } from "lucide-react";
 
-import { Button } from "@jayant/web-ui/button";
-import { Label } from "@jayant/web-ui/label";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Label } from "@jayantgoyal/web-ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@jayant/web-ui/select";
+} from "@jayantgoyal/web-ui/select";
 
 import { GameSetupSheet } from "@/components/games/game-setup-sheet";
 import type {

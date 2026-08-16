@@ -5,7 +5,7 @@ import type {
   PortfolioSectionPresentationResponse,
   PortfolioTable,
   PortfolioUpdateInput,
-} from "@jayant/portfolio-contracts";
+} from "@jayantgoyal/portfolio-contracts";
 
 export interface PortfolioApiResponse<T> {
   data?: T;

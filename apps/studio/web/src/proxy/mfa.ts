@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { buildAuthMfaUrl } from "@jayant/web-auth/entry";
+import { buildAuthMfaUrl } from "@jayantgoyal/web-auth/entry";
 import type { ProxyContext } from "./types";
 
 /** APIs that are safe to call without completing MFA */

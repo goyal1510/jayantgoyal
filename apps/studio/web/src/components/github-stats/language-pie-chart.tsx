@@ -9,8 +9,13 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
-import { Card, CardContent, CardHeader, CardTitle } from "@jayant/web-ui/card";
-import type { LanguageDistribution } from "@jayant/github";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import type { LanguageDistribution } from "@jayantgoyal/github";
 
 interface LanguagePieChartProps {
   data: LanguageDistribution[];

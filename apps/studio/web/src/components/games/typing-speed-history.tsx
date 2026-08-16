@@ -2,9 +2,9 @@
 
 import { History } from "lucide-react";
 
-import { Button } from "@jayant/web-ui/button";
-import { Card, CardContent } from "@jayant/web-ui/card";
-import { PageSpinner } from "@jayant/web-ui/page-spinner";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Card, CardContent } from "@jayantgoyal/web-ui/card";
+import { PageSpinner } from "@jayantgoyal/web-ui/page-spinner";
 import type { TypingTestResult } from "@/lib/typing-test/database";
 
 interface TypingSpeedHistoryProps {

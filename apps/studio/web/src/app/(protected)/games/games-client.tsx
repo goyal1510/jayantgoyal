@@ -2,13 +2,11 @@
 
 import * as React from "react";
 import Link from "next/link";
-import {
-  ArrowUpRight,
-} from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 
-import { Button } from "@jayant/web-ui/button";
-import { Card } from "@jayant/web-ui/card";
-import { cn } from "@jayant/web-ui/lib/utils";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Card } from "@jayantgoyal/web-ui/card";
+import { cn } from "@jayantgoyal/web-ui/lib/utils";
 
 import {
   GAME_PLAY_FILTERS,

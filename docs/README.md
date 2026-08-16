@@ -1,8 +1,9 @@
-# Jayant documentation
+# jayantgoyal documentation
 
-This directory is the central, current-state knowledge base for the **Jayant**
-monorepo. `jayantgoyal.com` is the primary public domain; it is not the name of
-the ecosystem, a platform, or a shared application.
+This directory is the central, current-state knowledge base for the
+`jayantgoyal` monorepo. Jayant is the public person identity; the repository and
+domain slug are technical identifiers, not an umbrella product or expanded
+personal name.
 
 Use this index to move from product context to implementation detail. Code,
 tests, package manifests, runtime registries, migrations, schema snapshots, and
@@ -11,7 +12,7 @@ prose.
 
 ## Reading paths
 
-- New to the repository: read [Ecosystem](overview/ecosystem.md), [System
+- New to the repository: read [Product suite](overview/product-suite.md), [System
   map](overview/system-map.md), [Architecture
   principles](architecture/principles.md), then the owning product.
 - Placing or restructuring code: read [Repository
@@ -36,7 +37,7 @@ prose.
 
 ## Overview
 
-- [Ecosystem](overview/ecosystem.md): products, audiences, and operating model.
+- [Product suite](overview/product-suite.md): products, audiences, and operating model.
 - [System map](overview/system-map.md): how products, clients, shared systems,
   data, providers, and deployments connect.
 - [Terminology](overview/terminology.md): stable vocabulary used across code
@@ -72,6 +73,7 @@ invent clients or product capabilities that do not exist.
 - [Data and Supabase](shared-systems/data/README.md)
 - [Database schema catalog](shared-systems/data/schema-catalog.md)
 - [Design and brand](shared-systems/design-and-brand/README.md)
+- [Naming contract](shared-systems/design-and-brand/naming-contract.md)
 - [External integrations](shared-systems/integrations/README.md)
 
 ## Engineering

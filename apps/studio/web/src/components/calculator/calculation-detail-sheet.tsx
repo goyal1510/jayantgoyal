@@ -12,8 +12,13 @@ import {
 import { toast } from "sonner";
 
 import type { CalculationWithDenominations } from "@/lib/calculator/database";
-import { Button } from "@jayant/web-ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@jayant/web-ui/sheet";
+import { Button } from "@jayantgoyal/web-ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@jayantgoyal/web-ui/sheet";
 import {
   formatDateDisplay,
   formatTimeDisplay,

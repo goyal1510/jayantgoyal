@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { buildAuthMfaUrl } from "@jayant/web-auth/entry";
-import { safeReturnPath } from "@jayant/web-auth/redirects";
+import { buildAuthMfaUrl } from "@jayantgoyal/web-auth/entry";
+import { safeReturnPath } from "@jayantgoyal/web-auth/redirects";
 import {
   copyAuthCacheHeaders,
   createSupabaseRequestClient,
-} from "@jayant/web-auth/server";
-import { syncProfileNamesFromIdentities } from "@jayant/web-auth/profile";
+} from "@jayantgoyal/web-auth/server";
+import { syncProfileNamesFromIdentities } from "@jayantgoyal/web-auth/profile";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);

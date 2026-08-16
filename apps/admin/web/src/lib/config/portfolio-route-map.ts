@@ -1,4 +1,4 @@
-import { PORTFOLIO_WORKSPACE_ROUTES } from "@jayant/portfolio-contracts";
+import { PORTFOLIO_WORKSPACE_ROUTES } from "@jayantgoyal/portfolio-contracts";
 
 /**
  * Compatibility destinations for URLs that existed before Portfolio editing

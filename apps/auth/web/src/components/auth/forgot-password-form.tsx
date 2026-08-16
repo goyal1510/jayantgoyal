@@ -6,9 +6,9 @@ import Link from "next/link";
 import { forgotPasswordAction } from "@/app/actions/recovery";
 import { ActionMessage } from "@/components/auth/action-message";
 import { SubmitButton } from "@/components/auth/submit-button";
-import { AuthCard } from "@jayant/web-ui/auth-presentation";
-import { Input } from "@jayant/web-ui/input";
-import { Label } from "@jayant/web-ui/label";
+import { AuthCard } from "@jayantgoyal/web-ui/auth-presentation";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
 
 const initialState = {};
 

@@ -1,54 +1,54 @@
-"use client"
+"use client";
 
-import React from "react"
-import Link from "next/link"
-import { ChevronRight, LayoutDashboard } from "lucide-react"
-import { cn } from "@jayant/web-ui/lib/utils"
-import type { AppConfig } from "@/lib/config/hub-config"
-import { toolCategories } from "@/lib/tools/tools"
-import type { ToolCategory } from "@/lib/tools/tools"
+import React from "react";
+import Link from "next/link";
+import { ChevronRight, LayoutDashboard } from "lucide-react";
+import { cn } from "@jayantgoyal/web-ui/lib/utils";
+import type { AppConfig } from "@/lib/config/hub-config";
+import { toolCategories } from "@/lib/tools/tools";
+import type { ToolCategory } from "@/lib/tools/tools";
 
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@jayant/web-ui/collapsible"
+} from "@jayantgoyal/web-ui/collapsible";
 import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@jayant/web-ui/sidebar"
+} from "@jayantgoyal/web-ui/sidebar";
 
-import { CollapsedFlyout } from "./collapsed-flyout"
-import { FlyoutItem } from "./flyout-items"
-import { getToolColor } from "./tool-colors"
+import { CollapsedFlyout } from "./collapsed-flyout";
+import { FlyoutItem } from "./flyout-items";
+import { getToolColor } from "./tool-colors";
 
 function TechToolsFlyoutContent({
   pathname,
   activeCategoryId,
   onNavigate,
 }: {
-  pathname: string
-  activeCategoryId: string | undefined
-  onNavigate: () => void
+  pathname: string;
+  activeCategoryId: string | undefined;
+  onNavigate: () => void;
 }) {
-  const [expandedCategories, setExpandedCategories] = React.useState<Set<string>>(
-    () => new Set(activeCategoryId ? [activeCategoryId] : [])
-  )
+  const [expandedCategories, setExpandedCategories] = React.useState<
+    Set<string>
+  >(() => new Set(activeCategoryId ? [activeCategoryId] : []));
 
   const toggleCategory = (id: string) => {
     setExpandedCategories((prev) => {
-      const next = new Set(prev)
+      const next = new Set(prev);
       if (next.has(id)) {
-        next.delete(id)
+        next.delete(id);
       } else {
-        next.add(id)
+        next.add(id);
       }
-      return next
-    })
-  }
+      return next;
+    });
+  };
 
   return (
     <>
@@ -61,7 +61,7 @@ function TechToolsFlyoutContent({
         onClick={onNavigate}
       />
       {toolCategories.map((category: ToolCategory) => {
-        const isExpanded = expandedCategories.has(category.id)
+        const isExpanded = expandedCategories.has(category.id);
         return (
           <div key={category.id}>
             <button
@@ -69,15 +69,17 @@ function TechToolsFlyoutContent({
               onClick={() => toggleCategory(category.id)}
               className={cn(
                 "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                activeCategoryId === category.id && "font-medium"
+                activeCategoryId === category.id && "font-medium",
               )}
             >
-              <category.icon className={cn("size-4 shrink-0", category.color)} />
+              <category.icon
+                className={cn("size-4 shrink-0", category.color)}
+              />
               <span className="truncate">{category.title}</span>
               <ChevronRight
                 className={cn(
                   "ml-auto size-3 shrink-0 transition-transform duration-200",
-                  isExpanded && "rotate-90"
+                  isExpanded && "rotate-90",
                 )}
               />
             </button>
@@ -97,10 +99,10 @@ function TechToolsFlyoutContent({
               </div>
             )}
           </div>
-        )
+        );
       })}
     </>
-  )
+  );
 }
 
 export function TechToolsMenuItem({
@@ -111,33 +113,33 @@ export function TechToolsMenuItem({
   activeCategoryId,
   closeMobileSidebar,
 }: {
-  app: AppConfig
-  isActiveApp: boolean
-  isCollapsed: boolean
-  pathname: string
-  activeCategoryId: string | undefined
-  closeMobileSidebar: () => void
+  app: AppConfig;
+  isActiveApp: boolean;
+  isCollapsed: boolean;
+  pathname: string;
+  activeCategoryId: string | undefined;
+  closeMobileSidebar: () => void;
 }) {
-  const itemRef = React.useRef<HTMLLIElement>(null)
-  const [flyoutOpen, setFlyoutOpen] = React.useState(false)
+  const itemRef = React.useRef<HTMLLIElement>(null);
+  const [flyoutOpen, setFlyoutOpen] = React.useState(false);
 
   // Close flyout when sidebar expands
   React.useEffect(() => {
-    if (!isCollapsed) setFlyoutOpen(false)
-  }, [isCollapsed])
+    if (!isCollapsed) setFlyoutOpen(false);
+  }, [isCollapsed]);
 
   const handleIconClick = () => {
     if (isCollapsed) {
-      setFlyoutOpen((prev) => !prev)
+      setFlyoutOpen((prev) => !prev);
     }
-  }
+  };
 
-  const closeFlyout = () => setFlyoutOpen(false)
+  const closeFlyout = () => setFlyoutOpen(false);
 
   const handleFlyoutNavigate = () => {
-    closeFlyout()
-    closeMobileSidebar()
-  }
+    closeFlyout();
+    closeMobileSidebar();
+  };
 
   return (
     <Collapsible
@@ -168,14 +170,18 @@ export function TechToolsMenuItem({
           <SidebarMenuSub>
             <SidebarMenuSubItem>
               <SidebarMenuSubButton asChild isActive={pathname === "/tools"}>
-                <Link href="/tools" prefetch={false} onClick={closeMobileSidebar}>
+                <Link
+                  href="/tools"
+                  prefetch={false}
+                  onClick={closeMobileSidebar}
+                >
                   <LayoutDashboard className="size-4 text-orange-500 dark:text-orange-400" />
                   <span>All Tools</span>
                 </Link>
               </SidebarMenuSubButton>
             </SidebarMenuSubItem>
             {toolCategories.map((category) => {
-              const isCategoryActive = activeCategoryId === category.id
+              const isCategoryActive = activeCategoryId === category.id;
               return (
                 <Collapsible
                   key={category.id}
@@ -186,7 +192,9 @@ export function TechToolsMenuItem({
                   <SidebarMenuSubItem>
                     <CollapsibleTrigger asChild>
                       <SidebarMenuSubButton isActive={isCategoryActive}>
-                        <category.icon className={cn("size-4", category.color)} />
+                        <category.icon
+                          className={cn("size-4", category.color)}
+                        />
                         <span>{category.title}</span>
                         <ChevronRight className="ml-auto size-3 transition-transform duration-200 group-data-[state=open]/category:rotate-90" />
                       </SidebarMenuSubButton>
@@ -194,31 +202,45 @@ export function TechToolsMenuItem({
                     <CollapsibleContent>
                       <SidebarMenuSub className="ml-2 border-l border-sidebar-border pl-2">
                         {category.tools.map((tool) => {
-                          const isToolActive = pathname === tool.path
+                          const isToolActive = pathname === tool.path;
                           return (
                             <SidebarMenuSubItem key={tool.id}>
                               <SidebarMenuSubButton
                                 asChild
                                 isActive={isToolActive}
                               >
-                                <Link href={tool.path} prefetch={false} onClick={closeMobileSidebar}>
-                                  <tool.icon className={cn("size-4", getToolColor(tool.id))} />
+                                <Link
+                                  href={tool.path}
+                                  prefetch={false}
+                                  onClick={closeMobileSidebar}
+                                >
+                                  <tool.icon
+                                    className={cn(
+                                      "size-4",
+                                      getToolColor(tool.id),
+                                    )}
+                                  />
                                   <span>{tool.title}</span>
                                 </Link>
                               </SidebarMenuSubButton>
                             </SidebarMenuSubItem>
-                          )
+                          );
                         })}
                       </SidebarMenuSub>
                     </CollapsibleContent>
                   </SidebarMenuSubItem>
                 </Collapsible>
-              )
+              );
             })}
           </SidebarMenuSub>
         </CollapsibleContent>
 
-        <CollapsedFlyout triggerRef={itemRef} open={flyoutOpen} onClose={closeFlyout} title={app.name}>
+        <CollapsedFlyout
+          triggerRef={itemRef}
+          open={flyoutOpen}
+          onClose={closeFlyout}
+          title={app.name}
+        >
           <TechToolsFlyoutContent
             pathname={pathname}
             activeCategoryId={activeCategoryId}
@@ -227,5 +249,5 @@ export function TechToolsMenuItem({
         </CollapsedFlyout>
       </SidebarMenuItem>
     </Collapsible>
-  )
+  );
 }

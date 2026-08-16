@@ -1,8 +1,14 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Input } from "@jayant/web-ui/input"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Input } from "@jayantgoyal/web-ui/input";
 
 const statusCodes = [
   { code: 200, name: "OK", category: "Success" },
@@ -18,23 +24,24 @@ const statusCodes = [
   { code: 500, name: "Internal Server Error", category: "Server Error" },
   { code: 502, name: "Bad Gateway", category: "Server Error" },
   { code: 503, name: "Service Unavailable", category: "Server Error" },
-]
+];
 
 export default function HTTPStatusCodesClient() {
-  const [search, setSearch] = React.useState("")
+  const [search, setSearch] = React.useState("");
   const filtered = React.useMemo(() => {
-    if (!search.trim()) return statusCodes
-    const query = search.toLowerCase()
+    if (!search.trim()) return statusCodes;
+    const query = search.toLowerCase();
     return statusCodes.filter(
       (sc) =>
         sc.code.toString().includes(query) ||
         sc.name.toLowerCase().includes(query) ||
-        sc.category.toLowerCase().includes(query)
-    )
-  }, [search])
+        sc.category.toLowerCase().includes(query),
+    );
+  }, [search]);
 
   return (
-    <div className="space-y-6"><Card>
+    <div className="space-y-6">
+      <Card>
         <CardHeader>
           <CardTitle>Search</CardTitle>
           <CardDescription>Search HTTP status codes</CardDescription>
@@ -54,12 +61,17 @@ export default function HTTPStatusCodesClient() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-2xl">{status.code}</CardTitle>
-                <span className={`text-xs px-2 py-1 rounded ${
-                  status.category === "Success" ? "bg-green-500/20 text-green-600" :
-                  status.category === "Redirect" ? "bg-blue-500/20 text-blue-600" :
-                  status.category === "Client Error" ? "bg-yellow-500/20 text-yellow-600" :
-                  "bg-red-500/20 text-red-600"
-                }`}>
+                <span
+                  className={`text-xs px-2 py-1 rounded ${
+                    status.category === "Success"
+                      ? "bg-green-500/20 text-green-600"
+                      : status.category === "Redirect"
+                        ? "bg-blue-500/20 text-blue-600"
+                        : status.category === "Client Error"
+                          ? "bg-yellow-500/20 text-yellow-600"
+                          : "bg-red-500/20 text-red-600"
+                  }`}
+                >
                   {status.category}
                 </span>
               </div>
@@ -71,5 +83,5 @@ export default function HTTPStatusCodesClient() {
         ))}
       </div>
     </div>
-  )
+  );
 }

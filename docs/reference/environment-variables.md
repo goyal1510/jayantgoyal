@@ -24,9 +24,11 @@ clients. The `.env.example` files remain the executable contract.
 | `NEXT_PUBLIC_ADMIN_URL`           | Auth                    | public   | Allowed Admin return origin.                                                                  |
 | `NEXT_PUBLIC_AUTH_RETURN_ORIGINS` | Auth                    | public   | Optional comma-separated exact Preview origins; never use wildcard or secret values.          |
 
-Canonical production origins are also represented by `@jayant/web-brand` and
-`@jayant/web-urls`. Environment overrides exist for local/Preview routing, not
-to create a second production identity registry.
+Canonical production and development origins are owned by
+`@jayantgoyal/identity`. `@jayantgoyal/web-urls` projects that registry into
+environment-aware URL helpers, while `@jayantgoyal/web-brand` supplies public
+labels and descriptions. Environment overrides exist for local/Preview
+routing, not to create a second production identity registry.
 
 ## Portfolio variables
 

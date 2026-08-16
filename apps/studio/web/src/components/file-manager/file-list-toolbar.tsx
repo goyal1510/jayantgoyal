@@ -1,19 +1,19 @@
 "use client";
 
-import { Button } from "@jayant/web-ui/button";
+import { Button } from "@jayantgoyal/web-ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@jayant/web-ui/dropdown-menu";
+} from "@jayantgoyal/web-ui/dropdown-menu";
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@jayant/web-ui/breadcrumb";
+} from "@jayantgoyal/web-ui/breadcrumb";
 import {
   ArrowDown,
   ArrowUp,

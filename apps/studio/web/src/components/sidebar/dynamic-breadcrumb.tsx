@@ -5,7 +5,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import {
   BreadcrumbTrail,
   type BreadcrumbTrailItem,
-} from "@jayant/web-ui/application-shell";
+} from "@jayantgoyal/web-ui/application-shell";
 
 import { getAppById, HUB_APPS } from "@/lib/config/hub-config";
 import { getStudioProduct } from "@/lib/config/studio-inventory";

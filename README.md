@@ -1,8 +1,8 @@
-# Jayant
+# jayantgoyal
 
-Jayant is a product-first monorepo for Jayant's portfolio, products, and
-supporting operations. `jayantgoyal.com` is the primary domain; it is not the
-name of a platform or product.
+`jayantgoyal` is the product-first monorepo for products built by Jayant. The
+repository name matches the `jayantgoyal.com` domain; it is a technical
+namespace, not Jayant's expanded personal name or an umbrella product brand.
 
 The repository currently contains four independently deployed web clients:
 
@@ -25,12 +25,14 @@ apps/
 └── auth/web/           # Shared entry and account-security experience
 
 packages/
-├── ecosystem/identity/ # Product-neutral Jayant identity
+├── foundation/identity/ # Person, technical namespace, products, hosts
 ├── integrations/github/
 ├── web/                # Auth, brand, URLs, SEO, UI, and Tailwind contracts
 └── tooling/            # ESLint and TypeScript configuration
 
-assets/brand/web/       # Canonical web favicon assets
+assets/brand/
+├── web/                # Canonical web favicon assets
+└── social/             # Canonical product social previews
 docs/                   # Canonical current-state documentation
 scripts/                # Repository checks and operational helpers
 supabase/               # Migrations, schema snapshots, and local config
@@ -56,7 +58,7 @@ pnpm dev
 Run one client with its workspace name, for example:
 
 ```bash
-pnpm --filter @jayant/studio-web dev
+pnpm --filter @jayantgoyal/studio-web dev
 ```
 
 ## Quality checks
@@ -64,6 +66,8 @@ pnpm --filter @jayant/studio-web dev
 ```bash
 pnpm check:architecture
 pnpm check:brand-assets
+pnpm check:identity
+pnpm check:seo
 pnpm check:service-role
 pnpm check:source-health
 pnpm check:dead-code
@@ -76,7 +80,7 @@ pnpm build
 
 ## Documentation
 
-[Documentation index](docs/README.md) is the source of truth for the ecosystem,
+[Documentation index](docs/README.md) is the source of truth for the repository,
 architecture, products, clients, shared systems, engineering, operations, and
 reference material. Documentation describes the current system only; this
 repository does not maintain session entries, progress logs, completed-plan
@@ -85,6 +89,7 @@ archives, or an architecture history ledger.
 Useful starting points:
 
 - [Architecture principles](docs/architecture/principles.md)
+- [Naming contract](docs/shared-systems/design-and-brand/naming-contract.md)
 - [Runtime topology](docs/architecture/runtime-topology.md)
 - [Repository inventory](docs/reference/repository-inventory.md)
 - [Database schema catalog](docs/shared-systems/data/schema-catalog.md)

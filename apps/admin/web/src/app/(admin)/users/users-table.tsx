@@ -1,15 +1,15 @@
 "use client";
 
 import { Check, X, Trash2, Loader2 } from "lucide-react";
-import { Badge } from "@jayant/web-ui/badge";
-import { IconAction } from "@jayant/web-ui/icon-action";
+import { Badge } from "@jayantgoyal/web-ui/badge";
+import { IconAction } from "@jayantgoyal/web-ui/icon-action";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@jayant/web-ui/select";
+} from "@jayantgoyal/web-ui/select";
 import type { Profile, UserRole } from "@/lib/types";
 
 const roleLabels: Record<UserRole, string> = {
@@ -18,7 +18,10 @@ const roleLabels: Record<UserRole, string> = {
   super_admin: "Super Admin",
 };
 
-const roleBadgeVariant: Record<UserRole, "secondary" | "default" | "destructive"> = {
+const roleBadgeVariant: Record<
+  UserRole,
+  "secondary" | "default" | "destructive"
+> = {
   user: "secondary",
   admin: "default",
   super_admin: "destructive",
@@ -71,10 +74,14 @@ export function UsersTable({
                   )}
                 </td>
                 <td className="py-3 pr-4">
-                  {profile.first_name || <span className="text-muted-foreground">—</span>}
+                  {profile.first_name || (
+                    <span className="text-muted-foreground">—</span>
+                  )}
                 </td>
                 <td className="py-3 pr-4">
-                  {profile.last_name || <span className="text-muted-foreground">—</span>}
+                  {profile.last_name || (
+                    <span className="text-muted-foreground">—</span>
+                  )}
                 </td>
                 <td className="py-3 pr-4">
                   <Badge variant={roleBadgeVariant[profile.role]}>
@@ -89,9 +96,11 @@ export function UsersTable({
                   )}
                 </td>
                 <td className="py-3 pr-4 text-muted-foreground">
-                  {profile.terms_accepted_at
-                    ? new Date(profile.terms_accepted_at).toLocaleDateString()
-                    : <span>—</span>}
+                  {profile.terms_accepted_at ? (
+                    new Date(profile.terms_accepted_at).toLocaleDateString()
+                  ) : (
+                    <span>—</span>
+                  )}
                 </td>
                 <td className="py-3 text-right">
                   {!isCurrentUser && (
@@ -99,7 +108,11 @@ export function UsersTable({
                       <Select
                         value={profile.role}
                         onValueChange={(v) =>
-                          onUpdateRole(profile.id, profile.user_id, v as UserRole)
+                          onUpdateRole(
+                            profile.id,
+                            profile.user_id,
+                            v as UserRole,
+                          )
                         }
                         disabled={isLoading}
                       >
@@ -109,12 +122,16 @@ export function UsersTable({
                         <SelectContent>
                           <SelectItem value="user">User</SelectItem>
                           <SelectItem value="admin">Admin</SelectItem>
-                          <SelectItem value="super_admin">Super Admin</SelectItem>
+                          <SelectItem value="super_admin">
+                            Super Admin
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                       <IconAction
                         icon={isLoading ? Loader2 : Trash2}
-                        iconClassName={isLoading ? "size-3.5 animate-spin" : "size-3.5"}
+                        iconClassName={
+                          isLoading ? "size-3.5 animate-spin" : "size-3.5"
+                        }
                         label={`Remove ${profile.email || "user"}`}
                         variant="destructive"
                         onClick={() =>

@@ -45,10 +45,10 @@ const publicPreviewHeaders = [{ key: "X-Robots-Tag", value: "index, follow" }];
 const nextConfig: NextConfig = {
   allowedDevOrigins,
   transpilePackages: [
-    "@jayant/web-auth",
-    "@jayant/web-brand",
-    "@jayant/web-urls",
-    "@jayant/web-ui",
+    "@jayantgoyal/web-auth",
+    "@jayantgoyal/web-brand",
+    "@jayantgoyal/web-urls",
+    "@jayantgoyal/web-ui",
   ],
   typescript: { ignoreBuildErrors: true },
   async headers() {

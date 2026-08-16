@@ -1,28 +1,31 @@
-"use client"
+"use client";
 
-import { FileFolderIcon } from "@/components/file-manager/file-icons"
-import { Button } from "@jayant/web-ui/button"
+import { FileFolderIcon } from "@/components/file-manager/file-icons";
+import { Button } from "@jayantgoyal/web-ui/button";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
-} from "@jayant/web-ui/dropdown-menu"
+} from "@jayantgoyal/web-ui/dropdown-menu";
 import {
   ContextMenu,
   ContextMenuTrigger,
-} from "@jayant/web-ui/context-menu"
-import { MoreVertical } from "lucide-react"
-import { formatFileSize, formatDate } from "@/lib/file-manager/format-utils"
-import type { DirectoryListingItem } from "@/lib/file-manager/types"
-import { FileItemDropdownContent, FileItemContextContent } from "@/components/file-manager/file-item-actions"
+} from "@jayantgoyal/web-ui/context-menu";
+import { MoreVertical } from "lucide-react";
+import { formatFileSize, formatDate } from "@/lib/file-manager/format-utils";
+import type { DirectoryListingItem } from "@/lib/file-manager/types";
+import {
+  FileItemDropdownContent,
+  FileItemContextContent,
+} from "@/components/file-manager/file-item-actions";
 
 interface FileListViewProps {
-  files: DirectoryListingItem[]
-  onItemClick: (file: DirectoryListingItem) => void
-  onDownload: (e: React.MouseEvent, file: DirectoryListingItem) => void
-  onRename: (e: React.MouseEvent, file: DirectoryListingItem) => void
-  onDelete: (e: React.MouseEvent, file: DirectoryListingItem) => void
-  onMove: (e: React.MouseEvent, file: DirectoryListingItem) => void
-  onCopy: (e: React.MouseEvent, file: DirectoryListingItem) => void
+  files: DirectoryListingItem[];
+  onItemClick: (file: DirectoryListingItem) => void;
+  onDownload: (e: React.MouseEvent, file: DirectoryListingItem) => void;
+  onRename: (e: React.MouseEvent, file: DirectoryListingItem) => void;
+  onDelete: (e: React.MouseEvent, file: DirectoryListingItem) => void;
+  onMove: (e: React.MouseEvent, file: DirectoryListingItem) => void;
+  onCopy: (e: React.MouseEvent, file: DirectoryListingItem) => void;
 }
 
 export function FileListView({
@@ -41,7 +44,7 @@ export function FileListView({
     onMove,
     onCopy,
     onDelete,
-  }
+  };
 
   return (
     <div className="hidden sm:block border rounded-lg overflow-hidden">
@@ -54,11 +57,11 @@ export function FileListView({
       </div>
       <div className="divide-y">
         {files.map((file) => {
-          const displayName = file.display_name || file.file_name
-          const isDirectory = file.is_directory
+          const displayName = file.display_name || file.file_name;
+          const isDirectory = file.is_directory;
           const fileType = isDirectory
             ? `Folder${file.child_count > 0 ? ` (${file.child_count})` : ""}`
-            : file.file_type || "File"
+            : file.file_type || "File";
           return (
             <ContextMenu key={file.id}>
               <ContextMenuTrigger asChild>
@@ -77,7 +80,9 @@ export function FileListView({
                     </span>
                   </div>
                   <div className="text-sm text-muted-foreground text-right">
-                    {isDirectory ? "\u2014" : formatFileSize(file.size_bytes || 0)}
+                    {isDirectory
+                      ? "\u2014"
+                      : formatFileSize(file.size_bytes || 0)}
                   </div>
                   <div className="text-sm text-muted-foreground capitalize truncate">
                     {fileType}
@@ -97,16 +102,19 @@ export function FileListView({
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <FileItemDropdownContent file={file} handlers={handlers} />
+                      <FileItemDropdownContent
+                        file={file}
+                        handlers={handlers}
+                      />
                     </DropdownMenu>
                   </div>
                 </div>
               </ContextMenuTrigger>
               <FileItemContextContent file={file} handlers={handlers} />
             </ContextMenu>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 }

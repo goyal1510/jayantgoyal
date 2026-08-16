@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   File,
   FileText,
@@ -13,8 +13,8 @@ import {
   FileType,
   Folder,
   FolderOpen,
-} from "lucide-react"
-import { cn } from "@jayant/web-ui/lib/utils"
+} from "lucide-react";
+import { cn } from "@jayantgoyal/web-ui/lib/utils";
 
 type FileTypeCategory =
   | "image"
@@ -25,46 +25,50 @@ type FileTypeCategory =
   | "code"
   | "archive"
   | "text"
-  | "other"
+  | "other";
 
 export interface FileIconProps {
-  type?: FileTypeCategory
-  name?: string
-  isFolder?: boolean
-  isOpen?: boolean
-  className?: string
-  size?: number
+  type?: FileTypeCategory;
+  name?: string;
+  isFolder?: boolean;
+  isOpen?: boolean;
+  className?: string;
+  size?: number;
 }
 
 /**
  * Get file type category from file name/extension
  */
 function getFileType(fileName: string): FileTypeCategory {
-  const extension = fileName.split(".").pop()?.toLowerCase() || ""
+  const extension = fileName.split(".").pop()?.toLowerCase() || "";
 
   // Image types
-  if (["jpg", "jpeg", "png", "gif", "svg", "webp", "bmp", "ico"].includes(extension)) {
-    return "image"
+  if (
+    ["jpg", "jpeg", "png", "gif", "svg", "webp", "bmp", "ico"].includes(
+      extension,
+    )
+  ) {
+    return "image";
   }
 
   // Video types
   if (["mp4", "avi", "mov", "wmv", "flv", "webm", "mkv"].includes(extension)) {
-    return "video"
+    return "video";
   }
 
   // Audio types
   if (["mp3", "wav", "flac", "aac", "ogg", "m4a"].includes(extension)) {
-    return "audio"
+    return "audio";
   }
 
   // Document types
   if (["pdf", "doc", "docx", "rtf"].includes(extension)) {
-    return "document"
+    return "document";
   }
 
   // Spreadsheet types
   if (["xls", "xlsx", "csv"].includes(extension)) {
-    return "spreadsheet"
+    return "spreadsheet";
   }
 
   // Code types
@@ -96,20 +100,20 @@ function getFileType(fileName: string): FileTypeCategory {
       "zsh",
     ].includes(extension)
   ) {
-    return "code"
+    return "code";
   }
 
   // Archive types
   if (["zip", "rar", "7z", "tar", "gz", "bz2"].includes(extension)) {
-    return "archive"
+    return "archive";
   }
 
   // Text types
   if (["txt", "md", "readme"].includes(extension)) {
-    return "text"
+    return "text";
   }
 
-  return "other"
+  return "other";
 }
 
 /**
@@ -121,9 +125,12 @@ function FileIcon({
   className,
   size = 20,
 }: Omit<FileIconProps, "isFolder" | "isOpen">) {
-  const fileType = type || (name ? getFileType(name) : "other")
+  const fileType = type || (name ? getFileType(name) : "other");
 
-  const iconMap: Record<FileTypeCategory, React.ComponentType<{ className?: string; size?: number }>> = {
+  const iconMap: Record<
+    FileTypeCategory,
+    React.ComponentType<{ className?: string; size?: number }>
+  > = {
     image: Image,
     video: Video,
     audio: Music,
@@ -133,11 +140,13 @@ function FileIcon({
     archive: Archive,
     text: FileType,
     other: File,
-  }
+  };
 
-  const Icon = iconMap[fileType]
+  const Icon = iconMap[fileType];
 
-  return <Icon className={cn("text-muted-foreground", className)} size={size} />
+  return (
+    <Icon className={cn("text-muted-foreground", className)} size={size} />
+  );
 }
 
 /**
@@ -148,14 +157,14 @@ function FolderIcon({
   className,
   size = 20,
 }: Omit<FileIconProps, "type" | "name" | "isFolder"> & { isOpen?: boolean }) {
-  const Icon = isOpen ? FolderOpen : Folder
+  const Icon = isOpen ? FolderOpen : Folder;
 
   return (
     <Icon
       className={cn("text-yellow-500 dark:text-yellow-400", className)}
       size={size}
     />
-  )
+  );
 }
 
 /**
@@ -170,8 +179,8 @@ export function FileFolderIcon({
   size = 20,
 }: FileIconProps) {
   if (isFolder) {
-    return <FolderIcon isOpen={isOpen} className={className} size={size} />
+    return <FolderIcon isOpen={isOpen} className={className} size={size} />;
   }
 
-  return <FileIcon type={type} name={name} className={className} size={size} />
+  return <FileIcon type={type} name={name} className={className} size={size} />;
 }

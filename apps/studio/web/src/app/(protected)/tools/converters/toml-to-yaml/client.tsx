@@ -1,132 +1,145 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 function tomlToYaml(toml: string): string {
   // Convert TOML to JSON first, then JSON to YAML
   try {
-    const result: Record<string, unknown> = {}
-    const lines = toml.split("\n")
-    let currentSection: Record<string, unknown> = result
+    const result: Record<string, unknown> = {};
+    const lines = toml.split("\n");
+    let currentSection: Record<string, unknown> = result;
 
     lines.forEach((line) => {
-      const trimmed = line.trim()
-      if (!trimmed || trimmed.startsWith("#")) return
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith("#")) return;
 
       if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
-        const sectionPath = trimmed.slice(1, -1).split(".")
-        currentSection = result
+        const sectionPath = trimmed.slice(1, -1).split(".");
+        currentSection = result;
         sectionPath.forEach((part, index) => {
           if (!currentSection[part]) {
-            currentSection[part] = {}
+            currentSection[part] = {};
           }
           if (index === sectionPath.length - 1) {
-            currentSection = currentSection[part] as Record<string, unknown>
+            currentSection = currentSection[part] as Record<string, unknown>;
           } else {
-            currentSection = currentSection[part] as Record<string, unknown>
+            currentSection = currentSection[part] as Record<string, unknown>;
           }
-        })
-        return
+        });
+        return;
       }
 
-      const equalIndex = trimmed.indexOf("=")
+      const equalIndex = trimmed.indexOf("=");
       if (equalIndex > 0) {
-        const key = trimmed.slice(0, equalIndex).trim()
-        const value = trimmed.slice(equalIndex + 1).trim()
-        currentSection[key] = parseTomlValue(value)
+        const key = trimmed.slice(0, equalIndex).trim();
+        const value = trimmed.slice(equalIndex + 1).trim();
+        currentSection[key] = parseTomlValue(value);
       }
-    })
+    });
 
-    return jsonToYaml(result)
+    return jsonToYaml(result);
   } catch {
-    throw new Error("Failed to parse TOML")
+    throw new Error("Failed to parse TOML");
   }
 }
 
 function parseTomlValue(value: string): unknown {
-  const trimmed = value.trim()
+  const trimmed = value.trim();
   if (trimmed.startsWith('"') && trimmed.endsWith('"')) {
-    return trimmed.slice(1, -1).replace(/\\"/g, '"')
+    return trimmed.slice(1, -1).replace(/\\"/g, '"');
   }
-  if (trimmed === "true") return true
-  if (trimmed === "false") return false
-  if (trimmed === "null") return null
+  if (trimmed === "true") return true;
+  if (trimmed === "false") return false;
+  if (trimmed === "null") return null;
   if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
-    return trimmed.slice(1, -1).split(",").map(s => parseTomlValue(s.trim()))
+    return trimmed
+      .slice(1, -1)
+      .split(",")
+      .map((s) => parseTomlValue(s.trim()));
   }
   if (!isNaN(Number(trimmed))) {
-    return Number(trimmed)
+    return Number(trimmed);
   }
-  return trimmed
+  return trimmed;
 }
 
 function jsonToYaml(obj: unknown, indent: number = 0): string {
-  let yaml = ""
-  const spaces = "  ".repeat(indent)
+  let yaml = "";
+  const spaces = "  ".repeat(indent);
 
   if (Array.isArray(obj)) {
     obj.forEach((item) => {
       if (typeof item === "object" && item !== null) {
-        yaml += `${spaces}- ` + jsonToYaml(item, indent + 1).trim() + "\n"
+        yaml += `${spaces}- ` + jsonToYaml(item, indent + 1).trim() + "\n";
       } else {
-        yaml += `${spaces}- ${stringifyValue(item)}\n`
+        yaml += `${spaces}- ${stringifyValue(item)}\n`;
       }
-    })
+    });
   } else if (typeof obj === "object" && obj !== null) {
     Object.entries(obj as Record<string, unknown>).forEach(([key, value]) => {
-      if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-        yaml += `${spaces}${key}:\n${jsonToYaml(value, indent + 1)}`
+      if (
+        typeof value === "object" &&
+        value !== null &&
+        !Array.isArray(value)
+      ) {
+        yaml += `${spaces}${key}:\n${jsonToYaml(value, indent + 1)}`;
       } else if (Array.isArray(value)) {
-        yaml += `${spaces}${key}:\n${jsonToYaml(value, indent + 1)}`
+        yaml += `${spaces}${key}:\n${jsonToYaml(value, indent + 1)}`;
       } else {
-        yaml += `${spaces}${key}: ${stringifyValue(value)}\n`
+        yaml += `${spaces}${key}: ${stringifyValue(value)}\n`;
       }
-    })
+    });
   }
 
-  return yaml
+  return yaml;
 }
 
 function stringifyValue(value: unknown): string {
-  if (value === null) return "null"
-  if (typeof value === "string") return `"${value.replace(/"/g, '\\"')}"`
-  return String(value)
+  if (value === null) return "null";
+  if (typeof value === "string") return `"${value.replace(/"/g, '\\"')}"`;
+  return String(value);
 }
 
 export default function TOMLToYAMLClient() {
-  const [input, setInput] = React.useState("")
-  const [output, setOutput] = React.useState("")
-  const [error, setError] = React.useState("")
+  const [input, setInput] = React.useState("");
+  const [output, setOutput] = React.useState("");
+  const [error, setError] = React.useState("");
 
   const convert = React.useCallback(() => {
     if (!input.trim()) {
-      setOutput("")
-      setError("")
-      return
+      setOutput("");
+      setError("");
+      return;
     }
 
     try {
-      const yaml = tomlToYaml(input)
-      setOutput(yaml)
-      setError("")
+      const yaml = tomlToYaml(input);
+      setOutput(yaml);
+      setError("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Invalid TOML")
-      setOutput("")
+      setError(err instanceof Error ? err.message : "Invalid TOML");
+      setOutput("");
     }
-  }, [input])
+  }, [input]);
 
   React.useEffect(() => {
-    convert()
-  }, [convert])
+    convert();
+  }, [convert]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(output)
-    toast.success("YAML copied to clipboard")
-  }
+    navigator.clipboard.writeText(output);
+    toast.success("YAML copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -143,9 +156,7 @@ export default function TOMLToYAMLClient() {
               placeholder="key = value"
               className="w-full min-h-[400px] rounded-md border border-input bg-transparent px-3 py-2 text-sm font-mono"
             />
-            {error && (
-              <p className="text-sm text-red-500 mt-2">{error}</p>
-            )}
+            {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
           </CardContent>
         </Card>
 
@@ -174,5 +185,5 @@ export default function TOMLToYAMLClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

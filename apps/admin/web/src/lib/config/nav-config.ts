@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
-import { PORTFOLIO_WORKSPACE_ROUTES } from "@jayant/portfolio-contracts";
+import { PORTFOLIO_WORKSPACE_ROUTES } from "@jayantgoyal/portfolio-contracts";
 import type { UserRole } from "@/lib/types";
 import { getCanonicalAdminPath } from "./portfolio-route-map";
 
@@ -24,7 +24,7 @@ export interface NavItem {
 
 export interface AdminNavigationDomain {
   id: "portfolio" | "studio" | "system";
-  label: "Portfolio" | "Studio" | "Platform";
+  label: "Portfolio" | "Studio" | "Operations";
   homeHref: string | null;
   items: readonly NavItem[];
   roles: readonly UserRole[];
@@ -46,7 +46,11 @@ const portfolioNavItems: NavItem[] = [
     icon: Github,
   },
   { label: "Work", href: PORTFOLIO_WORKSPACE_ROUTES.work, icon: FolderKanban },
-  { label: "Writing", href: PORTFOLIO_WORKSPACE_ROUTES.writing, icon: BookOpen },
+  {
+    label: "Writing",
+    href: PORTFOLIO_WORKSPACE_ROUTES.writing,
+    icon: BookOpen,
+  },
   { label: "Contact", href: PORTFOLIO_WORKSPACE_ROUTES.contact, icon: Mail },
 ];
 
@@ -75,7 +79,7 @@ export const adminNavigationDomains: readonly AdminNavigationDomain[] = [
   },
   {
     id: "system",
-    label: "Platform",
+    label: "Operations",
     homeHref: "/users",
     items: [...systemNavItems, ...deploymentNavItems],
     roles: ["super_admin"],

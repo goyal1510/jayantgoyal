@@ -1,37 +1,44 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
 
 function ipToNumber(ip: string): number | null {
-  const parts = ip.split(".").map(Number)
-  if (parts.length !== 4 || parts.some(p => isNaN(p) || p < 0 || p > 255)) return null
-  return (parts[0]! << 24) + (parts[1]! << 16) + (parts[2]! << 8) + parts[3]!
+  const parts = ip.split(".").map(Number);
+  if (parts.length !== 4 || parts.some((p) => isNaN(p) || p < 0 || p > 255))
+    return null;
+  return (parts[0]! << 24) + (parts[1]! << 16) + (parts[2]! << 8) + parts[3]!;
 }
 
 function numberToIP(num: number): string {
   return [
-    (num >>> 24) & 0xFF,
-    (num >>> 16) & 0xFF,
-    (num >>> 8) & 0xFF,
-    num & 0xFF,
-  ].join(".")
+    (num >>> 24) & 0xff,
+    (num >>> 16) & 0xff,
+    (num >>> 8) & 0xff,
+    num & 0xff,
+  ].join(".");
 }
 
 function expandRange(startIP: string, endIP: string) {
-  const start = ipToNumber(startIP)
-  const end = ipToNumber(endIP)
+  const start = ipToNumber(startIP);
+  const end = ipToNumber(endIP);
 
-  if (start === null || end === null || start > end) return null
+  if (start === null || end === null || start > end) return null;
 
-  const range = end - start + 1
-  const prefixLength = 32 - Math.ceil(Math.log2(range))
+  const range = end - start + 1;
+  const prefixLength = 32 - Math.ceil(Math.log2(range));
 
   // Find the network address
-  const networkMask = (0xFFFFFFFF << (32 - prefixLength)) >>> 0
-  const networkAddress = start & networkMask
+  const networkMask = (0xffffffff << (32 - prefixLength)) >>> 0;
+  const networkAddress = start & networkMask;
 
   return {
     startIP,
@@ -40,19 +47,20 @@ function expandRange(startIP: string, endIP: string) {
     broadcast: numberToIP(networkAddress | (~networkMask >>> 0)),
     cidr: `${numberToIP(networkAddress)}/${prefixLength}`,
     hostCount: range,
-  }
+  };
 }
 
 export default function IPv4RangeExpanderClient() {
-  const [startIP, setStartIP] = React.useState("")
-  const [endIP, setEndIP] = React.useState("")
+  const [startIP, setStartIP] = React.useState("");
+  const [endIP, setEndIP] = React.useState("");
   const expanded = React.useMemo(() => {
-    if (!startIP || !endIP) return null
-    return expandRange(startIP, endIP)
-  }, [startIP, endIP])
+    if (!startIP || !endIP) return null;
+    return expandRange(startIP, endIP);
+  }, [startIP, endIP]);
 
   return (
-    <div className="space-y-6"><Card>
+    <div className="space-y-6">
+      <Card>
         <CardHeader>
           <CardTitle>IP Range</CardTitle>
           <CardDescription>Enter start and end IP addresses</CardDescription>
@@ -96,7 +104,9 @@ export default function IPv4RangeExpanderClient() {
                 <p className="font-mono font-semibold">{expanded.network}</p>
               </div>
               <div>
-                <Label className="text-muted-foreground">Broadcast Address</Label>
+                <Label className="text-muted-foreground">
+                  Broadcast Address
+                </Label>
                 <p className="font-mono font-semibold">{expanded.broadcast}</p>
               </div>
               <div>
@@ -105,7 +115,9 @@ export default function IPv4RangeExpanderClient() {
               </div>
               <div>
                 <Label className="text-muted-foreground">Host Count</Label>
-                <p className="font-semibold">{expanded.hostCount.toLocaleString()}</p>
+                <p className="font-semibold">
+                  {expanded.hostCount.toLocaleString()}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -118,5 +130,5 @@ export default function IPv4RangeExpanderClient() {
         </Card>
       ) : null}
     </div>
-  )
+  );
 }

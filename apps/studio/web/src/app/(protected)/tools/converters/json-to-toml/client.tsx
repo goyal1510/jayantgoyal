@@ -1,70 +1,76 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 function jsonToToml(obj: Record<string, unknown>, prefix: string = ""): string {
-  let toml = ""
+  let toml = "";
 
   Object.entries(obj).forEach(([key, value]) => {
-    const fullKey = prefix ? `${prefix}.${key}` : key
+    const fullKey = prefix ? `${prefix}.${key}` : key;
 
     if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-      toml += `[${fullKey}]\n`
-      toml += jsonToToml(value as Record<string, unknown>, fullKey)
+      toml += `[${fullKey}]\n`;
+      toml += jsonToToml(value as Record<string, unknown>, fullKey);
     } else {
-      const tomlValue = valueToToml(value)
-      toml += `${key} = ${tomlValue}\n`
+      const tomlValue = valueToToml(value);
+      toml += `${key} = ${tomlValue}\n`;
     }
-  })
+  });
 
-  return toml
+  return toml;
 }
 
 function valueToToml(value: unknown): string {
-  if (value === null) return "null"
-  if (typeof value === "string") return `"${value.replace(/"/g, '\\"')}"`
-  if (typeof value === "boolean") return value ? "true" : "false"
+  if (value === null) return "null";
+  if (typeof value === "string") return `"${value.replace(/"/g, '\\"')}"`;
+  if (typeof value === "boolean") return value ? "true" : "false";
   if (Array.isArray(value)) {
-    return `[${value.map(valueToToml).join(", ")}]`
+    return `[${value.map(valueToToml).join(", ")}]`;
   }
-  return String(value)
+  return String(value);
 }
 
 export default function JSONToTOMLClient() {
-  const [input, setInput] = React.useState("")
-  const [output, setOutput] = React.useState("")
-  const [error, setError] = React.useState("")
+  const [input, setInput] = React.useState("");
+  const [output, setOutput] = React.useState("");
+  const [error, setError] = React.useState("");
 
   const convert = React.useCallback(() => {
     if (!input.trim()) {
-      setOutput("")
-      setError("")
-      return
+      setOutput("");
+      setError("");
+      return;
     }
 
     try {
-      const parsed = JSON.parse(input)
-      const toml = jsonToToml(parsed)
-      setOutput(toml)
-      setError("")
+      const parsed = JSON.parse(input);
+      const toml = jsonToToml(parsed);
+      setOutput(toml);
+      setError("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Invalid JSON")
-      setOutput("")
+      setError(err instanceof Error ? err.message : "Invalid JSON");
+      setOutput("");
     }
-  }, [input])
+  }, [input]);
 
   React.useEffect(() => {
-    convert()
-  }, [convert])
+    convert();
+  }, [convert]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(output)
-    toast.success("TOML copied to clipboard")
-  }
+    navigator.clipboard.writeText(output);
+    toast.success("TOML copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -81,9 +87,7 @@ export default function JSONToTOMLClient() {
               placeholder='{"key": "value"}'
               className="w-full min-h-[400px] rounded-md border border-input bg-transparent px-3 py-2 text-sm font-mono"
             />
-            {error && (
-              <p className="text-sm text-red-500 mt-2">{error}</p>
-            )}
+            {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
           </CardContent>
         </Card>
 
@@ -112,5 +116,5 @@ export default function JSONToTOMLClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

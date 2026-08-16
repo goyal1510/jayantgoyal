@@ -8,7 +8,7 @@ working contract. Detailed app-local READMEs are intentionally not maintained.
 
 | Area             | Question answered                                           |
 | ---------------- | ----------------------------------------------------------- |
-| `overview`       | What is the ecosystem and how does it fit together?         |
+| `overview`       | What is the product suite and how does it fit together?     |
 | `architecture`   | Where does code/data belong and how may it depend?          |
 | `products`       | What does each product own and expose?                      |
 | `clients`        | Which delivery platforms exist and what does a client own?  |

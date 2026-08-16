@@ -9,8 +9,8 @@ import {
   BookOpen,
 } from "lucide-react";
 import { m } from "framer-motion";
-import { Card, CardContent } from "@jayant/web-ui/card";
-import type { GitHubUser } from "@jayant/github";
+import { Card, CardContent } from "@jayantgoyal/web-ui/card";
+import type { GitHubUser } from "@jayantgoyal/github";
 
 interface ProfileCardProps {
   user: GitHubUser;

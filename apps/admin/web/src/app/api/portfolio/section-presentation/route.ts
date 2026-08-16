@@ -3,7 +3,7 @@ import {
   type PortfolioSectionPresentationInput,
   type PortfolioSectionPresentationResponse,
   validatePortfolioSectionPresentationInput,
-} from "@jayant/portfolio-contracts";
+} from "@jayantgoyal/portfolio-contracts";
 
 import {
   authorizeAndGetClient,

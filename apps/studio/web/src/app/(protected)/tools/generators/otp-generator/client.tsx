@@ -1,82 +1,102 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
-import { Copy, RefreshCw, CheckCircle2, XCircle } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Copy, RefreshCw, CheckCircle2, XCircle } from "lucide-react";
+import { toast } from "sonner";
 
 // TOTP implementation
-function generateTOTP(secret: string, timeStep: number = 30, digits: number = 6): string {
-  const now = Math.floor(Date.now() / 1000)
-  const counter = Math.floor(now / timeStep)
+function generateTOTP(
+  secret: string,
+  timeStep: number = 30,
+  digits: number = 6,
+): string {
+  const now = Math.floor(Date.now() / 1000);
+  const counter = Math.floor(now / timeStep);
 
   // Simple TOTP implementation (for demo purposes)
   // In production, use a proper crypto library
-  const hash = btoa(secret + counter).slice(0, 20)
-  const code = parseInt(hash.replace(/[^0-9]/g, "").slice(0, digits)) || 0
-  return code.toString().padStart(digits, "0")
+  const hash = btoa(secret + counter).slice(0, 20);
+  const code = parseInt(hash.replace(/[^0-9]/g, "").slice(0, digits)) || 0;
+  return code.toString().padStart(digits, "0");
 }
 
-function validateTOTP(secret: string, code: string, timeStep: number = 30, digits: number = 6): boolean {
-  const generated = generateTOTP(secret, timeStep, digits)
-  return generated === code
+function validateTOTP(
+  secret: string,
+  code: string,
+  timeStep: number = 30,
+  digits: number = 6,
+): boolean {
+  const generated = generateTOTP(secret, timeStep, digits);
+  return generated === code;
 }
 
 export default function OTPGeneratorClient() {
-  const [secret, setSecret] = React.useState("")
-  const [timeStep, setTimeStep] = React.useState(30)
-  const [digits, setDigits] = React.useState(6)
-  const [otp, setOtp] = React.useState("")
-  const [validationCode, setValidationCode] = React.useState("")
-  const [isValid, setIsValid] = React.useState<boolean | null>(null)
+  const [secret, setSecret] = React.useState("");
+  const [timeStep, setTimeStep] = React.useState(30);
+  const [digits, setDigits] = React.useState(6);
+  const [otp, setOtp] = React.useState("");
+  const [validationCode, setValidationCode] = React.useState("");
+  const [isValid, setIsValid] = React.useState<boolean | null>(null);
 
   const generateSecret = () => {
-    const array = new Uint8Array(16)
-    crypto.getRandomValues(array)
-    const newSecret = Array.from(array).map(b => b.toString(16).padStart(2, "0")).join("")
-    setSecret(newSecret)
-    generateOTP(newSecret)
-  }
+    const array = new Uint8Array(16);
+    crypto.getRandomValues(array);
+    const newSecret = Array.from(array)
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+    setSecret(newSecret);
+    generateOTP(newSecret);
+  };
 
-  const generateOTP = React.useCallback((secretKey?: string) => {
-    const key = secretKey || secret
-    if (!key) {
-      toast.error("Please enter or generate a secret")
-      return
-    }
-    const code = generateTOTP(key, timeStep, digits)
-    setOtp(code)
-  }, [secret, timeStep, digits])
+  const generateOTP = React.useCallback(
+    (secretKey?: string) => {
+      const key = secretKey || secret;
+      if (!key) {
+        toast.error("Please enter or generate a secret");
+        return;
+      }
+      const code = generateTOTP(key, timeStep, digits);
+      setOtp(code);
+    },
+    [secret, timeStep, digits],
+  );
 
   React.useEffect(() => {
     if (secret) {
-      generateOTP()
-      const interval = setInterval(() => generateOTP(), timeStep * 1000)
-      return () => clearInterval(interval)
+      generateOTP();
+      const interval = setInterval(() => generateOTP(), timeStep * 1000);
+      return () => clearInterval(interval);
     }
-  }, [secret, timeStep, digits, generateOTP])
+  }, [secret, timeStep, digits, generateOTP]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(otp)
-    toast.success("OTP copied to clipboard")
-  }
+    navigator.clipboard.writeText(otp);
+    toast.success("OTP copied to clipboard");
+  };
 
   const validateCode = () => {
     if (!secret) {
-      toast.error("Please enter a secret first")
-      return
+      toast.error("Please enter a secret first");
+      return;
     }
-    const valid = validateTOTP(secret, validationCode, timeStep, digits)
-    setIsValid(valid)
+    const valid = validateTOTP(secret, validationCode, timeStep, digits);
+    setIsValid(valid);
     if (valid) {
-      toast.success("OTP code is valid")
+      toast.success("OTP code is valid");
     } else {
-      toast.error("OTP code is invalid")
+      toast.error("OTP code is invalid");
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -94,8 +114,8 @@ export default function OTPGeneratorClient() {
                   id="secret"
                   value={secret}
                   onChange={(e) => {
-                    setSecret(e.target.value)
-                    setIsValid(null)
+                    setSecret(e.target.value);
+                    setIsValid(null);
                   }}
                   placeholder="Enter or generate a secret key"
                   className="font-mono text-sm"
@@ -114,7 +134,11 @@ export default function OTPGeneratorClient() {
                 min="10"
                 max="300"
                 value={timeStep}
-                onChange={(e) => setTimeStep(Math.max(10, Math.min(300, parseInt(e.target.value) || 30)))}
+                onChange={(e) =>
+                  setTimeStep(
+                    Math.max(10, Math.min(300, parseInt(e.target.value) || 30)),
+                  )
+                }
               />
             </div>
 
@@ -126,7 +150,11 @@ export default function OTPGeneratorClient() {
                 min="4"
                 max="10"
                 value={digits}
-                onChange={(e) => setDigits(Math.max(4, Math.min(10, parseInt(e.target.value) || 6)))}
+                onChange={(e) =>
+                  setDigits(
+                    Math.max(4, Math.min(10, parseInt(e.target.value) || 6)),
+                  )
+                }
               />
             </div>
 
@@ -169,19 +197,28 @@ export default function OTPGeneratorClient() {
                   id="validate"
                   value={validationCode}
                   onChange={(e) => {
-                    setValidationCode(e.target.value)
-                    setIsValid(null)
+                    setValidationCode(e.target.value);
+                    setIsValid(null);
                   }}
                   placeholder="Enter code to validate"
                   className="font-mono"
                 />
-                <Button onClick={validateCode} disabled={!validationCode || !secret}>
+                <Button
+                  onClick={validateCode}
+                  disabled={!validationCode || !secret}
+                >
                   Validate
                 </Button>
               </div>
               {isValid !== null && (
-                <div className={`flex items-center gap-2 text-sm ${isValid ? "text-green-600" : "text-red-600"}`}>
-                  {isValid ? <CheckCircle2 className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
+                <div
+                  className={`flex items-center gap-2 text-sm ${isValid ? "text-green-600" : "text-red-600"}`}
+                >
+                  {isValid ? (
+                    <CheckCircle2 className="h-4 w-4" />
+                  ) : (
+                    <XCircle className="h-4 w-4" />
+                  )}
                   <span>{isValid ? "Valid" : "Invalid"} code</span>
                 </div>
               )}
@@ -190,5 +227,5 @@ export default function OTPGeneratorClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

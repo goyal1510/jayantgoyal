@@ -2,15 +2,15 @@
 
 import type { ReactNode } from "react";
 
-import { Button } from "@jayant/web-ui/button";
-import { cn } from "@jayant/web-ui/lib/utils";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { cn } from "@jayantgoyal/web-ui/lib/utils";
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "@jayant/web-ui/sheet";
+} from "@jayantgoyal/web-ui/sheet";
 
 export type GameSetupPath = "local" | "computer" | "online";
 

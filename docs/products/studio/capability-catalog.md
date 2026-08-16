@@ -6,18 +6,17 @@ files.
 
 ## Product inventory
 
-| Product card        | Access   | Status    | Owned implementation                                           |
-| ------------------- | -------- | --------- | -------------------------------------------------------------- |
-| Tech Tools          | public   | available | 87 browser utility pages plus optional account usage history   |
-| Weather             | public   | available | City/geolocation search, current conditions, five-day forecast |
-| GitHub Stats        | public   | available | Public profile, repository, language, and activity summaries   |
-| Calculator Builder  | public   | beta      | Drag/drop inputs, operations, outputs, local persisted state   |
-| Game Hub            | account  | available | Nine local/computer games; eight online-room variants          |
-| Activity Tracker    | account  | available | Activity definitions, daily entries, dashboard statistics      |
-| Currency Calculator | account  | available | Cash denominations, saved calculations, history/PDF detail     |
-| File Manager        | account  | available | Private folders/files, upload, move, copy, rename, soft delete |
-| Sync Scratchpad     | account  | beta      | Private text/code entries with Realtime synchronization        |
-| E-commerce          | external | beta link | Separate deployment; not implemented in this repository tree   |
+| Product card        | Access  | Status    | Owned implementation                                           |
+| ------------------- | ------- | --------- | -------------------------------------------------------------- |
+| Tech Tools          | public  | available | 87 browser utility pages plus optional account usage history   |
+| Weather             | public  | available | City/geolocation search, current conditions, five-day forecast |
+| GitHub Stats        | public  | available | Public profile, repository, language, and activity summaries   |
+| Calculator Builder  | public  | beta      | Drag/drop inputs, operations, outputs, local persisted state   |
+| Game Hub            | account | available | Nine local/computer games; eight online-room variants          |
+| Activity Tracker    | account | available | Activity definitions, daily entries, dashboard statistics      |
+| Currency Calculator | account | available | Cash denominations, saved calculations, history/PDF detail     |
+| File Manager        | account | available | Private folders/files, upload, move, copy, rename, soft delete |
+| Sync Scratchpad     | account | beta      | Private text/code entries with Realtime synchronization        |
 
 Portfolio/Writing links in Studio navigation are external destinations owned by
 Portfolio, not Studio capabilities.

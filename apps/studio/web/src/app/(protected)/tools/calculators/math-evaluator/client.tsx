@@ -1,50 +1,62 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
-function evaluateMath(expression: string): { result: number | null; error: string | null } {
+function evaluateMath(expression: string): {
+  result: number | null;
+  error: string | null;
+} {
   try {
     // Safe evaluation using Function constructor
-    const sanitized = expression.replace(/[^0-9+\-*/().\s,sqrtcosinabslogexppow]/gi, "")
-    const func = new Function("Math", `return ${sanitized}`)
-    const result = func(Math)
+    const sanitized = expression.replace(
+      /[^0-9+\-*/().\s,sqrtcosinabslogexppow]/gi,
+      "",
+    );
+    const func = new Function("Math", `return ${sanitized}`);
+    const result = func(Math);
     if (typeof result === "number" && !isNaN(result) && isFinite(result)) {
-      return { result, error: null }
+      return { result, error: null };
     }
-    return { result: null, error: "Invalid expression" }
+    return { result: null, error: "Invalid expression" };
   } catch {
-    return { result: null, error: "Invalid expression" }
+    return { result: null, error: "Invalid expression" };
   }
 }
 
 export default function MathEvaluatorClient() {
-  const [expression, setExpression] = React.useState("")
-  const [result, setResult] = React.useState<number | null>(null)
-  const [error, setError] = React.useState<string | null>(null)
+  const [expression, setExpression] = React.useState("");
+  const [result, setResult] = React.useState<number | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     if (!expression.trim()) {
-      setResult(null)
-      setError(null)
-      return
+      setResult(null);
+      setError(null);
+      return;
     }
 
-    const evalResult = evaluateMath(expression)
-    setResult(evalResult.result)
-    setError(evalResult.error)
-  }, [expression])
+    const evalResult = evaluateMath(expression);
+    setResult(evalResult.result);
+    setError(evalResult.error);
+  }, [expression]);
 
   const copyToClipboard = () => {
     if (result !== null) {
-      navigator.clipboard.writeText(result.toString())
-      toast.success("Result copied to clipboard")
+      navigator.clipboard.writeText(result.toString());
+      toast.success("Result copied to clipboard");
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -61,7 +73,8 @@ export default function MathEvaluatorClient() {
             className="font-mono text-lg"
           />
           <p className="text-xs text-muted-foreground">
-            Supports: +, -, *, /, sqrt(), cos(), sin(), abs(), log(), exp(), pow()
+            Supports: +, -, *, /, sqrt(), cos(), sin(), abs(), log(), exp(),
+            pow()
           </p>
         </CardContent>
       </Card>
@@ -88,5 +101,5 @@ export default function MathEvaluatorClient() {
         </Card>
       )}
     </div>
-  )
+  );
 }

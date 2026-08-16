@@ -1,74 +1,112 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 const NATO_ALPHABET: Record<string, string> = {
-  A: "Alpha", B: "Bravo", C: "Charlie", D: "Delta", E: "Echo",
-  F: "Foxtrot", G: "Golf", H: "Hotel", I: "India", J: "Juliet",
-  K: "Kilo", L: "Lima", M: "Mike", N: "November", O: "Oscar",
-  P: "Papa", Q: "Quebec", R: "Romeo", S: "Sierra", T: "Tango",
-  U: "Uniform", V: "Victor", W: "Whiskey", X: "X-ray", Y: "Yankee", Z: "Zulu",
-  "0": "Zero", "1": "One", "2": "Two", "3": "Three", "4": "Four",
-  "5": "Five", "6": "Six", "7": "Seven", "8": "Eight", "9": "Nine",
-}
+  A: "Alpha",
+  B: "Bravo",
+  C: "Charlie",
+  D: "Delta",
+  E: "Echo",
+  F: "Foxtrot",
+  G: "Golf",
+  H: "Hotel",
+  I: "India",
+  J: "Juliet",
+  K: "Kilo",
+  L: "Lima",
+  M: "Mike",
+  N: "November",
+  O: "Oscar",
+  P: "Papa",
+  Q: "Quebec",
+  R: "Romeo",
+  S: "Sierra",
+  T: "Tango",
+  U: "Uniform",
+  V: "Victor",
+  W: "Whiskey",
+  X: "X-ray",
+  Y: "Yankee",
+  Z: "Zulu",
+  "0": "Zero",
+  "1": "One",
+  "2": "Two",
+  "3": "Three",
+  "4": "Four",
+  "5": "Five",
+  "6": "Six",
+  "7": "Seven",
+  "8": "Eight",
+  "9": "Nine",
+};
 
 const NATO_TO_CHAR: Record<string, string> = Object.fromEntries(
-  Object.entries(NATO_ALPHABET).map(([char, word]) => [word.toUpperCase(), char])
-)
+  Object.entries(NATO_ALPHABET).map(([char, word]) => [
+    word.toUpperCase(),
+    char,
+  ]),
+);
 
 function textToNATO(text: string): string {
   return text
     .toUpperCase()
     .split("")
     .map((char) => {
-      if (char === " ") return " "
-      return NATO_ALPHABET[char] || char
+      if (char === " ") return " ";
+      return NATO_ALPHABET[char] || char;
     })
     .join(" ")
     .replace(/\s+/g, " ")
-    .trim()
+    .trim();
 }
 
 function natoToText(nato: string): string {
-  const words = nato.split(/\s+/)
+  const words = nato.split(/\s+/);
   return words
     .map((word) => {
-      const upperWord = word.toUpperCase()
-      return NATO_TO_CHAR[upperWord] || word
+      const upperWord = word.toUpperCase();
+      return NATO_TO_CHAR[upperWord] || word;
     })
-    .join("")
+    .join("");
 }
 
 export default function TextToNATOClient() {
-  const [mode, setMode] = React.useState<"to-nato" | "from-nato">("to-nato")
-  const [input, setInput] = React.useState("")
-  const [output, setOutput] = React.useState("")
+  const [mode, setMode] = React.useState<"to-nato" | "from-nato">("to-nato");
+  const [input, setInput] = React.useState("");
+  const [output, setOutput] = React.useState("");
 
   React.useEffect(() => {
     if (!input.trim()) {
-      setOutput("")
-      return
+      setOutput("");
+      return;
     }
 
     try {
       if (mode === "to-nato") {
-        setOutput(textToNATO(input))
+        setOutput(textToNATO(input));
       } else {
-        setOutput(natoToText(input))
+        setOutput(natoToText(input));
       }
     } catch {
-      setOutput("Conversion failed")
+      setOutput("Conversion failed");
     }
-  }, [input, mode])
+  }, [input, mode]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(output)
-    toast.success("Copied to clipboard")
-  }
+    navigator.clipboard.writeText(output);
+    toast.success("Copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -80,8 +118,8 @@ export default function TextToNATOClient() {
               <Button
                 variant={mode === "to-nato" ? "default" : "outline"}
                 onClick={() => {
-                  setMode("to-nato")
-                  setOutput("")
+                  setMode("to-nato");
+                  setOutput("");
                 }}
               >
                 Text → NATO
@@ -89,8 +127,8 @@ export default function TextToNATOClient() {
               <Button
                 variant={mode === "from-nato" ? "default" : "outline"}
                 onClick={() => {
-                  setMode("from-nato")
-                  setOutput("")
+                  setMode("from-nato");
+                  setOutput("");
                 }}
               >
                 NATO → Text
@@ -103,16 +141,22 @@ export default function TextToNATOClient() {
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>{mode === "to-nato" ? "Text Input" : "NATO Input"}</CardTitle>
+            <CardTitle>
+              {mode === "to-nato" ? "Text Input" : "NATO Input"}
+            </CardTitle>
             <CardDescription>
-              {mode === "to-nato" ? "Enter text to convert" : "Enter NATO alphabet"}
+              {mode === "to-nato"
+                ? "Enter text to convert"
+                : "Enter NATO alphabet"}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={mode === "to-nato" ? "Enter text..." : "Alpha Bravo Charlie..."}
+              placeholder={
+                mode === "to-nato" ? "Enter text..." : "Alpha Bravo Charlie..."
+              }
               className="w-full min-h-[200px] rounded-md border border-input bg-transparent px-3 py-2 text-sm"
             />
           </CardContent>
@@ -122,7 +166,9 @@ export default function TextToNATOClient() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle>{mode === "to-nato" ? "NATO Output" : "Text Output"}</CardTitle>
+                <CardTitle>
+                  {mode === "to-nato" ? "NATO Output" : "Text Output"}
+                </CardTitle>
                 <CardDescription>Result</CardDescription>
               </div>
               {output && (
@@ -143,5 +189,5 @@ export default function TextToNATOClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

@@ -1,3 +1,5 @@
+import { PERSON_BRAND } from "@jayantgoyal/web-brand";
+
 import {
   PERSON_NAME,
   SITE_DESCRIPTION,
@@ -24,7 +26,7 @@ export function WebSiteJsonLd({
     author: {
       "@type": "Person",
       name: PERSON_NAME,
-      url: siteUrl,
+      url: PERSON_BRAND.canonicalUrl,
     },
   };
 
@@ -48,7 +50,7 @@ export function SoftwareAppJsonLd({
     url: `${siteUrl}/tools`,
     applicationCategory: "DeveloperApplication",
     operatingSystem: "Web",
-    description: `A collection of ${allTools.length} free developer tools by Jayant, including UUID generation, JSON formatting, Base64 encoding, hashing, regex testing, converters, and more.`,
+    description: `A collection of ${allTools.length} free developer tools by ${PERSON_NAME}, including UUID generation, JSON formatting, Base64 encoding, hashing, regex testing, converters, and more.`,
     offers: {
       "@type": "Offer",
       price: "0",
@@ -57,7 +59,7 @@ export function SoftwareAppJsonLd({
     author: {
       "@type": "Person",
       name: PERSON_NAME,
-      url: siteUrl,
+      url: PERSON_BRAND.canonicalUrl,
     },
   };
 

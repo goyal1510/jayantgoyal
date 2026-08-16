@@ -3,11 +3,11 @@
 import * as React from "react";
 import { CloudSun, Droplets, LocateFixed, Search, Wind } from "lucide-react";
 
-import { Button } from "@jayant/web-ui/button";
-import { Input } from "@jayant/web-ui/input";
-import { cn } from "@jayant/web-ui/lib/utils";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { cn } from "@jayantgoyal/web-ui/lib/utils";
 
-import { WorkspaceHeader } from "@jayant/web-ui/workspace-header";
+import { WorkspaceHeader } from "@jayantgoyal/web-ui/workspace-header";
 
 import { useWeather } from "./use-weather";
 import {

@@ -48,8 +48,6 @@ export interface PortfolioHeroRecord {
 
 export type PortfolioHeroPublicRow = Pick<
   PortfolioHeroRecord,
-  | "name"
-  | "display_name"
   | "role"
   | "tagline"
   | "blurb"
@@ -58,7 +56,6 @@ export type PortfolioHeroPublicRow = Pick<
   | "availability"
   | "resume_url"
   | "github_username"
-  | "seo_title"
   | "seo_description"
 >;
 
@@ -349,15 +346,14 @@ export type PortfolioRecordMap = {
 };
 
 export const PORTFOLIO_SELECT_COLUMNS: Record<PortfolioTable, string> = {
-  hero: "name, display_name, role, tagline, blurb, headline, current_title, availability, resume_url, github_username, seo_title, seo_description",
+  hero: "role, tagline, blurb, headline, current_title, availability, resume_url, github_username, seo_description",
   about: "headline, objective, summary, story, personal, principles",
   education: "school, degree, period, location, detail",
   experience:
     "company, company_url, company_linkedin_url, role, period, location, summary, bullets",
   skill_categories: "id, title, description",
   skills: "category_id, name, proficiency, evidence",
-  work:
-    "name, slug, eyebrow, short_description, impact, contribution, year_label, image_url, image_alt, case_study, case_study_published, tags, github_link, live_link",
+  work: "name, slug, eyebrow, short_description, impact, contribution, year_label, image_url, image_alt, case_study, case_study_published, tags, github_link, live_link",
   certificates:
     "name, description, category, issuer, issued_at, credential_id, credential_url, document_url, preview_url, image_alt",
   contact: "email, phone, location, socials",
@@ -379,8 +375,7 @@ export const PORTFOLIO_ADMIN_SELECT_COLUMNS: Record<PortfolioTable, string> = {
     "id, title, description, sort_order, is_visible, created_at, updated_at",
   skills:
     "id, category_id, name, proficiency, evidence, sort_order, is_visible, created_at, updated_at",
-  work:
-    "id, name, slug, eyebrow, short_description, impact, contribution, year_label, image_url, image_alt, case_study, case_study_published, tags, github_link, live_link, sort_order, is_visible, created_at, updated_at",
+  work: "id, name, slug, eyebrow, short_description, impact, contribution, year_label, image_url, image_alt, case_study, case_study_published, tags, github_link, live_link, sort_order, is_visible, created_at, updated_at",
   certificates:
     "id, name, description, category, issuer, issued_at, credential_id, credential_url, document_url, preview_url, image_alt, sort_order, is_visible, created_at, updated_at",
   contact: "id, email, phone, location, socials, created_at, updated_at",
@@ -392,8 +387,13 @@ export const PORTFOLIO_ADMIN_SELECT_COLUMNS: Record<PortfolioTable, string> = {
 
 type WithoutGeneratedColumns<T> = Omit<T, "id" | "created_at" | "updated_at">;
 
+type PortfolioHeroWriteInput = Omit<
+  WithoutGeneratedColumns<PortfolioHeroRecord>,
+  "name" | "display_name" | "seo_title"
+>;
+
 export type PortfolioWriteInputMap = {
-  hero: WithoutGeneratedColumns<PortfolioHeroRecord>;
+  hero: PortfolioHeroWriteInput;
   about: WithoutGeneratedColumns<PortfolioAboutRecord>;
   education: WithoutGeneratedColumns<PortfolioEducationRecord>;
   experience: WithoutGeneratedColumns<PortfolioExperienceRecord>;

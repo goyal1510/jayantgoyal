@@ -1,7 +1,9 @@
 # Repository agent contract
 
-This is the **Jayant** monorepo. `jayantgoyal.com` is a domain, not the name of
-the product ecosystem or a platform.
+This is the `jayantgoyal` monorepo for products built by Jayant. `Jayant` is
+the public person name, `jg` is the short visual mark, and `jayantgoyal` is the
+repository/domain/package namespace. Never expand it into a personal full name
+or use it as an umbrella product brand.
 
 Read [docs/README.md](docs/README.md) before changing architecture. Code,
 package manifests, runtime registries, tests, migrations, and schema snapshots
@@ -18,7 +20,7 @@ remain authoritative when prose disagrees.
 - Applications may import packages, but never another application's source.
 - Reusable packages must never import a web client.
 - Web-specific code belongs under `packages/web`; product-neutral identity
-  belongs under `packages/ecosystem`; provider code belongs under
+  belongs under `packages/foundation`; provider code belongs under
   `packages/integrations`; build configuration belongs under
   `packages/tooling`.
 - Do not create session-entry files for this personal repository.
@@ -39,12 +41,12 @@ Run `pnpm check:architecture` after ownership or dependency changes.
 
 ## Applications
 
-| Product   | Workspace               | Ownership                                       |
-| --------- | ----------------------- | ----------------------------------------------- |
-| Portfolio | `@jayant/portfolio-web` | Public professional and editorial content       |
-| Studio    | `@jayant/studio-web`    | Product catalog, utilities, games, workspaces   |
-| Admin     | `@jayant/admin-web`     | Portfolio CMS, users, deployment operations     |
-| Auth      | `@jayant/auth-web`      | Sign-in, recovery, MFA, profile, account safety |
+| Product   | Workspace                    | Ownership                                       |
+| --------- | ---------------------------- | ----------------------------------------------- |
+| Portfolio | `@jayantgoyal/portfolio-web` | Public professional and editorial content       |
+| Studio    | `@jayantgoyal/studio-web`    | Product catalog, utilities, games, workspaces   |
+| Admin     | `@jayantgoyal/admin-web`     | Portfolio CMS, users, deployment operations     |
+| Auth      | `@jayantgoyal/auth-web`      | Sign-in, recovery, MFA, profile, account safety |
 
 Every current client is Next.js 16, React 19, TypeScript 5.9, and Tailwind CSS
 v4. Next.js request middleware is `src/proxy.ts`, not `middleware.ts`. Use the
@@ -52,17 +54,19 @@ application-local `@/*` alias for its `src/*` files.
 
 ## Shared ownership
 
-- `@jayant/identity`: framework-neutral person and product identity.
-- `@jayant/web-brand`: web metadata and synchronized web asset paths.
-- `@jayant/web-urls`: canonical web origins and URL rewriting.
-- `@jayant/web-seo`: shared Next.js metadata/indexability helpers.
-- `@jayant/web-auth`: Supabase SSR, session, entry, redirect, profile, password,
+- `@jayantgoyal/identity`: framework-neutral person, technical namespace,
+  product identity, canonical host, and development-origin registry.
+- `@jayantgoyal/web-brand`: web-facing product labels, descriptions, and
+  synchronized web asset paths.
+- `@jayantgoyal/web-urls`: canonical web origins and URL rewriting.
+- `@jayantgoyal/web-seo`: shared Next.js metadata/indexability helpers.
+- `@jayantgoyal/web-auth`: Supabase SSR, session, entry, redirect, profile, password,
   and logout contracts.
-- `@jayant/web-ui`: shared Studio/Admin/Auth components and application shell.
-- `@jayant/portfolio-contracts`: Portfolio/Admin data and validation contract.
-- `@jayant/github`: provider integration used by Portfolio and Studio.
-- `@jayant/tailwind-config`, `@jayant/eslint-config`, and
-  `@jayant/typescript-config`: shared web/tooling configuration.
+- `@jayantgoyal/web-ui`: shared Studio/Admin/Auth components and application shell.
+- `@jayantgoyal/portfolio-contracts`: Portfolio/Admin data and validation contract.
+- `@jayantgoyal/github`: provider integration used by Portfolio and Studio.
+- `@jayantgoyal/tailwind-config`, `@jayantgoyal/eslint-config`, and
+  `@jayantgoyal/typescript-config`: shared web/tooling configuration.
 
 Portfolio deliberately owns its editorial component system and must not import
 the shared application shell or application-surface stylesheet.
@@ -111,13 +115,15 @@ define a second ownership model.
 
 ```bash
 pnpm dev
-pnpm --filter @jayant/portfolio-web dev
-pnpm --filter @jayant/studio-web dev
-pnpm --filter @jayant/admin-web dev
-pnpm --filter @jayant/auth-web dev
+pnpm --filter @jayantgoyal/portfolio-web dev
+pnpm --filter @jayantgoyal/studio-web dev
+pnpm --filter @jayantgoyal/admin-web dev
+pnpm --filter @jayantgoyal/auth-web dev
 
 pnpm check:architecture
 pnpm check:brand-assets
+pnpm check:identity
+pnpm check:seo
 pnpm check:service-role
 pnpm check:source-health
 pnpm check:dead-code

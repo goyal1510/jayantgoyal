@@ -41,6 +41,12 @@ jobs:
       - name: Check brand assets
         run: pnpm check:brand-assets
 
+      - name: Check identity and namespace contracts
+        run: pnpm check:identity
+
+      - name: Check SEO contracts
+        run: pnpm check:seo
+
       - name: Check service-role boundaries
         run: pnpm check:service-role
 

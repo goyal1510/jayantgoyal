@@ -1,52 +1,65 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
-function generateCrontab(minute: string, hour: string, day: string, month: string, weekday: string): string {
-  return `${minute} ${hour} ${day} ${month} ${weekday}`
+function generateCrontab(
+  minute: string,
+  hour: string,
+  day: string,
+  month: string,
+  weekday: string,
+): string {
+  return `${minute} ${hour} ${day} ${month} ${weekday}`;
 }
 
 function describeCrontab(crontab: string): string {
-  const [minute, hour, day, month, weekday] = crontab.split(" ")
+  const [minute, hour, day, month, weekday] = crontab.split(" ");
 
-  const parts: string[] = []
-  if (minute !== "*") parts.push(`at minute ${minute}`)
-  if (hour !== "*") parts.push(`at hour ${hour}`)
-  if (day !== "*") parts.push(`on day ${day}`)
-  if (month !== "*") parts.push(`in month ${month}`)
-  if (weekday !== "*") parts.push(`on weekday ${weekday}`)
+  const parts: string[] = [];
+  if (minute !== "*") parts.push(`at minute ${minute}`);
+  if (hour !== "*") parts.push(`at hour ${hour}`);
+  if (day !== "*") parts.push(`on day ${day}`);
+  if (month !== "*") parts.push(`in month ${month}`);
+  if (weekday !== "*") parts.push(`on weekday ${weekday}`);
 
-  return parts.length > 0 ? parts.join(", ") : "Every minute"
+  return parts.length > 0 ? parts.join(", ") : "Every minute";
 }
 
 export default function CrontabGeneratorClient() {
-  const [minute, setMinute] = React.useState("*")
-  const [hour, setHour] = React.useState("*")
-  const [day, setDay] = React.useState("*")
-  const [month, setMonth] = React.useState("*")
-  const [weekday, setWeekday] = React.useState("*")
-  const [crontab, setCrontab] = React.useState("")
-  const [description, setDescription] = React.useState("")
+  const [minute, setMinute] = React.useState("*");
+  const [hour, setHour] = React.useState("*");
+  const [day, setDay] = React.useState("*");
+  const [month, setMonth] = React.useState("*");
+  const [weekday, setWeekday] = React.useState("*");
+  const [crontab, setCrontab] = React.useState("");
+  const [description, setDescription] = React.useState("");
 
   React.useEffect(() => {
-    const crontabStr = generateCrontab(minute, hour, day, month, weekday)
-    setCrontab(crontabStr)
-    setDescription(describeCrontab(crontabStr))
-  }, [minute, hour, day, month, weekday])
+    const crontabStr = generateCrontab(minute, hour, day, month, weekday);
+    setCrontab(crontabStr);
+    setDescription(describeCrontab(crontabStr));
+  }, [minute, hour, day, month, weekday]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(crontab)
-    toast.success("Crontab copied to clipboard")
-  }
+    navigator.clipboard.writeText(crontab);
+    toast.success("Crontab copied to clipboard");
+  };
 
   return (
-    <div className="space-y-6"><Card>
+    <div className="space-y-6">
+      <Card>
         <CardHeader>
           <CardTitle>Cron Schedule</CardTitle>
           <CardDescription>Configure cron expression</CardDescription>
@@ -123,5 +136,5 @@ export default function CrontabGeneratorClient() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

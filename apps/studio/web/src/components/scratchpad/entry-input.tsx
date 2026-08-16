@@ -1,13 +1,23 @@
 "use client";
 
 import * as React from "react";
-import { Button } from "@jayant/web-ui/button";
-import { Textarea } from "@jayant/web-ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jayant/web-ui/select";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Textarea } from "@jayantgoyal/web-ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@jayantgoyal/web-ui/select";
 import { Code2, MessageSquare, Send } from "lucide-react";
 
 interface EntryInputProps {
-  onSend: (content: string, entryType: "text" | "code", language?: string) => Promise<boolean>;
+  onSend: (
+    content: string,
+    entryType: "text" | "code",
+    language?: string,
+  ) => Promise<boolean>;
   disabled?: boolean;
 }
 
@@ -50,7 +60,7 @@ export function EntryInput({ onSend, disabled = false }: EntryInputProps) {
     const success = await onSend(
       content.trim(),
       entryType,
-      entryType === "code" ? language : undefined
+      entryType === "code" ? language : undefined,
     );
 
     if (success) {
@@ -68,7 +78,7 @@ export function EntryInput({ onSend, disabled = false }: EntryInputProps) {
         handleSend();
       }
     },
-    [handleSend]
+    [handleSend],
   );
 
   return (
@@ -112,7 +122,9 @@ export function EntryInput({ onSend, disabled = false }: EntryInputProps) {
       <Textarea
         ref={textareaRef}
         value={content}
-        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setContent(e.target.value)}
+        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+          setContent(e.target.value)
+        }
         onKeyDown={handleKeyDown}
         placeholder={
           entryType === "code"

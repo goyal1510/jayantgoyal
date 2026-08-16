@@ -10,7 +10,7 @@ adapter. It turns the ownership principles into concrete placement decisions.
 | Product page, API, UI, client state | `apps/<product>/<platform>`     | Never solely because it is large                                  |
 | Product rule used by one client     | Owning client                   | A second implemented client needs the same framework-neutral rule |
 | Product contract used by Admin      | `apps/<product>/contracts`      | It remains owned by the product, not Admin                        |
-| Person/product identity             | `packages/ecosystem`            | It is framework-neutral and cross-product                         |
+| Person/product identity             | `packages/foundation`           | It is framework-neutral and cross-product                         |
 | Web session, metadata, URL, UI      | `packages/web`                  | Multiple web clients share a stable responsibility                |
 | Provider protocol/client            | Owning client                   | Multiple products share the same stable provider boundary         |
 | Lint/compiler/build convention      | `packages/tooling`              | Multiple workspaces consume it                                    |

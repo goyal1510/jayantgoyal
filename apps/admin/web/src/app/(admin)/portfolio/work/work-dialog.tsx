@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { Loader2, X } from "lucide-react";
 
-import { Badge } from "@jayant/web-ui/badge";
-import { Button } from "@jayant/web-ui/button";
-import { FormMessage } from "@jayant/web-ui/form-message";
+import { Badge } from "@jayantgoyal/web-ui/badge";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { FormMessage } from "@jayantgoyal/web-ui/form-message";
 import {
   Dialog,
   DialogContent,
@@ -13,11 +13,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@jayant/web-ui/dialog";
-import { Input } from "@jayant/web-ui/input";
-import { Label } from "@jayant/web-ui/label";
-import { Switch } from "@jayant/web-ui/switch";
-import { Textarea } from "@jayant/web-ui/textarea";
+} from "@jayantgoyal/web-ui/dialog";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Switch } from "@jayantgoyal/web-ui/switch";
+import { Textarea } from "@jayantgoyal/web-ui/textarea";
 
 import { PortfolioAssetUpload } from "@/components/portfolio/asset-upload";
 import { AccessibleForm } from "@/components/accessible-form";

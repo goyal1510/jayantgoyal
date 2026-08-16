@@ -1,40 +1,46 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 function decodeSafeLink(url: string): string {
   try {
-    const urlObj = new URL(url)
-    const urlParam = urlObj.searchParams.get("url")
+    const urlObj = new URL(url);
+    const urlParam = urlObj.searchParams.get("url");
     if (urlParam) {
-      return decodeURIComponent(urlParam)
+      return decodeURIComponent(urlParam);
     }
-    return url
+    return url;
   } catch {
-    return url
+    return url;
   }
 }
 
 export default function OutlookSafeLinkDecoderClient() {
-  const [input, setInput] = React.useState("")
-  const [decoded, setDecoded] = React.useState("")
+  const [input, setInput] = React.useState("");
+  const [decoded, setDecoded] = React.useState("");
 
   React.useEffect(() => {
     if (!input.trim()) {
-      setDecoded("")
-      return
+      setDecoded("");
+      return;
     }
-    setDecoded(decodeSafeLink(input))
-  }, [input])
+    setDecoded(decodeSafeLink(input));
+  }, [input]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(decoded)
-    toast.success("Decoded URL copied to clipboard")
-  }
+    navigator.clipboard.writeText(decoded);
+    toast.success("Decoded URL copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -76,5 +82,5 @@ export default function OutlookSafeLinkDecoderClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

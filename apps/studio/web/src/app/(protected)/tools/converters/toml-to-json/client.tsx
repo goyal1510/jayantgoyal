@@ -1,106 +1,115 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 function tomlToJson(toml: string): string {
   try {
-    const result: Record<string, unknown> = {}
-    const lines = toml.split("\n")
-    let currentSection: Record<string, unknown> = result
+    const result: Record<string, unknown> = {};
+    const lines = toml.split("\n");
+    let currentSection: Record<string, unknown> = result;
 
     lines.forEach((line) => {
-      const trimmed = line.trim()
-      if (!trimmed || trimmed.startsWith("#")) return
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith("#")) return;
 
       // Section header [section.name]
       if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
-        const sectionPath = trimmed.slice(1, -1).split(".")
-        currentSection = result
+        const sectionPath = trimmed.slice(1, -1).split(".");
+        currentSection = result;
         sectionPath.forEach((part, index) => {
           if (!currentSection[part]) {
-            currentSection[part] = {}
+            currentSection[part] = {};
           }
           if (index === sectionPath.length - 1) {
-            currentSection = currentSection[part] as Record<string, unknown>
+            currentSection = currentSection[part] as Record<string, unknown>;
           } else {
-            currentSection = currentSection[part] as Record<string, unknown>
+            currentSection = currentSection[part] as Record<string, unknown>;
           }
-        })
-        return
+        });
+        return;
       }
 
       // Key = value
-      const equalIndex = trimmed.indexOf("=")
+      const equalIndex = trimmed.indexOf("=");
       if (equalIndex > 0) {
-        const key = trimmed.slice(0, equalIndex).trim()
-        const value = trimmed.slice(equalIndex + 1).trim()
-        currentSection[key] = parseTomlValue(value)
+        const key = trimmed.slice(0, equalIndex).trim();
+        const value = trimmed.slice(equalIndex + 1).trim();
+        currentSection[key] = parseTomlValue(value);
       }
-    })
+    });
 
-    return JSON.stringify(result, null, 2)
+    return JSON.stringify(result, null, 2);
   } catch {
-    throw new Error("Failed to parse TOML")
+    throw new Error("Failed to parse TOML");
   }
 }
 
 function parseTomlValue(value: string): unknown {
-  const trimmed = value.trim()
+  const trimmed = value.trim();
 
   if (trimmed.startsWith('"') && trimmed.endsWith('"')) {
-    return trimmed.slice(1, -1).replace(/\\"/g, '"')
+    return trimmed.slice(1, -1).replace(/\\"/g, '"');
   }
   if (trimmed.startsWith("'") && trimmed.endsWith("'")) {
-    return trimmed.slice(1, -1)
+    return trimmed.slice(1, -1);
   }
-  if (trimmed === "true") return true
-  if (trimmed === "false") return false
-  if (trimmed === "null") return null
+  if (trimmed === "true") return true;
+  if (trimmed === "false") return false;
+  if (trimmed === "null") return null;
   if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
-    const items = trimmed.slice(1, -1).split(",").map(s => parseTomlValue(s.trim()))
-    return items
+    const items = trimmed
+      .slice(1, -1)
+      .split(",")
+      .map((s) => parseTomlValue(s.trim()));
+    return items;
   }
   if (!isNaN(Number(trimmed))) {
-    return Number(trimmed)
+    return Number(trimmed);
   }
 
-  return trimmed
+  return trimmed;
 }
 
 export default function TOMLToJSONClient() {
-  const [input, setInput] = React.useState("")
-  const [output, setOutput] = React.useState("")
-  const [error, setError] = React.useState("")
+  const [input, setInput] = React.useState("");
+  const [output, setOutput] = React.useState("");
+  const [error, setError] = React.useState("");
 
   const convert = React.useCallback(() => {
     if (!input.trim()) {
-      setOutput("")
-      setError("")
-      return
+      setOutput("");
+      setError("");
+      return;
     }
 
     try {
-      const json = tomlToJson(input)
-      setOutput(json)
-      setError("")
+      const json = tomlToJson(input);
+      setOutput(json);
+      setError("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Invalid TOML")
-      setOutput("")
+      setError(err instanceof Error ? err.message : "Invalid TOML");
+      setOutput("");
     }
-  }, [input])
+  }, [input]);
 
   React.useEffect(() => {
-    convert()
-  }, [convert])
+    convert();
+  }, [convert]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(output)
-    toast.success("JSON copied to clipboard")
-  }
+    navigator.clipboard.writeText(output);
+    toast.success("JSON copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -117,9 +126,7 @@ export default function TOMLToJSONClient() {
               placeholder="key = value"
               className="w-full min-h-[400px] rounded-md border border-input bg-transparent px-3 py-2 text-sm font-mono"
             />
-            {error && (
-              <p className="text-sm text-red-500 mt-2">{error}</p>
-            )}
+            {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
           </CardContent>
         </Card>
 
@@ -148,5 +155,5 @@ export default function TOMLToJSONClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

@@ -1,139 +1,142 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { Eye, EyeOff, LogIn, AlertCircle, Timer } from "lucide-react"
+import * as React from "react";
+import Link from "next/link";
+import { Eye, EyeOff, LogIn, AlertCircle, Timer } from "lucide-react";
 
-import { createSupabaseBrowserClient } from "@/lib/supabase/client"
-import { signOutSession } from "@jayant/web-auth/logout"
-import { passwordValidationError } from "@jayant/web-auth/password"
-import { Button } from "@jayant/web-ui/button"
-import { Card, CardContent } from "@jayant/web-ui/card"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
-import { Switch } from "@jayant/web-ui/switch"
-import { cn } from "@jayant/web-ui/lib/utils"
-import { toast } from "sonner"
-import { Spinner } from "@jayant/web-ui/spinner"
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { signOutSession } from "@jayantgoyal/web-auth/logout";
+import { passwordValidationError } from "@jayantgoyal/web-auth/password";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Card, CardContent } from "@jayantgoyal/web-ui/card";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Switch } from "@jayantgoyal/web-ui/switch";
+import { cn } from "@jayantgoyal/web-ui/lib/utils";
+import { toast } from "sonner";
+import { Spinner } from "@jayantgoyal/web-ui/spinner";
 
-type SessionState = "loading" | "none" | "ready"
+type SessionState = "loading" | "none" | "ready";
 
 function clearRecoveryCookie() {
-  document.cookie = "recovery_mode=; path=/; max-age=0"
+  document.cookie = "recovery_mode=; path=/; max-age=0";
 }
 
 export function ResetPasswordForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [showPassword, setShowPassword] = React.useState(false)
-  const [password, setPassword] = React.useState("")
-  const [confirmPassword, setConfirmPassword] = React.useState("")
-  const [isPending, setIsPending] = React.useState(false)
-  const [sessionState, setSessionState] = React.useState<SessionState>("loading")
-  const [signOutAll, setSignOutAll] = React.useState(false)
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [password, setPassword] = React.useState("");
+  const [confirmPassword, setConfirmPassword] = React.useState("");
+  const [isPending, setIsPending] = React.useState(false);
+  const [sessionState, setSessionState] =
+    React.useState<SessionState>("loading");
+  const [signOutAll, setSignOutAll] = React.useState(false);
 
-  const [timeLeft, setTimeLeft] = React.useState(120) // 2 minutes
+  const [timeLeft, setTimeLeft] = React.useState(120); // 2 minutes
 
   React.useEffect(() => {
     const checkSession = async () => {
       // Redirect on refresh: if the page was already visited, sign out
-      const hasVisited = sessionStorage.getItem("reset_password_visited")
+      const hasVisited = sessionStorage.getItem("reset_password_visited");
       if (hasVisited) {
-        sessionStorage.removeItem("reset_password_visited")
-        const supabase = createSupabaseBrowserClient()
-        await signOutSession(supabase)
-        clearRecoveryCookie()
-        window.location.href = "/welcome"
-        return
+        sessionStorage.removeItem("reset_password_visited");
+        const supabase = createSupabaseBrowserClient();
+        await signOutSession(supabase);
+        clearRecoveryCookie();
+        window.location.href = "/welcome";
+        return;
       }
-      sessionStorage.setItem("reset_password_visited", "true")
+      sessionStorage.setItem("reset_password_visited", "true");
 
-      const supabase = createSupabaseBrowserClient()
-      const { data: { user: sessionUser } } = await supabase.auth.getUser()
+      const supabase = createSupabaseBrowserClient();
+      const {
+        data: { user: sessionUser },
+      } = await supabase.auth.getUser();
 
       if (!sessionUser) {
         // Clear stale recovery cookie if session is gone
-        clearRecoveryCookie()
-        setSessionState("none")
-        return
+        clearRecoveryCookie();
+        setSessionState("none");
+        return;
       }
 
       // MFA is enforced at the proxy level — if we reach here, MFA is already passed
-      setSessionState("ready")
-    }
-    checkSession()
-  }, [])
+      setSessionState("ready");
+    };
+    checkSession();
+  }, []);
 
   const cleanupAndRedirectToLogin = React.useCallback(async () => {
-    sessionStorage.removeItem("reset_password_visited")
-    const supabase = createSupabaseBrowserClient()
-    await signOutSession(supabase)
-    clearRecoveryCookie()
-    window.location.href = "/welcome"
-  }, [])
+    sessionStorage.removeItem("reset_password_visited");
+    const supabase = createSupabaseBrowserClient();
+    await signOutSession(supabase);
+    clearRecoveryCookie();
+    window.location.href = "/welcome";
+  }, []);
 
   // 2-minute countdown timer — auto-redirect to login when expired
   React.useEffect(() => {
-    if (sessionState !== "ready") return
+    if (sessionState !== "ready") return;
 
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
-          clearInterval(interval)
-          void cleanupAndRedirectToLogin()
-          return 0
+          clearInterval(interval);
+          void cleanupAndRedirectToLogin();
+          return 0;
         }
-        return prev - 1
-      })
-    }, 1000)
+        return prev - 1;
+      });
+    }, 1000);
 
-    return () => clearInterval(interval)
-  }, [sessionState, cleanupAndRedirectToLogin])
+    return () => clearInterval(interval);
+  }, [sessionState, cleanupAndRedirectToLogin]);
 
   const handleSubmit = React.useCallback(
     (e: React.FormEvent) => {
-      e.preventDefault()
+      e.preventDefault();
 
-      const passwordError = passwordValidationError(password)
+      const passwordError = passwordValidationError(password);
       if (passwordError) {
-        toast.error(passwordError)
-        return
+        toast.error(passwordError);
+        return;
       }
 
       if (password !== confirmPassword) {
-        toast.error("Passwords do not match.")
-        return
+        toast.error("Passwords do not match.");
+        return;
       }
 
-      setIsPending(true)
+      setIsPending(true);
 
       void (async () => {
         try {
-          const supabase = createSupabaseBrowserClient()
-          const { error } = await supabase.auth.updateUser({ password })
+          const supabase = createSupabaseBrowserClient();
+          const { error } = await supabase.auth.updateUser({ password });
 
           if (error) {
-            toast.error(error.message)
-            return
+            toast.error(error.message);
+            return;
           }
 
           // Sign out after password change
-          sessionStorage.removeItem("reset_password_visited")
-          await signOutSession(supabase, signOutAll ? "global" : "local")
-          clearRecoveryCookie()
-          window.location.href = "/welcome?message=password_changed"
+          sessionStorage.removeItem("reset_password_visited");
+          await signOutSession(supabase, signOutAll ? "global" : "local");
+          clearRecoveryCookie();
+          window.location.href = "/welcome?message=password_changed";
         } catch (err) {
           const message =
-            err instanceof Error ? err.message : "Unable to update password."
-          toast.error(message)
+            err instanceof Error ? err.message : "Unable to update password.";
+          toast.error(message);
         } finally {
-          setIsPending(false)
+          setIsPending(false);
         }
-      })()
+      })();
     },
-    [password, confirmPassword, signOutAll]
-  )
+    [password, confirmPassword, signOutAll],
+  );
 
   // Loading state while checking session
   if (sessionState === "loading") {
@@ -147,7 +150,7 @@ export function ResetPasswordForm({
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
   // No session — invalid or expired link
@@ -160,7 +163,8 @@ export function ResetPasswordForm({
               <AlertCircle className="size-12 text-destructive" />
               <h1 className="text-2xl font-bold">Invalid or Expired Link</h1>
               <p className="text-muted-foreground">
-                This password reset link is invalid or has expired. Please request a new one.
+                This password reset link is invalid or has expired. Please
+                request a new one.
               </p>
               <div className="flex flex-col gap-2 w-full mt-4">
                 <Button asChild>
@@ -177,7 +181,7 @@ export function ResetPasswordForm({
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
   return (
@@ -190,12 +194,15 @@ export function ResetPasswordForm({
               <p className="text-muted-foreground text-sm mt-1">
                 Enter your new password below.
               </p>
-              <div className={cn(
-                "flex items-center gap-1.5 text-xs mt-2 font-medium",
-                timeLeft <= 30 ? "text-destructive" : "text-muted-foreground"
-              )}>
+              <div
+                className={cn(
+                  "flex items-center gap-1.5 text-xs mt-2 font-medium",
+                  timeLeft <= 30 ? "text-destructive" : "text-muted-foreground",
+                )}
+              >
                 <Timer className="size-3.5" />
-                Session expires in {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, "0")}
+                Session expires in {Math.floor(timeLeft / 60)}:
+                {String(timeLeft % 60).padStart(2, "0")}
               </div>
             </div>
             <div className="grid gap-2">
@@ -217,7 +224,11 @@ export function ResetPasswordForm({
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground hover:text-foreground"
                 >
-                  {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                  {showPassword ? (
+                    <EyeOff className="size-4" />
+                  ) : (
+                    <Eye className="size-4" />
+                  )}
                 </button>
               </div>
             </div>
@@ -244,11 +255,7 @@ export function ResetPasswordForm({
                 onCheckedChange={setSignOutAll}
               />
             </div>
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isPending}
-            >
+            <Button type="submit" className="w-full" disabled={isPending}>
               {isPending ? "Updating..." : "Update Password"}
             </Button>
             <Button
@@ -264,5 +271,5 @@ export function ResetPasswordForm({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

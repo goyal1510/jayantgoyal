@@ -9,7 +9,7 @@ import {
   getNextMonth,
 } from "@/lib/activity-tracker/date";
 import { CalendarCheck2 } from "lucide-react";
-import { WorkspaceHeader } from "@jayant/web-ui/workspace-header";
+import { WorkspaceHeader } from "@jayantgoyal/web-ui/workspace-header";
 
 export default function TrackerClient() {
   const [currentMonth, setCurrentMonth] =

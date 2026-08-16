@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import { ExternalLink, Github, Radio } from "lucide-react";
-import { Badge } from "@jayant/web-ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@jayant/web-ui/card";
+import { Badge } from "@jayantgoyal/web-ui/badge";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
 
 import { SectionEditorialPanel } from "@/components/portfolio/section-editorial-panel";
 import { PortfolioWorkspaceHeader } from "@/components/portfolio/portfolio-workspace-header";
@@ -69,8 +74,8 @@ export default async function ActivityPage() {
             <CardTitle className="text-base">What is editable</CardTitle>
           </CardHeader>
           <CardContent className="text-sm text-muted-foreground">
-            Edit the identity and links in Home and Contact. Keep GitHub
-            metrics derived so the public surface stays trustworthy.
+            Edit the identity and links in Home and Contact. Keep GitHub metrics
+            derived so the public surface stays trustworthy.
           </CardContent>
         </Card>
         <Card className="bg-muted/30">
@@ -79,8 +84,8 @@ export default async function ActivityPage() {
             <CardTitle className="text-base">Open source</CardTitle>
           </CardHeader>
           <CardContent className="text-sm text-muted-foreground">
-            Verify the latest contribution history directly on the linked
-            GitHub profile before publishing a content change.
+            Verify the latest contribution history directly on the linked GitHub
+            profile before publishing a content change.
           </CardContent>
         </Card>
       </div>

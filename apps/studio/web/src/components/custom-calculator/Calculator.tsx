@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useCalculatorStore } from "@/lib/custom-calculator/useCalculatorStore";
-import { Button } from "@jayant/web-ui/button";
+import { Button } from "@jayantgoyal/web-ui/button";
 import Display from "./Display";
 import { Calculator as CalculatorIcon, History } from "lucide-react";
 

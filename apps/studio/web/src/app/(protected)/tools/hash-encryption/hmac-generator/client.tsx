@@ -1,34 +1,44 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
-async function generateHMAC(message: string, secret: string, algorithm: string): Promise<string> {
-  const encoder = new TextEncoder()
-  const keyData = encoder.encode(secret)
-  const messageData = encoder.encode(message)
+async function generateHMAC(
+  message: string,
+  secret: string,
+  algorithm: string,
+): Promise<string> {
+  const encoder = new TextEncoder();
+  const keyData = encoder.encode(secret);
+  const messageData = encoder.encode(message);
 
-  let hashAlgorithm: string
+  let hashAlgorithm: string;
   switch (algorithm) {
     case "SHA-256":
-      hashAlgorithm = "SHA-256"
-      break
+      hashAlgorithm = "SHA-256";
+      break;
     case "SHA-384":
-      hashAlgorithm = "SHA-384"
-      break
+      hashAlgorithm = "SHA-384";
+      break;
     case "SHA-512":
-      hashAlgorithm = "SHA-512"
-      break
+      hashAlgorithm = "SHA-512";
+      break;
     case "SHA-1":
-      hashAlgorithm = "SHA-1"
-      break
+      hashAlgorithm = "SHA-1";
+      break;
     default:
-      hashAlgorithm = "SHA-256"
+      hashAlgorithm = "SHA-256";
   }
 
   const key = await crypto.subtle.importKey(
@@ -36,55 +46,55 @@ async function generateHMAC(message: string, secret: string, algorithm: string):
     keyData,
     { name: "HMAC", hash: hashAlgorithm },
     false,
-    ["sign"]
-  )
+    ["sign"],
+  );
 
-  const signature = await crypto.subtle.sign("HMAC", key, messageData)
+  const signature = await crypto.subtle.sign("HMAC", key, messageData);
   return Array.from(new Uint8Array(signature))
-    .map(b => b.toString(16).padStart(2, "0"))
-    .join("")
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 }
 
 export default function HMACGeneratorClient() {
-  const [message, setMessage] = React.useState("")
-  const [secret, setSecret] = React.useState("")
-  const [algorithm, setAlgorithm] = React.useState("SHA-256")
-  const [hmac, setHmac] = React.useState("")
-  const [isGenerating, setIsGenerating] = React.useState(false)
+  const [message, setMessage] = React.useState("");
+  const [secret, setSecret] = React.useState("");
+  const [algorithm, setAlgorithm] = React.useState("SHA-256");
+  const [hmac, setHmac] = React.useState("");
+  const [isGenerating, setIsGenerating] = React.useState(false);
 
   const algorithms = [
     { value: "SHA-1", label: "SHA-1" },
     { value: "SHA-256", label: "SHA-256" },
     { value: "SHA-384", label: "SHA-384" },
     { value: "SHA-512", label: "SHA-512" },
-  ]
+  ];
 
   const generateHMACValue = React.useCallback(async () => {
     if (!message.trim() || !secret.trim()) {
-      setHmac("")
-      return
+      setHmac("");
+      return;
     }
 
-    setIsGenerating(true)
+    setIsGenerating(true);
     try {
-      const result = await generateHMAC(message, secret, algorithm)
-      setHmac(result)
+      const result = await generateHMAC(message, secret, algorithm);
+      setHmac(result);
     } catch {
-      toast.error("Failed to generate HMAC")
-      setHmac("")
+      toast.error("Failed to generate HMAC");
+      setHmac("");
     } finally {
-      setIsGenerating(false)
+      setIsGenerating(false);
     }
-  }, [message, secret, algorithm])
+  }, [message, secret, algorithm]);
 
   React.useEffect(() => {
-    generateHMACValue()
-  }, [generateHMACValue])
+    generateHMACValue();
+  }, [generateHMACValue]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(hmac)
-    toast.success("HMAC copied to clipboard")
-  }
+    navigator.clipboard.writeText(hmac);
+    toast.success("HMAC copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -138,17 +148,15 @@ export default function HMACGeneratorClient() {
         <Card>
           <CardHeader>
             <CardTitle>HMAC Output</CardTitle>
-            <CardDescription>Hash-based message authentication code</CardDescription>
+            <CardDescription>
+              Hash-based message authentication code
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label>HMAC ({algorithm})</Label>
               <div className="flex gap-2">
-                <Input
-                  value={hmac}
-                  readOnly
-                  className="font-mono text-sm"
-                />
+                <Input value={hmac} readOnly className="font-mono text-sm" />
                 <Button
                   variant="outline"
                   size="icon"
@@ -169,5 +177,5 @@ export default function HMACGeneratorClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

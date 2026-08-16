@@ -6,15 +6,15 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   profileDisplayName,
   resolveProfileAvatar,
-} from "@jayant/web-auth/profile";
-import { ApplicationShell } from "@jayant/web-ui/application-shell";
-import { ApplicationTopbar } from "@jayant/web-ui/application-topbar";
-import { RouteChangeProvider } from "@jayant/web-ui/route-change-provider";
+} from "@jayantgoyal/web-auth/profile";
+import { ApplicationShell } from "@jayantgoyal/web-ui/application-shell";
+import { ApplicationTopbar } from "@jayantgoyal/web-ui/application-topbar";
+import { RouteChangeProvider } from "@jayantgoyal/web-ui/route-change-provider";
 import {
   SIDEBAR_STATE_COOKIE_NAME,
   SIDEBAR_WIDTH_COOKIE_NAME,
   parseSidebarPreferences,
-} from "@jayant/web-ui/lib/sidebar-preferences";
+} from "@jayantgoyal/web-ui/lib/sidebar-preferences";
 
 export default async function AccountLayout({
   children,

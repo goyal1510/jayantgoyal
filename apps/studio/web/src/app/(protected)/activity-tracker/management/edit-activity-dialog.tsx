@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Button } from "@jayant/web-ui/button"
+import * as React from "react";
+import { Button } from "@jayantgoyal/web-ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,18 +9,18 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@jayant/web-ui/dialog"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
-import { Switch } from "@jayant/web-ui/switch"
-import { Activity } from "@/lib/activity-tracker/database"
-import { toast } from "sonner"
+} from "@jayantgoyal/web-ui/dialog";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Switch } from "@jayantgoyal/web-ui/switch";
+import { Activity } from "@/lib/activity-tracker/database";
+import { toast } from "sonner";
 
 interface EditActivityDialogProps {
-  activity: Activity | null
-  isOpen: boolean
-  onOpenChange: (open: boolean) => void
-  onSaved: (updated: Activity) => void
+  activity: Activity | null;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSaved: (updated: Activity) => void;
 }
 
 export function EditActivityDialog({
@@ -29,33 +29,33 @@ export function EditActivityDialog({
   onOpenChange,
   onSaved,
 }: EditActivityDialogProps) {
-  const [editName, setEditName] = React.useState("")
-  const [editIsActive, setEditIsActive] = React.useState(true)
-  const [isSaving, setIsSaving] = React.useState(false)
+  const [editName, setEditName] = React.useState("");
+  const [editIsActive, setEditIsActive] = React.useState(true);
+  const [isSaving, setIsSaving] = React.useState(false);
 
   React.useEffect(() => {
     if (activity) {
-      setEditName(activity.name)
-      setEditIsActive(activity.is_active)
+      setEditName(activity.name);
+      setEditIsActive(activity.is_active);
     }
-  }, [activity])
+  }, [activity]);
 
   const handleClose = () => {
-    onOpenChange(false)
-    setEditName("")
-    setEditIsActive(true)
-  }
+    onOpenChange(false);
+    setEditName("");
+    setEditIsActive(true);
+  };
 
   const handleSave = async () => {
-    if (!activity) return
+    if (!activity) return;
 
     if (!editName.trim()) {
-      toast.error("Activity name is required.")
-      return
+      toast.error("Activity name is required.");
+      return;
     }
 
     try {
-      setIsSaving(true)
+      setIsSaving(true);
 
       const response = await fetch(`/api/activity-tracker/${activity.id}`, {
         method: "PATCH",
@@ -66,25 +66,25 @@ export function EditActivityDialog({
           name: editName.trim(),
           is_active: editIsActive,
         }),
-      })
+      });
 
       if (!response.ok) {
-        throw new Error("Failed to update activity.")
+        throw new Error("Failed to update activity.");
       }
 
       const { activity: updatedActivity } = (await response.json()) as {
-        activity: Activity
-      }
+        activity: Activity;
+      };
 
-      toast.success("Activity updated successfully!")
-      onSaved(updatedActivity)
-      handleClose()
+      toast.success("Activity updated successfully!");
+      onSaved(updatedActivity);
+      handleClose();
     } catch {
-      toast.error("Unable to update activity.")
+      toast.error("Unable to update activity.");
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -92,7 +92,8 @@ export function EditActivityDialog({
         <DialogHeader>
           <DialogTitle>Edit Activity</DialogTitle>
           <DialogDescription>
-            Update the activity name and status. Changes will be reflected immediately.
+            Update the activity name and status. Changes will be reflected
+            immediately.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
@@ -105,7 +106,7 @@ export function EditActivityDialog({
               onChange={(e) => setEditName(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !isSaving) {
-                  handleSave()
+                  handleSave();
                 }
               }}
             />
@@ -128,11 +129,7 @@ export function EditActivityDialog({
           </div>
         </div>
         <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={handleClose}
-            disabled={isSaving}
-          >
+          <Button variant="outline" onClick={handleClose} disabled={isSaving}>
             Cancel
           </Button>
           <Button onClick={handleSave} disabled={isSaving}>
@@ -141,5 +138,5 @@ export function EditActivityDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

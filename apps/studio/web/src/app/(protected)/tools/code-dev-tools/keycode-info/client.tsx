@@ -1,20 +1,26 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Label } from "@jayant/web-ui/label"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Label } from "@jayantgoyal/web-ui/label";
 
 export default function KeycodeInfoClient() {
   const [keyInfo, setKeyInfo] = React.useState<{
-    key: string
-    code: string
-    keyCode: number
-    location: number
-    ctrl: boolean
-    shift: boolean
-    alt: boolean
-    meta: boolean
-  } | null>(null)
+    key: string;
+    code: string;
+    keyCode: number;
+    location: number;
+    ctrl: boolean;
+    shift: boolean;
+    alt: boolean;
+    meta: boolean;
+  } | null>(null);
 
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -27,15 +33,16 @@ export default function KeycodeInfoClient() {
         shift: e.shiftKey,
         alt: e.altKey,
         meta: e.metaKey,
-      })
-    }
+      });
+    };
 
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [])
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   return (
-    <div className="space-y-6"><Card>
+    <div className="space-y-6">
+      <Card>
         <CardHeader>
           <CardTitle>Press Any Key</CardTitle>
           <CardDescription>Key information will appear below</CardDescription>
@@ -45,10 +52,14 @@ export default function KeycodeInfoClient() {
             {keyInfo ? (
               <div className="text-center space-y-2">
                 <div className="text-4xl font-bold">{keyInfo.key}</div>
-                <p className="text-sm text-muted-foreground">Press another key to update</p>
+                <p className="text-sm text-muted-foreground">
+                  Press another key to update
+                </p>
               </div>
             ) : (
-              <p className="text-muted-foreground">Press any key on your keyboard...</p>
+              <p className="text-muted-foreground">
+                Press any key on your keyboard...
+              </p>
             )}
           </div>
         </CardContent>
@@ -83,16 +94,24 @@ export default function KeycodeInfoClient() {
             <div>
               <Label className="text-muted-foreground">Modifiers</Label>
               <div className="flex gap-4 mt-2">
-                <span className={`px-2 py-1 rounded text-sm ${keyInfo.ctrl ? "bg-primary text-primary-foreground" : "bg-muted"}`}>
+                <span
+                  className={`px-2 py-1 rounded text-sm ${keyInfo.ctrl ? "bg-primary text-primary-foreground" : "bg-muted"}`}
+                >
                   Ctrl
                 </span>
-                <span className={`px-2 py-1 rounded text-sm ${keyInfo.shift ? "bg-primary text-primary-foreground" : "bg-muted"}`}>
+                <span
+                  className={`px-2 py-1 rounded text-sm ${keyInfo.shift ? "bg-primary text-primary-foreground" : "bg-muted"}`}
+                >
                   Shift
                 </span>
-                <span className={`px-2 py-1 rounded text-sm ${keyInfo.alt ? "bg-primary text-primary-foreground" : "bg-muted"}`}>
+                <span
+                  className={`px-2 py-1 rounded text-sm ${keyInfo.alt ? "bg-primary text-primary-foreground" : "bg-muted"}`}
+                >
                   Alt
                 </span>
-                <span className={`px-2 py-1 rounded text-sm ${keyInfo.meta ? "bg-primary text-primary-foreground" : "bg-muted"}`}>
+                <span
+                  className={`px-2 py-1 rounded text-sm ${keyInfo.meta ? "bg-primary text-primary-foreground" : "bg-muted"}`}
+                >
                   Meta
                 </span>
               </div>
@@ -101,5 +120,5 @@ export default function KeycodeInfoClient() {
         </Card>
       )}
     </div>
-  )
+  );
 }

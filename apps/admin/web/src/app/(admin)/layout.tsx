@@ -4,19 +4,19 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { AdminCommandPalette } from "@/components/header/command-palette";
 import { DynamicBreadcrumb } from "@/components/sidebar/dynamic-breadcrumb";
-import { ApplicationShell } from "@jayant/web-ui/application-shell";
-import { ApplicationTopbar } from "@jayant/web-ui/application-topbar";
-import { LazyMotionProvider } from "@jayant/web-ui/lazy-motion-provider";
+import { ApplicationShell } from "@jayantgoyal/web-ui/application-shell";
+import { ApplicationTopbar } from "@jayantgoyal/web-ui/application-topbar";
+import { LazyMotionProvider } from "@jayantgoyal/web-ui/lazy-motion-provider";
 import {
   SIDEBAR_STATE_COOKIE_NAME,
   SIDEBAR_WIDTH_COOKIE_NAME,
   parseSidebarPreferences,
-} from "@jayant/web-ui/lib/sidebar-preferences";
-import { RouteChangeProvider } from "@jayant/web-ui/route-change-provider";
+} from "@jayantgoyal/web-ui/lib/sidebar-preferences";
+import { RouteChangeProvider } from "@jayantgoyal/web-ui/route-change-provider";
 import {
   profileDisplayName,
   resolveProfileAvatar,
-} from "@jayant/web-auth/profile";
+} from "@jayantgoyal/web-auth/profile";
 import type { UserRole } from "@/lib/types";
 
 export default async function AdminLayout({

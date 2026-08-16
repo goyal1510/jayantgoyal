@@ -2,10 +2,10 @@
 
 import { FolderOpen } from "lucide-react";
 
-import { Spinner } from "@jayant/web-ui/spinner";
-import { PageSpinner } from "@jayant/web-ui/page-spinner";
-import { Card } from "@jayant/web-ui/card";
-import { WorkspaceHeader } from "@jayant/web-ui/workspace-header";
+import { Spinner } from "@jayantgoyal/web-ui/spinner";
+import { PageSpinner } from "@jayantgoyal/web-ui/page-spinner";
+import { Card } from "@jayantgoyal/web-ui/card";
+import { WorkspaceHeader } from "@jayantgoyal/web-ui/workspace-header";
 import { CreateFolderDialog } from "@/components/file-manager/create-folder-dialog";
 import { RenameDialog } from "@/components/file-manager/rename-dialog";
 import { DeleteDialog } from "@/components/file-manager/delete-dialog";

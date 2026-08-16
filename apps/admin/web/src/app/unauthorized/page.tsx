@@ -1,15 +1,15 @@
 "use client";
 
 import { ShieldX, ArrowLeft } from "lucide-react";
-import { buildAuthLogoutUrl } from "@jayant/web-auth/entry";
-import { Button } from "@jayant/web-ui/button";
+import { buildAuthLogoutUrl } from "@jayantgoyal/web-auth/entry";
+import { Button } from "@jayantgoyal/web-ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@jayant/web-ui/card";
+} from "@jayantgoyal/web-ui/card";
 
 export default function UnauthorizedPage() {
   function handleLogout() {

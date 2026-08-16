@@ -1,6 +1,6 @@
 "use client";
 
-import { ApplicationErrorScreen } from "@jayant/web-ui/application-error-screen";
+import { ApplicationErrorScreen } from "@jayantgoyal/web-ui/application-error-screen";
 
 export default function Error({
   error,

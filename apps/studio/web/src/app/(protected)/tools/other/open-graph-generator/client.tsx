@@ -1,40 +1,50 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 export default function OpenGraphGeneratorClient() {
-  const [title, setTitle] = React.useState("")
-  const [description, setDescription] = React.useState("")
-  const [url, setUrl] = React.useState("")
-  const [image, setImage] = React.useState("")
-  const [siteName, setSiteName] = React.useState("")
-  const [html, setHtml] = React.useState("")
+  const [title, setTitle] = React.useState("");
+  const [description, setDescription] = React.useState("");
+  const [url, setUrl] = React.useState("");
+  const [image, setImage] = React.useState("");
+  const [siteName, setSiteName] = React.useState("");
+  const [html, setHtml] = React.useState("");
 
   React.useEffect(() => {
-    const tags: string[] = []
-    if (title) tags.push(`<meta property="og:title" content="${title}" />`)
-    if (description) tags.push(`<meta property="og:description" content="${description}" />`)
-    if (url) tags.push(`<meta property="og:url" content="${url}" />`)
-    if (image) tags.push(`<meta property="og:image" content="${image}" />`)
-    if (siteName) tags.push(`<meta property="og:site_name" content="${siteName}" />`)
-    if (title) tags.push(`<meta name="twitter:card" content="summary_large_image" />`)
-    if (title) tags.push(`<meta name="twitter:title" content="${title}" />`)
-    if (description) tags.push(`<meta name="twitter:description" content="${description}" />`)
-    if (image) tags.push(`<meta name="twitter:image" content="${image}" />`)
+    const tags: string[] = [];
+    if (title) tags.push(`<meta property="og:title" content="${title}" />`);
+    if (description)
+      tags.push(`<meta property="og:description" content="${description}" />`);
+    if (url) tags.push(`<meta property="og:url" content="${url}" />`);
+    if (image) tags.push(`<meta property="og:image" content="${image}" />`);
+    if (siteName)
+      tags.push(`<meta property="og:site_name" content="${siteName}" />`);
+    if (title)
+      tags.push(`<meta name="twitter:card" content="summary_large_image" />`);
+    if (title) tags.push(`<meta name="twitter:title" content="${title}" />`);
+    if (description)
+      tags.push(`<meta name="twitter:description" content="${description}" />`);
+    if (image) tags.push(`<meta name="twitter:image" content="${image}" />`);
 
-    setHtml(tags.join("\n"))
-  }, [title, description, url, image, siteName])
+    setHtml(tags.join("\n"));
+  }, [title, description, url, image, siteName]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(html)
-    toast.success("HTML copied to clipboard")
-  }
+    navigator.clipboard.writeText(html);
+    toast.success("HTML copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -112,5 +122,5 @@ export default function OpenGraphGeneratorClient() {
         </Card>
       )}
     </div>
-  )
+  );
 }

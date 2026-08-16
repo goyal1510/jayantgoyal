@@ -2,7 +2,13 @@ import type { Metadata } from "next";
 
 import { AccountWorkspaceHeader } from "@/components/account/account-workspace-header";
 import { PasswordForm } from "@/components/account/password-form";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
 
 export const metadata: Metadata = { title: "Password" };
 

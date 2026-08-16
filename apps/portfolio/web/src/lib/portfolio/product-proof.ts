@@ -1,4 +1,4 @@
-import { APP_BRANDS } from "@jayant/web-brand";
+import { APP_BRANDS } from "@jayantgoyal/web-brand";
 
 const applicationCount = Object.keys(APP_BRANDS).length;
 

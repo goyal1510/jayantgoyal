@@ -22,12 +22,13 @@ The app also owns `layout.tsx`, `error.tsx`, `not-found.tsx`, `manifest.ts`,
 
 ## Route handlers
 
-| Method and route                | Input and authorization                  | Operation                                                       | Failure/degradation                       |
-| ------------------------------- | ---------------------------------------- | --------------------------------------------------------------- | ----------------------------------------- |
-| `POST /api/contact`             | Public JSON; hashed client IP rate limit | Validate enquiry, load CMS recipient, send with Resend          | `400`, `429`, `500`, or fail-closed `503` |
-| `GET /api/github-contributions` | Valid GitHub username and period         | Fetch contribution calendar with server token and bounded cache | Non-sensitive unavailable payload         |
-| `GET /api/github-loc`           | Valid GitHub username                    | Fetch language/code statistics through `@jayant/github`         | `404` or `503`, no provider details       |
-| `GET /api/resume`               | Public request                           | Export Google document as PDF                                   | Checked-in PDF, CMS URL, then safe error  |
+| Method and route                | Input and authorization                  | Operation                                                                               | Failure/degradation                       |
+| ------------------------------- | ---------------------------------------- | --------------------------------------------------------------------------------------- | ----------------------------------------- |
+| `POST /api/contact`             | Public JSON; hashed client IP rate limit | Validate enquiry, load CMS recipient, send with Resend                                  | `400`, `429`, `500`, or fail-closed `503` |
+| `GET /api/github-contributions` | Valid GitHub username and period         | Fetch contribution calendar with server token and bounded cache                         | Non-sensitive unavailable payload         |
+| `GET /api/github-loc`           | Valid GitHub username                    | Fetch language/code statistics through `@jayantgoyal/github`                            | `404` or `503`, no provider details       |
+| `GET /api/resume`               | Public request                           | Export Google document as PDF                                                           | Checked-in PDF, CMS URL, then safe error  |
+| `GET /llms.txt`                 | Public request                           | Generate current Portfolio/Studio discovery text from shared identity and URL contracts | Plain-text response                       |
 
 ## Editorial read flow
 
@@ -106,6 +107,6 @@ Admin editor
 ```
 
 Any change to selected columns, JSON shapes, section keys, asset kinds, or
-publication semantics must update `@jayant/portfolio-contracts`, the public
+publication semantics must update `@jayantgoyal/portfolio-contracts`, the public
 loader, Admin validation/editor behavior, tests, and database constraints in
 one coherent change.

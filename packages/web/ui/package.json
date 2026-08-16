@@ -1,6 +1,7 @@
 {
-  "name": "@jayant/web-ui",
+  "name": "@jayantgoyal/web-ui",
   "version": "0.0.0",
+  "private": true,
   "exports": {
     "./application-surface.css": "./src/styles/application-surface.css",
     "./lib/utils": "./src/lib/utils.ts",
@@ -46,8 +47,8 @@
     "react-dom": "^19"
   },
   "devDependencies": {
-    "@jayant/eslint-config": "workspace:*",
-    "@jayant/typescript-config": "workspace:*",
+    "@jayantgoyal/eslint-config": "workspace:*",
+    "@jayantgoyal/typescript-config": "workspace:*",
     "@types/react": "^19.1.0",
     "eslint": "^9.39.1",
     "framer-motion": "^12.23.24",

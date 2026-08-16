@@ -9,15 +9,15 @@ import {
   updatePortfolioData,
   deletePortfolioData,
 } from "@/lib/portfolio-api";
-import { Button } from "@jayant/web-ui/button";
-import { ConfirmationDialog } from "@jayant/web-ui/confirmation-dialog";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { ConfirmationDialog } from "@jayantgoyal/web-ui/confirmation-dialog";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@jayant/web-ui/card";
+} from "@jayantgoyal/web-ui/card";
 import type {
   SkillCategoryWithSkills,
   SkillCategory,
@@ -65,7 +65,9 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
 
   const [deleting, setDeleting] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<
-    { kind: "category"; item: SkillCategory } | { kind: "skill"; item: Skill } | null
+    | { kind: "category"; item: SkillCategory }
+    | { kind: "skill"; item: Skill }
+    | null
   >(null);
 
   useEffect(() => {
@@ -297,7 +299,9 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
                   onToggle={() => toggleCategory(category.id)}
                   onEditCategory={openEditCategoryDialog}
                   onDeleteCategory={(id) => {
-                    const item = categories.find((category) => category.id === id);
+                    const item = categories.find(
+                      (category) => category.id === id,
+                    );
                     if (item) setPendingDelete({ kind: "category", item });
                   }}
                   onAddSkill={openAddSkillDialog}
@@ -353,7 +357,11 @@ export function SkillsManager({ initialData }: SkillsManagerProps) {
             ? "This removes the empty category from the Skills workspace."
             : "This removes the skill from the public Skills section."
         }
-        confirmLabel={pendingDelete?.kind === "category" ? "Delete category" : "Delete skill"}
+        confirmLabel={
+          pendingDelete?.kind === "category"
+            ? "Delete category"
+            : "Delete skill"
+        }
         destructive
         onConfirm={() => {
           if (!pendingDelete) return;

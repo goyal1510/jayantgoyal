@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FileQuestion, Home, ArrowLeft } from "lucide-react";
-import { Button } from "@jayant/web-ui/button";
+import { Button } from "@jayantgoyal/web-ui/button";
 
 export default function NotFound() {
   const router = useRouter();

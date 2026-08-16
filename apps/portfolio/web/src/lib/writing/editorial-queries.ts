@@ -5,7 +5,7 @@ import {
   PORTFOLIO_WRITING_PREVIEW_SELECT_COLUMNS,
   readStringArray,
   type PortfolioWritingPreviewRow,
-} from "@jayant/portfolio-contracts";
+} from "@jayantgoyal/portfolio-contracts";
 
 import { formatEditorialDate } from "@/lib/writing/date";
 import type { WritingPreview } from "@/lib/portfolio/editorial-data";

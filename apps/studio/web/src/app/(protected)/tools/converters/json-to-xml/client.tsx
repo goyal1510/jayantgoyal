@@ -1,11 +1,17 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Label } from "@jayant/web-ui/label"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 function jsonToXml(obj: unknown, rootTag: string = "root"): string {
   function escapeXml(str: string): string {
@@ -14,69 +20,69 @@ function jsonToXml(obj: unknown, rootTag: string = "root"): string {
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
-      .replace(/'/g, "&apos;")
+      .replace(/'/g, "&apos;");
   }
 
   function valueToXml(value: unknown, tag: string, indent: number = 0): string {
-    const spaces = "  ".repeat(indent)
+    const spaces = "  ".repeat(indent);
 
     if (value === null || value === undefined) {
-      return `${spaces}<${tag}></${tag}>\n`
+      return `${spaces}<${tag}></${tag}>\n`;
     }
 
     if (typeof value === "object") {
       if (Array.isArray(value)) {
-        return value.map((item) =>
-          valueToXml(item, tag, indent)
-        ).join("")
+        return value.map((item) => valueToXml(item, tag, indent)).join("");
       } else {
-        let xml = `${spaces}<${tag}>\n`
-        Object.entries(value as Record<string, unknown>).forEach(([key, val]) => {
-          xml += valueToXml(val, key, indent + 1)
-        })
-        xml += `${spaces}</${tag}>\n`
-        return xml
+        let xml = `${spaces}<${tag}>\n`;
+        Object.entries(value as Record<string, unknown>).forEach(
+          ([key, val]) => {
+            xml += valueToXml(val, key, indent + 1);
+          },
+        );
+        xml += `${spaces}</${tag}>\n`;
+        return xml;
       }
     }
 
-    return `${spaces}<${tag}>${escapeXml(String(value))}</${tag}>\n`
+    return `${spaces}<${tag}>${escapeXml(String(value))}</${tag}>\n`;
   }
 
-  return `<?xml version="1.0" encoding="UTF-8"?>\n${valueToXml(obj, rootTag)}`
+  return `<?xml version="1.0" encoding="UTF-8"?>\n${valueToXml(obj, rootTag)}`;
 }
 
 export default function JSONToXMLClient() {
-  const [input, setInput] = React.useState("")
-  const [output, setOutput] = React.useState("")
-  const [error, setError] = React.useState("")
-  const [rootTag, setRootTag] = React.useState("root")
+  const [input, setInput] = React.useState("");
+  const [output, setOutput] = React.useState("");
+  const [error, setError] = React.useState("");
+  const [rootTag, setRootTag] = React.useState("root");
 
   const convert = React.useCallback(() => {
     if (!input.trim()) {
-      setOutput("")
-      setError("")
-      return
+      setOutput("");
+      setError("");
+      return;
     }
 
     try {
-      const parsed = JSON.parse(input)
-      const xml = jsonToXml(parsed, rootTag)
-      setOutput(xml)
-      setError("")
+      const parsed = JSON.parse(input);
+      const xml = jsonToXml(parsed, rootTag);
+      setOutput(xml);
+      setError("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Invalid JSON")
-      setOutput("")
+      setError(err instanceof Error ? err.message : "Invalid JSON");
+      setOutput("");
     }
-  }, [input, rootTag])
+  }, [input, rootTag]);
 
   React.useEffect(() => {
-    convert()
-  }, [convert])
+    convert();
+  }, [convert]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(output)
-    toast.success("XML copied to clipboard")
-  }
+    navigator.clipboard.writeText(output);
+    toast.success("XML copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -112,9 +118,7 @@ export default function JSONToXMLClient() {
               placeholder='{"key": "value"}'
               className="w-full min-h-[400px] rounded-md border border-input bg-transparent px-3 py-2 text-sm font-mono"
             />
-            {error && (
-              <p className="text-sm text-red-500 mt-2">{error}</p>
-            )}
+            {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
           </CardContent>
         </Card>
 
@@ -143,5 +147,5 @@ export default function JSONToXMLClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

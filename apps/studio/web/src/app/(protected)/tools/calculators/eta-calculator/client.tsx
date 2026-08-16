@@ -1,49 +1,65 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
 
-function calculateETA(startTime: Date, currentProgress: number, totalProgress: number): {
-  elapsed: number
-  remaining: number
-  eta: Date
-  speed: number
+function calculateETA(
+  startTime: Date,
+  currentProgress: number,
+  totalProgress: number,
+): {
+  elapsed: number;
+  remaining: number;
+  eta: Date;
+  speed: number;
 } {
-  const elapsed = Date.now() - startTime.getTime()
-  const progress = currentProgress / totalProgress
-  const remaining = progress > 0 ? elapsed / progress - elapsed : 0
-  const eta = new Date(Date.now() + remaining)
-  const speed = elapsed > 0 ? currentProgress / (elapsed / 1000) : 0
+  const elapsed = Date.now() - startTime.getTime();
+  const progress = currentProgress / totalProgress;
+  const remaining = progress > 0 ? elapsed / progress - elapsed : 0;
+  const eta = new Date(Date.now() + remaining);
+  const speed = elapsed > 0 ? currentProgress / (elapsed / 1000) : 0;
 
-  return { elapsed, remaining, eta, speed }
+  return { elapsed, remaining, eta, speed };
 }
 
 function formatTime(ms: number): string {
-  const seconds = Math.floor(ms / 1000)
-  const minutes = Math.floor(seconds / 60)
-  const hours = Math.floor(minutes / 60)
+  const seconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
 
-  if (hours > 0) return `${hours}h ${minutes % 60}m ${seconds % 60}s`
-  if (minutes > 0) return `${minutes}m ${seconds % 60}s`
-  return `${seconds}s`
+  if (hours > 0) return `${hours}h ${minutes % 60}m ${seconds % 60}s`;
+  if (minutes > 0) return `${minutes}m ${seconds % 60}s`;
+  return `${seconds}s`;
 }
 
 export default function ETACalculatorClient() {
-  const [startTime, setStartTime] = React.useState(new Date())
-  const [currentProgress, setCurrentProgress] = React.useState(0)
-  const [totalProgress, setTotalProgress] = React.useState(100)
-  const [eta, setEta] = React.useState<ReturnType<typeof calculateETA> | null>(null)
+  const [startTime, setStartTime] = React.useState(new Date());
+  const [currentProgress, setCurrentProgress] = React.useState(0);
+  const [totalProgress, setTotalProgress] = React.useState(100);
+  const [eta, setEta] = React.useState<ReturnType<typeof calculateETA> | null>(
+    null,
+  );
 
   React.useEffect(() => {
-    if (currentProgress > 0 && totalProgress > 0 && currentProgress <= totalProgress) {
-      const result = calculateETA(startTime, currentProgress, totalProgress)
-      setEta(result)
+    if (
+      currentProgress > 0 &&
+      totalProgress > 0 &&
+      currentProgress <= totalProgress
+    ) {
+      const result = calculateETA(startTime, currentProgress, totalProgress);
+      setEta(result);
     } else {
-      setEta(null)
+      setEta(null);
     }
-  }, [startTime, currentProgress, totalProgress])
+  }, [startTime, currentProgress, totalProgress]);
 
   return (
     <div className="space-y-6">
@@ -60,7 +76,11 @@ export default function ETACalculatorClient() {
                 id="current"
                 type="number"
                 value={currentProgress}
-                onChange={(e) => setCurrentProgress(Math.max(0, parseFloat(e.target.value) || 0))}
+                onChange={(e) =>
+                  setCurrentProgress(
+                    Math.max(0, parseFloat(e.target.value) || 0),
+                  )
+                }
               />
             </div>
             <div className="space-y-2">
@@ -69,7 +89,9 @@ export default function ETACalculatorClient() {
                 id="total"
                 type="number"
                 value={totalProgress}
-                onChange={(e) => setTotalProgress(Math.max(1, parseFloat(e.target.value) || 1))}
+                onChange={(e) =>
+                  setTotalProgress(Math.max(1, parseFloat(e.target.value) || 1))
+                }
               />
             </div>
           </div>
@@ -107,12 +129,14 @@ export default function ETACalculatorClient() {
               </div>
               <div>
                 <Label className="text-muted-foreground">Speed</Label>
-                <p className="font-semibold">{eta.speed.toFixed(2)} units/sec</p>
+                <p className="font-semibold">
+                  {eta.speed.toFixed(2)} units/sec
+                </p>
               </div>
             </div>
           </CardContent>
         </Card>
       )}
     </div>
-  )
+  );
 }

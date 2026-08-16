@@ -4,13 +4,13 @@ Run repository commands from the monorepo root unless a page says otherwise.
 
 ## Development and build
 
-| Command                                   | Purpose                              |
-| ----------------------------------------- | ------------------------------------ |
-| `pnpm install`                            | Install the frozen workspace graph   |
-| `pnpm dev`                                | Run all client development tasks     |
-| `pnpm --filter @jayant/<product>-web dev` | Run one product web client           |
-| `pnpm build`                              | Build every workspace                |
-| `pnpm format`                             | Format TypeScript and Markdown files |
+| Command                                        | Purpose                              |
+| ---------------------------------------------- | ------------------------------------ |
+| `pnpm install`                                 | Install the frozen workspace graph   |
+| `pnpm dev`                                     | Run all client development tasks     |
+| `pnpm --filter @jayantgoyal/<product>-web dev` | Run one product web client           |
+| `pnpm build`                                   | Build every workspace                |
+| `pnpm format`                                  | Format TypeScript and Markdown files |
 
 ## Required quality
 
@@ -18,6 +18,8 @@ Run repository commands from the monorepo root unless a page says otherwise.
 | -------------------------- | --------------------------------------------------- |
 | `pnpm check:architecture`  | Enforce product/package dependency boundaries       |
 | `pnpm check:brand-assets`  | Verify canonical favicon copies                     |
+| `pnpm check:identity`      | Enforce public identity and workspace namespace     |
+| `pnpm check:seo`           | Verify shared metadata and tool-description policy  |
 | `pnpm check:service-role`  | Enforce privileged-client and Portfolio boundaries  |
 | `pnpm check:source-health` | Enforce the 500-line limit and 400-line alert       |
 | `pnpm check:dead-code`     | Find unused files, exports, types, and dependencies |

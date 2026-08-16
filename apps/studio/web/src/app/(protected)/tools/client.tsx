@@ -4,10 +4,10 @@ import * as React from "react";
 import Link from "next/link";
 import { ArrowUpRight, Search, Star } from "lucide-react";
 
-import { Button } from "@jayant/web-ui/button";
-import { Card } from "@jayant/web-ui/card";
-import { Input } from "@jayant/web-ui/input";
-import { cn } from "@jayant/web-ui/lib/utils";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Card } from "@jayantgoyal/web-ui/card";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { cn } from "@jayantgoyal/web-ui/lib/utils";
 
 import { ToolFavoriteButton } from "@/components/tools/tool-favorite-button";
 import {

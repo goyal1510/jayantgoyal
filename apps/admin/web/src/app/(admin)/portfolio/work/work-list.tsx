@@ -20,24 +20,20 @@ import {
   updatePortfolioData,
   deletePortfolioData,
 } from "@/lib/portfolio-api";
-import { Button } from "@jayant/web-ui/button";
+import { Button } from "@jayantgoyal/web-ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@jayant/web-ui/card";
-import { Badge } from "@jayant/web-ui/badge";
-import { ConfirmationDialog } from "@jayant/web-ui/confirmation-dialog";
-import { IconAction } from "@jayant/web-ui/icon-action";
-import { VisibilityBadge } from "@jayant/web-ui/status-badge";
+} from "@jayantgoyal/web-ui/card";
+import { Badge } from "@jayantgoyal/web-ui/badge";
+import { ConfirmationDialog } from "@jayantgoyal/web-ui/confirmation-dialog";
+import { IconAction } from "@jayantgoyal/web-ui/icon-action";
+import { VisibilityBadge } from "@jayantgoyal/web-ui/status-badge";
 import type { WorkItem } from "@/lib/types";
-import {
-  WorkDialog,
-  emptyWorkForm,
-  type WorkFormData,
-} from "./work-dialog";
+import { WorkDialog, emptyWorkForm, type WorkFormData } from "./work-dialog";
 
 interface WorkListProps {
   initialData: WorkItem[];
@@ -166,9 +162,7 @@ export function WorkList({ initialData }: WorkListProps) {
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle>Work</CardTitle>
-            <CardDescription>
-              Showcase your work and side work.
-            </CardDescription>
+            <CardDescription>Showcase your work and side work.</CardDescription>
           </div>
           <Button onClick={openAddDialog}>
             <Plus className="mr-2 h-4 w-4" />
@@ -178,7 +172,7 @@ export function WorkList({ initialData }: WorkListProps) {
         <CardContent>
           {items.length === 0 ? (
             <p className="text-sm text-muted-foreground py-8 text-center">
-            No work yet. Click &quot;Add Work&quot; to get started.
+              No work yet. Click &quot;Add Work&quot; to get started.
             </p>
           ) : (
             <div className="space-y-4">
@@ -191,9 +185,7 @@ export function WorkList({ initialData }: WorkListProps) {
                     {item.image_url ? (
                       <img
                         src={item.image_url}
-                        alt={
-                          item.image_alt || `${item.name} work screenshot`
-                        }
+                        alt={item.image_alt || `${item.name} work screenshot`}
                         className="h-full w-full object-contain"
                       />
                     ) : (

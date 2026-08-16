@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import React from "react"
-import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
-import { cn } from "@jayant/web-ui/lib/utils"
-import type { AppConfig } from "@/lib/config/hub-config"
-import { toolCategories } from "@/lib/tools/tools"
+import React from "react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { cn } from "@jayantgoyal/web-ui/lib/utils";
+import type { AppConfig } from "@/lib/config/hub-config";
+import { toolCategories } from "@/lib/tools/tools";
 
 import {
   SidebarGroup,
@@ -14,16 +14,16 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@jayant/web-ui/sidebar"
+} from "@jayantgoyal/web-ui/sidebar";
 
-import { TechToolsMenuItem } from "./tech-tools-menu-item"
-import { SubNavMenuItem } from "./sub-nav-menu-item"
+import { TechToolsMenuItem } from "./tech-tools-menu-item";
+import { SubNavMenuItem } from "./sub-nav-menu-item";
 
 interface NavAppsProps {
-  apps: AppConfig[]
-  activeAppId?: string
-  activeNavId?: string
-  label?: string
+  apps: AppConfig[];
+  activeAppId?: string;
+  activeNavId?: string;
+  label?: string;
 }
 
 export function NavApps({
@@ -32,31 +32,31 @@ export function NavApps({
   activeNavId,
   label,
 }: NavAppsProps) {
-  const pathname = usePathname()
-  const router = useRouter()
-  const { isMobile, setOpenMobile, state } = useSidebar()
+  const pathname = usePathname();
+  const router = useRouter();
+  const { isMobile, setOpenMobile, state } = useSidebar();
 
-  const isCollapsed = state === "collapsed" && !isMobile
+  const isCollapsed = state === "collapsed" && !isMobile;
 
   // Close mobile sidebar on navigation
   const closeMobileSidebar = () => {
     if (isMobile) {
-      setOpenMobile(false)
+      setOpenMobile(false);
     }
-  }
+  };
 
   // Determine active tool category for tech tools
   const activeCategoryId = toolCategories.find((category) =>
-    category.tools.some((tool) => tool.path === pathname)
-  )?.id
+    category.tools.some((tool) => tool.path === pathname),
+  )?.id;
 
   return (
     <SidebarGroup>
       {label && <SidebarGroupLabel>{label}</SidebarGroupLabel>}
       <SidebarMenu>
         {apps.map((app) => {
-          const isActiveApp = activeAppId === app.id
-          const hasSubNav = app.navItems.length > 0
+          const isActiveApp = activeAppId === app.id;
+          const hasSubNav = app.navItems.length > 0;
 
           // Tech Tools - special nested navigation (categories > tools)
           if (app.id === "tech-tools") {
@@ -70,7 +70,7 @@ export function NavApps({
                 activeCategoryId={activeCategoryId}
                 closeMobileSidebar={closeMobileSidebar}
               />
-            )
+            );
           }
 
           // External link app - opens in new tab
@@ -93,12 +93,12 @@ export function NavApps({
                   </a>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-            )
+            );
           }
 
           // Single page app - no sub-navigation
           if (!hasSubNav) {
-            const href = app.url ?? `/${app.id}`
+            const href = app.url ?? `/${app.id}`;
             return (
               <SidebarMenuItem key={app.id}>
                 <SidebarMenuButton
@@ -106,13 +106,17 @@ export function NavApps({
                   tooltip={app.name}
                   isActive={isActiveApp}
                 >
-                  <Link href={href} prefetch={false} onClick={closeMobileSidebar}>
+                  <Link
+                    href={href}
+                    prefetch={false}
+                    onClick={closeMobileSidebar}
+                  >
                     <app.icon className={cn(app.color)} />
                     <span>{app.name}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-            )
+            );
           }
 
           // App with sub-navigation
@@ -126,9 +130,9 @@ export function NavApps({
               router={router}
               closeMobileSidebar={closeMobileSidebar}
             />
-          )
+          );
         })}
       </SidebarMenu>
     </SidebarGroup>
-  )
+  );
 }

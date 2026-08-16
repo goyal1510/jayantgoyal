@@ -13,8 +13,13 @@ import {
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-import { Button } from "@jayant/web-ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@jayant/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
 
 import type { GameSetupPath } from "@/components/games/game-setup-sheet";
 import { useDareX } from "@/components/games/use-dare-x";

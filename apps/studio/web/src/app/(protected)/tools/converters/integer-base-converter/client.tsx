@@ -1,23 +1,29 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 function convertBase(value: string, fromBase: number, toBase: number): string {
   try {
     // Convert to decimal first
-    const decimal = parseInt(value, fromBase)
-    if (isNaN(decimal)) return "Invalid input"
+    const decimal = parseInt(value, fromBase);
+    if (isNaN(decimal)) return "Invalid input";
 
     // Convert from decimal to target base
-    return decimal.toString(toBase).toUpperCase()
+    return decimal.toString(toBase).toUpperCase();
   } catch {
-    return "Conversion failed"
+    return "Conversion failed";
   }
 }
 
@@ -26,34 +32,34 @@ const bases = [
   { value: 8, label: "Octal (8)" },
   { value: 10, label: "Decimal (10)" },
   { value: 16, label: "Hexadecimal (16)" },
-]
+];
 
 export default function IntegerBaseConverterClient() {
-  const [input, setInput] = React.useState("")
-  const [fromBase, setFromBase] = React.useState(10)
-  const [results, setResults] = React.useState<Record<number, string>>({})
+  const [input, setInput] = React.useState("");
+  const [fromBase, setFromBase] = React.useState(10);
+  const [results, setResults] = React.useState<Record<number, string>>({});
 
   React.useEffect(() => {
     if (!input.trim()) {
-      setResults({})
-      return
+      setResults({});
+      return;
     }
 
-    const newResults: Record<number, string> = {}
+    const newResults: Record<number, string> = {};
     bases.forEach((base) => {
       if (base.value !== fromBase) {
-        newResults[base.value] = convertBase(input, fromBase, base.value)
+        newResults[base.value] = convertBase(input, fromBase, base.value);
       } else {
-        newResults[base.value] = input
+        newResults[base.value] = input;
       }
-    })
-    setResults(newResults)
-  }, [input, fromBase])
+    });
+    setResults(newResults);
+  }, [input, fromBase]);
 
   const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text)
-    toast.success("Copied to clipboard")
-  }
+    navigator.clipboard.writeText(text);
+    toast.success("Copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -121,5 +127,5 @@ export default function IntegerBaseConverterClient() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

@@ -6,13 +6,13 @@ short-lived callback compatibility where an already-issued link may still land.
 
 ## Responsibilities
 
-| Layer               | Responsibility                                                         |
-| ------------------- | ---------------------------------------------------------------------- |
-| Auth web client     | Entry, recovery, MFA, profile, password, providers, logout             |
-| `@jayant/web-auth`  | Supabase clients, cookie/session contract, safe returns, shared rules  |
-| Studio proxy/routes | Studio public/protected split, terms, product authorization            |
-| Admin proxy/routes  | Admin role, required assurance level, and privileged authorization     |
-| Supabase            | Identities, tokens, MFA factors, sessions, and RLS-backed account data |
+| Layer                   | Responsibility                                                         |
+| ----------------------- | ---------------------------------------------------------------------- |
+| Auth web client         | Entry, recovery, MFA, profile, password, providers, logout             |
+| `@jayantgoyal/web-auth` | Supabase clients, cookie/session contract, safe returns, shared rules  |
+| Studio proxy/routes     | Studio public/protected split, terms, product authorization            |
+| Admin proxy/routes      | Admin role, required assurance level, and privileged authorization     |
+| Supabase                | Identities, tokens, MFA factors, sessions, and RLS-backed account data |
 
 `/welcome`, recovery-request, and MFA aliases in Studio or Admin redirect to
 Auth with an exact validated return target. They contain no local credential or
@@ -22,7 +22,7 @@ Admin retains only its callback exchange compatibility path.
 
 The normal production session uses the shared cross-subdomain cookie contract.
 The existing `platform` runtime value is compatibility vocabulary for that
-cookie mode and is not the ecosystem name. `compatibility` may read and promote
+cookie mode and is not the product suite name. `compatibility` may read and promote
 an older host-only session during rollout; `legacy` is emergency rollback only.
 
 ## Security requirements

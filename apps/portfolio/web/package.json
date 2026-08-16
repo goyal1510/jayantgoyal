@@ -1,5 +1,5 @@
 {
-  "name": "@jayant/portfolio-web",
+  "name": "@jayantgoyal/portfolio-web",
   "version": "1.0.0",
   "type": "module",
   "private": true,
@@ -11,11 +11,11 @@
     "check-types": "next typegen && tsc --noEmit"
   },
   "dependencies": {
-    "@jayant/web-brand": "workspace:*",
-    "@jayant/github": "workspace:*",
-    "@jayant/web-urls": "workspace:*",
-    "@jayant/portfolio-contracts": "workspace:*",
-    "@jayant/web-seo": "workspace:*",
+    "@jayantgoyal/web-brand": "workspace:*",
+    "@jayantgoyal/github": "workspace:*",
+    "@jayantgoyal/web-urls": "workspace:*",
+    "@jayantgoyal/portfolio-contracts": "workspace:*",
+    "@jayantgoyal/web-seo": "workspace:*",
     "@supabase/supabase-js": "^2.110.7",
     "lucide-react": "^0.554.0",
     "next": "^16.2.10",
@@ -27,9 +27,9 @@
     "resend": "^6.17.2"
   },
   "devDependencies": {
-    "@jayant/eslint-config": "workspace:*",
-    "@jayant/tailwind-config": "workspace:*",
-    "@jayant/typescript-config": "workspace:*",
+    "@jayantgoyal/eslint-config": "workspace:*",
+    "@jayantgoyal/tailwind-config": "workspace:*",
+    "@jayantgoyal/typescript-config": "workspace:*",
     "@tailwindcss/postcss": "^4.1.5",
     "@types/node": "^22.15.30",
     "@types/react": "^19.1.0",

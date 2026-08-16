@@ -3,16 +3,16 @@ import { NextResponse, type NextRequest } from "next/server";
 import {
   copyAuthCacheHeaders,
   createSupabaseRequestClient,
-} from "@jayant/web-auth/server";
+} from "@jayantgoyal/web-auth/server";
 import {
   hasAuthSessionCookie,
   resolveAuthSessionMode,
-} from "@jayant/web-auth/cookies";
+} from "@jayantgoyal/web-auth/cookies";
 import {
   buildAuthForgotPasswordUrl,
   buildAuthLoginUrl,
   buildAuthMfaUrl,
-} from "@jayant/web-auth/entry";
+} from "@jayantgoyal/web-auth/entry";
 
 import { runMiddleware } from "@/proxy/runner";
 import { mfaMiddleware } from "@/proxy/mfa";
@@ -40,7 +40,6 @@ const ZERO_COST_PATHS = [
   "/sitemap.xml",
   "/robots.txt",
   "/manifest.webmanifest",
-  "/opengraph-image",
   "/twitter-image",
   "/.well-known/",
   "/llms.txt",

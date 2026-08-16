@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Card } from "@jayant/web-ui/card";
+import { Card } from "@jayantgoyal/web-ui/card";
 import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
 import {
@@ -17,9 +17,9 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@jayant/web-ui/collapsible";
+} from "@jayantgoyal/web-ui/collapsible";
 import type { Database } from "@/lib/scratchpad/database.types";
-import { cn } from "@jayant/web-ui/lib/utils";
+import { cn } from "@jayantgoyal/web-ui/lib/utils";
 
 type Entry = Database["scratchpad"]["Tables"]["entries"]["Row"];
 

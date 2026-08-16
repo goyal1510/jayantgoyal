@@ -1,10 +1,15 @@
 import Link from "next/link";
 import { ArrowRight, Check, ExternalLink, LockKeyhole } from "lucide-react";
 
-import { Badge } from "@jayant/web-ui/badge";
-import { Button } from "@jayant/web-ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@jayant/web-ui/card";
-import { cn } from "@jayant/web-ui/lib/utils";
+import { Badge } from "@jayantgoyal/web-ui/badge";
+import { Button } from "@jayantgoyal/web-ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { cn } from "@jayantgoyal/web-ui/lib/utils";
 
 import {
   studioProductDetailHref,

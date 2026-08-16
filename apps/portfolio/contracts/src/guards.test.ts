@@ -203,7 +203,10 @@ describe("portfolio data guards", () => {
         { name: "Jayant", unexpected: true },
         "update",
       ),
-    ).toEqual(["unexpected is not writable on hero"]);
+    ).toEqual([
+      "name is not writable on hero",
+      "unexpected is not writable on hero",
+    ]);
 
     expect(
       validatePortfolioWriteInput(

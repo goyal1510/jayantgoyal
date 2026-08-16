@@ -9,7 +9,9 @@ import {
 
 describe("web branding", () => {
   it("adds web metadata to the canonical product identities", () => {
-    expect(APP_BRANDS.portfolio.defaultTitle).toContain(PERSON_BRAND.fullName);
+    expect(APP_BRANDS.portfolio.defaultTitle).toContain(
+      PERSON_BRAND.displayName,
+    );
     expect(APP_BRANDS.studio.publicName).toBe("Studio by Jayant");
     expect(APP_BRANDS.admin.publicName).toBe("Admin by Jayant");
     expect(APP_BRANDS.auth.publicName).toBe("Auth by Jayant");
@@ -24,10 +26,9 @@ describe("web branding", () => {
   });
 
   it("uses canonical screenshot crops for web link previews", () => {
-    for (const preview of Object.values(APP_SOCIAL_PREVIEW_IMAGES)) {
-      expect(preview.url).toMatch(
-        /^https:\/\/jayantgoyal\.com\/images\/social\/.+-preview\.jpg\?v=\d+$/,
-      );
+    for (const [appId, preview] of Object.entries(APP_SOCIAL_PREVIEW_IMAGES)) {
+      expect(preview.url).toContain(`${appId}-preview.jpg?v=`);
+      expect(preview.url).toMatch(/^https:\/\/(?:[a-z]+\.)?jayantgoyal\.com\//);
       expect(preview.width).toBe(1200);
       expect(preview.height).toBe(630);
       expect(preview.type).toBe("image/jpeg");

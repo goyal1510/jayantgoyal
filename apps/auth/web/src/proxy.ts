@@ -3,11 +3,11 @@ import { NextResponse, type NextRequest } from "next/server";
 import {
   hasAuthSessionCookie,
   resolveAuthSessionMode,
-} from "@jayant/web-auth/cookies";
+} from "@jayantgoyal/web-auth/cookies";
 import {
   copyAuthCacheHeaders,
   createSupabaseRequestClient,
-} from "@jayant/web-auth/server";
+} from "@jayantgoyal/web-auth/server";
 
 import {
   hasRecentSignIn,

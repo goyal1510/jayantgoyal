@@ -1,4 +1,4 @@
-import { applicationOrigin, applicationUrl } from "@jayant/web-urls";
+import { applicationOrigin, applicationUrl } from "@jayantgoyal/web-urls";
 
 export const PORTFOLIO_URL = applicationOrigin(
   "portfolio",

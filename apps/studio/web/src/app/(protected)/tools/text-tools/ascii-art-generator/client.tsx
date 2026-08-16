@@ -1,16 +1,22 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 function generateASCIIArt(text: string): string {
   // Simple ASCII art generator
-  const lines: string[] = []
-  const upperText = text.toUpperCase()
+  const lines: string[] = [];
+  const upperText = text.toUpperCase();
 
   // Simple block letters
   const patterns: Record<string, string[]> = {
@@ -18,40 +24,40 @@ function generateASCIIArt(text: string): string {
     B: ["###  ", "#  # ", "###  ", "#  # ", "###  "],
     C: [" ### ", "#    ", "#    ", "#    ", " ### "],
     // ... simplified for brevity
-  }
+  };
 
   // Generate simple ASCII art
   for (let i = 0; i < 5; i++) {
-    let line = ""
+    let line = "";
     for (const char of upperText) {
       if (patterns[char] && patterns[char]![i]) {
-        line += patterns[char]![i] + " "
+        line += patterns[char]![i] + " ";
       } else {
-        line += char + " "
+        line += char + " ";
       }
     }
-    lines.push(line)
+    lines.push(line);
   }
 
-  return lines.join("\n")
+  return lines.join("\n");
 }
 
 export default function ASCIIArtGeneratorClient() {
-  const [input, setInput] = React.useState("")
-  const [output, setOutput] = React.useState("")
+  const [input, setInput] = React.useState("");
+  const [output, setOutput] = React.useState("");
 
   React.useEffect(() => {
     if (!input.trim()) {
-      setOutput("")
-      return
+      setOutput("");
+      return;
     }
-    setOutput(generateASCIIArt(input))
-  }, [input])
+    setOutput(generateASCIIArt(input));
+  }, [input]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(output)
-    toast.success("ASCII art copied to clipboard")
-  }
+    navigator.clipboard.writeText(output);
+    toast.success("ASCII art copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -94,5 +100,5 @@ export default function ASCIIArtGeneratorClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

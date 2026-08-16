@@ -1,9 +1,15 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
 
 // Simplified MAC vendor lookup (in production use a proper database)
 const macVendors: Record<string, string> = {
@@ -14,23 +20,24 @@ const macVendors: Record<string, string> = {
   "00:25:00": "Apple",
   "08:00:27": "VirtualBox",
   "52:54:00": "QEMU",
-}
+};
 
 function lookupMAC(mac: string) {
-  const cleaned = mac.replace(/[:-]/g, ":").toUpperCase()
-  const oui = cleaned.split(":").slice(0, 3).join(":")
-  return macVendors[oui] || "Unknown vendor"
+  const cleaned = mac.replace(/[:-]/g, ":").toUpperCase();
+  const oui = cleaned.split(":").slice(0, 3).join(":");
+  return macVendors[oui] || "Unknown vendor";
 }
 
 export default function MACAddressLookupClient() {
-  const [input, setInput] = React.useState("")
+  const [input, setInput] = React.useState("");
   const vendor = React.useMemo(() => {
-    if (!input.trim()) return null
-    return lookupMAC(input)
-  }, [input])
+    if (!input.trim()) return null;
+    return lookupMAC(input);
+  }, [input]);
 
   return (
-    <div className="space-y-6"><Card>
+    <div className="space-y-6">
+      <Card>
         <CardHeader>
           <CardTitle>MAC Address</CardTitle>
           <CardDescription>Enter MAC address to lookup</CardDescription>
@@ -56,12 +63,13 @@ export default function MACAddressLookupClient() {
               <Label className="text-muted-foreground">Vendor</Label>
               <p className="font-semibold text-lg">{vendor}</p>
               <p className="text-sm text-muted-foreground mt-2">
-                Note: This is a simplified lookup. For production use, integrate with a comprehensive MAC vendor database.
+                Note: This is a simplified lookup. For production use, integrate
+                with a comprehensive MAC vendor database.
               </p>
             </div>
           </CardContent>
         </Card>
       )}
     </div>
-  )
+  );
 }

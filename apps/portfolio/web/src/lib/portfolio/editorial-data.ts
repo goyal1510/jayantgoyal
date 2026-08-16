@@ -152,6 +152,6 @@ export type PortfolioEditorialData = {
   credentials: PortfolioCredential[];
   principles: PortfolioPrinciple[];
 };
-import type { PortfolioSectionKey } from "@jayant/portfolio-contracts";
+import type { PortfolioSectionKey } from "@jayantgoyal/portfolio-contracts";
 
 export type { PortfolioSectionKey };

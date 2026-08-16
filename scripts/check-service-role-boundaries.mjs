@@ -9,7 +9,7 @@ const sourceRoots = [
 ];
 const clientDirective = /^\s*["']use client["'];?/m;
 const serviceRolePattern =
-  /SUPABASE_SERVICE_ROLE_KEY|createSupabaseAdminClient|supabase\/admin|@jayant\/web-auth\/service-role/;
+  /SUPABASE_SERVICE_ROLE_KEY|createSupabaseAdminClient|supabase\/admin|@jayantgoyal\/web-auth\/service-role/;
 const violations = [];
 
 function walk(directory) {

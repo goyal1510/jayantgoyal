@@ -1,69 +1,75 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
-import { Copy, RefreshCw } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Copy, RefreshCw } from "lucide-react";
+import { toast } from "sonner";
 
 // ULID generation implementation
-const ENCODING = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
-const TIME_LEN = 10
-const RANDOM_LEN = 16
+const ENCODING = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
+const TIME_LEN = 10;
+const RANDOM_LEN = 16;
 
 function encodeTime(now: number, len: number): string {
-  let str = ""
+  let str = "";
   while (len > 0) {
-    str = ENCODING[now % 32] + str
-    now = Math.floor(now / 32)
-    len--
+    str = ENCODING[now % 32] + str;
+    now = Math.floor(now / 32);
+    len--;
   }
-  return str
+  return str;
 }
 
 function generateULID(): string {
-  const now = Date.now()
-  const time = encodeTime(now, TIME_LEN)
+  const now = Date.now();
+  const time = encodeTime(now, TIME_LEN);
 
-  let random = ""
-  const array = new Uint8Array(RANDOM_LEN)
-  crypto.getRandomValues(array)
+  let random = "";
+  const array = new Uint8Array(RANDOM_LEN);
+  crypto.getRandomValues(array);
 
   for (let i = 0; i < RANDOM_LEN; i++) {
-    const byte = array[i] ?? 0
-    random += ENCODING[byte % 32]
+    const byte = array[i] ?? 0;
+    random += ENCODING[byte % 32];
   }
 
-  return time + random
+  return time + random;
 }
 
 export default function ULIDGeneratorClient() {
-  const [ulids, setUlids] = React.useState<string[]>([])
-  const [count, setCount] = React.useState(1)
+  const [ulids, setUlids] = React.useState<string[]>([]);
+  const [count, setCount] = React.useState(1);
 
   const generateULIDs = React.useCallback(() => {
-    const newULIDs: string[] = []
+    const newULIDs: string[] = [];
     for (let i = 0; i < count; i++) {
-      newULIDs.push(generateULID())
+      newULIDs.push(generateULID());
     }
-    setUlids(newULIDs)
-  }, [count])
+    setUlids(newULIDs);
+  }, [count]);
 
   React.useEffect(() => {
-    generateULIDs()
-  }, [generateULIDs])
+    generateULIDs();
+  }, [generateULIDs]);
 
   const copyToClipboard = (ulid: string) => {
-    navigator.clipboard.writeText(ulid)
-    toast.success("ULID copied to clipboard")
-  }
+    navigator.clipboard.writeText(ulid);
+    toast.success("ULID copied to clipboard");
+  };
 
   const copyAllToClipboard = () => {
-    navigator.clipboard.writeText(ulids.join("\n"))
-    toast.success("All ULIDs copied to clipboard")
-  }
+    navigator.clipboard.writeText(ulids.join("\n"));
+    toast.success("All ULIDs copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -82,7 +88,11 @@ export default function ULIDGeneratorClient() {
                 min="1"
                 max="100"
                 value={count}
-                onChange={(e) => setCount(Math.max(1, Math.min(100, parseInt(e.target.value) || 1)))}
+                onChange={(e) =>
+                  setCount(
+                    Math.max(1, Math.min(100, parseInt(e.target.value) || 1)),
+                  )
+                }
               />
             </div>
 
@@ -98,10 +108,16 @@ export default function ULIDGeneratorClient() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle>Generated ULIDs</CardTitle>
-                <CardDescription>{ulids.length} ULID{ulids.length !== 1 ? "s" : ""} generated</CardDescription>
+                <CardDescription>
+                  {ulids.length} ULID{ulids.length !== 1 ? "s" : ""} generated
+                </CardDescription>
               </div>
               {ulids.length > 0 && (
-                <Button variant="outline" size="sm" onClick={copyAllToClipboard}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={copyAllToClipboard}
+                >
                   <Copy className="h-4 w-4 mr-2" />
                   Copy All
                 </Button>
@@ -111,10 +127,15 @@ export default function ULIDGeneratorClient() {
           <CardContent>
             <div className="space-y-2 max-h-[400px] overflow-y-auto">
               {ulids.length === 0 ? (
-                <p className="text-muted-foreground text-sm">No ULIDs generated yet</p>
+                <p className="text-muted-foreground text-sm">
+                  No ULIDs generated yet
+                </p>
               ) : (
                 ulids.map((ulid, index) => (
-                  <div key={index} className="flex items-center gap-2 p-2 rounded border">
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 p-2 rounded border"
+                  >
                     <code className="flex-1 font-mono text-sm">{ulid}</code>
                     <Button
                       variant="ghost"
@@ -132,5 +153,5 @@ export default function ULIDGeneratorClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

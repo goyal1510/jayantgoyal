@@ -1,5 +1,5 @@
-import { safeReturnTarget } from "@jayant/web-auth/redirects";
-import { applicationOrigin } from "@jayant/web-urls";
+import { safeReturnTarget } from "@jayantgoyal/web-auth/redirects";
+import { applicationOrigin } from "@jayantgoyal/web-urls";
 
 export const AUTH_ORIGIN = applicationOrigin(
   "auth",

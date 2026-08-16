@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   BreadcrumbTrail,
   type BreadcrumbTrailItem,
-} from "@jayant/web-ui/application-shell";
+} from "@jayantgoyal/web-ui/application-shell";
 
 export function AccountBreadcrumb() {
   const pathname = usePathname();

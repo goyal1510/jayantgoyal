@@ -5,7 +5,9 @@ drifting.
 
 | Term        | Meaning                                                               |
 | ----------- | --------------------------------------------------------------------- |
-| Jayant      | The ecosystem and monorepo identity                                   |
+| Jayant      | Public and official person/author name                                |
+| jg          | Short visual mark used for compact brand assets                       |
+| jayantgoyal | Technical repository, domain, and internal package namespace          |
 | Product     | A user-facing responsibility such as Portfolio, Studio, Admin, Auth   |
 | Client      | An implemented delivery surface owned by a product                    |
 | Platform    | A delivery technology such as web, iOS, Android, desktop, or CLI      |
@@ -16,10 +18,10 @@ drifting.
 | Capability  | A business or technical responsibility, whether current or future     |
 | Surface     | A route, workflow, or interface exposed by a client                   |
 
-`jayantgoyal.com` and its subdomains are hosts. They do not rename the
-ecosystem or create a product called “JayantGoyal Platform.” Existing runtime
-values using `platform` are compatibility vocabulary for the shared web
-session and should not spread into product naming.
+`jayantgoyal.com` and its subdomains are hosts. They do not create an expanded
+personal name or a product brand. Existing runtime values using `platform` are
+compatibility vocabulary for the shared web session and must not spread into
+product naming or visible account copy.
 
 Use `current` only for implemented and operable behavior. Use `future` or
 `extension rule` for ownership guidance that intentionally has no code yet.

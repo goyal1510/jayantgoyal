@@ -18,7 +18,7 @@ import {
   type WordleSeat,
 } from "@/lib/games/wordle";
 import { getWordleSolutionForSession } from "@/lib/games/wordle.server";
-import { createSupabaseServiceRoleClient } from "@jayant/web-auth/service-role";
+import { createSupabaseServiceRoleClient } from "@jayantgoyal/web-auth/service-role";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function POST(

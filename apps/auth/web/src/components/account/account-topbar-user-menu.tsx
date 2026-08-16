@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 
-import { ApplicationUserMenu } from "@jayant/web-ui/application-user-menu";
+import { ApplicationUserMenu } from "@jayantgoyal/web-ui/application-user-menu";
 
 export function AccountTopbarUserMenu({
   user,

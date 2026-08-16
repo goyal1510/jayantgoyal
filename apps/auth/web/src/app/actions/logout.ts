@@ -2,7 +2,10 @@
 
 import { redirect } from "next/navigation";
 
-import { signOutSession, type SignOutScope } from "@jayant/web-auth/logout";
+import {
+  signOutSession,
+  type SignOutScope,
+} from "@jayantgoyal/web-auth/logout";
 
 import { actionContext, stringField } from "@/lib/auth/action-support";
 import { buildSignedOutLoginUrl } from "@/lib/auth/returns";

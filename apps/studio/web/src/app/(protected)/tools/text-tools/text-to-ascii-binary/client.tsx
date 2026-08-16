@@ -1,16 +1,22 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 function textToBinary(text: string): string {
   return text
     .split("")
     .map((char) => char.charCodeAt(0).toString(2).padStart(8, "0"))
-    .join(" ")
+    .join(" ");
 }
 
 function binaryToText(binary: string): string {
@@ -18,40 +24,42 @@ function binaryToText(binary: string): string {
     .split(/\s+/)
     .map((bin) => {
       try {
-        return String.fromCharCode(parseInt(bin, 2))
+        return String.fromCharCode(parseInt(bin, 2));
       } catch {
-        return ""
+        return "";
       }
     })
-    .join("")
+    .join("");
 }
 
 export default function TextToASCIIBinaryClient() {
-  const [mode, setMode] = React.useState<"to-binary" | "from-binary">("to-binary")
-  const [input, setInput] = React.useState("")
-  const [output, setOutput] = React.useState("")
+  const [mode, setMode] = React.useState<"to-binary" | "from-binary">(
+    "to-binary",
+  );
+  const [input, setInput] = React.useState("");
+  const [output, setOutput] = React.useState("");
 
   React.useEffect(() => {
     if (!input.trim()) {
-      setOutput("")
-      return
+      setOutput("");
+      return;
     }
 
     try {
       if (mode === "to-binary") {
-        setOutput(textToBinary(input))
+        setOutput(textToBinary(input));
       } else {
-        setOutput(binaryToText(input))
+        setOutput(binaryToText(input));
       }
     } catch {
-      setOutput("Conversion failed")
+      setOutput("Conversion failed");
     }
-  }, [input, mode])
+  }, [input, mode]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(output)
-    toast.success("Copied to clipboard")
-  }
+    navigator.clipboard.writeText(output);
+    toast.success("Copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -63,8 +71,8 @@ export default function TextToASCIIBinaryClient() {
               <Button
                 variant={mode === "to-binary" ? "default" : "outline"}
                 onClick={() => {
-                  setMode("to-binary")
-                  setOutput("")
+                  setMode("to-binary");
+                  setOutput("");
                 }}
               >
                 Text → Binary
@@ -72,8 +80,8 @@ export default function TextToASCIIBinaryClient() {
               <Button
                 variant={mode === "from-binary" ? "default" : "outline"}
                 onClick={() => {
-                  setMode("from-binary")
-                  setOutput("")
+                  setMode("from-binary");
+                  setOutput("");
                 }}
               >
                 Binary → Text
@@ -86,16 +94,24 @@ export default function TextToASCIIBinaryClient() {
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>{mode === "to-binary" ? "Text Input" : "Binary Input"}</CardTitle>
+            <CardTitle>
+              {mode === "to-binary" ? "Text Input" : "Binary Input"}
+            </CardTitle>
             <CardDescription>
-              {mode === "to-binary" ? "Enter text to convert" : "Enter binary (8-bit groups)"}
+              {mode === "to-binary"
+                ? "Enter text to convert"
+                : "Enter binary (8-bit groups)"}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={mode === "to-binary" ? "Enter text..." : "01001000 01100101 01101100..."}
+              placeholder={
+                mode === "to-binary"
+                  ? "Enter text..."
+                  : "01001000 01100101 01101100..."
+              }
               className="w-full min-h-[300px] rounded-md border border-input bg-transparent px-3 py-2 text-sm font-mono"
             />
           </CardContent>
@@ -105,7 +121,9 @@ export default function TextToASCIIBinaryClient() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle>{mode === "to-binary" ? "Binary Output" : "Text Output"}</CardTitle>
+                <CardTitle>
+                  {mode === "to-binary" ? "Binary Output" : "Text Output"}
+                </CardTitle>
                 <CardDescription>Result</CardDescription>
               </div>
               {output && (
@@ -126,5 +144,5 @@ export default function TextToASCIIBinaryClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

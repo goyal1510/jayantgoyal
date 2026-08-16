@@ -1,19 +1,19 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Star } from "lucide-react"
-import { Button } from "@jayant/web-ui/button"
-import { cn } from "@jayant/web-ui/lib/utils"
+import * as React from "react";
+import { Star } from "lucide-react";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { cn } from "@jayantgoyal/web-ui/lib/utils";
 import {
   useToolsUsageHydration,
   useToolsUsageStore,
-} from "@/lib/tools/use-tools-usage-store"
+} from "@/lib/tools/use-tools-usage-store";
 
 interface ToolFavoriteButtonProps {
-  toolId: string
-  className?: string
-  size?: "default" | "sm" | "lg" | "icon"
-  variant?: "default" | "outline" | "ghost"
+  toolId: string;
+  className?: string;
+  size?: "default" | "sm" | "lg" | "icon";
+  variant?: "default" | "outline" | "ghost";
 }
 
 export function ToolFavoriteButton({
@@ -22,10 +22,10 @@ export function ToolFavoriteButton({
   size = "sm",
   variant = "outline",
 }: ToolFavoriteButtonProps) {
-  const hasHydrated = useToolsUsageHydration()
-  const favoriteToolIds = useToolsUsageStore((state) => state.favoriteToolIds)
-  const toggleFavorite = useToolsUsageStore((state) => state.toggleFavorite)
-  const isFavorite = favoriteToolIds.includes(toolId)
+  const hasHydrated = useToolsUsageHydration();
+  const favoriteToolIds = useToolsUsageStore((state) => state.favoriteToolIds);
+  const toggleFavorite = useToolsUsageStore((state) => state.toggleFavorite);
+  const isFavorite = favoriteToolIds.includes(toolId);
 
   return (
     <Button
@@ -38,20 +38,18 @@ export function ToolFavoriteButton({
       title={isFavorite ? "Remove from favorites" : "Add to favorites"}
       className={cn("shrink-0 gap-2", className)}
       onClick={(event) => {
-        event.preventDefault()
-        event.stopPropagation()
-        toggleFavorite(toolId)
+        event.preventDefault();
+        event.stopPropagation();
+        toggleFavorite(toolId);
       }}
     >
       <Star
         className={cn(
           "size-4",
-          isFavorite && "fill-yellow-400 text-yellow-500"
+          isFavorite && "fill-yellow-400 text-yellow-500",
         )}
       />
-      {size !== "icon" && (
-        <span>{isFavorite ? "Favorited" : "Favorite"}</span>
-      )}
+      {size !== "icon" && <span>{isFavorite ? "Favorited" : "Favorite"}</span>}
     </Button>
-  )
+  );
 }

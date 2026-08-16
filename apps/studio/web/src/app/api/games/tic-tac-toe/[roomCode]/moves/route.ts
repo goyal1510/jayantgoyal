@@ -17,7 +17,7 @@ import {
   parseTicTacToeState,
   type TicTacToeMark,
 } from "@/lib/games/tic-tac-toe";
-import { createSupabaseServiceRoleClient } from "@jayant/web-auth/service-role";
+import { createSupabaseServiceRoleClient } from "@jayantgoyal/web-auth/service-role";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function POST(

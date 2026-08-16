@@ -20,16 +20,18 @@ import {
   type PortfolioNavigationRecord,
   type PortfolioSectionContentRecord,
   type PortfolioHeroPublicRow,
-} from "@jayant/portfolio-contracts";
-import { Badge } from "@jayant/web-ui/badge";
+} from "@jayantgoyal/portfolio-contracts";
+import { Badge } from "@jayantgoyal/web-ui/badge";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@jayant/web-ui/card";
-import { Button } from "@jayant/web-ui/button";
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { PERSON_BRAND } from "@jayantgoyal/web-brand";
+import { applicationUrl } from "@jayantgoyal/web-urls";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { castPortfolioRecord } from "@/lib/portfolio-admin-data";
@@ -268,7 +270,7 @@ export default async function PortfolioPage() {
             </Button>
             <Button asChild variant="outline">
               <a
-                href="https://jayantgoyal.com"
+                href={applicationUrl("portfolio")}
                 target="_blank"
                 rel="noreferrer"
               >
@@ -286,7 +288,7 @@ export default async function PortfolioPage() {
           </div>
           <div className="rounded-xl border bg-muted/30 p-4">
             <p className="truncate text-lg font-semibold">
-              {heroRecord?.display_name || "Jayant"}
+              {PERSON_BRAND.displayName}
             </p>
             <p className="mt-1 text-xs uppercase tracking-[0.16em] text-muted-foreground">
               {heroRecord?.role || "Portfolio owner"}
@@ -380,7 +382,7 @@ export default async function PortfolioPage() {
           <CardContent>
             <Button asChild variant="secondary">
               <a
-                href="https://jayantgoyal.com"
+                href={applicationUrl("portfolio")}
                 target="_blank"
                 rel="noreferrer"
               >

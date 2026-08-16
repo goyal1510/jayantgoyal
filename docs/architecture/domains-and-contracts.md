@@ -8,20 +8,20 @@ actually consumes it.
 
 | Domain             | Primary owner | Shared boundary                                          |
 | ------------------ | ------------- | -------------------------------------------------------- |
-| Professional story | Portfolio     | `@jayant/portfolio-contracts` shared with Admin          |
+| Professional story | Portfolio     | `@jayantgoyal/portfolio-contracts` shared with Admin     |
 | Writing            | Portfolio     | Published data read by Portfolio, administered by Admin  |
 | Product catalog    | Studio        | Studio runtime registries                                |
 | Personal workspace | Studio        | `jg_app` tables, RLS, Storage, and client APIs           |
-| Account identity   | Auth          | `@jayant/web-auth`, Supabase Auth, `jg_account`          |
+| Account identity   | Auth          | `@jayantgoyal/web-auth`, Supabase Auth, `jg_account`     |
 | Administration     | Admin         | Role-gated APIs over owned product/account/provider data |
-| Public identity    | Ecosystem     | `@jayant/identity` and web-brand projections             |
+| Public identity    | Foundation    | `@jayantgoyal/identity` and web-brand projections        |
 
 ## Contract placement
 
 - Keep route-local types and helpers in the owning web client.
 - Keep product contracts under `apps/<product>/contracts` when another client
   or administrative product consumes them. Portfolio is the current example.
-- Put framework-neutral ecosystem concepts under `packages/ecosystem`.
+- Put framework-neutral foundation concepts under `packages/foundation`.
 - Put intentionally web-specific session, metadata, URL, component, and style
   contracts under `packages/web`.
 - Put provider protocols under `packages/integrations` only after stable reuse

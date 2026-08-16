@@ -2,7 +2,7 @@
 
 Portfolio is Jayant's public professional and editorial product at
 [jayantgoyal.com](https://jayantgoyal.com). The implemented client is
-`apps/portfolio/web`, workspace `@jayant/portfolio-web`, running locally on
+`apps/portfolio/web`, workspace `@jayantgoyal/portfolio-web`, running locally on
 port 3000.
 
 ## Product boundary
@@ -24,7 +24,7 @@ not become the owner of the Portfolio contract.
 
 ## Current web surface
 
-The client has eight public pages and four public route handlers. The complete
+The client has eight public pages and five public route handlers. The complete
 route behavior and request flows are in [routes and data
 flows](routes-and-data-flows.md).
 
@@ -37,6 +37,7 @@ flows](routes-and-data-flows.md).
 | Resume         | `/resume`, `/api/resume`                       | CMS shell plus Google/static PDF delivery    |
 | Contact        | `/contact`, `/api/contact`                     | CMS contact data plus Resend delivery        |
 | GitHub         | `/api/github-contributions`, `/api/github-loc` | GitHub provider APIs with caching            |
+| Discovery      | `/llms.txt`                                    | Registry-derived product summary             |
 
 ## Internal architecture
 
@@ -47,6 +48,19 @@ models, and is cached with the `portfolio-content` tag. Core `hero`, `about`,
 and `contact` records are required; query failures and missing core records
 surface as errors rather than using duplicated static content.
 
+Public person identity is deliberately not CMS content. The shared identity
+registry supplies `Jayant` to the public view model, and the SEO title is
+derived from that identity plus the CMS-owned role. Admin can still edit the
+role, headline, current title, availability, Resume URL, GitHub username, and
+SEO description. It cannot edit the public name or a duplicate SEO title.
+
+The existing `portfolio.hero` identity columns remain in the database only as
+a compatibility boundary: Admin injects their fixed values when creating the
+singleton row, while public Portfolio selects no longer depend on them. A
+future reviewed migration may remove those columns only after the deployed
+read/write paths are verified; this restructure does not rewrite migration
+history or mutate the remote database.
+
 Portfolio owns an editorial component and CSS system under
 `src/components/editorial` and `src/app/editorial`. This is intentionally not
 the same application shell used by Studio, Admin, and Auth. Shared identity,
@@ -54,20 +68,20 @@ URLs, metadata helpers, and genuinely shared providers remain packages.
 
 ## Contracts and dependencies
 
-`@jayant/portfolio-contracts` lives at `apps/portfolio/contracts` because the
+`@jayantgoyal/portfolio-contracts` lives at `apps/portfolio/contracts` because the
 public Portfolio reader and Admin editor both consume the same table columns,
 guards, section keys, Writing shape, asset rules, and presentation contract.
 It remains a Portfolio-owned contract.
 
 Portfolio also consumes:
 
-- `@jayant/web-brand` for public identity and deployable web assets;
-- `@jayant/web-urls` for canonical application origins;
-- `@jayant/web-seo` for metadata and indexability helpers;
-- `@jayant/github` for shared server-side GitHub statistics;
+- `@jayantgoyal/web-brand` for public identity and deployable web assets;
+- `@jayantgoyal/web-urls` for canonical application origins;
+- `@jayantgoyal/web-seo` for metadata and indexability helpers;
+- `@jayantgoyal/github` for shared server-side GitHub statistics;
 - shared Tailwind, ESLint, and TypeScript configuration.
 
-It deliberately does not consume `@jayant/web-auth`, `@jayant/web-ui`, or a
+It deliberately does not consume `@jayantgoyal/web-auth`, `@jayantgoyal/web-ui`, or a
 Supabase service-role client.
 
 ## Data ownership
@@ -79,6 +93,11 @@ is an operational table used only through its database function.
 
 The detailed table inventory and policies are in the [schema
 catalog](../../shared-systems/data/schema-catalog.md).
+
+The root layout, page/article metadata, manifest, favicon paths, and social
+preview descriptors come from shared web contracts. Mutable editorial SEO copy
+continues to come from Portfolio data where the content is genuinely specific
+to the current public narrative.
 
 ## Environment and providers
 

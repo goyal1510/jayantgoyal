@@ -4,7 +4,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   profileDisplayName,
   resolveProfileAvatar,
-} from "@jayant/web-auth/profile";
+} from "@jayantgoyal/web-auth/profile";
 
 /**
  * Combined init endpoint — returns profile + terms status in one call.
@@ -17,8 +17,9 @@ export async function GET(request: NextRequest) {
   // Trust proxy-verified headers (set by proxy after getUser())
   let userId = request.headers.get("x-user-id");
   let userEmail = request.headers.get("x-user-email") ?? undefined;
-  let authUser: Awaited<ReturnType<typeof supabase.auth.getUser>>["data"]["user"] =
-    null;
+  let authUser: Awaited<
+    ReturnType<typeof supabase.auth.getUser>
+  >["data"]["user"] = null;
 
   if (!userId) {
     // Fallback: called directly without proxy (e.g., during development)

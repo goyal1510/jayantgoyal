@@ -5,24 +5,19 @@ import { headers } from "next/headers";
 import { IBM_Plex_Mono, Manrope } from "next/font/google";
 import Script from "next/script";
 
-import { Toaster } from "@jayant/web-ui/sonner";
-import { ThemeProvider } from "@jayant/web-ui/theme-provider";
-import { BRAND_ASSET_PATHS } from "@jayant/web-brand";
+import { Toaster } from "@jayantgoyal/web-ui/sonner";
+import { ThemeProvider } from "@jayantgoyal/web-ui/theme-provider";
+import { buildAppRootMetadata } from "@jayantgoyal/web-seo";
 
 import { SoftwareAppJsonLd, WebSiteJsonLd } from "@/components/seo/json-ld";
 import { ToastSoundProvider } from "@/components/providers/toast-sound-provider";
-import { PORTFOLIO_URL } from "@/lib/platform/urls";
 import {
-  DEFAULT_OG_IMAGE,
-  DEFAULT_OG_IMAGE_METADATA,
   isIndexablePath,
   isProductionStudioHost,
   normalizePathname,
-  PERSON_NAME,
   SITE_DESCRIPTION,
   SITE_NAME,
   SITE_TITLE,
-  SITE_TITLE_TEMPLATE,
   SITE_URL,
 } from "@/lib/seo/config";
 
@@ -39,62 +34,6 @@ const ibmPlexMono = IBM_Plex_Mono({
   weight: ["400", "500"],
 });
 
-const baseMetadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
-  title: {
-    default: SITE_TITLE,
-    template: SITE_TITLE_TEMPLATE,
-  },
-  description: SITE_DESCRIPTION,
-  authors: [{ name: PERSON_NAME, url: PORTFOLIO_URL }],
-  creator: PERSON_NAME,
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: SITE_URL,
-    siteName: SITE_NAME,
-    title: SITE_TITLE,
-    description: SITE_DESCRIPTION,
-    images: [
-      {
-        url: DEFAULT_OG_IMAGE,
-        width: DEFAULT_OG_IMAGE_METADATA.width,
-        height: DEFAULT_OG_IMAGE_METADATA.height,
-        alt: DEFAULT_OG_IMAGE_METADATA.alt,
-        type: DEFAULT_OG_IMAGE_METADATA.type,
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: SITE_TITLE,
-    description: SITE_DESCRIPTION,
-    images: [DEFAULT_OG_IMAGE],
-  },
-  icons: {
-    icon: [
-      { url: BRAND_ASSET_PATHS.favicon },
-      {
-        url: BRAND_ASSET_PATHS.favicon32,
-        sizes: "32x32",
-        type: "image/png",
-      },
-      {
-        url: BRAND_ASSET_PATHS.favicon16,
-        sizes: "16x16",
-        type: "image/png",
-      },
-    ],
-    apple: [
-      {
-        url: BRAND_ASSET_PATHS.appleTouchIcon,
-        sizes: "180x180",
-        type: "image/png",
-      },
-    ],
-  },
-};
-
 export async function generateMetadata(): Promise<Metadata> {
   const headerStore = await headers();
   const pathname = normalizePathname(headerStore.get("x-pathname"));
@@ -103,12 +42,14 @@ export async function generateMetadata(): Promise<Metadata> {
     isProductionStudioHost(headerStore.get("host")) &&
     isIndexablePath(pathname);
 
-  return {
-    ...baseMetadata,
-    alternates: { canonical: canonicalUrl },
-    openGraph: { ...baseMetadata.openGraph, url: canonicalUrl },
+  return buildAppRootMetadata({
+    appId: "studio",
+    siteUrl: SITE_URL,
+    canonicalUrl,
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     robots: { index: shouldIndex, follow: shouldIndex },
-  };
+  });
 }
 
 export default async function RootLayout({

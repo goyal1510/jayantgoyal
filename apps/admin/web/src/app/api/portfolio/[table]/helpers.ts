@@ -1,14 +1,16 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
-import { createSupabaseServiceRoleClient } from "@jayant/web-auth/service-role";
+import { createSupabaseServiceRoleClient } from "@jayantgoyal/web-auth/service-role";
 import {
   PORTFOLIO_ADMIN_SELECT_COLUMNS,
   PORTFOLIO_TABLES,
   type PortfolioTable,
   validatePortfolioWriteInput,
-} from "@jayant/portfolio-contracts";
+} from "@jayantgoyal/portfolio-contracts";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getPortfolioPublicRevalidationPaths } from "@/lib/portfolio-revalidation";
+
+export { preparePortfolioMutationPayload } from "./hero-identity";
 
 const ALLOWED_TABLES = PORTFOLIO_TABLES;
 

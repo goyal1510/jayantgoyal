@@ -1,12 +1,12 @@
-import { APP_BRANDS, type AppBrandId } from "@jayant/web-brand";
+import { PRODUCT_IDENTITIES, type ProductId } from "@jayantgoyal/identity";
 
-export type ApplicationId = AppBrandId;
+export type ApplicationId = ProductId;
 
 const APPLICATION_HOSTS: Record<ApplicationId, readonly string[]> = {
-  portfolio: ["jayantgoyal.com", "www.jayantgoyal.com"],
-  studio: ["studio.jayantgoyal.com"],
-  admin: ["admin.jayantgoyal.com"],
-  auth: ["auth.jayantgoyal.com"],
+  portfolio: PRODUCT_IDENTITIES.portfolio.canonicalHosts,
+  studio: PRODUCT_IDENTITIES.studio.canonicalHosts,
+  admin: PRODUCT_IDENTITIES.admin.canonicalHosts,
+  auth: PRODUCT_IDENTITIES.auth.canonicalHosts,
 };
 
 export function normalizeHostname(host: string | null | undefined): string {
@@ -33,7 +33,7 @@ export function applicationOrigin(
   appId: ApplicationId,
   override?: string | null,
 ): string {
-  return normalizeOrigin(override, APP_BRANDS[appId].canonicalUrl);
+  return normalizeOrigin(override, PRODUCT_IDENTITIES[appId].canonicalOrigin);
 }
 
 export function applicationUrl(

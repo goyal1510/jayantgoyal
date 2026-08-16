@@ -4,9 +4,9 @@ import * as React from "react";
 import { usePathname } from "next/navigation";
 import { LayoutGrid } from "lucide-react";
 
-import { APP_BRANDS } from "@jayant/web-brand";
-import { ApplicationSidebarFrame } from "@jayant/web-ui/application-shell";
-import { cn } from "@jayant/web-ui/lib/utils";
+import { APP_BRANDS } from "@jayantgoyal/web-brand";
+import { ApplicationSidebarFrame } from "@jayantgoyal/web-ui/application-shell";
+import { cn } from "@jayantgoyal/web-ui/lib/utils";
 
 import { useActiveApp } from "@/hooks/use-active-app";
 import { getSurfaceApps, type AppConfig } from "@/lib/config/hub-config";

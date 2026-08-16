@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { formatAppPageTitle } from "@jayant/web-brand";
+import { buildPublicArticleMetadata } from "@jayantgoyal/web-seo";
 
 import {
   getWritingPostBySlug,
@@ -24,32 +24,16 @@ export async function generateMetadata({
 
   if (!post) notFound();
 
-  const url = `${SITE_URL}/writing/${slug}`;
-  const description = post.excerpt ?? undefined;
-  const socialTitle = formatAppPageTitle("portfolio", post.title);
-
-  return {
+  return buildPublicArticleMetadata({
+    appId: "portfolio",
+    siteUrl: SITE_URL,
     title: post.title,
-    description,
-    alternates: { canonical: url },
-    openGraph: {
-      type: "article",
-      title: socialTitle,
-      description,
-      url,
-      publishedTime: post.published_at ?? undefined,
-      modifiedTime: post.updated_at,
-      images: post.cover_image
-        ? [{ url: post.cover_image }]
-        : [{ url: DEFAULT_OG_IMAGE }],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: socialTitle,
-      description,
-      images: [post.cover_image ?? DEFAULT_OG_IMAGE],
-    },
-  };
+    description: post.excerpt ?? "",
+    pathname: `/writing/${slug}`,
+    image: post.cover_image ?? DEFAULT_OG_IMAGE,
+    publishedTime: post.published_at ?? undefined,
+    modifiedTime: post.updated_at,
+  });
 }
 
 export default async function WritingPostPage({

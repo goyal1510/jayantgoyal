@@ -20,10 +20,9 @@ universal.
 
 ## Advertising, sales, purchases, and subscriptions
 
-Studio currently links to an external e-commerce experiment, but this monorepo
-has no owned commerce client, contract, provider adapter, or current schema.
-The structure can support a real product capability later without a repository
-split:
+This monorepo has no current commerce client, contract, payment-provider
+adapter, or commerce schema. The structure can support a real capability later
+without a repository split:
 
 - Product-specific offers, checkout entry points, and merchandising stay in
   the owning product client.

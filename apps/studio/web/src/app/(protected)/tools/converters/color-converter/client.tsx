@@ -1,53 +1,69 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
     ? {
         r: parseInt(result[1]!, 16),
         g: parseInt(result[2]!, 16),
         b: parseInt(result[3]!, 16),
       }
-    : null
+    : null;
 }
 
 function rgbToHex(r: number, g: number, b: number): string {
-  return "#" + [r, g, b].map((x) => Math.round(x).toString(16).padStart(2, "0")).join("").toUpperCase()
+  return (
+    "#" +
+    [r, g, b]
+      .map((x) => Math.round(x).toString(16).padStart(2, "0"))
+      .join("")
+      .toUpperCase()
+  );
 }
 
-function rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: number } {
-  r /= 255
-  g /= 255
-  b /= 255
+function rgbToHsl(
+  r: number,
+  g: number,
+  b: number,
+): { h: number; s: number; l: number } {
+  r /= 255;
+  g /= 255;
+  b /= 255;
 
-  const max = Math.max(r, g, b)
-  const min = Math.min(r, g, b)
-  let h = 0
-  let s = 0
-  const l = (max + min) / 2
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h = 0;
+  let s = 0;
+  const l = (max + min) / 2;
 
   if (max !== min) {
-    const d = max - min
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
 
     switch (max) {
       case r:
-        h = ((g - b) / d + (g < b ? 6 : 0)) / 6
-        break
+        h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+        break;
       case g:
-        h = ((b - r) / d + 2) / 6
-        break
+        h = ((b - r) / d + 2) / 6;
+        break;
       case b:
-        h = ((r - g) / d + 4) / 6
-        break
+        h = ((r - g) / d + 4) / 6;
+        break;
     }
   }
 
@@ -55,73 +71,74 @@ function rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: n
     h: Math.round(h * 360),
     s: Math.round(s * 100),
     l: Math.round(l * 100),
-  }
+  };
 }
 
 export default function ColorConverterClient() {
-  const [hex, setHex] = React.useState("#FF5733")
-  const [rgb, setRgb] = React.useState({ r: 255, g: 87, b: 51 })
-  const [hsl, setHsl] = React.useState({ h: 9, s: 100, l: 60 })
+  const [hex, setHex] = React.useState("#FF5733");
+  const [rgb, setRgb] = React.useState({ r: 255, g: 87, b: 51 });
+  const [hsl, setHsl] = React.useState({ h: 9, s: 100, l: 60 });
 
   const updateFromHex = (hexValue: string) => {
-    setHex(hexValue)
-    const rgbValue = hexToRgb(hexValue)
+    setHex(hexValue);
+    const rgbValue = hexToRgb(hexValue);
     if (rgbValue) {
-      setRgb(rgbValue)
-      setHsl(rgbToHsl(rgbValue.r, rgbValue.g, rgbValue.b))
+      setRgb(rgbValue);
+      setHsl(rgbToHsl(rgbValue.r, rgbValue.g, rgbValue.b));
     }
-  }
+  };
 
   const updateFromRgb = (r: number, g: number, b: number) => {
-    setRgb({ r, g, b })
-    setHex(rgbToHex(r, g, b))
-    setHsl(rgbToHsl(r, g, b))
-  }
+    setRgb({ r, g, b });
+    setHex(rgbToHex(r, g, b));
+    setHsl(rgbToHsl(r, g, b));
+  };
 
   const updateFromHsl = (h: number, s: number, l: number) => {
-    setHsl({ h, s, l })
+    setHsl({ h, s, l });
     // Convert HSL to RGB
-    const hNorm = h / 360
-    const sNorm = s / 100
-    const lNorm = l / 100
+    const hNorm = h / 360;
+    const sNorm = s / 100;
+    const lNorm = l / 100;
 
-    let r = 0
-    let g = 0
-    let b = 0
+    let r = 0;
+    let g = 0;
+    let b = 0;
 
     if (sNorm === 0) {
-      r = g = b = lNorm
+      r = g = b = lNorm;
     } else {
       const hue2rgb = (p: number, q: number, t: number) => {
-        if (t < 0) t += 1
-        if (t > 1) t -= 1
-        if (t < 1 / 6) return p + (q - p) * 6 * t
-        if (t < 1 / 2) return q
-        if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6
-        return p
-      }
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1 / 6) return p + (q - p) * 6 * t;
+        if (t < 1 / 2) return q;
+        if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+        return p;
+      };
 
-      const q = lNorm < 0.5 ? lNorm * (1 + sNorm) : lNorm + sNorm - lNorm * sNorm
-      const p = 2 * lNorm - q
+      const q =
+        lNorm < 0.5 ? lNorm * (1 + sNorm) : lNorm + sNorm - lNorm * sNorm;
+      const p = 2 * lNorm - q;
 
-      r = hue2rgb(p, q, hNorm + 1 / 3)
-      g = hue2rgb(p, q, hNorm)
-      b = hue2rgb(p, q, hNorm - 1 / 3)
+      r = hue2rgb(p, q, hNorm + 1 / 3);
+      g = hue2rgb(p, q, hNorm);
+      b = hue2rgb(p, q, hNorm - 1 / 3);
     }
 
     const rgbValue = {
       r: Math.round(r * 255),
       g: Math.round(g * 255),
       b: Math.round(b * 255),
-    }
-    setRgb(rgbValue)
-    setHex(rgbToHex(rgbValue.r, rgbValue.g, rgbValue.b))
-  }
+    };
+    setRgb(rgbValue);
+    setHex(rgbToHex(rgbValue.r, rgbValue.g, rgbValue.b));
+  };
 
   const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text)
-    toast.success("Copied to clipboard")
-  }
+    navigator.clipboard.writeText(text);
+    toast.success("Copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -156,21 +173,27 @@ export default function ColorConverterClient() {
                   min="0"
                   max="255"
                   value={rgb.r}
-                  onChange={(e) => updateFromRgb(parseInt(e.target.value) || 0, rgb.g, rgb.b)}
+                  onChange={(e) =>
+                    updateFromRgb(parseInt(e.target.value) || 0, rgb.g, rgb.b)
+                  }
                 />
                 <Input
                   type="number"
                   min="0"
                   max="255"
                   value={rgb.g}
-                  onChange={(e) => updateFromRgb(rgb.r, parseInt(e.target.value) || 0, rgb.b)}
+                  onChange={(e) =>
+                    updateFromRgb(rgb.r, parseInt(e.target.value) || 0, rgb.b)
+                  }
                 />
                 <Input
                   type="number"
                   min="0"
                   max="255"
                   value={rgb.b}
-                  onChange={(e) => updateFromRgb(rgb.r, rgb.g, parseInt(e.target.value) || 0)}
+                  onChange={(e) =>
+                    updateFromRgb(rgb.r, rgb.g, parseInt(e.target.value) || 0)
+                  }
                 />
               </div>
             </div>
@@ -183,7 +206,9 @@ export default function ColorConverterClient() {
                   min="0"
                   max="360"
                   value={hsl.h}
-                  onChange={(e) => updateFromHsl(parseInt(e.target.value) || 0, hsl.s, hsl.l)}
+                  onChange={(e) =>
+                    updateFromHsl(parseInt(e.target.value) || 0, hsl.s, hsl.l)
+                  }
                   placeholder="H"
                 />
                 <Input
@@ -191,7 +216,9 @@ export default function ColorConverterClient() {
                   min="0"
                   max="100"
                   value={hsl.s}
-                  onChange={(e) => updateFromHsl(hsl.h, parseInt(e.target.value) || 0, hsl.l)}
+                  onChange={(e) =>
+                    updateFromHsl(hsl.h, parseInt(e.target.value) || 0, hsl.l)
+                  }
                   placeholder="S"
                 />
                 <Input
@@ -199,7 +226,9 @@ export default function ColorConverterClient() {
                   min="0"
                   max="100"
                   value={hsl.l}
-                  onChange={(e) => updateFromHsl(hsl.h, hsl.s, parseInt(e.target.value) || 0)}
+                  onChange={(e) =>
+                    updateFromHsl(hsl.h, hsl.s, parseInt(e.target.value) || 0)
+                  }
                   placeholder="L"
                 />
               </div>
@@ -217,7 +246,11 @@ export default function ColorConverterClient() {
               <Label>HEX</Label>
               <div className="flex gap-2">
                 <Input value={hex} readOnly className="font-mono" />
-                <Button variant="outline" size="icon" onClick={() => copyToClipboard(hex)}>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => copyToClipboard(hex)}
+                >
                   <Copy className="h-4 w-4" />
                 </Button>
               </div>
@@ -234,7 +267,9 @@ export default function ColorConverterClient() {
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => copyToClipboard(`rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`)}
+                  onClick={() =>
+                    copyToClipboard(`rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`)
+                  }
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
@@ -252,7 +287,9 @@ export default function ColorConverterClient() {
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => copyToClipboard(`hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`)}
+                  onClick={() =>
+                    copyToClipboard(`hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`)
+                  }
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
@@ -267,5 +304,5 @@ export default function ColorConverterClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

@@ -5,8 +5,8 @@ import { useTransition } from "react";
 import {
   buildAuthAccountSecurityUrl,
   buildAuthLogoutUrl,
-} from "@jayant/web-auth/entry";
-import { ApplicationUserMenu } from "@jayant/web-ui/application-user-menu";
+} from "@jayantgoyal/web-auth/entry";
+import { ApplicationUserMenu } from "@jayantgoyal/web-ui/application-user-menu";
 
 export function TopbarUserMenu({
   user,

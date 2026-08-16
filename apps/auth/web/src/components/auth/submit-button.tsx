@@ -2,7 +2,7 @@
 
 import { useFormStatus } from "react-dom";
 
-import { Button } from "@jayant/web-ui/button";
+import { Button } from "@jayantgoyal/web-ui/button";
 
 export function SubmitButton({
   idleLabel,

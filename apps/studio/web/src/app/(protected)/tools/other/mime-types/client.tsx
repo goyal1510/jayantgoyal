@@ -1,8 +1,13 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Input } from "@jayant/web-ui/input"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Input } from "@jayantgoyal/web-ui/input";
 
 const mimeTypes: Record<string, string[]> = {
   "application/json": ["json"],
@@ -17,34 +22,34 @@ const mimeTypes: Record<string, string[]> = {
   "text/plain": ["txt"],
   "video/mp4": ["mp4"],
   "audio/mpeg": ["mp3"],
-}
+};
 
-const extensionToMime: Record<string, string> = {}
+const extensionToMime: Record<string, string> = {};
 Object.entries(mimeTypes).forEach(([mime, exts]) => {
-  exts.forEach(ext => {
-    extensionToMime[ext] = mime
-  })
-})
+  exts.forEach((ext) => {
+    extensionToMime[ext] = mime;
+  });
+});
 
 export default function MIMETypesClient() {
-  const [input, setInput] = React.useState("")
-  const [mode, setMode] = React.useState<"mime" | "ext">("mime")
-  const [result, setResult] = React.useState<string[]>([])
+  const [input, setInput] = React.useState("");
+  const [mode, setMode] = React.useState<"mime" | "ext">("mime");
+  const [result, setResult] = React.useState<string[]>([]);
 
   React.useEffect(() => {
     if (!input.trim()) {
-      setResult([])
-      return
+      setResult([]);
+      return;
     }
 
     if (mode === "mime") {
-      const mime = input.toLowerCase()
-      setResult(mimeTypes[mime] || [])
+      const mime = input.toLowerCase();
+      setResult(mimeTypes[mime] || []);
     } else {
-      const ext = input.toLowerCase().replace(/^\./, "")
-      setResult([extensionToMime[ext] || "Unknown"])
+      const ext = input.toLowerCase().replace(/^\./, "");
+      setResult([extensionToMime[ext] || "Unknown"]);
     }
-  }, [input, mode])
+  }, [input, mode]);
 
   return (
     <div className="space-y-6">
@@ -86,12 +91,14 @@ export default function MIMETypesClient() {
           <CardContent>
             <div className="space-y-2">
               {result.map((r, i) => (
-                <p key={i} className="font-mono">{r}</p>
+                <p key={i} className="font-mono">
+                  {r}
+                </p>
               ))}
             </div>
           </CardContent>
         </Card>
       )}
     </div>
-  )
+  );
 }

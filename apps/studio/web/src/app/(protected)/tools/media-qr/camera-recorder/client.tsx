@@ -1,12 +1,18 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Camera, Video, Download } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Camera, Video, Download } from "lucide-react";
+import { toast } from "sonner";
 
-import { useCamera } from "./use-camera"
+import { useCamera } from "./use-camera";
 
 export default function CameraRecorderClient() {
   const {
@@ -24,13 +30,16 @@ export default function CameraRecorderClient() {
     startRecording,
     stopRecording,
     downloadVideo,
-  } = useCamera()
+  } = useCamera();
 
   return (
-    <div className="space-y-6"><Card>
+    <div className="space-y-6">
+      <Card>
         <CardHeader>
           <CardTitle>Camera</CardTitle>
-          <CardDescription>Access your camera to take photos or record videos</CardDescription>
+          <CardDescription>
+            Access your camera to take photos or record videos
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-2">
@@ -38,7 +47,9 @@ export default function CameraRecorderClient() {
               <Button onClick={startCamera}>Start Camera</Button>
             ) : (
               <>
-                <Button variant="destructive" onClick={stopCamera}>Stop Camera</Button>
+                <Button variant="destructive" onClick={stopCamera}>
+                  Stop Camera
+                </Button>
                 <Button onClick={takePhoto} disabled={recording || !videoReady}>
                   <Camera className="h-4 w-4 mr-2" />
                   Take Photo
@@ -65,20 +76,20 @@ export default function CameraRecorderClient() {
                 playsInline
                 muted
                 className="w-full max-w-md rounded border bg-black"
-                style={{ transform: 'scaleX(-1)' }}
+                style={{ transform: "scaleX(-1)" }}
                 onLoadedMetadata={() => {
                   if (videoRef.current && videoRef.current.videoWidth > 0) {
-                    setVideoReady(true)
+                    setVideoReady(true);
                   }
                 }}
                 onCanPlay={() => {
                   if (videoRef.current && videoRef.current.videoWidth > 0) {
-                    setVideoReady(true)
+                    setVideoReady(true);
                   }
                 }}
                 onPlaying={() => {
                   if (videoRef.current && videoRef.current.videoWidth > 0) {
-                    setVideoReady(true)
+                    setVideoReady(true);
                   }
                 }}
               />
@@ -104,15 +115,19 @@ export default function CameraRecorderClient() {
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={photoUrl} alt="Captured" className="w-full max-w-md rounded border mx-auto" />
+                <img
+                  src={photoUrl}
+                  alt="Captured"
+                  className="w-full max-w-md rounded border mx-auto"
+                />
                 <Button
                   variant="outline"
                   onClick={() => {
-                    const a = document.createElement("a")
-                    a.href = photoUrl
-                    a.download = `photo-${Date.now()}.png`
-                    a.click()
-                    toast.success("Photo downloaded")
+                    const a = document.createElement("a");
+                    a.href = photoUrl;
+                    a.download = `photo-${Date.now()}.png`;
+                    a.click();
+                    toast.success("Photo downloaded");
                   }}
                   className="w-full"
                 >
@@ -148,5 +163,5 @@ export default function CameraRecorderClient() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

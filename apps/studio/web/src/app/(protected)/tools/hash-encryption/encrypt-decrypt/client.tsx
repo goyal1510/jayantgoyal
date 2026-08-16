@@ -1,16 +1,26 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
-import { Copy, Lock, Unlock } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Copy, Lock, Unlock } from "lucide-react";
+import { toast } from "sonner";
 
-async function encryptText(text: string, password: string, algorithm: string): Promise<string> {
-  const encoder = new TextEncoder()
-  const data = encoder.encode(text)
+async function encryptText(
+  text: string,
+  password: string,
+  algorithm: string,
+): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(text);
 
   // Derive key from password
   const keyMaterial = await crypto.subtle.importKey(
@@ -18,10 +28,10 @@ async function encryptText(text: string, password: string, algorithm: string): P
     encoder.encode(password),
     "PBKDF2",
     false,
-    ["deriveBits", "deriveKey"]
-  )
+    ["deriveBits", "deriveKey"],
+  );
 
-  const salt = crypto.getRandomValues(new Uint8Array(16))
+  const salt = crypto.getRandomValues(new Uint8Array(16));
   const key = await crypto.subtle.deriveKey(
     {
       name: "PBKDF2",
@@ -32,35 +42,43 @@ async function encryptText(text: string, password: string, algorithm: string): P
     keyMaterial,
     { name: algorithm, length: 256 },
     false,
-    ["encrypt"]
-  )
+    ["encrypt"],
+  );
 
-  const iv = crypto.getRandomValues(new Uint8Array(16))
+  const iv = crypto.getRandomValues(new Uint8Array(16));
   const encrypted = await crypto.subtle.encrypt(
     { name: algorithm, iv: iv },
     key,
-    data
-  )
+    data,
+  );
 
   // Combine salt, iv, and encrypted data
-  const combined = new Uint8Array(salt.length + iv.length + encrypted.byteLength)
-  combined.set(salt, 0)
-  combined.set(iv, salt.length)
-  combined.set(new Uint8Array(encrypted), salt.length + iv.length)
+  const combined = new Uint8Array(
+    salt.length + iv.length + encrypted.byteLength,
+  );
+  combined.set(salt, 0);
+  combined.set(iv, salt.length);
+  combined.set(new Uint8Array(encrypted), salt.length + iv.length);
 
-  return btoa(String.fromCharCode(...combined))
+  return btoa(String.fromCharCode(...combined));
 }
 
-async function decryptText(encryptedBase64: string, password: string, algorithm: string): Promise<string> {
+async function decryptText(
+  encryptedBase64: string,
+  password: string,
+  algorithm: string,
+): Promise<string> {
   try {
-    const encoder = new TextEncoder()
-    const decoder = new TextDecoder()
+    const encoder = new TextEncoder();
+    const decoder = new TextDecoder();
 
-    const combined = Uint8Array.from(atob(encryptedBase64), c => c.charCodeAt(0))
+    const combined = Uint8Array.from(atob(encryptedBase64), (c) =>
+      c.charCodeAt(0),
+    );
 
-    const salt = combined.slice(0, 16)
-    const iv = combined.slice(16, 32)
-    const encrypted = combined.slice(32)
+    const salt = combined.slice(0, 16);
+    const iv = combined.slice(16, 32);
+    const encrypted = combined.slice(32);
 
     // Derive key from password
     const keyMaterial = await crypto.subtle.importKey(
@@ -68,8 +86,8 @@ async function decryptText(encryptedBase64: string, password: string, algorithm:
       encoder.encode(password),
       "PBKDF2",
       false,
-      ["deriveBits", "deriveKey"]
-    )
+      ["deriveBits", "deriveKey"],
+    );
 
     const key = await crypto.subtle.deriveKey(
       {
@@ -81,64 +99,65 @@ async function decryptText(encryptedBase64: string, password: string, algorithm:
       keyMaterial,
       { name: algorithm, length: 256 },
       false,
-      ["decrypt"]
-    )
+      ["decrypt"],
+    );
 
     const decrypted = await crypto.subtle.decrypt(
       { name: algorithm, iv: iv },
       key,
-      encrypted
-    )
+      encrypted,
+    );
 
-    return decoder.decode(decrypted)
+    return decoder.decode(decrypted);
   } catch {
-    throw new Error("Decryption failed - incorrect password or corrupted data")
+    throw new Error("Decryption failed - incorrect password or corrupted data");
   }
 }
 
 export default function EncryptDecryptClient() {
-  const [mode, setMode] = React.useState<"encrypt" | "decrypt">("encrypt")
-  const [input, setInput] = React.useState("")
-  const [password, setPassword] = React.useState("")
-  const [algorithm, setAlgorithm] = React.useState("AES-GCM")
-  const [output, setOutput] = React.useState("")
-  const [isProcessing, setIsProcessing] = React.useState(false)
+  const [mode, setMode] = React.useState<"encrypt" | "decrypt">("encrypt");
+  const [input, setInput] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [algorithm, setAlgorithm] = React.useState("AES-GCM");
+  const [output, setOutput] = React.useState("");
+  const [isProcessing, setIsProcessing] = React.useState(false);
 
   const algorithms = [
     { value: "AES-GCM", label: "AES-GCM" },
     { value: "AES-CBC", label: "AES-CBC" },
-  ]
+  ];
 
   const handleProcess = async () => {
     if (!input.trim() || !password.trim()) {
-      setOutput("")
-      return
+      setOutput("");
+      return;
     }
 
-    setIsProcessing(true)
+    setIsProcessing(true);
     try {
       if (mode === "encrypt") {
-        const result = await encryptText(input, password, algorithm)
-        setOutput(result)
-        toast.success("Text encrypted successfully")
+        const result = await encryptText(input, password, algorithm);
+        setOutput(result);
+        toast.success("Text encrypted successfully");
       } else {
-        const result = await decryptText(input, password, algorithm)
-        setOutput(result)
-        toast.success("Text decrypted successfully")
+        const result = await decryptText(input, password, algorithm);
+        setOutput(result);
+        toast.success("Text decrypted successfully");
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Operation failed"
-      toast.error(message)
-      setOutput("")
+      const message =
+        error instanceof Error ? error.message : "Operation failed";
+      toast.error(message);
+      setOutput("");
     } finally {
-      setIsProcessing(false)
+      setIsProcessing(false);
     }
-  }
+  };
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(output)
-    toast.success("Copied to clipboard")
-  }
+    navigator.clipboard.writeText(output);
+    toast.success("Copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -150,8 +169,8 @@ export default function EncryptDecryptClient() {
               <Button
                 variant={mode === "encrypt" ? "default" : "outline"}
                 onClick={() => {
-                  setMode("encrypt")
-                  setOutput("")
+                  setMode("encrypt");
+                  setOutput("");
                 }}
               >
                 <Lock className="h-4 w-4 mr-2" />
@@ -160,8 +179,8 @@ export default function EncryptDecryptClient() {
               <Button
                 variant={mode === "decrypt" ? "default" : "outline"}
                 onClick={() => {
-                  setMode("decrypt")
-                  setOutput("")
+                  setMode("decrypt");
+                  setOutput("");
                 }}
               >
                 <Unlock className="h-4 w-4 mr-2" />
@@ -203,16 +222,24 @@ export default function EncryptDecryptClient() {
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>{mode === "encrypt" ? "Plain Text" : "Encrypted Text"}</CardTitle>
+            <CardTitle>
+              {mode === "encrypt" ? "Plain Text" : "Encrypted Text"}
+            </CardTitle>
             <CardDescription>
-              {mode === "encrypt" ? "Enter text to encrypt" : "Enter encrypted text to decrypt"}
+              {mode === "encrypt"
+                ? "Enter text to encrypt"
+                : "Enter encrypted text to decrypt"}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={mode === "encrypt" ? "Enter text to encrypt..." : "Enter encrypted text..."}
+              placeholder={
+                mode === "encrypt"
+                  ? "Enter text to encrypt..."
+                  : "Enter encrypted text..."
+              }
               className="w-full min-h-[200px] rounded-md border border-input bg-transparent px-3 py-2 text-sm"
             />
           </CardContent>
@@ -222,7 +249,9 @@ export default function EncryptDecryptClient() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle>{mode === "encrypt" ? "Encrypted Text" : "Decrypted Text"}</CardTitle>
+                <CardTitle>
+                  {mode === "encrypt" ? "Encrypted Text" : "Decrypted Text"}
+                </CardTitle>
                 <CardDescription>Result</CardDescription>
               </div>
               {output && (
@@ -244,11 +273,15 @@ export default function EncryptDecryptClient() {
               className="w-full mt-4"
               disabled={isProcessing || !input.trim() || !password.trim()}
             >
-              {isProcessing ? "Processing..." : mode === "encrypt" ? "Encrypt" : "Decrypt"}
+              {isProcessing
+                ? "Processing..."
+                : mode === "encrypt"
+                  ? "Encrypt"
+                  : "Decrypt"}
             </Button>
           </CardContent>
         </Card>
       </div>
     </div>
-  )
+  );
 }

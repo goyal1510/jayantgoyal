@@ -1,59 +1,67 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 function jsonToCSV(json: Record<string, unknown>[]): string {
-  if (json.length === 0) return ""
+  if (json.length === 0) return "";
 
-  const headers = Object.keys(json[0]!)
-  const rows = json.map(obj => headers.map(header => {
-    const value = obj[header]
-    if (value === null || value === undefined) return ""
-    if (typeof value === "object") return JSON.stringify(value)
-    return String(value).replace(/"/g, '""')
-  }))
+  const headers = Object.keys(json[0]!);
+  const rows = json.map((obj) =>
+    headers.map((header) => {
+      const value = obj[header];
+      if (value === null || value === undefined) return "";
+      if (typeof value === "object") return JSON.stringify(value);
+      return String(value).replace(/"/g, '""');
+    }),
+  );
 
   return [
-    headers.map(h => `"${h}"`).join(","),
-    ...rows.map(row => row.map(cell => `"${cell}"`).join(","))
-  ].join("\n")
+    headers.map((h) => `"${h}"`).join(","),
+    ...rows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
+  ].join("\n");
 }
 
 export default function JSONToCSVClient() {
-  const [input, setInput] = React.useState("")
-  const [csv, setCsv] = React.useState("")
-  const [error, setError] = React.useState("")
+  const [input, setInput] = React.useState("");
+  const [csv, setCsv] = React.useState("");
+  const [error, setError] = React.useState("");
 
   React.useEffect(() => {
     if (!input.trim()) {
-      setCsv("")
-      setError("")
-      return
+      setCsv("");
+      setError("");
+      return;
     }
 
     try {
-      const parsed = JSON.parse(input)
+      const parsed = JSON.parse(input);
       if (!Array.isArray(parsed)) {
-        setError("JSON must be an array of objects")
-        setCsv("")
-        return
+        setError("JSON must be an array of objects");
+        setCsv("");
+        return;
       }
-      setCsv(jsonToCSV(parsed))
-      setError("")
+      setCsv(jsonToCSV(parsed));
+      setError("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Invalid JSON")
-      setCsv("")
+      setError(err instanceof Error ? err.message : "Invalid JSON");
+      setCsv("");
     }
-  }, [input])
+  }, [input]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(csv)
-    toast.success("CSV copied to clipboard")
-  }
+    navigator.clipboard.writeText(csv);
+    toast.success("CSV copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -70,9 +78,7 @@ export default function JSONToCSVClient() {
               placeholder='[{"name": "John", "age": 30}]'
               className="w-full min-h-[400px] rounded-md border border-input bg-transparent px-3 py-2 text-sm font-mono"
             />
-            {error && (
-              <p className="text-sm text-red-500 mt-2">{error}</p>
-            )}
+            {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
           </CardContent>
         </Card>
 
@@ -98,5 +104,5 @@ export default function JSONToCSVClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

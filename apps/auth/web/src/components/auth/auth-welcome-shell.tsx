@@ -3,8 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
-import { PERSON_BRAND } from "@jayant/web-brand";
-import { ThemeMenu } from "@jayant/web-ui/theme-menu";
+import { PERSON_BRAND } from "@jayantgoyal/web-brand";
+import { ThemeMenu } from "@jayantgoyal/web-ui/theme-menu";
 
 export function AuthWelcomeShell({ children }: { children: ReactNode }) {
   return (
@@ -28,7 +28,7 @@ export function AuthWelcomeShell({ children }: { children: ReactNode }) {
                 href={PERSON_BRAND.canonicalUrl}
                 className="group inline-flex items-center gap-2 font-serif text-xl tracking-[-0.03em]"
               >
-                Jayant
+                {PERSON_BRAND.displayName}
                 <ArrowUpRight className="size-3.5 opacity-60 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
               </Link>
               <span className="size-8" aria-hidden="true" />

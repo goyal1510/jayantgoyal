@@ -1,11 +1,17 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 const ROMAN_VALUES: Record<string, number> = {
   M: 1000,
@@ -21,87 +27,87 @@ const ROMAN_VALUES: Record<string, number> = {
   V: 5,
   IV: 4,
   I: 1,
-}
+};
 
 function numberToRoman(num: number): string {
-  if (num <= 0 || num > 3999) return "Invalid (1-3999)"
+  if (num <= 0 || num > 3999) return "Invalid (1-3999)";
 
-  let result = ""
+  let result = "";
   for (const [roman, value] of Object.entries(ROMAN_VALUES)) {
     while (num >= value) {
-      result += roman
-      num -= value
+      result += roman;
+      num -= value;
     }
   }
-  return result
+  return result;
 }
 
 function romanToNumber(roman: string): number {
-  const upperRoman = roman.toUpperCase().trim()
-  if (!upperRoman) return 0
+  const upperRoman = roman.toUpperCase().trim();
+  if (!upperRoman) return 0;
 
-  let result = 0
-  let i = 0
+  let result = 0;
+  let i = 0;
 
   while (i < upperRoman.length) {
-    const twoChar = upperRoman.slice(i, i + 2)
+    const twoChar = upperRoman.slice(i, i + 2);
     if (ROMAN_VALUES[twoChar]) {
-      result += ROMAN_VALUES[twoChar]
-      i += 2
+      result += ROMAN_VALUES[twoChar];
+      i += 2;
     } else {
-      const oneChar = upperRoman[i]
+      const oneChar = upperRoman[i];
       if (oneChar && ROMAN_VALUES[oneChar]) {
-        result += ROMAN_VALUES[oneChar]
-        i += 1
+        result += ROMAN_VALUES[oneChar];
+        i += 1;
       } else {
-        return NaN
+        return NaN;
       }
     }
   }
 
-  return result
+  return result;
 }
 
 export default function RomanNumeralConverterClient() {
-  const [mode, setMode] = React.useState<"to-roman" | "to-number">("to-roman")
-  const [input, setInput] = React.useState("")
-  const [output, setOutput] = React.useState("")
+  const [mode, setMode] = React.useState<"to-roman" | "to-number">("to-roman");
+  const [input, setInput] = React.useState("");
+  const [output, setOutput] = React.useState("");
 
   const convert = React.useCallback(() => {
     if (!input.trim()) {
-      setOutput("")
-      return
+      setOutput("");
+      return;
     }
 
     try {
       if (mode === "to-roman") {
-        const num = parseInt(input)
+        const num = parseInt(input);
         if (isNaN(num)) {
-          setOutput("Invalid number")
-          return
+          setOutput("Invalid number");
+          return;
         }
-        setOutput(numberToRoman(num))
+        setOutput(numberToRoman(num));
       } else {
-        const num = romanToNumber(input)
+        const num = romanToNumber(input);
         if (isNaN(num)) {
-          setOutput("Invalid Roman numeral")
-          return
+          setOutput("Invalid Roman numeral");
+          return;
         }
-        setOutput(num.toString())
+        setOutput(num.toString());
       }
     } catch {
-      setOutput("Conversion failed")
+      setOutput("Conversion failed");
     }
-  }, [input, mode])
+  }, [input, mode]);
 
   React.useEffect(() => {
-    convert()
-  }, [convert])
+    convert();
+  }, [convert]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(output)
-    toast.success("Copied to clipboard")
-  }
+    navigator.clipboard.writeText(output);
+    toast.success("Copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -113,8 +119,8 @@ export default function RomanNumeralConverterClient() {
               <Button
                 variant={mode === "to-roman" ? "default" : "outline"}
                 onClick={() => {
-                  setMode("to-roman")
-                  setOutput("")
+                  setMode("to-roman");
+                  setOutput("");
                 }}
               >
                 Number → Roman
@@ -122,8 +128,8 @@ export default function RomanNumeralConverterClient() {
               <Button
                 variant={mode === "to-number" ? "default" : "outline"}
                 onClick={() => {
-                  setMode("to-number")
-                  setOutput("")
+                  setMode("to-number");
+                  setOutput("");
                 }}
               >
                 Roman → Number
@@ -136,9 +142,13 @@ export default function RomanNumeralConverterClient() {
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>{mode === "to-roman" ? "Number" : "Roman Numeral"}</CardTitle>
+            <CardTitle>
+              {mode === "to-roman" ? "Number" : "Roman Numeral"}
+            </CardTitle>
             <CardDescription>
-              {mode === "to-roman" ? "Enter number (1-3999)" : "Enter Roman numeral"}
+              {mode === "to-roman"
+                ? "Enter number (1-3999)"
+                : "Enter Roman numeral"}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -155,7 +165,9 @@ export default function RomanNumeralConverterClient() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle>{mode === "to-roman" ? "Roman Numeral" : "Number"}</CardTitle>
+                <CardTitle>
+                  {mode === "to-roman" ? "Roman Numeral" : "Number"}
+                </CardTitle>
                 <CardDescription>Result</CardDescription>
               </div>
               {output && (
@@ -166,14 +178,10 @@ export default function RomanNumeralConverterClient() {
             </div>
           </CardHeader>
           <CardContent>
-            <Input
-              value={output}
-              readOnly
-              className="font-mono text-lg"
-            />
+            <Input value={output} readOnly className="font-mono text-lg" />
           </CardContent>
         </Card>
       </div>
     </div>
-  )
+  );
 }

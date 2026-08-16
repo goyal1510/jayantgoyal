@@ -1,9 +1,9 @@
 "use client";
 
 import { Loader2, Plus, X } from "lucide-react";
-import { Button } from "@jayant/web-ui/button";
-import { IconAction } from "@jayant/web-ui/icon-action";
-import { FormMessage } from "@jayant/web-ui/form-message";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { IconAction } from "@jayantgoyal/web-ui/icon-action";
+import { FormMessage } from "@jayantgoyal/web-ui/form-message";
 import {
   Dialog,
   DialogContent,
@@ -11,11 +11,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@jayant/web-ui/dialog";
-import { Input } from "@jayant/web-ui/input";
-import { Label } from "@jayant/web-ui/label";
-import { Textarea } from "@jayant/web-ui/textarea";
-import { Switch } from "@jayant/web-ui/switch";
+} from "@jayantgoyal/web-ui/dialog";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Textarea } from "@jayantgoyal/web-ui/textarea";
+import { Switch } from "@jayantgoyal/web-ui/switch";
 import type { Experience } from "@/lib/types";
 import { AccessibleForm } from "@/components/accessible-form";
 

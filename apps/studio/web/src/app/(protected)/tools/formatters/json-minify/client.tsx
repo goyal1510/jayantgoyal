@@ -1,42 +1,48 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 export default function JSONMinifyClient() {
-  const [input, setInput] = React.useState("")
-  const [output, setOutput] = React.useState("")
-  const [error, setError] = React.useState("")
+  const [input, setInput] = React.useState("");
+  const [output, setOutput] = React.useState("");
+  const [error, setError] = React.useState("");
 
   const minify = React.useCallback(() => {
     if (!input.trim()) {
-      setOutput("")
-      setError("")
-      return
+      setOutput("");
+      setError("");
+      return;
     }
 
     try {
-      const parsed = JSON.parse(input)
-      const minified = JSON.stringify(parsed)
-      setOutput(minified)
-      setError("")
+      const parsed = JSON.parse(input);
+      const minified = JSON.stringify(parsed);
+      setOutput(minified);
+      setError("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Invalid JSON")
-      setOutput("")
+      setError(err instanceof Error ? err.message : "Invalid JSON");
+      setOutput("");
     }
-  }, [input])
+  }, [input]);
 
   React.useEffect(() => {
-    minify()
-  }, [minify])
+    minify();
+  }, [minify]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(output)
-    toast.success("Copied to clipboard")
-  }
+    navigator.clipboard.writeText(output);
+    toast.success("Copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -53,9 +59,7 @@ export default function JSONMinifyClient() {
               placeholder='{"key": "value"}'
               className="w-full min-h-[300px] rounded-md border border-input bg-transparent px-3 py-2 text-sm font-mono"
             />
-            {error && (
-              <p className="text-sm text-red-500 mt-2">{error}</p>
-            )}
+            {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
           </CardContent>
         </Card>
 
@@ -82,13 +86,19 @@ export default function JSONMinifyClient() {
             />
             {output && (
               <div className="text-sm text-muted-foreground mt-2">
-                <p>Original: {input.length} chars → Minified: {output.length} chars</p>
-                <p>Saved: {input.length - output.length} characters ({(100 - (output.length / input.length) * 100).toFixed(1)}%)</p>
+                <p>
+                  Original: {input.length} chars → Minified: {output.length}{" "}
+                  chars
+                </p>
+                <p>
+                  Saved: {input.length - output.length} characters (
+                  {(100 - (output.length / input.length) * 100).toFixed(1)}%)
+                </p>
               </div>
             )}
           </CardContent>
         </Card>
       </div>
     </div>
-  )
+  );
 }

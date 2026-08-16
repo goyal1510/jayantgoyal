@@ -1,88 +1,98 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 function dockerRunToCompose(dockerRun: string): string {
   // Simple converter - parse docker run command and convert to docker-compose format
-  const lines = dockerRun.split("\\").map(s => s.trim()).filter(Boolean)
-  let image = ""
-  const ports: string[] = []
-  const volumes: string[] = []
-  const env: string[] = []
+  const lines = dockerRun
+    .split("\\")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  let image = "";
+  const ports: string[] = [];
+  const volumes: string[] = [];
+  const env: string[] = [];
 
   lines.forEach((line) => {
     if (line.includes("docker run")) {
-      const parts = line.split(/\s+/)
-      const imageIndex = parts.findIndex(p => !p.startsWith("-"))
+      const parts = line.split(/\s+/);
+      const imageIndex = parts.findIndex((p) => !p.startsWith("-"));
       if (imageIndex > 0) {
-        image = parts[imageIndex] || ""
+        image = parts[imageIndex] || "";
       }
     }
     if (line.includes("-p ") || line.includes("--publish")) {
-      const match = line.match(/-p\s+(\S+)|--publish\s+(\S+)/)
+      const match = line.match(/-p\s+(\S+)|--publish\s+(\S+)/);
       if (match) {
-        ports.push(match[1] || match[2] || "")
+        ports.push(match[1] || match[2] || "");
       }
     }
     if (line.includes("-v ") || line.includes("--volume")) {
-      const match = line.match(/-v\s+(\S+)|--volume\s+(\S+)/)
+      const match = line.match(/-v\s+(\S+)|--volume\s+(\S+)/);
       if (match) {
-        volumes.push(match[1] || match[2] || "")
+        volumes.push(match[1] || match[2] || "");
       }
     }
     if (line.includes("-e ") || line.includes("--env")) {
-      const match = line.match(/-e\s+(\S+)|--env\s+(\S+)/)
+      const match = line.match(/-e\s+(\S+)|--env\s+(\S+)/);
       if (match) {
-        env.push(match[1] || match[2] || "")
+        env.push(match[1] || match[2] || "");
       }
     }
-  })
+  });
 
-  let compose = "version: '3'\n\nservices:\n  app:\n"
-  if (image) compose += `    image: ${image}\n`
+  let compose = "version: '3'\n\nservices:\n  app:\n";
+  if (image) compose += `    image: ${image}\n`;
   if (ports.length > 0) {
-    compose += "    ports:\n"
-    ports.forEach(p => compose += `      - "${p}"\n`)
+    compose += "    ports:\n";
+    ports.forEach((p) => (compose += `      - "${p}"\n`));
   }
   if (volumes.length > 0) {
-    compose += "    volumes:\n"
-    volumes.forEach(v => compose += `      - ${v}\n`)
+    compose += "    volumes:\n";
+    volumes.forEach((v) => (compose += `      - ${v}\n`));
   }
   if (env.length > 0) {
-    compose += "    environment:\n"
-    env.forEach(e => compose += `      - ${e}\n`)
+    compose += "    environment:\n";
+    env.forEach((e) => (compose += `      - ${e}\n`));
   }
 
-  return compose
+  return compose;
 }
 
 export default function DockerConverterClient() {
-  const [dockerRun, setDockerRun] = React.useState("")
-  const [compose, setCompose] = React.useState("")
+  const [dockerRun, setDockerRun] = React.useState("");
+  const [compose, setCompose] = React.useState("");
 
   React.useEffect(() => {
     if (!dockerRun.trim()) {
-      setCompose("")
-      return
+      setCompose("");
+      return;
     }
     try {
-      setCompose(dockerRunToCompose(dockerRun))
+      setCompose(dockerRunToCompose(dockerRun));
     } catch {
-      setCompose("Failed to convert")
+      setCompose("Failed to convert");
     }
-  }, [dockerRun])
+  }, [dockerRun]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(compose)
-    toast.success("Docker Compose copied to clipboard")
-  }
+    navigator.clipboard.writeText(compose);
+    toast.success("Docker Compose copied to clipboard");
+  };
 
   return (
-    <div className="space-y-6"><div className="grid gap-6 md:grid-cols-2">
+    <div className="space-y-6">
+      <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>Docker Run Command</CardTitle>
@@ -123,5 +133,5 @@ export default function DockerConverterClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

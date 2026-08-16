@@ -1,7 +1,7 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
-import { Button } from "@jayant/web-ui/button";
+import { Button } from "@jayantgoyal/web-ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@jayant/web-ui/dialog";
+} from "@jayantgoyal/web-ui/dialog";
 
 interface ConfirmActionDialogProps {
   action: "redeploy" | "rollback" | null;
@@ -27,10 +27,7 @@ export function ConfirmActionDialog({
   deploymentLabel,
 }: ConfirmActionDialogProps) {
   return (
-    <Dialog
-      open={!!action}
-      onOpenChange={(open) => !open && onClose()}
-    >
+    <Dialog open={!!action} onOpenChange={(open) => !open && onClose()}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>

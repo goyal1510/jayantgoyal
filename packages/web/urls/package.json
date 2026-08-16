@@ -1,5 +1,5 @@
 {
-  "name": "@jayant/web-urls",
+  "name": "@jayantgoyal/web-urls",
   "version": "0.0.0",
   "type": "module",
   "private": true,
@@ -12,11 +12,11 @@
     "lint": "eslint src --max-warnings 0"
   },
   "dependencies": {
-    "@jayant/web-brand": "workspace:*"
+    "@jayantgoyal/identity": "workspace:*"
   },
   "devDependencies": {
-    "@jayant/eslint-config": "workspace:*",
-    "@jayant/typescript-config": "workspace:*",
+    "@jayantgoyal/eslint-config": "workspace:*",
+    "@jayantgoyal/typescript-config": "workspace:*",
     "@types/node": "^22.15.30",
     "eslint": "^9.39.1",
     "typescript": "5.9.2",

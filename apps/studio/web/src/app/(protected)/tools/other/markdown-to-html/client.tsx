@@ -1,10 +1,16 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 function markdownToHTML(markdown: string): string {
   const html = markdown
@@ -15,27 +21,27 @@ function markdownToHTML(markdown: string): string {
     .replace(/\*(.*?)\*/g, "<em>$1</em>")
     .replace(/`(.*?)`/g, "<code>$1</code>")
     .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>')
-    .replace(/\n/g, "<br />")
+    .replace(/\n/g, "<br />");
 
-  return html
+  return html;
 }
 
 export default function MarkdownToHTMLClient() {
-  const [input, setInput] = React.useState("")
-  const [html, setHtml] = React.useState("")
+  const [input, setInput] = React.useState("");
+  const [html, setHtml] = React.useState("");
 
   React.useEffect(() => {
     if (!input.trim()) {
-      setHtml("")
-      return
+      setHtml("");
+      return;
     }
-    setHtml(markdownToHTML(input))
-  }, [input])
+    setHtml(markdownToHTML(input));
+  }, [input]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(html)
-    toast.success("HTML copied to clipboard")
-  }
+    navigator.clipboard.writeText(html);
+    toast.success("HTML copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -77,5 +83,5 @@ export default function MarkdownToHTMLClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

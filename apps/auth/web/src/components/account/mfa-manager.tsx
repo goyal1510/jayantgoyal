@@ -9,9 +9,9 @@ import {
   verifyMfaEnrollmentAction,
 } from "@/app/actions/mfa";
 import type { MfaEnrollmentResult } from "@/lib/auth/action-support";
-import { Button } from "@jayant/web-ui/button";
-import { Input } from "@jayant/web-ui/input";
-import { Label } from "@jayant/web-ui/label";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
 
 type Enrollment = NonNullable<MfaEnrollmentResult["enrollment"]>;
 

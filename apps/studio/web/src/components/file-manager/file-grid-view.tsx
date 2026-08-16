@@ -1,31 +1,34 @@
-"use client"
+"use client";
 
-import { FileThumbnail } from "@/components/file-manager/file-thumbnail"
-import { Button } from "@jayant/web-ui/button"
+import { FileThumbnail } from "@/components/file-manager/file-thumbnail";
+import { Button } from "@jayantgoyal/web-ui/button";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
-} from "@jayant/web-ui/dropdown-menu"
+} from "@jayantgoyal/web-ui/dropdown-menu";
 import {
   ContextMenu,
   ContextMenuTrigger,
-} from "@jayant/web-ui/context-menu"
-import { Card } from "@jayant/web-ui/card"
-import { MoreVertical } from "lucide-react"
-import { cn } from "@jayant/web-ui/lib/utils"
-import { formatFileSize } from "@/lib/file-manager/format-utils"
-import type { DirectoryListingItem } from "@/lib/file-manager/types"
-import { FileItemDropdownContent, FileItemContextContent } from "@/components/file-manager/file-item-actions"
+} from "@jayantgoyal/web-ui/context-menu";
+import { Card } from "@jayantgoyal/web-ui/card";
+import { MoreVertical } from "lucide-react";
+import { cn } from "@jayantgoyal/web-ui/lib/utils";
+import { formatFileSize } from "@/lib/file-manager/format-utils";
+import type { DirectoryListingItem } from "@/lib/file-manager/types";
+import {
+  FileItemDropdownContent,
+  FileItemContextContent,
+} from "@/components/file-manager/file-item-actions";
 
 interface FileGridViewProps {
-  files: DirectoryListingItem[]
-  viewMode: "grid" | "list"
-  onItemClick: (file: DirectoryListingItem) => void
-  onDownload: (e: React.MouseEvent, file: DirectoryListingItem) => void
-  onRename: (e: React.MouseEvent, file: DirectoryListingItem) => void
-  onDelete: (e: React.MouseEvent, file: DirectoryListingItem) => void
-  onMove: (e: React.MouseEvent, file: DirectoryListingItem) => void
-  onCopy: (e: React.MouseEvent, file: DirectoryListingItem) => void
+  files: DirectoryListingItem[];
+  viewMode: "grid" | "list";
+  onItemClick: (file: DirectoryListingItem) => void;
+  onDownload: (e: React.MouseEvent, file: DirectoryListingItem) => void;
+  onRename: (e: React.MouseEvent, file: DirectoryListingItem) => void;
+  onDelete: (e: React.MouseEvent, file: DirectoryListingItem) => void;
+  onMove: (e: React.MouseEvent, file: DirectoryListingItem) => void;
+  onCopy: (e: React.MouseEvent, file: DirectoryListingItem) => void;
 }
 
 export function FileGridView({
@@ -45,25 +48,25 @@ export function FileGridView({
     onMove,
     onCopy,
     onDelete,
-  }
+  };
 
   return (
     <div
       className={cn(
         "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4",
-        viewMode === "list" ? "sm:hidden" : ""
+        viewMode === "list" ? "sm:hidden" : "",
       )}
     >
       {files.map((file) => {
-        const displayName = file.display_name || file.file_name
-        const isDirectory = file.is_directory
+        const displayName = file.display_name || file.file_name;
+        const isDirectory = file.is_directory;
         return (
           <ContextMenu key={file.id}>
             <ContextMenuTrigger asChild>
               <Card
                 className={cn(
                   "p-4 cursor-pointer transition-colors hover:bg-accent relative group",
-                  isDirectory && "hover:bg-accent/80"
+                  isDirectory && "hover:bg-accent/80",
                 )}
                 onClick={() => onItemClick(file)}
               >
@@ -81,12 +84,12 @@ export function FileGridView({
                   <FileItemDropdownContent file={file} handlers={handlers} />
                 </DropdownMenu>
                 <div className="flex flex-col items-center gap-2">
-                  <FileThumbnail
-                    file={file}
-                    size={48}
-                  />
+                  <FileThumbnail file={file} size={48} />
                   <div className="text-center w-full">
-                    <p className="text-sm font-medium truncate" title={displayName}>
+                    <p
+                      className="text-sm font-medium truncate"
+                      title={displayName}
+                    >
                       {displayName}
                     </p>
                     {!isDirectory && (
@@ -96,7 +99,8 @@ export function FileGridView({
                     )}
                     {isDirectory && file.child_count > 0 && (
                       <p className="text-xs text-muted-foreground">
-                        {file.child_count} item{file.child_count !== 1 ? "s" : ""}
+                        {file.child_count} item
+                        {file.child_count !== 1 ? "s" : ""}
                       </p>
                     )}
                   </div>
@@ -105,8 +109,8 @@ export function FileGridView({
             </ContextMenuTrigger>
             <FileItemContextContent file={file} handlers={handlers} />
           </ContextMenu>
-        )
+        );
       })}
     </div>
-  )
+  );
 }

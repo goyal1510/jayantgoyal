@@ -4,8 +4,17 @@ import { AccountWorkspaceHeader } from "@/components/account/account-workspace-h
 import { AvatarForm } from "@/components/account/avatar-form";
 import { ProfileForm } from "@/components/account/profile-form";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { profileDisplayName, resolveProfileAvatar } from "@jayant/web-auth/profile";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card";
+import {
+  profileDisplayName,
+  resolveProfileAvatar,
+} from "@jayantgoyal/web-auth/profile";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
 
 export const metadata: Metadata = { title: "Profile" };
 

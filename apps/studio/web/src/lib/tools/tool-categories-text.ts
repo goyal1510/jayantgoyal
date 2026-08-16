@@ -56,7 +56,8 @@ export const textAndParserToolCategories: ToolCategory[] = [
       {
         id: "text-to-unicode",
         title: "Text to Unicode",
-        description: "Parse and convert text to unicode and vice-versa.",
+        description:
+          "Convert text into Unicode code points and decode Unicode sequences back into readable text.",
         icon: Type,
         path: "/tools/text-tools/text-to-unicode",
       },
@@ -64,14 +65,15 @@ export const textAndParserToolCategories: ToolCategory[] = [
         id: "list-converter",
         title: "List Converter",
         description:
-          "This tool can process column-based data and apply various changes (transpose, add prefix and suffix, reverse list, sort list, lowercase values, truncate values) to each row.",
+          "Transform column-based lists by transposing, sorting, reversing, changing case, truncating values, or adding a prefix and suffix.",
         icon: List,
         path: "/tools/text-tools/list-converter",
       },
       {
         id: "slugify-string",
         title: "Slugify String",
-        description: "Make a string url, filename and id safe.",
+        description:
+          "Turn text into a clean, lowercase slug suitable for URLs, filenames, anchors, and identifiers.",
         icon: Link,
         path: "/tools/text-tools/slugify-string",
       },
@@ -101,7 +103,8 @@ export const textAndParserToolCategories: ToolCategory[] = [
       {
         id: "ascii-art-generator",
         title: "ASCII Art Text Generator",
-        description: "Create ASCII art text with many fonts and styles.",
+        description:
+          "Generate copyable ASCII art text with a selection of readable fonts and visual styles.",
         icon: FileCode,
         path: "/tools/text-tools/ascii-art-generator",
       },
@@ -181,7 +184,7 @@ export const textAndParserToolCategories: ToolCategory[] = [
         id: "pdf-signature-checker",
         title: "PDF Signature Checker",
         description:
-          "Verify the signatures of a PDF file. A signed PDF file contains one or more signatures that may be used to determine whether the contents of the file have been altered since the file was signed.",
+          "Inspect a PDF's embedded signatures to determine whether its contents may have changed after the document was signed.",
         icon: FileCheck,
         path: "/tools/parsers-validators/pdf-signature-checker",
       },

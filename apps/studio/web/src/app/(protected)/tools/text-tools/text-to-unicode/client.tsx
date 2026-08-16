@@ -1,19 +1,25 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 function textToUnicode(text: string): string {
   return text
     .split("")
     .map((char) => {
-      const code = char.charCodeAt(0)
-      return `U+${code.toString(16).toUpperCase().padStart(4, "0")}`
+      const code = char.charCodeAt(0);
+      return `U+${code.toString(16).toUpperCase().padStart(4, "0")}`;
     })
-    .join(" ")
+    .join(" ");
 }
 
 function unicodeToText(unicode: string): string {
@@ -21,41 +27,43 @@ function unicodeToText(unicode: string): string {
     .split(/\s+/)
     .map((code) => {
       try {
-        const hex = code.replace(/^U\+/i, "")
-        return String.fromCharCode(parseInt(hex, 16))
+        const hex = code.replace(/^U\+/i, "");
+        return String.fromCharCode(parseInt(hex, 16));
       } catch {
-        return ""
+        return "";
       }
     })
-    .join("")
+    .join("");
 }
 
 export default function TextToUnicodeClient() {
-  const [mode, setMode] = React.useState<"to-unicode" | "from-unicode">("to-unicode")
-  const [input, setInput] = React.useState("")
-  const [output, setOutput] = React.useState("")
+  const [mode, setMode] = React.useState<"to-unicode" | "from-unicode">(
+    "to-unicode",
+  );
+  const [input, setInput] = React.useState("");
+  const [output, setOutput] = React.useState("");
 
   React.useEffect(() => {
     if (!input.trim()) {
-      setOutput("")
-      return
+      setOutput("");
+      return;
     }
 
     try {
       if (mode === "to-unicode") {
-        setOutput(textToUnicode(input))
+        setOutput(textToUnicode(input));
       } else {
-        setOutput(unicodeToText(input))
+        setOutput(unicodeToText(input));
       }
     } catch {
-      setOutput("Conversion failed")
+      setOutput("Conversion failed");
     }
-  }, [input, mode])
+  }, [input, mode]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(output)
-    toast.success("Copied to clipboard")
-  }
+    navigator.clipboard.writeText(output);
+    toast.success("Copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -67,8 +75,8 @@ export default function TextToUnicodeClient() {
               <Button
                 variant={mode === "to-unicode" ? "default" : "outline"}
                 onClick={() => {
-                  setMode("to-unicode")
-                  setOutput("")
+                  setMode("to-unicode");
+                  setOutput("");
                 }}
               >
                 Text → Unicode
@@ -76,8 +84,8 @@ export default function TextToUnicodeClient() {
               <Button
                 variant={mode === "from-unicode" ? "default" : "outline"}
                 onClick={() => {
-                  setMode("from-unicode")
-                  setOutput("")
+                  setMode("from-unicode");
+                  setOutput("");
                 }}
               >
                 Unicode → Text
@@ -90,16 +98,24 @@ export default function TextToUnicodeClient() {
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>{mode === "to-unicode" ? "Text Input" : "Unicode Input"}</CardTitle>
+            <CardTitle>
+              {mode === "to-unicode" ? "Text Input" : "Unicode Input"}
+            </CardTitle>
             <CardDescription>
-              {mode === "to-unicode" ? "Enter text to convert" : "Enter Unicode codes (U+XXXX)"}
+              {mode === "to-unicode"
+                ? "Enter text to convert"
+                : "Enter Unicode codes (U+XXXX)"}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={mode === "to-unicode" ? "Enter text..." : "U+0048 U+0065 U+006C..."}
+              placeholder={
+                mode === "to-unicode"
+                  ? "Enter text..."
+                  : "U+0048 U+0065 U+006C..."
+              }
               className="w-full min-h-[300px] rounded-md border border-input bg-transparent px-3 py-2 text-sm font-mono"
             />
           </CardContent>
@@ -109,7 +125,9 @@ export default function TextToUnicodeClient() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle>{mode === "to-unicode" ? "Unicode Output" : "Text Output"}</CardTitle>
+                <CardTitle>
+                  {mode === "to-unicode" ? "Unicode Output" : "Text Output"}
+                </CardTitle>
                 <CardDescription>Result</CardDescription>
               </div>
               {output && (
@@ -130,5 +148,5 @@ export default function TextToUnicodeClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

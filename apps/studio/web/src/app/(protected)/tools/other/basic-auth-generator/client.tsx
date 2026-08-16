@@ -1,31 +1,37 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 export default function BasicAuthGeneratorClient() {
-  const [username, setUsername] = React.useState("")
-  const [password, setPassword] = React.useState("")
-  const [header, setHeader] = React.useState("")
+  const [username, setUsername] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [header, setHeader] = React.useState("");
 
   React.useEffect(() => {
     if (username && password) {
-      const credentials = btoa(`${username}:${password}`)
-      setHeader(`Basic ${credentials}`)
+      const credentials = btoa(`${username}:${password}`);
+      setHeader(`Basic ${credentials}`);
     } else {
-      setHeader("")
+      setHeader("");
     }
-  }, [username, password])
+  }, [username, password]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(header)
-    toast.success("Authorization header copied to clipboard")
-  }
+    navigator.clipboard.writeText(header);
+    toast.success("Authorization header copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -73,5 +79,5 @@ export default function BasicAuthGeneratorClient() {
         </Card>
       )}
     </div>
-  )
+  );
 }

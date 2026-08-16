@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { buildAuthMfaUrl } from "@jayant/web-auth/entry";
+import { buildAuthMfaUrl } from "@jayantgoyal/web-auth/entry";
 
 interface PageProps {
   searchParams: Promise<{ redirect?: string }>;

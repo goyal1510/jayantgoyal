@@ -1,17 +1,25 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
-import { Copy, RefreshCw } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Copy, RefreshCw } from "lucide-react";
+import { toast } from "sonner";
 
 function parseUserAgent(ua: string) {
-  const browser = ua.match(/(Chrome|Firefox|Safari|Edge|Opera|IE)\/[\d.]+/)?.[0] || "Unknown"
-  const os = ua.match(/(Windows|Mac|Linux|Android|iOS|iPhone|iPad)/)?.[0] || "Unknown"
-  const device = ua.match(/(Mobile|Tablet|Desktop)/)?.[0] || "Desktop"
+  const browser =
+    ua.match(/(Chrome|Firefox|Safari|Edge|Opera|IE)\/[\d.]+/)?.[0] || "Unknown";
+  const os =
+    ua.match(/(Windows|Mac|Linux|Android|iOS|iPhone|iPad)/)?.[0] || "Unknown";
+  const device = ua.match(/(Mobile|Tablet|Desktop)/)?.[0] || "Desktop";
 
   return {
     userAgent: ua,
@@ -19,21 +27,24 @@ function parseUserAgent(ua: string) {
     os,
     device,
     engine: ua.match(/(Gecko|WebKit|Trident|Blink)/)?.[0] || "Unknown",
-  }
+  };
 }
 
 export default function UserAgentParserClient() {
-  const [input, setInput] = React.useState("")
-  const parsed = React.useMemo(() => input ? parseUserAgent(input) : null, [input])
+  const [input, setInput] = React.useState("");
+  const parsed = React.useMemo(
+    () => (input ? parseUserAgent(input) : null),
+    [input],
+  );
 
   const useCurrentUA = () => {
-    setInput(navigator.userAgent)
-  }
+    setInput(navigator.userAgent);
+  };
 
   const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text)
-    toast.success("Copied to clipboard")
-  }
+    navigator.clipboard.writeText(text);
+    toast.success("Copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -79,7 +90,9 @@ export default function UserAgentParserClient() {
                 <p className="font-semibold">{parsed.browser}</p>
               </div>
               <div>
-                <Label className="text-muted-foreground">Operating System</Label>
+                <Label className="text-muted-foreground">
+                  Operating System
+                </Label>
                 <p className="font-semibold">{parsed.os}</p>
               </div>
               <div>
@@ -101,5 +114,5 @@ export default function UserAgentParserClient() {
         </Card>
       )}
     </div>
-  )
+  );
 }

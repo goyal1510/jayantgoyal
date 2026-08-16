@@ -4,8 +4,8 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { ArrowLeft, Copy } from "lucide-react";
 
-import { Button } from "@jayant/web-ui/button";
-import { CardHeader, CardTitle } from "@jayant/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { CardHeader, CardTitle } from "@jayantgoyal/web-ui/card";
 
 import { GAME_META, type GameSlug } from "@/lib/games/config";
 import { GAME_PRESENTATION } from "@/lib/games/presentation";

@@ -1,112 +1,122 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 // Simple YAML to JSON converter (basic implementation)
 function yamlToJson(yaml: string): string {
   try {
     // This is a simplified converter - for production use a proper YAML parser
-    const lines = yaml.split("\n")
-    const result: Record<string, unknown> = {}
-    const stack: Array<Record<string, unknown>> = [result]
+    const lines = yaml.split("\n");
+    const result: Record<string, unknown> = {};
+    const stack: Array<Record<string, unknown>> = [result];
     lines.forEach((line) => {
-      const trimmed = line.trim()
-      if (!trimmed || trimmed.startsWith("#")) return
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith("#")) return;
 
-      const indent = line.length - line.trimStart().length
-      const indentLevel = Math.floor(indent / 2)
+      const indent = line.length - line.trimStart().length;
+      const indentLevel = Math.floor(indent / 2);
 
       // Adjust stack based on indent
       while (stack.length > indentLevel + 1) {
-        stack.pop()
+        stack.pop();
       }
 
-      const current = stack[stack.length - 1]
+      const current = stack[stack.length - 1];
       if (!current || typeof current !== "object") {
         // Skip invalid entries
       } else if (trimmed.startsWith("- ")) {
         // Array item
         if (!Array.isArray(current)) {
           // Convert to array
-          const keys = Object.keys(current)
+          const keys = Object.keys(current);
           if (keys.length > 0) {
-            const key = keys[0]
+            const key = keys[0];
             if (key) {
-              current[key] = []
+              current[key] = [];
             }
           }
         }
       } else {
-        const colonIndex = trimmed.indexOf(":")
+        const colonIndex = trimmed.indexOf(":");
         if (colonIndex > 0) {
-          const key = trimmed.slice(0, colonIndex).trim()
-          const value = trimmed.slice(colonIndex + 1).trim()
+          const key = trimmed.slice(0, colonIndex).trim();
+          const value = trimmed.slice(colonIndex + 1).trim();
 
           if (value === "" || value === "{}" || value === "[]") {
-            current[key] = value === "[]" ? [] : {}
-            if (typeof current[key] === "object" && current[key] !== null && !Array.isArray(current[key])) {
-              stack.push(current[key] as Record<string, unknown>)
+            current[key] = value === "[]" ? [] : {};
+            if (
+              typeof current[key] === "object" &&
+              current[key] !== null &&
+              !Array.isArray(current[key])
+            ) {
+              stack.push(current[key] as Record<string, unknown>);
             }
           } else {
             // Try to parse value
-            let parsedValue: unknown = value
+            let parsedValue: unknown = value;
             if (value.startsWith('"') && value.endsWith('"')) {
-              parsedValue = value.slice(1, -1)
+              parsedValue = value.slice(1, -1);
             } else if (value === "true") {
-              parsedValue = true
+              parsedValue = true;
             } else if (value === "false") {
-              parsedValue = false
+              parsedValue = false;
             } else if (value === "null") {
-              parsedValue = null
+              parsedValue = null;
             } else if (!isNaN(Number(value))) {
-              parsedValue = Number(value)
+              parsedValue = Number(value);
             }
-            current[key] = parsedValue
+            current[key] = parsedValue;
           }
         }
       }
-    })
+    });
 
-    return JSON.stringify(result, null, 2)
+    return JSON.stringify(result, null, 2);
   } catch {
-    throw new Error("Failed to parse YAML")
+    throw new Error("Failed to parse YAML");
   }
 }
 
 export default function YAMLToJSONClient() {
-  const [input, setInput] = React.useState("")
-  const [output, setOutput] = React.useState("")
-  const [error, setError] = React.useState("")
+  const [input, setInput] = React.useState("");
+  const [output, setOutput] = React.useState("");
+  const [error, setError] = React.useState("");
 
   const convert = React.useCallback(() => {
     if (!input.trim()) {
-      setOutput("")
-      setError("")
-      return
+      setOutput("");
+      setError("");
+      return;
     }
 
     try {
-      const json = yamlToJson(input)
-      setOutput(json)
-      setError("")
+      const json = yamlToJson(input);
+      setOutput(json);
+      setError("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Invalid YAML")
-      setOutput("")
+      setError(err instanceof Error ? err.message : "Invalid YAML");
+      setOutput("");
     }
-  }, [input])
+  }, [input]);
 
   React.useEffect(() => {
-    convert()
-  }, [convert])
+    convert();
+  }, [convert]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(output)
-    toast.success("JSON copied to clipboard")
-  }
+    navigator.clipboard.writeText(output);
+    toast.success("JSON copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -123,9 +133,7 @@ export default function YAMLToJSONClient() {
               placeholder="key: value"
               className="w-full min-h-[400px] rounded-md border border-input bg-transparent px-3 py-2 text-sm font-mono"
             />
-            {error && (
-              <p className="text-sm text-red-500 mt-2">{error}</p>
-            )}
+            {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
           </CardContent>
         </Card>
 
@@ -154,5 +162,5 @@ export default function YAMLToJSONClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

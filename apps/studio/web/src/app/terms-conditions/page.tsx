@@ -2,8 +2,8 @@ import {
   TermsContent,
   TERMS_LAST_UPDATED,
 } from "@/components/auth/terms-content";
-import { Button } from "@jayant/web-ui/button";
-import { ScrollArea } from "@jayant/web-ui/scroll-area";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { ScrollArea } from "@jayantgoyal/web-ui/scroll-area";
 import { FileText } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";

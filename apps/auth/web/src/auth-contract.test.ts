@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
-import { AUTH_SURFACE_ROUTES } from "@jayant/web-auth/surface";
+import { AUTH_SURFACE_ROUTES } from "@jayantgoyal/web-auth/surface";
 
 const appRoot = fileURLToPath(new URL("..", import.meta.url));
 const sourceRoot = fileURLToPath(new URL(".", import.meta.url));
@@ -196,8 +196,9 @@ describe("standalone Auth application contract", () => {
     const robots = readFileSync(`${sourceRoot}/app/robots.ts`, "utf8");
 
     expect(homePage).toContain('if (user) redirect("/account/security")');
-    expect(homePage).toContain("<AuthWelcomeShell>");
-    expect(homePage).toContain("<WelcomeForm");
+    expect(homePage).toContain('redirect("/welcome")');
+    expect(homePage).not.toContain("<AuthWelcomeShell>");
+    expect(homePage).not.toContain("<WelcomeForm");
     expect(configuration).toContain(
       '{ key: "X-Robots-Tag", value: "index, follow" }',
     );

@@ -1,57 +1,65 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 export default function ListConverterClient() {
-  const [input, setInput] = React.useState("")
-  const [prefix, setPrefix] = React.useState("")
-  const [suffix, setSuffix] = React.useState("")
-  const [output, setOutput] = React.useState("")
-  const [sortOrder, setSortOrder] = React.useState<"none" | "asc" | "desc">("none")
-  const [toLowerCase, setToLowerCase] = React.useState(false)
-  const [reverse, setReverse] = React.useState(false)
+  const [input, setInput] = React.useState("");
+  const [prefix, setPrefix] = React.useState("");
+  const [suffix, setSuffix] = React.useState("");
+  const [output, setOutput] = React.useState("");
+  const [sortOrder, setSortOrder] = React.useState<"none" | "asc" | "desc">(
+    "none",
+  );
+  const [toLowerCase, setToLowerCase] = React.useState(false);
+  const [reverse, setReverse] = React.useState(false);
 
   const processList = React.useCallback(() => {
     if (!input.trim()) {
-      setOutput("")
-      return
+      setOutput("");
+      return;
     }
 
-    let lines = input.split("\n").filter(line => line.trim())
+    let lines = input.split("\n").filter((line) => line.trim());
 
     if (toLowerCase) {
-      lines = lines.map(line => line.toLowerCase())
+      lines = lines.map((line) => line.toLowerCase());
     }
 
     if (sortOrder === "asc") {
-      lines = [...lines].sort()
+      lines = [...lines].sort();
     } else if (sortOrder === "desc") {
-      lines = [...lines].sort().reverse()
+      lines = [...lines].sort().reverse();
     }
 
     if (reverse) {
-      lines = lines.reverse()
+      lines = lines.reverse();
     }
 
-    lines = lines.map(line => `${prefix}${line}${suffix}`)
+    lines = lines.map((line) => `${prefix}${line}${suffix}`);
 
-    setOutput(lines.join("\n"))
-  }, [input, prefix, suffix, sortOrder, toLowerCase, reverse])
+    setOutput(lines.join("\n"));
+  }, [input, prefix, suffix, sortOrder, toLowerCase, reverse]);
 
   React.useEffect(() => {
-    processList()
-  }, [processList])
+    processList();
+  }, [processList]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(output)
-    toast.success("Processed list copied to clipboard")
-  }
+    navigator.clipboard.writeText(output);
+    toast.success("Processed list copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -59,7 +67,9 @@ export default function ListConverterClient() {
         <Card>
           <CardHeader>
             <CardTitle>Input & Options</CardTitle>
-            <CardDescription>Enter list and configure transformations</CardDescription>
+            <CardDescription>
+              Enter list and configure transformations
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -99,7 +109,9 @@ export default function ListConverterClient() {
               <select
                 id="sort"
                 value={sortOrder}
-                onChange={(e) => setSortOrder(e.target.value as "none" | "asc" | "desc")}
+                onChange={(e) =>
+                  setSortOrder(e.target.value as "none" | "asc" | "desc")
+                }
                 className="w-full h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm"
               >
                 <option value="none">None</option>
@@ -161,5 +173,5 @@ export default function ListConverterClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

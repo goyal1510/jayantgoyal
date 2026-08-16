@@ -2,78 +2,76 @@ import {
   PERSON_IDENTITY,
   PRODUCT_IDENTITIES,
   type ProductId,
-} from "@jayant/identity";
+} from "@jayantgoyal/identity";
 
 export * from "./assets";
 
-const PORTFOLIO_ORIGIN = "https://jayantgoyal.com";
-
 export const PERSON_BRAND = {
   ...PERSON_IDENTITY,
-  canonicalUrl: PORTFOLIO_ORIGIN,
+  canonicalUrl: PRODUCT_IDENTITIES.portfolio.canonicalOrigin,
 } as const;
 
 export const APP_BRANDS = {
   portfolio: {
     ...PRODUCT_IDENTITIES.portfolio,
-    canonicalUrl: PORTFOLIO_ORIGIN,
-    defaultTitle: `${PERSON_IDENTITY.fullName} | Software Engineer`,
-    titleTemplate: `%s | ${PERSON_IDENTITY.fullName}`,
-    description: `The portfolio of ${PERSON_IDENTITY.fullName}, a software engineer shaping clear, dependable digital products from idea through delivery.`,
+    canonicalUrl: PRODUCT_IDENTITIES.portfolio.canonicalOrigin,
+    defaultTitle: `${PERSON_IDENTITY.displayName} | Software Engineer`,
+    titleTemplate: `%s | ${PERSON_IDENTITY.displayName}`,
+    description: `The portfolio of ${PERSON_IDENTITY.displayName}, a software engineer shaping clear, dependable digital products from idea through delivery.`,
   },
   studio: {
     ...PRODUCT_IDENTITIES.studio,
-    canonicalUrl: "https://studio.jayantgoyal.com",
-    defaultTitle: `Studio by ${PERSON_IDENTITY.fullName} | Apps, Tools, and Experiments`,
+    canonicalUrl: PRODUCT_IDENTITIES.studio.canonicalOrigin,
+    defaultTitle: `Studio by ${PERSON_IDENTITY.displayName} | Apps, Tools, and Experiments`,
     titleTemplate: "%s | Studio",
-    description: `Explore apps, developer tools, games, personal workspaces, and experiments built by ${PERSON_IDENTITY.fullName}.`,
+    description: `Explore apps, developer tools, games, personal workspaces, and experiments built by ${PERSON_IDENTITY.displayName}.`,
   },
   admin: {
     ...PRODUCT_IDENTITIES.admin,
-    canonicalUrl: "https://admin.jayantgoyal.com",
-    defaultTitle: `Admin by ${PERSON_IDENTITY.fullName}`,
+    canonicalUrl: PRODUCT_IDENTITIES.admin.canonicalOrigin,
+    defaultTitle: `Admin by ${PERSON_IDENTITY.displayName}`,
     titleTemplate: "%s | Admin",
-    description: `Private administration for ${PERSON_IDENTITY.fullName}'s portfolio content and application operations.`,
+    description: `Private administration for ${PERSON_IDENTITY.displayName}'s portfolio content and application operations.`,
   },
   auth: {
     ...PRODUCT_IDENTITIES.auth,
-    canonicalUrl: "https://auth.jayantgoyal.com",
-    defaultTitle: `Auth by ${PERSON_IDENTITY.fullName}`,
+    canonicalUrl: PRODUCT_IDENTITIES.auth.canonicalOrigin,
+    defaultTitle: `Auth by ${PERSON_IDENTITY.displayName}`,
     titleTemplate: "%s | Auth",
-    description: `Secure sign-in and account security for ${PERSON_IDENTITY.fullName}'s applications.`,
+    description: `Secure sign-in and account security for ${PERSON_IDENTITY.displayName}'s applications.`,
   },
 } as const satisfies Record<ProductId, object>;
 
-const SOCIAL_PREVIEW_VERSION = "20260727";
+const SOCIAL_PREVIEW_VERSION = "20260816";
 
 export const APP_SOCIAL_PREVIEW_IMAGES = {
   portfolio: {
-    url: `${PORTFOLIO_ORIGIN}/images/social/portfolio-preview.jpg?v=${SOCIAL_PREVIEW_VERSION}`,
+    url: `${PRODUCT_IDENTITIES.portfolio.canonicalOrigin}/images/social/portfolio-preview.jpg?v=${SOCIAL_PREVIEW_VERSION}`,
     width: 1200,
     height: 630,
     type: "image/jpeg",
-    alt: `${PERSON_IDENTITY.fullName}'s Software Engineer portfolio`,
+    alt: `${PERSON_IDENTITY.displayName}'s Software Engineer portfolio`,
   },
   studio: {
-    url: `${PORTFOLIO_ORIGIN}/images/social/studio-preview.jpg?v=${SOCIAL_PREVIEW_VERSION}`,
+    url: `${PRODUCT_IDENTITIES.studio.canonicalOrigin}/images/social/studio-preview.jpg?v=${SOCIAL_PREVIEW_VERSION}`,
     width: 1200,
     height: 630,
     type: "image/jpeg",
-    alt: `Studio apps, tools, and experiments by ${PERSON_IDENTITY.fullName}`,
+    alt: `Studio apps, tools, and experiments by ${PERSON_IDENTITY.displayName}`,
   },
   admin: {
-    url: `${PORTFOLIO_ORIGIN}/images/social/admin-preview.jpg?v=${SOCIAL_PREVIEW_VERSION}`,
+    url: `${PRODUCT_IDENTITIES.admin.canonicalOrigin}/images/social/admin-preview.jpg?v=${SOCIAL_PREVIEW_VERSION}`,
     width: 1200,
     height: 630,
     type: "image/jpeg",
-    alt: `Admin content management system by ${PERSON_IDENTITY.fullName}`,
+    alt: `Admin content management system by ${PERSON_IDENTITY.displayName}`,
   },
   auth: {
-    url: `${PORTFOLIO_ORIGIN}/images/social/auth-preview.jpg?v=${SOCIAL_PREVIEW_VERSION}`,
+    url: `${PRODUCT_IDENTITIES.auth.canonicalOrigin}/images/social/auth-preview.jpg?v=${SOCIAL_PREVIEW_VERSION}`,
     width: 1200,
     height: 630,
     type: "image/jpeg",
-    alt: `Auth account security application by ${PERSON_IDENTITY.fullName}`,
+    alt: `Auth account security application by ${PERSON_IDENTITY.displayName}`,
   },
 } as const;
 

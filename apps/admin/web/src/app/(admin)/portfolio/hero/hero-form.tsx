@@ -5,22 +5,23 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2, Save } from "lucide-react";
 import { createPortfolioData, updatePortfolioData } from "@/lib/portfolio-api";
-import { Button } from "@jayant/web-ui/button";
-import { FormMessage } from "@jayant/web-ui/form-message";
-import { Input } from "@jayant/web-ui/input";
-import { Label } from "@jayant/web-ui/label";
-import { Textarea } from "@jayant/web-ui/textarea";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { FormMessage } from "@jayantgoyal/web-ui/form-message";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Textarea } from "@jayantgoyal/web-ui/textarea";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@jayant/web-ui/card";
+} from "@jayantgoyal/web-ui/card";
 import type { Hero } from "@/lib/types";
 import { PortfolioAssetUpload } from "@/components/portfolio/asset-upload";
 import { useUnsavedChangesGuard } from "@/lib/use-unsaved-changes-guard";
 import { AccessibleForm } from "@/components/accessible-form";
+import { PERSON_BRAND } from "@jayantgoyal/web-brand";
 
 interface HeroFormProps {
   initialData: Hero | null;
@@ -31,8 +32,6 @@ export function HeroForm({ initialData }: HeroFormProps) {
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
-    name: initialData?.name ?? "",
-    display_name: initialData?.display_name ?? "",
     role: initialData?.role ?? "",
     tagline: initialData?.tagline ?? "",
     blurb: initialData?.blurb ?? "",
@@ -41,13 +40,10 @@ export function HeroForm({ initialData }: HeroFormProps) {
     availability: initialData?.availability ?? "",
     resume_url: initialData?.resume_url ?? "",
     github_username: initialData?.github_username ?? "",
-    seo_title: initialData?.seo_title ?? "",
     seo_description: initialData?.seo_description ?? "",
   });
   const [savedSnapshot, setSavedSnapshot] = useState(() =>
     JSON.stringify({
-      name: initialData?.name ?? "",
-      display_name: initialData?.display_name ?? "",
       role: initialData?.role ?? "",
       tagline: initialData?.tagline ?? "",
       blurb: initialData?.blurb ?? "",
@@ -56,7 +52,6 @@ export function HeroForm({ initialData }: HeroFormProps) {
       availability: initialData?.availability ?? "",
       resume_url: initialData?.resume_url ?? "",
       github_username: initialData?.github_username ?? "",
-      seo_title: initialData?.seo_title ?? "",
       seo_description: initialData?.seo_description ?? "",
     }),
   );
@@ -105,34 +100,17 @@ export function HeroForm({ initialData }: HeroFormProps) {
       </CardHeader>
       <CardContent>
         <AccessibleForm onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                placeholder="Your Name"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="display_name">Header Wordmark</Label>
-              <Input
-                id="display_name"
-                value={formData.display_name}
-                onChange={(e) =>
-                  setFormData({ ...formData, display_name: e.target.value })
-                }
-                placeholder="Jayant"
-                required
-              />
-              <p className="text-xs text-muted-foreground">
-                The visible name in every public Portfolio header.
-              </p>
-            </div>
+          <div className="rounded-lg border bg-muted/30 p-4">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Public identity
+            </p>
+            <p className="mt-1 text-lg font-semibold">
+              {PERSON_BRAND.displayName}
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Fixed by the shared identity registry; it is not editable CMS
+              content.
+            </p>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
@@ -228,7 +206,7 @@ export function HeroForm({ initialData }: HeroFormProps) {
               onChange={(e) =>
                 setFormData({ ...formData, blurb: e.target.value })
               }
-                placeholder="I'm Jayant, a software engineer..."
+              placeholder="I'm Jayant, a software engineer..."
               rows={4}
               required
             />
@@ -256,16 +234,16 @@ export function HeroForm({ initialData }: HeroFormProps) {
             </p>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="seo_title">Search & Social Title</Label>
-            <Input
-              id="seo_title"
-              value={formData.seo_title}
-              onChange={(event) =>
-                setFormData({ ...formData, seo_title: event.target.value })
-              }
-              required
-            />
+          <div className="space-y-2 rounded-lg border bg-muted/30 p-4">
+            <Label>Derived Search & Social Title</Label>
+            <p className="text-sm font-medium">
+              {PERSON_BRAND.displayName} |{" "}
+              {formData.role || "Software Engineer"}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Generated from the fixed public identity and the professional role
+              above.
+            </p>
           </div>
 
           <div className="space-y-2">

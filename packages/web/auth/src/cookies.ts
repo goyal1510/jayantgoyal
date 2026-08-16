@@ -1,8 +1,9 @@
 import type { CookieOptions } from "@supabase/ssr";
+import { PRODUCT_IDENTITIES, TECHNICAL_IDENTITY } from "@jayantgoyal/identity";
 
 export const PLATFORM_SESSION_COOKIE_NAME = "__Secure-jg-session-v1";
 export const LOCAL_SESSION_COOKIE_NAME = "jg-session-v1";
-export const PLATFORM_SESSION_COOKIE_DOMAIN = "jayantgoyal.com";
+export const PLATFORM_SESSION_COOKIE_DOMAIN = TECHNICAL_IDENTITY.primaryDomain;
 export const LOCAL_DEVELOPMENT_COOKIE_DOMAIN_SUFFIXES = [
   ".test",
   ".localhost",
@@ -14,13 +15,11 @@ export type RequestSessionSource = "legacy" | "platform" | "promote";
 
 type CookieValue = { name: string; value: string };
 
-const TRUSTED_PLATFORM_HOSTS = new Set([
-  "jayantgoyal.com",
-  "www.jayantgoyal.com",
-  "studio.jayantgoyal.com",
-  "admin.jayantgoyal.com",
-  "auth.jayantgoyal.com",
-]);
+const TRUSTED_PLATFORM_HOSTS = new Set<string>(
+  Object.values(PRODUCT_IDENTITIES).flatMap(
+    ({ canonicalHosts }) => canonicalHosts,
+  ),
+);
 
 function normalizeHostname(hostname: string | null | undefined): string {
   if (!hostname) return "";

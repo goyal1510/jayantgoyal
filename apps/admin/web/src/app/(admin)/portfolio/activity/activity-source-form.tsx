@@ -5,11 +5,16 @@ import { useRouter } from "next/navigation";
 import { Github, Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
 
-import { Button } from "@jayant/web-ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@jayant/web-ui/card";
-import { FormMessage } from "@jayant/web-ui/form-message";
-import { Input } from "@jayant/web-ui/input";
-import { Label } from "@jayant/web-ui/label";
+import { Button } from "@jayantgoyal/web-ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { FormMessage } from "@jayantgoyal/web-ui/form-message";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
 
 import { updatePortfolioData } from "@/lib/portfolio-api";
 import type { Hero } from "@/lib/types";

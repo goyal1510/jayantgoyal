@@ -220,7 +220,8 @@ export const transformationToolCategories: ToolCategory[] = [
       {
         id: "yaml-to-toml",
         title: "YAML to TOML",
-        description: "Parse and convert YAML to TOML.",
+        description:
+          "Convert structured YAML documents into readable TOML configuration while preserving values and nesting.",
         icon: FileType,
         path: "/tools/converters/yaml-to-toml",
       },
@@ -235,35 +236,40 @@ export const transformationToolCategories: ToolCategory[] = [
       {
         id: "json-to-toml",
         title: "JSON to TOML",
-        description: "Parse and convert JSON to TOML.",
+        description:
+          "Convert valid JSON objects into readable TOML configuration while preserving values and nesting.",
         icon: FileType,
         path: "/tools/converters/json-to-toml",
       },
       {
         id: "toml-to-json",
         title: "TOML to JSON",
-        description: "Parse and convert TOML to JSON.",
+        description:
+          "Parse TOML configuration and convert it into formatted JSON for applications, APIs, and debugging.",
         icon: FileJson,
         path: "/tools/converters/toml-to-json",
       },
       {
         id: "toml-to-yaml",
         title: "TOML to YAML",
-        description: "Parse and convert TOML to YAML.",
+        description:
+          "Parse TOML configuration and convert it into readable YAML while preserving values and nesting.",
         icon: FileType,
         path: "/tools/converters/toml-to-yaml",
       },
       {
         id: "xml-to-json",
         title: "XML to JSON",
-        description: "Convert XML to JSON.",
+        description:
+          "Convert XML documents into formatted JSON for easier inspection, transformation, and application use.",
         icon: FileJson,
         path: "/tools/converters/xml-to-json",
       },
       {
         id: "json-to-xml",
         title: "JSON to XML",
-        description: "Convert JSON to XML.",
+        description:
+          "Convert valid JSON data into structured XML for integrations, exports, and interoperability workflows.",
         icon: FileCode2,
         path: "/tools/converters/json-to-xml",
       },

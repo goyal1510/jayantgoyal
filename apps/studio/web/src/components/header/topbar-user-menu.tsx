@@ -7,10 +7,10 @@ import { User } from "lucide-react";
 import {
   buildAuthAccountSecurityUrl,
   buildAuthLogoutUrl,
-} from "@jayant/web-auth/entry";
-import { ApplicationUserMenu } from "@jayant/web-ui/application-user-menu";
-import { Button } from "@jayant/web-ui/button";
-import { Skeleton } from "@jayant/web-ui/skeleton";
+} from "@jayantgoyal/web-auth/entry";
+import { ApplicationUserMenu } from "@jayantgoyal/web-ui/application-user-menu";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Skeleton } from "@jayantgoyal/web-ui/skeleton";
 
 type StudioUser = { name: string; email: string; avatarUrl: string | null };
 

@@ -7,7 +7,10 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-import { WorkspaceHeader, type WorkspaceTone } from "@jayant/web-ui/workspace-header";
+import {
+  WorkspaceHeader,
+  type WorkspaceTone,
+} from "@jayantgoyal/web-ui/workspace-header";
 
 type AccountWorkspaceKey =
   | "security"
@@ -29,7 +32,7 @@ const WORKSPACE_COPY: Record<
   security: {
     title: "Account security",
     description:
-      "A clear home for your identity, password, and second factor across every Jayant workspace.",
+      "A clear home for your identity, password, and second factor across Studio and Admin.",
     detail: "One account · one security posture · no provider clutter",
     icon: LayoutDashboard,
     tone: "lavender",
@@ -38,7 +41,7 @@ const WORKSPACE_COPY: Record<
     title: "Profile",
     description:
       "Keep the name shown across Studio and Admin current without changing your sign-in details.",
-    detail: "Identity details used across the platform",
+    detail: "Identity details used by your connected applications",
     icon: UserRound,
     tone: "sage",
   },

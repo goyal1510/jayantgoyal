@@ -1,49 +1,55 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
-import { Copy, RefreshCw } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Copy, RefreshCw } from "lucide-react";
+import { toast } from "sonner";
 
 function formatDate(date: Date, format: string): string {
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, "0")
-  const day = String(date.getDate()).padStart(2, "0")
-  const hours = String(date.getHours()).padStart(2, "0")
-  const minutes = String(date.getMinutes()).padStart(2, "0")
-  const seconds = String(date.getSeconds()).padStart(2, "0")
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
   switch (format) {
     case "ISO 8601":
-      return date.toISOString()
+      return date.toISOString();
     case "Unix Timestamp":
-      return Math.floor(date.getTime() / 1000).toString()
+      return Math.floor(date.getTime() / 1000).toString();
     case "Unix Timestamp (ms)":
-      return date.getTime().toString()
+      return date.getTime().toString();
     case "RFC 2822":
-      return date.toUTCString()
+      return date.toUTCString();
     case "YYYY-MM-DD":
-      return `${year}-${month}-${day}`
+      return `${year}-${month}-${day}`;
     case "DD/MM/YYYY":
-      return `${day}/${month}/${year}`
+      return `${day}/${month}/${year}`;
     case "MM/DD/YYYY":
-      return `${month}/${day}/${year}`
+      return `${month}/${day}/${year}`;
     case "YYYY-MM-DD HH:mm:ss":
-      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     case "DD-MM-YYYY HH:mm:ss":
-      return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`
+      return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
     default:
-      return date.toString()
+      return date.toString();
   }
 }
 
 export default function DateTimeConverterClient() {
-  const [input, setInput] = React.useState("")
-  const [inputFormat, setInputFormat] = React.useState("ISO 8601")
-  const [outputFormat, setOutputFormat] = React.useState("Unix Timestamp")
-  const [output, setOutput] = React.useState("")
+  const [input, setInput] = React.useState("");
+  const [inputFormat, setInputFormat] = React.useState("ISO 8601");
+  const [outputFormat, setOutputFormat] = React.useState("Unix Timestamp");
+  const [output, setOutput] = React.useState("");
 
   const formats = [
     "ISO 8601",
@@ -55,51 +61,51 @@ export default function DateTimeConverterClient() {
     "MM/DD/YYYY",
     "YYYY-MM-DD HH:mm:ss",
     "DD-MM-YYYY HH:mm:ss",
-  ]
+  ];
 
   const convert = React.useCallback(() => {
     if (!input.trim()) {
-      setOutput("")
-      return
+      setOutput("");
+      return;
     }
 
     try {
-      let date: Date
+      let date: Date;
 
       if (inputFormat === "Unix Timestamp") {
-        date = new Date(parseInt(input) * 1000)
+        date = new Date(parseInt(input) * 1000);
       } else if (inputFormat === "Unix Timestamp (ms)") {
-        date = new Date(parseInt(input))
+        date = new Date(parseInt(input));
       } else {
-        date = new Date(input)
+        date = new Date(input);
       }
 
       if (isNaN(date.getTime())) {
-        setOutput("Invalid date")
-        return
+        setOutput("Invalid date");
+        return;
       }
 
-      const result = formatDate(date, outputFormat)
-      setOutput(result)
+      const result = formatDate(date, outputFormat);
+      setOutput(result);
     } catch {
-      setOutput("Conversion failed")
+      setOutput("Conversion failed");
     }
-  }, [input, inputFormat, outputFormat])
+  }, [input, inputFormat, outputFormat]);
 
   React.useEffect(() => {
-    convert()
-  }, [convert])
+    convert();
+  }, [convert]);
 
   const useCurrentTime = () => {
-    const now = new Date()
-    setInput(now.toISOString())
-    setInputFormat("ISO 8601")
-  }
+    const now = new Date();
+    setInput(now.toISOString());
+    setInputFormat("ISO 8601");
+  };
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(output)
-    toast.success("Copied to clipboard")
-  }
+    navigator.clipboard.writeText(output);
+    toast.success("Copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -136,7 +142,11 @@ export default function DateTimeConverterClient() {
               />
             </div>
 
-            <Button variant="outline" onClick={useCurrentTime} className="w-full">
+            <Button
+              variant="outline"
+              onClick={useCurrentTime}
+              className="w-full"
+            >
               <RefreshCw className="h-4 w-4 mr-2" />
               Use Current Time
             </Button>
@@ -168,11 +178,7 @@ export default function DateTimeConverterClient() {
             <div className="space-y-2">
               <Label>Result</Label>
               <div className="flex gap-2">
-                <Input
-                  value={output}
-                  readOnly
-                  className="font-mono"
-                />
+                <Input value={output} readOnly className="font-mono" />
                 <Button
                   variant="outline"
                   size="icon"
@@ -187,5 +193,5 @@ export default function DateTimeConverterClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

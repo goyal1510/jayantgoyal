@@ -1,65 +1,78 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
-import { Copy, RefreshCw } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Copy, RefreshCw } from "lucide-react";
+import { toast } from "sonner";
 
-function generateMACAddress(prefix?: string, uppercase: boolean = false): string {
-  const array = new Uint8Array(6)
-  crypto.getRandomValues(array)
+function generateMACAddress(
+  prefix?: string,
+  uppercase: boolean = false,
+): string {
+  const array = new Uint8Array(6);
+  crypto.getRandomValues(array);
 
-  let mac = ""
+  let mac = "";
   if (prefix) {
-    const prefixParts = prefix.split(":").filter(p => p.length === 2)
+    const prefixParts = prefix.split(":").filter((p) => p.length === 2);
     if (prefixParts.length > 0 && prefixParts.length <= 6) {
-      mac = prefixParts.join(":")
-      const remaining = 6 - prefixParts.length
+      mac = prefixParts.join(":");
+      const remaining = 6 - prefixParts.length;
       for (let i = 0; i < remaining; i++) {
-        const byte = array[i + prefixParts.length] ?? 0
-        mac += ":" + byte.toString(16).padStart(2, "0")
+        const byte = array[i + prefixParts.length] ?? 0;
+        mac += ":" + byte.toString(16).padStart(2, "0");
       }
     } else {
       // Invalid prefix, generate full MAC
-      mac = Array.from(array).map(b => (b ?? 0).toString(16).padStart(2, "0")).join(":")
+      mac = Array.from(array)
+        .map((b) => (b ?? 0).toString(16).padStart(2, "0"))
+        .join(":");
     }
   } else {
-    mac = Array.from(array).map(b => (b ?? 0).toString(16).padStart(2, "0")).join(":")
+    mac = Array.from(array)
+      .map((b) => (b ?? 0).toString(16).padStart(2, "0"))
+      .join(":");
   }
 
-  return uppercase ? mac.toUpperCase() : mac.toLowerCase()
+  return uppercase ? mac.toUpperCase() : mac.toLowerCase();
 }
 
 export default function MACGeneratorClient() {
-  const [macs, setMacs] = React.useState<string[]>([])
-  const [count, setCount] = React.useState(1)
-  const [prefix, setPrefix] = React.useState("")
-  const [uppercase, setUppercase] = React.useState(false)
+  const [macs, setMacs] = React.useState<string[]>([]);
+  const [count, setCount] = React.useState(1);
+  const [prefix, setPrefix] = React.useState("");
+  const [uppercase, setUppercase] = React.useState(false);
 
   const generateMACs = React.useCallback(() => {
-    const newMACs: string[] = []
+    const newMACs: string[] = [];
     for (let i = 0; i < count; i++) {
-      newMACs.push(generateMACAddress(prefix || undefined, uppercase))
+      newMACs.push(generateMACAddress(prefix || undefined, uppercase));
     }
-    setMacs(newMACs)
-  }, [count, prefix, uppercase])
+    setMacs(newMACs);
+  }, [count, prefix, uppercase]);
 
   React.useEffect(() => {
-    generateMACs()
-  }, [generateMACs])
+    generateMACs();
+  }, [generateMACs]);
 
   const copyToClipboard = (mac: string) => {
-    navigator.clipboard.writeText(mac)
-    toast.success("MAC address copied to clipboard")
-  }
+    navigator.clipboard.writeText(mac);
+    toast.success("MAC address copied to clipboard");
+  };
 
   const copyAllToClipboard = () => {
-    navigator.clipboard.writeText(macs.join("\n"))
-    toast.success("All MAC addresses copied to clipboard")
-  }
+    navigator.clipboard.writeText(macs.join("\n"));
+    toast.success("All MAC addresses copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -78,7 +91,11 @@ export default function MACGeneratorClient() {
                 min="1"
                 max="100"
                 value={count}
-                onChange={(e) => setCount(Math.max(1, Math.min(100, parseInt(e.target.value) || 1)))}
+                onChange={(e) =>
+                  setCount(
+                    Math.max(1, Math.min(100, parseInt(e.target.value) || 1)),
+                  )
+                }
               />
             </div>
 
@@ -120,10 +137,17 @@ export default function MACGeneratorClient() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle>Generated MAC Addresses</CardTitle>
-                <CardDescription>{macs.length} MAC address{macs.length !== 1 ? "es" : ""} generated</CardDescription>
+                <CardDescription>
+                  {macs.length} MAC address{macs.length !== 1 ? "es" : ""}{" "}
+                  generated
+                </CardDescription>
               </div>
               {macs.length > 0 && (
-                <Button variant="outline" size="sm" onClick={copyAllToClipboard}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={copyAllToClipboard}
+                >
                   <Copy className="h-4 w-4 mr-2" />
                   Copy All
                 </Button>
@@ -133,10 +157,15 @@ export default function MACGeneratorClient() {
           <CardContent>
             <div className="space-y-2 max-h-[400px] overflow-y-auto">
               {macs.length === 0 ? (
-                <p className="text-muted-foreground text-sm">No MAC addresses generated yet</p>
+                <p className="text-muted-foreground text-sm">
+                  No MAC addresses generated yet
+                </p>
               ) : (
                 macs.map((mac, index) => (
-                  <div key={index} className="flex items-center gap-2 p-2 rounded border">
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 p-2 rounded border"
+                  >
                     <code className="flex-1 font-mono text-sm">{mac}</code>
                     <Button
                       variant="ghost"
@@ -154,5 +183,5 @@ export default function MACGeneratorClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

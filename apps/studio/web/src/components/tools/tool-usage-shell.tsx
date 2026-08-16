@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 
-import { WorkspaceHeader } from "@jayant/web-ui/workspace-header";
+import { WorkspaceHeader } from "@jayantgoyal/web-ui/workspace-header";
 import { ToolFavoriteButton } from "@/components/tools/tool-favorite-button";
 import { getToolTone } from "@/lib/tools/tool-tones";
 import {

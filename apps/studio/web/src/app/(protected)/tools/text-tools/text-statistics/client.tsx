@@ -1,17 +1,23 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Label } from "@jayant/web-ui/label"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Label } from "@jayantgoyal/web-ui/label";
 
 function getTextStats(text: string) {
-  const chars = text.length
-  const charsNoSpaces = text.replace(/\s/g, "").length
-  const words = text.trim() ? text.trim().split(/\s+/).length : 0
-  const lines = text.split("\n").length
-  const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim()).length
-  const sentences = text.split(/[.!?]+/).filter(s => s.trim()).length
-  const bytes = new TextEncoder().encode(text).length
+  const chars = text.length;
+  const charsNoSpaces = text.replace(/\s/g, "").length;
+  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+  const lines = text.split("\n").length;
+  const paragraphs = text.split(/\n\s*\n/).filter((p) => p.trim()).length;
+  const sentences = text.split(/[.!?]+/).filter((s) => s.trim()).length;
+  const bytes = new TextEncoder().encode(text).length;
 
   return {
     characters: chars,
@@ -21,12 +27,12 @@ function getTextStats(text: string) {
     paragraphs,
     sentences,
     bytes,
-  }
+  };
 }
 
 export default function TextStatisticsClient() {
-  const [input, setInput] = React.useState("")
-  const stats = React.useMemo(() => getTextStats(input), [input])
+  const [input, setInput] = React.useState("");
+  const stats = React.useMemo(() => getTextStats(input), [input]);
 
   return (
     <div className="space-y-6">
@@ -55,36 +61,52 @@ export default function TextStatisticsClient() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label className="text-muted-foreground">Characters</Label>
-                <p className="text-2xl font-bold">{stats.characters.toLocaleString()}</p>
+                <p className="text-2xl font-bold">
+                  {stats.characters.toLocaleString()}
+                </p>
               </div>
               <div>
-                <Label className="text-muted-foreground">Characters (no spaces)</Label>
-                <p className="text-2xl font-bold">{stats.charactersNoSpaces.toLocaleString()}</p>
+                <Label className="text-muted-foreground">
+                  Characters (no spaces)
+                </Label>
+                <p className="text-2xl font-bold">
+                  {stats.charactersNoSpaces.toLocaleString()}
+                </p>
               </div>
               <div>
                 <Label className="text-muted-foreground">Words</Label>
-                <p className="text-2xl font-bold">{stats.words.toLocaleString()}</p>
+                <p className="text-2xl font-bold">
+                  {stats.words.toLocaleString()}
+                </p>
               </div>
               <div>
                 <Label className="text-muted-foreground">Lines</Label>
-                <p className="text-2xl font-bold">{stats.lines.toLocaleString()}</p>
+                <p className="text-2xl font-bold">
+                  {stats.lines.toLocaleString()}
+                </p>
               </div>
               <div>
                 <Label className="text-muted-foreground">Paragraphs</Label>
-                <p className="text-2xl font-bold">{stats.paragraphs.toLocaleString()}</p>
+                <p className="text-2xl font-bold">
+                  {stats.paragraphs.toLocaleString()}
+                </p>
               </div>
               <div>
                 <Label className="text-muted-foreground">Sentences</Label>
-                <p className="text-2xl font-bold">{stats.sentences.toLocaleString()}</p>
+                <p className="text-2xl font-bold">
+                  {stats.sentences.toLocaleString()}
+                </p>
               </div>
               <div className="col-span-2">
                 <Label className="text-muted-foreground">Size (bytes)</Label>
-                <p className="text-2xl font-bold">{stats.bytes.toLocaleString()}</p>
+                <p className="text-2xl font-bold">
+                  {stats.bytes.toLocaleString()}
+                </p>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
     </div>
-  )
+  );
 }

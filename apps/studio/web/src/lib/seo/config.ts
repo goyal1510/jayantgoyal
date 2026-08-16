@@ -4,24 +4,23 @@ import {
   APP_BRANDS,
   APP_SOCIAL_PREVIEW_IMAGES,
   PERSON_BRAND,
-} from "@jayant/web-brand";
+} from "@jayantgoyal/web-brand";
 import {
   buildPublicPageMetadata as buildSharedPageMetadata,
   isCanonicalApplicationHost,
   isIndexablePath as isSharedIndexablePath,
   matchesPathOrChild,
   normalizePathname,
-} from "@jayant/web-seo";
+} from "@jayantgoyal/web-seo";
 
 import { STUDIO_URL } from "@/lib/platform/urls";
 
 const STUDIO_BRAND = APP_BRANDS.studio;
 
 export const SITE_URL = STUDIO_URL;
-export const PERSON_NAME = PERSON_BRAND.fullName;
+export const PERSON_NAME = PERSON_BRAND.displayName;
 export const SITE_NAME = STUDIO_BRAND.publicName;
 export const SITE_TITLE = STUDIO_BRAND.defaultTitle;
-export const SITE_TITLE_TEMPLATE = STUDIO_BRAND.titleTemplate;
 export const SITE_DESCRIPTION = STUDIO_BRAND.description;
 export const DEFAULT_OG_IMAGE = APP_SOCIAL_PREVIEW_IMAGES.studio.url;
 export const DEFAULT_OG_IMAGE_METADATA = APP_SOCIAL_PREVIEW_IMAGES.studio;

@@ -1,47 +1,53 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 export default function Base64EncoderDecoderClient() {
-  const [mode, setMode] = React.useState<"encode" | "decode">("encode")
-  const [input, setInput] = React.useState("")
-  const [output, setOutput] = React.useState("")
+  const [mode, setMode] = React.useState<"encode" | "decode">("encode");
+  const [input, setInput] = React.useState("");
+  const [output, setOutput] = React.useState("");
 
   const convert = React.useCallback(() => {
     if (!input.trim()) {
-      setOutput("")
-      return
+      setOutput("");
+      return;
     }
 
     try {
       if (mode === "encode") {
-        const encoded = btoa(unescape(encodeURIComponent(input)))
-        setOutput(encoded)
+        const encoded = btoa(unescape(encodeURIComponent(input)));
+        setOutput(encoded);
       } else {
         try {
-          const decoded = decodeURIComponent(escape(atob(input)))
-          setOutput(decoded)
+          const decoded = decodeURIComponent(escape(atob(input)));
+          setOutput(decoded);
         } catch {
-          setOutput("Invalid Base64 string")
+          setOutput("Invalid Base64 string");
         }
       }
     } catch {
-      setOutput("Conversion failed")
+      setOutput("Conversion failed");
     }
-  }, [input, mode])
+  }, [input, mode]);
 
   React.useEffect(() => {
-    convert()
-  }, [convert])
+    convert();
+  }, [convert]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(output)
-    toast.success("Copied to clipboard")
-  }
+    navigator.clipboard.writeText(output);
+    toast.success("Copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -53,8 +59,8 @@ export default function Base64EncoderDecoderClient() {
               <Button
                 variant={mode === "encode" ? "default" : "outline"}
                 onClick={() => {
-                  setMode("encode")
-                  setOutput("")
+                  setMode("encode");
+                  setOutput("");
                 }}
               >
                 Encode
@@ -62,8 +68,8 @@ export default function Base64EncoderDecoderClient() {
               <Button
                 variant={mode === "decode" ? "default" : "outline"}
                 onClick={() => {
-                  setMode("decode")
-                  setOutput("")
+                  setMode("decode");
+                  setOutput("");
                 }}
               >
                 Decode
@@ -76,16 +82,22 @@ export default function Base64EncoderDecoderClient() {
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>{mode === "encode" ? "Plain Text" : "Base64 String"}</CardTitle>
+            <CardTitle>
+              {mode === "encode" ? "Plain Text" : "Base64 String"}
+            </CardTitle>
             <CardDescription>
-              {mode === "encode" ? "Enter text to encode" : "Enter Base64 to decode"}
+              {mode === "encode"
+                ? "Enter text to encode"
+                : "Enter Base64 to decode"}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={mode === "encode" ? "Enter text..." : "Enter Base64..."}
+              placeholder={
+                mode === "encode" ? "Enter text..." : "Enter Base64..."
+              }
               className="w-full min-h-[200px] rounded-md border border-input bg-transparent px-3 py-2 text-sm"
             />
           </CardContent>
@@ -95,7 +107,9 @@ export default function Base64EncoderDecoderClient() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle>{mode === "encode" ? "Base64 Encoded" : "Decoded Text"}</CardTitle>
+                <CardTitle>
+                  {mode === "encode" ? "Base64 Encoded" : "Decoded Text"}
+                </CardTitle>
                 <CardDescription>Result</CardDescription>
               </div>
               {output && (
@@ -116,5 +130,5 @@ export default function Base64EncoderDecoderClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

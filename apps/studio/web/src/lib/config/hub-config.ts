@@ -27,9 +27,7 @@ import {
   getStudioSurface,
   type StudioSurfaceId,
 } from "@/lib/config/studio-surfaces";
-import type {
-  ApplicationNavigationItem,
-} from "@jayant/web-ui/application-shell";
+import type { ApplicationNavigationItem } from "@jayantgoyal/web-ui/application-shell";
 
 export type NavItem = {
   id: string;
@@ -288,15 +286,14 @@ export const HUB_APPS: AppConfig[] = [
   createSurfaceApp("activity-tracker", ACTIVITY_TRACKER_NAV),
   createSurfaceApp("currency-calculator", CURRENCY_CALC_NAV),
   createSurfaceApp("file-manager"),
-    createSurfaceApp("scratchpad"),
+  createSurfaceApp("scratchpad"),
   // --- Public apps (dropdowns first) ---
   createSurfaceApp("portfolio", PORTFOLIO_NAV),
   createSurfaceApp("tech-tools"),
-    createSurfaceApp("writing"),
+  createSurfaceApp("writing"),
   createSurfaceApp("weather"),
   createSurfaceApp("custom-calculator"),
   createSurfaceApp("github-stats"),
-  createSurfaceApp("ecommerce"),
 ];
 
 const STUDIO_HOME_APP = createSurfaceApp("studio-home");

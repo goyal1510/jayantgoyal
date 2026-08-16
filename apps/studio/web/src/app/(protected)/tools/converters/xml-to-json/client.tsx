@@ -1,104 +1,113 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 function xmlToJson(xml: string): string {
   try {
     // Simple XML to JSON converter
-    const parser = new DOMParser()
-    const xmlDoc = parser.parseFromString(xml, "text/xml")
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(xml, "text/xml");
 
-    const parseError = xmlDoc.querySelector("parsererror")
+    const parseError = xmlDoc.querySelector("parsererror");
     if (parseError) {
-      throw new Error("Invalid XML")
+      throw new Error("Invalid XML");
     }
 
     function nodeToJson(node: Node): unknown {
       if (node.nodeType === Node.TEXT_NODE) {
-        const text = node.textContent?.trim()
-        return text || null
+        const text = node.textContent?.trim();
+        return text || null;
       }
 
       if (node.nodeType === Node.ELEMENT_NODE) {
-        const element = node as Element
-        const result: Record<string, unknown> = {}
+        const element = node as Element;
+        const result: Record<string, unknown> = {};
 
         // Attributes
         if (element.attributes.length > 0) {
-          const attrs: Record<string, string> = {}
+          const attrs: Record<string, string> = {};
           Array.from(element.attributes).forEach((attr) => {
-            attrs[attr.name] = attr.value
-          })
-          result["@attributes"] = attrs
+            attrs[attr.name] = attr.value;
+          });
+          result["@attributes"] = attrs;
         }
 
         // Children
-        const children: Record<string, unknown[]> = {}
+        const children: Record<string, unknown[]> = {};
         Array.from(element.childNodes).forEach((child) => {
           if (child.nodeType === Node.ELEMENT_NODE) {
-            const childElement = child as Element
-            const tagName = childElement.tagName
+            const childElement = child as Element;
+            const tagName = childElement.tagName;
             if (!children[tagName]) {
-              children[tagName] = []
+              children[tagName] = [];
             }
-            children[tagName].push(nodeToJson(child))
-          } else if (child.nodeType === Node.TEXT_NODE && child.textContent?.trim()) {
-            result["#text"] = child.textContent.trim()
+            children[tagName].push(nodeToJson(child));
+          } else if (
+            child.nodeType === Node.TEXT_NODE &&
+            child.textContent?.trim()
+          ) {
+            result["#text"] = child.textContent.trim();
           }
-        })
+        });
 
         // Merge children
         Object.entries(children).forEach(([key, value]) => {
-          result[key] = value.length === 1 ? value[0] : value
-        })
+          result[key] = value.length === 1 ? value[0] : value;
+        });
 
-        return result
+        return result;
       }
 
-      return null
+      return null;
     }
 
-    const json = nodeToJson(xmlDoc.documentElement)
-    return JSON.stringify(json, null, 2)
+    const json = nodeToJson(xmlDoc.documentElement);
+    return JSON.stringify(json, null, 2);
   } catch {
-    throw new Error("Failed to parse XML")
+    throw new Error("Failed to parse XML");
   }
 }
 
 export default function XMLToJSONClient() {
-  const [input, setInput] = React.useState("")
-  const [output, setOutput] = React.useState("")
-  const [error, setError] = React.useState("")
+  const [input, setInput] = React.useState("");
+  const [output, setOutput] = React.useState("");
+  const [error, setError] = React.useState("");
 
   const convert = React.useCallback(() => {
     if (!input.trim()) {
-      setOutput("")
-      setError("")
-      return
+      setOutput("");
+      setError("");
+      return;
     }
 
     try {
-      const json = xmlToJson(input)
-      setOutput(json)
-      setError("")
+      const json = xmlToJson(input);
+      setOutput(json);
+      setError("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Invalid XML")
-      setOutput("")
+      setError(err instanceof Error ? err.message : "Invalid XML");
+      setOutput("");
     }
-  }, [input])
+  }, [input]);
 
   React.useEffect(() => {
-    convert()
-  }, [convert])
+    convert();
+  }, [convert]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(output)
-    toast.success("JSON copied to clipboard")
-  }
+    navigator.clipboard.writeText(output);
+    toast.success("JSON copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -112,12 +121,10 @@ export default function XMLToJSONClient() {
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder='<root><item>value</item></root>'
+              placeholder="<root><item>value</item></root>"
               className="w-full min-h-[400px] rounded-md border border-input bg-transparent px-3 py-2 text-sm font-mono"
             />
-            {error && (
-              <p className="text-sm text-red-500 mt-2">{error}</p>
-            )}
+            {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
           </CardContent>
         </Card>
 
@@ -146,5 +153,5 @@ export default function XMLToJSONClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

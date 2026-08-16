@@ -1,25 +1,36 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
 
 function parseCIDR(cidr: string) {
-  const [ip, prefix] = cidr.split("/")
-  if (!ip || !prefix) return null
+  const [ip, prefix] = cidr.split("/");
+  if (!ip || !prefix) return null;
 
-  const prefixLength = parseInt(prefix)
-  if (prefixLength < 0 || prefixLength > 32) return null
+  const prefixLength = parseInt(prefix);
+  if (prefixLength < 0 || prefixLength > 32) return null;
 
-  const ipParts = ip.split(".").map(Number)
-  if (ipParts.length !== 4 || ipParts.some(p => isNaN(p) || p < 0 || p > 255)) return null
+  const ipParts = ip.split(".").map(Number);
+  if (ipParts.length !== 4 || ipParts.some((p) => isNaN(p) || p < 0 || p > 255))
+    return null;
 
-  const ipNumber = (ipParts[0]! << 24) + (ipParts[1]! << 16) + (ipParts[2]! << 8) + ipParts[3]!
-  const subnetMask = (0xFFFFFFFF << (32 - prefixLength)) >>> 0
-  const networkAddress = ipNumber & subnetMask
-  const broadcastAddress = networkAddress | (~subnetMask >>> 0)
-  const hostCount = Math.pow(2, 32 - prefixLength) - 2
+  const ipNumber =
+    (ipParts[0]! << 24) +
+    (ipParts[1]! << 16) +
+    (ipParts[2]! << 8) +
+    ipParts[3]!;
+  const subnetMask = (0xffffffff << (32 - prefixLength)) >>> 0;
+  const networkAddress = ipNumber & subnetMask;
+  const broadcastAddress = networkAddress | (~subnetMask >>> 0);
+  const hostCount = Math.pow(2, 32 - prefixLength) - 2;
 
   return {
     network: formatIP(networkAddress),
@@ -29,27 +40,33 @@ function parseCIDR(cidr: string) {
     lastHost: formatIP(broadcastAddress - 1),
     hostCount,
     prefixLength,
-  }
+  };
 }
 
 function formatIP(num: number): string {
   return [
-    (num >>> 24) & 0xFF,
-    (num >>> 16) & 0xFF,
-    (num >>> 8) & 0xFF,
-    num & 0xFF,
-  ].join(".")
+    (num >>> 24) & 0xff,
+    (num >>> 16) & 0xff,
+    (num >>> 8) & 0xff,
+    num & 0xff,
+  ].join(".");
 }
 
 export default function IPv4SubnetCalculatorClient() {
-  const [input, setInput] = React.useState("")
-  const parsed = React.useMemo(() => input ? parseCIDR(input) : null, [input])
+  const [input, setInput] = React.useState("");
+  const parsed = React.useMemo(
+    () => (input ? parseCIDR(input) : null),
+    [input],
+  );
 
   return (
-    <div className="space-y-6"><Card>
+    <div className="space-y-6">
+      <Card>
         <CardHeader>
           <CardTitle>CIDR Block</CardTitle>
-          <CardDescription>Enter CIDR notation (e.g., 192.168.1.0/24)</CardDescription>
+          <CardDescription>
+            Enter CIDR notation (e.g., 192.168.1.0/24)
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Input
@@ -74,7 +91,9 @@ export default function IPv4SubnetCalculatorClient() {
                 <p className="font-mono font-semibold">{parsed.network}</p>
               </div>
               <div>
-                <Label className="text-muted-foreground">Broadcast Address</Label>
+                <Label className="text-muted-foreground">
+                  Broadcast Address
+                </Label>
                 <p className="font-mono font-semibold">{parsed.broadcast}</p>
               </div>
               <div>
@@ -95,7 +114,9 @@ export default function IPv4SubnetCalculatorClient() {
               </div>
               <div className="col-span-2">
                 <Label className="text-muted-foreground">Usable Hosts</Label>
-                <p className="font-semibold text-lg">{parsed.hostCount.toLocaleString()}</p>
+                <p className="font-semibold text-lg">
+                  {parsed.hostCount.toLocaleString()}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -108,5 +129,5 @@ export default function IPv4SubnetCalculatorClient() {
         </Card>
       ) : null}
     </div>
-  )
+  );
 }

@@ -1,38 +1,49 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
-function generateSVGPlaceholder(width: number, height: number, text?: string): string {
-  const displayText = text || `${width}x${height}`
+function generateSVGPlaceholder(
+  width: number,
+  height: number,
+  text?: string,
+): string {
+  const displayText = text || `${width}x${height}`;
   return `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
   <rect width="100%" height="100%" fill="#f3f4f6"/>
   <text x="50%" y="50%" font-family="Arial, sans-serif" font-size="14" fill="#6b7280" text-anchor="middle" dominant-baseline="middle">${displayText}</text>
-</svg>`
+</svg>`;
 }
 
 export default function SVGPlaceholderGeneratorClient() {
-  const [width, setWidth] = React.useState(300)
-  const [height, setHeight] = React.useState(200)
-  const [text, setText] = React.useState("")
-  const [svg, setSvg] = React.useState("")
+  const [width, setWidth] = React.useState(300);
+  const [height, setHeight] = React.useState(200);
+  const [text, setText] = React.useState("");
+  const [svg, setSvg] = React.useState("");
 
   React.useEffect(() => {
-    setSvg(generateSVGPlaceholder(width, height, text || undefined))
-  }, [width, height, text])
+    setSvg(generateSVGPlaceholder(width, height, text || undefined));
+  }, [width, height, text]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(svg)
-    toast.success("SVG copied to clipboard")
-  }
+    navigator.clipboard.writeText(svg);
+    toast.success("SVG copied to clipboard");
+  };
 
   return (
-    <div className="space-y-6"><Card>
+    <div className="space-y-6">
+      <Card>
         <CardHeader>
           <CardTitle>Options</CardTitle>
           <CardDescription>Configure placeholder</CardDescription>
@@ -47,7 +58,9 @@ export default function SVGPlaceholderGeneratorClient() {
                 min="1"
                 max="2000"
                 value={width}
-                onChange={(e) => setWidth(Math.max(1, parseInt(e.target.value) || 1))}
+                onChange={(e) =>
+                  setWidth(Math.max(1, parseInt(e.target.value) || 1))
+                }
               />
             </div>
             <div className="space-y-2">
@@ -58,7 +71,9 @@ export default function SVGPlaceholderGeneratorClient() {
                 min="1"
                 max="2000"
                 value={height}
-                onChange={(e) => setHeight(Math.max(1, parseInt(e.target.value) || 1))}
+                onChange={(e) =>
+                  setHeight(Math.max(1, parseInt(e.target.value) || 1))
+                }
               />
             </div>
           </div>
@@ -96,5 +111,5 @@ export default function SVGPlaceholderGeneratorClient() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

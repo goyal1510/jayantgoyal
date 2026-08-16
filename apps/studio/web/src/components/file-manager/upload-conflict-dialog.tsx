@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   Dialog,
@@ -6,37 +6,37 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@jayant/web-ui/dialog"
-import { Button } from "@jayant/web-ui/button"
-import { AlertCircle, Replace, SkipForward, Copy } from "lucide-react"
-import { formatFileSize } from "@/lib/file-manager/format-utils"
+} from "@jayantgoyal/web-ui/dialog";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { AlertCircle, Replace, SkipForward, Copy } from "lucide-react";
+import { formatFileSize } from "@/lib/file-manager/format-utils";
 
 export interface UploadConflictInfo {
-  file: File
+  file: File;
   existingFile: {
-    id: string
-    name: string
-    size: number
-    updated_at: string
-  }
+    id: string;
+    name: string;
+    size: number;
+    updated_at: string;
+  };
 }
 
-export type UploadConflictResolution = "replace" | "keep" | "both"
+export type UploadConflictResolution = "replace" | "keep" | "both";
 
 interface UploadConflictDialogProps {
-  conflict: UploadConflictInfo | null
-  onResolve: (resolution: UploadConflictResolution | null) => void
+  conflict: UploadConflictInfo | null;
+  onResolve: (resolution: UploadConflictResolution | null) => void;
 }
 
 export function UploadConflictDialog({
   conflict,
   onResolve,
 }: UploadConflictDialogProps) {
-  if (!conflict) return null
+  if (!conflict) return null;
 
   const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleString()
-  }
+    return new Date(dateString).toLocaleString();
+  };
 
   return (
     <Dialog open={!!conflict} onOpenChange={() => onResolve(null)}>
@@ -47,7 +47,9 @@ export function UploadConflictDialog({
             File Already Exists
           </DialogTitle>
           <DialogDescription>
-            A file named <span className="font-medium">{conflict.file.name}</span> already exists in this directory.
+            A file named{" "}
+            <span className="font-medium">{conflict.file.name}</span> already
+            exists in this directory.
           </DialogDescription>
         </DialogHeader>
 
@@ -55,7 +57,8 @@ export function UploadConflictDialog({
           <div className="rounded-md border p-3 space-y-1">
             <p className="text-sm font-medium">Existing file:</p>
             <p className="text-xs text-muted-foreground">
-              Size: {formatFileSize(conflict.existingFile.size)} • Modified: {formatDate(conflict.existingFile.updated_at)}
+              Size: {formatFileSize(conflict.existingFile.size)} • Modified:{" "}
+              {formatDate(conflict.existingFile.updated_at)}
             </p>
           </div>
           <div className="rounded-md border p-3 space-y-1">
@@ -93,5 +96,5 @@ export function UploadConflictDialog({
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

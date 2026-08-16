@@ -1,11 +1,17 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 function slugify(text: string): string {
   return text
@@ -13,25 +19,25 @@ function slugify(text: string): string {
     .trim()
     .replace(/[^\w\s-]/g, "")
     .replace(/[\s_-]+/g, "-")
-    .replace(/^-+|-+$/g, "")
+    .replace(/^-+|-+$/g, "");
 }
 
 export default function SlugifyStringClient() {
-  const [input, setInput] = React.useState("")
-  const [slug, setSlug] = React.useState("")
+  const [input, setInput] = React.useState("");
+  const [slug, setSlug] = React.useState("");
 
   React.useEffect(() => {
     if (!input.trim()) {
-      setSlug("")
-      return
+      setSlug("");
+      return;
     }
-    setSlug(slugify(input))
-  }, [input])
+    setSlug(slugify(input));
+  }, [input]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(slug)
-    toast.success("Slug copied to clipboard")
-  }
+    navigator.clipboard.writeText(slug);
+    toast.success("Slug copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -66,11 +72,7 @@ export default function SlugifyStringClient() {
             </div>
           </CardHeader>
           <CardContent>
-            <Input
-              value={slug}
-              readOnly
-              className="font-mono"
-            />
+            <Input value={slug} readOnly className="font-mono" />
             <p className="text-sm text-muted-foreground mt-2">
               Safe for use in URLs, filenames, and IDs
             </p>
@@ -78,5 +80,5 @@ export default function SlugifyStringClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

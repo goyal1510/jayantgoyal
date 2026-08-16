@@ -1,43 +1,49 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
-import { Copy, RefreshCw } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Copy, RefreshCw } from "lucide-react";
+import { toast } from "sonner";
 
 function generateRandomPort(): number {
   // Generate port between 1024 and 65535 (outside known ports 0-1023)
-  return Math.floor(Math.random() * (65535 - 1024 + 1)) + 1024
+  return Math.floor(Math.random() * (65535 - 1024 + 1)) + 1024;
 }
 
 export default function RandomPortGeneratorClient() {
-  const [ports, setPorts] = React.useState<number[]>([])
-  const [count, setCount] = React.useState(1)
+  const [ports, setPorts] = React.useState<number[]>([]);
+  const [count, setCount] = React.useState(1);
 
   const generatePorts = React.useCallback(() => {
-    const newPorts: number[] = []
+    const newPorts: number[] = [];
     for (let i = 0; i < count; i++) {
-      newPorts.push(generateRandomPort())
+      newPorts.push(generateRandomPort());
     }
-    setPorts(newPorts)
-  }, [count])
+    setPorts(newPorts);
+  }, [count]);
 
   React.useEffect(() => {
-    generatePorts()
-  }, [generatePorts])
+    generatePorts();
+  }, [generatePorts]);
 
   const copyToClipboard = (port: number) => {
-    navigator.clipboard.writeText(port.toString())
-    toast.success("Port copied to clipboard")
-  }
+    navigator.clipboard.writeText(port.toString());
+    toast.success("Port copied to clipboard");
+  };
 
   const copyAllToClipboard = () => {
-    navigator.clipboard.writeText(ports.join("\n"))
-    toast.success("All ports copied to clipboard")
-  }
+    navigator.clipboard.writeText(ports.join("\n"));
+    toast.success("All ports copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -56,7 +62,11 @@ export default function RandomPortGeneratorClient() {
                 min="1"
                 max="100"
                 value={count}
-                onChange={(e) => setCount(Math.max(1, Math.min(100, parseInt(e.target.value) || 1)))}
+                onChange={(e) =>
+                  setCount(
+                    Math.max(1, Math.min(100, parseInt(e.target.value) || 1)),
+                  )
+                }
               />
             </div>
 
@@ -77,10 +87,16 @@ export default function RandomPortGeneratorClient() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle>Generated Ports</CardTitle>
-                <CardDescription>{ports.length} port{ports.length !== 1 ? "s" : ""} generated</CardDescription>
+                <CardDescription>
+                  {ports.length} port{ports.length !== 1 ? "s" : ""} generated
+                </CardDescription>
               </div>
               {ports.length > 0 && (
-                <Button variant="outline" size="sm" onClick={copyAllToClipboard}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={copyAllToClipboard}
+                >
                   <Copy className="h-4 w-4 mr-2" />
                   Copy All
                 </Button>
@@ -90,10 +106,15 @@ export default function RandomPortGeneratorClient() {
           <CardContent>
             <div className="space-y-2 max-h-[400px] overflow-y-auto">
               {ports.length === 0 ? (
-                <p className="text-muted-foreground text-sm">No ports generated yet</p>
+                <p className="text-muted-foreground text-sm">
+                  No ports generated yet
+                </p>
               ) : (
                 ports.map((port, index) => (
-                  <div key={index} className="flex items-center gap-2 p-2 rounded border">
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 p-2 rounded border"
+                  >
                     <code className="flex-1 font-mono text-sm">{port}</code>
                     <Button
                       variant="ghost"
@@ -111,5 +132,5 @@ export default function RandomPortGeneratorClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

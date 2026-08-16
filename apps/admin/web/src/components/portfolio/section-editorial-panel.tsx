@@ -5,21 +5,21 @@ import { useRouter } from "next/navigation";
 import { ExternalLink, Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
 
-import type { PortfolioSectionKey } from "@jayant/portfolio-contracts";
-import { APP_BRANDS } from "@jayant/web-brand";
-import { Button } from "@jayant/web-ui/button";
+import type { PortfolioSectionKey } from "@jayantgoyal/portfolio-contracts";
+import { APP_BRANDS } from "@jayantgoyal/web-brand";
+import { Button } from "@jayantgoyal/web-ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@jayant/web-ui/card";
-import { Input } from "@jayant/web-ui/input";
-import { Label } from "@jayant/web-ui/label";
-import { FormMessage } from "@jayant/web-ui/form-message";
-import { Switch } from "@jayant/web-ui/switch";
-import { Textarea } from "@jayant/web-ui/textarea";
+} from "@jayantgoyal/web-ui/card";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { FormMessage } from "@jayantgoyal/web-ui/form-message";
+import { Switch } from "@jayantgoyal/web-ui/switch";
+import { Textarea } from "@jayantgoyal/web-ui/textarea";
 
 import { savePortfolioSectionPresentation } from "@/lib/portfolio-api";
 import type { NavItem, SectionContent } from "@/lib/types";

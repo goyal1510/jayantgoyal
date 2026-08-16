@@ -1,8 +1,8 @@
 import Link from "next/link";
 
-import { AuthCard } from "@jayant/web-ui/auth-presentation";
+import { AuthCard } from "@jayantgoyal/web-ui/auth-presentation";
 import { AuthWelcomeShell } from "@/components/auth/auth-welcome-shell";
-import { Button } from "@jayant/web-ui/button";
+import { Button } from "@jayantgoyal/web-ui/button";
 
 export default function NotFound() {
   return (

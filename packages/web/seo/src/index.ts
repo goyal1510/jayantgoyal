@@ -4,8 +4,10 @@ import {
   APP_BRANDS,
   formatAppPageTitle,
   type AppBrandId,
-} from "@jayant/web-brand";
-import { isApplicationHost } from "@jayant/web-urls";
+} from "@jayantgoyal/web-brand";
+import { isApplicationHost } from "@jayantgoyal/web-urls";
+
+export * from "./app-metadata";
 
 const MAX_METADATA_DESCRIPTION_LENGTH = 160;
 
@@ -21,6 +23,17 @@ export interface PublicPageMetadataInput {
     height: number;
     type?: string;
   };
+}
+
+export interface PublicArticleMetadataInput {
+  appId: AppBrandId;
+  siteUrl: string;
+  title: string;
+  description: string;
+  pathname: string;
+  image: string;
+  publishedTime?: string;
+  modifiedTime?: string;
 }
 
 export function normalizeMetadataDescription(
@@ -71,7 +84,49 @@ export function buildPublicPageMetadata({
       title: socialTitle,
       description: normalizedDescription,
       url: canonical,
+      siteName: APP_BRANDS[appId].publicName,
       images: [socialImage],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: socialTitle,
+      description: normalizedDescription,
+      images: [image],
+    },
+  };
+}
+
+/** Builds complete, normalized metadata for a public authored article. */
+export function buildPublicArticleMetadata({
+  appId,
+  siteUrl,
+  title,
+  description,
+  pathname,
+  image,
+  publishedTime,
+  modifiedTime,
+}: PublicArticleMetadataInput): Metadata {
+  const canonical = new URL(pathname, siteUrl).toString();
+  const socialTitle = formatAppPageTitle(appId, title);
+  const normalizedDescription = normalizeMetadataDescription(
+    description,
+    APP_BRANDS[appId].description,
+  );
+
+  return {
+    title,
+    description: normalizedDescription,
+    alternates: { canonical },
+    openGraph: {
+      type: "article",
+      title: socialTitle,
+      description: normalizedDescription,
+      url: canonical,
+      siteName: APP_BRANDS[appId].publicName,
+      publishedTime,
+      modifiedTime,
+      images: [{ url: image, alt: socialTitle }],
     },
     twitter: {
       card: "summary_large_image",

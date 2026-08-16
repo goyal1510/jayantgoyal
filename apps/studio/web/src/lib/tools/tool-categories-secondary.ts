@@ -99,14 +99,16 @@ export const secondaryToolCategories: ToolCategory[] = [
       {
         id: "regex-tester",
         title: "Regex Tester",
-        description: "Test your regular expressions with sample text.",
+        description:
+          "Test regular expressions against sample text and inspect matches while refining patterns and flags.",
         icon: Regex,
         path: "/tools/code-dev-tools/regex-tester",
       },
       {
         id: "regex-cheatsheet",
         title: "Regex Cheatsheet",
-        description: "Javascript Regex/Regular Expression cheatsheet.",
+        description:
+          "Reference common JavaScript regular-expression syntax, groups, assertions, flags, and practical patterns.",
         icon: Regex,
         path: "/tools/code-dev-tools/regex-cheatsheet",
       },
@@ -328,7 +330,8 @@ export const secondaryToolCategories: ToolCategory[] = [
       {
         id: "outlook-safelink-decoder",
         title: "Outlook Safelink Decoder",
-        description: "Decode Outlook SafeLink links.",
+        description:
+          "Decode Microsoft Outlook Safe Links and recover the original destination URL for inspection.",
         icon: Link,
         path: "/tools/other/outlook-safelink-decoder",
       },

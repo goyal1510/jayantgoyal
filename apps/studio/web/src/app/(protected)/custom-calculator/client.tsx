@@ -8,7 +8,7 @@ import DragDropContainer from "@/components/custom-calculator/DragDropContainer"
 import DragDropProvider from "@/components/custom-calculator/DragDropProvider";
 import { useCalculatorStore } from "@/lib/custom-calculator/useCalculatorStore";
 import { Blocks } from "lucide-react";
-import { WorkspaceHeader } from "@jayant/web-ui/workspace-header";
+import { WorkspaceHeader } from "@jayantgoyal/web-ui/workspace-header";
 
 function CalculatorApp() {
   return (

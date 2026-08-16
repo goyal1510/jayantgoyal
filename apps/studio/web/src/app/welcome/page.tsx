@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { buildAuthLoginUrl } from "@jayant/web-auth/entry";
+import { buildAuthLoginUrl } from "@jayantgoyal/web-auth/entry";
 
 export const metadata: Metadata = {
   title: "Welcome",
-  description: "Continue to the Jayant account sign-in experience.",
+  description: "Continue to secure account sign-in for Studio and Admin.",
 };
 
 export default async function WelcomePage({

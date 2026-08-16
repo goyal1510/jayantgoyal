@@ -9,7 +9,7 @@ import {
   Calendar,
 } from "lucide-react";
 import { m } from "framer-motion";
-import type { GitHubStats } from "@jayant/github";
+import type { GitHubStats } from "@jayantgoyal/github";
 
 interface StatsCardsProps {
   stats: GitHubStats;

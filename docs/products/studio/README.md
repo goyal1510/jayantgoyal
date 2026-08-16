@@ -3,7 +3,7 @@
 Studio is Jayant's product catalog, browser-utility collection, game hub, and
 personal workspace at
 [studio.jayantgoyal.com](https://studio.jayantgoyal.com). The current client is
-`apps/studio/web`, workspace `@jayant/studio-web`, running locally on port 3001.
+`apps/studio/web`, workspace `@jayantgoyal/studio-web`, running locally on port 3001.
 
 ## Product boundary
 
@@ -14,14 +14,13 @@ Studio owns four kinds of experience:
 - account-owned productivity workspaces;
 - local/computer and realtime room-based games.
 
-It does not own credential entry, Portfolio editorial content, user-role
-administration, or the external e-commerce experiment linked from its catalog.
-Auth owns account entry/security. Portfolio owns Writing even when Studio links
-to it.
+It does not own credential entry, Portfolio editorial content, or user-role
+administration. Auth owns account entry/security. Portfolio owns Writing even
+when Studio links to it. No commerce surface is currently implemented.
 
 ## Implemented surface
 
-The current web route tree contains 125 pages and 39 route handlers. The public
+The current web route tree contains 125 pages and 40 route handlers. The public
 utility collection has 87 tool pages in 11 categories. Game Hub has nine games,
 eight with online-room support. Exact current inventories are documented in:
 
@@ -79,12 +78,12 @@ Account workspaces use Studio-owned API routes and `jg_app` RLS:
 - Tool usage: favorites and bounded recent history.
 
 Calculator Builder currently persists browser state through Zustand rather
-than the database. This local state does not justify an ecosystem package.
+than the database. This local state does not justify a foundation package.
 
 ## Dependencies
 
-Studio consumes `@jayant/web-auth`, `@jayant/web-brand`, `@jayant/web-urls`,
-`@jayant/web-seo`, `@jayant/web-ui`, `@jayant/github`, shared Tailwind, and
+Studio consumes `@jayantgoyal/web-auth`, `@jayantgoyal/web-brand`, `@jayantgoyal/web-urls`,
+`@jayantgoyal/web-seo`, `@jayantgoyal/web-ui`, `@jayantgoyal/github`, shared Tailwind, and
 tooling configuration. Studio product rules, game engines, file operations,
 weather, calculators, and tool metadata remain inside Studio because another
 product does not consume those domains.

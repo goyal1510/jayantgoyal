@@ -1,92 +1,103 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 function formatXML(xml: string): string {
   try {
-    const parser = new DOMParser()
-    const xmlDoc = parser.parseFromString(xml, "text/xml")
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(xml, "text/xml");
 
-    const parseError = xmlDoc.querySelector("parsererror")
+    const parseError = xmlDoc.querySelector("parsererror");
     if (parseError) {
-      throw new Error("Invalid XML")
+      throw new Error("Invalid XML");
     }
 
     function formatNode(node: Node, indent: number = 0): string {
-      const spaces = "  ".repeat(indent)
-      let result = ""
+      const spaces = "  ".repeat(indent);
+      let result = "";
 
       if (node.nodeType === Node.ELEMENT_NODE) {
-        const element = node as Element
-        const tagName = element.tagName
+        const element = node as Element;
+        const tagName = element.tagName;
         const attributes = Array.from(element.attributes)
-          .map(attr => ` ${attr.name}="${attr.value}"`)
-          .join("")
+          .map((attr) => ` ${attr.name}="${attr.value}"`)
+          .join("");
 
         const children = Array.from(element.childNodes).filter(
-          child => child.nodeType === Node.ELEMENT_NODE || (child.nodeType === Node.TEXT_NODE && child.textContent?.trim())
-        )
+          (child) =>
+            child.nodeType === Node.ELEMENT_NODE ||
+            (child.nodeType === Node.TEXT_NODE && child.textContent?.trim()),
+        );
 
         if (children.length === 0) {
-          result += `${spaces}<${tagName}${attributes} />\n`
+          result += `${spaces}<${tagName}${attributes} />\n`;
         } else {
-          result += `${spaces}<${tagName}${attributes}>\n`
+          result += `${spaces}<${tagName}${attributes}>\n`;
 
           children.forEach((child) => {
-            if (child.nodeType === Node.TEXT_NODE && child.textContent?.trim()) {
-              result += `${spaces}  ${child.textContent.trim()}\n`
+            if (
+              child.nodeType === Node.TEXT_NODE &&
+              child.textContent?.trim()
+            ) {
+              result += `${spaces}  ${child.textContent.trim()}\n`;
             } else if (child.nodeType === Node.ELEMENT_NODE) {
-              result += formatNode(child, indent + 1)
+              result += formatNode(child, indent + 1);
             }
-          })
+          });
 
-          result += `${spaces}</${tagName}>\n`
+          result += `${spaces}</${tagName}>\n`;
         }
       }
 
-      return result
+      return result;
     }
 
-    return formatNode(xmlDoc.documentElement)
+    return formatNode(xmlDoc.documentElement);
   } catch {
-    throw new Error("Failed to format XML")
+    throw new Error("Failed to format XML");
   }
 }
 
 export default function XMLFormatterClient() {
-  const [input, setInput] = React.useState("")
-  const [output, setOutput] = React.useState("")
-  const [error, setError] = React.useState("")
+  const [input, setInput] = React.useState("");
+  const [output, setOutput] = React.useState("");
+  const [error, setError] = React.useState("");
 
   const format = React.useCallback(() => {
     if (!input.trim()) {
-      setOutput("")
-      setError("")
-      return
+      setOutput("");
+      setError("");
+      return;
     }
 
     try {
-      const formatted = formatXML(input)
-      setOutput(formatted)
-      setError("")
+      const formatted = formatXML(input);
+      setOutput(formatted);
+      setError("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Invalid XML")
-      setOutput("")
+      setError(err instanceof Error ? err.message : "Invalid XML");
+      setOutput("");
     }
-  }, [input])
+  }, [input]);
 
   React.useEffect(() => {
-    format()
-  }, [format])
+    format();
+  }, [format]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(output)
-    toast.success("Formatted XML copied to clipboard")
-  }
+    navigator.clipboard.writeText(output);
+    toast.success("Formatted XML copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -100,12 +111,10 @@ export default function XMLFormatterClient() {
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder='<root><item>value</item></root>'
+              placeholder="<root><item>value</item></root>"
               className="w-full min-h-[400px] rounded-md border border-input bg-transparent px-3 py-2 text-sm font-mono"
             />
-            {error && (
-              <p className="text-sm text-red-500 mt-2">{error}</p>
-            )}
+            {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
           </CardContent>
         </Card>
 
@@ -134,5 +143,5 @@ export default function XMLFormatterClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

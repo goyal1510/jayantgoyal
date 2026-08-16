@@ -5,10 +5,15 @@ import { BarChart3, Delete, Globe2, Loader2, RotateCcw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-import { Button } from "@jayant/web-ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@jayant/web-ui/card";
-import { Input } from "@jayant/web-ui/input";
-import { Label } from "@jayant/web-ui/label";
+import { Button } from "@jayantgoyal/web-ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
 
 import { GameSetupSheet } from "@/components/games/game-setup-sheet";
 import {

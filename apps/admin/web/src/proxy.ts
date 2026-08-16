@@ -1,10 +1,13 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { buildAuthLoginUrl, buildAuthMfaUrl } from "@jayant/web-auth/entry";
+import {
+  buildAuthLoginUrl,
+  buildAuthMfaUrl,
+} from "@jayantgoyal/web-auth/entry";
 import {
   copyAuthCacheHeaders,
   createSupabaseRequestClient,
-} from "@jayant/web-auth/server";
+} from "@jayantgoyal/web-auth/server";
 
 export const config = {
   matcher: [

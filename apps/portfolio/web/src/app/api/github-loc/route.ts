@@ -1,5 +1,5 @@
-import { GitHubApiError, type GitHubLOCStats } from "@jayant/github";
-import { githubServerClient } from "@jayant/github/server";
+import { GitHubApiError, type GitHubLOCStats } from "@jayantgoyal/github";
+import { githubServerClient } from "@jayantgoyal/github/server";
 import { type NextRequest, NextResponse } from "next/server";
 
 type ResponseCacheEntry = {

@@ -10,14 +10,14 @@ import {
   ChevronDown,
   ChevronRight,
 } from "lucide-react";
-import { Button } from "@jayant/web-ui/button";
-import { IconAction } from "@jayant/web-ui/icon-action";
-import { VisibilityBadge } from "@jayant/web-ui/status-badge";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { IconAction } from "@jayantgoyal/web-ui/icon-action";
+import { VisibilityBadge } from "@jayantgoyal/web-ui/status-badge";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@jayant/web-ui/collapsible";
+} from "@jayantgoyal/web-ui/collapsible";
 import type {
   SkillCategoryWithSkills,
   SkillCategory,

@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  buildAppManifest,
+  buildAppRootMetadata,
+  buildPublicArticleMetadata,
   buildPublicPageMetadata,
   isCanonicalApplicationHost,
   isIndexablePath,
@@ -10,6 +13,26 @@ import {
 } from "./index";
 
 describe("shared SEO helpers", () => {
+  it("builds complete product root metadata and manifest identity", () => {
+    const metadata = buildAppRootMetadata({ appId: "studio" });
+    const manifest = buildAppManifest({
+      appId: "studio",
+      backgroundColor: "#000000",
+      themeColor: "#ffffff",
+    });
+
+    expect(metadata.applicationName).toBe("Studio by Jayant");
+    expect(metadata.authors).toEqual([
+      { name: "Jayant", url: "https://jayantgoyal.com" },
+    ]);
+    expect(metadata.openGraph?.siteName).toBe("Studio by Jayant");
+    expect(metadata.twitter?.images).toEqual([
+      "https://studio.jayantgoyal.com/images/social/studio-preview.jpg?v=20260816",
+    ]);
+    expect(manifest.name).toBe("Studio by Jayant");
+    expect(manifest.short_name).toBe("Studio");
+  });
+
   it("builds canonical and social metadata from the app contract", () => {
     const metadata = buildPublicPageMetadata({
       appId: "studio",
@@ -17,7 +40,7 @@ describe("shared SEO helpers", () => {
       title: "Weather",
       description: "Weather workspace",
       pathname: "/weather",
-      image: "https://studio.jayantgoyal.com/opengraph-image",
+      image: "https://studio.jayantgoyal.com/images/social/studio-preview.jpg",
     });
 
     expect(metadata.title).toBe("Weather");
@@ -25,7 +48,23 @@ describe("shared SEO helpers", () => {
       "https://studio.jayantgoyal.com/weather",
     );
     expect(metadata.openGraph?.title).toBe("Weather | Studio");
+    expect(metadata.openGraph?.siteName).toBe("Studio by Jayant");
     expect(metadata.twitter?.title).toBe("Weather | Studio");
+  });
+
+  it("normalizes complete article metadata from the shared app contract", () => {
+    const metadata = buildPublicArticleMetadata({
+      appId: "portfolio",
+      siteUrl: "https://jayantgoyal.com",
+      title: "A durable article",
+      description: "A ".repeat(100),
+      pathname: "/writing/a-durable-article",
+      image: "https://jayantgoyal.com/images/social/portfolio-preview.jpg",
+    });
+
+    expect(metadata.description?.length).toBeLessThanOrEqual(160);
+    expect(metadata.openGraph?.siteName).toBe("Jayant");
+    expect(metadata.openGraph).toMatchObject({ type: "article" });
   });
 
   it("uses the app description when CMS metadata copy is blank", () => {
@@ -35,7 +74,7 @@ describe("shared SEO helpers", () => {
       title: "About",
       description: "   ",
       pathname: "/about",
-      image: "https://jayantgoyal.com/opengraph-image",
+      image: "https://jayantgoyal.com/images/social/portfolio-preview.jpg",
     });
 
     expect(metadata.description).toBe(
@@ -66,7 +105,7 @@ describe("shared SEO helpers", () => {
     expect(isIndexablePath("/files", ["/"], ["/weather"])).toBe(false);
   });
 
-  it("uses the platform host contract", () => {
+  it("uses the application host contract", () => {
     expect(
       isCanonicalApplicationHost("studio", "studio.jayantgoyal.com:443"),
     ).toBe(true);

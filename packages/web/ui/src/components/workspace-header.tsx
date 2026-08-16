@@ -1,6 +1,6 @@
 import type { ComponentType, ReactNode } from "react";
 
-import { cn } from "@jayant/web-ui/lib/utils";
+import { cn } from "@jayantgoyal/web-ui/lib/utils";
 
 const toneClasses = {
   blue: "border-[#a8c3e7] bg-[#dce9f8] text-[#211512] dark:border-[#40536b] dark:bg-[#243142] dark:text-[#fff8ef]",

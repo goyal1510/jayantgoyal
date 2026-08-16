@@ -1,40 +1,49 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
-import { Play } from "lucide-react"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Play } from "lucide-react";
 
 export default function BenchmarkBuilderClient() {
-  const [code, setCode] = React.useState("")
-  const [iterations, setIterations] = React.useState(1000)
-  const [results, setResults] = React.useState<{ time: number; average: number } | null>(null)
-  const [running, setRunning] = React.useState(false)
+  const [code, setCode] = React.useState("");
+  const [iterations, setIterations] = React.useState(1000);
+  const [results, setResults] = React.useState<{
+    time: number;
+    average: number;
+  } | null>(null);
+  const [running, setRunning] = React.useState(false);
 
   const runBenchmark = () => {
-    if (!code.trim()) return
+    if (!code.trim()) return;
 
-    setRunning(true)
-    const start = performance.now()
+    setRunning(true);
+    const start = performance.now();
 
     try {
-      const func = new Function(code)
+      const func = new Function(code);
       for (let i = 0; i < iterations; i++) {
-        func()
+        func();
       }
-      const end = performance.now()
-      const totalTime = end - start
-      const average = totalTime / iterations
+      const end = performance.now();
+      const totalTime = end - start;
+      const average = totalTime / iterations;
 
-      setResults({ time: totalTime, average })
+      setResults({ time: totalTime, average });
     } catch {
-      setResults({ time: 0, average: 0 })
+      setResults({ time: 0, average: 0 });
     } finally {
-      setRunning(false)
+      setRunning(false);
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -52,7 +61,9 @@ export default function BenchmarkBuilderClient() {
               min="1"
               max="100000"
               value={iterations}
-              onChange={(e) => setIterations(Math.max(1, parseInt(e.target.value) || 1))}
+              onChange={(e) =>
+                setIterations(Math.max(1, parseInt(e.target.value) || 1))
+              }
             />
           </div>
           <div className="space-y-2">
@@ -80,15 +91,21 @@ export default function BenchmarkBuilderClient() {
           <CardContent className="space-y-2">
             <div>
               <Label className="text-muted-foreground">Total Time</Label>
-              <p className="font-semibold text-lg">{results.time.toFixed(4)} ms</p>
+              <p className="font-semibold text-lg">
+                {results.time.toFixed(4)} ms
+              </p>
             </div>
             <div>
-              <Label className="text-muted-foreground">Average Time per Iteration</Label>
-              <p className="font-semibold text-lg">{results.average.toFixed(6)} ms</p>
+              <Label className="text-muted-foreground">
+                Average Time per Iteration
+              </Label>
+              <p className="font-semibold text-lg">
+                {results.average.toFixed(6)} ms
+              </p>
             </div>
           </CardContent>
         </Card>
       )}
     </div>
-  )
+  );
 }

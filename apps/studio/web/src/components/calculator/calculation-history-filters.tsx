@@ -1,7 +1,7 @@
 import { Search } from "lucide-react";
 
-import { Button } from "@jayant/web-ui/button";
-import { Input } from "@jayant/web-ui/input";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
 
 import { type AmountFilter, formatDateKeyLabel } from "./calculations-utils";
 

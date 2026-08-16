@@ -5,7 +5,7 @@ import { WelcomeForm } from "@/components/auth/welcome-form";
 import { resolveAuthReturnTarget } from "@/lib/auth/returns";
 import { buildAuthLandingMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = buildAuthLandingMetadata("/welcome");
+export const metadata: Metadata = buildAuthLandingMetadata();
 
 export default async function WelcomePage({
   searchParams,

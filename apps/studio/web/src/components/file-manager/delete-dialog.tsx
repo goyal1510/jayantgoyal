@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,16 +8,16 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@jayant/web-ui/dialog"
-import { Button } from "@jayant/web-ui/button"
-import { Trash2, AlertTriangle } from "lucide-react"
-import type { DirectoryListingItem } from "@/lib/file-manager/types"
+} from "@jayantgoyal/web-ui/dialog";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Trash2, AlertTriangle } from "lucide-react";
+import type { DirectoryListingItem } from "@/lib/file-manager/types";
 
 interface DeleteDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  file: DirectoryListingItem | null
-  onSuccess?: () => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  file: DirectoryListingItem | null;
+  onSuccess?: () => void;
 }
 
 export function DeleteDialog({
@@ -26,49 +26,49 @@ export function DeleteDialog({
   file,
   onSuccess,
 }: DeleteDialogProps) {
-  const [loading, setLoading] = React.useState(false)
-  const [error, setError] = React.useState<string | null>(null)
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
 
   // Reset error when dialog opens/closes
   React.useEffect(() => {
     if (!open) {
-      setError(null)
+      setError(null);
     }
-  }, [open])
+  }, [open]);
 
   const handleDelete = async () => {
-    if (!file) return
+    if (!file) return;
 
-    setError(null)
-    setLoading(true)
+    setError(null);
+    setLoading(true);
 
     try {
       const response = await fetch(`/api/files/${file.id}`, {
         method: "DELETE",
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to delete")
+        throw new Error(data.error || "Failed to delete");
       }
 
       // Success
-      onOpenChange(false)
+      onOpenChange(false);
       if (onSuccess) {
-        onSuccess()
+        onSuccess();
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
+      setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  if (!file) return null
+  if (!file) return null;
 
-  const displayName = file.display_name || file.file_name
-  const isDirectory = file.is_directory
+  const displayName = file.display_name || file.file_name;
+  const isDirectory = file.is_directory;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -82,17 +82,17 @@ export function DeleteDialog({
             Are you sure you want to delete &ldquo;{displayName}&rdquo;?
             {isDirectory && file.child_count > 0 && (
               <span className="block mt-2 text-destructive">
-                This folder contains {file.child_count} item{file.child_count !== 1 ? "s" : ""}.
+                This folder contains {file.child_count} item
+                {file.child_count !== 1 ? "s" : ""}.
               </span>
             )}
             <span className="block mt-2">
-              This action cannot be undone. The {isDirectory ? "folder" : "file"} will be moved to trash.
+              This action cannot be undone. The{" "}
+              {isDirectory ? "folder" : "file"} will be moved to trash.
             </span>
           </DialogDescription>
         </DialogHeader>
-        {error && (
-          <div className="text-sm text-destructive">{error}</div>
-        )}
+        {error && <div className="text-sm text-destructive">{error}</div>}
         <DialogFooter className="flex-col-reverse sm:flex-row gap-2">
           <Button
             type="button"
@@ -116,5 +116,5 @@ export function DeleteDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

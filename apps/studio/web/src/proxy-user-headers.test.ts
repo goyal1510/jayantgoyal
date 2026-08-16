@@ -5,9 +5,9 @@ const mocks = vi.hoisted(() => ({
   getUser: vi.fn(),
 }));
 
-vi.mock("@jayant/web-auth/server", async (importOriginal) => {
+vi.mock("@jayantgoyal/web-auth/server", async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import("@jayant/web-auth/server")>();
+    await importOriginal<typeof import("@jayantgoyal/web-auth/server")>();
 
   return {
     ...actual,

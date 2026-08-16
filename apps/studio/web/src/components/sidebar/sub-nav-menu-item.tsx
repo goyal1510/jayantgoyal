@@ -1,27 +1,27 @@
-"use client"
+"use client";
 
-import React from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { ChevronRight } from "lucide-react"
-import { cn } from "@jayant/web-ui/lib/utils"
-import type { AppConfig, NavItem } from "@/lib/config/hub-config"
+import React from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { ChevronRight } from "lucide-react";
+import { cn } from "@jayantgoyal/web-ui/lib/utils";
+import type { AppConfig, NavItem } from "@/lib/config/hub-config";
 
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@jayant/web-ui/collapsible"
+} from "@jayantgoyal/web-ui/collapsible";
 import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@jayant/web-ui/sidebar"
+} from "@jayantgoyal/web-ui/sidebar";
 
-import { CollapsedFlyout } from "./collapsed-flyout"
-import { FlyoutItem, FlyoutAnchorItem } from "./flyout-items"
+import { CollapsedFlyout } from "./collapsed-flyout";
+import { FlyoutItem, FlyoutAnchorItem } from "./flyout-items";
 
 export function SubNavMenuItem({
   app,
@@ -31,33 +31,33 @@ export function SubNavMenuItem({
   router,
   closeMobileSidebar,
 }: {
-  app: AppConfig
-  isActiveApp: boolean
-  activeNavId?: string
-  isCollapsed: boolean
-  router: ReturnType<typeof useRouter>
-  closeMobileSidebar: () => void
+  app: AppConfig;
+  isActiveApp: boolean;
+  activeNavId?: string;
+  isCollapsed: boolean;
+  router: ReturnType<typeof useRouter>;
+  closeMobileSidebar: () => void;
 }) {
-  const itemRef = React.useRef<HTMLLIElement>(null)
-  const [flyoutOpen, setFlyoutOpen] = React.useState(false)
+  const itemRef = React.useRef<HTMLLIElement>(null);
+  const [flyoutOpen, setFlyoutOpen] = React.useState(false);
 
   // Close flyout when sidebar expands
   React.useEffect(() => {
-    if (!isCollapsed) setFlyoutOpen(false)
-  }, [isCollapsed])
+    if (!isCollapsed) setFlyoutOpen(false);
+  }, [isCollapsed]);
 
   const handleIconClick = () => {
     if (isCollapsed) {
-      setFlyoutOpen((prev) => !prev)
+      setFlyoutOpen((prev) => !prev);
     }
-  }
+  };
 
-  const closeFlyout = () => setFlyoutOpen(false)
+  const closeFlyout = () => setFlyoutOpen(false);
 
   const handleFlyoutNavigate = () => {
-    closeFlyout()
-    closeMobileSidebar()
-  }
+    closeFlyout();
+    closeMobileSidebar();
+  };
 
   return (
     <Collapsible
@@ -89,32 +89,36 @@ export function SubNavMenuItem({
         <CollapsibleContent>
           <SidebarMenuSub>
             {app.navItems.map((navItem) => {
-              const isActiveNav = isActiveApp && activeNavId === navItem.id
+              const isActiveNav = isActiveApp && activeNavId === navItem.id;
 
               // Portfolio uses hash navigation (scroll-based)
               if (app.id === "portfolio") {
                 return (
                   <SidebarMenuSubItem key={navItem.id}>
-                    <SidebarMenuSubButton
-                      asChild
-                      isActive={isActiveNav}
-                    >
+                    <SidebarMenuSubButton asChild isActive={isActiveNav}>
                       <a
                         href={`/#${navItem.id}`}
                         onClick={(e) => {
-                          e.preventDefault()
-                          closeMobileSidebar()
+                          e.preventDefault();
+                          closeMobileSidebar();
                           // Delay scroll to let sidebar close animation finish
                           requestAnimationFrame(() => {
-                            const el = document.getElementById(navItem.id)
+                            const el = document.getElementById(navItem.id);
                             if (el) {
-                              const top = el.getBoundingClientRect().top + window.scrollY - 80
-                              window.scrollTo({ top, behavior: "smooth" })
-                              window.history.replaceState(null, "", `/#${navItem.id}`)
+                              const top =
+                                el.getBoundingClientRect().top +
+                                window.scrollY -
+                                80;
+                              window.scrollTo({ top, behavior: "smooth" });
+                              window.history.replaceState(
+                                null,
+                                "",
+                                `/#${navItem.id}`,
+                              );
                             } else {
-                              router.push(`/#${navItem.id}`)
+                              router.push(`/#${navItem.id}`);
                             }
-                          })
+                          });
                         }}
                       >
                         <navItem.icon className={cn("size-4", navItem.color)} />
@@ -122,31 +126,37 @@ export function SubNavMenuItem({
                       </a>
                     </SidebarMenuSubButton>
                   </SidebarMenuSubItem>
-                )
+                );
               }
 
               // Other apps use URL-based navigation
-              const href = navItem.url ?? `/${app.id}/${navItem.id}`
+              const href = navItem.url ?? `/${app.id}/${navItem.id}`;
               return (
                 <SidebarMenuSubItem key={navItem.id}>
-                  <SidebarMenuSubButton
-                    asChild
-                    isActive={isActiveNav}
-                  >
-                    <Link href={href} prefetch={false} onClick={closeMobileSidebar}>
+                  <SidebarMenuSubButton asChild isActive={isActiveNav}>
+                    <Link
+                      href={href}
+                      prefetch={false}
+                      onClick={closeMobileSidebar}
+                    >
                       <navItem.icon className={cn("size-4", navItem.color)} />
                       <span>{navItem.label}</span>
                     </Link>
                   </SidebarMenuSubButton>
                 </SidebarMenuSubItem>
-              )
+              );
             })}
           </SidebarMenuSub>
         </CollapsibleContent>
 
-        <CollapsedFlyout triggerRef={itemRef} open={flyoutOpen} onClose={closeFlyout} title={app.name}>
+        <CollapsedFlyout
+          triggerRef={itemRef}
+          open={flyoutOpen}
+          onClose={closeFlyout}
+          title={app.name}
+        >
           {app.navItems.map((navItem: NavItem) => {
-            const isActiveNav = isActiveApp && activeNavId === navItem.id
+            const isActiveNav = isActiveApp && activeNavId === navItem.id;
 
             if (app.id === "portfolio") {
               return (
@@ -158,22 +168,23 @@ export function SubNavMenuItem({
                   color={navItem.color}
                   isActive={isActiveNav}
                   onClick={(e) => {
-                    e.preventDefault()
-                    handleFlyoutNavigate()
-                    const el = document.getElementById(navItem.id)
+                    e.preventDefault();
+                    handleFlyoutNavigate();
+                    const el = document.getElementById(navItem.id);
                     if (el) {
-                      const top = el.getBoundingClientRect().top + window.scrollY - 80
-                      window.scrollTo({ top, behavior: "smooth" })
-                      window.history.replaceState(null, "", `/#${navItem.id}`)
+                      const top =
+                        el.getBoundingClientRect().top + window.scrollY - 80;
+                      window.scrollTo({ top, behavior: "smooth" });
+                      window.history.replaceState(null, "", `/#${navItem.id}`);
                     } else {
-                      router.push(`/#${navItem.id}`)
+                      router.push(`/#${navItem.id}`);
                     }
                   }}
                 />
-              )
+              );
             }
 
-            const href = navItem.url ?? `/${app.id}/${navItem.id}`
+            const href = navItem.url ?? `/${app.id}/${navItem.id}`;
             return (
               <FlyoutItem
                 key={navItem.id}
@@ -184,10 +195,10 @@ export function SubNavMenuItem({
                 isActive={isActiveNav}
                 onClick={handleFlyoutNavigate}
               />
-            )
+            );
           })}
         </CollapsedFlyout>
       </SidebarMenuItem>
     </Collapsible>
-  )
+  );
 }

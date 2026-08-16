@@ -6,11 +6,16 @@ import { useRouter } from "next/navigation";
 import { Globe2, Loader2, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 
-import { Button } from "@jayant/web-ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@jayant/web-ui/card";
-import { Input } from "@jayant/web-ui/input";
-import { Label } from "@jayant/web-ui/label";
-import { cn } from "@jayant/web-ui/lib/utils";
+import { Button } from "@jayantgoyal/web-ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { cn } from "@jayantgoyal/web-ui/lib/utils";
 
 import { GameSetupSheet } from "@/components/games/game-setup-sheet";
 import {

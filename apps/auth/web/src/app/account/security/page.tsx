@@ -12,8 +12,14 @@ import {
 
 import { AccountWorkspaceHeader } from "@/components/account/account-workspace-header";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { Badge } from "@jayant/web-ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card";
+import { Badge } from "@jayantgoyal/web-ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
 
 export const metadata: Metadata = { title: "Account security" };
 

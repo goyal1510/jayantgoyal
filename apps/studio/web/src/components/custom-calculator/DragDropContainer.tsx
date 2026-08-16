@@ -2,9 +2,9 @@
 
 import { useDrop } from "react-dnd";
 import { useCalculatorStore } from "@/lib/custom-calculator/useCalculatorStore";
-import { Button } from "@jayant/web-ui/button";
+import { Button } from "@jayantgoyal/web-ui/button";
 import { CalculatorComponent } from "@/lib/custom-calculator/types";
-import { cn } from "@jayant/web-ui/lib/utils";
+import { cn } from "@jayantgoyal/web-ui/lib/utils";
 import { GripVertical, MousePointerClick, Trash2, X } from "lucide-react";
 
 function DragDropContainer() {

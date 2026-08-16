@@ -1,45 +1,102 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 const caseTypes = [
   { id: "lowercase", label: "lowercase", fn: (s: string) => s.toLowerCase() },
   { id: "uppercase", label: "UPPERCASE", fn: (s: string) => s.toUpperCase() },
-  { id: "title", label: "Title Case", fn: (s: string) => s.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()) },
-  { id: "camel", label: "camelCase", fn: (s: string) => s.replace(/(?:^\w|[A-Z]|\b\w)/g, (word, index) => index === 0 ? word.toLowerCase() : word.toUpperCase()).replace(/\s+/g, "") },
-  { id: "pascal", label: "PascalCase", fn: (s: string) => s.replace(/(?:^\w|[A-Z]|\b\w)/g, (word) => word.toUpperCase()).replace(/\s+/g, "") },
-  { id: "snake", label: "snake_case", fn: (s: string) => s.replace(/\W+/g, " ").split(/ |\B(?=[A-Z])/).map(word => word.toLowerCase()).join("_") },
-  { id: "kebab", label: "kebab-case", fn: (s: string) => s.replace(/\W+/g, " ").split(/ |\B(?=[A-Z])/).map(word => word.toLowerCase()).join("-") },
-  { id: "constant", label: "CONSTANT_CASE", fn: (s: string) => s.replace(/\W+/g, " ").split(/ |\B(?=[A-Z])/).map(word => word.toUpperCase()).join("_") },
-]
+  {
+    id: "title",
+    label: "Title Case",
+    fn: (s: string) =>
+      s.replace(
+        /\w\S*/g,
+        (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(),
+      ),
+  },
+  {
+    id: "camel",
+    label: "camelCase",
+    fn: (s: string) =>
+      s
+        .replace(/(?:^\w|[A-Z]|\b\w)/g, (word, index) =>
+          index === 0 ? word.toLowerCase() : word.toUpperCase(),
+        )
+        .replace(/\s+/g, ""),
+  },
+  {
+    id: "pascal",
+    label: "PascalCase",
+    fn: (s: string) =>
+      s
+        .replace(/(?:^\w|[A-Z]|\b\w)/g, (word) => word.toUpperCase())
+        .replace(/\s+/g, ""),
+  },
+  {
+    id: "snake",
+    label: "snake_case",
+    fn: (s: string) =>
+      s
+        .replace(/\W+/g, " ")
+        .split(/ |\B(?=[A-Z])/)
+        .map((word) => word.toLowerCase())
+        .join("_"),
+  },
+  {
+    id: "kebab",
+    label: "kebab-case",
+    fn: (s: string) =>
+      s
+        .replace(/\W+/g, " ")
+        .split(/ |\B(?=[A-Z])/)
+        .map((word) => word.toLowerCase())
+        .join("-"),
+  },
+  {
+    id: "constant",
+    label: "CONSTANT_CASE",
+    fn: (s: string) =>
+      s
+        .replace(/\W+/g, " ")
+        .split(/ |\B(?=[A-Z])/)
+        .map((word) => word.toUpperCase())
+        .join("_"),
+  },
+];
 
 export default function CaseConverterClient() {
-  const [input, setInput] = React.useState("")
-  const [results, setResults] = React.useState<Record<string, string>>({})
+  const [input, setInput] = React.useState("");
+  const [results, setResults] = React.useState<Record<string, string>>({});
 
   React.useEffect(() => {
     if (!input.trim()) {
-      setResults({})
-      return
+      setResults({});
+      return;
     }
 
-    const newResults: Record<string, string> = {}
+    const newResults: Record<string, string> = {};
     caseTypes.forEach((type) => {
-      newResults[type.id] = type.fn(input)
-    })
-    setResults(newResults)
-  }, [input])
+      newResults[type.id] = type.fn(input);
+    });
+    setResults(newResults);
+  }, [input]);
 
   const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text)
-    toast.success("Copied to clipboard")
-  }
+    navigator.clipboard.writeText(text);
+    toast.success("Copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -87,5 +144,5 @@ export default function CaseConverterClient() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

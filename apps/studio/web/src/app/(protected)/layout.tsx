@@ -4,19 +4,19 @@ import { cookies, headers } from "next/headers";
 import {
   hasAuthSessionCookie,
   resolveAuthSessionMode,
-} from "@jayant/web-auth/cookies";
+} from "@jayantgoyal/web-auth/cookies";
 
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { DynamicBreadcrumb } from "@/components/sidebar/dynamic-breadcrumb";
-import { LazyMotionProvider } from "@jayant/web-ui/lazy-motion-provider";
-import { ApplicationShell } from "@jayant/web-ui/application-shell";
-import { ApplicationTopbar } from "@jayant/web-ui/application-topbar";
+import { LazyMotionProvider } from "@jayantgoyal/web-ui/lazy-motion-provider";
+import { ApplicationShell } from "@jayantgoyal/web-ui/application-shell";
+import { ApplicationTopbar } from "@jayantgoyal/web-ui/application-topbar";
 import {
   SIDEBAR_STATE_COOKIE_NAME,
   SIDEBAR_WIDTH_COOKIE_NAME,
   parseSidebarPreferences,
-} from "@jayant/web-ui/lib/sidebar-preferences";
-import { RouteChangeProvider } from "@jayant/web-ui/route-change-provider";
+} from "@jayantgoyal/web-ui/lib/sidebar-preferences";
+import { RouteChangeProvider } from "@jayantgoyal/web-ui/route-change-provider";
 import { TermsAcceptanceCheck } from "@/components/auth/terms-acceptance-check";
 import { AuthGateWrapper } from "@/components/auth/auth-gate";
 import { LazyCommandPalette } from "@/components/providers/lazy-components";

@@ -1,65 +1,71 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 function convertTemperature(value: number, from: string, to: string): number {
   // Convert to Celsius first
-  let celsius = 0
+  let celsius = 0;
 
   switch (from) {
     case "Celsius":
-      celsius = value
-      break
+      celsius = value;
+      break;
     case "Fahrenheit":
-      celsius = (value - 32) * 5 / 9
-      break
+      celsius = ((value - 32) * 5) / 9;
+      break;
     case "Kelvin":
-      celsius = value - 273.15
-      break
+      celsius = value - 273.15;
+      break;
     case "Rankine":
-      celsius = (value - 491.67) * 5 / 9
-      break
+      celsius = ((value - 491.67) * 5) / 9;
+      break;
     case "Delisle":
-      celsius = 100 - value * 2 / 3
-      break
+      celsius = 100 - (value * 2) / 3;
+      break;
     case "Newton":
-      celsius = value * 100 / 33
-      break
+      celsius = (value * 100) / 33;
+      break;
     case "Reaumur":
-      celsius = value * 5 / 4
-      break
+      celsius = (value * 5) / 4;
+      break;
     case "Romer":
-      celsius = (value - 7.5) * 40 / 21
-      break
+      celsius = ((value - 7.5) * 40) / 21;
+      break;
     default:
-      return value
+      return value;
   }
 
   // Convert from Celsius to target
   switch (to) {
     case "Celsius":
-      return celsius
+      return celsius;
     case "Fahrenheit":
-      return celsius * 9 / 5 + 32
+      return (celsius * 9) / 5 + 32;
     case "Kelvin":
-      return celsius + 273.15
+      return celsius + 273.15;
     case "Rankine":
-      return celsius * 9 / 5 + 491.67
+      return (celsius * 9) / 5 + 491.67;
     case "Delisle":
-      return (100 - celsius) * 3 / 2
+      return ((100 - celsius) * 3) / 2;
     case "Newton":
-      return celsius * 33 / 100
+      return (celsius * 33) / 100;
     case "Reaumur":
-      return celsius * 4 / 5
+      return (celsius * 4) / 5;
     case "Romer":
-      return celsius * 21 / 40 + 7.5
+      return (celsius * 21) / 40 + 7.5;
     default:
-      return celsius
+      return celsius;
   }
 }
 
@@ -72,41 +78,41 @@ const units = [
   "Newton",
   "Reaumur",
   "Romer",
-]
+];
 
 export default function TemperatureConverterClient() {
-  const [input, setInput] = React.useState("")
-  const [fromUnit, setFromUnit] = React.useState("Celsius")
-  const [results, setResults] = React.useState<Record<string, string>>({})
+  const [input, setInput] = React.useState("");
+  const [fromUnit, setFromUnit] = React.useState("Celsius");
+  const [results, setResults] = React.useState<Record<string, string>>({});
 
   React.useEffect(() => {
     if (!input.trim()) {
-      setResults({})
-      return
+      setResults({});
+      return;
     }
 
-    const value = parseFloat(input)
+    const value = parseFloat(input);
     if (isNaN(value)) {
-      setResults({})
-      return
+      setResults({});
+      return;
     }
 
-    const newResults: Record<string, string> = {}
+    const newResults: Record<string, string> = {};
     units.forEach((unit) => {
       if (unit !== fromUnit) {
-        const converted = convertTemperature(value, fromUnit, unit)
-        newResults[unit] = converted.toFixed(2)
+        const converted = convertTemperature(value, fromUnit, unit);
+        newResults[unit] = converted.toFixed(2);
       } else {
-        newResults[unit] = value.toString()
+        newResults[unit] = value.toString();
       }
-    })
-    setResults(newResults)
-  }, [input, fromUnit])
+    });
+    setResults(newResults);
+  }, [input, fromUnit]);
 
   const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text)
-    toast.success("Copied to clipboard")
-  }
+    navigator.clipboard.writeText(text);
+    toast.success("Copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -126,7 +132,15 @@ export default function TemperatureConverterClient() {
             >
               {units.map((unit) => (
                 <option key={unit} value={unit}>
-                  {unit} ({unit === "Celsius" ? "°C" : unit === "Fahrenheit" ? "°F" : unit === "Kelvin" ? "K" : unit})
+                  {unit} (
+                  {unit === "Celsius"
+                    ? "°C"
+                    : unit === "Fahrenheit"
+                      ? "°F"
+                      : unit === "Kelvin"
+                        ? "K"
+                        : unit}
+                  )
                 </option>
               ))}
             </select>
@@ -173,5 +187,5 @@ export default function TemperatureConverterClient() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

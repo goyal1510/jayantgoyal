@@ -9,9 +9,9 @@ import {
   getCalculations,
 } from "@/lib/calculator/client-calculations";
 import type { CalculationWithDenominations } from "@/lib/calculator/database";
-import { Button } from "@jayant/web-ui/button";
-import { PageSpinner } from "@jayant/web-ui/page-spinner";
-import { WorkspaceHeader } from "@jayant/web-ui/workspace-header";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { PageSpinner } from "@jayantgoyal/web-ui/page-spinner";
+import { WorkspaceHeader } from "@jayantgoyal/web-ui/workspace-header";
 
 import { CalculationHistoryFilters } from "./calculation-history-filters";
 import { CalculationDetailSheet } from "./calculation-detail-sheet";

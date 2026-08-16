@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 
 import { logoutAction } from "@/app/actions/logout";
 import { resolveAuthReturnTarget } from "@/lib/auth/returns";
-import { AuthCard } from "@jayant/web-ui/auth-presentation";
+import { AuthCard } from "@jayantgoyal/web-ui/auth-presentation";
 import { AuthWelcomeShell } from "@/components/auth/auth-welcome-shell";
-import { Button } from "@jayant/web-ui/button";
+import { Button } from "@jayantgoyal/web-ui/button";
 
 export const metadata: Metadata = { title: "Sign out" };
 

@@ -1,23 +1,23 @@
-'use client';
+"use client";
 
 import { useDrag } from "react-dnd";
 import { useCalculatorStore } from "@/lib/custom-calculator/useCalculatorStore";
-import { Button } from "@jayant/web-ui/button";
+import { Button } from "@jayantgoyal/web-ui/button";
 import { CalculatorComponent } from "@/lib/custom-calculator/types";
-import { cn } from "@jayant/web-ui/lib/utils";
+import { cn } from "@jayantgoyal/web-ui/lib/utils";
 
 interface CalculatorButtonProps {
   label: string;
-  variant?: 'default' | 'outline' | 'secondary';
-  size?: 'default' | 'sm' | 'lg';
+  variant?: "default" | "outline" | "secondary";
+  size?: "default" | "sm" | "lg";
   className?: string;
 }
 
 function CalculatorButton({
   label,
-  variant = 'default',
-  size = 'default',
-  className
+  variant = "default",
+  size = "default",
+  className,
 }: CalculatorButtonProps) {
   const { components, addComponent } = useCalculatorStore();
 
@@ -32,7 +32,7 @@ function CalculatorButton({
   const handleClick = () => {
     const alreadyAdded = components.some((comp) => comp.label === label);
     if (alreadyAdded) {
-      if (typeof window !== 'undefined') {
+      if (typeof window !== "undefined") {
         // Use a more subtle notification
         console.log(`Component "${label}" is already added!`);
       }
@@ -58,7 +58,7 @@ function CalculatorButton({
       className={cn(
         "transition-all duration-200 hover:scale-105 active:scale-95 select-none cursor-grab active:cursor-grabbing",
         isDragging && "opacity-50 scale-95",
-        className
+        className,
       )}
       onClick={handleClick}
     >

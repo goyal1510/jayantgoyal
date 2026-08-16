@@ -5,6 +5,7 @@ import { buildProductionRobotsContent } from "./app/robots.txt/route";
 import { getStudioProduct } from "./lib/config/studio-inventory";
 import { LAST_SIGNIFICANT_UPDATE } from "./lib/seo/config";
 import { buildStudioProductMetadata } from "./lib/seo/product-metadata";
+import { allTools } from "./lib/tools/tools";
 
 describe("Studio search metadata", () => {
   it("emits a supported robots policy with the canonical sitemap", () => {
@@ -34,12 +35,23 @@ describe("Studio search metadata", () => {
 
     expect(entries.length).toBeGreaterThan(0);
     expect(
-      entries.every(
-        (entry) => entry.lastModified === LAST_SIGNIFICANT_UPDATE,
-      ),
+      entries.every((entry) => entry.lastModified === LAST_SIGNIFICANT_UPDATE),
     ).toBe(true);
     expect(new Date(LAST_SIGNIFICANT_UPDATE).toISOString()).toBe(
       "2026-07-26T00:00:00.000Z",
     );
+  });
+
+  it("keeps every tool description useful and snippet-safe", () => {
+    const invalidDescriptions = allTools
+      .filter(
+        (tool) => tool.description.length < 50 || tool.description.length > 160,
+      )
+      .map((tool) => ({
+        path: tool.path,
+        length: tool.description.length,
+      }));
+
+    expect(invalidDescriptions).toEqual([]);
   });
 });

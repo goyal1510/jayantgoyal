@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@jayant/web-ui/lib/utils";
+import { cn } from "@jayantgoyal/web-ui/lib/utils";
 
 interface DisplayProps {
   value: string;

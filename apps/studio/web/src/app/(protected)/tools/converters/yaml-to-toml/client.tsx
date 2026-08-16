@@ -1,109 +1,115 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 function yamlToToml(yaml: string): string {
   // Simple YAML to TOML converter
   // First convert YAML to JSON, then JSON to TOML
   try {
-    const lines = yaml.split("\n")
-    const result: Record<string, unknown> = {}
+    const lines = yaml.split("\n");
+    const result: Record<string, unknown> = {};
 
     lines.forEach((line) => {
-      const trimmed = line.trim()
-      if (!trimmed || trimmed.startsWith("#")) return
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith("#")) return;
 
-      const colonIndex = trimmed.indexOf(":")
+      const colonIndex = trimmed.indexOf(":");
       if (colonIndex > 0) {
-        const key = trimmed.slice(0, colonIndex).trim()
-        const value = trimmed.slice(colonIndex + 1).trim()
+        const key = trimmed.slice(0, colonIndex).trim();
+        const value = trimmed.slice(colonIndex + 1).trim();
 
-        let parsedValue: unknown = value
+        let parsedValue: unknown = value;
         if (value.startsWith('"') && value.endsWith('"')) {
-          parsedValue = value.slice(1, -1)
+          parsedValue = value.slice(1, -1);
         } else if (value === "true") {
-          parsedValue = true
+          parsedValue = true;
         } else if (value === "false") {
-          parsedValue = false
+          parsedValue = false;
         } else if (value === "null") {
-          parsedValue = null
+          parsedValue = null;
         } else if (!isNaN(Number(value))) {
-          parsedValue = Number(value)
+          parsedValue = Number(value);
         }
 
-        result[key] = parsedValue
+        result[key] = parsedValue;
       }
-    })
+    });
 
     // Convert JSON to TOML
-    return jsonToToml(result)
+    return jsonToToml(result);
   } catch {
-    throw new Error("Failed to parse YAML")
+    throw new Error("Failed to parse YAML");
   }
 }
 
 function jsonToToml(obj: Record<string, unknown>, prefix: string = ""): string {
-  let toml = ""
+  let toml = "";
 
   Object.entries(obj).forEach(([key, value]) => {
-    const fullKey = prefix ? `${prefix}.${key}` : key
+    const fullKey = prefix ? `${prefix}.${key}` : key;
 
     if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-      toml += `[${fullKey}]\n`
-      toml += jsonToToml(value as Record<string, unknown>, fullKey)
+      toml += `[${fullKey}]\n`;
+      toml += jsonToToml(value as Record<string, unknown>, fullKey);
     } else {
-      const tomlValue = valueToToml(value)
-      toml += `${key} = ${tomlValue}\n`
+      const tomlValue = valueToToml(value);
+      toml += `${key} = ${tomlValue}\n`;
     }
-  })
+  });
 
-  return toml
+  return toml;
 }
 
 function valueToToml(value: unknown): string {
-  if (value === null) return "null"
-  if (typeof value === "string") return `"${value.replace(/"/g, '\\"')}"`
-  if (typeof value === "boolean") return value ? "true" : "false"
+  if (value === null) return "null";
+  if (typeof value === "string") return `"${value.replace(/"/g, '\\"')}"`;
+  if (typeof value === "boolean") return value ? "true" : "false";
   if (Array.isArray(value)) {
-    return `[${value.map(valueToToml).join(", ")}]`
+    return `[${value.map(valueToToml).join(", ")}]`;
   }
-  return String(value)
+  return String(value);
 }
 
 export default function YAMLToTOMLClient() {
-  const [input, setInput] = React.useState("")
-  const [output, setOutput] = React.useState("")
-  const [error, setError] = React.useState("")
+  const [input, setInput] = React.useState("");
+  const [output, setOutput] = React.useState("");
+  const [error, setError] = React.useState("");
 
   const convert = React.useCallback(() => {
     if (!input.trim()) {
-      setOutput("")
-      setError("")
-      return
+      setOutput("");
+      setError("");
+      return;
     }
 
     try {
-      const toml = yamlToToml(input)
-      setOutput(toml)
-      setError("")
+      const toml = yamlToToml(input);
+      setOutput(toml);
+      setError("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Invalid YAML")
-      setOutput("")
+      setError(err instanceof Error ? err.message : "Invalid YAML");
+      setOutput("");
     }
-  }, [input])
+  }, [input]);
 
   React.useEffect(() => {
-    convert()
-  }, [convert])
+    convert();
+  }, [convert]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(output)
-    toast.success("TOML copied to clipboard")
-  }
+    navigator.clipboard.writeText(output);
+    toast.success("TOML copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -120,9 +126,7 @@ export default function YAMLToTOMLClient() {
               placeholder="key: value"
               className="w-full min-h-[400px] rounded-md border border-input bg-transparent px-3 py-2 text-sm font-mono"
             />
-            {error && (
-              <p className="text-sm text-red-500 mt-2">{error}</p>
-            )}
+            {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
           </CardContent>
         </Card>
 
@@ -151,5 +155,5 @@ export default function YAMLToTOMLClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

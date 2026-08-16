@@ -5,14 +5,19 @@ import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
 import { m } from "framer-motion";
 import { Github, ChevronDown, Check } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@jayant/web-ui/card";
-import { Button } from "@jayant/web-ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@jayant/web-ui/dropdown-menu";
+} from "@jayantgoyal/web-ui/dropdown-menu";
 
 const GitHubCalendar = dynamic(
   () =>

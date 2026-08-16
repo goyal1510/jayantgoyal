@@ -13,7 +13,7 @@ are independent Next.js applications under `apps/<product>/web`.
 
 Each client owns its routes, APIs, local components, authorization policy,
 environment example, Vitest project, and Turbo build environment inputs. A
-client imports stable contracts from `@jayant/*` packages; it never imports
+client imports stable contracts from `@jayantgoyal/*` packages; it never imports
 another client's source.
 
 ## Server and client boundaries
@@ -78,6 +78,8 @@ packages into a lowest-common-denominator abstraction.
 
 ## Brand assets
 
-`assets/brand/web` is canonical. Each web client's public directory contains a
-deployable copy under `public/assets/Jayant_favicon_io`. Run
-`pnpm check:brand-assets` after changing either source or copies.
+`assets/brand/web` is the canonical icon source and `assets/brand/social` owns
+social previews. Each client serves synchronized assets below
+`public/assets/brand` and `public/images/social`; its special
+`src/app/favicon.ico` also matches the canonical icon. Run
+`pnpm check:brand-assets` after changing a source or copy.

@@ -46,18 +46,27 @@ importers:
 
   apps/admin/web:
     dependencies:
-      "@jayant/portfolio-contracts":
+      "@jayantgoyal/identity":
+        specifier: workspace:*
+        version: link:../../../packages/foundation/identity
+      "@jayantgoyal/portfolio-contracts":
         specifier: workspace:*
         version: link:../../portfolio/contracts
-      "@jayant/web-auth":
+      "@jayantgoyal/web-auth":
         specifier: workspace:*
         version: link:../../../packages/web/auth
-      "@jayant/web-brand":
+      "@jayantgoyal/web-brand":
         specifier: workspace:*
         version: link:../../../packages/web/brand
-      "@jayant/web-ui":
+      "@jayantgoyal/web-seo":
+        specifier: workspace:*
+        version: link:../../../packages/web/seo
+      "@jayantgoyal/web-ui":
         specifier: workspace:*
         version: link:../../../packages/web/ui
+      "@jayantgoyal/web-urls":
+        specifier: workspace:*
+        version: link:../../../packages/web/urls
       framer-motion:
         specifier: ^12.23.24
         version: 12.23.24(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
@@ -83,13 +92,13 @@ importers:
         specifier: ^2.0.7
         version: 2.0.7(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
     devDependencies:
-      "@jayant/eslint-config":
+      "@jayantgoyal/eslint-config":
         specifier: workspace:*
         version: link:../../../packages/tooling/eslint-config
-      "@jayant/tailwind-config":
+      "@jayantgoyal/tailwind-config":
         specifier: workspace:*
         version: link:../../../packages/web/tailwind-config
-      "@jayant/typescript-config":
+      "@jayantgoyal/typescript-config":
         specifier: workspace:*
         version: link:../../../packages/tooling/typescript-config
       "@tailwindcss/postcss":
@@ -122,16 +131,19 @@ importers:
 
   apps/auth/web:
     dependencies:
-      "@jayant/web-auth":
+      "@jayantgoyal/web-auth":
         specifier: workspace:*
         version: link:../../../packages/web/auth
-      "@jayant/web-brand":
+      "@jayantgoyal/web-brand":
         specifier: workspace:*
         version: link:../../../packages/web/brand
-      "@jayant/web-ui":
+      "@jayantgoyal/web-seo":
+        specifier: workspace:*
+        version: link:../../../packages/web/seo
+      "@jayantgoyal/web-ui":
         specifier: workspace:*
         version: link:../../../packages/web/ui
-      "@jayant/web-urls":
+      "@jayantgoyal/web-urls":
         specifier: workspace:*
         version: link:../../../packages/web/urls
       lucide-react:
@@ -147,13 +159,13 @@ importers:
         specifier: ^19.2.1
         version: 19.2.1(react@19.2.1)
     devDependencies:
-      "@jayant/eslint-config":
+      "@jayantgoyal/eslint-config":
         specifier: workspace:*
         version: link:../../../packages/tooling/eslint-config
-      "@jayant/tailwind-config":
+      "@jayantgoyal/tailwind-config":
         specifier: workspace:*
         version: link:../../../packages/web/tailwind-config
-      "@jayant/typescript-config":
+      "@jayantgoyal/typescript-config":
         specifier: workspace:*
         version: link:../../../packages/tooling/typescript-config
       "@tailwindcss/postcss":
@@ -186,10 +198,10 @@ importers:
 
   apps/portfolio/contracts:
     devDependencies:
-      "@jayant/eslint-config":
+      "@jayantgoyal/eslint-config":
         specifier: workspace:*
         version: link:../../../packages/tooling/eslint-config
-      "@jayant/typescript-config":
+      "@jayantgoyal/typescript-config":
         specifier: workspace:*
         version: link:../../../packages/tooling/typescript-config
       eslint:
@@ -204,19 +216,19 @@ importers:
 
   apps/portfolio/web:
     dependencies:
-      "@jayant/github":
+      "@jayantgoyal/github":
         specifier: workspace:*
         version: link:../../../packages/integrations/github
-      "@jayant/portfolio-contracts":
+      "@jayantgoyal/portfolio-contracts":
         specifier: workspace:*
         version: link:../contracts
-      "@jayant/web-brand":
+      "@jayantgoyal/web-brand":
         specifier: workspace:*
         version: link:../../../packages/web/brand
-      "@jayant/web-seo":
+      "@jayantgoyal/web-seo":
         specifier: workspace:*
         version: link:../../../packages/web/seo
-      "@jayant/web-urls":
+      "@jayantgoyal/web-urls":
         specifier: workspace:*
         version: link:../../../packages/web/urls
       "@supabase/supabase-js":
@@ -247,13 +259,13 @@ importers:
         specifier: ^6.17.2
         version: 6.17.2
     devDependencies:
-      "@jayant/eslint-config":
+      "@jayantgoyal/eslint-config":
         specifier: workspace:*
         version: link:../../../packages/tooling/eslint-config
-      "@jayant/tailwind-config":
+      "@jayantgoyal/tailwind-config":
         specifier: workspace:*
         version: link:../../../packages/web/tailwind-config
-      "@jayant/typescript-config":
+      "@jayantgoyal/typescript-config":
         specifier: workspace:*
         version: link:../../../packages/tooling/typescript-config
       "@tailwindcss/postcss":
@@ -289,22 +301,22 @@ importers:
       "@faker-js/faker":
         specifier: ^10.2.0
         version: 10.2.0
-      "@jayant/github":
+      "@jayantgoyal/github":
         specifier: workspace:*
         version: link:../../../packages/integrations/github
-      "@jayant/web-auth":
+      "@jayantgoyal/web-auth":
         specifier: workspace:*
         version: link:../../../packages/web/auth
-      "@jayant/web-brand":
+      "@jayantgoyal/web-brand":
         specifier: workspace:*
         version: link:../../../packages/web/brand
-      "@jayant/web-seo":
+      "@jayantgoyal/web-seo":
         specifier: workspace:*
         version: link:../../../packages/web/seo
-      "@jayant/web-ui":
+      "@jayantgoyal/web-ui":
         specifier: workspace:*
         version: link:../../../packages/web/ui
-      "@jayant/web-urls":
+      "@jayantgoyal/web-urls":
         specifier: workspace:*
         version: link:../../../packages/web/urls
       "@supabase/supabase-js":
@@ -356,13 +368,13 @@ importers:
         specifier: ^5.0.9
         version: 5.0.9(@types/react@19.2.2)(immer@11.1.3)(react@19.2.1)(use-sync-external-store@1.6.0(react@19.2.1))
     devDependencies:
-      "@jayant/eslint-config":
+      "@jayantgoyal/eslint-config":
         specifier: workspace:*
         version: link:../../../packages/tooling/eslint-config
-      "@jayant/tailwind-config":
+      "@jayantgoyal/tailwind-config":
         specifier: workspace:*
         version: link:../../../packages/web/tailwind-config
-      "@jayant/typescript-config":
+      "@jayantgoyal/typescript-config":
         specifier: workspace:*
         version: link:../../../packages/tooling/typescript-config
       "@tailwindcss/postcss":
@@ -396,12 +408,12 @@ importers:
         specifier: 5.9.2
         version: 5.9.2
 
-  packages/ecosystem/identity:
+  packages/foundation/identity:
     devDependencies:
-      "@jayant/eslint-config":
+      "@jayantgoyal/eslint-config":
         specifier: workspace:*
         version: link:../../tooling/eslint-config
-      "@jayant/typescript-config":
+      "@jayantgoyal/typescript-config":
         specifier: workspace:*
         version: link:../../tooling/typescript-config
       eslint:
@@ -416,10 +428,10 @@ importers:
 
   packages/integrations/github:
     devDependencies:
-      "@jayant/eslint-config":
+      "@jayantgoyal/eslint-config":
         specifier: workspace:*
         version: link:../../tooling/eslint-config
-      "@jayant/typescript-config":
+      "@jayantgoyal/typescript-config":
         specifier: workspace:*
         version: link:../../tooling/typescript-config
       "@types/node":
@@ -475,6 +487,9 @@ importers:
 
   packages/web/auth:
     dependencies:
+      "@jayantgoyal/identity":
+        specifier: workspace:*
+        version: link:../../foundation/identity
       "@supabase/ssr":
         specifier: ^0.12.3
         version: 0.12.3(@supabase/supabase-js@2.110.7)
@@ -482,10 +497,10 @@ importers:
         specifier: ^2.110.7
         version: 2.110.7
     devDependencies:
-      "@jayant/eslint-config":
+      "@jayantgoyal/eslint-config":
         specifier: workspace:*
         version: link:../../tooling/eslint-config
-      "@jayant/typescript-config":
+      "@jayantgoyal/typescript-config":
         specifier: workspace:*
         version: link:../../tooling/typescript-config
       "@types/node":
@@ -503,14 +518,14 @@ importers:
 
   packages/web/brand:
     dependencies:
-      "@jayant/identity":
+      "@jayantgoyal/identity":
         specifier: workspace:*
-        version: link:../../ecosystem/identity
+        version: link:../../foundation/identity
     devDependencies:
-      "@jayant/eslint-config":
+      "@jayantgoyal/eslint-config":
         specifier: workspace:*
         version: link:../../tooling/eslint-config
-      "@jayant/typescript-config":
+      "@jayantgoyal/typescript-config":
         specifier: workspace:*
         version: link:../../tooling/typescript-config
       eslint:
@@ -525,17 +540,17 @@ importers:
 
   packages/web/seo:
     dependencies:
-      "@jayant/web-brand":
+      "@jayantgoyal/web-brand":
         specifier: workspace:*
         version: link:../brand
-      "@jayant/web-urls":
+      "@jayantgoyal/web-urls":
         specifier: workspace:*
         version: link:../urls
     devDependencies:
-      "@jayant/eslint-config":
+      "@jayantgoyal/eslint-config":
         specifier: workspace:*
         version: link:../../tooling/eslint-config
-      "@jayant/typescript-config":
+      "@jayantgoyal/typescript-config":
         specifier: workspace:*
         version: link:../../tooling/typescript-config
       eslint:
@@ -635,10 +650,10 @@ importers:
         specifier: ^3.4.0
         version: 3.4.0
     devDependencies:
-      "@jayant/eslint-config":
+      "@jayantgoyal/eslint-config":
         specifier: workspace:*
         version: link:../../tooling/eslint-config
-      "@jayant/typescript-config":
+      "@jayantgoyal/typescript-config":
         specifier: workspace:*
         version: link:../../tooling/typescript-config
       "@types/react":
@@ -656,14 +671,14 @@ importers:
 
   packages/web/urls:
     dependencies:
-      "@jayant/web-brand":
+      "@jayantgoyal/identity":
         specifier: workspace:*
-        version: link:../brand
+        version: link:../../foundation/identity
     devDependencies:
-      "@jayant/eslint-config":
+      "@jayantgoyal/eslint-config":
         specifier: workspace:*
         version: link:../../tooling/eslint-config
-      "@jayant/typescript-config":
+      "@jayantgoyal/typescript-config":
         specifier: workspace:*
         version: link:../../tooling/typescript-config
       "@types/node":

@@ -1,37 +1,43 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
 
 function parsePhoneNumber(phone: string) {
-  const cleaned = phone.replace(/\D/g, "")
+  const cleaned = phone.replace(/\D/g, "");
 
   if (cleaned.length < 10) {
-    return null
+    return null;
   }
 
-  let countryCode = ""
-  let areaCode = ""
-  let number = ""
+  let countryCode = "";
+  let areaCode = "";
+  let number = "";
 
   if (cleaned.length === 11 && cleaned.startsWith("1")) {
-    countryCode = "+1"
-    areaCode = cleaned.slice(1, 4)
-    number = cleaned.slice(4)
+    countryCode = "+1";
+    areaCode = cleaned.slice(1, 4);
+    number = cleaned.slice(4);
   } else if (cleaned.length === 10) {
-    areaCode = cleaned.slice(0, 3)
-    number = cleaned.slice(3)
+    areaCode = cleaned.slice(0, 3);
+    number = cleaned.slice(3);
   } else if (cleaned.length > 11) {
-    countryCode = `+${cleaned.slice(0, cleaned.length - 10)}`
-    areaCode = cleaned.slice(cleaned.length - 10, cleaned.length - 7)
-    number = cleaned.slice(cleaned.length - 7)
+    countryCode = `+${cleaned.slice(0, cleaned.length - 10)}`;
+    areaCode = cleaned.slice(cleaned.length - 10, cleaned.length - 7);
+    number = cleaned.slice(cleaned.length - 7);
   }
 
   const formatted = countryCode
     ? `${countryCode} (${areaCode}) ${number.slice(0, 3)}-${number.slice(3)}`
-    : `(${areaCode}) ${number.slice(0, 3)}-${number.slice(3)}`
+    : `(${areaCode}) ${number.slice(0, 3)}-${number.slice(3)}`;
 
   return {
     original: phone,
@@ -41,12 +47,15 @@ function parsePhoneNumber(phone: string) {
     areaCode,
     number,
     type: cleaned.length === 10 ? "Local" : "International",
-  }
+  };
 }
 
 export default function PhoneParserClient() {
-  const [input, setInput] = React.useState("")
-  const parsed = React.useMemo(() => input ? parsePhoneNumber(input) : null, [input])
+  const [input, setInput] = React.useState("");
+  const parsed = React.useMemo(
+    () => (input ? parsePhoneNumber(input) : null),
+    [input],
+  );
 
   return (
     <div className="space-y-6">
@@ -93,7 +102,9 @@ export default function PhoneParserClient() {
                 <p className="font-mono">{parsed.number}</p>
               </div>
               <div className="col-span-2">
-                <Label className="text-muted-foreground">Cleaned (digits only)</Label>
+                <Label className="text-muted-foreground">
+                  Cleaned (digits only)
+                </Label>
                 <p className="font-mono">{parsed.cleaned}</p>
               </div>
             </div>
@@ -107,5 +118,5 @@ export default function PhoneParserClient() {
         </Card>
       ) : null}
     </div>
-  )
+  );
 }

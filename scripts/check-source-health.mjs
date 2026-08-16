@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 
 const SOFT_LINE_LIMIT = 400;
 const HARD_LINE_LIMIT = 500;
@@ -38,6 +38,7 @@ function sourceFiles() {
   )
     .split("\n")
     .filter(Boolean)
+    .filter((file) => existsSync(file))
     .filter((file) => SOURCE_EXTENSIONS.has(sourceExtension(file)))
     .filter((file) => !file.endsWith(".d.ts"));
 }

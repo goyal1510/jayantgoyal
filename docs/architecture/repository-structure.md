@@ -15,7 +15,7 @@ apps/
     └── web/
 
 packages/
-├── ecosystem/
+├── foundation/
 │   └── identity/
 ├── integrations/
 │   └── github/
@@ -31,7 +31,9 @@ packages/
     └── typescript-config/
 
 assets/
-└── brand/web/
+└── brand/
+    ├── web/
+    └── social/
 
 docs/
 ├── overview/
@@ -60,7 +62,7 @@ iOS client would be added under the owning product, for example
 
 ## Package convention
 
-- `packages/ecosystem`: framework-neutral identity and ecosystem concepts.
+- `packages/foundation`: framework-neutral identity and foundation concepts.
 - `packages/integrations`: external provider adapters.
 - `packages/web`: contracts that intentionally depend on web frameworks,
   browser behavior, Next.js, React, or web metadata.
@@ -72,8 +74,10 @@ workspace exception.
 
 ## Assets and documentation
 
-`assets/brand/web` is the canonical source for favicon assets copied into each
-web client's public directory. `pnpm check:brand-assets` prevents divergence.
+`assets/brand/web` is the canonical favicon source and `assets/brand/social`
+owns product social previews. Each web client serves synchronized copies from
+stable `/assets/brand` and `/images/social` paths. `pnpm check:brand-assets`
+prevents divergence, including special `src/app/favicon.ico` files.
 
 `docs/` is the only maintained detailed documentation tree. Product information
 belongs in `docs/products/<product>`, platform behavior in `docs/clients`, and

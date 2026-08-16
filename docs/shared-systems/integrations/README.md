@@ -33,7 +33,7 @@ guide](../data/README.md).
 
 ### GitHub
 
-Portfolio and Studio share `@jayant/github` for typed server-side statistics.
+Portfolio and Studio share `@jayantgoyal/github` for typed server-side statistics.
 Each product owns its route validation, response shape, cache policy, and UI.
 `GITHUB_TOKEN` stays server-only. Public usernames are pattern-validated and
 provider failures return bounded unavailable responses instead of leaking raw

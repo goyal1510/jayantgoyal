@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { buildAuthForgotPasswordUrl } from "@jayant/web-auth/entry";
+import { buildAuthForgotPasswordUrl } from "@jayantgoyal/web-auth/entry";
 
 export const metadata: Metadata = { title: "Forgot password" };
 

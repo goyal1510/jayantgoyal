@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 import {
   PORTFOLIO_WRITING_CMS_SELECT_COLUMNS,
   validatePortfolioWritingWriteInput,
-} from "@jayant/portfolio-contracts";
+} from "@jayantgoyal/portfolio-contracts";
 import { authorizeAndGetClient } from "../../portfolio/[table]/helpers";
 import { getPortfolioPublicRevalidationPaths } from "@/lib/portfolio-revalidation";
 

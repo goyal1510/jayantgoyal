@@ -2,9 +2,13 @@
 
 import type { ComponentType } from "react";
 
-import { Button } from "@jayant/web-ui/button";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@jayant/web-ui/tooltip";
-import { cn } from "@jayant/web-ui/lib/utils";
+import { Button } from "@jayantgoyal/web-ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@jayantgoyal/web-ui/tooltip";
+import { cn } from "@jayantgoyal/web-ui/lib/utils";
 
 export function IconAction({
   icon: Icon,

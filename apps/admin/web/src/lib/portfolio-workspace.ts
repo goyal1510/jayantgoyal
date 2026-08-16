@@ -5,7 +5,7 @@ import {
   type PortfolioNavigationPublicRow,
   type PortfolioSectionContentPublicRow,
   type PortfolioSectionKey,
-} from "@jayant/portfolio-contracts";
+} from "@jayantgoyal/portfolio-contracts";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type {

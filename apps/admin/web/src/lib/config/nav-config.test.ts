@@ -4,7 +4,7 @@ import { resolve } from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { PORTFOLIO_WORKSPACE_ROUTES } from "@jayant/portfolio-contracts";
+import { PORTFOLIO_WORKSPACE_ROUTES } from "@jayantgoyal/portfolio-contracts";
 
 import {
   adminNavigationDomains,
@@ -18,11 +18,11 @@ import {
 } from "./portfolio-route-map";
 
 describe("Admin navigation domains", () => {
-  it("uses the approved Portfolio, Studio, and Platform organization", () => {
+  it("uses the approved Portfolio, Studio, and Operations organization", () => {
     expect(adminNavigationDomains.map((domain) => domain.label)).toEqual([
       "Portfolio",
       "Studio",
-      "Platform",
+      "Operations",
     ]);
     expect(
       adminNavigationDomains
@@ -92,18 +92,18 @@ describe("Admin navigation domains", () => {
     const adminRoot = fileURLToPath(new URL("../../../", import.meta.url));
     const canonicalPagePaths = Object.values(PORTFOLIO_WORKSPACE_ROUTES).map(
       (route) =>
-        resolve(
-          adminRoot,
-          "src/app/(admin)",
-          `${route.slice(1)}/page.tsx`,
-        ),
+        resolve(adminRoot, "src/app/(admin)", `${route.slice(1)}/page.tsx`),
     );
 
     expect(canonicalPagePaths.every((path) => existsSync(path))).toBe(true);
-    for (const legacyPath of Object.keys(PORTFOLIO_LEGACY_ADMIN_ROUTE_TARGETS)) {
+    for (const legacyPath of Object.keys(
+      PORTFOLIO_LEGACY_ADMIN_ROUTE_TARGETS,
+    )) {
       const route = legacyPath === "/writing" ? "/writing" : legacyPath;
       expect(
-        existsSync(resolve(adminRoot, "src/app/(admin)", `${route.slice(1)}/page.tsx`)),
+        existsSync(
+          resolve(adminRoot, "src/app/(admin)", `${route.slice(1)}/page.tsx`),
+        ),
       ).toBe(true);
     }
   });

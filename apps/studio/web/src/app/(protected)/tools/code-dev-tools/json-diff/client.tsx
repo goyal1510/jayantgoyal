@@ -1,61 +1,87 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
 
-function jsonDiff(obj1: Record<string, unknown>, obj2: Record<string, unknown>, path: string = ""): string[] {
-  const diffs: string[] = []
+function jsonDiff(
+  obj1: Record<string, unknown>,
+  obj2: Record<string, unknown>,
+  path: string = "",
+): string[] {
+  const diffs: string[] = [];
 
-  const keys1 = Object.keys(obj1 || {})
-  const keys2 = Object.keys(obj2 || {})
-  const allKeys = new Set([...keys1, ...keys2])
+  const keys1 = Object.keys(obj1 || {});
+  const keys2 = Object.keys(obj2 || {});
+  const allKeys = new Set([...keys1, ...keys2]);
 
   allKeys.forEach((key) => {
-    const currentPath = path ? `${path}.${key}` : key
-    const val1 = obj1?.[key]
-    const val2 = obj2?.[key]
+    const currentPath = path ? `${path}.${key}` : key;
+    const val1 = obj1?.[key];
+    const val2 = obj2?.[key];
 
     if (!(key in obj1)) {
-      diffs.push(`+ ${currentPath}: ${JSON.stringify(val2)}`)
+      diffs.push(`+ ${currentPath}: ${JSON.stringify(val2)}`);
     } else if (!(key in obj2)) {
-      diffs.push(`- ${currentPath}: ${JSON.stringify(val1)}`)
-    } else if (typeof val1 === "object" && typeof val2 === "object" && val1 !== null && val2 !== null && !Array.isArray(val1) && !Array.isArray(val2)) {
-      diffs.push(...jsonDiff(val1 as Record<string, unknown>, val2 as Record<string, unknown>, currentPath))
+      diffs.push(`- ${currentPath}: ${JSON.stringify(val1)}`);
+    } else if (
+      typeof val1 === "object" &&
+      typeof val2 === "object" &&
+      val1 !== null &&
+      val2 !== null &&
+      !Array.isArray(val1) &&
+      !Array.isArray(val2)
+    ) {
+      diffs.push(
+        ...jsonDiff(
+          val1 as Record<string, unknown>,
+          val2 as Record<string, unknown>,
+          currentPath,
+        ),
+      );
     } else if (JSON.stringify(val1) !== JSON.stringify(val2)) {
-      diffs.push(`~ ${currentPath}: ${JSON.stringify(val1)} → ${JSON.stringify(val2)}`)
+      diffs.push(
+        `~ ${currentPath}: ${JSON.stringify(val1)} → ${JSON.stringify(val2)}`,
+      );
     }
-  })
+  });
 
-  return diffs
+  return diffs;
 }
 
 export default function JSONDiffClient() {
-  const [json1, setJson1] = React.useState("")
-  const [json2, setJson2] = React.useState("")
-  const [diffs, setDiffs] = React.useState<string[]>([])
-  const [error, setError] = React.useState("")
+  const [json1, setJson1] = React.useState("");
+  const [json2, setJson2] = React.useState("");
+  const [diffs, setDiffs] = React.useState<string[]>([]);
+  const [error, setError] = React.useState("");
 
   React.useEffect(() => {
     if (!json1.trim() || !json2.trim()) {
-      setDiffs([])
-      setError("")
-      return
+      setDiffs([]);
+      setError("");
+      return;
     }
 
     try {
-      const obj1 = JSON.parse(json1)
-      const obj2 = JSON.parse(json2)
-      const differences = jsonDiff(obj1, obj2)
-      setDiffs(differences)
-      setError("")
+      const obj1 = JSON.parse(json1);
+      const obj2 = JSON.parse(json2);
+      const differences = jsonDiff(obj1, obj2);
+      setDiffs(differences);
+      setError("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Invalid JSON")
-      setDiffs([])
+      setError(err instanceof Error ? err.message : "Invalid JSON");
+      setDiffs([]);
     }
-  }, [json1, json2])
+  }, [json1, json2]);
 
   return (
-    <div className="space-y-6"><div className="grid gap-6 md:grid-cols-2">
+    <div className="space-y-6">
+      <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>JSON 1</CardTitle>
@@ -99,7 +125,9 @@ export default function JSONDiffClient() {
         <Card>
           <CardHeader>
             <CardTitle>Differences</CardTitle>
-            <CardDescription>Found {diffs.length} difference(s)</CardDescription>
+            <CardDescription>
+              Found {diffs.length} difference(s)
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
@@ -107,9 +135,11 @@ export default function JSONDiffClient() {
                 <div
                   key={index}
                   className={`p-2 rounded text-sm font-mono ${
-                    diff.startsWith("+") ? "bg-green-500/20 text-green-700 dark:text-green-400" :
-                    diff.startsWith("-") ? "bg-red-500/20 text-red-700 dark:text-red-400" :
-                    "bg-yellow-500/20 text-yellow-700 dark:text-yellow-400"
+                    diff.startsWith("+")
+                      ? "bg-green-500/20 text-green-700 dark:text-green-400"
+                      : diff.startsWith("-")
+                        ? "bg-red-500/20 text-red-700 dark:text-red-400"
+                        : "bg-yellow-500/20 text-yellow-700 dark:text-yellow-400"
                   }`}
                 >
                   {diff}
@@ -120,5 +150,5 @@ export default function JSONDiffClient() {
         </Card>
       )}
     </div>
-  )
+  );
 }

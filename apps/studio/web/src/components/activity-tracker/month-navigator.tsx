@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Button } from "@jayant/web-ui/button";
+import { Button } from "@jayantgoyal/web-ui/button";
 import { formatMonth } from "@/lib/activity-tracker/date";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 

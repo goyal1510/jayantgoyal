@@ -1,7 +1,12 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@jayant/web-ui/card"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
 
 const regexCheatsheet = [
   {
@@ -50,9 +55,7 @@ const regexCheatsheet = [
   },
   {
     category: "Alternation",
-    items: [
-      { pattern: "a|b", description: "a or b" },
-    ],
+    items: [{ pattern: "a|b", description: "a or b" }],
   },
   {
     category: "Flags",
@@ -65,11 +68,12 @@ const regexCheatsheet = [
       { pattern: "y", description: "Sticky" },
     ],
   },
-]
+];
 
 export default function RegexCheatsheetClient() {
   return (
-    <div className="space-y-6"><div className="grid gap-6 md:grid-cols-2">
+    <div className="space-y-6">
+      <div className="grid gap-6 md:grid-cols-2">
         {regexCheatsheet.map((section) => (
           <Card key={section.category}>
             <CardHeader>
@@ -91,5 +95,5 @@ export default function RegexCheatsheetClient() {
         ))}
       </div>
     </div>
-  )
+  );
 }

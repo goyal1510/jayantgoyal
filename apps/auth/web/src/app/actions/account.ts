@@ -18,7 +18,7 @@ import {
   PROFILE_AVATAR_BUCKET,
   PROFILE_AVATAR_MAX_BYTES,
   PROFILE_AVATAR_MIME_TYPES,
-} from "@jayant/web-auth/profile";
+} from "@jayantgoyal/web-auth/profile";
 
 export async function changePasswordAction(
   _previous: AuthActionState,

@@ -192,24 +192,6 @@ export const STUDIO_PRODUCTS: readonly StudioProduct[] = [
     ],
     featured: false,
   },
-  {
-    id: "ecommerce",
-    name: STUDIO_SURFACES.ecommerce.name,
-    description:
-      "A separate storefront experiment with product browsing, cart, and transaction flows.",
-    href: STUDIO_SURFACES.ecommerce.href,
-    icon: STUDIO_SURFACES.ecommerce.icon,
-    access: "external",
-    type: "experiment",
-    status: "beta",
-    capability: "Separate application",
-    highlights: [
-      "Product browsing",
-      "Cart and checkout flows",
-      "Independent deployment lifecycle",
-    ],
-    featured: false,
-  },
 ];
 
 export const FEATURED_STUDIO_PRODUCTS = STUDIO_PRODUCTS.filter(

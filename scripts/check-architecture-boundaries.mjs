@@ -48,20 +48,23 @@ for (const sourceRoot of packageSourceRoots) {
     }
 
     if (
-      path.startsWith("packages/ecosystem/") &&
+      path.startsWith("packages/foundation/") &&
       imports(
         source,
-        /["']@jayant\/(?:web-|github(?:[/'"]|$)|portfolio-contracts(?:[/'"]|$))/,
+        /["']@jayantgoyal\/(?:web-|github(?:[/'"]|$)|portfolio-contracts(?:[/'"]|$))/,
       )
     ) {
       violations.push(
-        `${path}: ecosystem packages must remain independent of web, integrations, and product contracts`,
+        `${path}: foundation packages must remain independent of web, integrations, and product contracts`,
       );
     }
 
     if (
       path.startsWith("packages/integrations/") &&
-      imports(source, /["']@jayant\/(?:web-|portfolio-contracts(?:[/'"]|$))/)
+      imports(
+        source,
+        /["']@jayantgoyal\/(?:web-|portfolio-contracts(?:[/'"]|$))/,
+      )
     ) {
       violations.push(
         `${path}: integration packages must remain independent of web and product contracts`,
@@ -71,7 +74,7 @@ for (const sourceRoot of packageSourceRoots) {
     if (
       path.startsWith("apps/") &&
       path.includes("/contracts/") &&
-      imports(source, /["']@jayant\/web-/)
+      imports(source, /["']@jayantgoyal\/web-/)
     ) {
       violations.push(
         `${path}: product contracts cannot depend on web packages`,
@@ -107,13 +110,13 @@ for (const appName of appNames) {
 
     if (
       appName === "portfolio" &&
-      source.includes("@jayant/web-ui/application-shell")
+      source.includes("@jayantgoyal/web-ui/application-shell")
     ) {
       violations.push(`${path}: Portfolio cannot import the application shell`);
     }
     if (
       appName === "portfolio" &&
-      source.includes("@jayant/web-ui/application-surface.css")
+      source.includes("@jayantgoyal/web-ui/application-surface.css")
     ) {
       violations.push(
         `${path}: Portfolio cannot import the application surface`,
@@ -128,5 +131,5 @@ if (violations.length > 0) {
 }
 
 console.log(
-  "Architecture boundaries are clean across ecosystem, integration, web, product-contract, and client ownership layers.",
+  "Architecture boundaries are clean across foundation, integration, web, product-contract, and client ownership layers.",
 );

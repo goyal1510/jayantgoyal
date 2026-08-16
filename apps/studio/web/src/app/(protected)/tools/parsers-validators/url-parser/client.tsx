@@ -1,17 +1,23 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
 
 function parseURL(url: string) {
   try {
-    const urlObj = new URL(url)
-    const params: Record<string, string> = {}
+    const urlObj = new URL(url);
+    const params: Record<string, string> = {};
     urlObj.searchParams.forEach((value, key) => {
-      params[key] = value
-    })
+      params[key] = value;
+    });
 
     return {
       protocol: urlObj.protocol,
@@ -24,15 +30,15 @@ function parseURL(url: string) {
       username: urlObj.username || "",
       password: urlObj.password || "",
       params,
-    }
+    };
   } catch {
-    return null
+    return null;
   }
 }
 
 export default function URLParserClient() {
-  const [input, setInput] = React.useState("")
-  const parsed = React.useMemo(() => parseURL(input), [input])
+  const [input, setInput] = React.useState("");
+  const parsed = React.useMemo(() => parseURL(input), [input]);
 
   return (
     <div className="space-y-6">
@@ -97,7 +103,9 @@ export default function URLParserClient() {
 
             {Object.keys(parsed.params).length > 0 && (
               <div>
-                <Label className="text-muted-foreground">Query Parameters</Label>
+                <Label className="text-muted-foreground">
+                  Query Parameters
+                </Label>
                 <div className="mt-2 space-y-1">
                   {Object.entries(parsed.params).map(([key, value]) => (
                     <div key={key} className="flex gap-2 text-sm">
@@ -118,5 +126,5 @@ export default function URLParserClient() {
         </Card>
       ) : null}
     </div>
-  )
+  );
 }

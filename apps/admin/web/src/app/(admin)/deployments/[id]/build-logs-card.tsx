@@ -1,14 +1,14 @@
 "use client";
 
 import { Loader2, RefreshCw } from "lucide-react";
-import { Button } from "@jayant/web-ui/button";
+import { Button } from "@jayantgoyal/web-ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@jayant/web-ui/card";
+} from "@jayantgoyal/web-ui/card";
 import type { VercelBuildLogEntry } from "@/lib/types";
 
 interface BuildLogsCardProps {
@@ -17,7 +17,11 @@ interface BuildLogsCardProps {
   onRefresh: () => void;
 }
 
-export function BuildLogsCard({ logs, loading, onRefresh }: BuildLogsCardProps) {
+export function BuildLogsCard({
+  logs,
+  loading,
+  onRefresh,
+}: BuildLogsCardProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -25,8 +29,15 @@ export function BuildLogsCard({ logs, loading, onRefresh }: BuildLogsCardProps) 
           <CardTitle>Build Logs</CardTitle>
           <CardDescription>Output from the build process</CardDescription>
         </div>
-        <Button variant="outline" size="sm" onClick={onRefresh} disabled={loading}>
-          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onRefresh}
+          disabled={loading}
+        >
+          <RefreshCw
+            className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`}
+          />
           Refresh
         </Button>
       </CardHeader>
@@ -36,7 +47,9 @@ export function BuildLogsCard({ logs, loading, onRefresh }: BuildLogsCardProps) 
             <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
           </div>
         ) : logs.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No build logs available</p>
+          <p className="text-sm text-muted-foreground">
+            No build logs available
+          </p>
         ) : (
           <div className="bg-muted/50 rounded-md p-4 max-h-[500px] overflow-y-auto">
             <pre className="text-xs font-mono whitespace-pre-wrap break-all">

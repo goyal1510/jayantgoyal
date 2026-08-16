@@ -2,7 +2,7 @@
 
 Auth is Jayant's account-entry and security product at
 [auth.jayantgoyal.com](https://auth.jayantgoyal.com). The current client is
-`apps/auth/web`, workspace `@jayant/auth-web`, running locally on port 3003.
+`apps/auth/web`, workspace `@jayantgoyal/auth-web`, running locally on port 3003.
 
 ## Product boundary
 
@@ -31,7 +31,7 @@ security](flows-and-security.md).
 
 | Area           | Routes                                                                             |
 | -------------- | ---------------------------------------------------------------------------------- |
-| Entry          | `/`, `/welcome`, `/login`, `/register`                                             |
+| Entry          | `/welcome`, `/login`, `/register`                                                  |
 | Recovery       | `/forgot-password`, `/reset-password`, `/verify`                                   |
 | MFA            | `/mfa`, `/account/mfa`                                                             |
 | Account        | `/account/security`, `/account/profile`, `/account/password`, `/account/providers` |
@@ -41,6 +41,10 @@ security](flows-and-security.md).
 `/login` and `/register` remain named entry surfaces, while the primary
 `/welcome` action first attempts sign-in and then creates a new account when
 the credentials do not identify an existing account.
+
+`/` does not render a competing entry page. It redirects an anonymous request
+to `/welcome` and an authenticated request to `/account/security`. Public
+metadata therefore canonicalizes the entry experience to `/welcome`.
 
 ## Internal architecture
 
@@ -61,7 +65,7 @@ the UI and proxy are not the only safety boundary.
 
 ## Shared web contract
 
-`@jayant/web-auth` owns web-specific Supabase browser/request/server clients,
+`@jayantgoyal/web-auth` owns web-specific Supabase browser/request/server clients,
 cookie selection and promotion, Auth entry URL builders, safe returns, password
 rules, profile/avatar resolution, provider metadata, and logout scope. It does
 not own Studio or Admin authorization.
@@ -69,6 +73,11 @@ not own Studio or Admin authorization.
 The shared production cookie can be read by trusted Jayant subdomains. Preview
 deployments do not receive a broad production-domain cookie. Details are in the
 [shared session contract](../../shared-systems/authentication/cookie-and-return-contract.md).
+
+Auth root metadata, its installable manifest, favicon paths, and social preview
+are generated from the shared identity, web-brand, URL, and SEO contracts. Auth
+and account pages remain non-indexable even though the public welcome entry is
+indexable.
 
 ## Data and storage
 

@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import {
   ApplicationCommandPalette,
   type ApplicationCommandPaletteGroup,
-} from "@jayant/web-ui/application-command-palette";
+} from "@jayantgoyal/web-ui/application-command-palette";
 
 import {
   getVisibleAdminNavigationDomains,
@@ -36,7 +36,7 @@ export function AdminCommandPalette({ role }: { role: UserRole }) {
     <ApplicationCommandPalette
       ariaLabel="Search Admin"
       title="Search Admin"
-      description="Search portfolio workspaces and platform tools"
+      description="Search Portfolio workspaces and Admin operations"
       placeholder="Search Admin workspaces…"
       emptyMessage="No Admin destination found."
       groups={groups}

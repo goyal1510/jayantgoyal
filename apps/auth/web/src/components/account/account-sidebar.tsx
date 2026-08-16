@@ -10,13 +10,13 @@ import {
   UserRound,
 } from "lucide-react";
 
-import { APP_BRANDS } from "@jayant/web-brand";
+import { APP_BRANDS } from "@jayantgoyal/web-brand";
 import { AccountTopbarUserMenu } from "@/components/account/account-topbar-user-menu";
 import {
   ApplicationSidebarFrame,
   ApplicationSidebarSection,
   type ApplicationNavigationSection,
-} from "@jayant/web-ui/application-shell";
+} from "@jayantgoyal/web-ui/application-shell";
 
 const authBrand = {
   name: APP_BRANDS.auth.name,

@@ -1,22 +1,28 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
-import { Eye } from "lucide-react"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Eye } from "lucide-react";
 
 interface PasswordStrength {
-  score: number
-  label: string
-  color: string
-  feedback: string[]
-  crackTime: string
+  score: number;
+  label: string;
+  color: string;
+  feedback: string[];
+  crackTime: string;
 }
 
 function calculatePasswordStrength(password: string): PasswordStrength {
-  let score = 0
-  const feedback: string[] = []
+  let score = 0;
+  const feedback: string[] = [];
 
   if (password.length === 0) {
     return {
@@ -25,37 +31,41 @@ function calculatePasswordStrength(password: string): PasswordStrength {
       color: "text-muted-foreground",
       feedback: [],
       crackTime: "N/A",
-    }
+    };
   }
 
   // Length checks
-  if (password.length >= 8) score += 1
-  else feedback.push("Use at least 8 characters")
+  if (password.length >= 8) score += 1;
+  else feedback.push("Use at least 8 characters");
 
-  if (password.length >= 12) score += 1
-  if (password.length >= 16) score += 1
+  if (password.length >= 12) score += 1;
+  if (password.length >= 16) score += 1;
 
   // Character variety
-  if (/[a-z]/.test(password)) score += 1
-  else feedback.push("Add lowercase letters")
+  if (/[a-z]/.test(password)) score += 1;
+  else feedback.push("Add lowercase letters");
 
-  if (/[A-Z]/.test(password)) score += 1
-  else feedback.push("Add uppercase letters")
+  if (/[A-Z]/.test(password)) score += 1;
+  else feedback.push("Add uppercase letters");
 
-  if (/[0-9]/.test(password)) score += 1
-  else feedback.push("Add numbers")
+  if (/[0-9]/.test(password)) score += 1;
+  else feedback.push("Add numbers");
 
-  if (/[^a-zA-Z0-9]/.test(password)) score += 1
-  else feedback.push("Add special characters")
+  if (/[^a-zA-Z0-9]/.test(password)) score += 1;
+  else feedback.push("Add special characters");
 
   // Common patterns
-  if (!/(.)\1{2,}/.test(password)) score += 1
-  else feedback.push("Avoid repeating characters")
+  if (!/(.)\1{2,}/.test(password)) score += 1;
+  else feedback.push("Avoid repeating characters");
 
-  if (!/(012|123|234|345|456|567|678|789|890|abc|bcd|cde|def|efg|fgh|ghi|hij|ijk|jkl|klm|lmn|mno|nop|opq|pqr|qrs|rst|stu|tuv|uvw|vwx|wxy|xyz)/i.test(password)) {
-    score += 1
+  if (
+    !/(012|123|234|345|456|567|678|789|890|abc|bcd|cde|def|efg|fgh|ghi|hij|ijk|jkl|klm|lmn|mno|nop|opq|pqr|qrs|rst|stu|tuv|uvw|vwx|wxy|xyz)/i.test(
+      password,
+    )
+  ) {
+    score += 1;
   } else {
-    feedback.push("Avoid common sequences")
+    feedback.push("Avoid common sequences");
   }
 
   // Calculate crack time estimate
@@ -63,36 +73,37 @@ function calculatePasswordStrength(password: string): PasswordStrength {
     (/[a-z]/.test(password) ? 26 : 0) +
     (/[A-Z]/.test(password) ? 26 : 0) +
     (/[0-9]/.test(password) ? 10 : 0) +
-    (/[^a-zA-Z0-9]/.test(password) ? 32 : 0)
+    (/[^a-zA-Z0-9]/.test(password) ? 32 : 0);
 
-  const combinations = Math.pow(charsetSize, password.length)
-  const guessesPerSecond = 1e9 // 1 billion guesses per second
-  const seconds = combinations / guessesPerSecond
+  const combinations = Math.pow(charsetSize, password.length);
+  const guessesPerSecond = 1e9; // 1 billion guesses per second
+  const seconds = combinations / guessesPerSecond;
 
-  let crackTime = "Instant"
+  let crackTime = "Instant";
   if (seconds > 1) {
-    if (seconds < 60) crackTime = `${Math.round(seconds)} seconds`
-    else if (seconds < 3600) crackTime = `${Math.round(seconds / 60)} minutes`
-    else if (seconds < 86400) crackTime = `${Math.round(seconds / 3600)} hours`
-    else if (seconds < 31536000) crackTime = `${Math.round(seconds / 86400)} days`
-    else crackTime = `${Math.round(seconds / 31536000)} years`
+    if (seconds < 60) crackTime = `${Math.round(seconds)} seconds`;
+    else if (seconds < 3600) crackTime = `${Math.round(seconds / 60)} minutes`;
+    else if (seconds < 86400) crackTime = `${Math.round(seconds / 3600)} hours`;
+    else if (seconds < 31536000)
+      crackTime = `${Math.round(seconds / 86400)} days`;
+    else crackTime = `${Math.round(seconds / 31536000)} years`;
   }
 
-  let label = "Very Weak"
-  let color = "text-red-500"
+  let label = "Very Weak";
+  let color = "text-red-500";
 
   if (score >= 8) {
-    label = "Very Strong"
-    color = "text-green-500"
+    label = "Very Strong";
+    color = "text-green-500";
   } else if (score >= 6) {
-    label = "Strong"
-    color = "text-green-600"
+    label = "Strong";
+    color = "text-green-600";
   } else if (score >= 4) {
-    label = "Moderate"
-    color = "text-yellow-500"
+    label = "Moderate";
+    color = "text-yellow-500";
   } else if (score >= 2) {
-    label = "Weak"
-    color = "text-orange-500"
+    label = "Weak";
+    color = "text-orange-500";
   }
 
   return {
@@ -101,13 +112,16 @@ function calculatePasswordStrength(password: string): PasswordStrength {
     color,
     feedback: feedback.length > 0 ? feedback : ["Password looks good!"],
     crackTime,
-  }
+  };
 }
 
 export default function PasswordStrengthClient() {
-  const [password, setPassword] = React.useState("")
-  const [showPassword, setShowPassword] = React.useState(false)
-  const strength = React.useMemo(() => calculatePasswordStrength(password), [password])
+  const [password, setPassword] = React.useState("");
+  const [showPassword, setShowPassword] = React.useState(false);
+  const strength = React.useMemo(
+    () => calculatePasswordStrength(password),
+    [password],
+  );
 
   return (
     <div className="space-y-6">
@@ -156,11 +170,15 @@ export default function PasswordStrengthClient() {
               <div className="w-full bg-muted rounded-full h-2">
                 <div
                   className={`h-2 rounded-full transition-all ${
-                    strength.score >= 8 ? "bg-green-500" :
-                    strength.score >= 6 ? "bg-green-600" :
-                    strength.score >= 4 ? "bg-yellow-500" :
-                    strength.score >= 2 ? "bg-orange-500" :
-                    "bg-red-500"
+                    strength.score >= 8
+                      ? "bg-green-500"
+                      : strength.score >= 6
+                        ? "bg-green-600"
+                        : strength.score >= 4
+                          ? "bg-yellow-500"
+                          : strength.score >= 2
+                            ? "bg-orange-500"
+                            : "bg-red-500"
                   }`}
                   style={{ width: `${(strength.score / 10) * 100}%` }}
                 />
@@ -191,5 +209,5 @@ export default function PasswordStrengthClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

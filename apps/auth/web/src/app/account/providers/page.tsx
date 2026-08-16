@@ -7,15 +7,15 @@ import {
 } from "@/app/actions/account";
 import { AccountWorkspaceHeader } from "@/components/account/account-workspace-header";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { GithubIcon, GoogleIcon } from "@jayant/web-ui/auth-presentation";
-import { Button } from "@jayant/web-ui/button";
+import { GithubIcon, GoogleIcon } from "@jayantgoyal/web-ui/auth-presentation";
+import { Button } from "@jayantgoyal/web-ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@jayant/web-ui/card";
+} from "@jayantgoyal/web-ui/card";
 
 export const metadata: Metadata = { title: "Connected providers" };
 export const dynamic = "force-dynamic";

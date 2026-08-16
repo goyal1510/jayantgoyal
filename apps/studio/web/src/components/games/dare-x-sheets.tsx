@@ -3,18 +3,18 @@
 import type { ChangeEvent, RefObject } from "react";
 import { Download, Globe2, Loader2, Upload, Users } from "lucide-react";
 
-import { Button } from "@jayant/web-ui/button";
-import { Input } from "@jayant/web-ui/input";
-import { Label } from "@jayant/web-ui/label";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@jayant/web-ui/select";
-import { Separator } from "@jayant/web-ui/separator";
-import { cn } from "@jayant/web-ui/lib/utils";
+} from "@jayantgoyal/web-ui/select";
+import { Separator } from "@jayantgoyal/web-ui/separator";
+import { cn } from "@jayantgoyal/web-ui/lib/utils";
 
 import {
   GameSetupPathPicker,

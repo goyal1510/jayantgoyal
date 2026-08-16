@@ -3,11 +3,11 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   copyAuthCacheHeaders,
   createSupabaseRequestClient,
-} from "@jayant/web-auth/server";
+} from "@jayantgoyal/web-auth/server";
 
 import { resolveAuthReturnTarget } from "@/lib/auth/returns";
 import { classifyAuthCallback } from "@/lib/auth/callback";
-import { syncProfileNamesFromIdentities } from "@jayant/web-auth/profile";
+import { syncProfileNamesFromIdentities } from "@jayantgoyal/web-auth/profile";
 
 function noStore(response: NextResponse) {
   response.headers.set("Cache-Control", "private, no-store, max-age=0");

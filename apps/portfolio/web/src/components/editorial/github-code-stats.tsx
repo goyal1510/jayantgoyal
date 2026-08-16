@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import type { GitHubLOCStats } from "@jayant/github";
+import type { GitHubLOCStats } from "@jayantgoyal/github";
 
 function compact(value: number) {
   return new Intl.NumberFormat("en", {

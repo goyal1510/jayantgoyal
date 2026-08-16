@@ -1,57 +1,71 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 async function hashText(text: string, algorithm: string): Promise<string> {
-  const encoder = new TextEncoder()
-  const data = encoder.encode(text)
+  const encoder = new TextEncoder();
+  const data = encoder.encode(text);
 
   switch (algorithm) {
     case "SHA-256": {
-      const hash256 = await crypto.subtle.digest("SHA-256", data)
-      return Array.from(new Uint8Array(hash256)).map(b => b.toString(16).padStart(2, "0")).join("")
+      const hash256 = await crypto.subtle.digest("SHA-256", data);
+      return Array.from(new Uint8Array(hash256))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
     }
     case "SHA-384": {
-      const hash384 = await crypto.subtle.digest("SHA-384", data)
-      return Array.from(new Uint8Array(hash384)).map(b => b.toString(16).padStart(2, "0")).join("")
+      const hash384 = await crypto.subtle.digest("SHA-384", data);
+      return Array.from(new Uint8Array(hash384))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
     }
     case "SHA-512": {
-      const hash512 = await crypto.subtle.digest("SHA-512", data)
-      return Array.from(new Uint8Array(hash512)).map(b => b.toString(16).padStart(2, "0")).join("")
+      const hash512 = await crypto.subtle.digest("SHA-512", data);
+      return Array.from(new Uint8Array(hash512))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
     }
     case "SHA-1": {
-      const hash1 = await crypto.subtle.digest("SHA-1", data)
-      return Array.from(new Uint8Array(hash1)).map(b => b.toString(16).padStart(2, "0")).join("")
+      const hash1 = await crypto.subtle.digest("SHA-1", data);
+      return Array.from(new Uint8Array(hash1))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
     }
     default:
-      throw new Error("Unsupported algorithm")
+      throw new Error("Unsupported algorithm");
   }
 }
 
 // Simple MD5 implementation (for demo - not cryptographically secure)
 function md5(text: string): string {
   // This is a simplified version - in production use a proper crypto library
-  const encoder = new TextEncoder()
-  const data = encoder.encode(text)
-  let hash = 0
+  const encoder = new TextEncoder();
+  const data = encoder.encode(text);
+  let hash = 0;
   for (let i = 0; i < data.length; i++) {
-    hash = ((hash << 5) - hash) + data[i]!
-    hash = hash & hash
+    hash = (hash << 5) - hash + data[i]!;
+    hash = hash & hash;
   }
-  return Math.abs(hash).toString(16).padStart(32, "0")
+  return Math.abs(hash).toString(16).padStart(32, "0");
 }
 
 export default function HashTextClient() {
-  const [input, setInput] = React.useState("")
-  const [algorithm, setAlgorithm] = React.useState("SHA-256")
-  const [hashed, setHashed] = React.useState("")
-  const [isHashing, setIsHashing] = React.useState(false)
+  const [input, setInput] = React.useState("");
+  const [algorithm, setAlgorithm] = React.useState("SHA-256");
+  const [hashed, setHashed] = React.useState("");
+  const [isHashing, setIsHashing] = React.useState(false);
 
   const algorithms = [
     { value: "MD5", label: "MD5" },
@@ -59,39 +73,39 @@ export default function HashTextClient() {
     { value: "SHA-256", label: "SHA-256" },
     { value: "SHA-384", label: "SHA-384" },
     { value: "SHA-512", label: "SHA-512" },
-  ]
+  ];
 
   const performHash = React.useCallback(async () => {
     if (!input.trim()) {
-      setHashed("")
-      return
+      setHashed("");
+      return;
     }
 
-    setIsHashing(true)
+    setIsHashing(true);
     try {
-      let result: string
+      let result: string;
       if (algorithm === "MD5") {
-        result = md5(input)
+        result = md5(input);
       } else {
-        result = await hashText(input, algorithm)
+        result = await hashText(input, algorithm);
       }
-      setHashed(result)
+      setHashed(result);
     } catch {
-      toast.error("Failed to hash text")
-      setHashed("")
+      toast.error("Failed to hash text");
+      setHashed("");
     } finally {
-      setIsHashing(false)
+      setIsHashing(false);
     }
-  }, [input, algorithm])
+  }, [input, algorithm]);
 
   React.useEffect(() => {
-    performHash()
-  }, [performHash])
+    performHash();
+  }, [performHash]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(hashed)
-    toast.success("Hash copied to clipboard")
-  }
+    navigator.clipboard.writeText(hashed);
+    toast.success("Hash copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -140,11 +154,7 @@ export default function HashTextClient() {
             <div className="space-y-2">
               <Label>Hash ({algorithm})</Label>
               <div className="flex gap-2">
-                <Input
-                  value={hashed}
-                  readOnly
-                  className="font-mono text-sm"
-                />
+                <Input value={hashed} readOnly className="font-mono text-sm" />
                 <Button
                   variant="outline"
                   size="icon"
@@ -165,5 +175,5 @@ export default function HashTextClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

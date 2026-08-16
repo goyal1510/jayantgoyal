@@ -1,82 +1,90 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
-import { Copy, Download } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Copy, Download } from "lucide-react";
+import { toast } from "sonner";
 
 export default function Base64FileConverterClient() {
-  const [file, setFile] = React.useState<File | null>(null)
-  const [base64, setBase64] = React.useState("")
-  const [fileName, setFileName] = React.useState("")
-  const [isProcessing, setIsProcessing] = React.useState(false)
+  const [file, setFile] = React.useState<File | null>(null);
+  const [base64, setBase64] = React.useState("");
+  const [fileName, setFileName] = React.useState("");
+  const [isProcessing, setIsProcessing] = React.useState(false);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0]
-    if (!selectedFile) return
+    const selectedFile = e.target.files?.[0];
+    if (!selectedFile) return;
 
-    setFile(selectedFile)
-    setFileName(selectedFile.name)
-    setIsProcessing(true)
+    setFile(selectedFile);
+    setFileName(selectedFile.name);
+    setIsProcessing(true);
 
     try {
-      const reader = new FileReader()
+      const reader = new FileReader();
       reader.onload = (event) => {
-        const result = event.target?.result as string
+        const result = event.target?.result as string;
         // Remove data URL prefix if present
-        const base64String = result.includes(",") ? result.split(",")[1] ?? "" : result
-        setBase64(base64String)
-        setIsProcessing(false)
-      }
+        const base64String = result.includes(",")
+          ? (result.split(",")[1] ?? "")
+          : result;
+        setBase64(base64String);
+        setIsProcessing(false);
+      };
       reader.onerror = () => {
-        toast.error("Failed to read file")
-        setIsProcessing(false)
-      }
-      reader.readAsDataURL(selectedFile)
+        toast.error("Failed to read file");
+        setIsProcessing(false);
+      };
+      reader.readAsDataURL(selectedFile);
     } catch {
-      toast.error("Failed to process file")
-      setIsProcessing(false)
+      toast.error("Failed to process file");
+      setIsProcessing(false);
     }
-  }
+  };
 
   const handleBase64Input = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setBase64(e.target.value)
-  }
+    setBase64(e.target.value);
+  };
 
   const downloadFile = () => {
     if (!base64 || !fileName) {
-      toast.error("No file data available")
-      return
+      toast.error("No file data available");
+      return;
     }
 
     try {
-      const binaryString = atob(base64)
-      const bytes = new Uint8Array(binaryString.length)
+      const binaryString = atob(base64);
+      const bytes = new Uint8Array(binaryString.length);
       for (let i = 0; i < binaryString.length; i++) {
-        bytes[i] = binaryString.charCodeAt(i)
+        bytes[i] = binaryString.charCodeAt(i);
       }
-      const blob = new Blob([bytes])
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement("a")
-      a.href = url
-      a.download = fileName || "download"
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
-      toast.success("File downloaded")
+      const blob = new Blob([bytes]);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName || "download";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success("File downloaded");
     } catch {
-      toast.error("Failed to download file")
+      toast.error("Failed to download file");
     }
-  }
+  };
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(base64)
-    toast.success("Base64 copied to clipboard")
-  }
+    navigator.clipboard.writeText(base64);
+    toast.success("Base64 copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -110,7 +118,9 @@ export default function Base64FileConverterClient() {
             )}
 
             {isProcessing && (
-              <p className="text-sm text-muted-foreground">Processing file...</p>
+              <p className="text-sm text-muted-foreground">
+                Processing file...
+              </p>
             )}
           </CardContent>
         </Card>
@@ -162,5 +172,5 @@ export default function Base64FileConverterClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

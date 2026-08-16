@@ -12,10 +12,12 @@ vi.mock("./helpers", async () => {
     PORTFOLIO_ADMIN_SELECT_COLUMNS,
     PORTFOLIO_TABLES,
     validatePortfolioWriteInput,
-  } = await import("@jayant/portfolio-contracts");
+  } = await import("@jayantgoyal/portfolio-contracts");
 
   function validateTable(table: string) {
-    if (!PORTFOLIO_TABLES.includes(table as (typeof PORTFOLIO_TABLES)[number])) {
+    if (
+      !PORTFOLIO_TABLES.includes(table as (typeof PORTFOLIO_TABLES)[number])
+    ) {
       return NextResponse.json({ error: "Invalid table" }, { status: 400 });
     }
     return null;
@@ -35,6 +37,29 @@ vi.mock("./helpers", async () => {
         );
   }
 
+  function preparePortfolioMutationPayload(
+    table: string,
+    body: unknown,
+    operation: "create" | "update",
+  ) {
+    if (
+      table !== "hero" ||
+      operation !== "create" ||
+      typeof body !== "object" ||
+      body === null
+    ) {
+      return body;
+    }
+
+    const input = body as Record<string, unknown>;
+    return {
+      ...input,
+      name: "Jayant",
+      display_name: "Jayant",
+      seo_title: `Jayant | ${input.role}`,
+    };
+  }
+
   return {
     ALLOWED_TABLES: PORTFOLIO_TABLES,
     TABLES_WITH_SORT_ORDER: [
@@ -52,6 +77,7 @@ vi.mock("./helpers", async () => {
         table as keyof typeof PORTFOLIO_ADMIN_SELECT_COLUMNS
       ],
     validatePortfolioRequestBody,
+    preparePortfolioMutationPayload,
     authorizeAndGetClient: authorizeAndGetClientMock,
     revalidatePortfolioPublicContent: revalidateMock,
   };
@@ -177,7 +203,10 @@ describe("Admin Portfolio table route contract", () => {
 
   it("writes a valid project through the requested schema/table and revalidates public pages", async () => {
     const operations: Array<Record<string, unknown>> = [];
-    const client = makeClient({ operations, result: { data: { id: "project-1" }, error: null } });
+    const client = makeClient({
+      operations,
+      result: { data: { id: "project-1" }, error: null },
+    });
     authorizeAndGetClientMock.mockResolvedValue({ client });
     const payload = {
       name: "Signal",
@@ -212,6 +241,45 @@ describe("Admin Portfolio table route contract", () => {
     expect(client.schema).toHaveBeenCalledWith("portfolio");
     expect(operations).toContainEqual({ operation: "insert", payload });
     expect(revalidateMock).toHaveBeenCalledOnce();
+  });
+
+  it("injects fixed identity fields when creating the Portfolio hero", async () => {
+    const operations: Array<Record<string, unknown>> = [];
+    const client = makeClient({ operations });
+    authorizeAndGetClientMock.mockResolvedValue({ client });
+    const payload = {
+      role: "Software Engineer",
+      tagline: "Reliable product systems",
+      blurb: "I build dependable software.",
+      headline: "Clear products from idea through delivery.",
+      current_title: "Software Engineer",
+      availability: "Open to thoughtful collaborations.",
+      resume_url: "/resume.pdf",
+      github_username: "goyal1510",
+      seo_description: "Jayant builds clear and dependable digital products.",
+    };
+
+    const response = requireResponse(
+      await POST(
+        request("/api/portfolio/hero", {
+          method: "POST",
+          body: JSON.stringify(payload),
+          headers: { "content-type": "application/json" },
+        }),
+        routeParams("hero"),
+      ),
+    );
+
+    expect(response.status).toBe(200);
+    expect(operations).toContainEqual({
+      operation: "insert",
+      payload: {
+        ...payload,
+        name: "Jayant",
+        display_name: "Jayant",
+        seo_title: "Jayant | Software Engineer",
+      },
+    });
   });
 
   it("requires an id for updates and deletes", async () => {
@@ -294,10 +362,7 @@ describe("Admin Portfolio table route contract", () => {
     authorizeAndGetClientMock.mockResolvedValue({ client });
 
     const response = requireResponse(
-      await GET(
-        request("/api/portfolio/hero?id=hero-1"),
-        routeParams("hero"),
-      ),
+      await GET(request("/api/portfolio/hero?id=hero-1"), routeParams("hero")),
     );
 
     expect(response.status).toBe(200);
@@ -310,7 +375,10 @@ describe("Admin Portfolio table route contract", () => {
 
   it("orders collection reads with the canonical sort field", async () => {
     const operations: Array<Record<string, unknown>> = [];
-    const client = makeClient({ operations, result: { data: [], error: null } });
+    const client = makeClient({
+      operations,
+      result: { data: [], error: null },
+    });
     authorizeAndGetClientMock.mockResolvedValue({ client });
 
     const response = requireResponse(

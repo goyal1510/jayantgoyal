@@ -9,7 +9,7 @@ const allowedDevOrigins = localCookieDomain?.endsWith(".localhost")
 
 const nextConfig: NextConfig = {
   allowedDevOrigins,
-  transpilePackages: ["@jayant/web-ui"],
+  transpilePackages: ["@jayantgoyal/web-ui"],
   async headers() {
     return [
       {

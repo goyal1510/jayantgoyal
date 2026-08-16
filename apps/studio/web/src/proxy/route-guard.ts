@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { buildAuthLoginUrl } from "@jayant/web-auth/entry";
+import { buildAuthLoginUrl } from "@jayantgoyal/web-auth/entry";
 
 import type { ProxyContext } from "./types";
 

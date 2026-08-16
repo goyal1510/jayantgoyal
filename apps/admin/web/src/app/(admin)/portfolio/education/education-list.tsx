@@ -17,17 +17,17 @@ import {
   updatePortfolioData,
   deletePortfolioData,
 } from "@/lib/portfolio-api";
-import { Button } from "@jayant/web-ui/button";
-import { ConfirmationDialog } from "@jayant/web-ui/confirmation-dialog";
-import { IconAction } from "@jayant/web-ui/icon-action";
-import { VisibilityBadge } from "@jayant/web-ui/status-badge";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { ConfirmationDialog } from "@jayantgoyal/web-ui/confirmation-dialog";
+import { IconAction } from "@jayantgoyal/web-ui/icon-action";
+import { VisibilityBadge } from "@jayantgoyal/web-ui/status-badge";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@jayant/web-ui/card";
+} from "@jayantgoyal/web-ui/card";
 import type { Education } from "@/lib/types";
 import {
   EducationDialog,

@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,18 +8,18 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@jayant/web-ui/dialog"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
-import { Pencil } from "lucide-react"
-import type { DirectoryListingItem } from "@/lib/file-manager/types"
+} from "@jayantgoyal/web-ui/dialog";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Pencil } from "lucide-react";
+import type { DirectoryListingItem } from "@/lib/file-manager/types";
 
 interface RenameDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  file: DirectoryListingItem | null
-  onSuccess?: () => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  file: DirectoryListingItem | null;
+  onSuccess?: () => void;
 }
 
 export function RenameDialog({
@@ -28,40 +28,44 @@ export function RenameDialog({
   file,
   onSuccess,
 }: RenameDialogProps) {
-  const [name, setName] = React.useState("")
-  const [loading, setLoading] = React.useState(false)
-  const [error, setError] = React.useState<string | null>(null)
+  const [name, setName] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
 
   // Update name when file changes
   React.useEffect(() => {
     if (file) {
       // For files, remove extension from display name
-      const displayName = file.display_name || file.file_name
+      const displayName = file.display_name || file.file_name;
       if (file.is_directory) {
-        setName(displayName)
+        setName(displayName);
       } else {
         // Remove extension for files
-        const lastDotIndex = displayName.lastIndexOf(".")
-        setName(lastDotIndex > 0 ? displayName.substring(0, lastDotIndex) : displayName)
+        const lastDotIndex = displayName.lastIndexOf(".");
+        setName(
+          lastDotIndex > 0
+            ? displayName.substring(0, lastDotIndex)
+            : displayName,
+        );
       }
-      setError(null)
+      setError(null);
     }
-  }, [file])
+  }, [file]);
 
   // Reset form when dialog opens/closes
   React.useEffect(() => {
     if (!open) {
-      setName("")
-      setError(null)
+      setName("");
+      setError(null);
     }
-  }, [open])
+  }, [open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!file) return
+    e.preventDefault();
+    if (!file) return;
 
-    setError(null)
-    setLoading(true)
+    setError(null);
+    setLoading(true);
 
     try {
       const response = await fetch(`/api/files/${file.id}`, {
@@ -72,27 +76,27 @@ export function RenameDialog({
         body: JSON.stringify({
           name: name.trim(),
         }),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to rename")
+        throw new Error(data.error || "Failed to rename");
       }
 
       // Success
-      onOpenChange(false)
+      onOpenChange(false);
       if (onSuccess) {
-        onSuccess()
+        onSuccess();
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
+      setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  if (!file) return null
+  if (!file) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -121,9 +125,7 @@ export function RenameDialog({
                 autoFocus
                 required
               />
-              {error && (
-                <p className="text-sm text-destructive">{error}</p>
-              )}
+              {error && <p className="text-sm text-destructive">{error}</p>}
             </div>
           </div>
           <DialogFooter className="flex-col-reverse sm:flex-row gap-2">
@@ -136,12 +138,16 @@ export function RenameDialog({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={loading || !name.trim()} className="w-full sm:w-auto">
+            <Button
+              type="submit"
+              disabled={loading || !name.trim()}
+              className="w-full sm:w-auto"
+            >
               {loading ? "Renaming..." : "Rename"}
             </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

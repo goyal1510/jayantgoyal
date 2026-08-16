@@ -1,4 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@jayant/web-ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
 
 import { getToolByPath } from "@/lib/tools/tools";
 import { toolSeoContentByPath } from "@/lib/tools/seo-content";

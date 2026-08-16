@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { PageSpinner } from "@jayant/web-ui/page-spinner";
-import { Progress } from "@jayant/web-ui/progress";
+import { PageSpinner } from "@jayantgoyal/web-ui/page-spinner";
+import { Progress } from "@jayantgoyal/web-ui/progress";
 import { ActivityStats as ActivityStatsType } from "@/lib/activity-tracker/database";
 import { toast } from "sonner";
 

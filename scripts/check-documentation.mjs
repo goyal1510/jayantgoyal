@@ -10,7 +10,7 @@ const repositoryRoot = path.resolve(
 
 const requiredDocuments = [
   "docs/README.md",
-  "docs/overview/ecosystem.md",
+  "docs/overview/product-suite.md",
   "docs/overview/system-map.md",
   "docs/overview/terminology.md",
   "docs/architecture/principles.md",
@@ -36,6 +36,7 @@ const requiredDocuments = [
   "docs/shared-systems/data/README.md",
   "docs/shared-systems/data/schema-catalog.md",
   "docs/shared-systems/design-and-brand/README.md",
+  "docs/shared-systems/design-and-brand/naming-contract.md",
   "docs/shared-systems/integrations/README.md",
   "docs/engineering/local-development.md",
   "docs/engineering/configuration.md",
@@ -124,7 +125,7 @@ function listRepositoryFiles() {
     { cwd: repositoryRoot, encoding: "utf8" },
   )
     .split("\n")
-    .filter(Boolean)
+    .filter((file) => file && existsSync(path.join(repositoryRoot, file)))
     .sort();
 }
 

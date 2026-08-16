@@ -10,8 +10,13 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
-import { Card, CardContent, CardHeader, CardTitle } from "@jayant/web-ui/card";
-import type { GitHubRepo } from "@jayant/github";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import type { GitHubRepo } from "@jayantgoyal/github";
 
 interface TopReposBarChartProps {
   repos: GitHubRepo[];

@@ -1,44 +1,51 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 function normalizeEmail(email: string): string {
-  const trimmed = email.trim().toLowerCase()
-  const [localPart, domain] = trimmed.split("@")
+  const trimmed = email.trim().toLowerCase();
+  const [localPart, domain] = trimmed.split("@");
 
-  if (!localPart || !domain) return trimmed
+  if (!localPart || !domain) return trimmed;
 
   // Remove dots from local part (Gmail style)
-  const normalizedLocal = localPart.replace(/\./g, "")
+  const normalizedLocal = localPart.replace(/\./g, "");
 
   // Remove everything after + (plus addressing)
-  const plusIndex = normalizedLocal.indexOf("+")
-  const finalLocal = plusIndex > 0 ? normalizedLocal.slice(0, plusIndex) : normalizedLocal
+  const plusIndex = normalizedLocal.indexOf("+");
+  const finalLocal =
+    plusIndex > 0 ? normalizedLocal.slice(0, plusIndex) : normalizedLocal;
 
-  return `${finalLocal}@${domain}`
+  return `${finalLocal}@${domain}`;
 }
 
 export default function EmailNormalizerClient() {
-  const [input, setInput] = React.useState("")
-  const [normalized, setNormalized] = React.useState("")
+  const [input, setInput] = React.useState("");
+  const [normalized, setNormalized] = React.useState("");
 
   React.useEffect(() => {
     if (!input.trim()) {
-      setNormalized("")
-      return
+      setNormalized("");
+      return;
     }
-    setNormalized(normalizeEmail(input))
-  }, [input])
+    setNormalized(normalizeEmail(input));
+  }, [input]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(normalized)
-    toast.success("Normalized email copied to clipboard")
-  }
+    navigator.clipboard.writeText(normalized);
+    toast.success("Normalized email copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -73,11 +80,7 @@ export default function EmailNormalizerClient() {
             </div>
           </CardHeader>
           <CardContent>
-            <Input
-              value={normalized}
-              readOnly
-              className="font-mono"
-            />
+            <Input value={normalized} readOnly className="font-mono" />
             <p className="text-xs text-muted-foreground mt-2">
               Normalized: lowercase, dots removed, plus addressing removed
             </p>
@@ -85,5 +88,5 @@ export default function EmailNormalizerClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

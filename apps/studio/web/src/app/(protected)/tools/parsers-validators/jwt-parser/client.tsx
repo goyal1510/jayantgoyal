@@ -1,22 +1,32 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 function parseJWT(token: string) {
   try {
-    const parts = token.split(".")
+    const parts = token.split(".");
     if (parts.length !== 3) {
-      throw new Error("Invalid JWT format")
+      throw new Error("Invalid JWT format");
     }
 
-    const header = JSON.parse(atob(parts[0]!.replace(/-/g, "+").replace(/_/g, "/")))
-    const payload = JSON.parse(atob(parts[1]!.replace(/-/g, "+").replace(/_/g, "/")))
-    const signature = parts[2]
+    const header = JSON.parse(
+      atob(parts[0]!.replace(/-/g, "+").replace(/_/g, "/")),
+    );
+    const payload = JSON.parse(
+      atob(parts[1]!.replace(/-/g, "+").replace(/_/g, "/")),
+    );
+    const signature = parts[2];
 
     return {
       header,
@@ -27,38 +37,40 @@ function parseJWT(token: string) {
         payload: parts[1],
         signature: parts[2],
       },
-    }
+    };
   } catch {
-    throw new Error("Failed to parse JWT")
+    throw new Error("Failed to parse JWT");
   }
 }
 
 export default function JWTParserClient() {
-  const [input, setInput] = React.useState("")
-  const [parsed, setParsed] = React.useState<ReturnType<typeof parseJWT> | null>(null)
-  const [error, setError] = React.useState("")
+  const [input, setInput] = React.useState("");
+  const [parsed, setParsed] = React.useState<ReturnType<
+    typeof parseJWT
+  > | null>(null);
+  const [error, setError] = React.useState("");
 
   React.useEffect(() => {
     if (!input.trim()) {
-      setParsed(null)
-      setError("")
-      return
+      setParsed(null);
+      setError("");
+      return;
     }
 
     try {
-      const result = parseJWT(input)
-      setParsed(result)
-      setError("")
+      const result = parseJWT(input);
+      setParsed(result);
+      setError("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Invalid JWT")
-      setParsed(null)
+      setError(err instanceof Error ? err.message : "Invalid JWT");
+      setParsed(null);
     }
-  }, [input])
+  }, [input]);
 
   const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text)
-    toast.success("Copied to clipboard")
-  }
+    navigator.clipboard.writeText(text);
+    toast.success("Copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -74,9 +86,7 @@ export default function JWTParserClient() {
             placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
             className="font-mono text-xs"
           />
-          {error && (
-            <p className="text-sm text-red-500 mt-2">{error}</p>
-          )}
+          {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
         </CardContent>
       </Card>
 
@@ -89,7 +99,9 @@ export default function JWTParserClient() {
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => copyToClipboard(JSON.stringify(parsed.header, null, 2))}
+                  onClick={() =>
+                    copyToClipboard(JSON.stringify(parsed.header, null, 2))
+                  }
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
@@ -109,7 +121,9 @@ export default function JWTParserClient() {
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => copyToClipboard(JSON.stringify(parsed.payload, null, 2))}
+                  onClick={() =>
+                    copyToClipboard(JSON.stringify(parsed.payload, null, 2))
+                  }
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
@@ -124,5 +138,5 @@ export default function JWTParserClient() {
         </div>
       )}
     </div>
-  )
+  );
 }

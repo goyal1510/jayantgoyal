@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { WorkspaceHeader } from "@jayant/web-ui/workspace-header";
+import { WorkspaceHeader } from "@jayantgoyal/web-ui/workspace-header";
 import { getGamePlayLabels } from "@/lib/games/catalog";
 import { GAME_META, type GameSlug } from "@/lib/games/config";
 import { GAME_PRESENTATION } from "@/lib/games/presentation";

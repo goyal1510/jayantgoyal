@@ -3,7 +3,7 @@ import {
   PORTFOLIO_WRITING_SELECT_COLUMNS,
   type PortfolioWritingDetailRecord,
   type PortfolioWritingListRecord,
-} from "@jayant/portfolio-contracts";
+} from "@jayantgoyal/portfolio-contracts";
 import { cache } from "react";
 import { unstable_cache } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase/server";

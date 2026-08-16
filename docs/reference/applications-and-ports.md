@@ -1,11 +1,11 @@
 # Applications, hosts, and ports
 
-| Product   | Workspace               | Path                 | Local origin            | Production origin                |
-| --------- | ----------------------- | -------------------- | ----------------------- | -------------------------------- |
-| Portfolio | `@jayant/portfolio-web` | `apps/portfolio/web` | `http://localhost:3000` | `https://jayantgoyal.com`        |
-| Studio    | `@jayant/studio-web`    | `apps/studio/web`    | `http://localhost:3001` | `https://studio.jayantgoyal.com` |
-| Admin     | `@jayant/admin-web`     | `apps/admin/web`     | `http://localhost:3002` | `https://admin.jayantgoyal.com`  |
-| Auth      | `@jayant/auth-web`      | `apps/auth/web`      | `http://localhost:3003` | `https://auth.jayantgoyal.com`   |
+| Product   | Workspace                    | Path                 | Local origin            | Production origin                |
+| --------- | ---------------------------- | -------------------- | ----------------------- | -------------------------------- |
+| Portfolio | `@jayantgoyal/portfolio-web` | `apps/portfolio/web` | `http://localhost:3000` | `https://jayantgoyal.com`        |
+| Studio    | `@jayantgoyal/studio-web`    | `apps/studio/web`    | `http://localhost:3001` | `https://studio.jayantgoyal.com` |
+| Admin     | `@jayantgoyal/admin-web`     | `apps/admin/web`     | `http://localhost:3002` | `https://admin.jayantgoyal.com`  |
+| Auth      | `@jayantgoyal/auth-web`      | `apps/auth/web`      | `http://localhost:3003` | `https://auth.jayantgoyal.com`   |
 
 All are independently deployed Next.js web clients sourced from the same
 repository and `main` branch. Their `.env.example`, `turbo.json`, route tree,

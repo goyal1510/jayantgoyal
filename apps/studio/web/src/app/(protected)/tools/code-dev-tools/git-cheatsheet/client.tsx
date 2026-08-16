@@ -1,10 +1,15 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 const gitCommands = [
   {
@@ -15,7 +20,7 @@ const gitCommands = [
       { cmd: "git status", desc: "Check status of working directory" },
       { cmd: "git add <file>", desc: "Stage a file" },
       { cmd: "git add .", desc: "Stage all changes" },
-      { cmd: "git commit -m \"message\"", desc: "Commit staged changes" },
+      { cmd: 'git commit -m "message"', desc: "Commit staged changes" },
       { cmd: "git log", desc: "View commit history" },
       { cmd: "git diff", desc: "Show changes" },
     ],
@@ -47,20 +52,27 @@ const gitCommands = [
       { cmd: "git reset HEAD <file>", desc: "Unstage file" },
       { cmd: "git checkout -- <file>", desc: "Discard changes" },
       { cmd: "git revert <commit>", desc: "Revert a commit" },
-      { cmd: "git reset --soft HEAD~1", desc: "Undo last commit, keep changes" },
-      { cmd: "git reset --hard HEAD~1", desc: "Undo last commit, discard changes" },
+      {
+        cmd: "git reset --soft HEAD~1",
+        desc: "Undo last commit, keep changes",
+      },
+      {
+        cmd: "git reset --hard HEAD~1",
+        desc: "Undo last commit, discard changes",
+      },
     ],
   },
-]
+];
 
 export default function GitCheatsheetClient() {
   const copyToClipboard = (command: string) => {
-    navigator.clipboard.writeText(command)
-    toast.success("Command copied to clipboard")
-  }
+    navigator.clipboard.writeText(command);
+    toast.success("Command copied to clipboard");
+  };
 
   return (
-    <div className="space-y-6"><div className="grid gap-6 md:grid-cols-2">
+    <div className="space-y-6">
+      <div className="grid gap-6 md:grid-cols-2">
         {gitCommands.map((section) => (
           <Card key={section.category}>
             <CardHeader>
@@ -84,7 +96,9 @@ export default function GitCheatsheetClient() {
                         <Copy className="h-4 w-4" />
                       </Button>
                     </div>
-                    <p className="text-sm text-muted-foreground ml-2">{item.desc}</p>
+                    <p className="text-sm text-muted-foreground ml-2">
+                      {item.desc}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -93,5 +107,5 @@ export default function GitCheatsheetClient() {
         ))}
       </div>
     </div>
-  )
+  );
 }

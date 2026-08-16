@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { buildAuthLoginUrl } from "@jayant/web-auth/entry";
+import { buildAuthLoginUrl } from "@jayantgoyal/web-auth/entry";
 
 export default async function WelcomePage({
   searchParams,

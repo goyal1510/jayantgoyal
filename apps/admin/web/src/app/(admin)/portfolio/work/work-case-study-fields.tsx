@@ -1,10 +1,10 @@
 import { X } from "lucide-react";
 
-import { Button } from "@jayant/web-ui/button";
-import { Input } from "@jayant/web-ui/input";
-import { Label } from "@jayant/web-ui/label";
-import { Switch } from "@jayant/web-ui/switch";
-import { Textarea } from "@jayant/web-ui/textarea";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Switch } from "@jayantgoyal/web-ui/switch";
+import { Textarea } from "@jayantgoyal/web-ui/textarea";
 
 import type { WorkFormData } from "./work-form-data";
 

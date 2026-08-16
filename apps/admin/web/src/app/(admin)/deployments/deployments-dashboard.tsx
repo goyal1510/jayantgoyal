@@ -2,25 +2,22 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
-import {
-  Loader2,
-  RefreshCw,
-} from "lucide-react";
-import { Button } from "@jayant/web-ui/button";
+import { Loader2, RefreshCw } from "lucide-react";
+import { Button } from "@jayantgoyal/web-ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@jayant/web-ui/card";
+} from "@jayantgoyal/web-ui/card";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@jayant/web-ui/select";
+} from "@jayantgoyal/web-ui/select";
 import {
   listDeployments,
   redeployDeployment,
@@ -47,7 +44,9 @@ export function DeploymentsDashboard() {
       const data = await listDeployments(project);
       setDeployments(data);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to fetch deployments");
+      toast.error(
+        err instanceof Error ? err.message : "Failed to fetch deployments",
+      );
     } finally {
       setLoading(false);
     }
@@ -64,7 +63,11 @@ export function DeploymentsDashboard() {
     setActionLoading(deployment.uid);
     try {
       if (type === "redeploy") {
-        await redeployDeployment(deployment.uid, project, deployment.target || "production");
+        await redeployDeployment(
+          deployment.uid,
+          project,
+          deployment.target || "production",
+        );
         toast.success("Redeploy triggered");
       } else {
         await rollbackDeployment(deployment.uid, project);
@@ -102,8 +105,15 @@ export function DeploymentsDashboard() {
                 <SelectItem value="admin">Admin App</SelectItem>
               </SelectContent>
             </Select>
-            <Button variant="outline" size="sm" onClick={fetchDeployments} disabled={loading}>
-              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={fetchDeployments}
+              disabled={loading}
+            >
+              <RefreshCw
+                className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`}
+              />
               Refresh
             </Button>
           </div>
@@ -114,13 +124,19 @@ export function DeploymentsDashboard() {
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
           ) : deployments.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No deployments found</p>
+            <p className="text-sm text-muted-foreground">
+              No deployments found
+            </p>
           ) : (
             <DeploymentsTable
               deployments={deployments}
               actionLoading={actionLoading}
-              onRedeploy={(d) => setConfirmAction({ type: "redeploy", deployment: d })}
-              onRollback={(d) => setConfirmAction({ type: "rollback", deployment: d })}
+              onRedeploy={(d) =>
+                setConfirmAction({ type: "redeploy", deployment: d })
+              }
+              onRollback={(d) =>
+                setConfirmAction({ type: "rollback", deployment: d })
+              }
             />
           )}
         </CardContent>
@@ -131,7 +147,11 @@ export function DeploymentsDashboard() {
         onClose={() => setConfirmAction(null)}
         onConfirm={handleConfirm}
         loading={!!actionLoading}
-        deploymentLabel={confirmAction?.deployment.url || confirmAction?.deployment.uid.slice(0, 12) || ""}
+        deploymentLabel={
+          confirmAction?.deployment.url ||
+          confirmAction?.deployment.uid.slice(0, 12) ||
+          ""
+        }
       />
     </div>
   );

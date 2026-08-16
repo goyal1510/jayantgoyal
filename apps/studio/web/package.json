@@ -1,5 +1,5 @@
 {
-  "name": "@jayant/studio-web",
+  "name": "@jayantgoyal/studio-web",
   "version": "1.0.0",
   "type": "module",
   "private": true,
@@ -13,12 +13,12 @@
   },
   "dependencies": {
     "@faker-js/faker": "^10.2.0",
-    "@jayant/web-auth": "workspace:*",
-    "@jayant/web-brand": "workspace:*",
-    "@jayant/github": "workspace:*",
-    "@jayant/web-urls": "workspace:*",
-    "@jayant/web-seo": "workspace:*",
-    "@jayant/web-ui": "workspace:*",
+    "@jayantgoyal/web-auth": "workspace:*",
+    "@jayantgoyal/web-brand": "workspace:*",
+    "@jayantgoyal/github": "workspace:*",
+    "@jayantgoyal/web-urls": "workspace:*",
+    "@jayantgoyal/web-seo": "workspace:*",
+    "@jayantgoyal/web-ui": "workspace:*",
     "@supabase/supabase-js": "^2.110.7",
     "chess.js": "^1.4.0",
     "framer-motion": "^12.23.24",
@@ -37,9 +37,9 @@
     "zustand": "^5.0.9"
   },
   "devDependencies": {
-    "@jayant/eslint-config": "workspace:*",
-    "@jayant/tailwind-config": "workspace:*",
-    "@jayant/typescript-config": "workspace:*",
+    "@jayantgoyal/eslint-config": "workspace:*",
+    "@jayantgoyal/tailwind-config": "workspace:*",
+    "@jayantgoyal/typescript-config": "workspace:*",
     "@tailwindcss/postcss": "^4.1.5",
     "@types/node": "^22.15.30",
     "@types/react": "^19.1.0",

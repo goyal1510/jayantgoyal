@@ -1,54 +1,88 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
-import { Copy, RefreshCw } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Copy, RefreshCw } from "lucide-react";
+import { toast } from "sonner";
 
 // Simplified BIP39 implementation (using a subset of wordlist for demo)
 // In production, use a proper BIP39 library
 const BIP39_WORDLIST = [
-  "abandon", "ability", "able", "about", "above", "absent", "absorb", "abstract",
-  "absurd", "abuse", "access", "accident", "account", "accuse", "achieve", "acid",
-  "acoustic", "acquire", "across", "act", "action", "actor", "actual", "adapt",
-  "add", "addict", "address", "adjust", "admit", "adult", "advance", "advice",
+  "abandon",
+  "ability",
+  "able",
+  "about",
+  "above",
+  "absent",
+  "absorb",
+  "abstract",
+  "absurd",
+  "abuse",
+  "access",
+  "accident",
+  "account",
+  "accuse",
+  "achieve",
+  "acid",
+  "acoustic",
+  "acquire",
+  "across",
+  "act",
+  "action",
+  "actor",
+  "actual",
+  "adapt",
+  "add",
+  "addict",
+  "address",
+  "adjust",
+  "admit",
+  "adult",
+  "advance",
+  "advice",
   // ... truncated for brevity - in production use full 2048 word list
-]
+];
 
 function generateMnemonic(words: number = 12): string {
-  const array = new Uint8Array(Math.ceil(words * 4 / 3))
-  crypto.getRandomValues(array)
+  const array = new Uint8Array(Math.ceil((words * 4) / 3));
+  crypto.getRandomValues(array);
 
-  const mnemonic: string[] = []
+  const mnemonic: string[] = [];
   for (let i = 0; i < words; i++) {
-    const index = (array[i] ?? 0) % BIP39_WORDLIST.length
-    mnemonic.push(BIP39_WORDLIST[index] ?? BIP39_WORDLIST[0] ?? "abandon")
+    const index = (array[i] ?? 0) % BIP39_WORDLIST.length;
+    mnemonic.push(BIP39_WORDLIST[index] ?? BIP39_WORDLIST[0] ?? "abandon");
   }
 
-  return mnemonic.join(" ")
+  return mnemonic.join(" ");
 }
 
 export default function BIP39GeneratorClient() {
-  const [mnemonic, setMnemonic] = React.useState("")
-  const [wordCount, setWordCount] = React.useState(12)
-  const [passphrase, setPassphrase] = React.useState("")
+  const [mnemonic, setMnemonic] = React.useState("");
+  const [wordCount, setWordCount] = React.useState(12);
+  const [passphrase, setPassphrase] = React.useState("");
 
   const generateMnemonicPhrase = React.useCallback(() => {
-    const newMnemonic = generateMnemonic(wordCount)
-    setMnemonic(newMnemonic)
-  }, [wordCount])
+    const newMnemonic = generateMnemonic(wordCount);
+    setMnemonic(newMnemonic);
+  }, [wordCount]);
 
   React.useEffect(() => {
-    generateMnemonicPhrase()
-  }, [generateMnemonicPhrase])
+    generateMnemonicPhrase();
+  }, [generateMnemonicPhrase]);
 
   const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text)
-    toast.success("Copied to clipboard")
-  }
+    navigator.clipboard.writeText(text);
+    toast.success("Copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -56,7 +90,9 @@ export default function BIP39GeneratorClient() {
         <Card>
           <CardHeader>
             <CardTitle>Options</CardTitle>
-            <CardDescription>Configure BIP39 mnemonic generation</CardDescription>
+            <CardDescription>
+              Configure BIP39 mnemonic generation
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -69,12 +105,12 @@ export default function BIP39GeneratorClient() {
                 step="3"
                 value={wordCount}
                 onChange={(e) => {
-                  const val = parseInt(e.target.value) || 12
-                  const validValues = [12, 15, 18, 21, 24]
+                  const val = parseInt(e.target.value) || 12;
+                  const validValues = [12, 15, 18, 21, 24];
                   const closest = validValues.reduce((prev, curr) =>
-                    Math.abs(curr - val) < Math.abs(prev - val) ? curr : prev
-                  )
-                  setWordCount(closest)
+                    Math.abs(curr - val) < Math.abs(prev - val) ? curr : prev,
+                  );
+                  setWordCount(closest);
                 }}
               />
               <p className="text-xs text-muted-foreground">
@@ -131,13 +167,13 @@ export default function BIP39GeneratorClient() {
             <div className="p-3 bg-muted rounded-md text-sm">
               <p className="font-semibold mb-1">Security Warning</p>
               <p className="text-muted-foreground">
-                Keep your mnemonic phrase secure and never share it. Anyone with access to your
-                mnemonic can access your funds.
+                Keep your mnemonic phrase secure and never share it. Anyone with
+                access to your mnemonic can access your funds.
               </p>
             </div>
           </CardContent>
         </Card>
       </div>
     </div>
-  )
+  );
 }

@@ -1,15 +1,15 @@
 import Link from "next/link";
 import { ArrowUpRight, LockKeyhole } from "lucide-react";
 
-import { Badge } from "@jayant/web-ui/badge";
+import { Badge } from "@jayantgoyal/web-ui/badge";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@jayant/web-ui/card";
-import { cn } from "@jayant/web-ui/lib/utils";
+} from "@jayantgoyal/web-ui/card";
+import { cn } from "@jayantgoyal/web-ui/lib/utils";
 
 import { type StudioProduct } from "@/lib/config/studio-inventory";
 

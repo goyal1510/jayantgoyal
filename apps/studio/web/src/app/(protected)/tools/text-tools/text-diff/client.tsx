@@ -1,45 +1,51 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
 
 function computeDiff(text1: string, text2: string): string {
-  const lines1 = text1.split("\n")
-  const lines2 = text2.split("\n")
-  const maxLen = Math.max(lines1.length, lines2.length)
-  let diff = ""
+  const lines1 = text1.split("\n");
+  const lines2 = text2.split("\n");
+  const maxLen = Math.max(lines1.length, lines2.length);
+  let diff = "";
 
   for (let i = 0; i < maxLen; i++) {
-    const line1 = lines1[i]
-    const line2 = lines2[i]
+    const line1 = lines1[i];
+    const line2 = lines2[i];
 
     if (line1 === undefined) {
-      diff += `+ ${line2}\n`
+      diff += `+ ${line2}\n`;
     } else if (line2 === undefined) {
-      diff += `- ${line1}\n`
+      diff += `- ${line1}\n`;
     } else if (line1 === line2) {
-      diff += `  ${line1}\n`
+      diff += `  ${line1}\n`;
     } else {
-      diff += `- ${line1}\n`
-      diff += `+ ${line2}\n`
+      diff += `- ${line1}\n`;
+      diff += `+ ${line2}\n`;
     }
   }
 
-  return diff.trim()
+  return diff.trim();
 }
 
 export default function TextDiffClient() {
-  const [text1, setText1] = React.useState("")
-  const [text2, setText2] = React.useState("")
-  const [diff, setDiff] = React.useState("")
+  const [text1, setText1] = React.useState("");
+  const [text2, setText2] = React.useState("");
+  const [diff, setDiff] = React.useState("");
 
   React.useEffect(() => {
     if (!text1.trim() && !text2.trim()) {
-      setDiff("")
-      return
+      setDiff("");
+      return;
     }
-    setDiff(computeDiff(text1, text2))
-  }, [text1, text2])
+    setDiff(computeDiff(text1, text2));
+  }, [text1, text2]);
 
   return (
     <div className="space-y-6">
@@ -89,8 +95,8 @@ export default function TextDiffClient() {
                   line.startsWith("+")
                     ? "bg-green-500/20 text-green-700 dark:text-green-400"
                     : line.startsWith("-")
-                    ? "bg-red-500/20 text-red-700 dark:text-red-400"
-                    : ""
+                      ? "bg-red-500/20 text-red-700 dark:text-red-400"
+                      : ""
                 }
               >
                 {line}
@@ -100,5 +106,5 @@ export default function TextDiffClient() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

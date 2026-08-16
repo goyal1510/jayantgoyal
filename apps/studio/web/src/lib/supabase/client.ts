@@ -1,1 +1,1 @@
-export { createSupabaseBrowserClient } from "@jayant/web-auth/browser";
+export { createSupabaseBrowserClient } from "@jayantgoyal/web-auth/browser";

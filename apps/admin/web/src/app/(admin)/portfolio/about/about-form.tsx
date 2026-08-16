@@ -5,19 +5,19 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2, Save, Plus, X } from "lucide-react";
 import { createPortfolioData, updatePortfolioData } from "@/lib/portfolio-api";
-import { Button } from "@jayant/web-ui/button";
-import { FormMessage } from "@jayant/web-ui/form-message";
-import { IconAction } from "@jayant/web-ui/icon-action";
-import { Input } from "@jayant/web-ui/input";
-import { Label } from "@jayant/web-ui/label";
-import { Textarea } from "@jayant/web-ui/textarea";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { FormMessage } from "@jayantgoyal/web-ui/form-message";
+import { IconAction } from "@jayantgoyal/web-ui/icon-action";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { Textarea } from "@jayantgoyal/web-ui/textarea";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@jayant/web-ui/card";
+} from "@jayantgoyal/web-ui/card";
 import type { About, PersonalInfo, PortfolioPrinciple } from "@/lib/types";
 import { useUnsavedChangesGuard } from "@/lib/use-unsaved-changes-guard";
 import { AccessibleForm } from "@/components/accessible-form";

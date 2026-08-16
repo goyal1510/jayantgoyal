@@ -1,6 +1,6 @@
 import type { NextResponse } from "next/server";
 
-import { copyAuthCacheHeaders } from "@jayant/web-auth/server";
+import { copyAuthCacheHeaders } from "@jayantgoyal/web-auth/server";
 
 import type { ProxyContext, ProxyMiddleware } from "./types";
 
@@ -10,7 +10,7 @@ import type { ProxyContext, ProxyMiddleware } from "./types";
  */
 export async function runMiddleware(
   ctx: ProxyContext,
-  middlewares: ProxyMiddleware[]
+  middlewares: ProxyMiddleware[],
 ): Promise<NextResponse> {
   for (const middleware of middlewares) {
     const result = await middleware(ctx);

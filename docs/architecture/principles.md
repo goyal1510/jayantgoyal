@@ -1,6 +1,6 @@
 # Architecture principles
 
-These principles are the durable design contract for the Jayant monorepo. They
+These principles are the durable design contract for the `jayantgoyal` monorepo. They
 describe how the current repository should evolve; they are not a record of
 past architecture work.
 
@@ -23,7 +23,7 @@ New behavior starts at its narrowest real owner:
    client.
 2. Business rules shared by clients of one product stay beside that product.
 3. A stable responsibility used by more than one product may become an
-   ecosystem, web, integration, or tooling package.
+   foundation, web, integration, or tooling package.
 
 Code size, visual similarity, or possible future reuse is not enough to create
 a shared package. Extraction requires named ownership, real consumers, a
@@ -74,7 +74,7 @@ product capability selects a provider. Add an operational system when someone
 will own its signals and response. Do not create empty directories, generic
 services, or placeholder contracts to predict the future.
 
-## The monorepo remains the ecosystem boundary
+## The monorepo remains the repository boundary
 
 Products, clients, product contracts, shared packages, database sources,
 scripts, and central documentation stay in this repository. An independently

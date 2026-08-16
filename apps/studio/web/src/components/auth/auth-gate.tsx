@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Lock } from "lucide-react";
-import { Button } from "@jayant/web-ui/button";
+import { Button } from "@jayantgoyal/web-ui/button";
 import { matchesPathOrChild } from "@/lib/seo/config";
 
 /** Public paths that don't require auth — must match proxy PUBLIC_PAGES */

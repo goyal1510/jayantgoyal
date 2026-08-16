@@ -1,50 +1,62 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Input } from "@jayant/web-ui/input"
-import { Label } from "@jayant/web-ui/label"
-import { CheckCircle2, XCircle } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
+import { CheckCircle2, XCircle } from "lucide-react";
+import { toast } from "sonner";
 
 export default function PDFSignatureCheckerClient() {
-  const [file, setFile] = React.useState<File | null>(null)
-  const [status, setStatus] = React.useState<"idle" | "checking" | "signed" | "unsigned" | "error">("idle")
+  const [file, setFile] = React.useState<File | null>(null);
+  const [status, setStatus] = React.useState<
+    "idle" | "checking" | "signed" | "unsigned" | "error"
+  >("idle");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0]
-    if (!selectedFile) return
+    const selectedFile = e.target.files?.[0];
+    if (!selectedFile) return;
 
     if (selectedFile.type !== "application/pdf") {
-      toast.error("Please select a PDF file")
-      return
+      toast.error("Please select a PDF file");
+      return;
     }
 
-    setFile(selectedFile)
-    setStatus("checking")
+    setFile(selectedFile);
+    setStatus("checking");
 
     // Simple check - in production use a proper PDF library
-    const reader = new FileReader()
+    const reader = new FileReader();
     reader.onload = (event) => {
-      const arrayBuffer = event.target?.result as ArrayBuffer
-      const uint8Array = new Uint8Array(arrayBuffer)
+      const arrayBuffer = event.target?.result as ArrayBuffer;
+      const uint8Array = new Uint8Array(arrayBuffer);
       const text = Array.from(uint8Array.slice(0, 1000))
-        .map(b => String.fromCharCode(b))
-        .join("")
+        .map((b) => String.fromCharCode(b))
+        .join("");
 
       // Check for signature markers (simplified)
-      if (text.includes("/Sig") || text.includes("/ByteRange") || text.includes("/Contents")) {
-        setStatus("signed")
+      if (
+        text.includes("/Sig") ||
+        text.includes("/ByteRange") ||
+        text.includes("/Contents")
+      ) {
+        setStatus("signed");
       } else {
-        setStatus("unsigned")
+        setStatus("unsigned");
       }
-    }
+    };
     reader.onerror = () => {
-      setStatus("error")
-      toast.error("Failed to read PDF file")
-    }
-    reader.readAsArrayBuffer(selectedFile)
-  }
+      setStatus("error");
+      toast.error("Failed to read PDF file");
+    };
+    reader.readAsArrayBuffer(selectedFile);
+  };
 
   return (
     <div className="space-y-6">
@@ -85,7 +97,9 @@ export default function PDFSignatureCheckerClient() {
           </CardHeader>
           <CardContent>
             {status === "checking" && (
-              <p className="text-muted-foreground">Checking PDF for signatures...</p>
+              <p className="text-muted-foreground">
+                Checking PDF for signatures...
+              </p>
             )}
             {status === "signed" && (
               <div className="flex items-center gap-2 text-green-500">
@@ -96,7 +110,9 @@ export default function PDFSignatureCheckerClient() {
             {status === "unsigned" && (
               <div className="flex items-center gap-2 text-orange-500">
                 <XCircle className="h-5 w-5" />
-                <span className="font-semibold">PDF does not appear to be signed</span>
+                <span className="font-semibold">
+                  PDF does not appear to be signed
+                </span>
               </div>
             )}
             {status === "error" && (
@@ -106,11 +122,12 @@ export default function PDFSignatureCheckerClient() {
               </div>
             )}
             <p className="text-sm text-muted-foreground mt-4">
-              Note: This is a basic check. For production use, implement proper PDF signature validation using a PDF library.
+              Note: This is a basic check. For production use, implement proper
+              PDF signature validation using a PDF library.
             </p>
           </CardContent>
         </Card>
       )}
     </div>
-  )
+  );
 }

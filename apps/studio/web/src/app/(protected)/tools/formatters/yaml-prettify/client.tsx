@@ -1,75 +1,81 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Copy } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 function prettifyYAML(yaml: string): string {
   // Simple YAML prettifier - ensures consistent indentation
-  const lines = yaml.split("\n")
-  const formatted: string[] = []
-  let indentLevel = 0
+  const lines = yaml.split("\n");
+  const formatted: string[] = [];
+  let indentLevel = 0;
 
   lines.forEach((line) => {
-    const trimmed = line.trim()
+    const trimmed = line.trim();
     if (!trimmed || trimmed.startsWith("#")) {
-      if (trimmed) formatted.push("  ".repeat(indentLevel) + trimmed)
-      return
+      if (trimmed) formatted.push("  ".repeat(indentLevel) + trimmed);
+      return;
     }
 
     // Adjust indent level based on list items
     if (trimmed.startsWith("- ")) {
-      formatted.push("  ".repeat(indentLevel) + trimmed)
-      indentLevel++
+      formatted.push("  ".repeat(indentLevel) + trimmed);
+      indentLevel++;
     } else {
-      const colonIndex = trimmed.indexOf(":")
+      const colonIndex = trimmed.indexOf(":");
       if (colonIndex > 0) {
-        const key = trimmed.slice(0, colonIndex).trim()
-        const value = trimmed.slice(colonIndex + 1).trim()
+        const key = trimmed.slice(0, colonIndex).trim();
+        const value = trimmed.slice(colonIndex + 1).trim();
 
         if (value === "" || value === "{}" || value === "[]") {
-          formatted.push("  ".repeat(indentLevel) + `${key}:`)
-          indentLevel++
+          formatted.push("  ".repeat(indentLevel) + `${key}:`);
+          indentLevel++;
         } else {
-          formatted.push("  ".repeat(indentLevel) + `${key}: ${value}`)
+          formatted.push("  ".repeat(indentLevel) + `${key}: ${value}`);
         }
       } else {
-        formatted.push("  ".repeat(indentLevel) + trimmed)
+        formatted.push("  ".repeat(indentLevel) + trimmed);
       }
     }
-  })
+  });
 
-  return formatted.join("\n")
+  return formatted.join("\n");
 }
 
 export default function YAMLPrettifyClient() {
-  const [input, setInput] = React.useState("")
-  const [output, setOutput] = React.useState("")
+  const [input, setInput] = React.useState("");
+  const [output, setOutput] = React.useState("");
 
   const prettify = React.useCallback(() => {
     if (!input.trim()) {
-      setOutput("")
-      return
+      setOutput("");
+      return;
     }
 
     try {
-      const formatted = prettifyYAML(input)
-      setOutput(formatted)
+      const formatted = prettifyYAML(input);
+      setOutput(formatted);
     } catch {
-      setOutput("Failed to prettify YAML")
+      setOutput("Failed to prettify YAML");
     }
-  }, [input])
+  }, [input]);
 
   React.useEffect(() => {
-    prettify()
-  }, [prettify])
+    prettify();
+  }, [prettify]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(output)
-    toast.success("Prettified YAML copied to clipboard")
-  }
+    navigator.clipboard.writeText(output);
+    toast.success("Prettified YAML copied to clipboard");
+  };
 
   return (
     <div className="space-y-6">
@@ -114,5 +120,5 @@ export default function YAMLPrettifyClient() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

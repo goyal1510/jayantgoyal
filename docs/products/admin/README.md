@@ -2,7 +2,7 @@
 
 Admin is Jayant's private operations product at
 [admin.jayantgoyal.com](https://admin.jayantgoyal.com). The current client is
-`apps/admin/web`, workspace `@jayant/admin-web`, running locally on port 3002.
+`apps/admin/web`, workspace `@jayantgoyal/admin-web`, running locally on port 3002.
 
 ## Product boundary
 
@@ -23,7 +23,7 @@ Studio navigation domain exists with no active Admin workspace.
 The proxy requires a valid Supabase user, completes MFA step-up when a verified
 factor exists, reads `jg_account.profiles.role`, and admits `admin` or
 `super_admin`. The sidebar exposes Portfolio workspaces to both roles and
-Platform operations only to `super_admin`.
+Operations only to `super_admin`.
 
 Every elevated route reauthorizes its caller. Proxy admission alone is not
 sufficient for service-role or Vercel-token access. `/unauthorized` and the
@@ -44,7 +44,7 @@ operations](routes-and-operations.md) for the complete catalog.
 
 ## Data and provider access
 
-Admin consumes `@jayant/portfolio-contracts` to validate the same public
+Admin consumes `@jayantgoyal/portfolio-contracts` to validate the same public
 columns, JSON shapes, Writing records, section presentation, and assets that
 Portfolio reads. Authorized APIs operate on `portfolio.*`,
 `jg_app.writing_posts`, and the `portfolio-assets` bucket.
@@ -53,6 +53,12 @@ Account administration combines `jg_account.profiles` with Supabase Auth admin
 data so super admins can associate roles with real identities. Deployment
 operations use server-only Vercel credentials and are currently scoped to the
 Studio and Admin project IDs.
+
+The Portfolio hero editor treats public person identity as read-only shared
+configuration. It edits mutable positioning and SEO-description content, then
+derives the preview title from the shared person name and the selected role.
+Legacy database identity columns are populated only on singleton creation for
+schema compatibility and are not accepted from Admin clients.
 
 ## Internal architecture
 
@@ -64,8 +70,10 @@ Studio and Admin project IDs.
 - `src/app/api/jg-app/[table]/helpers.ts` owns Writing allowlists and validation.
 - `src/lib/vercel-server.ts` is the server-only Vercel transport.
 
-Admin uses `@jayant/web-auth`, `@jayant/web-brand`, `@jayant/web-ui`, and shared
-tooling/style packages. It does not export a reusable application API.
+Admin uses `@jayantgoyal/identity`, `@jayantgoyal/web-auth`,
+`@jayantgoyal/web-brand`, `@jayantgoyal/web-urls`, `@jayantgoyal/web-seo`,
+`@jayantgoyal/web-ui`, and shared tooling/style packages. It does not export a
+reusable application API.
 
 ## Environment and security
 
@@ -75,7 +83,8 @@ after route-specific authorization. Auth/session variables support the shared
 web cookie and canonical Auth redirects. Vercel token, team, and project IDs
 are super-admin server-only inputs.
 
-Admin is non-indexable. Responses carrying identity, role, or deployment data
+Admin is non-indexable and intentionally has no installable web manifest.
+Responses carrying identity, role, or deployment data
 must remain private. Logs must not expose tokens, auth user metadata, or
 deployment environment values.
 

@@ -2,21 +2,17 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
-import {
-  Plus,
-  Loader2,
-  RefreshCw,
-} from "lucide-react";
+import { Plus, Loader2, RefreshCw } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-import { Button } from "@jayant/web-ui/button";
-import { ConfirmationDialog } from "@jayant/web-ui/confirmation-dialog";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { ConfirmationDialog } from "@jayantgoyal/web-ui/confirmation-dialog";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@jayant/web-ui/card";
+} from "@jayantgoyal/web-ui/card";
 import type { Profile, UserRole } from "@/lib/types";
 import { AddUserDialog } from "./add-user-dialog";
 import { UsersTable } from "./users-table";
@@ -74,7 +70,7 @@ export function UserManagement({ currentUserId }: UserManagementProps) {
   async function updateRole(
     profileId: number,
     userId: string,
-    newRole: UserRole
+    newRole: UserRole,
   ) {
     if (userId === currentUserId) {
       toast.error("You cannot change your own role");
@@ -97,7 +93,9 @@ export function UserManagement({ currentUserId }: UserManagementProps) {
         return;
       }
 
-      toast.success(`Role updated to ${newRole === "super_admin" ? "Super Admin" : newRole === "admin" ? "Admin" : "User"}`);
+      toast.success(
+        `Role updated to ${newRole === "super_admin" ? "Super Admin" : newRole === "admin" ? "Admin" : "User"}`,
+      );
       fetchUsers();
     } catch {
       toast.error("Failed to update role");
@@ -187,9 +185,7 @@ export function UserManagement({ currentUserId }: UserManagementProps) {
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle>Users</CardTitle>
-            <CardDescription>
-              Manage all users and their roles
-            </CardDescription>
+            <CardDescription>Manage all users and their roles</CardDescription>
           </div>
           <div className="flex items-center gap-2">
             <Button
@@ -221,7 +217,9 @@ export function UserManagement({ currentUserId }: UserManagementProps) {
                   profileId,
                   userId,
                   name: profile
-                    ? `${profile.first_name} ${profile.last_name}`.trim() || profile.email || "this user"
+                    ? `${profile.first_name} ${profile.last_name}`.trim() ||
+                      profile.email ||
+                      "this user"
                     : "this user",
                 });
               }}

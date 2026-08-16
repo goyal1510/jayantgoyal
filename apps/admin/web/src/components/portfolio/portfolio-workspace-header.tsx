@@ -9,8 +9,11 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-import type { PortfolioWorkspaceKey } from "@jayant/portfolio-contracts";
-import { WorkspaceHeader, type WorkspaceTone } from "@jayant/web-ui/workspace-header";
+import type { PortfolioWorkspaceKey } from "@jayantgoyal/portfolio-contracts";
+import {
+  WorkspaceHeader,
+  type WorkspaceTone,
+} from "@jayantgoyal/web-ui/workspace-header";
 
 const WORKSPACE_COPY: Record<
   PortfolioWorkspaceKey,
@@ -101,9 +104,7 @@ export function PortfolioWorkspaceHeader({
       title={copy.title}
       description={copy.description}
       tone={copy.tone}
-      details={
-        <p className="text-sm font-medium opacity-75">{copy.detail}</p>
-      }
+      details={<p className="text-sm font-medium opacity-75">{copy.detail}</p>}
     />
   );
 }

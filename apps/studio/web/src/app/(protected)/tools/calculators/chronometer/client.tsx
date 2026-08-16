@@ -1,59 +1,65 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Play, Pause, Square } from "lucide-react"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Play, Pause, Square } from "lucide-react";
 
 function formatTime(ms: number): string {
-  const totalSeconds = Math.floor(ms / 1000)
-  const hours = Math.floor(totalSeconds / 3600)
-  const minutes = Math.floor((totalSeconds % 3600) / 60)
-  const seconds = totalSeconds % 60
-  const milliseconds = Math.floor((ms % 1000) / 10)
+  const totalSeconds = Math.floor(ms / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  const milliseconds = Math.floor((ms % 1000) / 10);
 
   if (hours > 0) {
-    return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}.${milliseconds.toString().padStart(2, "0")}`
+    return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}.${milliseconds.toString().padStart(2, "0")}`;
   }
-  return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}.${milliseconds.toString().padStart(2, "0")}`
+  return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}.${milliseconds.toString().padStart(2, "0")}`;
 }
 
 export default function ChronometerClient() {
-  const [time, setTime] = React.useState(0)
-  const [running, setRunning] = React.useState(false)
-  const [startTime, setStartTime] = React.useState(0)
-  const intervalRef = React.useRef<NodeJS.Timeout | null>(null)
+  const [time, setTime] = React.useState(0);
+  const [running, setRunning] = React.useState(false);
+  const [startTime, setStartTime] = React.useState(0);
+  const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
 
   React.useEffect(() => {
     if (running) {
       intervalRef.current = setInterval(() => {
-        setTime(Date.now() - startTime)
-      }, 10)
+        setTime(Date.now() - startTime);
+      }, 10);
     } else {
       if (intervalRef.current) {
-        clearInterval(intervalRef.current)
+        clearInterval(intervalRef.current);
       }
     }
     return () => {
       if (intervalRef.current) {
-        clearInterval(intervalRef.current)
+        clearInterval(intervalRef.current);
       }
-    }
-  }, [running, startTime])
+    };
+  }, [running, startTime]);
 
   const start = () => {
-    setStartTime(Date.now() - time)
-    setRunning(true)
-  }
+    setStartTime(Date.now() - time);
+    setRunning(true);
+  };
 
   const pause = () => {
-    setRunning(false)
-  }
+    setRunning(false);
+  };
 
   const reset = () => {
-    setRunning(false)
-    setTime(0)
-  }
+    setRunning(false);
+    setTime(0);
+  };
 
   return (
     <div className="space-y-6">
@@ -86,5 +92,5 @@ export default function ChronometerClient() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

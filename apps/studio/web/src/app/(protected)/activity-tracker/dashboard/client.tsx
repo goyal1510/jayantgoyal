@@ -3,7 +3,7 @@
 import * as React from "react";
 import { ActivityStats } from "@/components/activity-tracker/activity-stats";
 import { MonthNavigator } from "@/components/activity-tracker/month-navigator";
-import { Button } from "@jayant/web-ui/button";
+import { Button } from "@jayantgoyal/web-ui/button";
 import {
   Dialog,
   DialogContent,
@@ -12,9 +12,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@jayant/web-ui/dialog";
-import { Input } from "@jayant/web-ui/input";
-import { Label } from "@jayant/web-ui/label";
+} from "@jayantgoyal/web-ui/dialog";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Label } from "@jayantgoyal/web-ui/label";
 import {
   getCurrentMonth,
   getPreviousMonth,
@@ -22,7 +22,7 @@ import {
 } from "@/lib/activity-tracker/date";
 import { Plus, Target } from "lucide-react";
 import { toast } from "sonner";
-import { WorkspaceHeader } from "@jayant/web-ui/workspace-header";
+import { WorkspaceHeader } from "@jayantgoyal/web-ui/workspace-header";
 
 export default function DashboardClient() {
   const [currentMonth, setCurrentMonth] =

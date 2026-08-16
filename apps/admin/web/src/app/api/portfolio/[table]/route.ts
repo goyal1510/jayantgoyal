@@ -3,6 +3,7 @@ import {
   validateTable,
   authorizeAndGetClient,
   getPortfolioAdminSelectColumns,
+  preparePortfolioMutationPayload,
   validatePortfolioRequestBody,
   revalidatePortfolioPublicContent,
   TABLES_WITH_SORT_ORDER,
@@ -10,7 +11,7 @@ import {
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ table: string }> }
+  { params }: { params: Promise<{ table: string }> },
 ) {
   try {
     const { table } = await params;
@@ -62,14 +63,14 @@ export async function GET(
     console.error("Error fetching portfolio data:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function POST(
   request: Request,
-  { params }: { params: Promise<{ table: string }> }
+  { params }: { params: Promise<{ table: string }> },
 ) {
   try {
     const { table } = await params;
@@ -84,10 +85,11 @@ export async function POST(
     const payloadError = validatePortfolioRequestBody(table, body, "create");
     if (payloadError) return payloadError;
 
+    const payload = preparePortfolioMutationPayload(table, body, "create");
     const { data, error } = await auth.client
       .schema("portfolio")
       .from(table)
-      .insert(body)
+      .insert(payload)
       .select(getPortfolioAdminSelectColumns(table))
       .single();
 
@@ -101,14 +103,14 @@ export async function POST(
     console.error("Error creating portfolio data:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function PUT(
   request: Request,
-  { params }: { params: Promise<{ table: string }> }
+  { params }: { params: Promise<{ table: string }> },
 ) {
   try {
     const { table } = await params;
@@ -125,7 +127,7 @@ export async function PUT(
     if (!id) {
       return NextResponse.json(
         { error: "ID is required for update" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -151,14 +153,14 @@ export async function PUT(
     console.error("Error updating portfolio data:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ table: string }> }
+  { params }: { params: Promise<{ table: string }> },
 ) {
   try {
     const { table } = await params;
@@ -175,7 +177,7 @@ export async function DELETE(
     if (!id) {
       return NextResponse.json(
         { error: "ID is required for delete" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -195,7 +197,7 @@ export async function DELETE(
     console.error("Error deleting portfolio data:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

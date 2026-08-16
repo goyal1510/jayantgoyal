@@ -1,8 +1,10 @@
+import { PRODUCT_IDENTITIES } from "@jayantgoyal/identity";
+
 import { safeReturnPath } from "./redirects";
 import { resolveLocalDevelopmentCookieDomain } from "./cookies";
 import { authSurfacePath } from "./surface";
 
-export const CANONICAL_AUTH_ORIGIN = "https://auth.jayantgoyal.com";
+export const CANONICAL_AUTH_ORIGIN = PRODUCT_IDENTITIES.auth.canonicalOrigin;
 
 type HeaderReader = {
   get(name: string): string | null;
@@ -58,7 +60,12 @@ export function resolveAuthApplicationOrigin(
     const url = new URL(value);
     if (url.username || url.password) return CANONICAL_AUTH_ORIGIN;
 
-    if (url.protocol === "https:" && url.hostname === "auth.jayantgoyal.com") {
+    if (
+      url.protocol === "https:" &&
+      (PRODUCT_IDENTITIES.auth.canonicalHosts as readonly string[]).includes(
+        url.hostname,
+      )
+    ) {
       return url.origin;
     }
 

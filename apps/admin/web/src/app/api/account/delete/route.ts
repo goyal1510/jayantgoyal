@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createSupabaseServiceRoleClient } from "@jayant/web-auth/service-role";
+import { createSupabaseServiceRoleClient } from "@jayantgoyal/web-auth/service-role";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -19,7 +19,9 @@ export async function DELETE() {
 
   if (user.is_anonymous === true) {
     return NextResponse.json(
-      { error: "Anonymous accounts cannot be deleted. Please sign out instead." },
+      {
+        error: "Anonymous accounts cannot be deleted. Please sign out instead.",
+      },
       { status: 403 },
     );
   }
@@ -35,7 +37,8 @@ export async function DELETE() {
   }
 
   const { error } = await adminClient.auth.admin.deleteUser(user.id);
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  if (error)
+    return NextResponse.json({ error: error.message }, { status: 400 });
 
   try {
     await supabase.auth.signOut();

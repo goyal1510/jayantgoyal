@@ -1,37 +1,46 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@jayant/web-ui/card"
-import { Button } from "@jayant/web-ui/button"
-import { Input } from "@jayant/web-ui/input"
-import { Download } from "lucide-react"
-import { toast } from "sonner"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@jayantgoyal/web-ui/card";
+import { Button } from "@jayantgoyal/web-ui/button";
+import { Input } from "@jayantgoyal/web-ui/input";
+import { Download } from "lucide-react";
+import { toast } from "sonner";
 
 export default function QRCodeGeneratorClient() {
-  const [text, setText] = React.useState("")
-  const [qrUrl, setQrUrl] = React.useState("")
+  const [text, setText] = React.useState("");
+  const [qrUrl, setQrUrl] = React.useState("");
 
   React.useEffect(() => {
     if (!text.trim()) {
-      setQrUrl("")
-      return
+      setQrUrl("");
+      return;
     }
     // Using a QR code API service
-    const encoded = encodeURIComponent(text)
-    setQrUrl(`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encoded}`)
-  }, [text])
+    const encoded = encodeURIComponent(text);
+    setQrUrl(
+      `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encoded}`,
+    );
+  }, [text]);
 
   const downloadQR = () => {
-    if (!qrUrl) return
-    const link = document.createElement("a")
-    link.href = qrUrl
-    link.download = "qrcode.png"
-    link.click()
-    toast.success("QR code downloaded")
-  }
+    if (!qrUrl) return;
+    const link = document.createElement("a");
+    link.href = qrUrl;
+    link.download = "qrcode.png";
+    link.click();
+    toast.success("QR code downloaded");
+  };
 
   return (
-    <div className="space-y-6"><Card>
+    <div className="space-y-6">
+      <Card>
         <CardHeader>
           <CardTitle>Input</CardTitle>
           <CardDescription>Enter text or URL to encode</CardDescription>
@@ -63,5 +72,5 @@ export default function QRCodeGeneratorClient() {
         </Card>
       )}
     </div>
-  )
+  );
 }
