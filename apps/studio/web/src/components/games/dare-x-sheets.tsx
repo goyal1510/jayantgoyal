@@ -1,12 +1,11 @@
 "use client";
 
 import type { ChangeEvent, RefObject } from "react";
-import { Download, Globe2, Loader2, Upload, Users, X } from "lucide-react";
+import { Download, Globe2, Loader2, Upload, Users } from "lucide-react";
 
 import { Button } from "@jayant/web-ui/button";
 import { Input } from "@jayant/web-ui/input";
 import { Label } from "@jayant/web-ui/label";
-import { Separator } from "@jayant/web-ui/separator";
 import {
   Select,
   SelectContent,
@@ -14,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@jayant/web-ui/select";
+import { Separator } from "@jayant/web-ui/separator";
 import { cn } from "@jayant/web-ui/lib/utils";
 
 import {
@@ -22,7 +22,6 @@ import {
   type GameSetupPath,
 } from "@/components/games/game-setup-sheet";
 import type {
-  Attempt,
   CustomDare,
   DareSource,
   Player,
@@ -376,178 +375,6 @@ export function DareXSetupSheet({
             Unlock and clear this session
           </Button>
         ) : null}
-      </div>
-    </GameSetupSheet>
-  );
-}
-
-interface CustomListSheetProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  customDares: CustomDare[];
-  deleteCustomDare: (id: string) => void;
-  configLocked: boolean;
-}
-
-export function DareXCustomListSheet({
-  open,
-  onOpenChange,
-  customDares,
-  deleteCustomDare,
-  configLocked,
-}: CustomListSheetProps) {
-  return (
-    <GameSetupSheet
-      open={open}
-      onOpenChange={onOpenChange}
-      title="Custom dares"
-      description="Manage the custom prompts available to Dare X. Built-in dares are not shown here."
-      className="sm:max-w-lg"
-    >
-      <div className="space-y-2 text-sm">
-        {customDares.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-border/80 bg-muted/20 p-8 text-center text-sm text-muted-foreground">
-            No custom dares yet. Add one from the setup sheet.
-          </div>
-        ) : (
-          customDares.map((dare) => (
-            <div
-              key={dare.id}
-              className="flex items-center justify-between gap-3 rounded-xl border border-border/70 bg-background p-3"
-            >
-              <span className="text-sm leading-6">{dare.text}</span>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => deleteCustomDare(dare.id)}
-                disabled={configLocked}
-              >
-                <span className="sr-only">Delete dare</span>
-                <X className="h-4 w-4 text-muted-foreground" />
-              </Button>
-            </div>
-          ))
-        )}
-      </div>
-    </GameSetupSheet>
-  );
-}
-
-interface HistorySheetProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  historyPlayerId: string | null;
-  setHistoryPlayerId: (id: string) => void;
-  players: Player[];
-  selectedHistoryPlayer: Player | undefined;
-  completed: Record<string, { done: string[]; skipped: string[] }>;
-  history: Attempt[];
-}
-
-export function DareXHistorySheet({
-  open,
-  onOpenChange,
-  historyPlayerId,
-  setHistoryPlayerId,
-  players,
-  selectedHistoryPlayer,
-  completed,
-  history,
-}: HistorySheetProps) {
-  const completedAttempts = history.filter(
-    (attempt) =>
-      attempt.playerId === selectedHistoryPlayer?.id &&
-      attempt.status === "done",
-  );
-  const skippedAttempts = history.filter(
-    (attempt) =>
-      attempt.playerId === selectedHistoryPlayer?.id &&
-      attempt.status === "not_done",
-  );
-
-  return (
-    <GameSetupSheet
-      open={open}
-      onOpenChange={onOpenChange}
-      title="Dare history"
-      description="Review completed and skipped dares for each active player."
-    >
-      <div className="space-y-5">
-        <div className="space-y-2">
-          <Label className="text-sm font-medium">Player</Label>
-          <Select
-            value={historyPlayerId ?? undefined}
-            onValueChange={(value) => setHistoryPlayerId(value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select player" />
-            </SelectTrigger>
-            <SelectContent>
-              {players.map((player) => (
-                <SelectItem key={player.id} value={player.id}>
-                  {player.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="rounded-2xl border border-border/70 bg-muted/25 p-4">
-            <div className="flex items-center justify-between text-sm font-medium">
-              <span>Done</span>
-              <span className="text-xs text-muted-foreground">
-                {completed[selectedHistoryPlayer?.id ?? ""]?.done.length ?? 0}
-              </span>
-            </div>
-            <div className="mt-2 space-y-2 max-h-[320px] overflow-y-auto text-sm">
-              {completedAttempts.map((attempt) => (
-                <div
-                  key={attempt.id}
-                  className="rounded-md border bg-background p-2"
-                >
-                  <div className="text-xs text-muted-foreground">
-                    {new Date(attempt.createdAt).toLocaleString()}
-                  </div>
-                  <div className="font-medium">{attempt.dare}</div>
-                </div>
-              ))}
-              {completedAttempts.length === 0 ? (
-                <div className="text-xs text-muted-foreground">
-                  No done dares yet.
-                </div>
-              ) : null}
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-border/70 bg-muted/25 p-4">
-            <div className="flex items-center justify-between text-sm font-medium">
-              <span>Skipped</span>
-              <span className="text-xs text-muted-foreground">
-                {completed[selectedHistoryPlayer?.id ?? ""]?.skipped.length ??
-                  0}
-              </span>
-            </div>
-            <div className="mt-2 space-y-2 max-h-[320px] overflow-y-auto text-sm">
-              {skippedAttempts.map((attempt) => (
-                <div
-                  key={attempt.id}
-                  className="rounded-md border bg-background p-2"
-                >
-                  <div className="text-xs text-muted-foreground">
-                    {new Date(attempt.createdAt).toLocaleString()}
-                  </div>
-                  <div className="font-medium">{attempt.dare}</div>
-                </div>
-              ))}
-              {skippedAttempts.length === 0 ? (
-                <div className="text-xs text-muted-foreground">
-                  No skipped dares yet.
-                </div>
-              ) : null}
-            </div>
-          </div>
-        </div>
       </div>
     </GameSetupSheet>
   );

@@ -18,11 +18,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@jayant/web-ui/card";
 
 import type { GameSetupPath } from "@/components/games/game-setup-sheet";
 import { useDareX } from "@/components/games/use-dare-x";
+import { DareXSetupSheet } from "@/components/games/dare-x-sheets";
 import {
-  DareXSetupSheet,
   DareXCustomListSheet,
   DareXHistorySheet,
-} from "@/components/games/dare-x-sheets";
+} from "@/components/games/dare-x-history-sheets";
 import { createDareXState } from "@/lib/games/dare-x";
 
 export function DareX() {
