@@ -14,6 +14,22 @@ The install command uses the repository lockfile. The client build command is
 its normal workspace/Next.js build; application-specific environment values
 are configured only on projects that consume them.
 
+## Project contract
+
+Each project must keep:
+
+- the root directory shown above;
+- pnpm installation from the repository root lockfile;
+- the client-specific build command/root discovered by Vercel;
+- only the environment variables listed by that client's `.env.example`;
+- the ignored-build command below;
+- the canonical Production domain and generated Preview domains;
+- Git integration targeting `main` for Production.
+
+A shared package or root tool can affect several projects. Changing only a
+client root in Vercel without the repository path move leaves deployment and
+local architecture inconsistent.
+
 ## Ignored build step
 
 Because Vercel executes the ignored-build command from the configured client
@@ -37,9 +53,38 @@ previous deployment range, it builds instead of risking a false skip.
 build hash. Preview uses generated deployment origins where required; there is
 no persistent staging branch or staging domain.
 
-Auth is provider-linked but DNS/cutover state must be verified before changing
-live entry ownership. Studio and Admin compatibility routes remain available
-until the Auth cutover is explicitly complete.
+Auth is the canonical interactive entry/security owner at
+`auth.jayantgoyal.com`. Studio and Admin retain redirect aliases and narrow
+callback compatibility for already-issued links; those paths do not change
+normal ownership.
+
+## Build and runtime validation
+
+Before a production push, run the frozen install when the lockfile changed,
+all structural/quality checks, strict types, tests, and the full production
+build. A Next.js build that ignores framework type errors does not replace
+`pnpm check-types`.
+
+After the push:
+
+1. Confirm the GitHub Quality workflow is green for the exact commit.
+2. Confirm every affected Vercel project reaches `Ready` for that commit.
+3. Check the deployment root/build logs for unexpected workspace selection.
+4. Smoke the canonical route for each affected product.
+5. For shared Auth changes, test a protected Studio return and Admin admission.
+6. For public content/SEO changes, verify canonical metadata, robots, and a
+   representative dynamic page.
+7. For provider changes, exercise only the affected safe read/action without
+   exposing credentials in evidence.
+
+## Rollback
+
+Prefer reverting the responsible Git commit and letting all affected projects
+redeploy from one consistent repository state. A Vercel-only redeploy is useful
+for a transient failed build but does not undo a bad source/configuration
+change. If an environment variable caused the incident, restore/rotate it in
+the owning project, redeploy that exact known source revision, and verify
+cross-product Auth/session behavior when relevant.
 
 ## Shipping
 

@@ -17,6 +17,11 @@ Canonical storage buckets are `private-files`, `portfolio-assets`, and
 every query error, and preserve RLS or an equivalent server authorization
 boundary.
 
+The current snapshots contain 28 application tables: one in `jg_account`, 15
+in `jg_app`, and 12 in `portfolio`. See the [schema
+catalog](schema-catalog.md) for table purpose, access model, database functions,
+and Storage ownership.
+
 ## Repository sources
 
 - `supabase/migrations/*.sql`: ordered forward database changes.
@@ -28,6 +33,26 @@ boundary.
 Never edit an applied migration. Historical migrations may contain historical
 content and paths; current production data changes belong in a new reviewed
 migration.
+
+In particular, migration history contains experiments that were later rolled
+back or decommissioned, including jobs, commerce, broader messaging, file
+sharing, custom calculator templates, and media conversion. Their historical
+`CREATE TABLE` statements do not make those current capabilities. Use the
+canonical schema snapshots and current application code to determine what
+exists now.
+
+## Runtime access modes
+
+| Mode                   | Credential                       | Boundary                                                   |
+| ---------------------- | -------------------------------- | ---------------------------------------------------------- |
+| Public content read    | Supabase anonymous key           | Public RLS policies and explicit selected columns          |
+| User-owned workspace   | Authenticated session            | `auth.uid()` RLS plus route/object validation              |
+| Admin content write    | Authenticated admin session      | Admin authorization plus table/payload allowlists          |
+| Service-role operation | Server-only service-role key     | Live user and role authorization before client creation    |
+| Storage upload/read    | User/admin session or signed URL | Bucket policy, object ownership, MIME/size/path validation |
+
+The service role bypasses RLS and is therefore never a substitute for an
+authorization check. Portfolio and Auth do not use it.
 
 ## Safe workflow
 
@@ -47,6 +72,14 @@ between worktrees. Remove any generated pooler URL after linked checks.
 `pnpm test:db:linked` performs remote test writes as part of its boundary
 verification. Run it only when the current task explicitly authorizes that
 external mutation.
+
+## Schema change definition of done
+
+A database change is not complete until the SQL is reviewed, the exact linked
+project is verified, migration history is inspected, the approved migration is
+applied through the disposable workflow, all three schema snapshots are
+refreshed and reviewed, generated pooler data is removed, application
+contracts/tests pass, and the schema catalog is updated.
 
 ## Local parity
 

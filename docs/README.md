@@ -9,6 +9,31 @@ tests, package manifests, runtime registries, migrations, schema snapshots, and
 environment examples remain authoritative where they are more precise than
 prose.
 
+## Reading paths
+
+- New to the repository: read [Ecosystem](overview/ecosystem.md), [System
+  map](overview/system-map.md), [Architecture
+  principles](architecture/principles.md), then the owning product.
+- Placing or restructuring code: read [Repository
+  structure](architecture/repository-structure.md), [Ownership
+  boundaries](architecture/ownership-boundaries.md), and the [Change placement
+  guide](architecture/change-placement-guide.md).
+- Changing a product: start with its README, then its route/capability/flow page
+  and the relevant shared-system contract.
+- Changing Auth or data: read the [shared cookie/return
+  contract](shared-systems/authentication/cookie-and-return-contract.md),
+  [Supabase guide](shared-systems/data/README.md), [schema
+  catalog](shared-systems/data/schema-catalog.md), and [security
+  boundaries](operations/security/README.md).
+- Running or shipping the system: use [Local
+  development](engineering/local-development.md), [Quality
+  gates](engineering/testing.md), [Vercel
+  deployment](operations/deployment/vercel.md), and [Operational
+  runbooks](operations/runbooks.md).
+- Looking for an exact fact: use the Reference section; its route/workspace,
+  environment, package, host, technology, and ownership catalogs are kept
+  current by documentation checks where possible.
+
 ## Overview
 
 - [Ecosystem](overview/ecosystem.md): products, audiences, and operating model.
@@ -19,9 +44,12 @@ prose.
 
 ## Architecture
 
+- [Architecture principles](architecture/principles.md)
 - [Repository structure](architecture/repository-structure.md)
+- [Runtime topology](architecture/runtime-topology.md)
 - [Ownership boundaries](architecture/ownership-boundaries.md)
 - [Domains and contracts](architecture/domains-and-contracts.md)
+- [Change placement guide](architecture/change-placement-guide.md)
 - [Long-term extensibility](architecture/extensibility.md)
 
 ## Products
@@ -31,18 +59,25 @@ prose.
 - [Admin](products/admin/README.md)
 - [Auth](products/auth/README.md)
 
+Each product page links to its route, capability, runtime-flow, data, and
+operational detail. These pages describe the implemented clients; they do not
+invent clients or product capabilities that do not exist.
+
 ## Clients and shared systems
 
 - [Client strategy](clients/README.md)
 - [Web clients](clients/web/README.md)
 - [Authentication](shared-systems/authentication/README.md)
+- [Shared web session and returns](shared-systems/authentication/cookie-and-return-contract.md)
 - [Data and Supabase](shared-systems/data/README.md)
+- [Database schema catalog](shared-systems/data/schema-catalog.md)
 - [Design and brand](shared-systems/design-and-brand/README.md)
 - [External integrations](shared-systems/integrations/README.md)
 
 ## Engineering
 
 - [Local development](engineering/local-development.md)
+- [Configuration model](engineering/configuration.md)
 - [Code quality](engineering/code-quality.md)
 - [Testing and quality gates](engineering/testing.md)
 - [Documentation governance](engineering/documentation.md)
@@ -52,11 +87,14 @@ prose.
 - [Security boundaries](operations/security/README.md)
 - [Reliability and observability](operations/reliability.md)
 - [Vercel deployment](operations/deployment/vercel.md)
+- [Operational runbooks](operations/runbooks.md)
 
 ## Reference
 
 - [Commands](reference/commands.md)
 - [Applications, hosts, and ports](reference/applications-and-ports.md)
+- [Repository inventory](reference/repository-inventory.md)
+- [Environment variables](reference/environment-variables.md)
 - [Package catalog](reference/package-catalog.md)
 - [Technology catalog](reference/technology-catalog.md)
 - [Ownership matrix](reference/ownership-matrix.md)
@@ -71,4 +109,6 @@ the relevant page and executable contracts belong beside the code.
 
 Every structural, behavioral, operational, or ownership change must update the
 smallest relevant page in the same change. Run `pnpm check:docs` to validate
-required pages, internal links, central placement, and index reachability.
+required pages, internal links, central placement, index reachability, and
+coverage of current routes, workspaces, environment contracts, and schema
+tables.

@@ -28,8 +28,10 @@ GitHub main ──────► Vercel projects ───────► indep
 | Admin     | Web            | Admins and super admins    | Content, users, deployment operations  |
 | Auth      | Web            | Account holders            | Entry, recovery, MFA, account security |
 
-Web is the only implemented client platform. Mobile, desktop, command-line,
-commerce, sales, and advertising implementations do not currently exist.
+Web is the only implemented client platform. Mobile, desktop, and command-line
+clients do not currently exist. Studio links to a separately deployed external
+e-commerce experiment, but this monorepo has no current owned commerce,
+subscription, sales, or advertising module/schema.
 
 ## Authority order
 

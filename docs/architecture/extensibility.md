@@ -20,8 +20,10 @@ universal.
 
 ## Advertising, sales, purchases, and subscriptions
 
-The current system has no commerce implementation. The structure can support
-one later without a repository split:
+Studio currently links to an external e-commerce experiment, but this monorepo
+has no owned commerce client, contract, provider adapter, or current schema.
+The structure can support a real product capability later without a repository
+split:
 
 - Product-specific offers, checkout entry points, and merchandising stay in
   the owning product client.
@@ -38,16 +40,16 @@ one later without a repository split:
 Possible capabilities fit into the current ownership model as follows. These
 are extension rules, not implemented modules:
 
-| Capability                    | Likely product ownership                                      |
-| ----------------------------- | ------------------------------------------------------------- |
-| Portfolio sponsorship or ads  | Portfolio presentation; shared provider adapter only if reused|
-| Studio paid feature           | Studio offer/use flow; Auth account identity and entitlements |
-| Subscription lifecycle        | Owning product contract plus account-linked entitlement data  |
-| Checkout and payment provider | Owning product entry; server-only provider integration        |
-| Lead capture and sales CRM    | Source product capture; Admin operations; provider adapter    |
-| Catalog pricing               | Product-owned domain contract, never hardcoded across clients |
-| Refund/support operation      | Admin workflow authorized against the owning product domain   |
-| Business analytics            | Product-defined events with privacy and retention boundaries  |
+| Capability                    | Likely product ownership                                       |
+| ----------------------------- | -------------------------------------------------------------- |
+| Portfolio sponsorship or ads  | Portfolio presentation; shared provider adapter only if reused |
+| Studio paid feature           | Studio offer/use flow; Auth account identity and entitlements  |
+| Subscription lifecycle        | Owning product contract plus account-linked entitlement data   |
+| Checkout and payment provider | Owning product entry; server-only provider integration         |
+| Lead capture and sales CRM    | Source product capture; Admin operations; provider adapter     |
+| Catalog pricing               | Product-owned domain contract, never hardcoded across clients  |
+| Refund/support operation      | Admin workflow authorized against the owning product domain    |
+| Business analytics            | Product-defined events with privacy and retention boundaries   |
 
 A capability becomes a separate product under `apps/<product>/<platform>` only
 when it has an independent audience, lifecycle, authorization model, and

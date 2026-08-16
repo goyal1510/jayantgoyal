@@ -1,48 +1,111 @@
 # Studio
 
-Studio is the product catalog and workspace at
-[studio.jayantgoyal.com](https://studio.jayantgoyal.com). Its web client lives at
-`apps/studio/web` and runs locally on port 3001.
+Studio is Jayant's product catalog, browser-utility collection, game hub, and
+personal workspace at
+[studio.jayantgoyal.com](https://studio.jayantgoyal.com). The current client is
+`apps/studio/web`, workspace `@jayant/studio-web`, running locally on port 3001.
 
-## Ownership
+## Product boundary
 
-Studio owns public product discovery, browser utilities, games, weather, GitHub
-statistics, and custom calculation experiences. Authenticated workspaces
-include Activity Tracker, Currency Calculator history, File Manager, Sync
-Scratchpad, and online game rooms.
+Studio owns four kinds of experience:
 
-Canonical registries define the current surface:
+- public discovery of implemented products and capabilities;
+- public browser utilities, weather, GitHub statistics, and calculator builder;
+- account-owned productivity workspaces;
+- local/computer and realtime room-based games.
 
-- Product inventory: `src/lib/config/studio-inventory.ts`
-- Public/protected surface policy: `src/lib/config/studio-surfaces.ts`
-- Navigation: `src/lib/config/hub-config.ts`
-- Games: `src/lib/games/config.ts`
-- Developer tools: `src/lib/tools/tools.ts`
+It does not own credential entry, Portfolio editorial content, user-role
+administration, or the external e-commerce experiment linked from its catalog.
+Auth owns account entry/security. Portfolio owns Writing even when Studio links
+to it.
 
-Treat those files and their tests as the source of truth instead of duplicating
-counts in documentation.
+## Implemented surface
 
-## Authentication and data
+The current web route tree contains 125 pages and 39 route handlers. The public
+utility collection has 87 tool pages in 11 categories. Game Hub has nine games,
+eight with online-room support. Exact current inventories are documented in:
 
-`src/proxy.ts` performs the public/protected route split, session refresh, MFA
-assurance requirement, and terms checks. `src/components/auth/auth-gate.tsx`
-mirrors client-side access classification. Auth owns all interactive entry and
-account flows. Studio's `/welcome`, `/forgot-password`, and `/mfa-verify` paths
-are redirects; its callback/reset code only completes an already-issued legacy
-recovery link and must not originate new recovery requests.
+- [capability catalog](capability-catalog.md): products, tools, games, and
+  account workspaces;
+- [routes and APIs](routes-and-apis.md): every page/handler, access class, and
+  grouped API behavior.
 
-Studio data lives primarily in `jg_app`, with account/terms state in
-`jg_account`. Private files use the `private-files` bucket. Every query must
-select its intended schema, handle errors, and preserve user-scoped RLS or
-server-side authorization.
+Runtime registries remain executable sources of truth:
 
-## Environment
+- `src/lib/config/studio-inventory.ts`: product cards and detail pages;
+- `src/lib/config/studio-surfaces.ts`: named product surfaces;
+- `src/lib/config/hub-config.ts`: application navigation;
+- `src/lib/games/config.ts`: game modes and online readiness;
+- `src/lib/tools/tools.ts`: aggregated utility registry.
 
-The contract is `apps/studio/web/.env.example`. It includes Supabase, shared
-session/Auth ownership, local application origins, Wordle seed, OpenWeather,
-and GitHub variables. The service-role key is server-only and may be used only
-by routes that independently authorize the caller.
+Tests assert alignment among inventory, routes, navigation, SEO content, and
+presentation. Documentation explains the meaning and flow; it does not replace
+those runtime registries.
 
-When adding a public surface, reconcile metadata, sitemap, proxy public paths,
-the client auth gate, zero-cost API classification, the appropriate registry,
-and regression tests.
+## Access model
+
+Public pages are classified both in `src/proxy.ts` and
+`src/components/auth/auth-gate.tsx`. Public catalog/tool routes render without
+a full identity lookup when possible. Account workspaces render a sign-in CTA
+or require a verified session. APIs have a separate policy: zero-cost public,
+auth-aware public, or protected.
+
+For authenticated requests the proxy:
+
+1. strips client-supplied internal headers;
+2. resolves the shared session cookie and calls Supabase `getUser()`;
+3. checks TOTP assurance when a factor exists;
+4. confines recovery-mode sessions to reset behavior;
+5. checks terms acceptance for protected APIs;
+6. forwards verified user headers and refreshed cookies.
+
+Auth owns the resulting login, forgot-password, and MFA UI. Studio aliases
+redirect there with a validated return target.
+
+## Capability architecture
+
+Public utilities are mostly browser-local and retain their UI/logic under the
+Studio client. Tool favorites and recently used history are persisted for
+signed-in users. Weather uses the browser-visible OpenWeather key. GitHub
+statistics use server routes and the shared GitHub package.
+
+Account workspaces use Studio-owned API routes and `jg_app` RLS:
+
+- Activity Tracker: activities, entries, and computed statistics;
+- Currency Calculator: calculations and denomination rows;
+- File Manager: metadata/RPCs plus private Storage objects and signed uploads;
+- Sync Scratchpad: private entries and Realtime updates;
+- Game Hub: sessions, participants, ordered moves, results, and typing scores;
+- Tool usage: favorites and bounded recent history.
+
+Calculator Builder currently persists browser state through Zustand rather
+than the database. This local state does not justify an ecosystem package.
+
+## Dependencies
+
+Studio consumes `@jayant/web-auth`, `@jayant/web-brand`, `@jayant/web-urls`,
+`@jayant/web-seo`, `@jayant/web-ui`, `@jayant/github`, shared Tailwind, and
+tooling configuration. Studio product rules, game engines, file operations,
+weather, calculators, and tool metadata remain inside Studio because another
+product does not consume those domains.
+
+## Environment and security
+
+`apps/studio/web/.env.example` owns Supabase, shared Auth/session, application
+origins, Wordle seed, OpenWeather, and GitHub variables. The service-role key is
+server-only and used by independently authorized account deletion and online
+game coordination routes. Those handlers authenticate the current user and
+validate room membership/state before elevated access; ordinary workspace
+operations use the user's RLS-bound session.
+
+Private files use signed upload/complete flows and the `private-files` bucket.
+Online game actions validate session membership, turn/order rules, and current
+state before the database RPC records an action. Provider secrets and the
+Wordle seed secret must never reach client bundles.
+
+## Change checklist
+
+For a public surface, reconcile the product/surface/tool registry, route page,
+navigation, command palette, proxy, AuthGate, metadata, JSON-LD/breadcrumb,
+sitemap, API cost class, and tests. For an account capability, also update RLS,
+API authorization, data catalog, failure behavior, and operational signals.

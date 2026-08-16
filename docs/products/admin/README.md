@@ -1,43 +1,87 @@
 # Admin
 
-Admin is the private operations product at
-[admin.jayantgoyal.com](https://admin.jayantgoyal.com). Its web client lives at
-`apps/admin/web`, runs locally on port 3002, and requires an `admin` or
-`super_admin` account.
+Admin is Jayant's private operations product at
+[admin.jayantgoyal.com](https://admin.jayantgoyal.com). The current client is
+`apps/admin/web`, workspace `@jayant/admin-web`, running locally on port 3002.
 
-## Workspaces
+## Product boundary
 
-Admin owns Portfolio overview and editorial workspaces for Home, About, Skills,
-Experience, Activity, Work, Writing, and Contact. It also owns user/role
-administration and Vercel deployment operations for authorized super admins.
+Admin provides privileged operational interfaces; it does not take ownership
+of the domains it administers. Its current responsibilities are:
 
-Older granular Portfolio URLs are compatibility redirects defined by
-`src/lib/config/portfolio-route-map.ts`; they are not separate active
-workspaces.
+- Portfolio editorial overview and section workspaces;
+- Portfolio Work, Writing, and public asset administration;
+- account profile/role administration;
+- Vercel deployment listing, inspection, events, and redeployment actions.
 
-## Authorization and data
+Portfolio owns its public content contract. Auth owns credentials, MFA, and
+account security. Studio owns its product capabilities even though a reserved
+Studio navigation domain exists with no active Admin workspace.
 
-`src/proxy.ts` authenticates requests, requires the appropriate MFA assurance,
-loads the `jg_account.profiles` role, and rejects unauthorized users. Auth owns
-the MFA interface and returns the stepped-up session to Admin. Protected layouts
-and server routes recheck the relevant authorization boundary.
+## Roles and access
 
-Admin edits the same Portfolio and Writing contracts consumed publicly:
+The proxy requires a valid Supabase user, completes MFA step-up when a verified
+factor exists, reads `jg_account.profiles.role`, and admits `admin` or
+`super_admin`. The sidebar exposes Portfolio workspaces to both roles and
+Platform operations only to `super_admin`.
 
-- Portfolio tables and section presentation through `/api/portfolio/*`.
-- `jg_app.writing_posts` through the Writing workspace.
-- Public media in `portfolio-assets`.
-- Account profiles and roles through `/api/users`.
-- Vercel deployment operations through `/api/vercel/deployments/*`.
+Every elevated route reauthorizes its caller. Proxy admission alone is not
+sufficient for service-role or Vercel-token access. `/unauthorized` and the
+callback compatibility path are the only public destinations.
 
-`@jayant/portfolio-contracts` defines the shared runtime/type boundary.
+## Current workspaces
+
+| Domain      | Active workspace                                                            | Roles                | Operation                              |
+| ----------- | --------------------------------------------------------------------------- | -------------------- | -------------------------------------- |
+| Portfolio   | Overview, Home, About, Skills, Experience, Activity, Work, Writing, Contact | admin, super_admin   | Canonical CMS editing                  |
+| Accounts    | Users                                                                       | super_admin          | Profile/role inspection and assignment |
+| Deployments | Deployments and detail                                                      | super_admin          | Studio/Admin Vercel operations         |
+| Studio      | None                                                                        | super_admin reserved | No implemented Admin capability        |
+
+Several older granular URLs redirect to the current section-owned workspaces;
+they are compatibility paths, not additional features. See [routes and
+operations](routes-and-operations.md) for the complete catalog.
+
+## Data and provider access
+
+Admin consumes `@jayant/portfolio-contracts` to validate the same public
+columns, JSON shapes, Writing records, section presentation, and assets that
+Portfolio reads. Authorized APIs operate on `portfolio.*`,
+`jg_app.writing_posts`, and the `portfolio-assets` bucket.
+
+Account administration combines `jg_account.profiles` with Supabase Auth admin
+data so super admins can associate roles with real identities. Deployment
+operations use server-only Vercel credentials and are currently scoped to the
+Studio and Admin project IDs.
+
+## Internal architecture
+
+- `src/proxy.ts` owns request admission, MFA redirect, and role headers.
+- `src/lib/config/nav-config.ts` owns active role-aware navigation domains.
+- `src/lib/config/portfolio-route-map.ts` owns compatibility redirects.
+- `src/app/api/portfolio/[table]/helpers.ts` owns Portfolio allowlists,
+  validation, authorization, and revalidation.
+- `src/app/api/jg-app/[table]/helpers.ts` owns Writing allowlists and validation.
+- `src/lib/vercel-server.ts` is the server-only Vercel transport.
+
+Admin uses `@jayant/web-auth`, `@jayant/web-brand`, `@jayant/web-ui`, and shared
+tooling/style packages. It does not export a reusable application API.
 
 ## Environment and security
 
-The contract is `apps/admin/web/.env.example`. Supabase and shared Auth/session
-variables are required. Vercel token, team, and project IDs enable deployment
-operations. All service-role and Vercel credentials are server-only. Every
-service-role route must authorize the caller before bypassing RLS, and only
-super admins may perform user or deployment administration.
+The environment contract is `apps/admin/web/.env.example`. Supabase anonymous
+values support normal session/RLS behavior; the service-role key is used only
+after route-specific authorization. Auth/session variables support the shared
+web cookie and canonical Auth redirects. Vercel token, team, and project IDs
+are super-admin server-only inputs.
 
-Admin remains non-indexable.
+Admin is non-indexable. Responses carrying identity, role, or deployment data
+must remain private. Logs must not expose tokens, auth user metadata, or
+deployment environment values.
+
+## Change checklist
+
+When adding an operation, define the domain owner, minimum role, MFA/recent-auth
+requirement, explicit resource allowlist, validation, elevated credential
+boundary, audit/observability need, and degraded behavior. Update navigation,
+route catalog, environment ownership, tests, and owning product documentation.

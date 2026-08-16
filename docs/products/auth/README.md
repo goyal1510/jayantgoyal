@@ -1,42 +1,105 @@
 # Auth
 
-Auth is the shared account-entry and security product at
-[auth.jayantgoyal.com](https://auth.jayantgoyal.com). Its web client lives at
-`apps/auth/web` and runs locally on port 3003.
+Auth is Jayant's account-entry and security product at
+[auth.jayantgoyal.com](https://auth.jayantgoyal.com). The current client is
+`apps/auth/web`, workspace `@jayant/auth-web`, running locally on port 3003.
 
-## Ownership
+## Product boundary
 
-Auth owns normal sign-in/register entry, password recovery, verification,
-authenticator MFA, profile and avatar management, password changes, connected
-providers, and local/global logout.
+Auth is the sole interactive owner of:
 
-Primary routes include `/welcome`, `/login`, `/register`, `/forgot-password`,
-`/reset-password`, `/verify`, `/mfa`, `/account/*`, `/logout`, and `/callback`.
-Studio and Admin entry URLs are redirect aliases. Their compatibility callbacks
-do not render credential, recovery-request, or factor interfaces.
+- unified email/password sign-in and registration;
+- Google and GitHub OAuth entry;
+- email verification and callback completion;
+- forgot-password and reset-password recovery;
+- TOTP enrollment, challenge, verification, and removal;
+- account profile and avatar management;
+- password changes with reauthentication;
+- connected identity inspection, linking, and unlinking;
+- local-session and global-session logout.
 
-`src/proxy.ts` protects account routes, validates sessions, requires MFA
-step-up where appropriate, and requires recent sign-in for sensitive changes.
-Server actions validate mutation origins and safe return targets.
+Studio and Admin own product authorization, not credentials. Their `/welcome`,
+forgot-password, and MFA paths are redirects to Auth. Narrow compatibility
+callbacks may exchange already-issued links, but they must not grow into a
+second authentication UI.
 
-## Shared contract
+## Route surface
 
-`@jayant/web-auth` owns Supabase browser/request/server clients, the shared
-cross-subdomain cookie contract, safe return validation, Auth entry URLs,
-password/profile/provider contracts, and sign-out scopes. Runtime values named
-`platform` are retained as session-rollout compatibility vocabulary; they mean
-the shared web session, not a product called “JayantGoyal Platform.”
+Auth has public entry/recovery routes, protected account/security routes, and
+three callback aliases. The complete route and action sequence is in [flows and
+security](flows-and-security.md).
 
-## Data and environment
+| Area           | Routes                                                                             |
+| -------------- | ---------------------------------------------------------------------------------- |
+| Entry          | `/`, `/welcome`, `/login`, `/register`                                             |
+| Recovery       | `/forgot-password`, `/reset-password`, `/verify`                                   |
+| MFA            | `/mfa`, `/account/mfa`                                                             |
+| Account        | `/account/security`, `/account/profile`, `/account/password`, `/account/providers` |
+| Session        | `/logout`                                                                          |
+| Callback/error | `/callback`, `/auth/callback`, `/callback/auth/callback`, `/error`                 |
 
-Auth uses the Supabase anonymous key and RLS for Supabase Auth,
-`jg_account.profiles`, and the private `profile-avatars` bucket. It must not use
-a service-role credential.
+`/login` and `/register` remain named entry surfaces, while the primary
+`/welcome` action first attempts sign-in and then creates a new account when
+the credentials do not identify an existing account.
 
-The environment contract is `apps/auth/web/.env.example`: Supabase URL/key,
-session/cookie mode, Auth site URL, other application origins, and exact Preview
-return origins. Hosted Preview may omit `NEXT_PUBLIC_SITE_URL` so request
-headers identify the generated deployment origin.
+## Internal architecture
 
-Auth responses are private/no-store and account routes are non-indexable. Never
-put auth tokens in URLs or logs.
+- `src/app/actions/entry.ts` owns password and OAuth entry.
+- `src/app/actions/recovery.ts` owns recovery and post-reset logout.
+- `src/app/actions/mfa.ts` owns TOTP lifecycle.
+- `src/app/actions/account.ts` owns password, profile, avatar, and providers.
+- `src/app/actions/logout.ts` owns explicit sign-out scope.
+- `src/lib/auth/action-support.ts` owns mutation-origin checks and return
+  persistence.
+- `src/lib/auth/returns.ts` owns exact allowed return origins.
+- `src/lib/auth/policy.ts` owns protected routes, assurance, and recent-sign-in
+  rules.
+- `src/proxy.ts` applies those rules before protected pages render.
+
+All server actions re-establish their own identity and authorization context;
+the UI and proxy are not the only safety boundary.
+
+## Shared web contract
+
+`@jayant/web-auth` owns web-specific Supabase browser/request/server clients,
+cookie selection and promotion, Auth entry URL builders, safe returns, password
+rules, profile/avatar resolution, provider metadata, and logout scope. It does
+not own Studio or Admin authorization.
+
+The shared production cookie can be read by trusted Jayant subdomains. Preview
+deployments do not receive a broad production-domain cookie. Details are in the
+[shared session contract](../../shared-systems/authentication/cookie-and-return-contract.md).
+
+## Data and storage
+
+Auth uses Supabase Auth plus `jg_account.profiles` and the private
+`profile-avatars` bucket. Profiles hold names, roles, terms state, and avatar
+selection metadata; Supabase Auth remains authoritative for identities,
+passwords, sessions, verification, and MFA factors.
+
+Auth uses the anonymous key with RLS and must never receive or import a
+service-role credential. Avatar uploads are limited to JPG, PNG, or WebP and
+5 MB; profile updates and storage cleanup are coordinated by server actions.
+
+## Security posture
+
+- Mutation origins and return targets are validated before action.
+- Account pages require a live user, not only cookie presence.
+- Enrolled TOTP requires AAL2 step-up.
+- Sensitive account changes require either AAL2 or a recent sign-in window.
+- Password change rechecks the current password.
+- Recovery mode requires a verified recovery cookie and, when enrolled, MFA.
+- Tokens stay in cookies/provider exchanges, not user-visible return URLs or
+  logs.
+- Auth and account responses are private/no-store and non-indexable.
+
+## Environment and change checklist
+
+`apps/auth/web/.env.example` owns Supabase, session mode, local cookie domain,
+site/application origins, and explicit Preview return origins. See the
+[environment reference](../../reference/environment-variables.md).
+
+Any auth change must test safe returns, callback errors, cookie modes, Preview
+host behavior, MFA/recovery interaction, recent-sign-in behavior, logout scope,
+and Studio/Admin entry integration. Update the Auth flow and shared session
+documents together when the cross-product contract changes.

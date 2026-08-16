@@ -81,3 +81,12 @@ architecture, products, clients, shared systems, engineering, operations, and
 reference material. Documentation describes the current system only; this
 repository does not maintain session entries, progress logs, completed-plan
 archives, or an architecture history ledger.
+
+Useful starting points:
+
+- [Architecture principles](docs/architecture/principles.md)
+- [Runtime topology](docs/architecture/runtime-topology.md)
+- [Repository inventory](docs/reference/repository-inventory.md)
+- [Database schema catalog](docs/shared-systems/data/schema-catalog.md)
+- [Environment variables](docs/reference/environment-variables.md)
+- [Operational runbooks](docs/operations/runbooks.md)
