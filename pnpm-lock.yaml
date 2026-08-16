@@ -46,9 +46,6 @@ importers:
 
   apps/admin/web:
     dependencies:
-      "@jayantgoyal/identity":
-        specifier: workspace:*
-        version: link:../../../packages/foundation/identity
       "@jayantgoyal/portfolio-contracts":
         specifier: workspace:*
         version: link:../../portfolio/contracts
