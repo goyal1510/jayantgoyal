@@ -8,7 +8,11 @@ import {
   hasAuthSessionCookie,
   resolveAuthSessionMode,
 } from "@jayant/web-auth/cookies";
-import { buildAuthLoginUrl, resolveAuthFlowOwner } from "@jayant/web-auth/entry";
+import {
+  buildAuthForgotPasswordUrl,
+  buildAuthLoginUrl,
+  buildAuthMfaUrl,
+} from "@jayant/web-auth/entry";
 
 import { runMiddleware } from "@/proxy/runner";
 import { mfaMiddleware } from "@/proxy/mfa";
@@ -55,15 +59,12 @@ const PUBLIC_PAGES = [
   "/custom-calculator",
   "/terms-conditions",
   "/github-stats",
-  "/forgot-password",
   "/reset-password",
   "/auth/callback",
 ];
 
 /** Auth-gated public paths — still public but need auth state for redirect logic */
 const AUTH_PUBLIC_PATHS = [
-  "/welcome",
-  "/mfa-verify",
   "/api/account/accept-terms",
   "/api/account/init",
   "/api/tools/usage",
@@ -103,9 +104,28 @@ function forwardVerifiedRequestHeaders(
 export default async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  if (pathname === "/welcome" && resolveAuthFlowOwner() === "auth") {
+  if (pathname === "/welcome") {
     return NextResponse.redirect(
       buildAuthLoginUrl({
+        requestUrl: request.url,
+        requestHeaders: request.headers,
+        returnPath: request.nextUrl.searchParams.get("redirect"),
+      }),
+    );
+  }
+
+  if (pathname === "/forgot-password") {
+    return NextResponse.redirect(
+      buildAuthForgotPasswordUrl({
+        requestUrl: request.url,
+        requestHeaders: request.headers,
+      }),
+    );
+  }
+
+  if (pathname === "/mfa-verify") {
+    return NextResponse.redirect(
+      buildAuthMfaUrl({
         requestUrl: request.url,
         requestHeaders: request.headers,
         returnPath: request.nextUrl.searchParams.get("redirect"),
@@ -147,7 +167,13 @@ export default async function proxy(request: NextRequest) {
       matchPath(pathname, PUBLIC_PAGES) ||
       matchPath(pathname, AUTH_PUBLIC_PATHS);
     if (isPublic) return response;
-    return NextResponse.redirect(new URL("/welcome", request.url));
+    return NextResponse.redirect(
+      buildAuthLoginUrl({
+        requestUrl: request.url,
+        requestHeaders: request.headers,
+        returnPath: `${pathname}${request.nextUrl.search}`,
+      }),
+    );
   }
 
   const isPublicPage = matchPath(pathname, PUBLIC_PAGES);

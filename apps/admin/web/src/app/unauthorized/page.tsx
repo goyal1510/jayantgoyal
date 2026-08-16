@@ -1,9 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { ShieldX, ArrowLeft } from "lucide-react";
-import { signOutSession } from "@jayant/web-auth/logout";
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { buildAuthLogoutUrl } from "@jayant/web-auth/entry";
 import { Button } from "@jayant/web-ui/button";
 import {
   Card,
@@ -14,12 +12,10 @@ import {
 } from "@jayant/web-ui/card";
 
 export default function UnauthorizedPage() {
-  const router = useRouter();
-
-  async function handleLogout() {
-    const supabase = createSupabaseBrowserClient();
-    await signOutSession(supabase);
-    router.push("/welcome");
+  function handleLogout() {
+    window.location.href = buildAuthLogoutUrl({
+      requestUrl: window.location.href,
+    }).toString();
   }
 
   return (

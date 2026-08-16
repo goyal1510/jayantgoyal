@@ -24,7 +24,7 @@ export default async function MfaPage({
   ]);
   const requestOrigin = requestOriginFromHeaders(headerStore, AUTH_ORIGIN);
   const returnTo = resolveAuthReturnTarget(
-    cookieStore.get("auth_return_to")?.value ?? params.return_to,
+    params.return_to ?? cookieStore.get("auth_return_to")?.value,
     requestOrigin,
   );
   const {

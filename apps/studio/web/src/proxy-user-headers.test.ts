@@ -6,7 +6,8 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("@jayant/web-auth/server", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@jayant/web-auth/server")>();
+  const actual =
+    await importOriginal<typeof import("@jayant/web-auth/server")>();
 
   return {
     ...actual,
@@ -28,7 +29,6 @@ vi.mock("@jayant/web-auth/server", async (importOriginal) => {
 import studioProxy from "./proxy";
 
 beforeEach(() => {
-  vi.stubEnv("NEXT_PUBLIC_AUTH_FLOW_OWNER", "legacy");
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://project.supabase.co");
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "anon-key");
   mocks.getUser.mockResolvedValue({

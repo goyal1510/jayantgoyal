@@ -1,20 +1,25 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
-import { WelcomeForm } from "@/components/auth/welcome-form";
-import { CircularLoader } from "@jayant/web-ui/circular-loader";
-import { AuthPageShell } from "@jayant/web-ui/auth-presentation";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+
+import { buildAuthLoginUrl } from "@jayant/web-auth/entry";
 
 export const metadata: Metadata = {
   title: "Welcome",
-  description: "Sign in or create your account on jayantgoyal.com",
+  description: "Continue to the Jayant account sign-in experience.",
 };
 
-export default function WelcomePage() {
-  return (
-    <AuthPageShell>
-      <Suspense fallback={<CircularLoader />}>
-        <WelcomeForm />
-      </Suspense>
-    </AuthPageShell>
+export default async function WelcomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ redirect?: string }>;
+}) {
+  const [params, headerStore] = await Promise.all([searchParams, headers()]);
+  redirect(
+    buildAuthLoginUrl({
+      requestUrl: "http://localhost:3001/welcome",
+      requestHeaders: headerStore,
+      returnPath: params.redirect,
+    }).toString(),
   );
 }

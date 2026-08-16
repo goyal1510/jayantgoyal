@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { buildAuthMfaUrl } from "@jayant/web-auth/entry";
 import { safeReturnPath } from "@jayant/web-auth/redirects";
 import {
   copyAuthCacheHeaders,
@@ -48,11 +49,14 @@ export async function GET(request: NextRequest) {
   } = await supabase.auth.getUser();
   if (user) await syncProfileNamesFromIdentities(supabase, user);
 
-  // Always redirect through /mfa-verify after OAuth — the page checks
-  // if MFA is actually needed and redirects through if not.
-  const mfaUrl = new URL("/mfa-verify", request.url);
-  mfaUrl.searchParams.set("redirect", next);
-  const mfaResponse = NextResponse.redirect(mfaUrl);
+  // Auth owns MFA step-up and returns to the exact Admin destination.
+  const mfaResponse = NextResponse.redirect(
+    buildAuthMfaUrl({
+      requestUrl: request.url,
+      requestHeaders: request.headers,
+      returnPath: next,
+    }),
+  );
   response.cookies.getAll().forEach(({ name, value, ...options }) => {
     mfaResponse.cookies.set(name, value, options);
   });

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import {
   actionContext,
+  clearReturnTarget,
   rawStringField,
   rememberReturnTarget,
   stringField,
@@ -42,10 +43,11 @@ export async function authenticateAction(
 
   if (!loginError) {
     const { data: factors } = await supabase.auth.mfa.listFactors();
-    await rememberReturnTarget(returnTo, context.requestOrigin);
     if (factors?.totp.some((factor) => factor.status === "verified")) {
+      await rememberReturnTarget(returnTo, context.requestOrigin);
       redirect(`/mfa?return_to=${encodeURIComponent(returnTo)}`);
     }
+    await clearReturnTarget();
     redirect(returnTo);
   }
 
@@ -56,7 +58,10 @@ export async function authenticateAction(
   });
 
   if (!signupError) {
-    if (data.session) redirect(returnTo);
+    if (data.session) {
+      await clearReturnTarget();
+      redirect(returnTo);
+    }
     await rememberReturnTarget(returnTo, context.requestOrigin);
     return {
       success:

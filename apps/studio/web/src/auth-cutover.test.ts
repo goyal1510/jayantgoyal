@@ -5,7 +5,6 @@ import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import studioProxy from "./proxy";
 
 beforeEach(() => {
-  vi.stubEnv("NEXT_PUBLIC_AUTH_FLOW_OWNER", "legacy");
   vi.stubEnv("NEXT_PUBLIC_AUTH_URL", "https://auth.jayantgoyal.com");
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "");
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "");
@@ -29,7 +28,7 @@ describe("Studio Auth entry cutover", () => {
     ).toBe(false);
   });
 
-  it("keeps legacy account settings and MFA cleanup routes removed", () => {
+  it("keeps duplicated account and entry implementations removed", () => {
     expect(
       existsSync(
         new URL(
@@ -51,6 +50,21 @@ describe("Studio Auth entry cutover", () => {
     expect(
       existsSync(new URL("./app/api/account/delete/route.ts", import.meta.url)),
     ).toBe(true);
+    expect(
+      existsSync(
+        new URL("./components/auth/welcome-form.tsx", import.meta.url),
+      ),
+    ).toBe(false);
+    expect(
+      existsSync(
+        new URL("./components/auth/forgot-password-form.tsx", import.meta.url),
+      ),
+    ).toBe(false);
+    expect(
+      existsSync(
+        new URL("./components/auth/mfa-verify-step.tsx", import.meta.url),
+      ),
+    ).toBe(false);
   });
 
   it("keeps the protected layout on the shared session-cookie contract", () => {
@@ -64,19 +78,27 @@ describe("Studio Auth entry cutover", () => {
     expect(layout).not.toContain("sb-${projectRef}-auth-token");
   });
 
-  it("keeps the local welcome route in rollback mode", async () => {
-    const response = await studioProxy(
-      new NextRequest(
-        "https://studio.jayantgoyal.com/welcome?redirect=%2Ffiles",
-      ),
+  it("keeps product entry aliases as redirects rather than local forms", () => {
+    const welcomePage = readFileSync(
+      new URL("./app/welcome/page.tsx", import.meta.url),
+      "utf8",
+    );
+    const forgotPasswordPage = readFileSync(
+      new URL("./app/forgot-password/page.tsx", import.meta.url),
+      "utf8",
+    );
+    const mfaPage = readFileSync(
+      new URL("./app/mfa-verify/page.tsx", import.meta.url),
+      "utf8",
     );
 
-    expect(response.headers.get("location")).toBeNull();
+    expect(welcomePage).toContain("buildAuthLoginUrl");
+    expect(welcomePage).not.toContain("WelcomeForm");
+    expect(forgotPasswordPage).toContain("buildAuthForgotPasswordUrl");
+    expect(mfaPage).toContain("buildAuthMfaUrl");
   });
 
   it("routes login entry to Auth with an exact Studio return target", async () => {
-    vi.stubEnv("NEXT_PUBLIC_AUTH_FLOW_OWNER", "auth");
-
     const response = await studioProxy(
       new NextRequest(
         "https://studio.jayantgoyal.com/welcome?redirect=%2Ffiles",
@@ -85,6 +107,26 @@ describe("Studio Auth entry cutover", () => {
 
     expect(response.headers.get("location")).toBe(
       "https://auth.jayantgoyal.com/welcome?return_to=https%3A%2F%2Fstudio.jayantgoyal.com%2Ffiles",
+    );
+  });
+
+  it("routes recovery and MFA aliases to Auth", async () => {
+    const [recovery, mfa] = await Promise.all([
+      studioProxy(
+        new NextRequest("https://studio.jayantgoyal.com/forgot-password"),
+      ),
+      studioProxy(
+        new NextRequest(
+          "https://studio.jayantgoyal.com/mfa-verify?redirect=%2Ffiles%3Ffolder%3Done",
+        ),
+      ),
+    ]);
+
+    expect(recovery.headers.get("location")).toBe(
+      "https://auth.jayantgoyal.com/forgot-password",
+    );
+    expect(mfa.headers.get("location")).toBe(
+      "https://auth.jayantgoyal.com/mfa?return_to=https%3A%2F%2Fstudio.jayantgoyal.com%2Ffiles%3Ffolder%3Done",
     );
   });
 });

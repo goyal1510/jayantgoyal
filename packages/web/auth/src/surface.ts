@@ -4,8 +4,7 @@
  * This is deliberately React- and framework-free so each application can
  * reason about the same ownership contract without importing Auth UI or
  * Next.js route modules. The Auth app owns these paths; product applications
- * may link to them through the entry helpers, but must not reimplement them
- * once the rollout owner is switched.
+ * may link to them through the entry helpers, but must not reimplement them.
  */
 
 export const AUTH_SURFACE_ROUTES = [

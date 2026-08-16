@@ -27,7 +27,11 @@ function createContext({
 } = {}): ProxyContext {
   const request = new NextRequest(url, {
     headers: cookies
-      ? { cookie: Object.entries(cookies).map(([k, v]) => `${k}=${v}`).join("; ") }
+      ? {
+          cookie: Object.entries(cookies)
+            .map(([k, v]) => `${k}=${v}`)
+            .join("; "),
+        }
       : undefined,
   });
   const response = NextResponse.next();
@@ -59,26 +63,24 @@ function createContext({
 }
 
 describe("Studio authentication middleware policy", () => {
-  it("redirects an anonymous protected request to Welcome", async () => {
+  it("redirects an anonymous protected request to canonical Auth", async () => {
     const result = await routeGuardMiddleware(
       createContext({ isAuthed: false }),
     );
 
     expect(result?.headers.get("location")).toBe(
-      "https://studio.example.test/welcome?redirect=%2Ffiles",
+      "https://auth.jayantgoyal.com/welcome?return_to=https%3A%2F%2Fstudio.example.test%2Ffiles",
     );
   });
 
-  it("rejects an external authenticated Welcome destination", async () => {
+  it("leaves authenticated requests for later authorization layers", async () => {
     const result = await routeGuardMiddleware(
       createContext({
         url: "https://studio.example.test/welcome?redirect=https://evil.example",
       }),
     );
 
-    expect(result?.headers.get("location")).toBe(
-      "https://studio.example.test/",
-    );
+    expect(result).toBeNull();
   });
 
   it("requires MFA for an AAL1 user with a verified factor", async () => {
@@ -87,7 +89,7 @@ describe("Studio authentication middleware policy", () => {
     );
 
     expect(result?.headers.get("location")).toBe(
-      "https://studio.example.test/mfa-verify?redirect=%2Ffiles",
+      "https://auth.jayantgoyal.com/mfa?return_to=https%3A%2F%2Fstudio.example.test%2Ffiles",
     );
   });
 
@@ -125,9 +127,7 @@ describe("Studio middleware response propagation", () => {
       new URL("/mfa-verify", context.request.url),
     );
 
-    const result = await runMiddleware(context, [
-      async () => replacement,
-    ]);
+    const result = await runMiddleware(context, [async () => replacement]);
 
     expect(result.headers.get("location")).toBe(
       "https://studio.example.test/mfa-verify",

@@ -4,8 +4,6 @@ import { authSurfacePath } from "./surface";
 
 export const CANONICAL_AUTH_ORIGIN = "https://auth.jayantgoyal.com";
 
-export type AuthFlowOwner = "legacy" | "auth";
-
 type HeaderReader = {
   get(name: string): string | null;
 };
@@ -47,12 +45,6 @@ export function resolveExternalRequestUrl({
   } catch {
     return internalUrl;
   }
-}
-
-export function resolveAuthFlowOwner(
-  value = process.env.NEXT_PUBLIC_AUTH_FLOW_OWNER,
-): AuthFlowOwner {
-  return value === "legacy" ? "legacy" : "auth";
 }
 
 export function resolveAuthApplicationOrigin(
@@ -139,6 +131,46 @@ export function buildAuthLoginUrl({
   const returnTarget = new URL(targetPath, `${request.origin}/`);
   loginUrl.searchParams.set("return_to", returnTarget.toString());
   return loginUrl;
+}
+
+export function buildAuthForgotPasswordUrl({
+  requestUrl,
+  requestHeaders,
+  authOrigin,
+}: {
+  requestUrl: string;
+  requestHeaders?: HeaderReader;
+  authOrigin?: string | null;
+}): URL {
+  const request = resolveExternalRequestUrl({ requestUrl, requestHeaders });
+  return new URL(
+    authSurfacePath("forgot-password"),
+    `${authOriginForRequest(request, authOrigin)}/`,
+  );
+}
+
+export function buildAuthMfaUrl({
+  requestUrl,
+  requestHeaders,
+  returnPath,
+  authOrigin,
+}: {
+  requestUrl: string;
+  requestHeaders?: HeaderReader;
+  returnPath?: string | null;
+  authOrigin?: string | null;
+}): URL {
+  const request = resolveExternalRequestUrl({ requestUrl, requestHeaders });
+  const destination = new URL(
+    authSurfacePath("mfa"),
+    `${authOriginForRequest(request, authOrigin)}/`,
+  );
+  const targetPath = safeReturnPath(returnPath, "/");
+  destination.searchParams.set(
+    "return_to",
+    new URL(targetPath, `${request.origin}/`).toString(),
+  );
+  return destination;
 }
 
 function buildAuthOwnedUrl({

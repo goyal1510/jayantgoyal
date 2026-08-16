@@ -49,6 +49,10 @@ export async function rememberReturnTarget(
   });
 }
 
+export async function clearReturnTarget() {
+  (await cookies()).delete(RETURN_COOKIE);
+}
+
 export function stringField(formData: FormData, name: string): string {
   const value = formData.get(name);
   return typeof value === "string" ? value.trim() : "";

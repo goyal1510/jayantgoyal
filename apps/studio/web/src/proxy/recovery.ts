@@ -2,9 +2,7 @@ import { NextResponse } from "next/server";
 import type { ProxyContext } from "./types";
 
 /** APIs allowed during recovery mode */
-const RECOVERY_APIS = [
-  "/api/account/init",
-];
+const RECOVERY_APIS = ["/api/account/init"];
 
 /** Pages allowed during recovery mode */
 const RECOVERY_PAGES = [
@@ -12,7 +10,6 @@ const RECOVERY_PAGES = [
   "/welcome",
   "/forgot-password",
   "/auth/callback",
-  "/mfa-verify",
 ];
 
 /**
@@ -20,10 +17,13 @@ const RECOVERY_PAGES = [
  * When the recovery_mode cookie is set (password reset flow), lock the user
  * to only the reset-password page and essential APIs.
  */
-export async function recoveryMiddleware(ctx: ProxyContext): Promise<NextResponse | null> {
+export async function recoveryMiddleware(
+  ctx: ProxyContext,
+): Promise<NextResponse | null> {
   if (!ctx.isAuthed) return null;
 
-  const isRecoveryMode = ctx.request.cookies.get("recovery_mode")?.value === "true";
+  const isRecoveryMode =
+    ctx.request.cookies.get("recovery_mode")?.value === "true";
   if (!isRecoveryMode) return null;
 
   // Block non-essential APIs
@@ -33,7 +33,7 @@ export async function recoveryMiddleware(ctx: ProxyContext): Promise<NextRespons
 
     return NextResponse.json(
       { error: "Complete your password reset first." },
-      { status: 403 }
+      { status: 403 },
     );
   }
 

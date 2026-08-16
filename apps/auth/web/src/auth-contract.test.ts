@@ -30,7 +30,7 @@ const ROUTE_FILES = new Map<string, string>([
 ]);
 
 describe("standalone Auth application contract", () => {
-  it("owns every approved dark-launch route", () => {
+  it("owns every canonical account route", () => {
     AUTH_SURFACE_ROUTES.forEach(({ pathname }) => {
       const route = ROUTE_FILES.get(pathname);
       expect(route, pathname).toBeDefined();
@@ -101,6 +101,21 @@ describe("standalone Auth application contract", () => {
     expect(resetPage).toContain("redirect(`/mfa?return_to=");
     expect(recovery).toContain("getAuthenticatorAssuranceLevel");
     expect(recovery).toContain("redirect(`/mfa?return_to=");
+  });
+
+  it("clears transient return state when password entry does not need MFA", () => {
+    const actions = readActions();
+    const actionSupport = readFileSync(
+      `${sourceRoot}/lib/auth/action-support.ts`,
+      "utf8",
+    );
+    const mfaPage = readFileSync(`${sourceRoot}/app/mfa/page.tsx`, "utf8");
+
+    expect(actionSupport).toContain("export async function clearReturnTarget");
+    expect(actions).toContain("await clearReturnTarget()");
+    expect(mfaPage).toContain(
+      'params.return_to ?? cookieStore.get("auth_return_to")?.value',
+    );
   });
 
   it("exposes provider management in the visible account navigation", () => {

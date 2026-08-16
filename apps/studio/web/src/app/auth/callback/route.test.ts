@@ -1,24 +1,19 @@
 import { NextRequest } from "next/server";
 import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 
-const { createAdminClientMock, createRequestClientMock } = vi.hoisted(() => ({
-  createAdminClientMock: vi.fn(),
+const { createRequestClientMock } = vi.hoisted(() => ({
   createRequestClientMock: vi.fn(),
 }));
 
 vi.mock("@jayant/web-auth/server", async () => {
-  const actual = await vi.importActual<typeof import("@jayant/web-auth/server")>(
-    "@jayant/web-auth/server",
-  );
+  const actual = await vi.importActual<
+    typeof import("@jayant/web-auth/server")
+  >("@jayant/web-auth/server");
   return {
     ...actual,
     createSupabaseRequestClient: createRequestClientMock,
   };
 });
-
-vi.mock("@jayant/web-auth/service-role", () => ({
-  createSupabaseServiceRoleClient: createAdminClientMock,
-}));
 
 import { GET as authCallback } from "./route";
 
@@ -62,16 +57,6 @@ function useCallbackScenario({
       return supabase;
     },
   );
-  createAdminClientMock.mockReturnValue({
-    auth: {
-      admin: {
-        mfa: {
-          listFactors: vi.fn().mockResolvedValue({ data: { factors: [] } }),
-        },
-      },
-    },
-  });
-
   return supabase;
 }
 
@@ -86,16 +71,15 @@ afterAll(() => {
 });
 
 describe("Studio callback contract", () => {
-  it("returns a local error destination with refreshed response state", async () => {
+  it("returns a generic entry destination with refreshed response state", async () => {
     useCallbackScenario({ exchangeError: new Error("invalid code") });
-    vi.spyOn(console, "error").mockImplementation(() => undefined);
 
     const response = await authCallback(
       new NextRequest("https://studio.example.test/auth/callback?code=bad"),
     );
 
     expect(response.headers.get("location")).toBe(
-      "https://studio.example.test/welcome?error=invalid%20code",
+      "https://studio.example.test/welcome",
     );
     expect(response.cookies.get("session-cookie")?.value).toBe("refreshed");
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
@@ -125,7 +109,7 @@ describe("Studio callback contract", () => {
     );
 
     expect(response.headers.get("location")).toBe(
-      "https://studio.example.test/reset-password",
+      "https://auth.jayantgoyal.com/mfa?return_to=https%3A%2F%2Fstudio.example.test%2Freset-password",
     );
     expect(response.cookies.get("session-cookie")?.value).toBe("refreshed");
     expect(response.cookies.get("recovery_mode")?.value).toBe("true");

@@ -1,29 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { buildAuthMfaUrl } from "@jayant/web-auth/entry";
 import { safeReturnPath } from "@jayant/web-auth/redirects";
 import {
   copyAuthCacheHeaders,
   createSupabaseRequestClient,
 } from "@jayant/web-auth/server";
-import { createSupabaseServiceRoleClient } from "@jayant/web-auth/service-role";
 import { syncProfileNamesFromIdentities } from "@jayant/web-auth/profile";
-
-
-/** Check MFA via Admin API — no cookie dependency */
-async function userHasMfa(userId: string): Promise<boolean> {
-  try {
-    const adminClient = createSupabaseServiceRoleClient();
-    const { data, error } = await adminClient.auth.admin.mfa.listFactors({
-      userId,
-    });
-    if (error || !data) return false;
-    return data.factors.some(
-      (factor) => factor.factor_type === "totp" && factor.status === "verified",
-    );
-  } catch {
-    return false;
-  }
-}
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
@@ -39,7 +22,7 @@ export async function GET(request: NextRequest) {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    return NextResponse.redirect(new URL("/welcome?error=config", request.url));
+    return NextResponse.redirect(new URL("/welcome", request.url));
   }
 
   const redirectUrl = new URL(next, request.url);
@@ -63,12 +46,8 @@ export async function GET(request: NextRequest) {
   if (code) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     if (error) {
-      console.error("Auth callback error (code):", error.message);
       const errorResponse = NextResponse.redirect(
-        new URL(
-          `/welcome?error=${encodeURIComponent(error.message)}`,
-          request.url,
-        ),
+        new URL("/welcome", request.url),
       );
       response.cookies.getAll().forEach(({ name, value, ...options }) => {
         errorResponse.cookies.set(name, value, options);
@@ -80,18 +59,18 @@ export async function GET(request: NextRequest) {
     if (data?.user) {
       await syncProfileNamesFromIdentities(supabase, data.user);
 
-      // Check MFA — only redirect to /mfa-verify if user actually has MFA enabled.
-      // This avoids an unnecessary redirect (and spinner flash) for users without MFA.
-      if (await userHasMfa(data.user.id)) {
-        const mfaUrl = new URL("/mfa-verify", request.url);
-        mfaUrl.searchParams.set("redirect", next);
-        const mfaResponse = NextResponse.redirect(mfaUrl);
-        response.cookies.getAll().forEach(({ name, value, ...options }) => {
-          mfaResponse.cookies.set(name, value, options);
-        });
-        copyAuthCacheHeaders(response.headers, mfaResponse.headers);
-        return mfaResponse;
-      }
+      const mfaResponse = NextResponse.redirect(
+        buildAuthMfaUrl({
+          requestUrl: request.url,
+          requestHeaders: request.headers,
+          returnPath: next,
+        }),
+      );
+      response.cookies.getAll().forEach(({ name, value, ...options }) => {
+        mfaResponse.cookies.set(name, value, options);
+      });
+      copyAuthCacheHeaders(response.headers, mfaResponse.headers);
+      return mfaResponse;
     }
 
     // No MFA — redirect directly to target (single redirect, no spinner flash)
@@ -106,15 +85,8 @@ export async function GET(request: NextRequest) {
       type: type as "email" | "email_change" | "signup" | "recovery" | "invite",
     });
     if (error) {
-      console.error("Auth callback error (token_hash):", error.message);
-      const friendlyMessage = isRecovery
-        ? "This password reset link is invalid or has expired. Please request a new one."
-        : error.message;
       const errorResponse = NextResponse.redirect(
-        new URL(
-          `/welcome?error=${encodeURIComponent(friendlyMessage)}`,
-          request.url,
-        ),
+        new URL("/welcome", request.url),
       );
       response.cookies.getAll().forEach(({ name, value, ...options }) => {
         errorResponse.cookies.set(name, value, options);
@@ -124,15 +96,12 @@ export async function GET(request: NextRequest) {
     }
 
     if (isRecovery) {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      const hasMfa = user ? await userHasMfa(user.id) : false;
-      const recoveryTarget = hasMfa
-        ? "/mfa-verify?redirect=/reset-password"
-        : "/reset-password";
       const recoveryResponse = NextResponse.redirect(
-        new URL(recoveryTarget, request.url),
+        buildAuthMfaUrl({
+          requestUrl: request.url,
+          requestHeaders: request.headers,
+          returnPath: "/reset-password",
+        }),
       );
       response.cookies.getAll().forEach(({ name, value, ...options }) => {
         recoveryResponse.cookies.set(name, value, options);
@@ -149,7 +118,5 @@ export async function GET(request: NextRequest) {
     return response;
   }
 
-  return NextResponse.redirect(
-    new URL("/welcome?error=invalid_token", request.url),
-  );
+  return NextResponse.redirect(new URL("/welcome", request.url));
 }

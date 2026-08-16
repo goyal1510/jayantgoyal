@@ -1,19 +1,16 @@
-import type { Metadata } from "next"
-import { Suspense } from "react"
-import { ForgotPasswordForm } from "@/components/auth/forgot-password-form"
+import type { Metadata } from "next";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Forgot Password",
-}
+import { buildAuthForgotPasswordUrl } from "@jayant/web-auth/entry";
 
-export default function ForgotPasswordPage() {
-  return (
-    <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
-      <div className="w-full max-w-md">
-        <Suspense fallback={null}>
-          <ForgotPasswordForm />
-        </Suspense>
-      </div>
-    </div>
-  )
+export const metadata: Metadata = { title: "Forgot password" };
+
+export default async function ForgotPasswordPage() {
+  redirect(
+    buildAuthForgotPasswordUrl({
+      requestUrl: "http://localhost:3001/forgot-password",
+      requestHeaders: await headers(),
+    }).toString(),
+  );
 }

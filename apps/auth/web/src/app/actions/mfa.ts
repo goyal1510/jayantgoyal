@@ -25,7 +25,7 @@ export async function verifyMfaAction(
 
   const cookieStore = await cookies();
   const returnTo = resolveAuthReturnTarget(
-    cookieStore.get(RETURN_COOKIE)?.value ?? stringField(formData, "return_to"),
+    stringField(formData, "return_to") || cookieStore.get(RETURN_COOKIE)?.value,
     context.requestOrigin,
   );
   const supabase = await createSupabaseServerClient();

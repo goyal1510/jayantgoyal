@@ -1,7 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { safeReturnPath } from "@jayant/web-auth/redirects";
-import { buildAuthLoginUrl, resolveAuthFlowOwner } from "@jayant/web-auth/entry";
+import { buildAuthLoginUrl, buildAuthMfaUrl } from "@jayant/web-auth/entry";
 import {
   copyAuthCacheHeaders,
   createSupabaseRequestClient,
@@ -25,9 +24,19 @@ function withAuthState(source: NextResponse, target: NextResponse) {
 export default async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  if (pathname === "/welcome" && resolveAuthFlowOwner() === "auth") {
+  if (pathname === "/welcome") {
     return NextResponse.redirect(
       buildAuthLoginUrl({
+        requestUrl: request.url,
+        requestHeaders: request.headers,
+        returnPath: request.nextUrl.searchParams.get("redirect"),
+      }),
+    );
+  }
+
+  if (pathname === "/mfa-verify") {
+    return NextResponse.redirect(
+      buildAuthMfaUrl({
         requestUrl: request.url,
         requestHeaders: request.headers,
         returnPath: request.nextUrl.searchParams.get("redirect"),
@@ -50,7 +59,7 @@ export default async function proxy(request: NextRequest) {
   const response = NextResponse.next({ request: { headers: request.headers } });
 
   // Public paths that don't require authentication
-  const publicPaths = ["/welcome", "/unauthorized", "/auth/callback"];
+  const publicPaths = ["/unauthorized", "/auth/callback"];
 
   const isPublic = publicPaths.includes(pathname);
 
@@ -59,9 +68,13 @@ export default async function proxy(request: NextRequest) {
     if (isPublic) {
       return response;
     }
-    const loginUrl = new URL("/welcome", request.url);
-    loginUrl.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(loginUrl);
+    return NextResponse.redirect(
+      buildAuthLoginUrl({
+        requestUrl: request.url,
+        requestHeaders: request.headers,
+        returnPath: `${pathname}${request.nextUrl.search}`,
+      }),
+    );
   }
 
   const supabase = await createSupabaseRequestClient({
@@ -84,9 +97,16 @@ export default async function proxy(request: NextRequest) {
   // --- Unauthenticated users ---
   if (!isAuthed) {
     if (!isPublic) {
-      const loginUrl = new URL("/welcome", request.url);
-      loginUrl.searchParams.set("redirect", pathname);
-      return withAuthState(response, NextResponse.redirect(loginUrl));
+      return withAuthState(
+        response,
+        NextResponse.redirect(
+          buildAuthLoginUrl({
+            requestUrl: request.url,
+            requestHeaders: request.headers,
+            returnPath: `${pathname}${request.nextUrl.search}`,
+          }),
+        ),
+      );
     }
     return response;
   }
@@ -109,10 +129,6 @@ export default async function proxy(request: NextRequest) {
     );
 
     if (hasVerifiedFactor) {
-      if (pathname.startsWith("/mfa-verify")) {
-        return response;
-      }
-
       if (pathname.startsWith("/api/")) {
         return withAuthState(
           response,
@@ -123,31 +139,21 @@ export default async function proxy(request: NextRequest) {
         );
       }
 
-      const mfaUrl = new URL("/mfa-verify", request.url);
-      if (pathname !== "/") {
-        mfaUrl.searchParams.set("redirect", pathname);
-      }
-      return withAuthState(response, NextResponse.redirect(mfaUrl));
+      return withAuthState(
+        response,
+        NextResponse.redirect(
+          buildAuthMfaUrl({
+            requestUrl: request.url,
+            requestHeaders: request.headers,
+            returnPath: `${pathname}${request.nextUrl.search}`,
+          }),
+        ),
+      );
     }
   }
 
-  // Redirect authenticated users away from welcome page
-  if (pathname.startsWith("/welcome")) {
-    const redirectUrl = safeReturnPath(
-      request.nextUrl.searchParams.get("redirect"),
-    );
-    return withAuthState(
-      response,
-      NextResponse.redirect(new URL(redirectUrl, request.url)),
-    );
-  }
-
-  // Admin role check (skip for unauthorized page and MFA verify)
-  if (
-    !isPublic &&
-    pathname !== "/unauthorized" &&
-    !pathname.startsWith("/mfa-verify")
-  ) {
+  // Admin role check (skip only for the unauthorized page).
+  if (!isPublic && pathname !== "/unauthorized") {
     const { data: profile } = await supabase
       .schema("jg_account")
       .from("profiles")

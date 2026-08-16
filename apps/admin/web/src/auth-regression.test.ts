@@ -7,10 +7,9 @@ const { createRequestClientMock } = vi.hoisted(() => ({
 }));
 
 vi.mock("@jayant/web-auth/server", async () => {
-  const actual =
-    await vi.importActual<typeof import("@jayant/web-auth/server")>(
-      "@jayant/web-auth/server",
-    );
+  const actual = await vi.importActual<
+    typeof import("@jayant/web-auth/server")
+  >("@jayant/web-auth/server");
   return {
     ...actual,
     createSupabaseRequestClient: createRequestClientMock,
@@ -84,7 +83,6 @@ beforeEach(() => {
   vi.clearAllMocks();
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://test-project.supabase.co");
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "synthetic-anon-key");
-  vi.stubEnv("NEXT_PUBLIC_AUTH_FLOW_OWNER", "legacy");
   vi.stubEnv("NEXT_PUBLIC_AUTH_URL", "https://auth.jayantgoyal.com");
 });
 
@@ -118,7 +116,7 @@ describe("Admin Proxy authentication contract", () => {
     ).toBe(false);
   });
 
-  it("keeps legacy account settings and MFA cleanup routes removed", () => {
+  it("keeps duplicated account and MFA implementations removed", () => {
     expect(
       existsSync(
         new URL(
@@ -140,11 +138,25 @@ describe("Admin Proxy authentication contract", () => {
     expect(
       existsSync(new URL("./app/api/account/delete/route.ts", import.meta.url)),
     ).toBe(true);
+    expect(
+      existsSync(
+        new URL("./components/auth/mfa-verify-step.tsx", import.meta.url),
+      ),
+    ).toBe(false);
+    const welcomePage = readFileSync(
+      new URL("./app/welcome/page.tsx", import.meta.url),
+      "utf8",
+    );
+    const mfaPage = readFileSync(
+      new URL("./app/mfa-verify/page.tsx", import.meta.url),
+      "utf8",
+    );
+    expect(welcomePage).toContain("buildAuthLoginUrl");
+    expect(welcomePage).not.toContain("signInWithPassword");
+    expect(mfaPage).toContain("buildAuthMfaUrl");
   });
 
-  it("routes login entry to Auth only when the cutover flag is enabled", async () => {
-    vi.stubEnv("NEXT_PUBLIC_AUTH_FLOW_OWNER", "auth");
-
+  it("routes login entry to Auth unconditionally", async () => {
     const response = await adminProxy(
       new NextRequest(
         "https://admin.jayantgoyal.com/welcome?redirect=%2Fdeployments",
@@ -161,11 +173,11 @@ describe("Admin Proxy authentication contract", () => {
     useSupabaseScenario({ user: null });
 
     const response = await adminProxy(
-      new NextRequest("https://admin.example.test/portfolio/hero"),
+      new NextRequest("https://admin.jayantgoyal.com/portfolio/hero"),
     );
 
     expect(response.headers.get("location")).toBe(
-      "https://admin.example.test/welcome?redirect=%2Fportfolio%2Fhero",
+      "https://auth.jayantgoyal.com/welcome?return_to=https%3A%2F%2Fadmin.jayantgoyal.com%2Fportfolio%2Fhero",
     );
     expect(response.cookies.get("session-cookie")?.value).toBe("refreshed");
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
@@ -205,11 +217,11 @@ describe("Admin Proxy authentication contract", () => {
     });
 
     const response = await adminProxy(
-      new NextRequest("https://admin.example.test/users"),
+      new NextRequest("https://admin.jayantgoyal.com/users"),
     );
 
     expect(response.headers.get("location")).toBe(
-      "https://admin.example.test/mfa-verify?redirect=%2Fusers",
+      "https://auth.jayantgoyal.com/mfa?return_to=https%3A%2F%2Fadmin.jayantgoyal.com%2Fusers",
     );
     expect(response.cookies.get("session-cookie")?.value).toBe("refreshed");
   });
@@ -237,12 +249,12 @@ describe("Admin callback contract", () => {
 
     const response = await authCallback(
       new NextRequest(
-        "https://admin.example.test/auth/callback?code=valid&next=https://evil.example",
+        "https://admin.jayantgoyal.com/auth/callback?code=valid&next=https://evil.example",
       ),
     );
 
     expect(response.headers.get("location")).toBe(
-      "https://admin.example.test/mfa-verify?redirect=%2F",
+      "https://auth.jayantgoyal.com/mfa?return_to=https%3A%2F%2Fadmin.jayantgoyal.com%2F",
     );
   });
 });

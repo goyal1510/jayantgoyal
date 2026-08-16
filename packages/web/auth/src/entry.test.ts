@@ -3,11 +3,12 @@ import { afterAll, describe, expect, it, vi } from "vitest";
 import {
   CANONICAL_AUTH_ORIGIN,
   buildAuthAccountSecurityUrl,
+  buildAuthForgotPasswordUrl,
   buildAuthLoginUrl,
   buildAuthLogoutUrl,
+  buildAuthMfaUrl,
   resolveAuthApplicationOrigin,
   resolveExternalRequestUrl,
-  resolveAuthFlowOwner,
 } from "./entry";
 
 function headers(values: Record<string, string | null>) {
@@ -19,17 +20,6 @@ afterAll(() => {
 });
 
 describe("canonical Auth entry ownership", () => {
-  it("uses the standalone Auth app as the default owner while retaining an explicit rollback", () => {
-    vi.stubEnv("NEXT_PUBLIC_AUTH_FLOW_OWNER", "");
-    expect(resolveAuthFlowOwner()).toBe("auth");
-    expect(resolveAuthFlowOwner("unknown")).toBe("auth");
-    expect(resolveAuthFlowOwner("legacy")).toBe("legacy");
-  });
-
-  it("enables Auth only through the exact rollout value", () => {
-    expect(resolveAuthFlowOwner("auth")).toBe("auth");
-  });
-
   it("accepts only the canonical or approved local Auth origins", () => {
     expect(resolveAuthApplicationOrigin()).toBe(CANONICAL_AUTH_ORIGIN);
     expect(resolveAuthApplicationOrigin("http://localhost:3003")).toBe(
@@ -165,5 +155,33 @@ describe("canonical Auth entry ownership", () => {
     expect(logout.toString()).toBe(
       "http://localhost:3003/logout?return_to=http%3A%2F%2Flocalhost%3A3001%2Ffiles%3Ffolder%3Done",
     );
+  });
+
+  it("routes recovery requests to the canonical Auth owner", () => {
+    expect(
+      buildAuthForgotPasswordUrl({
+        requestUrl: "https://studio.jayantgoyal.com/forgot-password",
+      }).toString(),
+    ).toBe("https://auth.jayantgoyal.com/forgot-password");
+  });
+
+  it("routes MFA step-up through Auth with an exact product return target", () => {
+    expect(
+      buildAuthMfaUrl({
+        requestUrl: "https://admin.jayantgoyal.com/mfa-verify",
+        returnPath: "/users?role=admin",
+      }).toString(),
+    ).toBe(
+      "https://auth.jayantgoyal.com/mfa?return_to=https%3A%2F%2Fadmin.jayantgoyal.com%2Fusers%3Frole%3Dadmin",
+    );
+  });
+
+  it("rejects an external MFA return target", () => {
+    expect(
+      buildAuthMfaUrl({
+        requestUrl: "https://admin.jayantgoyal.com/mfa-verify",
+        returnPath: "https://evil.example/phish",
+      }).searchParams.get("return_to"),
+    ).toBe("https://admin.jayantgoyal.com/");
   });
 });
