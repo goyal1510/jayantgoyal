@@ -36,15 +36,23 @@ Because Vercel executes the ignored-build command from the configured client
 root, use the three-level path back to the repository script:
 
 ```text
-Portfolio: bash ../../../scripts/ignore-build.sh apps/portfolio/web
-Studio:    bash ../../../scripts/ignore-build.sh apps/studio/web
-Admin:     bash ../../../scripts/ignore-build.sh apps/admin/web
-Auth:      bash ../../../scripts/ignore-build.sh apps/auth/web
+Portfolio: node ../../../scripts/ignore-build.mjs apps/portfolio/web
+Studio:    node ../../../scripts/ignore-build.mjs apps/studio/web
+Admin:     node ../../../scripts/ignore-build.mjs apps/admin/web
+Auth:      node ../../../scripts/ignore-build.mjs apps/auth/web
 ```
 
-The detector builds when its client, any shared package, repository build
-configuration, or the detector itself changes. If Vercel cannot provide a safe
-previous deployment range, it builds instead of risking a false skip.
+Keep Vercel's monorepo **Skip deployment** setting enabled for every project so
+Vercel can avoid queuing deployments for unaffected workspace dependency
+graphs. The repository detector is a second guard for global paths outside the
+workspace graph, such as documentation and database migrations.
+
+The detector reads the target client's declared workspace dependencies and
+recursively watches their directories. This includes shared workspaces outside
+`packages/`, such as `apps/portfolio/contracts`. It also watches repository
+build configuration and its own implementation. If the graph, deployment
+range, or Git diff cannot be read safely, it builds instead of risking a false
+skip.
 
 ## Environment ownership
 

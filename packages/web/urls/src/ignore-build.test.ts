@@ -12,7 +12,7 @@ import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
 
 const SCRIPT_PATH = fileURLToPath(
-  new URL("../../../../scripts/ignore-build.sh", import.meta.url),
+  new URL("../../../../scripts/ignore-build.mjs", import.meta.url),
 );
 const repositories: string[] = [];
 
@@ -38,9 +38,13 @@ function createRepository() {
   git(repository, "config", "user.name", "Test User");
 
   for (const directory of [
+    "apps/portfolio/contracts",
+    "apps/portfolio/web",
     "apps/studio/web",
     "apps/admin/web",
     "apps/auth/web",
+    "packages/core/identity",
+    "packages/web/brand",
     "packages/web/ui",
     "scripts",
     "docs",
@@ -49,11 +53,57 @@ function createRepository() {
   }
 
   const files = {
+    "apps/portfolio/contracts/index.ts": "contracts\n",
+    "apps/portfolio/contracts/package.json": JSON.stringify({
+      name: "@jayantgoyal/portfolio-contracts",
+    }),
+    "apps/portfolio/web/app.ts": "portfolio\n",
+    "apps/portfolio/web/package.json": JSON.stringify({
+      name: "@jayantgoyal/portfolio-web",
+      dependencies: {
+        "@jayantgoyal/portfolio-contracts": "workspace:*",
+        "@jayantgoyal/web-brand": "workspace:*",
+      },
+    }),
     "apps/studio/web/app.ts": "studio\n",
+    "apps/studio/web/package.json": JSON.stringify({
+      name: "@jayantgoyal/studio-web",
+      dependencies: {
+        "@jayantgoyal/web-brand": "workspace:*",
+        "@jayantgoyal/web-ui": "workspace:*",
+      },
+    }),
     "apps/admin/web/app.ts": "admin\n",
+    "apps/admin/web/package.json": JSON.stringify({
+      name: "@jayantgoyal/admin-web",
+      dependencies: {
+        "@jayantgoyal/portfolio-contracts": "workspace:*",
+        "@jayantgoyal/web-ui": "workspace:*",
+      },
+    }),
     "apps/auth/web/app.ts": "auth\n",
+    "apps/auth/web/package.json": JSON.stringify({
+      name: "@jayantgoyal/auth-web",
+      dependencies: {
+        "@jayantgoyal/web-ui": "workspace:*",
+      },
+    }),
+    "packages/core/identity/index.ts": "identity\n",
+    "packages/core/identity/package.json": JSON.stringify({
+      name: "@jayantgoyal/identity",
+    }),
+    "packages/web/brand/index.ts": "brand\n",
+    "packages/web/brand/package.json": JSON.stringify({
+      name: "@jayantgoyal/web-brand",
+      dependencies: {
+        "@jayantgoyal/identity": "workspace:*",
+      },
+    }),
     "packages/web/ui/index.ts": "ui\n",
-    "scripts/ignore-build.sh": "detector\n",
+    "packages/web/ui/package.json": JSON.stringify({
+      name: "@jayantgoyal/web-ui",
+    }),
+    "scripts/ignore-build.mjs": "detector\n",
     "docs/readme.md": "docs\n",
     "package.json": "{}\n",
     "pnpm-lock.yaml": "lockfileVersion: '9.0'\n",
@@ -74,7 +124,7 @@ function runDetector(
   previousSha: string | undefined,
   commitSha: string,
 ) {
-  const result = spawnSync("bash", [SCRIPT_PATH, appDirectory], {
+  const result = spawnSync(process.execPath, [SCRIPT_PATH, appDirectory], {
     cwd: repository,
     encoding: "utf8",
     env: {
@@ -126,6 +176,44 @@ describe("Vercel ignored build detection", () => {
     );
   });
 
+  it("detects an app-local workspace dependency change", () => {
+    const { repository, base } = createRepository();
+    appendFileSync(
+      join(repository, "apps/portfolio/contracts/index.ts"),
+      "changed\n",
+    );
+    const head = commit(repository, "change portfolio contracts");
+
+    expect(
+      runDetector(repository, "apps/portfolio/web", base, head).status,
+    ).toBe(1);
+    expect(runDetector(repository, "apps/admin/web", base, head).status).toBe(
+      1,
+    );
+    expect(runDetector(repository, "apps/studio/web", base, head).status).toBe(
+      0,
+    );
+  });
+
+  it("detects transitive workspace dependency changes", () => {
+    const { repository, base } = createRepository();
+    appendFileSync(
+      join(repository, "packages/core/identity/index.ts"),
+      "changed\n",
+    );
+    const head = commit(repository, "change identity");
+
+    expect(
+      runDetector(repository, "apps/portfolio/web", base, head).status,
+    ).toBe(1);
+    expect(runDetector(repository, "apps/studio/web", base, head).status).toBe(
+      1,
+    );
+    expect(runDetector(repository, "apps/admin/web", base, head).status).toBe(
+      0,
+    );
+  });
+
   it("skips a documentation-only deployment range", () => {
     const { repository, base } = createRepository();
     appendFileSync(join(repository, "docs/readme.md"), "changed\n");
@@ -140,7 +228,7 @@ describe("Vercel ignored build detection", () => {
     "package.json",
     "pnpm-lock.yaml",
     "pnpm-workspace.yaml",
-    "scripts/ignore-build.sh",
+    "scripts/ignore-build.mjs",
     "turbo.json",
   ])("builds when shared root configuration changes: %s", (path) => {
     const { repository, base } = createRepository();
