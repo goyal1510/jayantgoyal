@@ -1,0 +1,31 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "env": [
+        "NEXT_PUBLIC_SUPABASE_URL",
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+        "NEXT_PUBLIC_AUTH_SESSION_MODE",
+        "NEXT_PUBLIC_AUTH_COOKIE_DOMAIN",
+        "NEXT_PUBLIC_SITE_URL",
+        "NEXT_PUBLIC_PORTFOLIO_URL",
+        "NEXT_PUBLIC_STUDIO_URL",
+        "NEXT_PUBLIC_ADMIN_URL",
+        "NEXT_PUBLIC_AUTH_RETURN_ORIGINS"
+      ]
+    },
+    "lint": {
+      "env": [
+        "NEXT_PUBLIC_SUPABASE_URL",
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+        "NEXT_PUBLIC_AUTH_SESSION_MODE",
+        "NEXT_PUBLIC_AUTH_COOKIE_DOMAIN",
+        "NEXT_PUBLIC_SITE_URL",
+        "NEXT_PUBLIC_PORTFOLIO_URL",
+        "NEXT_PUBLIC_STUDIO_URL",
+        "NEXT_PUBLIC_ADMIN_URL",
+        "NEXT_PUBLIC_AUTH_RETURN_ORIGINS"
+      ]
+    }
+  }
+}

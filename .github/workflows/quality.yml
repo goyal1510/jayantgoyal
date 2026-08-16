@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   quality:
-    name: Architecture, lint, types, and tests
+    name: Architecture, lint, types, tests, and build
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -52,3 +52,6 @@ jobs:
 
       - name: Run tests
         run: pnpm test
+
+      - name: Build all workspaces
+        run: pnpm build

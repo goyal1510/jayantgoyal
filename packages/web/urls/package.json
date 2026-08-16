@@ -1,0 +1,25 @@
+{
+  "name": "@jayant/web-urls",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "echo 'source package — nothing to compile'",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src --max-warnings 0"
+  },
+  "dependencies": {
+    "@jayant/web-brand": "workspace:*"
+  },
+  "devDependencies": {
+    "@jayant/eslint-config": "workspace:*",
+    "@jayant/typescript-config": "workspace:*",
+    "@types/node": "^22.15.30",
+    "eslint": "^9.39.1",
+    "typescript": "5.9.2",
+    "vitest": "^4.1.10"
+  }
+}

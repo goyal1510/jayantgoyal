@@ -1,0 +1,35 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "env": [
+        "NEXT_PUBLIC_SUPABASE_URL",
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+        "NEXT_PUBLIC_SITE_URL",
+        "NEXT_PUBLIC_STUDIO_URL",
+        "CONTACT_RATE_LIMIT_SECRET",
+        "GITHUB_TOKEN",
+        "RESEND_API_KEY",
+        "RESEND_FROM_EMAIL",
+        "GOOGLE_RESUME_DOCUMENT_ID",
+        "GOOGLE_SERVICE_ACCOUNT_EMAIL",
+        "GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY"
+      ]
+    },
+    "lint": {
+      "env": [
+        "NEXT_PUBLIC_SUPABASE_URL",
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+        "NEXT_PUBLIC_SITE_URL",
+        "NEXT_PUBLIC_STUDIO_URL",
+        "CONTACT_RATE_LIMIT_SECRET",
+        "GITHUB_TOKEN",
+        "RESEND_API_KEY",
+        "RESEND_FROM_EMAIL",
+        "GOOGLE_RESUME_DOCUMENT_ID",
+        "GOOGLE_SERVICE_ACCOUNT_EMAIL",
+        "GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY"
+      ]
+    }
+  }
+}

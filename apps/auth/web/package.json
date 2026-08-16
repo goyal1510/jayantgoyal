@@ -1,0 +1,37 @@
+{
+  "name": "@jayant/auth-web",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --webpack --port 3003",
+    "build": "next build",
+    "start": "next start --port 3003",
+    "lint": "eslint --max-warnings 0",
+    "check-types": "next typegen && tsc --noEmit"
+  },
+  "dependencies": {
+    "@jayant/web-auth": "workspace:*",
+    "@jayant/web-brand": "workspace:*",
+    "@jayant/web-urls": "workspace:*",
+    "@jayant/web-ui": "workspace:*",
+    "lucide-react": "^0.554.0",
+    "next": "^16.2.10",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1"
+  },
+  "devDependencies": {
+    "@jayant/eslint-config": "workspace:*",
+    "@jayant/tailwind-config": "workspace:*",
+    "@jayant/typescript-config": "workspace:*",
+    "@tailwindcss/postcss": "^4.1.5",
+    "@types/node": "^22.15.30",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.1",
+    "eslint": "^9.39.1",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.1.5",
+    "tailwindcss-animate": "^1.0.7",
+    "typescript": "5.9.2"
+  }
+}

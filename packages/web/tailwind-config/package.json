@@ -1,0 +1,13 @@
+{
+  "name": "@jayant/tailwind-config",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./shared-styles.css",
+    "./postcss": "./postcss.config.js"
+  },
+  "devDependencies": {
+    "tailwindcss": "^4.1.5"
+  }
+}

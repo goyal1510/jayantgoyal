@@ -1,8 +1,9 @@
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const root = resolve(new URL("..", import.meta.url).pathname);
+const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const apps = ["portfolio", "studio", "admin", "auth"];
 const files = [
   "favicon.ico",
@@ -13,27 +14,30 @@ const files = [
   "android-chrome-512x512.png",
 ];
 
-const hashes = new Map();
+const canonicalDirectory = resolve(root, "assets", "brand", "web");
 for (const app of apps) {
   for (const file of files) {
-    const path = resolve(
+    const canonicalPath = resolve(canonicalDirectory, file);
+    const appPath = resolve(
       root,
       "apps",
       app,
+      "web",
       "public",
       "assets",
       "Jayant_favicon_io",
       file,
     );
     try {
-      const digest = createHash("sha256")
-        .update(await readFile(path))
+      const canonicalDigest = createHash("sha256")
+        .update(await readFile(canonicalPath))
         .digest("hex");
-      const existing = hashes.get(file);
-      if (existing && existing.digest !== digest) {
-        throw new Error(`${file} differs between ${existing.app} and ${app}`);
+      const appDigest = createHash("sha256")
+        .update(await readFile(appPath))
+        .digest("hex");
+      if (canonicalDigest !== appDigest) {
+        throw new Error(`${file} differs from assets/brand/web/${file}`);
       }
-      hashes.set(file, { app, digest });
     } catch (error) {
       throw new Error(
         `Brand asset check failed for ${app}/${file}: ${error.message}`,
@@ -43,5 +47,5 @@ for (const app of apps) {
 }
 
 console.log(
-  `Brand assets are synchronized across ${apps.length} apps (${files.length} files).`,
+  `Brand assets match the canonical assets/brand/web source across ${apps.length} web clients (${files.length} files).`,
 );
