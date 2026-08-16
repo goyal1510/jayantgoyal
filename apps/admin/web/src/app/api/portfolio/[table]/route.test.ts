@@ -37,29 +37,6 @@ vi.mock("./helpers", async () => {
         );
   }
 
-  function preparePortfolioMutationPayload(
-    table: string,
-    body: unknown,
-    operation: "create" | "update",
-  ) {
-    if (
-      table !== "hero" ||
-      operation !== "create" ||
-      typeof body !== "object" ||
-      body === null
-    ) {
-      return body;
-    }
-
-    const input = body as Record<string, unknown>;
-    return {
-      ...input,
-      name: "Jayant",
-      display_name: "Jayant",
-      seo_title: `Jayant | ${input.role}`,
-    };
-  }
-
   return {
     ALLOWED_TABLES: PORTFOLIO_TABLES,
     TABLES_WITH_SORT_ORDER: [
@@ -77,7 +54,6 @@ vi.mock("./helpers", async () => {
         table as keyof typeof PORTFOLIO_ADMIN_SELECT_COLUMNS
       ],
     validatePortfolioRequestBody,
-    preparePortfolioMutationPayload,
     authorizeAndGetClient: authorizeAndGetClientMock,
     revalidatePortfolioPublicContent: revalidateMock,
   };
@@ -243,7 +219,7 @@ describe("Admin Portfolio table route contract", () => {
     expect(revalidateMock).toHaveBeenCalledOnce();
   });
 
-  it("injects fixed identity fields when creating the Portfolio hero", async () => {
+  it("creates the Portfolio hero without duplicated identity fields", async () => {
     const operations: Array<Record<string, unknown>> = [];
     const client = makeClient({ operations });
     authorizeAndGetClientMock.mockResolvedValue({ client });
@@ -273,12 +249,7 @@ describe("Admin Portfolio table route contract", () => {
     expect(response.status).toBe(200);
     expect(operations).toContainEqual({
       operation: "insert",
-      payload: {
-        ...payload,
-        name: "Jayant",
-        display_name: "Jayant",
-        seo_title: "Jayant | Software Engineer",
-      },
+      payload,
     });
   });
 

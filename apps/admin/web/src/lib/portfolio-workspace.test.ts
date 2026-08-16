@@ -125,7 +125,7 @@ describe("Portfolio CMS workspace loaders", () => {
   it("loads Home from hero and resume presentation rows without fallback data", async () => {
     const supabase = makeSupabaseMock({
       rows: {
-        "portfolio.hero": [{ id: "hero-1", display_name: "Jayant" }],
+        "portfolio.hero": [{ id: "hero-1", role: "Software Engineer" }],
         "portfolio.section_content": editorialRows,
         "portfolio.nav_items": [],
       },
@@ -133,7 +133,10 @@ describe("Portfolio CMS workspace loaders", () => {
 
     const result = await loadHomeWorkspace(supabase as never);
 
-    expect(result.hero).toEqual({ id: "hero-1", display_name: "Jayant" });
+    expect(result.hero).toEqual({
+      id: "hero-1",
+      role: "Software Engineer",
+    });
     expect(result.editorial.sectionContent?.section_key).toBe("hero");
     expect(result.editorialBySection.resume?.sectionContent?.section_key).toBe(
       "resume",

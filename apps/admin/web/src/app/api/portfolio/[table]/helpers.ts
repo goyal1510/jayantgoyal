@@ -10,8 +10,6 @@ import {
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getPortfolioPublicRevalidationPaths } from "@/lib/portfolio-revalidation";
 
-export { preparePortfolioMutationPayload } from "./hero-identity";
-
 const ALLOWED_TABLES = PORTFOLIO_TABLES;
 
 export const TABLES_WITH_SORT_ORDER = [

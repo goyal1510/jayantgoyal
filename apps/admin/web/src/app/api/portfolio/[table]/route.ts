@@ -3,7 +3,6 @@ import {
   validateTable,
   authorizeAndGetClient,
   getPortfolioAdminSelectColumns,
-  preparePortfolioMutationPayload,
   validatePortfolioRequestBody,
   revalidatePortfolioPublicContent,
   TABLES_WITH_SORT_ORDER,
@@ -85,11 +84,10 @@ export async function POST(
     const payloadError = validatePortfolioRequestBody(table, body, "create");
     if (payloadError) return payloadError;
 
-    const payload = preparePortfolioMutationPayload(table, body, "create");
     const { data, error } = await auth.client
       .schema("portfolio")
       .from(table)
-      .insert(payload)
+      .insert(body)
       .select(getPortfolioAdminSelectColumns(table))
       .single();
 

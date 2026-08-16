@@ -30,8 +30,6 @@ export const PORTFOLIO_SOCIAL_ICON_OPTIONS = [
 
 export interface PortfolioHeroRecord {
   id: string;
-  name: string;
-  display_name: string;
   role: string;
   tagline: string;
   blurb: string;
@@ -40,7 +38,6 @@ export interface PortfolioHeroRecord {
   availability: string;
   resume_url: string;
   github_username: string;
-  seo_title: string;
   seo_description: string;
   created_at: string;
   updated_at: string;
@@ -364,7 +361,7 @@ export const PORTFOLIO_SELECT_COLUMNS: Record<PortfolioTable, string> = {
 
 /** Full CMS rows for authenticated Admin editors, including generated metadata. */
 export const PORTFOLIO_ADMIN_SELECT_COLUMNS: Record<PortfolioTable, string> = {
-  hero: "id, name, display_name, role, tagline, blurb, headline, current_title, availability, resume_url, github_username, seo_title, seo_description, created_at, updated_at",
+  hero: "id, role, tagline, blurb, headline, current_title, availability, resume_url, github_username, seo_description, created_at, updated_at",
   about:
     "id, headline, objective, summary, story, personal, principles, created_at, updated_at",
   education:
@@ -387,10 +384,7 @@ export const PORTFOLIO_ADMIN_SELECT_COLUMNS: Record<PortfolioTable, string> = {
 
 type WithoutGeneratedColumns<T> = Omit<T, "id" | "created_at" | "updated_at">;
 
-type PortfolioHeroWriteInput = Omit<
-  WithoutGeneratedColumns<PortfolioHeroRecord>,
-  "name" | "display_name" | "seo_title"
->;
+type PortfolioHeroWriteInput = WithoutGeneratedColumns<PortfolioHeroRecord>;
 
 export type PortfolioWriteInputMap = {
   hero: PortfolioHeroWriteInput;
