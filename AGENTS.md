@@ -42,7 +42,6 @@ jayantgoyal/
 │   ├── schema/             # DB schema dumps (ground truth)
 │   └── migrations/         # Migration files
 │
-├── docs/                   # Documentation
 ├── turbo.json              # Turborepo pipeline config
 └── pnpm-workspace.yaml     # Workspace configuration
 ```
