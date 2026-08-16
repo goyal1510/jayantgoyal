@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Lock } from "lucide-react";
 import { Button } from "@jayant/web-ui/button";
@@ -40,6 +40,9 @@ export function AuthGateWrapper({
 
 function AuthGateCTA() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const query = searchParams.toString();
+  const returnPath = `${pathname}${query ? `?${query}` : ""}`;
 
   return (
     <div className="flex flex-1 items-center justify-center p-4">
@@ -50,7 +53,7 @@ function AuthGateCTA() {
           This feature requires authentication. Sign in to continue.
         </p>
         <Button asChild>
-          <Link href={`/welcome?redirect=${encodeURIComponent(pathname)}`}>
+          <Link href={`/welcome?redirect=${encodeURIComponent(returnPath)}`}>
             Sign In
           </Link>
         </Button>

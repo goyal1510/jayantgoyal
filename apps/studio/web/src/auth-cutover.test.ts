@@ -78,6 +78,19 @@ describe("Studio Auth entry cutover", () => {
     expect(layout).not.toContain("sb-${projectRef}-auth-token");
   });
 
+  it("preserves the full gated product destination through the entry alias", () => {
+    const authGate = readFileSync(
+      new URL("./components/auth/auth-gate.tsx", import.meta.url),
+      "utf8",
+    );
+
+    expect(authGate).toContain("useSearchParams");
+    expect(authGate).toContain(
+      'const returnPath = `${pathname}${query ? `?${query}` : ""}`',
+    );
+    expect(authGate).toContain("encodeURIComponent(returnPath)");
+  });
+
   it("keeps product entry aliases as redirects rather than local forms", () => {
     const welcomePage = readFileSync(
       new URL("./app/welcome/page.tsx", import.meta.url),
