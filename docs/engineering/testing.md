@@ -8,6 +8,9 @@ validated at their actual boundaries.
 | `pnpm check:architecture`   | Package group, product contract, and client dependency rules    |
 | `pnpm check:brand-assets`   | Every deployed favicon copy matches `assets/brand/web`          |
 | `pnpm check:service-role`   | Service-role code stays server-only and outside Portfolio       |
+| `pnpm check:source-health`  | Authored source stays within the 500-line hard limit            |
+| `pnpm check:dead-code`      | Unused files, exports, types, and dependencies are rejected     |
+| `pnpm check:docs`           | Central docs structure, placement, reachability, and links      |
 | `pnpm lint`                 | ESLint across every workspace with zero warnings                |
 | `pnpm check-types`          | Next route generation plus strict TypeScript checks             |
 | `pnpm test`                 | Vitest projects for each web client, shared packages, contracts |
@@ -20,9 +23,10 @@ discovers `apps/*/web/vitest.config.ts` and separately tests grouped packages
 and product contracts. Tests therefore do not depend on a particular client
 being the repository-wide alias owner.
 
-GitHub Actions runs architecture, brand asset, service-role, lint, type, test,
-and complete build checks for pull requests and pushes to `main`. Direct solo
-development still requires the same gates before pushing.
+GitHub Actions runs architecture, brand asset, service-role, source health,
+dead-code, documentation, lint, type, test, and complete build checks for pull
+requests and pushes to `main`. Direct solo development still requires the same
+gates before pushing.
 
 `pnpm test:db:linked` is not an ordinary local quality gate: it mutates remote
 test records while validating RLS and schema invariants. Use it only with

@@ -59,5 +59,5 @@ Do not commit `.vercel` or local environment files.
 - Add web-only contracts under `packages/web`.
 - Update the relevant central documentation page in the same change.
 
-Run the ownership and quality gates described in
-[quality-gates.md](../testing/quality-gates.md) before shipping.
+Run the ownership and quality gates described in [testing.md](testing.md) before
+shipping.

@@ -3,12 +3,12 @@
 Each web client is an independent Vercel project connected to the same GitHub
 repository and deployed from `main`.
 
-| Product   | Vercel root directory  | Production host             |
-| --------- | ---------------------- | --------------------------- |
-| Portfolio | `apps/portfolio/web`   | `jayantgoyal.com`           |
-| Studio    | `apps/studio/web`      | `studio.jayantgoyal.com`    |
-| Admin     | `apps/admin/web`       | `admin.jayantgoyal.com`     |
-| Auth      | `apps/auth/web`        | `auth.jayantgoyal.com`      |
+| Product   | Vercel root directory | Production host          |
+| --------- | --------------------- | ------------------------ |
+| Portfolio | `apps/portfolio/web`  | `jayantgoyal.com`        |
+| Studio    | `apps/studio/web`     | `studio.jayantgoyal.com` |
+| Admin     | `apps/admin/web`      | `admin.jayantgoyal.com`  |
+| Auth      | `apps/auth/web`       | `auth.jayantgoyal.com`   |
 
 The install command uses the repository lockfile. The client build command is
 its normal workspace/Next.js build; application-specific environment values

@@ -38,9 +38,9 @@ rather than maintaining a flat hard-coded list of packages.
 
 ## Current shared packages
 
-| Package                       | Ownership                                             |
-| ----------------------------- | ----------------------------------------------------- |
-| `@jayant/identity`            | Framework-neutral person and product identity         |
+| Package                       | Ownership                                              |
+| ----------------------------- | ------------------------------------------------------ |
+| `@jayant/identity`            | Framework-neutral person and product identity          |
 | `@jayant/web-brand`           | Web metadata, manifests, and asset paths               |
 | `@jayant/web-urls`            | Canonical origins, host checks, and URL construction   |
 | `@jayant/web-seo`             | Next.js public metadata and indexability helpers       |

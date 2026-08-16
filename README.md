@@ -65,6 +65,9 @@ pnpm --filter @jayant/studio-web dev
 pnpm check:architecture
 pnpm check:brand-assets
 pnpm check:service-role
+pnpm check:source-health
+pnpm check:dead-code
+pnpm check:docs
 pnpm lint
 pnpm check-types
 pnpm test
@@ -73,8 +76,8 @@ pnpm build
 
 ## Documentation
 
-[Documentation index](docs/README.md) is the source of truth for product
-ownership, architecture, authentication, data, security, development, testing,
-and deployment. Documentation describes the current system only; this
+[Documentation index](docs/README.md) is the source of truth for the ecosystem,
+architecture, products, clients, shared systems, engineering, operations, and
+reference material. Documentation describes the current system only; this
 repository does not maintain session entries, progress logs, completed-plan
 archives, or an architecture history ledger.

@@ -10,10 +10,10 @@ Auth owns normal sign-in/register entry, password recovery, verification,
 authenticator MFA, profile and avatar management, password changes, connected
 providers, and local/global logout.
 
-Primary routes include `/welcome`, `/forgot-password`, `/reset-password`,
-`/verify`, `/mfa`, `/account/*`, `/logout`, and `/callback`. Studio and Admin
-entry URLs are redirect aliases. Their compatibility callbacks do not render
-credential, recovery-request, or factor interfaces.
+Primary routes include `/welcome`, `/login`, `/register`, `/forgot-password`,
+`/reset-password`, `/verify`, `/mfa`, `/account/*`, `/logout`, and `/callback`.
+Studio and Admin entry URLs are redirect aliases. Their compatibility callbacks
+do not render credential, recovery-request, or factor interfaces.
 
 `src/proxy.ts` protects account routes, validates sessions, requires MFA
 step-up where appropriate, and requires recent sign-in for sensitive changes.

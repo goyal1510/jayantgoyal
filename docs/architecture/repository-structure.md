@@ -34,6 +34,15 @@ assets/
 └── brand/web/
 
 docs/
+├── overview/
+├── architecture/
+├── products/<product>/
+├── clients/<platform>/
+├── shared-systems/
+├── engineering/
+├── operations/
+└── reference/
+
 scripts/
 supabase/
 ```
@@ -66,6 +75,7 @@ workspace exception.
 `assets/brand/web` is the canonical source for favicon assets copied into each
 web client's public directory. `pnpm check:brand-assets` prevents divergence.
 
-`docs/` is the only maintained documentation tree. App-local READMEs are not
-used because product information belongs in `docs/products` and operational
-information belongs in the matching central category.
+`docs/` is the only maintained detailed documentation tree. Product information
+belongs in `docs/products/<product>`, platform behavior in `docs/clients`, and
+cross-product, engineering, operational, and exact reference information in
+their central categories. App-local READMEs are not used.

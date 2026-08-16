@@ -24,6 +24,16 @@ remain authoritative when prose disagrees.
 - Do not create session-entry files for this personal repository.
 - Keep docs current-state only. Do not add history ledgers, progress trackers,
   completed plans, or QA archives.
+- Keep authored TypeScript, JavaScript, JSX/TSX, CSS, and SCSS files at or below
+  500 physical lines. Treat 401-500 lines as a refactoring warning and prefer
+  files below 400 lines.
+- Remove unused files, imports, exports, helpers, stale branches, and speculative
+  implementations. Run the repository dead-code check before shipping.
+- Document exported and non-trivial functions when their responsibility, side
+  effects, authorization assumptions, external I/O, or invariants are not
+  obvious from names and types. Do not add comments that merely restate code.
+- Split by responsibility and ownership; do not create arbitrary fragments only
+  to satisfy the source-size check.
 
 Run `pnpm check:architecture` after ownership or dependency changes.
 
@@ -60,7 +70,8 @@ the shared application shell or application-surface stylesheet.
 ## Supabase safety
 
 The canonical linked project is `jayantgoyal` (`orwfvyditlguqvxvztkw`). Read
-[docs/database/supabase.md](docs/database/supabase.md) before database work.
+[the data and Supabase guide](docs/shared-systems/data/README.md) before database
+work.
 
 - Select the intended `jg_account`, `jg_app`, or `portfolio` schema explicitly.
 - Check every Supabase error.
@@ -108,6 +119,9 @@ pnpm --filter @jayant/auth-web dev
 pnpm check:architecture
 pnpm check:brand-assets
 pnpm check:service-role
+pnpm check:source-health
+pnpm check:dead-code
+pnpm check:docs
 pnpm lint
 pnpm check-types
 pnpm test
