@@ -91,9 +91,10 @@ route protection, and zero-cost API classification where applicable.
 
 Portfolio reads canonical CMS data from Supabase without duplicated static
 fallback content. Admin writes the same Portfolio and Writing contracts and
-must authorize callers before any service-role operation. Auth owns normal
-entry and account-security flows; legacy routes and session modes are rollback
-compatibility, not a second ownership model.
+must authorize callers before any service-role operation. Auth is the only
+interactive entry, recovery, MFA, provider, normal logout, and account-security
+owner. Product entry URLs are redirect aliases; compatibility callbacks do not
+define a second ownership model.
 
 ## Commands
 

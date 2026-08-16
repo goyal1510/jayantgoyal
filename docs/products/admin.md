@@ -17,8 +17,9 @@ workspaces.
 
 ## Authorization and data
 
-`src/proxy.ts` authenticates requests, enforces enrolled MFA, loads the
-`jg_account.profiles` role, and rejects unauthorized users. Protected layouts
+`src/proxy.ts` authenticates requests, requires the appropriate MFA assurance,
+loads the `jg_account.profiles` role, and rejects unauthorized users. Auth owns
+the MFA interface and returns the stepped-up session to Admin. Protected layouts
 and server routes recheck the relevant authorization boundary.
 
 Admin edits the same Portfolio and Writing contracts consumed publicly:

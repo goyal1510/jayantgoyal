@@ -24,10 +24,12 @@ counts in documentation.
 
 ## Authentication and data
 
-`src/proxy.ts` performs the public/protected route split, session refresh, and
-terms checks. `src/components/auth/auth-gate.tsx` mirrors client-side access
-classification. Auth owns the normal entry/account flows; Studio retains
-compatibility routes for controlled rollback.
+`src/proxy.ts` performs the public/protected route split, session refresh, MFA
+assurance requirement, and terms checks. `src/components/auth/auth-gate.tsx`
+mirrors client-side access classification. Auth owns all interactive entry and
+account flows. Studio's `/welcome`, `/forgot-password`, and `/mfa-verify` paths
+are redirects; its callback/reset code only completes an already-issued legacy
+recovery link and must not originate new recovery requests.
 
 Studio data lives primarily in `jg_app`, with account/terms state in
 `jg_account`. Private files use the `private-files` bucket. Every query must
