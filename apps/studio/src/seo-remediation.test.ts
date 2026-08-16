@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 
+import sitemap from "./app/sitemap";
 import { buildProductionRobotsContent } from "./app/robots.txt/route";
 import { getStudioProduct } from "./lib/config/studio-inventory";
+import { LAST_SIGNIFICANT_UPDATE } from "./lib/seo/config";
 import { buildStudioProductMetadata } from "./lib/seo/product-metadata";
 
 describe("Studio search metadata", () => {
@@ -24,6 +26,20 @@ describe("Studio search metadata", () => {
     expect(metadata.title).toBe("Weather Product Overview");
     expect(metadata.alternates?.canonical).toBe(
       "https://studio.jayantgoyal.com/products/weather",
+    );
+  });
+
+  it("dates submitted pages from the latest material SEO update", () => {
+    const entries = sitemap();
+
+    expect(entries.length).toBeGreaterThan(0);
+    expect(
+      entries.every(
+        (entry) => entry.lastModified === LAST_SIGNIFICANT_UPDATE,
+      ),
+    ).toBe(true);
+    expect(new Date(LAST_SIGNIFICANT_UPDATE).toISOString()).toBe(
+      "2026-07-26T00:00:00.000Z",
     );
   });
 });

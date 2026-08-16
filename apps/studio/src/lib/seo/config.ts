@@ -25,7 +25,9 @@ export const SITE_TITLE_TEMPLATE = STUDIO_BRAND.titleTemplate;
 export const SITE_DESCRIPTION = STUDIO_BRAND.description;
 export const DEFAULT_OG_IMAGE = APP_SOCIAL_PREVIEW_IMAGES.studio.url;
 export const DEFAULT_OG_IMAGE_METADATA = APP_SOCIAL_PREVIEW_IMAGES.studio;
-export const LAST_SIGNIFICANT_UPDATE = "2026-07-17T00:00:00.000Z";
+// Keep this aligned with the latest material page-content or search-metadata
+// change. Do not advance it for routine deployments.
+export const LAST_SIGNIFICANT_UPDATE = "2026-07-26T00:00:00.000Z";
 
 const INDEXABLE_EXACT_PATHS = ["/", "/terms-conditions"] as const;
 const INDEXABLE_PREFIXES = [
