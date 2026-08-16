@@ -139,4 +139,14 @@ describe("Portfolio security headers", () => {
     expect(csp).not.toContain("github-contributions-api.jogruber.de");
     expect(csp).not.toContain("https://api.github.com");
   });
+
+  it("prevents Cloudflare from rewriting the contact email into a crawler URL", async () => {
+    const headers = await configuredHeaders();
+    const contactRule = headers.find((entry) => entry.source === "/contact");
+    const cacheControl = contactRule?.headers.find(
+      (header) => header.key === "Cache-Control",
+    )?.value;
+
+    expect(cacheControl).toContain("no-transform");
+  });
 });
