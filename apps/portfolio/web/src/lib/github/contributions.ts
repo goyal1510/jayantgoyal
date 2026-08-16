@@ -1,6 +1,6 @@
 export type ContributionPeriod = number | "last";
 
-export type ContributionActivity = {
+type ContributionActivity = {
   date: string;
   count: number;
   level: 0 | 1 | 2 | 3 | 4;

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "ignoreDependencies": ["vercel"],
+  "ignoreFiles": ["scripts/linkedin/*.mjs"],
+  "ignoreUnresolved": ["^next$"],
+  "workspaces": {
+    "apps/portfolio/web": {
+      "entry": ["next.config.test.ts"]
+    },
+    "apps/studio/web": {
+      "entry": ["next.config.test.ts"]
+    }
+  }
+}

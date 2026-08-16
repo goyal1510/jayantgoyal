@@ -1,4 +1,4 @@
-export const PORTFOLIO_ANALYTICS_EVENTS = [
+const PORTFOLIO_ANALYTICS_EVENTS = [
   "contact_intent",
   "file_download",
   "generate_lead",

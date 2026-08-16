@@ -44,6 +44,15 @@ jobs:
       - name: Check service-role boundaries
         run: pnpm check:service-role
 
+      - name: Check source health
+        run: pnpm check:source-health
+
+      - name: Check dead code
+        run: pnpm check:dead-code
+
+      - name: Check documentation
+        run: pnpm check:docs
+
       - name: Lint
         run: pnpm lint
 

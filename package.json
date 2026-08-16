@@ -10,6 +10,9 @@
     "check:bundle-budgets": "pnpm --filter @jayant/studio-web build && pnpm analyze:all:turbopack && node scripts/check-bundle-budgets.mjs",
     "check:architecture": "node scripts/check-architecture-boundaries.mjs",
     "check:brand-assets": "node scripts/check-brand-assets.mjs",
+    "check:dead-code": "knip --no-progress",
+    "check:docs": "node scripts/check-documentation.mjs",
+    "check:source-health": "node scripts/check-source-health.mjs",
     "check:service-role": "node scripts/check-service-role-boundaries.mjs",
     "db:migrations:apply": "node scripts/supabase/migration-workflow.mjs --apply",
     "db:migrations:check": "node scripts/supabase/migration-workflow.mjs --check",
@@ -23,6 +26,7 @@
   },
   "devDependencies": {
     "@next/bundle-analyzer": "16.2.10",
+    "knip": "^6.32.2",
     "prettier": "^3.6.0",
     "turbo": "^2.6.1",
     "vercel": "^56.3.0",
