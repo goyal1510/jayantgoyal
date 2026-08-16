@@ -388,7 +388,6 @@ COMMENT ON COLUMN "portfolio"."experience"."company_linkedin_url" IS 'LinkedIn c
 
 CREATE TABLE IF NOT EXISTS "portfolio"."hero" (
     "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
-    "name" "text",
     "role" "text" NOT NULL,
     "tagline" "text" NOT NULL,
     "blurb" "text" NOT NULL,
@@ -398,11 +397,9 @@ CREATE TABLE IF NOT EXISTS "portfolio"."hero" (
     "current_title" "text" NOT NULL,
     "availability" "text" NOT NULL,
     "resume_url" "text" NOT NULL,
-    "display_name" "text",
     "github_username" "text" NOT NULL,
-    "seo_title" "text",
     "seo_description" "text" NOT NULL,
-    CONSTRAINT "hero_required_fields_nonblank_check" CHECK ((("btrim"("name") <> ''::"text") AND ("btrim"("display_name") <> ''::"text") AND ("btrim"("role") <> ''::"text") AND ("btrim"("tagline") <> ''::"text") AND ("btrim"("blurb") <> ''::"text") AND ("btrim"("headline") <> ''::"text") AND ("btrim"("current_title") <> ''::"text") AND ("btrim"("availability") <> ''::"text") AND ("btrim"("resume_url") <> ''::"text") AND ("btrim"("github_username") <> ''::"text") AND ("btrim"("seo_title") <> ''::"text") AND ("btrim"("seo_description") <> ''::"text")))
+    CONSTRAINT "hero_required_fields_nonblank_check" CHECK ((("btrim"("role") <> ''::"text") AND ("btrim"("tagline") <> ''::"text") AND ("btrim"("blurb") <> ''::"text") AND ("btrim"("headline") <> ''::"text") AND ("btrim"("current_title") <> ''::"text") AND ("btrim"("availability") <> ''::"text") AND ("btrim"("resume_url") <> ''::"text") AND ("btrim"("github_username") <> ''::"text") AND ("btrim"("seo_description") <> ''::"text")))
 );
 
 
