@@ -95,13 +95,6 @@ const securityHeaders = [
   },
 ];
 
-const contactPageHeaders = [
-  {
-    key: "Cache-Control",
-    value: "public, max-age=0, must-revalidate, no-transform",
-  },
-];
-
 const nextConfig: NextConfig = {
   transpilePackages: ["@repo/platform", "@repo/seo"],
   images: {
@@ -245,10 +238,6 @@ const nextConfig: NextConfig = {
       {
         source: "/(.*)",
         headers: securityHeaders,
-      },
-      {
-        source: "/contact",
-        headers: contactPageHeaders,
       },
       {
         source: "/assets/(.*)",
