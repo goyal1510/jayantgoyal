@@ -1,4 +1,9 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
+import {
+  createDatabaseBoundaryHttp,
+  databaseAuthHeaders as authHeaders,
+} from "./lib/database-boundary-http.mjs";
+import { createDatabaseBoundaryRest } from "./lib/database-boundary-rest.mjs";
 
 const supabaseUrl =
   process.env.DATABASE_TEST_SUPABASE_URL ??
@@ -17,6 +22,8 @@ if (!supabaseUrl || !anonKey || !serviceRoleKey) {
 }
 
 const normalizedUrl = supabaseUrl.replace(/\/+$/, "");
+const { expectStatus, readJson, request } =
+  createDatabaseBoundaryHttp(normalizedUrl);
 const testId = randomUUID();
 const testEmail = `database-boundary-${testId}@example.invalid`;
 const testPassword = `${randomBytes(24).toString("base64url")}Aa1!`;
@@ -34,78 +41,18 @@ let ownStorageName = null;
 let sessionCreated = false;
 let ownStorageCreated = false;
 let rateLimitCreated = false;
-
-function authHeaders(key, profile) {
-  return {
-    apikey: key,
-    authorization: `Bearer ${key}`,
-    ...(profile
-      ? {
-          "accept-profile": profile,
-          "content-profile": profile,
-        }
-      : {}),
-  };
-}
-
-async function request(path, options = {}) {
-  try {
-    return await fetch(`${normalizedUrl}${path}`, {
-      ...options,
-      signal: options.signal ?? AbortSignal.timeout(15_000),
-    });
-  } catch (error) {
-    throw new Error(
-      `${options.method ?? "GET"} ${path} failed before receiving a response.`,
-      { cause: error },
-    );
-  }
-}
-
-async function readJson(response) {
-  const text = await response.text();
-  if (!text) return null;
-
-  try {
-    return JSON.parse(text);
-  } catch {
-    return text;
-  }
-}
-
-async function expectStatus(response, allowedStatuses, label) {
-  const body = await readJson(response);
-  if (!allowedStatuses.includes(response.status)) {
-    throw new Error(
-      `${label} returned ${response.status}: ${JSON.stringify(body)}`,
-    );
-  }
-
-  return body;
-}
-
-async function restInsert(table, profile, body) {
-  const response = await request(`/rest/v1/${table}`, {
-    method: "POST",
-    headers: {
-      ...authHeaders(serviceRoleKey, profile),
-      "content-type": "application/json",
-      prefer: "return=representation",
-    },
-    body: JSON.stringify(body),
-  });
-  return expectStatus(response, [201], `Insert into ${profile}.${table}`);
-}
-
-async function restSelect(table, profile, query) {
-  const response = await request(`/rest/v1/${table}?${query}`, {
-    headers: authHeaders(serviceRoleKey, profile),
-  });
-  return expectStatus(response, [200], `Select from ${profile}.${table}`);
-}
+const { callUserRpc, restInsert, restSelect } = createDatabaseBoundaryRest({
+  anonKey,
+  serviceRoleKey,
+  authHeaders,
+  expectStatus,
+  getAccessToken: () => accessToken,
+  request,
+});
 
 async function callGameAction(overrides = {}) {
   const payload = {
+    p_actor_user_id: userId,
     p_session_id: sessionId,
     p_participant_id: participantId,
     p_move_number: 1,
@@ -121,10 +68,10 @@ async function callGameAction(overrides = {}) {
     ...overrides,
   };
 
-  return request("/rest/v1/rpc/record_game_hub_action", {
+  return request("/rest/v1/rpc/record_game_action", {
     method: "POST",
     headers: {
-      ...authHeaders(serviceRoleKey, "jg_app"),
+      ...authHeaders(serviceRoleKey, "studio"),
       "content-type": "application/json",
     },
     body: JSON.stringify(payload),
@@ -136,7 +83,7 @@ async function cleanup() {
 
   if (ownStorageCreated) {
     const response = await request(
-      `/storage/v1/object/private-files/${ownStorageName}`,
+      `/storage/v1/object/studio-files/${ownStorageName}`,
       {
         method: "DELETE",
         headers: authHeaders(serviceRoleKey),
@@ -164,10 +111,10 @@ async function cleanup() {
 
   if (sessionCreated) {
     const response = await request(
-      `/rest/v1/game_hub_sessions?id=eq.${sessionId}`,
+      `/rest/v1/game_sessions?id=eq.${sessionId}`,
       {
         method: "DELETE",
-        headers: authHeaders(serviceRoleKey, "jg_app"),
+        headers: authHeaders(serviceRoleKey, "studio"),
       },
     );
     if (![200, 204].includes(response.status)) {
@@ -233,6 +180,59 @@ try {
   accessToken = signIn?.access_token ?? null;
   if (!accessToken) throw new Error("The temporary test account has no token.");
 
+  const initialStudioAccess = await callUserRpc("has_product_access", "iam", {
+    p_product_key: "studio",
+  });
+  if (initialStudioAccess !== false) {
+    throw new Error("A new identity received Studio access without a grant.");
+  }
+
+  const initialAdminAccess = await callUserRpc("has_capability", "iam", {
+    p_capability_key: "admin.console.enter",
+  });
+  if (initialAdminAccess !== false) {
+    throw new Error("A new identity received Admin access without a grant.");
+  }
+
+  const blockedStudioInsert = await request("/rest/v1/scratchpad_entries", {
+    method: "POST",
+    headers: {
+      apikey: anonKey,
+      authorization: `Bearer ${accessToken}`,
+      "content-type": "application/json",
+      "content-profile": "studio",
+      prefer: "return=minimal",
+    },
+    body: JSON.stringify({
+      user_id: userId,
+      content: "This row must not be inserted.",
+      entry_type: "text",
+    }),
+  });
+  await expectStatus(
+    blockedStudioInsert,
+    [401, 403],
+    "Unassigned Studio insert",
+  );
+
+  await restInsert("product_memberships", "iam", {
+    product_key: "studio",
+    user_id: userId,
+    status: "active",
+  });
+  await restInsert("product_role_assignments", "iam", {
+    product_key: "studio",
+    user_id: userId,
+    role_key: "studio.member",
+  });
+
+  const grantedStudioCapability = await callUserRpc("has_capability", "iam", {
+    p_capability_key: "studio.files.create",
+  });
+  if (grantedStudioCapability !== true) {
+    throw new Error("Studio membership and role did not grant its capability.");
+  }
+
   const blockedRateLimitRead = await request(
     "/rest/v1/contact_rate_limits?select=key_hash&limit=1",
     { headers: authHeaders(anonKey, "portfolio") },
@@ -265,7 +265,7 @@ try {
   }
 
   const ownStorageResponse = await request(
-    `/storage/v1/object/private-files/${ownStorageName}`,
+    `/storage/v1/object/studio-files/${ownStorageName}`,
     {
       method: "POST",
       headers: {
@@ -281,7 +281,7 @@ try {
   ownStorageCreated = true;
 
   const blockedStorageResponse = await request(
-    `/storage/v1/object/private-files/${otherStorageName}`,
+    `/storage/v1/object/studio-files/${otherStorageName}`,
     {
       method: "POST",
       headers: {
@@ -299,7 +299,7 @@ try {
     "Cross-user storage upload",
   );
 
-  await restInsert("game_hub_sessions", "jg_app", {
+  await restInsert("game_sessions", "studio", {
     id: sessionId,
     room_code: roomCode,
     game_slug: "tic-tac-toe",
@@ -310,7 +310,7 @@ try {
   });
   sessionCreated = true;
 
-  await restInsert("game_hub_session_participants", "jg_app", {
+  await restInsert("game_session_participants", "studio", {
     id: participantId,
     session_id: sessionId,
     user_id: userId,
@@ -319,13 +319,14 @@ try {
     is_host: true,
   });
 
-  const blockedGameCall = await request("/rest/v1/rpc/record_game_hub_action", {
+  const blockedGameCall = await request("/rest/v1/rpc/record_game_action", {
     method: "POST",
     headers: {
-      ...authHeaders(anonKey, "jg_app"),
+      ...authHeaders(anonKey, "studio"),
       "content-type": "application/json",
     },
     body: JSON.stringify({
+      p_actor_user_id: userId,
       p_session_id: sessionId,
       p_participant_id: participantId,
       p_move_number: 1,
@@ -380,8 +381,8 @@ try {
   }
 
   const movesAfterFailures = await restSelect(
-    "game_hub_session_moves",
-    "jg_app",
+    "game_session_moves",
+    "studio",
     `session_id=eq.${sessionId}&select=move_number,resulting_state&order=move_number`,
   );
   if (
@@ -408,18 +409,18 @@ try {
 
   const [moves, results, sessions] = await Promise.all([
     restSelect(
-      "game_hub_session_moves",
-      "jg_app",
+      "game_session_moves",
+      "studio",
       `session_id=eq.${sessionId}&select=move_number&order=move_number`,
     ),
     restSelect(
-      "game_hub_session_results",
-      "jg_app",
+      "game_session_results",
+      "studio",
       `session_id=eq.${sessionId}&select=outcome,winner_participant_id`,
     ),
     restSelect(
-      "game_hub_sessions",
-      "jg_app",
+      "game_sessions",
+      "studio",
       `id=eq.${sessionId}&select=status,winner_participant_id,state`,
     ),
   ]);
@@ -449,7 +450,7 @@ try {
   }
 
   console.log(
-    "Database boundaries verified: role grants, contact throttling, owner-scoped storage, stale-action rejection, and atomic game completion.",
+    "Database boundaries verified: default denial, role grants, contact throttling, owner-scoped storage, stale-action rejection, and atomic game completion.",
   );
 } finally {
   await cleanup();

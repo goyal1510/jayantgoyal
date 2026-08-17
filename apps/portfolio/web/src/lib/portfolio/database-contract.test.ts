@@ -14,6 +14,9 @@ const STORAGE_MIGRATION_SUFFIX = "_harden_private_file_storage.sql";
 const GAME_ACTION_MIGRATION_SUFFIX = "_transactional_game_actions.sql";
 const GAME_CONFLICT_MIGRATION_SUFFIX = "_fix_game_action_conflict_code.sql";
 const NAMING_MIGRATION_SUFFIX = "_rename_portfolio_work_writing_activity.sql";
+const IAM_MIGRATION_SUFFIX = "_establish_iam_authorization.sql";
+const NORMALIZATION_MIGRATION_SUFFIX = "_normalize_product_schemas.sql";
+const AUTHORIZATION_MIGRATION_SUFFIX = "_harden_product_authorization.sql";
 
 async function readMigrationBySuffix(suffix: string) {
   const migrationsDirectory = resolve(process.cwd(), "supabase/migrations");
@@ -108,7 +111,9 @@ describe("Portfolio database foundation migration", () => {
     );
 
     expect(navigationSql).toContain("where section_id = 'resume';");
-    expect(navigationSql).toContain("section_id in ('skills', 'experience', 'activity')");
+    expect(navigationSql).toContain(
+      "section_id in ('skills', 'experience', 'activity')",
+    );
     expect(navigationSql).toMatch(
       /where section_id = 'resume';[\s\S]+?commit;/,
     );
@@ -132,13 +137,19 @@ describe("Portfolio database foundation migration", () => {
   });
 
   it("keeps current CMS vocabulary aligned with public destinations", async () => {
-    const destinationsSql = await readMigrationBySuffix(NAMING_MIGRATION_SUFFIX);
+    const destinationsSql = await readMigrationBySuffix(
+      NAMING_MIGRATION_SUFFIX,
+    );
 
     expect(destinationsSql).toContain("when 'projects' then 'work'");
     expect(destinationsSql).toContain("when 'github' then 'activity'");
     expect(destinationsSql).toContain("when 'blog' then 'writing'");
-    expect(destinationsSql).toContain("alter table portfolio.projects rename to work");
-    expect(destinationsSql).toContain("alter table jg_app.blog_posts rename to writing_posts");
+    expect(destinationsSql).toContain(
+      "alter table portfolio.projects rename to work",
+    );
+    expect(destinationsSql).toContain(
+      "alter table jg_app.blog_posts rename to writing_posts",
+    );
     expect(destinationsSql).not.toContain("JG Platform");
   });
 
@@ -230,5 +241,61 @@ describe("Portfolio database foundation migration", () => {
     );
     expect(conflictSql).toContain("errcode = 'P0001'");
     expect(conflictSql).not.toContain("errcode = '40001'");
+  });
+});
+
+describe("IAM and product-schema cutover", () => {
+  it("models roles as capability bundles with explicit product membership", async () => {
+    const iamSql = await readMigrationBySuffix(IAM_MIGRATION_SUFFIX);
+
+    expect(iamSql).toContain("create table iam.product_memberships");
+    expect(iamSql).toContain("create table iam.roles");
+    expect(iamSql).toContain("create table iam.capabilities");
+    expect(iamSql).toContain("create table iam.role_capabilities");
+    expect(iamSql).toContain("create table iam.product_role_assignments");
+    expect(iamSql).toContain(
+      "key = product_key || '.' || resource || '.' || action",
+    );
+    expect(iamSql).toContain("'admin.full_access'");
+    expect(iamSql).toContain("'admin.viewer'");
+    expect(iamSql).toContain("'admin.console.enter'");
+    expect(iamSql).toContain("'portfolio.content.read'");
+    expect(iamSql).toContain("'goyal151002@gmail.com'");
+    expect(iamSql).toContain("'gacbbl@gmail.com'");
+  });
+
+  it("moves product data to explicit owner schemas", async () => {
+    const normalizationSql = await readMigrationBySuffix(
+      NORMALIZATION_MIGRATION_SUFFIX,
+    );
+
+    expect(normalizationSql).toContain("create schema if not exists studio");
+    expect(normalizationSql).toContain(
+      "alter table jg_app.writing_posts set schema portfolio",
+    );
+    expect(normalizationSql).toContain(
+      "alter table studio.game_hub_sessions rename to game_sessions",
+    );
+    expect(normalizationSql).toContain(
+      "values ('studio-files', 'studio-files'",
+    );
+    expect(normalizationSql).toContain("drop schema jg_app");
+  });
+
+  it("enforces read-only viewer access and retires the global account role", async () => {
+    const authorizationSql = await readMigrationBySuffix(
+      AUTHORIZATION_MIGRATION_SUFFIX,
+    );
+
+    expect(authorizationSql).toContain("portfolio.content.read");
+    expect(authorizationSql).toContain("portfolio.content.create");
+    expect(authorizationSql).toContain("portfolio.content.update");
+    expect(authorizationSql).toContain("portfolio.content.delete");
+    expect(authorizationSql).toContain("function iam.set_admin_access");
+    expect(authorizationSql).toContain("function iam.revoke_admin_access");
+    expect(authorizationSql).toContain("drop schema jg_account");
+    expect(authorizationSql).toContain(
+      "to 'public,graphql_public,iam,studio,portfolio'",
+    );
   });
 });
