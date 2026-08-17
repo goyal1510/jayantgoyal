@@ -34,7 +34,7 @@ export default async function AccountLayout({
   } = await supabase.auth.getUser();
   const { data: profile } = user
     ? await supabase
-        .schema("jg_account")
+        .schema("iam")
         .from("profiles")
         .select(
           "first_name, last_name, avatar_url, avatar_mode, avatar_storage_path",

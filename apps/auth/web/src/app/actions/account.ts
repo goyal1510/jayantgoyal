@@ -89,7 +89,7 @@ export async function updateProfileAction(
   }
 
   const { error } = await supabase
-    .schema("jg_account")
+    .schema("iam")
     .from("profiles")
     .update({ first_name: firstName, last_name: lastName })
     .eq("user_id", user.id);
@@ -144,7 +144,7 @@ export async function uploadAvatarAction(
   }
 
   const { data: currentProfile } = await auth.supabase
-    .schema("jg_account")
+    .schema("iam")
     .from("profiles")
     .select("avatar_storage_path")
     .eq("user_id", auth.user.id)
@@ -162,7 +162,7 @@ export async function uploadAvatarAction(
   if (uploadError) return { error: "Unable to upload the avatar right now." };
 
   const { error: profileError } = await auth.supabase
-    .schema("jg_account")
+    .schema("iam")
     .from("profiles")
     .update({
       avatar_mode: "upload",
@@ -198,14 +198,14 @@ export async function removeAvatarAction(
   if ("error" in auth) return auth;
 
   const { data: profile } = await auth.supabase
-    .schema("jg_account")
+    .schema("iam")
     .from("profiles")
     .select("avatar_storage_path")
     .eq("user_id", auth.user.id)
     .maybeSingle();
 
   const { error } = await auth.supabase
-    .schema("jg_account")
+    .schema("iam")
     .from("profiles")
     .update({
       avatar_mode: "provider",

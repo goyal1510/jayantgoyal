@@ -34,7 +34,7 @@ export default async function AccountSecurityPage() {
     supabase.auth.mfa.listFactors(),
     user
       ? supabase
-          .schema("jg_account")
+          .schema("iam")
           .from("profiles")
           .select("first_name, last_name")
           .eq("user_id", user.id)
