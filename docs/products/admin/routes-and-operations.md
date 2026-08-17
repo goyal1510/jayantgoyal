@@ -5,21 +5,21 @@ admission paths, and privileged route handlers.
 
 ## Active page routes
 
-| Route                   | Role               | Purpose                                         |
-| ----------------------- | ------------------ | ----------------------------------------------- |
-| `/`                     | admin, super_admin | Admin landing/dashboard                         |
-| `/portfolio`            | admin, super_admin | Portfolio CMS overview and section presentation |
-| `/portfolio/home`       | admin, super_admin | Hero/home editorial content                     |
-| `/portfolio/about`      | admin, super_admin | About and education content                     |
-| `/portfolio/skills`     | admin, super_admin | Skill categories and skills                     |
-| `/portfolio/experience` | admin, super_admin | Experience and credentials                      |
-| `/portfolio/activity`   | admin, super_admin | GitHub/activity presentation content            |
-| `/portfolio/work`       | admin, super_admin | Work records, images, and case studies          |
-| `/portfolio/writing`    | admin, super_admin | Writing records and publication                 |
-| `/portfolio/contact`    | admin, super_admin | Contact presentation and destination            |
-| `/users`                | super_admin        | Account profiles and role assignment            |
-| `/deployments`          | super_admin        | Vercel deployment list and redeploy entry       |
-| `/deployments/[id]`     | super_admin        | Deployment detail and events                    |
+| Route                   | Minimum capability       | Purpose                                         |
+| ----------------------- | ------------------------ | ----------------------------------------------- |
+| `/`                     | `admin.console.enter`    | Admin landing/dashboard                         |
+| `/portfolio`            | `portfolio.content.read` | Portfolio CMS overview and section presentation |
+| `/portfolio/home`       | `portfolio.content.read` | Hero/home editorial content                     |
+| `/portfolio/about`      | `portfolio.content.read` | About and education content                     |
+| `/portfolio/skills`     | `portfolio.content.read` | Skill categories and skills                     |
+| `/portfolio/experience` | `portfolio.content.read` | Experience and credentials                      |
+| `/portfolio/activity`   | `portfolio.content.read` | GitHub/activity presentation content            |
+| `/portfolio/work`       | `portfolio.content.read` | Work records, images, and case studies          |
+| `/portfolio/writing`    | `portfolio.content.read` | Writing records and publication                 |
+| `/portfolio/contact`    | `portfolio.content.read` | Contact presentation and destination            |
+| `/users`                | `admin.users.read`       | Identities and Admin access assignments         |
+| `/deployments`          | `admin.deployments.read` | Vercel deployment list and redeploy entry       |
+| `/deployments/[id]`     | `admin.deployments.read` | Deployment detail and events                    |
 
 `/deployments/env` exists as a page route but is not an active navigation
 destination or an environment-secret editor. Do not expose Vercel environment
@@ -54,41 +54,43 @@ page redirects, active navigation, and breadcrumbs share one interpretation.
 
 ## Portfolio and Writing APIs
 
-| Method and route                          | Minimum role | Scope                                                      |
-| ----------------------------------------- | ------------ | ---------------------------------------------------------- |
-| `GET /api/portfolio/[table]`              | admin        | Read an allowlisted Portfolio table or record              |
-| `POST /api/portfolio/[table]`             | admin        | Validate and create an allowlisted record                  |
-| `PUT /api/portfolio/[table]`              | admin        | Validate and update a record by ID                         |
-| `DELETE /api/portfolio/[table]`           | admin        | Delete a record by ID                                      |
-| `POST /api/portfolio/assets`              | admin        | Validate and upload an allowlisted public asset kind       |
-| `PUT /api/portfolio/section-presentation` | admin        | Atomically save section copy and navigation through an RPC |
-| `GET /api/jg-app/[table]`                 | admin        | Read the allowlisted Writing table                         |
-| `POST /api/jg-app/[table]`                | admin        | Validate and create Writing content                        |
-| `PUT /api/jg-app/[table]`                 | admin        | Validate and update Writing content                        |
-| `DELETE /api/jg-app/[table]`              | admin        | Delete Writing content                                     |
+| Method and route                          | Minimum capability         | Scope                                                      |
+| ----------------------------------------- | -------------------------- | ---------------------------------------------------------- |
+| `GET /api/portfolio/[table]`              | `portfolio.content.read`   | Read an allowlisted Portfolio table or record              |
+| `POST /api/portfolio/[table]`             | `portfolio.content.create` | Validate and create an allowlisted record                  |
+| `PUT /api/portfolio/[table]`              | `portfolio.content.update` | Validate and update a record by ID                         |
+| `DELETE /api/portfolio/[table]`           | `portfolio.content.delete` | Delete a record by ID                                      |
+| `POST /api/portfolio/assets`              | `portfolio.content.create` | Validate and upload an allowlisted public asset kind       |
+| `PUT /api/portfolio/section-presentation` | `portfolio.content.update` | Atomically save section copy and navigation through an RPC |
+| `GET /api/writing/[table]`                | `portfolio.content.read`   | Read the allowlisted Writing table                         |
+| `POST /api/writing/[table]`               | `portfolio.content.create` | Validate and create Writing content                        |
+| `PUT /api/writing/[table]`                | `portfolio.content.update` | Validate and update Writing content                        |
+| `DELETE /api/writing/[table]`             | `portfolio.content.delete` | Delete Writing content                                     |
 
 The dynamic table segments are allowlists, not general database gateways.
 Successful mutations revalidate Portfolio content or Writing paths.
 
 ## Account APIs
 
-| Method and route             | Minimum role               | Scope                                                           |
-| ---------------------------- | -------------------------- | --------------------------------------------------------------- |
-| `GET /api/users`             | super_admin                | Combine profiles with Supabase Auth emails and unassigned users |
-| `POST /api/users`            | super_admin                | Validate identity and assign an allowed role                    |
-| `DELETE /api/account/delete` | authenticated current user | Delete the caller's account through the approved account flow   |
+| Method and route             | Minimum capability         | Scope                                                                |
+| ---------------------------- | -------------------------- | -------------------------------------------------------------------- |
+| `GET /api/users`             | `admin.users.read`         | Combine profiles, Auth emails, memberships, and role assignments     |
+| `POST /api/users`            | `admin.users.create`       | Activate Admin membership and assign an allowed role transactionally |
+| `PATCH /api/users`           | `admin.users.update`       | Replace an existing Admin role transactionally                       |
+| `DELETE /api/users`          | `admin.users.delete`       | Revoke Admin membership and role assignments transactionally         |
+| `DELETE /api/account/delete` | authenticated current user | Delete the caller's account through the approved account flow        |
 
-Account APIs recheck the live user and role before creating a service-role
-client. Roles are limited to `user`, `admin`, and `super_admin`.
+Account APIs recheck the live capability before creating a service-role client.
+Assignable roles are limited to `admin.viewer` and `admin.full_access`.
 
 ## Deployment APIs
 
-| Method and route                          | Minimum role | Scope                                      |
-| ----------------------------------------- | ------------ | ------------------------------------------ |
-| `GET /api/vercel/deployments`             | super_admin  | List deployments for configured projects   |
-| `POST /api/vercel/deployments`            | super_admin  | Trigger an approved redeployment operation |
-| `GET /api/vercel/deployments/[id]`        | super_admin  | Inspect one deployment                     |
-| `GET /api/vercel/deployments/[id]/events` | super_admin  | Read deployment build events               |
+| Method and route                          | Minimum capability         | Scope                                      |
+| ----------------------------------------- | -------------------------- | ------------------------------------------ |
+| `GET /api/vercel/deployments`             | `admin.deployments.read`   | List deployments for configured projects   |
+| `POST /api/vercel/deployments`            | `admin.deployments.update` | Trigger an approved redeployment operation |
+| `GET /api/vercel/deployments/[id]`        | `admin.deployments.read`   | Inspect one deployment                     |
+| `GET /api/vercel/deployments/[id]/events` | `admin.deployments.read`   | Read deployment build events               |
 
 The configured project allowlist currently contains Studio and Admin. The
 Vercel token is never returned to the browser.
@@ -97,9 +99,9 @@ Vercel token is never returned to the browser.
 
 ```text
 Request
-  → Admin proxy session + MFA + role admission
+  → Admin proxy session + MFA + `admin.console.enter`
   → route handler live user lookup
-  → route-specific role check
+  → route-specific capability check
   → allowlist and payload validation
   → service-role or Vercel client creation
   → bounded domain operation

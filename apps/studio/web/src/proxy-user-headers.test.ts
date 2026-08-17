@@ -21,7 +21,9 @@ vi.mock("@jayantgoyal/web-auth/server", async (importOriginal) => {
           listFactors: vi.fn(),
         },
       },
-      schema: vi.fn(),
+      schema: vi.fn(() => ({
+        rpc: vi.fn().mockResolvedValue({ data: true, error: null }),
+      })),
     }),
   };
 });
@@ -51,7 +53,7 @@ describe("Studio proxy verified identity forwarding", () => {
     const response = await studioProxy(
       new NextRequest("https://studio.jayantgoyal.com/api/scratchpad", {
         headers: {
-          cookie: "terms_accepted=true",
+          cookie: "terms_accepted=2026-01-26",
           "x-user-id": "forged-user",
           "x-user-email": "forged@example.com",
         },

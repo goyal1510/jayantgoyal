@@ -7,6 +7,7 @@ import {
   revalidatePortfolioPublicContent,
   TABLES_WITH_SORT_ORDER,
 } from "./helpers";
+import { ADMIN_CAPABILITIES } from "@/lib/access";
 
 export async function GET(
   request: Request,
@@ -18,7 +19,7 @@ export async function GET(
     const tableError = validateTable(table);
     if (tableError) return tableError;
 
-    const auth = await authorizeAndGetClient();
+    const auth = await authorizeAndGetClient(ADMIN_CAPABILITIES.portfolioRead);
     if ("error" in auth) return auth.error;
 
     const { searchParams } = new URL(request.url);
@@ -77,7 +78,9 @@ export async function POST(
     const tableError = validateTable(table);
     if (tableError) return tableError;
 
-    const auth = await authorizeAndGetClient();
+    const auth = await authorizeAndGetClient(
+      ADMIN_CAPABILITIES.portfolioCreate,
+    );
     if ("error" in auth) return auth.error;
 
     const body = await request.json();
@@ -116,7 +119,9 @@ export async function PUT(
     const tableError = validateTable(table);
     if (tableError) return tableError;
 
-    const auth = await authorizeAndGetClient();
+    const auth = await authorizeAndGetClient(
+      ADMIN_CAPABILITIES.portfolioUpdate,
+    );
     if ("error" in auth) return auth.error;
 
     const { searchParams } = new URL(request.url);
@@ -166,7 +171,9 @@ export async function DELETE(
     const tableError = validateTable(table);
     if (tableError) return tableError;
 
-    const auth = await authorizeAndGetClient();
+    const auth = await authorizeAndGetClient(
+      ADMIN_CAPABILITIES.portfolioDelete,
+    );
     if ("error" in auth) return auth.error;
 
     const { searchParams } = new URL(request.url);

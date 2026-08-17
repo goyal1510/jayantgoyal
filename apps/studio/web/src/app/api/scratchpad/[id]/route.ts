@@ -42,7 +42,7 @@ export async function PATCH(
     }
 
     const { data: entry, error } = await supabase
-      .schema("jg_app")
+      .schema("studio")
       .from("scratchpad_entries")
       .update(updateData)
       .eq("id", id)
@@ -88,7 +88,7 @@ export async function DELETE(
     const { id } = await params;
 
     const { data: deletedEntry, error } = await supabase
-      .schema("jg_app")
+      .schema("studio")
       .from("scratchpad_entries")
       .delete()
       .eq("id", id)

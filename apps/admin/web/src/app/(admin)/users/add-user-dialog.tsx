@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@jayantgoyal/web-ui/select";
-import type { UserRole } from "@/lib/types";
+import type { AdminRoleKey } from "@/lib/types";
 import { AccessibleForm } from "@/components/accessible-form";
 
 interface AvailableUser {
@@ -33,10 +33,11 @@ interface AddUserDialogProps {
   availableUsers: AvailableUser[];
   selectedUserId: string;
   setSelectedUserId: (id: string) => void;
-  newRole: UserRole;
-  setNewRole: (role: UserRole) => void;
+  newRole: AdminRoleKey;
+  setNewRole: (role: AdminRoleKey) => void;
   onSubmit: (e: React.FormEvent) => void;
   adding: boolean;
+  disabled: boolean;
 }
 
 export function AddUserDialog({
@@ -49,6 +50,7 @@ export function AddUserDialog({
   setNewRole,
   onSubmit,
   adding,
+  disabled,
 }: AddUserDialogProps) {
   return (
     <Dialog
@@ -57,17 +59,17 @@ export function AddUserDialog({
         onOpenChange(o);
         if (!o) {
           setSelectedUserId("");
-          setNewRole("user" as UserRole);
+          setNewRole("admin.viewer");
         }
       }}
     >
       <DialogContent>
         <AccessibleForm onSubmit={onSubmit}>
           <DialogHeader>
-            <DialogTitle>Add User</DialogTitle>
+            <DialogTitle>Grant Admin access</DialogTitle>
             <DialogDescription>
-              Add an existing user and assign a role. The user must have already
-              signed up.
+              Activate Admin membership for an existing identity and assign an
+              approved role.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -94,28 +96,30 @@ export function AddUserDialog({
               <Label htmlFor="role">Role</Label>
               <Select
                 value={newRole}
-                onValueChange={(v) => setNewRole(v as UserRole)}
-                disabled={adding}
+                onValueChange={(v) => setNewRole(v as AdminRoleKey)}
+                disabled={adding || disabled}
               >
                 <SelectTrigger id="role">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="user">User</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="super_admin">Super Admin</SelectItem>
+                  <SelectItem value="admin.viewer">Viewer</SelectItem>
+                  <SelectItem value="admin.full_access">Full access</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit" disabled={adding || !selectedUserId}>
+            <Button
+              type="submit"
+              disabled={disabled || adding || !selectedUserId}
+            >
               {adding ? (
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
               ) : (
                 <Plus className="h-4 w-4 mr-2" />
               )}
-              Add User
+              Grant access
             </Button>
           </DialogFooter>
         </AccessibleForm>

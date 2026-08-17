@@ -23,6 +23,13 @@ after two clients genuinely need it. Platform-specific code stays explicit;
 native clients must not inherit browser or Next.js assumptions through a
 falsely universal abstraction.
 
+Shaamil has an accepted mobile-first direction but no implemented client. Its
+future `apps/shaamil/mobile` path is created only when the physical-device
+reliability proof begins. That client must own native auth, secure storage,
+SQLite sync, accessibility, notifications, links, packaging, and release
+behavior without importing `@jayantgoyal/web-auth` or `@jayantgoyal/web-ui`.
+
 See [Web clients](web/README.md) for the current platform contract and
 [Long-term extensibility](../architecture/extensibility.md) for future-client
-and business-capability rules.
+and business-capability rules. See [Shaamil](../products/shaamil/README.md) for
+the defined product and first-client boundary.

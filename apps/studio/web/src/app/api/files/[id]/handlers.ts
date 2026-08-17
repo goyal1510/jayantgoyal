@@ -6,40 +6,31 @@ export async function handlePatchFile(
   request: NextRequest,
   fileId: string,
   supabase: SupabaseClient,
-  userId: string
+  userId: string,
 ) {
   const body = await request.json();
   const { name } = body;
 
   if (!name || typeof name !== "string") {
-    return NextResponse.json(
-      { error: "Name is required" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Name is required" }, { status: 400 });
   }
 
   // eslint-disable-next-line no-control-regex
   const sanitizedName = name.trim().replace(/[<>:"/\\|?*\x00-\x1f]/g, "");
   if (!sanitizedName) {
-    return NextResponse.json(
-      { error: "Invalid name" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid name" }, { status: 400 });
   }
 
   const currentFile = await supabase
-    .schema("jg_app")
-    .from("file_manager_files")
+    .schema("studio")
+    .from("file_entries")
     .select("*")
     .eq("id", fileId)
     .eq("user_id", userId)
     .single();
 
   if (currentFile.error || !currentFile.data) {
-    return NextResponse.json(
-      { error: "File not found" },
-      { status: 404 }
-    );
+    return NextResponse.json({ error: "File not found" }, { status: 404 });
   }
 
   const file = currentFile.data;
@@ -47,7 +38,7 @@ export async function handlePatchFile(
   if (file.is_deleted) {
     return NextResponse.json(
       { error: "Cannot rename deleted file" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -63,7 +54,7 @@ async function handleRenameDirectory(
   fileId: string,
   userId: string,
   file: Record<string, unknown>,
-  sanitizedName: string
+  sanitizedName: string,
 ) {
   const fileName = file.file_name as string;
   const filePath = file.file_path as string;
@@ -74,7 +65,7 @@ async function handleRenameDirectory(
   if (existingFile && existingFile.id !== fileId) {
     return NextResponse.json(
       { error: "A folder with this name already exists" },
-      { status: 409 }
+      { status: 409 },
     );
   }
 
@@ -87,14 +78,14 @@ async function handleRenameDirectory(
   if (!updated) {
     return NextResponse.json(
       { error: "Failed to rename folder" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
   const oldPathPrefix = filePath;
   const { data: children, error: childrenError } = await supabase
-    .schema("jg_app")
-    .from("file_manager_files")
+    .schema("studio")
+    .from("file_entries")
     .select("id, file_path")
     .eq("user_id", userId)
     .like("file_path", `${oldPathPrefix}%`)
@@ -107,8 +98,8 @@ async function handleRenameDirectory(
     for (const child of children) {
       const newChildPath = child.file_path.replace(oldPathPrefix, newPath);
       await supabase
-        .schema("jg_app")
-        .from("file_manager_files")
+        .schema("studio")
+        .from("file_entries")
         .update({
           file_path: newChildPath,
           updated_at: new Date().toISOString(),
@@ -129,7 +120,7 @@ async function handleRenameFile(
   fileId: string,
   userId: string,
   file: Record<string, unknown>,
-  sanitizedName: string
+  sanitizedName: string,
 ) {
   const fileName = file.file_name as string;
   const filePath = file.file_path as string;
@@ -144,7 +135,7 @@ async function handleRenameFile(
   if (existingFile && existingFile.id !== fileId) {
     return NextResponse.json(
       { error: "A file with this name already exists" },
-      { status: 409 }
+      { status: 409 },
     );
   }
 
@@ -157,7 +148,7 @@ async function handleRenameFile(
   if (!updated) {
     return NextResponse.json(
       { error: "Failed to rename file" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 

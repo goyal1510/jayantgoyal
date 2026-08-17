@@ -93,11 +93,14 @@ describe("Admin Writing CMS route contract", () => {
     authorizeAndGetClientMock.mockResolvedValue({ client });
 
     const response = requireResponse(
-      await GET(request("/api/jg-app/writing_posts"), routeParams()),
+      await GET(request("/api/writing/writing_posts"), routeParams()),
     );
 
     expect(response.status).toBe(200);
-    expect(client.schema).toHaveBeenCalledWith("jg_app");
+    expect(authorizeAndGetClientMock).toHaveBeenCalledWith(
+      "portfolio.content.read",
+    );
+    expect(client.schema).toHaveBeenCalledWith("portfolio");
     expect(revalidateMock).not.toHaveBeenCalled();
   });
 
@@ -107,7 +110,7 @@ describe("Admin Writing CMS route contract", () => {
 
     const response = requireResponse(
       await POST(
-        request("/api/jg-app/writing_posts", {
+        request("/api/writing/writing_posts", {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify({
@@ -137,7 +140,7 @@ describe("Admin Writing CMS route contract", () => {
 
     const response = requireResponse(
       await PUT(
-        request("/api/jg-app/writing_posts?id=post-1", {
+        request("/api/writing/writing_posts?id=post-1", {
           method: "PUT",
           headers: { "content-type": "application/json" },
           body: JSON.stringify({ title: "Updated note" }),
@@ -147,6 +150,9 @@ describe("Admin Writing CMS route contract", () => {
     );
 
     expect(response.status).toBe(200);
+    expect(authorizeAndGetClientMock).toHaveBeenCalledWith(
+      "portfolio.content.update",
+    );
     expect(client.builder.update).toHaveBeenCalledWith({
       title: "Updated note",
     });

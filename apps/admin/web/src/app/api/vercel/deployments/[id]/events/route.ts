@@ -1,42 +1,20 @@
 import { NextResponse } from "next/server";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { vercelFetch } from "@/lib/vercel-server";
-
-async function checkSuperAdminAccess() {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { authorized: false as const, error: "Unauthorized", status: 401 };
-  }
-
-  const { data: profile } = await supabase
-    .schema("jg_account")
-    .from("profiles")
-    .select("role")
-    .eq("user_id", user.id)
-    .single();
-
-  if (!profile || profile.role !== "super_admin") {
-    return { authorized: false as const, error: "Forbidden", status: 403 };
-  }
-
-  return { authorized: true as const };
-}
+import { ADMIN_CAPABILITIES, authorizeAdminCapability } from "@/lib/access";
 
 // GET - Build logs for a deployment
 export async function GET(
   _request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const authCheck = await checkSuperAdminAccess();
+    const authCheck = await authorizeAdminCapability(
+      ADMIN_CAPABILITIES.deploymentsRead,
+    );
     if (!authCheck.authorized) {
       return NextResponse.json(
         { error: authCheck.error },
-        { status: authCheck.status }
+        { status: authCheck.status },
       );
     }
 
@@ -48,7 +26,7 @@ export async function GET(
     if (!res.ok) {
       return NextResponse.json(
         { error: data.error?.message || "Vercel API error" },
-        { status: res.status }
+        { status: res.status },
       );
     }
 
@@ -57,7 +35,7 @@ export async function GET(
     console.error("Error fetching build logs:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

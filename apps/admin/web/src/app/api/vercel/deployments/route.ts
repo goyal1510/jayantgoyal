@@ -1,40 +1,18 @@
 import { NextResponse } from "next/server";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { vercelFetch, getProjectId } from "@/lib/vercel-server";
 import type { VercelProjectKey } from "@/lib/types";
-
-async function checkSuperAdminAccess() {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { authorized: false as const, error: "Unauthorized", status: 401 };
-  }
-
-  const { data: profile } = await supabase
-    .schema("jg_account")
-    .from("profiles")
-    .select("role")
-    .eq("user_id", user.id)
-    .single();
-
-  if (!profile || profile.role !== "super_admin") {
-    return { authorized: false as const, error: "Forbidden", status: 403 };
-  }
-
-  return { authorized: true as const };
-}
+import { ADMIN_CAPABILITIES, authorizeAdminCapability } from "@/lib/access";
 
 // GET - List deployments for a project
 export async function GET(request: Request) {
   try {
-    const authCheck = await checkSuperAdminAccess();
+    const authCheck = await authorizeAdminCapability(
+      ADMIN_CAPABILITIES.deploymentsRead,
+    );
     if (!authCheck.authorized) {
       return NextResponse.json(
         { error: authCheck.error },
-        { status: authCheck.status }
+        { status: authCheck.status },
       );
     }
 
@@ -43,29 +21,26 @@ export async function GET(request: Request) {
     const limit = searchParams.get("limit") || "20";
 
     if (!project || !["studio", "admin"].includes(project)) {
-      return NextResponse.json(
-        { error: "Invalid project" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid project" }, { status: 400 });
     }
 
     const projectId = getProjectId(project);
     if (!projectId) {
       return NextResponse.json(
         { error: "Project ID not configured" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     const res = await vercelFetch(
-      `/v6/deployments?projectId=${projectId}&limit=${limit}`
+      `/v6/deployments?projectId=${projectId}&limit=${limit}`,
     );
     const data = await res.json();
 
     if (!res.ok) {
       return NextResponse.json(
         { error: data.error?.message || "Vercel API error" },
-        { status: res.status }
+        { status: res.status },
       );
     }
 
@@ -74,7 +49,7 @@ export async function GET(request: Request) {
     console.error("Error listing deployments:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -82,11 +57,13 @@ export async function GET(request: Request) {
 // POST - Redeploy or rollback
 export async function POST(request: Request) {
   try {
-    const authCheck = await checkSuperAdminAccess();
+    const authCheck = await authorizeAdminCapability(
+      ADMIN_CAPABILITIES.deploymentsUpdate,
+    );
     if (!authCheck.authorized) {
       return NextResponse.json(
         { error: authCheck.error },
-        { status: authCheck.status }
+        { status: authCheck.status },
       );
     }
 
@@ -101,7 +78,7 @@ export async function POST(request: Request) {
     if (!action || !deploymentId || !project) {
       return NextResponse.json(
         { error: "Missing required fields" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -109,7 +86,7 @@ export async function POST(request: Request) {
     if (!projectId) {
       return NextResponse.json(
         { error: "Project ID not configured" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -127,7 +104,7 @@ export async function POST(request: Request) {
       if (!res.ok) {
         return NextResponse.json(
           { error: data.error?.message || "Redeploy failed" },
-          { status: res.status }
+          { status: res.status },
         );
       }
 
@@ -137,14 +114,14 @@ export async function POST(request: Request) {
     if (action === "rollback") {
       const res = await vercelFetch(
         `/v9/work/${projectId}/rollback/${deploymentId}`,
-        { method: "POST" }
+        { method: "POST" },
       );
 
       if (!res.ok) {
         const data = await res.json();
         return NextResponse.json(
           { error: data.error?.message || "Rollback failed" },
-          { status: res.status }
+          { status: res.status },
         );
       }
 
@@ -156,7 +133,7 @@ export async function POST(request: Request) {
     console.error("Error with deployment action:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

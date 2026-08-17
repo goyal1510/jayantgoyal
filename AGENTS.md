@@ -52,6 +52,11 @@ Every current client is Next.js 16, React 19, TypeScript 5.9, and Tailwind CSS
 v4. Next.js request middleware is `src/proxy.ts`, not `middleware.ts`. Use the
 application-local `@/*` alias for its `src/*` files.
 
+Shaamil is the approved name and `shaamil` is the technical slug for the
+defined mobile-first communication product. It has no implemented client or
+runtime yet. Do not create placeholders; read
+`docs/products/shaamil/README.md` before Shaamil work.
+
 ## Shared ownership
 
 - `@jayantgoyal/identity`: framework-neutral person, technical namespace,
@@ -77,7 +82,16 @@ The canonical linked project is `jayantgoyal` (`orwfvyditlguqvxvztkw`). Read
 [the data and Supabase guide](docs/shared-systems/data/README.md) before database
 work.
 
-- Select the intended `jg_account`, `jg_app`, or `portfolio` schema explicitly.
+- The current application schemas are private `foundation`, cross-product
+  `iam`, private `iam_private`, and product-owned `studio` and `portfolio`.
+  Select the intended schema explicitly.
+- IAM owns
+  profiles, product/workforce access, roles, and capabilities; products own
+  resource-specific authorization and data.
+- Shaamil uses this existing project and receives an owned `shaamil` schema
+  only when its approved backend implementation begins.
+- Read `docs/shared-systems/data/schema-ownership.md` before moving or renaming
+  any schema, table, function, policy, publication, or bucket.
 - Check every Supabase error.
 - Never expose a service-role key to client code.
 - Portfolio and Auth must not use a service-role key.
@@ -86,7 +100,7 @@ work.
 - Never edit an applied migration. Add a new reviewed migration.
 - Use the dedicated remote-migration workflow for an approved apply; never
   apply from the source clone or an ordinary worktree.
-- After an apply, refresh and review all canonical schema snapshots.
+- After an apply, refresh and review every affected canonical schema snapshot.
 
 `pnpm test:db:linked` reads and writes remote test records; run it only when the
 task explicitly authorizes that remote validation.

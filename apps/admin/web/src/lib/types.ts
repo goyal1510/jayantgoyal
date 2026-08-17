@@ -20,10 +20,10 @@ import type {
   PortfolioSocialLink,
 } from "@jayantgoyal/portfolio-contracts";
 
-export type UserRole = "user" | "admin" | "super_admin";
+export type UserRole = "viewer" | "full_access";
+export type AdminRoleKey = "admin.viewer" | "admin.full_access";
 
 export interface Profile {
-  id: number;
   user_id: string;
   first_name: string;
   last_name: string;
@@ -32,9 +32,7 @@ export interface Profile {
   avatar_provider: string | null;
   avatar_storage_path: string | null;
   avatar_updated_at: string | null;
-  role: UserRole;
-  terms_accepted: boolean;
-  terms_accepted_at: string | null;
+  admin_role: AdminRoleKey | null;
   created_at: string;
   updated_at: string;
   email?: string; // Joined from auth.users

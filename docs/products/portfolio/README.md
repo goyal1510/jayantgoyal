@@ -18,7 +18,7 @@ Portfolio owns the professional narrative presented to public visitors:
 - public GitHub contribution and code-statistic presentation;
 - public SEO, structured data, sitemap, robots, and web manifest behavior.
 
-Portfolio does not own account entry, private Studio workspaces, user-role
+Portfolio does not own account entry, private Studio workspaces, access
 administration, or deployment operations. Admin edits Portfolio data but does
 not become the owner of the Portfolio contract.
 
@@ -33,7 +33,7 @@ flows](routes-and-data-flows.md).
 | Editorial home | `/`                                            | Full Portfolio editorial loader              |
 | About          | `/about`                                       | CMS profile, experience, skills, credentials |
 | Work           | `/work`, `/work/[slug]`                        | Visible work and published case studies      |
-| Writing        | `/writing`, `/writing/[slug]`                  | Published `jg_app.writing_posts`             |
+| Writing        | `/writing`, `/writing/[slug]`                  | Published `portfolio.writing_posts`          |
 | Resume         | `/resume`, `/api/resume`                       | CMS shell plus Google/static PDF delivery    |
 | Contact        | `/contact`, `/api/contact`                     | CMS contact data plus Resend delivery        |
 | GitHub         | `/api/github-contributions`, `/api/github-loc` | GitHub provider APIs with caching            |
@@ -86,10 +86,11 @@ Supabase service-role client.
 
 ## Data ownership
 
-Portfolio reads `portfolio.*` CMS tables and `jg_app.writing_posts` using the
-anonymous Supabase key and RLS. Admin performs authorized writes to the same
-contract and public `portfolio-assets` bucket. `portfolio.contact_rate_limits`
-is an operational table used only through its database function.
+Portfolio reads `portfolio.*` CMS tables, including `portfolio.writing_posts`,
+using the anonymous Supabase key and RLS. Admin performs capability-authorized
+writes to the same contract and public `portfolio-assets` bucket.
+`portfolio.contact_rate_limits` is an operational table used only through its
+database function.
 
 The detailed table inventory and policies are in the [schema
 catalog](../../shared-systems/data/schema-catalog.md).

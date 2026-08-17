@@ -36,8 +36,8 @@ export async function GET(request: NextRequest) {
 
   const supabase = createSupabaseServiceRoleClient();
   const { data: session, error } = await supabase
-    .schema("jg_app")
-    .from("game_hub_sessions")
+    .schema("studio")
+    .from("game_sessions")
     .select("id")
     .eq("room_code", roomCode)
     .single();
@@ -47,8 +47,8 @@ export async function GET(request: NextRequest) {
   }
 
   const { data: participant } = await supabase
-    .schema("jg_app")
-    .from("game_hub_session_participants")
+    .schema("studio")
+    .from("game_session_participants")
     .select("id")
     .eq("session_id", session.id)
     .eq("user_id", user.id)
@@ -101,8 +101,8 @@ export async function POST(request: NextRequest) {
   for (let attempt = 0; attempt < 5; attempt++) {
     const roomCode = createRoomCode();
     const { data: session, error: sessionError } = await supabase
-      .schema("jg_app")
-      .from("game_hub_sessions")
+      .schema("studio")
+      .from("game_sessions")
       .insert({
         room_code: roomCode,
         game_slug: gameSlug,
@@ -124,8 +124,8 @@ export async function POST(request: NextRequest) {
     }
 
     const { data: participant, error: participantError } = await supabase
-      .schema("jg_app")
-      .from("game_hub_session_participants")
+      .schema("studio")
+      .from("game_session_participants")
       .insert({
         session_id: session.id,
         user_id: user.id,
@@ -139,8 +139,8 @@ export async function POST(request: NextRequest) {
     if (participantError || !participant) {
       console.error("Error creating host participant:", participantError);
       await supabase
-        .schema("jg_app")
-        .from("game_hub_sessions")
+        .schema("studio")
+        .from("game_sessions")
         .delete()
         .eq("id", session.id);
       return NextResponse.json(

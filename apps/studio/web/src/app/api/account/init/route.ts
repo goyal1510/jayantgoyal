@@ -5,6 +5,12 @@ import {
   profileDisplayName,
   resolveProfileAvatar,
 } from "@jayantgoyal/web-auth/profile";
+import { checkProductAccess } from "@jayantgoyal/web-auth/authorization";
+import {
+  hasAcceptedStudioTerms,
+  STUDIO_TERMS_COOKIE,
+  STUDIO_TERMS_VERSION,
+} from "@/lib/terms";
 
 /**
  * Combined init endpoint — returns profile + terms status in one call.
@@ -44,26 +50,29 @@ export async function GET(request: NextRequest) {
     authUser = user;
   }
 
-  // Single DB query: profile + terms
-  const { data: profile } = await supabase
-    .schema("jg_account")
-    .from("profiles")
-    .select(
-      "first_name, last_name, avatar_url, avatar_mode, avatar_storage_path, terms_accepted",
-    )
-    .eq("user_id", userId)
-    .single();
+  const [{ data: profile }, access, termsAccepted] = await Promise.all([
+    supabase
+      .schema("iam")
+      .from("profiles")
+      .select(
+        "first_name, last_name, avatar_url, avatar_mode, avatar_storage_path",
+      )
+      .eq("user_id", userId)
+      .single(),
+    checkProductAccess(supabase, "studio"),
+    hasAcceptedStudioTerms(supabase, userId),
+  ]);
 
   if (!profile) {
     return NextResponse.json({
       user: null,
       isAuthenticated: true,
-      needsAcceptance: true,
+      hasProductAccess: access.allowed,
+      needsAcceptance: access.allowed,
     });
   }
 
   const name = profileDisplayName(profile, "User");
-  const termsAccepted = profile.terms_accepted === true;
   const avatarUrl = authUser
     ? await resolveProfileAvatar(supabase, authUser, profile)
     : null;
@@ -76,11 +85,12 @@ export async function GET(request: NextRequest) {
       avatarUrl,
     },
     isAuthenticated: true,
-    needsAcceptance: !termsAccepted,
+    hasProductAccess: access.allowed,
+    needsAcceptance: access.allowed && !termsAccepted,
   });
 
   if (termsAccepted) {
-    res.cookies.set("terms_accepted", "true", {
+    res.cookies.set(STUDIO_TERMS_COOKIE, STUDIO_TERMS_VERSION, {
       path: "/",
       httpOnly: true,
       secure: true,

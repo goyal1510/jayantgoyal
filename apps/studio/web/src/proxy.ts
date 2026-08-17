@@ -13,6 +13,7 @@ import {
   buildAuthLoginUrl,
   buildAuthMfaUrl,
 } from "@jayantgoyal/web-auth/entry";
+import { checkProductAccess } from "@jayantgoyal/web-auth/authorization";
 
 import { runMiddleware } from "@/proxy/runner";
 import { mfaMiddleware } from "@/proxy/mfa";
@@ -21,6 +22,11 @@ import { termsMiddleware } from "@/proxy/terms";
 import { routeGuardMiddleware } from "@/proxy/route-guard";
 import type { ProxyContext } from "@/proxy/types";
 import { matchesPathOrChild } from "@/lib/seo/config";
+import {
+  hasAcceptedStudioTerms,
+  STUDIO_TERMS_COOKIE,
+  STUDIO_TERMS_VERSION,
+} from "@/lib/terms";
 
 export const config = {
   matcher: [
@@ -220,20 +226,18 @@ export default async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
   const isAuthed = Boolean(user);
+  const productAccess = user
+    ? (await checkProductAccess(supabase, "studio")).allowed
+    : false;
 
   // Trust httpOnly cookie as cache; fall back to DB check for API routes
-  const termsCookie = request.cookies.get("terms_accepted")?.value === "true";
+  const termsCookie =
+    request.cookies.get(STUDIO_TERMS_COOKIE)?.value === STUDIO_TERMS_VERSION;
   let termsAccepted = isAuthed ? termsCookie : false;
   if (isAuthed && !termsAccepted && pathname.startsWith("/api/")) {
-    const { data: profile } = await supabase
-      .schema("jg_account")
-      .from("profiles")
-      .select("terms_accepted")
-      .eq("user_id", user!.id)
-      .single();
-    termsAccepted = profile?.terms_accepted === true;
+    termsAccepted = await hasAcceptedStudioTerms(supabase, user!.id);
     if (termsAccepted) {
-      response.cookies.set("terms_accepted", "true", {
+      response.cookies.set(STUDIO_TERMS_COOKIE, STUDIO_TERMS_VERSION, {
         path: "/",
         httpOnly: true,
         secure: true,
@@ -266,6 +270,7 @@ export default async function proxy(request: NextRequest) {
     user,
     pathname,
     isAuthed,
+    productAccess,
     termsAccepted,
     isPublic,
     aalLevel,

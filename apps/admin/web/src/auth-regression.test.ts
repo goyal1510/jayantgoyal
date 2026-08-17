@@ -22,7 +22,7 @@ import adminProxy from "./proxy";
 
 type SupabaseScenario = {
   user?: { id: string } | null;
-  role?: string | null;
+  access?: "none" | "viewer" | "full_access";
   currentLevel?: "aal1" | "aal2";
   nextLevel?: "aal1" | "aal2";
   hasVerifiedFactor?: boolean;
@@ -31,15 +31,12 @@ type SupabaseScenario = {
 
 function useSupabaseScenario({
   user = { id: "test-user" },
-  role = "admin",
+  access = "full_access",
   currentLevel = "aal2",
   nextLevel = "aal2",
   hasVerifiedFactor = false,
   exchangeError = null,
 }: SupabaseScenario = {}) {
-  const single = vi.fn().mockResolvedValue({
-    data: role === null ? null : { role },
-  });
   const supabase = {
     auth: {
       exchangeCodeForSession: vi
@@ -60,11 +57,16 @@ function useSupabaseScenario({
       },
     },
     schema: vi.fn(() => ({
-      from: vi.fn(() => ({
-        select: vi.fn(() => ({
-          eq: vi.fn(() => ({ single })),
-        })),
-      })),
+      rpc: vi.fn((name: string, params: { p_capability_key?: string }) => {
+        if (name !== "has_capability") {
+          return Promise.resolve({ data: false, error: null });
+        }
+        const capability = params.p_capability_key;
+        const allowed =
+          access === "full_access" ||
+          (access === "viewer" && capability === "admin.console.enter");
+        return Promise.resolve({ data: allowed, error: null });
+      }),
     })),
   };
 
@@ -184,7 +186,7 @@ describe("Admin Proxy authentication contract", () => {
   });
 
   it("denies a signed-in non-admin without losing refresh state", async () => {
-    useSupabaseScenario({ role: "user" });
+    useSupabaseScenario({ access: "none" });
 
     const response = await adminProxy(
       new NextRequest("https://admin.example.test/users"),
@@ -197,8 +199,8 @@ describe("Admin Proxy authentication contract", () => {
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
   });
 
-  it("allows an admin and exposes only the verified role header", async () => {
-    useSupabaseScenario({ role: "admin" });
+  it("allows a viewer and exposes only the verified access header", async () => {
+    useSupabaseScenario({ access: "viewer" });
 
     const response = await adminProxy(
       new NextRequest("https://admin.example.test/users"),
@@ -206,7 +208,7 @@ describe("Admin Proxy authentication contract", () => {
 
     expect(response.headers.get("location")).toBeNull();
     expect(response.headers.get("x-auth-status")).toBe("authed");
-    expect(response.headers.get("x-user-role")).toBe("admin");
+    expect(response.headers.get("x-user-access")).toBe("viewer");
   });
 
   it("steps an AAL1 user with a verified factor up to MFA", async () => {

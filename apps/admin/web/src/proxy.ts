@@ -8,6 +8,7 @@ import {
   copyAuthCacheHeaders,
   createSupabaseRequestClient,
 } from "@jayantgoyal/web-auth/server";
+import { checkCapability } from "@jayantgoyal/web-auth/authorization";
 
 export const config = {
   matcher: [
@@ -157,21 +158,25 @@ export default async function proxy(request: NextRequest) {
 
   // Admin role check (skip only for the unauthorized page).
   if (!isPublic && pathname !== "/unauthorized") {
-    const { data: profile } = await supabase
-      .schema("jg_account")
-      .from("profiles")
-      .select("role")
-      .eq("user_id", user!.id)
-      .single();
-
-    if (!profile || !["admin", "super_admin"].includes(profile.role)) {
+    const entryDecision = await checkCapability(
+      supabase,
+      "admin.console.enter",
+    );
+    if (!entryDecision.allowed) {
       return withAuthState(
         response,
         NextResponse.redirect(new URL("/unauthorized", request.url)),
       );
     }
 
-    response.headers.set("x-user-role", profile.role);
+    const mutationDecision = await checkCapability(
+      supabase,
+      "portfolio.content.update",
+    );
+    response.headers.set(
+      "x-user-access",
+      mutationDecision.allowed ? "full_access" : "viewer",
+    );
   }
 
   return response;

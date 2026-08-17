@@ -328,7 +328,7 @@ export async function loadWritingWorkspace(
 ): Promise<WritingWorkspaceData> {
   const [postsResult, editorialBySection] = await Promise.all([
     supabase
-      .schema("jg_app")
+      .schema("portfolio")
       .from("writing_posts")
       .select(PORTFOLIO_WRITING_CMS_SELECT_COLUMNS)
       .order("published_at", { ascending: false }),

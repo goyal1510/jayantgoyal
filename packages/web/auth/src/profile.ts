@@ -1,8 +1,4 @@
-import type {
-  SupabaseClient,
-  User,
-  UserIdentity,
-} from "@supabase/supabase-js";
+import type { SupabaseClient, User, UserIdentity } from "@supabase/supabase-js";
 
 export const PROFILE_AVATAR_BUCKET = "profile-avatars";
 export const PROFILE_AVATAR_MAX_BYTES = 5 * 1024 * 1024;
@@ -88,15 +84,15 @@ function identityName(identity: UserIdentity) {
 }
 
 /** Provider data is read from Supabase identities, never auth user metadata. */
-export function profileMetadataFromIdentities(
-  user: Pick<User, "identities">,
-) {
+export function profileMetadataFromIdentities(user: Pick<User, "identities">) {
   const identity = identitiesByRecentUse(user).find((candidate) => {
     const name = identityName(candidate);
     return Boolean(name.firstName || name.lastName);
   });
 
-  return identity ? identityName(identity) : { firstName: null, lastName: null };
+  return identity
+    ? identityName(identity)
+    : { firstName: null, lastName: null };
 }
 
 /**
@@ -157,7 +153,7 @@ export async function syncProfileNamesFromIdentities(
   if (!metadata.firstName && !metadata.lastName) return;
 
   const { data: profile } = await supabase
-    .schema("jg_account")
+    .schema("iam")
     .from("profiles")
     .select("first_name, last_name")
     .eq("user_id", user.id)
@@ -174,7 +170,7 @@ export async function syncProfileNamesFromIdentities(
   if (Object.keys(updates).length === 0) return;
 
   await supabase
-    .schema("jg_account")
+    .schema("iam")
     .from("profiles")
     .update(updates)
     .eq("user_id", user.id);

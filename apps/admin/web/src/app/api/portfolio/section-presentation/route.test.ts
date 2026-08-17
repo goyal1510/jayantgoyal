@@ -101,6 +101,9 @@ describe("Admin section presentation route", () => {
 
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ data: saved });
+    expect(authorizeAndGetClientMock).toHaveBeenCalledWith(
+      "portfolio.content.update",
+    );
     expect(rpcClient.schema).toHaveBeenCalledWith("portfolio");
     expect(rpcClient.rpc).toHaveBeenCalledWith("save_section_presentation", {
       p_section_key: "about",

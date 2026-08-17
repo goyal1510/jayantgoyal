@@ -9,6 +9,7 @@ import {
   authorizeAndGetClient,
   revalidatePortfolioPublicContent,
 } from "../[table]/helpers";
+import { ADMIN_CAPABILITIES } from "@/lib/access";
 
 function invalidPayload(fields: string[]) {
   return NextResponse.json(
@@ -24,7 +25,9 @@ export async function PUT(request: Request) {
     if (validationErrors.length > 0) return invalidPayload(validationErrors);
 
     const input = body as PortfolioSectionPresentationInput;
-    const auth = await authorizeAndGetClient();
+    const auth = await authorizeAndGetClient(
+      ADMIN_CAPABILITIES.portfolioUpdate,
+    );
     if ("error" in auth) return auth.error;
 
     const { data, error } = await auth.client

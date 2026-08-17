@@ -22,5 +22,12 @@ export async function routeGuardMiddleware(
     );
   }
 
+  if (ctx.isAuthed && !ctx.productAccess && !ctx.isPublic) {
+    return NextResponse.json(
+      { error: "Studio access is not assigned." },
+      { status: 403 },
+    );
+  }
+
   return null;
 }

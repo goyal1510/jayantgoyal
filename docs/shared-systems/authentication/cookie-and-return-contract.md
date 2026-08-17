@@ -82,10 +82,11 @@ falls back to an Auth-owned safe path.
 ## Product authorization after entry
 
 A shared session proves the same user reached another host; it does not prove
-the user may perform that product action. Studio still checks recovery mode,
-MFA, terms, and user ownership. Admin still checks MFA, `admin`/`super_admin`
-role, and route-specific authorization. Every elevated API obtains a live user
-and rechecks its required role.
+the user may perform that product action. Studio still checks current product
+membership, recovery mode, MFA, versioned terms, capability, and user
+ownership. Admin still checks MFA, Admin membership, and the route-specific
+`product.resource.action` capability. Every elevated API obtains a live user
+and rechecks its required capability.
 
 ## Cache and logging rules
 

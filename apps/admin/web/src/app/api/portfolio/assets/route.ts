@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 
 import { authorizeAndGetClient } from "@/app/api/portfolio/[table]/helpers";
+import { ADMIN_CAPABILITIES } from "@/lib/access";
 import {
   PORTFOLIO_ASSET_BUCKET,
   PORTFOLIO_ASSET_FOLDER,
@@ -28,7 +29,7 @@ function isAssetKind(
 }
 
 export async function POST(request: Request) {
-  const auth = await authorizeAndGetClient();
+  const auth = await authorizeAndGetClient(ADMIN_CAPABILITIES.portfolioCreate);
   if ("error" in auth) return auth.error;
 
   const formData = await request.formData();

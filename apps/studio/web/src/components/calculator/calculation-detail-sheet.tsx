@@ -113,15 +113,10 @@ export function CalculationDetailSheet({
                 </SheetTitle>
                 <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                   <span className="rounded-full bg-muted px-2 py-0.5">
-                    {formatDateDisplay(
-                      currentEntry.ist_timestamp || currentEntry.created_at,
-                    )}
+                    {formatDateDisplay(currentEntry.created_at)}
                   </span>
                   <span className="rounded-full bg-muted px-2 py-0.5">
-                    {formatTimeDisplay(
-                      currentEntry.ist_timestamp || currentEntry.created_at,
-                    )}{" "}
-                    IST
+                    {formatTimeDisplay(currentEntry.created_at)} IST
                   </span>
                   {selectedDate ? (
                     <span className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">

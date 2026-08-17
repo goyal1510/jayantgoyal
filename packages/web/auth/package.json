@@ -4,6 +4,7 @@
   "type": "module",
   "private": true,
   "exports": {
+    "./authorization": "./src/authorization.ts",
     "./browser": "./src/browser.ts",
     "./cookies": "./src/cookies.ts",
     "./entry": "./src/entry.ts",

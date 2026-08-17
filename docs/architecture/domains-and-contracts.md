@@ -6,15 +6,17 @@ actually consumes it.
 
 ## Current domains
 
-| Domain             | Primary owner | Shared boundary                                          |
-| ------------------ | ------------- | -------------------------------------------------------- |
-| Professional story | Portfolio     | `@jayantgoyal/portfolio-contracts` shared with Admin     |
-| Writing            | Portfolio     | Published data read by Portfolio, administered by Admin  |
-| Product catalog    | Studio        | Studio runtime registries                                |
-| Personal workspace | Studio        | `jg_app` tables, RLS, Storage, and client APIs           |
-| Account identity   | Auth          | `@jayantgoyal/web-auth`, Supabase Auth, `jg_account`     |
-| Administration     | Admin         | Role-gated APIs over owned product/account/provider data |
-| Public identity    | Foundation    | `@jayantgoyal/identity` and web-brand projections        |
+| Domain                | Primary owner     | Shared boundary                                                               |
+| --------------------- | ----------------- | ----------------------------------------------------------------------------- |
+| Professional story    | Portfolio         | `@jayantgoyal/portfolio-contracts` shared with Admin                          |
+| Writing               | Portfolio         | Published data read by Portfolio, administered by Admin                       |
+| Product catalog       | Studio            | Studio runtime registries                                                     |
+| Personal workspace    | Studio            | `studio` tables, capability-aware RLS, Storage, and client APIs               |
+| Authentication        | Auth              | `@jayantgoyal/web-auth`, Supabase Auth, and `iam.profiles` access             |
+| Identity and access   | Cross-product IAM | Approved `iam` profile, entitlement, workforce, role, and capability boundary |
+| Administration        | Admin             | Capability-gated APIs over owned product/IAM/provider data                    |
+| Public identity       | Foundation        | `@jayantgoyal/identity` and web-brand projections                             |
+| Private communication | Shaamil           | Defined product boundary; no current runtime contract                         |
 
 ## Contract placement
 
@@ -35,11 +37,20 @@ source.
 
 ## Data contracts
 
-Database schema ownership is explicit: `portfolio` serves professional CMS
-data, `jg_account` serves profiles and account policy, and `jg_app` serves
-Studio and Writing capabilities. Migrations are append-only change contracts;
-schema snapshots describe current structure. Runtime validation remains
-necessary at every browser, server, provider, and database boundary.
+The deployed schema model gives each domain an explicit owner: `portfolio` serves
+professional CMS and Writing data, `iam` serves canonical profiles and access
+policy, and `studio` serves Studio capabilities. Ownership and safe evolution
+rules are defined in [Database schema ownership and
+evolution](../shared-systems/data/schema-ownership.md).
+
+IAM replaces the single global account role with product
+entitlements and scoped role/capability assignments. Products retain their own
+resource-level attributes and RLS; IAM does not absorb Studio resources or
+Shaamil community membership.
+
+Migrations are append-only change contracts; schema snapshots describe current
+structure. Runtime validation remains necessary at every client, server,
+provider, and database boundary.
 
 Before introducing a new domain such as billing or advertising, identify the
 owning product, public operations, authorization model, schema, provider

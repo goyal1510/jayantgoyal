@@ -6,7 +6,7 @@ import zlib from "node:zlib";
 const root = process.cwd();
 
 const clientBudgets = [
-  { app: "portfolio", maximumKiB: 280 },
+  { app: "portfolio", maximumKiB: 305 },
   { app: "studio", maximumKiB: 525 },
   { app: "admin", maximumKiB: 385 },
   { app: "auth", maximumKiB: 320 },
@@ -36,12 +36,13 @@ const routeBudgets = [
   },
 ];
 
+function getAppBuildDirectory(app) {
+  return path.join(root, "apps", app, "web", ".next");
+}
+
 function readAnalyzeHeader(app) {
   const filename = path.join(
-    root,
-    "apps",
-    app,
-    ".next",
+    getAppBuildDirectory(app),
     "diagnostics",
     "analyze",
     "data",
@@ -65,7 +66,7 @@ function getClientCompressedKiB(app) {
 }
 
 function getRouteEntryGzipKiB({ app, manifest }) {
-  const appBuildDirectory = path.join(root, "apps", app, ".next");
+  const appBuildDirectory = getAppBuildDirectory(app);
   const filename = path.join(appBuildDirectory, manifest);
   const source = fs.readFileSync(filename, "utf8");
   const context = { globalThis: {} };

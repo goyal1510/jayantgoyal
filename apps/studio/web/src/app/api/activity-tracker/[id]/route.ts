@@ -47,7 +47,7 @@ export async function PATCH(
     }
 
     const { data: updatedActivity, error: updateError } = await supabase
-      .schema("jg_app")
+      .schema("studio")
       .from("activity_tracker_activities")
       .update(updateData)
       .eq("id", activityId)
@@ -94,7 +94,7 @@ export async function DELETE(
 
     const { id: activityId } = await params;
     const { data: deletedActivity, error } = await supabase
-      .schema("jg_app")
+      .schema("studio")
       .from("activity_tracker_activities")
       .delete()
       .eq("id", activityId)

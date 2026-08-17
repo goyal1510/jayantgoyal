@@ -55,7 +55,7 @@ export function ScratchpadPage() {
 
         setUserId(user.id);
         const { data, error: supabaseError } = await supabase
-          .schema("jg_app")
+          .schema("studio")
           .from("scratchpad_entries")
           .select(
             "id,user_id,content,entry_type,language,created_at,updated_at,is_read",
@@ -85,7 +85,7 @@ export function ScratchpadPage() {
         "postgres_changes",
         {
           event: "INSERT",
-          schema: "jg_app",
+          schema: "studio",
           table: "scratchpad_entries",
           filter: `user_id=eq.${userId}`,
         },
@@ -103,7 +103,7 @@ export function ScratchpadPage() {
         "postgres_changes",
         {
           event: "UPDATE",
-          schema: "jg_app",
+          schema: "studio",
           table: "scratchpad_entries",
           filter: `user_id=eq.${userId}`,
         },
@@ -120,7 +120,7 @@ export function ScratchpadPage() {
         "postgres_changes",
         {
           event: "DELETE",
-          schema: "jg_app",
+          schema: "studio",
           table: "scratchpad_entries",
           filter: `user_id=eq.${userId}`,
         },

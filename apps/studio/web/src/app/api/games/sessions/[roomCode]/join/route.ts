@@ -36,8 +36,8 @@ export async function POST(
   const supabase = createSupabaseServiceRoleClient();
 
   const { data: session, error: sessionError } = await supabase
-    .schema("jg_app")
-    .from("game_hub_sessions")
+    .schema("studio")
+    .from("game_sessions")
     .select("*")
     .eq("room_code", roomCode)
     .single();
@@ -61,8 +61,8 @@ export async function POST(
   }
 
   const { data: existingParticipant } = await supabase
-    .schema("jg_app")
-    .from("game_hub_session_participants")
+    .schema("studio")
+    .from("game_session_participants")
     .select("*")
     .eq("session_id", session.id)
     .eq("user_id", user.id)
@@ -70,8 +70,8 @@ export async function POST(
 
   if (existingParticipant) {
     await supabase
-      .schema("jg_app")
-      .from("game_hub_session_participants")
+      .schema("studio")
+      .from("game_session_participants")
       .update({
         display_name: displayName,
         last_seen_at: new Date().toISOString(),
@@ -84,8 +84,8 @@ export async function POST(
   }
 
   const { data: activeParticipants, error: participantsError } = await supabase
-    .schema("jg_app")
-    .from("game_hub_session_participants")
+    .schema("studio")
+    .from("game_session_participants")
     .select("seat")
     .eq("session_id", session.id)
     .is("left_at", null)
@@ -122,8 +122,8 @@ export async function POST(
   }
 
   const { error: joinError } = await supabase
-    .schema("jg_app")
-    .from("game_hub_session_participants")
+    .schema("studio")
+    .from("game_session_participants")
     .insert({
       session_id: session.id,
       user_id: user.id,
@@ -146,8 +146,8 @@ export async function POST(
       : "waiting";
   if (nextStatus !== session.status) {
     await supabase
-      .schema("jg_app")
-      .from("game_hub_sessions")
+      .schema("studio")
+      .from("game_sessions")
       .update({
         status: nextStatus,
         started_at: nextStatus === "active" ? new Date().toISOString() : null,

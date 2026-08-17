@@ -17,11 +17,16 @@ All four clients
   ├─ consume selected workspace packages
   └─ connect to one verified Supabase project
        ├─ Supabase Auth
-       ├─ jg_account
-       ├─ jg_app
+       ├─ iam + iam_private
+       ├─ studio
        ├─ portfolio
+       ├─ foundation (private helpers)
        └─ Storage buckets
 ```
+
+This diagram is the coordinated post-cutover topology. The hosted schemas and
+deployed clients retain their predecessor contracts until the reviewed
+migrations and clients are released together.
 
 Vercel projects have separate root directories and environment sets. A shared
 package change can affect multiple deployments even when only one product
@@ -33,7 +38,7 @@ source directory changed.
 Browser
   → Portfolio server component
   → anonymous Supabase server client
-  → portfolio tables and/or jg_app.writing_posts
+  → portfolio tables, including portfolio.writing_posts
   → Portfolio contract validation and editorial mapping
   → server-rendered public page
 ```
@@ -63,9 +68,10 @@ are derived from Studio-owned registries.
 Browser with shared session cookie
   → Studio proxy
      → Supabase getUser
-     → MFA, recovery-mode, and terms middleware
+     → live Studio product membership
+     → MFA, recovery-mode, and versioned terms middleware
   → account workspace or API
-  → user-scoped jg_app query / RPC / Storage operation
+  → capability- and owner-scoped studio query / RPC / Storage operation
   → response or Realtime update
 ```
 
@@ -96,28 +102,29 @@ Preview and local hosts use safer host/local behavior.
 Browser
   → Admin proxy authenticates session
   → MFA assurance check
-  → jg_account.profiles role lookup
+  → iam.has_capability('admin.console.enter')
   → Admin page or route handler
-  → route-specific admin/super-admin authorization
+  → route-specific product.resource.action capability
   → RLS query or server-only service-role/provider call
 ```
 
 Admin access does not transfer product ownership. Portfolio remains the owner
-of its content contract; Admin is the privileged editor. Super-admin-only
-operations include account role management and deployment operations.
+of its content contract; Admin is the privileged editor. `admin.viewer` is
+read-only. `admin.full_access` includes the current access-management,
+Portfolio mutation, and deployment operations.
 
 ## Data ownership and access modes
 
-| Boundary                        | Primary owner       | Typical access                               |
-| ------------------------------- | ------------------- | -------------------------------------------- |
-| Supabase identities and factors | Auth                | Supabase Auth APIs with user session         |
-| `jg_account.profiles`           | Auth/account policy | User RLS; Admin role-gated elevation         |
-| `portfolio.*`                   | Portfolio           | Public RLS reads; Admin-authorized writes    |
-| `jg_app.writing_posts`          | Portfolio           | Public published reads; Admin writes         |
-| Other `jg_app.*` tables         | Studio              | User-scoped RLS and Studio APIs              |
-| `portfolio-assets`              | Portfolio           | Public reads; Admin-authorized writes        |
-| `private-files`                 | Studio              | Private owner-only access                    |
-| `profile-avatars`               | Auth                | Private owner-only access and signed display |
+| Boundary                        | Primary owner     | Typical access                                |
+| ------------------------------- | ----------------- | --------------------------------------------- |
+| Supabase identities and factors | Auth              | Supabase Auth APIs with user session          |
+| `iam.profiles` and access data  | Cross-product IAM | Self/read policies; trusted access mutations  |
+| `portfolio.*`                   | Portfolio         | Public reads; capability-authorized writes    |
+| `portfolio.writing_posts`       | Portfolio         | Published reads; capability-authorized writes |
+| `studio.*` tables               | Studio            | Capability- and owner-scoped RLS/APIs         |
+| `portfolio-assets`              | Portfolio         | Public reads; Admin-authorized writes         |
+| `studio-files`                  | Studio            | Private capability- and owner-scoped access   |
+| `profile-avatars`               | Auth              | Private owner-only access and signed display  |
 
 See the [schema catalog](../shared-systems/data/schema-catalog.md) for current
 tables and the [integration guide](../shared-systems/integrations/README.md)

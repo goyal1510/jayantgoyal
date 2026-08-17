@@ -91,18 +91,6 @@ export function CurrencyCalculatorForm() {
       previousNote = note;
       previousDenominations = denominations;
 
-      const now = new Date();
-      const istDate = new Date(
-        now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }),
-      );
-      const day = String(istDate.getDate()).padStart(2, "0");
-      const month = String(istDate.getMonth() + 1).padStart(2, "0");
-      const year = istDate.getFullYear();
-      const hours = String(istDate.getHours()).padStart(2, "0");
-      const minutes = String(istDate.getMinutes()).padStart(2, "0");
-      const seconds = String(istDate.getSeconds()).padStart(2, "0");
-      const istTimestamp = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
-
       setNote("");
       setDenominations(
         CURRENCY_DENOMINATIONS.map((currency) => ({
@@ -114,7 +102,6 @@ export function CurrencyCalculatorForm() {
 
       await createCalculation({
         note: previousNote || undefined,
-        ist_timestamp: istTimestamp,
         denominations: validDenominations,
       });
 

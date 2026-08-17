@@ -14,7 +14,7 @@ Studio owns four kinds of experience:
 - account-owned productivity workspaces;
 - local/computer and realtime room-based games.
 
-It does not own credential entry, Portfolio editorial content, or user-role
+It does not own credential entry, Portfolio editorial content, or access
 administration. Auth owns account entry/security. Portfolio owns Writing even
 when Studio links to it. No commerce surface is currently implemented.
 
@@ -53,10 +53,11 @@ For authenticated requests the proxy:
 
 1. strips client-supplied internal headers;
 2. resolves the shared session cookie and calls Supabase `getUser()`;
-3. checks TOTP assurance when a factor exists;
-4. confines recovery-mode sessions to reset behavior;
-5. checks terms acceptance for protected APIs;
-6. forwards verified user headers and refreshed cookies.
+3. evaluates current Studio product membership;
+4. checks TOTP assurance when a factor exists;
+5. confines recovery-mode sessions to reset behavior;
+6. checks versioned terms acceptance for protected APIs;
+7. forwards verified user headers and refreshed cookies.
 
 Auth owns the resulting login, forgot-password, and MFA UI. Studio aliases
 redirect there with a validated return target.
@@ -68,7 +69,8 @@ Studio client. Tool favorites and recently used history are persisted for
 signed-in users. Weather uses the browser-visible OpenWeather key. GitHub
 statistics use server routes and the shared GitHub package.
 
-Account workspaces use Studio-owned API routes and `jg_app` RLS:
+Account workspaces use Studio-owned API routes and capability-aware `studio`
+RLS:
 
 - Activity Tracker: activities, entries, and computed statistics;
 - Currency Calculator: calculations and denomination rows;
@@ -97,7 +99,7 @@ game coordination routes. Those handlers authenticate the current user and
 validate room membership/state before elevated access; ordinary workspace
 operations use the user's RLS-bound session.
 
-Private files use signed upload/complete flows and the `private-files` bucket.
+Private files use signed upload/complete flows and the `studio-files` bucket.
 Online game actions validate session membership, turn/order rules, and current
 state before the database RPC records an action. Provider secrets and the
 Wordle seed secret must never reach client bundles.

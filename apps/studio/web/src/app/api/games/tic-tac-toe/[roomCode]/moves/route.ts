@@ -60,8 +60,8 @@ export async function POST(
 
   const supabase = createSupabaseServiceRoleClient();
   const { data: session, error: sessionError } = await supabase
-    .schema("jg_app")
-    .from("game_hub_sessions")
+    .schema("studio")
+    .from("game_sessions")
     .select("*")
     .eq("room_code", roomCode)
     .eq("game_slug", "tic-tac-toe")
@@ -82,8 +82,8 @@ export async function POST(
   }
 
   const { data: participant } = await supabase
-    .schema("jg_app")
-    .from("game_hub_session_participants")
+    .schema("studio")
+    .from("game_session_participants")
     .select("*")
     .eq("session_id", session.id)
     .eq("user_id", user.id)
@@ -133,8 +133,8 @@ export async function POST(
   const isDraw = !winner && isTicTacToeBoardFull(board);
   const nextMark = nextTicTacToeMark(mark);
   const { data: nextParticipant } = await supabase
-    .schema("jg_app")
-    .from("game_hub_session_participants")
+    .schema("studio")
+    .from("game_session_participants")
     .select("id")
     .eq("session_id", session.id)
     .eq("seat", nextMark)
@@ -161,6 +161,7 @@ export async function POST(
       : null;
 
   const { error: actionError } = await recordOnlineGameAction(supabase, {
+    actorUserId: user.id,
     sessionId: session.id,
     participantId: participant.id,
     moveNumber,

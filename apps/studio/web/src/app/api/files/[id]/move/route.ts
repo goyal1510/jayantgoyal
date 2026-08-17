@@ -8,7 +8,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const supabase = await createSupabaseServerClient();
@@ -20,10 +20,7 @@ export async function POST(
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { id: fileId } = await params;
@@ -36,7 +33,7 @@ export async function POST(
     if (!targetPath || typeof targetPath !== "string") {
       return NextResponse.json(
         { error: "Target path is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -44,21 +41,22 @@ export async function POST(
     if (targetPath.includes("..") || !targetPath.startsWith("/")) {
       return NextResponse.json(
         { error: "Invalid target path" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Normalize target path (ensure it ends with /)
-    const normalizedTargetPath = targetPath === "/"
-      ? "/"
-      : targetPath.endsWith("/")
-        ? targetPath
-        : `${targetPath}/`;
+    const normalizedTargetPath =
+      targetPath === "/"
+        ? "/"
+        : targetPath.endsWith("/")
+          ? targetPath
+          : `${targetPath}/`;
 
     // Get current file to check if it exists and belongs to user
     const { data: file, error: fileError } = await supabase
-      .schema("jg_app")
-      .from("file_manager_files")
+      .schema("studio")
+      .from("file_entries")
       .select("*")
       .eq("id", fileId)
       .eq("user_id", user.id)
@@ -66,20 +64,20 @@ export async function POST(
       .single();
 
     if (fileError || !file) {
-      return NextResponse.json(
-        { error: "File not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "File not found" }, { status: 404 });
     }
 
     // Get current parent path
-    const currentParentPath = file.file_path.substring(0, file.file_path.lastIndexOf(file.file_name));
+    const currentParentPath = file.file_path.substring(
+      0,
+      file.file_path.lastIndexOf(file.file_name),
+    );
 
     // Check if trying to move to the same location
     if (normalizedTargetPath === currentParentPath) {
       return NextResponse.json(
         { error: "File is already in this location" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -88,7 +86,7 @@ export async function POST(
       if (normalizedTargetPath.startsWith(file.file_path)) {
         return NextResponse.json(
           { error: "Cannot move a folder into itself or its subfolders" },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
@@ -97,8 +95,8 @@ export async function POST(
     let newParentId: string | null = null;
     if (normalizedTargetPath !== "/") {
       const { data: parentDir } = await supabase
-        .schema("jg_app")
-        .from("file_manager_files")
+        .schema("studio")
+        .from("file_entries")
         .select("id")
         .eq("user_id", user.id)
         .eq("file_path", normalizedTargetPath)
@@ -109,15 +107,15 @@ export async function POST(
       if (!parentDir) {
         return NextResponse.json(
           { error: "Target directory not found" },
-          { status: 404 }
+          { status: 404 },
         );
       }
       newParentId = parentDir.id;
     } else {
       // Moving to root - get root directory ID
       const { data: rootDir } = await supabase
-        .schema("jg_app")
-        .from("file_manager_files")
+        .schema("studio")
+        .from("file_entries")
         .select("id")
         .eq("user_id", user.id)
         .eq("file_path", "/")
@@ -129,13 +127,16 @@ export async function POST(
     }
 
     // Construct the new file path
-    const newFilePath = normalizedTargetPath + file.file_name + (file.is_directory ? "/" : "");
+    const newFilePath =
+      normalizedTargetPath + file.file_name + (file.is_directory ? "/" : "");
 
     // Check if a file with the same name already exists at the destination
     const { data: existingFile } = await supabase
-      .schema("jg_app")
-      .from("file_manager_files")
-      .select("id, file_name, file_path, display_name, size_bytes, updated_at, is_directory, storage_path")
+      .schema("studio")
+      .from("file_entries")
+      .select(
+        "id, file_name, file_path, display_name, size_bytes, updated_at, is_directory, storage_path",
+      )
       .eq("user_id", user.id)
       .eq("file_path", newFilePath)
       .eq("is_deleted", false)
@@ -149,8 +150,8 @@ export async function POST(
       if (overwrite) {
         // Hard delete the existing file
         const { error: deleteError } = await supabase
-          .schema("jg_app")
-          .from("file_manager_files")
+          .schema("studio")
+          .from("file_entries")
           .delete()
           .eq("id", existingFile.id)
           .eq("user_id", user.id);
@@ -158,14 +159,18 @@ export async function POST(
         if (deleteError) {
           console.error("Error deleting existing file:", deleteError);
           return NextResponse.json(
-            { error: "Failed to replace existing file: " + deleteError.message },
-            { status: 500 }
+            {
+              error: "Failed to replace existing file: " + deleteError.message,
+            },
+            { status: 500 },
           );
         }
 
         // Also delete from storage if it exists
         if (existingFile.storage_path) {
-          await supabase.storage.from("private-files").remove([existingFile.storage_path]);
+          await supabase.storage
+            .from("studio-files")
+            .remove([existingFile.storage_path]);
         }
       } else if (rename) {
         // Generate a unique name by adding a number suffix
@@ -174,16 +179,23 @@ export async function POST(
         // For files, insert number before extension
         const lastDotIndex = file.file_name.lastIndexOf(".");
         const hasExtension = !file.is_directory && lastDotIndex > 0;
-        const baseName = hasExtension ? file.file_name.substring(0, lastDotIndex) : file.file_name;
-        const extension = hasExtension ? file.file_name.substring(lastDotIndex) : "";
+        const baseName = hasExtension
+          ? file.file_name.substring(0, lastDotIndex)
+          : file.file_name;
+        const extension = hasExtension
+          ? file.file_name.substring(lastDotIndex)
+          : "";
 
         while (true) {
           finalFileName = `${baseName} (${counter})${extension}`;
-          finalFilePath = normalizedTargetPath + finalFileName + (file.is_directory ? "/" : "");
+          finalFilePath =
+            normalizedTargetPath +
+            finalFileName +
+            (file.is_directory ? "/" : "");
 
           const { data: checkFile } = await supabase
-            .schema("jg_app")
-            .from("file_manager_files")
+            .schema("studio")
+            .from("file_entries")
             .select("id")
             .eq("user_id", user.id)
             .eq("file_path", finalFilePath)
@@ -209,15 +221,15 @@ export async function POST(
               is_directory: existingFile.is_directory,
             },
           },
-          { status: 409 }
+          { status: 409 },
         );
       }
     }
 
     // Move the file (update path and parent)
     const { error: updateError } = await supabase
-      .schema("jg_app")
-      .from("file_manager_files")
+      .schema("studio")
+      .from("file_entries")
       .update({
         file_path: finalFilePath,
         file_name: finalFileName,
@@ -231,7 +243,7 @@ export async function POST(
     if (updateError) {
       return NextResponse.json(
         { error: "Failed to move file" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -250,7 +262,7 @@ export async function POST(
     console.error("Error moving file:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -260,11 +272,11 @@ async function updateChildPaths(
   supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
   userId: string,
   oldPath: string,
-  newPath: string
+  newPath: string,
 ) {
   const { data: children } = await supabase
-    .schema("jg_app")
-    .from("file_manager_files")
+    .schema("studio")
+    .from("file_entries")
     .select("id, file_path")
     .eq("user_id", userId)
     .like("file_path", `${oldPath}%`)
@@ -275,8 +287,8 @@ async function updateChildPaths(
     for (const child of children) {
       const newChildPath = child.file_path.replace(oldPath, newPath);
       await supabase
-        .schema("jg_app")
-        .from("file_manager_files")
+        .schema("studio")
+        .from("file_entries")
         .update({
           file_path: newChildPath,
           updated_at: new Date().toISOString(),

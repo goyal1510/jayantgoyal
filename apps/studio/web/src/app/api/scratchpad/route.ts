@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     }
 
     const { data: entries, error } = await supabase
-      .schema("jg_app")
+      .schema("studio")
       .from("scratchpad_entries")
       .select(SCRATCHPAD_SELECT_COLUMNS)
       .eq("user_id", userId)
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { data: entry, error } = await supabase
-      .schema("jg_app")
+      .schema("studio")
       .from("scratchpad_entries")
       .insert({
         user_id: userId,

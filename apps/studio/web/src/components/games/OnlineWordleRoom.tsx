@@ -133,8 +133,8 @@ export function OnlineWordleRoom({ roomCode }: { roomCode: string }) {
         "postgres_changes",
         {
           event: "*",
-          schema: "jg_app",
-          table: "game_hub_sessions",
+          schema: "studio",
+          table: "game_sessions",
           filter: `id=eq.${session.id}`,
         },
         refreshRoom,
@@ -143,8 +143,8 @@ export function OnlineWordleRoom({ roomCode }: { roomCode: string }) {
         "postgres_changes",
         {
           event: "*",
-          schema: "jg_app",
-          table: "game_hub_session_participants",
+          schema: "studio",
+          table: "game_session_participants",
           filter: `session_id=eq.${session.id}`,
         },
         refreshRoom,
@@ -153,8 +153,8 @@ export function OnlineWordleRoom({ roomCode }: { roomCode: string }) {
         "postgres_changes",
         {
           event: "INSERT",
-          schema: "jg_app",
-          table: "game_hub_session_moves",
+          schema: "studio",
+          table: "game_session_moves",
           filter: `session_id=eq.${session.id}`,
         },
         refreshRoom,

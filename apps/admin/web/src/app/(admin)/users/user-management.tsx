@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import { Plus, Loader2, RefreshCw } from "lucide-react";
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { Button } from "@jayantgoyal/web-ui/button";
 import { ConfirmationDialog } from "@jayantgoyal/web-ui/confirmation-dialog";
 import {
@@ -13,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@jayantgoyal/web-ui/card";
-import type { Profile, UserRole } from "@/lib/types";
+import type { AdminRoleKey, Profile } from "@/lib/types";
 import { AddUserDialog } from "./add-user-dialog";
 import { UsersTable } from "./users-table";
 
@@ -25,9 +24,13 @@ interface AvailableUser {
 
 interface UserManagementProps {
   currentUserId: string;
+  canManageAccess: boolean;
 }
 
-export function UserManagement({ currentUserId }: UserManagementProps) {
+export function UserManagement({
+  currentUserId,
+  canManageAccess,
+}: UserManagementProps) {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [availableUsers, setAvailableUsers] = useState<AvailableUser[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,10 +38,9 @@ export function UserManagement({ currentUserId }: UserManagementProps) {
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState("");
-  const [newRole, setNewRole] = useState<UserRole>("user");
+  const [newRole, setNewRole] = useState<AdminRoleKey>("admin.viewer");
   const [addingUser, setAddingUser] = useState(false);
   const [pendingRemoval, setPendingRemoval] = useState<{
-    profileId: number;
     userId: string;
     name: string;
   } | null>(null);
@@ -67,35 +69,27 @@ export function UserManagement({ currentUserId }: UserManagementProps) {
     fetchUsers();
   }, [fetchUsers]);
 
-  async function updateRole(
-    profileId: number,
-    userId: string,
-    newRole: UserRole,
-  ) {
+  async function updateRole(userId: string, role: AdminRoleKey) {
     if (userId === currentUserId) {
       toast.error("You cannot change your own role");
       return;
     }
 
-    setActionLoading(String(profileId));
+    setActionLoading(userId);
 
     try {
-      const supabase = createSupabaseBrowserClient();
-
-      const { error } = await supabase
-        .schema("jg_account")
-        .from("profiles")
-        .update({ role: newRole })
-        .eq("id", profileId);
-
-      if (error) {
-        toast.error(error.message);
+      const response = await fetch("/api/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: userId, role }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        toast.error(data.error || "Failed to update access");
         return;
       }
 
-      toast.success(
-        `Role updated to ${newRole === "super_admin" ? "Super Admin" : newRole === "admin" ? "Admin" : "User"}`,
-      );
+      toast.success(data.message);
       fetchUsers();
     } catch {
       toast.error("Failed to update role");
@@ -104,29 +98,27 @@ export function UserManagement({ currentUserId }: UserManagementProps) {
     }
   }
 
-  async function removeUser(profileId: number, userId: string) {
+  async function removeUser(userId: string) {
     if (userId === currentUserId) {
       toast.error("You cannot remove yourself");
       return;
     }
 
-    setActionLoading(String(profileId));
+    setActionLoading(userId);
 
     try {
-      const supabase = createSupabaseBrowserClient();
-
-      const { error } = await supabase
-        .schema("jg_account")
-        .from("profiles")
-        .update({ role: "user" })
-        .eq("id", profileId);
-
-      if (error) {
-        toast.error(error.message);
+      const response = await fetch("/api/users", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: userId }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        toast.error(data.error || "Failed to remove access");
         return;
       }
 
-      toast.success("User access removed");
+      toast.success(data.message);
       fetchUsers();
     } catch {
       toast.error("Failed to remove user");
@@ -161,7 +153,7 @@ export function UserManagement({ currentUserId }: UserManagementProps) {
 
       toast.success(data.message);
       setSelectedUserId("");
-      setNewRole("admin");
+      setNewRole("admin.viewer");
       setDialogOpen(false);
       fetchUsers();
     } catch {
@@ -185,17 +177,23 @@ export function UserManagement({ currentUserId }: UserManagementProps) {
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle>Users</CardTitle>
-            <CardDescription>Manage all users and their roles</CardDescription>
+            <CardDescription>
+              {canManageAccess
+                ? "View identities and manage Admin access"
+                : "View identities and Admin access assignments"}
+            </CardDescription>
           </div>
           <div className="flex items-center gap-2">
-            <Button
-              size="sm"
-              disabled={availableUsers.length === 0}
-              onClick={() => setDialogOpen(true)}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add User
-            </Button>
+            {canManageAccess && (
+              <Button
+                size="sm"
+                disabled={availableUsers.length === 0}
+                onClick={() => setDialogOpen(true)}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Grant access
+              </Button>
+            )}
             <Button variant="outline" size="sm" onClick={fetchUsers}>
               <RefreshCw className="h-4 w-4 mr-2" />
               Refresh
@@ -209,12 +207,14 @@ export function UserManagement({ currentUserId }: UserManagementProps) {
             <UsersTable
               profiles={profiles}
               currentUserId={currentUserId}
+              canManageAccess={canManageAccess}
               actionLoading={actionLoading}
               onUpdateRole={updateRole}
-              onRemoveUser={(profileId, userId) => {
-                const profile = profiles.find((item) => item.id === profileId);
+              onRemoveUser={(userId) => {
+                const profile = profiles.find(
+                  (item) => item.user_id === userId,
+                );
                 setPendingRemoval({
-                  profileId,
                   userId,
                   name: profile
                     ? `${profile.first_name} ${profile.last_name}`.trim() ||
@@ -238,19 +238,20 @@ export function UserManagement({ currentUserId }: UserManagementProps) {
         setNewRole={setNewRole}
         onSubmit={handleAddUser}
         adding={addingUser}
+        disabled={!canManageAccess}
       />
       <ConfirmationDialog
         open={pendingRemoval !== null}
         onOpenChange={(open) => {
           if (!open) setPendingRemoval(null);
         }}
-        title="Remove admin access?"
-        description={`This will return ${pendingRemoval?.name ?? "this user"} to a regular account role.`}
+        title="Remove Admin access?"
+        description={`This will revoke Admin membership and assigned Admin roles for ${pendingRemoval?.name ?? "this user"}.`}
         confirmLabel="Remove access"
         destructive
         onConfirm={() => {
           if (pendingRemoval) {
-            return removeUser(pendingRemoval.profileId, pendingRemoval.userId);
+            return removeUser(pendingRemoval.userId);
           }
         }}
       />

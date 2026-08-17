@@ -5,7 +5,7 @@ import { handlePatchFile } from "./handlers";
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const supabase = await createSupabaseServerClient();
@@ -16,17 +16,14 @@ export async function GET(
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { id: fileId } = await params;
 
     const { data: file, error: fileError } = await supabase
-      .schema("jg_app")
-      .from("file_manager_files")
+      .schema("studio")
+      .from("file_entries")
       .select("*")
       .eq("id", fileId)
       .eq("user_id", user.id)
@@ -34,10 +31,7 @@ export async function GET(
       .single();
 
     if (fileError || !file) {
-      return NextResponse.json(
-        { error: "File not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "File not found" }, { status: 404 });
     }
 
     if (file.is_directory) {
@@ -56,15 +50,16 @@ export async function GET(
       });
     }
 
-    const { data: signedUrlData, error: signedUrlError } = await supabase.storage
-      .from("private-files")
-      .createSignedUrl(file.storage_path, 60);
+    const { data: signedUrlData, error: signedUrlError } =
+      await supabase.storage
+        .from("studio-files")
+        .createSignedUrl(file.storage_path, 60);
 
     if (signedUrlError) {
       console.error("Error creating signed URL:", signedUrlError);
       return NextResponse.json(
         { error: "Failed to generate file URL" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -89,14 +84,14 @@ export async function GET(
     console.error("Error getting file:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const supabase = await createSupabaseServerClient();
@@ -107,10 +102,7 @@ export async function PATCH(
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { id: fileId } = await params;
@@ -120,14 +112,14 @@ export async function PATCH(
     console.error("Error updating file:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const supabase = await createSupabaseServerClient();
@@ -138,33 +130,27 @@ export async function DELETE(
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { id: fileId } = await params;
 
     const file = await supabase
-      .schema("jg_app")
-      .from("file_manager_files")
+      .schema("studio")
+      .from("file_entries")
       .select("*")
       .eq("id", fileId)
       .eq("user_id", user.id)
       .single();
 
     if (file.error || !file.data) {
-      return NextResponse.json(
-        { error: "File not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "File not found" }, { status: 404 });
     }
 
     if (file.data.is_deleted) {
       return NextResponse.json(
         { error: "File is already deleted" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -173,7 +159,7 @@ export async function DELETE(
     if (!success) {
       return NextResponse.json(
         { error: "Failed to delete file" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -185,7 +171,7 @@ export async function DELETE(
     console.error("Error deleting file:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

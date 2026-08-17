@@ -262,7 +262,7 @@ SET default_table_access_method = "heap";
 
 
 CREATE TABLE IF NOT EXISTS "portfolio"."about" (
-    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
+    "id" "uuid" DEFAULT "foundation"."uuid_v7"() NOT NULL,
     "summary" "text" NOT NULL,
     "personal" "jsonb" DEFAULT '[]'::"jsonb" NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
@@ -274,7 +274,7 @@ CREATE TABLE IF NOT EXISTS "portfolio"."about" (
     CONSTRAINT "about_personal_shape_check" CHECK ("portfolio"."is_exact_text_object_array"("personal", ARRAY['label'::"text", 'value'::"text"])),
     CONSTRAINT "about_principles_shape_check" CHECK ("portfolio"."is_exact_text_object_array"("principles", ARRAY['title'::"text", 'copy'::"text"])),
     CONSTRAINT "about_required_copy_nonblank_check" CHECK ((("btrim"("summary") <> ''::"text") AND ("btrim"("headline") <> ''::"text") AND ("btrim"("objective") <> ''::"text"))),
-    CONSTRAINT "about_story_items_check" CHECK ("jg_app"."is_nonblank_text_array"("story"))
+    CONSTRAINT "about_story_items_check" CHECK ("foundation"."is_nonblank_text_array"("story"))
 );
 
 
@@ -282,7 +282,7 @@ ALTER TABLE "portfolio"."about" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "portfolio"."certificates" (
-    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
+    "id" "uuid" DEFAULT "foundation"."uuid_v7"() NOT NULL,
     "name" "text" NOT NULL,
     "description" "text",
     "category" "text" NOT NULL,
@@ -306,7 +306,7 @@ ALTER TABLE "portfolio"."certificates" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "portfolio"."contact" (
-    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
+    "id" "uuid" DEFAULT "foundation"."uuid_v7"() NOT NULL,
     "email" "text" NOT NULL,
     "phone" "text" NOT NULL,
     "location" "text" NOT NULL,
@@ -335,7 +335,7 @@ ALTER TABLE "portfolio"."contact_rate_limits" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "portfolio"."education" (
-    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
+    "id" "uuid" DEFAULT "foundation"."uuid_v7"() NOT NULL,
     "school" "text" NOT NULL,
     "degree" "text" NOT NULL,
     "period" "text" NOT NULL,
@@ -354,7 +354,7 @@ ALTER TABLE "portfolio"."education" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "portfolio"."experience" (
-    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
+    "id" "uuid" DEFAULT "foundation"."uuid_v7"() NOT NULL,
     "company" "text" NOT NULL,
     "role" "text" NOT NULL,
     "period" "text" NOT NULL,
@@ -367,7 +367,7 @@ CREATE TABLE IF NOT EXISTS "portfolio"."experience" (
     "bullets" "text"[] DEFAULT '{}'::"text"[] NOT NULL,
     "company_url" "text",
     "company_linkedin_url" "text",
-    CONSTRAINT "experience_bullets_items_check" CHECK ("jg_app"."is_nonblank_text_array"("bullets")),
+    CONSTRAINT "experience_bullets_items_check" CHECK ("foundation"."is_nonblank_text_array"("bullets")),
     CONSTRAINT "experience_company_linkedin_url_check" CHECK ((("company_linkedin_url" IS NULL) OR (("company_linkedin_url" = "btrim"("company_linkedin_url")) AND ("company_linkedin_url" ~* '^https://([[:alnum:]-]+\.)?linkedin\.com/(company|in)/[^[:space:]]+/?$'::"text")))),
     CONSTRAINT "experience_company_url_public_check" CHECK ((("company_url" IS NULL) OR (("company_url" = "btrim"("company_url")) AND ("company_url" ~* '^https?://[^[:space:]]+$'::"text")))),
     CONSTRAINT "experience_required_fields_nonblank_check" CHECK ((("btrim"("company") <> ''::"text") AND ("btrim"("role") <> ''::"text") AND ("btrim"("period") <> ''::"text"))),
@@ -387,7 +387,7 @@ COMMENT ON COLUMN "portfolio"."experience"."company_linkedin_url" IS 'LinkedIn c
 
 
 CREATE TABLE IF NOT EXISTS "portfolio"."hero" (
-    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
+    "id" "uuid" DEFAULT "foundation"."uuid_v7"() NOT NULL,
     "role" "text" NOT NULL,
     "tagline" "text" NOT NULL,
     "blurb" "text" NOT NULL,
@@ -407,7 +407,7 @@ ALTER TABLE "portfolio"."hero" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "portfolio"."nav_items" (
-    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
+    "id" "uuid" DEFAULT "foundation"."uuid_v7"() NOT NULL,
     "section_id" "text" NOT NULL,
     "label" "text" NOT NULL,
     "sort_order" integer DEFAULT 0 NOT NULL,
@@ -425,7 +425,7 @@ ALTER TABLE "portfolio"."nav_items" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "portfolio"."section_content" (
-    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
+    "id" "uuid" DEFAULT "foundation"."uuid_v7"() NOT NULL,
     "section_key" "text" NOT NULL,
     "eyebrow" "text" NOT NULL,
     "headline" "text",
@@ -444,7 +444,7 @@ ALTER TABLE "portfolio"."section_content" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "portfolio"."skill_categories" (
-    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
+    "id" "uuid" DEFAULT "foundation"."uuid_v7"() NOT NULL,
     "title" "text" NOT NULL,
     "sort_order" integer DEFAULT 0 NOT NULL,
     "is_visible" boolean DEFAULT true NOT NULL,
@@ -460,7 +460,7 @@ ALTER TABLE "portfolio"."skill_categories" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "portfolio"."skills" (
-    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
+    "id" "uuid" DEFAULT "foundation"."uuid_v7"() NOT NULL,
     "category_id" "uuid" NOT NULL,
     "name" "text" NOT NULL,
     "sort_order" integer DEFAULT 0 NOT NULL,
@@ -479,7 +479,7 @@ ALTER TABLE "portfolio"."skills" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "portfolio"."work" (
-    "id" "uuid" DEFAULT "jg_app"."uuid_v7"() NOT NULL,
+    "id" "uuid" DEFAULT "foundation"."uuid_v7"() NOT NULL,
     "name" "text" NOT NULL,
     "short_description" "text" NOT NULL,
     "github_link" "text",
@@ -503,11 +503,35 @@ CREATE TABLE IF NOT EXISTS "portfolio"."work" (
     CONSTRAINT "work_required_fields_nonblank_check" CHECK ((("btrim"("name") <> ''::"text") AND ("btrim"("short_description") <> ''::"text") AND ("btrim"("slug") <> ''::"text") AND ("btrim"("eyebrow") <> ''::"text") AND ("btrim"("impact") <> ''::"text") AND ("btrim"("contribution") <> ''::"text") AND ("btrim"("year_label") <> ''::"text") AND ("btrim"("image_alt") <> ''::"text") AND ("btrim"("image_url") <> ''::"text"))),
     CONSTRAINT "work_slug_format_check" CHECK (("slug" ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'::"text")),
     CONSTRAINT "work_sort_order_nonnegative_check" CHECK (("sort_order" >= 0)),
-    CONSTRAINT "work_tags_items_check" CHECK ("jg_app"."is_nonblank_text_array"("tags"))
+    CONSTRAINT "work_tags_items_check" CHECK ("foundation"."is_nonblank_text_array"("tags"))
 );
 
 
 ALTER TABLE "portfolio"."work" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "portfolio"."writing_posts" (
+    "id" "uuid" DEFAULT "foundation"."uuid_v7"() NOT NULL,
+    "title" "text" NOT NULL,
+    "slug" "text" NOT NULL,
+    "excerpt" "text",
+    "content" "text" DEFAULT ''::"text" NOT NULL,
+    "cover_image" "text",
+    "tags" "text"[] DEFAULT '{}'::"text"[] NOT NULL,
+    "is_visible" boolean DEFAULT true NOT NULL,
+    "is_published" boolean DEFAULT false NOT NULL,
+    "published_at" timestamp with time zone,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    CONSTRAINT "writing_posts_published_at_check" CHECK (((NOT "is_published") OR ("published_at" IS NOT NULL))),
+    CONSTRAINT "writing_posts_published_content_check" CHECK (((NOT "is_published") OR ("btrim"("content") <> ''::"text"))),
+    CONSTRAINT "writing_posts_required_fields_nonblank_check" CHECK ((("btrim"("title") <> ''::"text") AND ("btrim"("slug") <> ''::"text"))),
+    CONSTRAINT "writing_posts_slug_format_check" CHECK (("slug" ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'::"text")),
+    CONSTRAINT "writing_posts_tags_items_check" CHECK ("foundation"."is_nonblank_text_array"("tags"))
+);
+
+
+ALTER TABLE "portfolio"."writing_posts" OWNER TO "postgres";
 
 
 ALTER TABLE ONLY "portfolio"."about"
@@ -570,6 +594,16 @@ ALTER TABLE ONLY "portfolio"."work"
 
 
 
+ALTER TABLE ONLY "portfolio"."writing_posts"
+    ADD CONSTRAINT "writing_posts_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "portfolio"."writing_posts"
+    ADD CONSTRAINT "writing_posts_slug_key" UNIQUE ("slug");
+
+
+
 CREATE INDEX "contact_rate_limits_reset_at_idx" ON "portfolio"."contact_rate_limits" USING "btree" ("reset_at");
 
 
@@ -599,6 +633,10 @@ CREATE INDEX "idx_skills_sort_order" ON "portfolio"."skills" USING "btree" ("sor
 
 
 CREATE INDEX "idx_work_sort_order" ON "portfolio"."work" USING "btree" ("sort_order");
+
+
+
+CREATE INDEX "idx_writing_published" ON "portfolio"."writing_posts" USING "btree" ("is_published", "is_visible", "published_at" DESC);
 
 
 
@@ -674,6 +712,10 @@ CREATE OR REPLACE TRIGGER "skills_updated_at" BEFORE UPDATE ON "portfolio"."skil
 
 
 
+CREATE OR REPLACE TRIGGER "update_writing_posts_updated_at" BEFORE UPDATE ON "portfolio"."writing_posts" FOR EACH ROW EXECUTE FUNCTION "foundation"."set_updated_at"();
+
+
+
 CREATE OR REPLACE TRIGGER "work_updated_at" BEFORE UPDATE ON "portfolio"."work" FOR EACH ROW EXECUTE FUNCTION "portfolio"."update_updated_at_column"();
 
 
@@ -688,47 +730,199 @@ ALTER TABLE ONLY "portfolio"."skills"
 
 
 
-CREATE POLICY "Admin work access" ON "portfolio"."work" USING ("jg_account"."is_admin"()) WITH CHECK ("jg_account"."is_admin"());
+CREATE POLICY "Admin content create" ON "portfolio"."about" FOR INSERT TO "authenticated" WITH CHECK (( SELECT "iam_private"."has_capability"('portfolio.content.create'::"text") AS "has_capability"));
 
 
 
-CREATE POLICY "Admin write access" ON "portfolio"."about" USING ("jg_account"."is_admin"()) WITH CHECK ("jg_account"."is_admin"());
+CREATE POLICY "Admin content create" ON "portfolio"."certificates" FOR INSERT TO "authenticated" WITH CHECK (( SELECT "iam_private"."has_capability"('portfolio.content.create'::"text") AS "has_capability"));
 
 
 
-CREATE POLICY "Admin write access" ON "portfolio"."certificates" USING ("jg_account"."is_admin"()) WITH CHECK ("jg_account"."is_admin"());
+CREATE POLICY "Admin content create" ON "portfolio"."contact" FOR INSERT TO "authenticated" WITH CHECK (( SELECT "iam_private"."has_capability"('portfolio.content.create'::"text") AS "has_capability"));
 
 
 
-CREATE POLICY "Admin write access" ON "portfolio"."contact" USING ("jg_account"."is_admin"()) WITH CHECK ("jg_account"."is_admin"());
+CREATE POLICY "Admin content create" ON "portfolio"."education" FOR INSERT TO "authenticated" WITH CHECK (( SELECT "iam_private"."has_capability"('portfolio.content.create'::"text") AS "has_capability"));
 
 
 
-CREATE POLICY "Admin write access" ON "portfolio"."education" USING ("jg_account"."is_admin"()) WITH CHECK ("jg_account"."is_admin"());
+CREATE POLICY "Admin content create" ON "portfolio"."experience" FOR INSERT TO "authenticated" WITH CHECK (( SELECT "iam_private"."has_capability"('portfolio.content.create'::"text") AS "has_capability"));
 
 
 
-CREATE POLICY "Admin write access" ON "portfolio"."experience" USING ("jg_account"."is_admin"()) WITH CHECK ("jg_account"."is_admin"());
+CREATE POLICY "Admin content create" ON "portfolio"."hero" FOR INSERT TO "authenticated" WITH CHECK (( SELECT "iam_private"."has_capability"('portfolio.content.create'::"text") AS "has_capability"));
 
 
 
-CREATE POLICY "Admin write access" ON "portfolio"."hero" USING ("jg_account"."is_admin"()) WITH CHECK ("jg_account"."is_admin"());
+CREATE POLICY "Admin content create" ON "portfolio"."nav_items" FOR INSERT TO "authenticated" WITH CHECK (( SELECT "iam_private"."has_capability"('portfolio.content.create'::"text") AS "has_capability"));
 
 
 
-CREATE POLICY "Admin write access" ON "portfolio"."nav_items" USING ("jg_account"."is_admin"()) WITH CHECK ("jg_account"."is_admin"());
+CREATE POLICY "Admin content create" ON "portfolio"."section_content" FOR INSERT TO "authenticated" WITH CHECK (( SELECT "iam_private"."has_capability"('portfolio.content.create'::"text") AS "has_capability"));
 
 
 
-CREATE POLICY "Admin write access" ON "portfolio"."section_content" USING ("jg_account"."is_admin"()) WITH CHECK ("jg_account"."is_admin"());
+CREATE POLICY "Admin content create" ON "portfolio"."skill_categories" FOR INSERT TO "authenticated" WITH CHECK (( SELECT "iam_private"."has_capability"('portfolio.content.create'::"text") AS "has_capability"));
 
 
 
-CREATE POLICY "Admin write access" ON "portfolio"."skill_categories" USING ("jg_account"."is_admin"()) WITH CHECK ("jg_account"."is_admin"());
+CREATE POLICY "Admin content create" ON "portfolio"."skills" FOR INSERT TO "authenticated" WITH CHECK (( SELECT "iam_private"."has_capability"('portfolio.content.create'::"text") AS "has_capability"));
 
 
 
-CREATE POLICY "Admin write access" ON "portfolio"."skills" USING ("jg_account"."is_admin"()) WITH CHECK ("jg_account"."is_admin"());
+CREATE POLICY "Admin content create" ON "portfolio"."work" FOR INSERT TO "authenticated" WITH CHECK (( SELECT "iam_private"."has_capability"('portfolio.content.create'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content delete" ON "portfolio"."about" FOR DELETE TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.delete'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content delete" ON "portfolio"."certificates" FOR DELETE TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.delete'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content delete" ON "portfolio"."contact" FOR DELETE TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.delete'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content delete" ON "portfolio"."education" FOR DELETE TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.delete'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content delete" ON "portfolio"."experience" FOR DELETE TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.delete'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content delete" ON "portfolio"."hero" FOR DELETE TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.delete'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content delete" ON "portfolio"."nav_items" FOR DELETE TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.delete'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content delete" ON "portfolio"."section_content" FOR DELETE TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.delete'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content delete" ON "portfolio"."skill_categories" FOR DELETE TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.delete'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content delete" ON "portfolio"."skills" FOR DELETE TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.delete'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content delete" ON "portfolio"."work" FOR DELETE TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.delete'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content read" ON "portfolio"."about" FOR SELECT TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.read'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content read" ON "portfolio"."certificates" FOR SELECT TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.read'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content read" ON "portfolio"."contact" FOR SELECT TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.read'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content read" ON "portfolio"."education" FOR SELECT TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.read'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content read" ON "portfolio"."experience" FOR SELECT TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.read'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content read" ON "portfolio"."hero" FOR SELECT TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.read'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content read" ON "portfolio"."nav_items" FOR SELECT TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.read'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content read" ON "portfolio"."section_content" FOR SELECT TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.read'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content read" ON "portfolio"."skill_categories" FOR SELECT TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.read'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content read" ON "portfolio"."skills" FOR SELECT TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.read'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content read" ON "portfolio"."work" FOR SELECT TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.read'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content update" ON "portfolio"."about" FOR UPDATE TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.update'::"text") AS "has_capability")) WITH CHECK (( SELECT "iam_private"."has_capability"('portfolio.content.update'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content update" ON "portfolio"."certificates" FOR UPDATE TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.update'::"text") AS "has_capability")) WITH CHECK (( SELECT "iam_private"."has_capability"('portfolio.content.update'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content update" ON "portfolio"."contact" FOR UPDATE TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.update'::"text") AS "has_capability")) WITH CHECK (( SELECT "iam_private"."has_capability"('portfolio.content.update'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content update" ON "portfolio"."education" FOR UPDATE TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.update'::"text") AS "has_capability")) WITH CHECK (( SELECT "iam_private"."has_capability"('portfolio.content.update'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content update" ON "portfolio"."experience" FOR UPDATE TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.update'::"text") AS "has_capability")) WITH CHECK (( SELECT "iam_private"."has_capability"('portfolio.content.update'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content update" ON "portfolio"."hero" FOR UPDATE TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.update'::"text") AS "has_capability")) WITH CHECK (( SELECT "iam_private"."has_capability"('portfolio.content.update'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content update" ON "portfolio"."nav_items" FOR UPDATE TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.update'::"text") AS "has_capability")) WITH CHECK (( SELECT "iam_private"."has_capability"('portfolio.content.update'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content update" ON "portfolio"."section_content" FOR UPDATE TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.update'::"text") AS "has_capability")) WITH CHECK (( SELECT "iam_private"."has_capability"('portfolio.content.update'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content update" ON "portfolio"."skill_categories" FOR UPDATE TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.update'::"text") AS "has_capability")) WITH CHECK (( SELECT "iam_private"."has_capability"('portfolio.content.update'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content update" ON "portfolio"."skills" FOR UPDATE TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.update'::"text") AS "has_capability")) WITH CHECK (( SELECT "iam_private"."has_capability"('portfolio.content.update'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin content update" ON "portfolio"."work" FOR UPDATE TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.update'::"text") AS "has_capability")) WITH CHECK (( SELECT "iam_private"."has_capability"('portfolio.content.update'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin writing create" ON "portfolio"."writing_posts" FOR INSERT TO "authenticated" WITH CHECK (( SELECT "iam_private"."has_capability"('portfolio.content.create'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin writing delete" ON "portfolio"."writing_posts" FOR DELETE TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.delete'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin writing read" ON "portfolio"."writing_posts" FOR SELECT TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.read'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin writing update" ON "portfolio"."writing_posts" FOR UPDATE TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.update'::"text") AS "has_capability")) WITH CHECK (( SELECT "iam_private"."has_capability"('portfolio.content.update'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Anyone can read published writing" ON "portfolio"."writing_posts" FOR SELECT USING ((("is_published" = true) AND ("is_visible" = true)));
 
 
 
@@ -816,6 +1010,9 @@ ALTER TABLE "portfolio"."skills" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "portfolio"."work" ENABLE ROW LEVEL SECURITY;
 
 
+ALTER TABLE "portfolio"."writing_posts" ENABLE ROW LEVEL SECURITY;
+
+
 GRANT USAGE ON SCHEMA "portfolio" TO "anon";
 GRANT USAGE ON SCHEMA "portfolio" TO "authenticated";
 GRANT USAGE ON SCHEMA "portfolio" TO "service_role";
@@ -852,19 +1049,19 @@ GRANT ALL ON FUNCTION "portfolio"."update_updated_at_column"() TO "authenticated
 
 
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."about" TO "anon";
+GRANT SELECT ON TABLE "portfolio"."about" TO "anon";
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."about" TO "authenticated";
 GRANT ALL ON TABLE "portfolio"."about" TO "service_role";
 
 
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."certificates" TO "anon";
+GRANT SELECT ON TABLE "portfolio"."certificates" TO "anon";
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."certificates" TO "authenticated";
 GRANT ALL ON TABLE "portfolio"."certificates" TO "service_role";
 
 
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."contact" TO "anon";
+GRANT SELECT ON TABLE "portfolio"."contact" TO "anon";
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."contact" TO "authenticated";
 GRANT ALL ON TABLE "portfolio"."contact" TO "service_role";
 
@@ -874,51 +1071,57 @@ GRANT ALL ON TABLE "portfolio"."contact_rate_limits" TO "service_role";
 
 
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."education" TO "anon";
+GRANT SELECT ON TABLE "portfolio"."education" TO "anon";
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."education" TO "authenticated";
 GRANT ALL ON TABLE "portfolio"."education" TO "service_role";
 
 
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."experience" TO "anon";
+GRANT SELECT ON TABLE "portfolio"."experience" TO "anon";
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."experience" TO "authenticated";
 GRANT ALL ON TABLE "portfolio"."experience" TO "service_role";
 
 
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."hero" TO "anon";
+GRANT SELECT ON TABLE "portfolio"."hero" TO "anon";
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."hero" TO "authenticated";
 GRANT ALL ON TABLE "portfolio"."hero" TO "service_role";
 
 
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."nav_items" TO "anon";
+GRANT SELECT ON TABLE "portfolio"."nav_items" TO "anon";
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."nav_items" TO "authenticated";
 GRANT ALL ON TABLE "portfolio"."nav_items" TO "service_role";
 
 
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."section_content" TO "anon";
+GRANT SELECT ON TABLE "portfolio"."section_content" TO "anon";
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."section_content" TO "authenticated";
 GRANT ALL ON TABLE "portfolio"."section_content" TO "service_role";
 
 
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."skill_categories" TO "anon";
+GRANT SELECT ON TABLE "portfolio"."skill_categories" TO "anon";
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."skill_categories" TO "authenticated";
 GRANT ALL ON TABLE "portfolio"."skill_categories" TO "service_role";
 
 
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."skills" TO "anon";
+GRANT SELECT ON TABLE "portfolio"."skills" TO "anon";
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."skills" TO "authenticated";
 GRANT ALL ON TABLE "portfolio"."skills" TO "service_role";
 
 
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."work" TO "anon";
+GRANT SELECT ON TABLE "portfolio"."work" TO "anon";
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."work" TO "authenticated";
 GRANT ALL ON TABLE "portfolio"."work" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "portfolio"."writing_posts" TO "authenticated";
+GRANT ALL ON TABLE "portfolio"."writing_posts" TO "service_role";
+GRANT SELECT ON TABLE "portfolio"."writing_posts" TO "anon";
 
 
 

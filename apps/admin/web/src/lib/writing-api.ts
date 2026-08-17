@@ -16,7 +16,7 @@ export async function createWritingData(
   table: WritingTable,
   data: PortfolioWritingWriteInput,
 ): Promise<WritingApiResponse<PortfolioWritingPostRecord>> {
-  const response = await fetch(`/api/jg-app/${table}`, {
+  const response = await fetch(`/api/writing/${table}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -29,7 +29,7 @@ export async function updateWritingData(
   id: string,
   data: PortfolioWritingUpdateInput,
 ): Promise<WritingApiResponse<PortfolioWritingPostRecord>> {
-  const response = await fetch(`/api/jg-app/${table}?id=${id}`, {
+  const response = await fetch(`/api/writing/${table}?id=${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -41,7 +41,7 @@ export async function deleteWritingData(
   table: WritingTable,
   id: string,
 ): Promise<WritingApiResponse<void>> {
-  const response = await fetch(`/api/jg-app/${table}?id=${id}`, {
+  const response = await fetch(`/api/writing/${table}?id=${id}`, {
     method: "DELETE",
   });
   return response.json();

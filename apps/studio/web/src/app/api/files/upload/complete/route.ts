@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createFileRecord } from "@/lib/file-manager/database";
-import type { CreateFileData, FileTypeCategory } from "@/lib/file-manager/types";
+import type {
+  CreateFileData,
+  FileTypeCategory,
+} from "@/lib/file-manager/types";
 
 /**
  * POST /api/files/upload/complete
@@ -18,10 +21,7 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Parse JSON body
@@ -42,13 +42,13 @@ export async function POST(request: NextRequest) {
     if (!storagePath || !filePath || !fileName || !fileSize) {
       return NextResponse.json(
         { error: "Missing required fields" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Verify the file exists in storage
     const { data: fileList, error: listError } = await supabase.storage
-      .from("private-files")
+      .from("studio-files")
       .list(storagePath.split("/").slice(0, -1).join("/"), {
         search: storagePath.split("/").pop(),
       });
@@ -57,18 +57,18 @@ export async function POST(request: NextRequest) {
       console.error("Error verifying uploaded file:", listError);
       return NextResponse.json(
         { error: "Failed to verify uploaded file" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     const uploadedFile = fileList?.find(
-      (f) => f.name === storagePath.split("/").pop()
+      (f) => f.name === storagePath.split("/").pop(),
     );
 
     if (!uploadedFile) {
       return NextResponse.json(
         { error: "File not found in storage. Upload may have failed." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -83,17 +83,17 @@ export async function POST(request: NextRequest) {
       file_type: (fileType as FileTypeCategory) || "other",
       parent_id: parentId,
       storage_path: storagePath,
-      bucket_id: "private-files",
+      bucket_id: "studio-files",
     };
 
     const fileRecord = await createFileRecord(supabase, user.id, fileData);
 
     if (!fileRecord) {
       // Rollback: delete the uploaded file from storage
-      await supabase.storage.from("private-files").remove([storagePath]);
+      await supabase.storage.from("studio-files").remove([storagePath]);
       return NextResponse.json(
         { error: "Failed to create file record" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
     console.error("Error completing file upload:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -13,6 +13,7 @@ function createContext({
   isAuthed = true,
   isPublic = false,
   termsAccepted = true,
+  productAccess = true,
   aalLevel = "aal2",
   verifiedFactor = false,
   cookies,
@@ -21,6 +22,7 @@ function createContext({
   isAuthed?: boolean;
   isPublic?: boolean;
   termsAccepted?: boolean;
+  productAccess?: boolean;
   aalLevel?: string | null;
   verifiedFactor?: boolean;
   cookies?: Record<string, string>;
@@ -57,6 +59,7 @@ function createContext({
     pathname: request.nextUrl.pathname,
     isAuthed,
     termsAccepted,
+    productAccess,
     isPublic,
     aalLevel,
   } as unknown as ProxyContext;
