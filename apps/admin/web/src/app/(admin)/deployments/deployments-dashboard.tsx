@@ -27,7 +27,7 @@ import type { VercelDeployment, VercelProjectKey } from "@/lib/types";
 import { DeploymentsTable } from "./deployments-table";
 import { ConfirmActionDialog } from "./confirm-action-dialog";
 
-export function DeploymentsDashboard() {
+export function DeploymentsDashboard({ canManage }: { canManage: boolean }) {
   const [project, setProject] = useState<VercelProjectKey>("studio");
   const [deployments, setDeployments] = useState<VercelDeployment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -89,7 +89,9 @@ export function DeploymentsDashboard() {
           <div>
             <CardTitle>Deployments</CardTitle>
             <CardDescription>
-              View and manage Vercel deployments
+              {canManage
+                ? "View and manage Vercel deployments"
+                : "View Vercel deployments with read-only access"}
             </CardDescription>
           </div>
           <div className="flex items-center gap-2">
@@ -130,6 +132,7 @@ export function DeploymentsDashboard() {
           ) : (
             <DeploymentsTable
               deployments={deployments}
+              canManage={canManage}
               actionLoading={actionLoading}
               onRedeploy={(d) =>
                 setConfirmAction({ type: "redeploy", deployment: d })
@@ -142,17 +145,19 @@ export function DeploymentsDashboard() {
         </CardContent>
       </Card>
 
-      <ConfirmActionDialog
-        action={confirmAction?.type ?? null}
-        onClose={() => setConfirmAction(null)}
-        onConfirm={handleConfirm}
-        loading={!!actionLoading}
-        deploymentLabel={
-          confirmAction?.deployment.url ||
-          confirmAction?.deployment.uid.slice(0, 12) ||
-          ""
-        }
-      />
+      {canManage && (
+        <ConfirmActionDialog
+          action={confirmAction?.type ?? null}
+          onClose={() => setConfirmAction(null)}
+          onConfirm={handleConfirm}
+          loading={!!actionLoading}
+          deploymentLabel={
+            confirmAction?.deployment.url ||
+            confirmAction?.deployment.uid.slice(0, 12) ||
+            ""
+          }
+        />
+      )}
     </div>
   );
 }

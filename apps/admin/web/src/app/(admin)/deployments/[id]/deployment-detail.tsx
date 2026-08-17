@@ -51,9 +51,13 @@ function formatDate(ts: number) {
 
 interface DeploymentDetailProps {
   deploymentId: string;
+  canManage: boolean;
 }
 
-export function DeploymentDetail({ deploymentId }: DeploymentDetailProps) {
+export function DeploymentDetail({
+  deploymentId,
+  canManage,
+}: DeploymentDetailProps) {
   const [deployment, setDeployment] = useState<DeploymentDetailType | null>(
     null,
   );
@@ -188,16 +192,19 @@ export function DeploymentDetail({ deploymentId }: DeploymentDetailProps) {
                 </a>
               </Button>
             )}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setConfirmAction("redeploy")}
-              disabled={actionLoading}
-            >
-              <Rocket className="h-4 w-4 mr-2" />
-              Redeploy
-            </Button>
-            {deployment.state === "READY" &&
+            {canManage && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setConfirmAction("redeploy")}
+                disabled={actionLoading}
+              >
+                <Rocket className="h-4 w-4 mr-2" />
+                Redeploy
+              </Button>
+            )}
+            {canManage &&
+              deployment.state === "READY" &&
               deployment.target === "production" && (
                 <Button
                   variant="destructive"
@@ -261,13 +268,15 @@ export function DeploymentDetail({ deploymentId }: DeploymentDetailProps) {
 
       <BuildLogsCard logs={logs} loading={logsLoading} onRefresh={fetchLogs} />
 
-      <ConfirmActionDialog
-        action={confirmAction}
-        onClose={() => setConfirmAction(null)}
-        onConfirm={handleAction}
-        loading={actionLoading}
-        deploymentLabel={deployment.url}
-      />
+      {canManage && (
+        <ConfirmActionDialog
+          action={confirmAction}
+          onClose={() => setConfirmAction(null)}
+          onConfirm={handleAction}
+          loading={actionLoading}
+          deploymentLabel={deployment.url}
+        />
+      )}
     </div>
   );
 }

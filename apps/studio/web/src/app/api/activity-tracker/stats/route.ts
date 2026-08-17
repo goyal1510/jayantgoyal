@@ -43,14 +43,14 @@ export async function GET(request: NextRequest) {
 
     const [entriesResult, activitiesResult] = await Promise.all([
       supabase
-        .schema("jg_app")
+        .schema("studio")
         .from("activity_tracker_entries")
         .select("activity_id,date,completed")
         .eq("user_id", userId)
         .gte("date", range.startDate)
         .lte("date", range.endDate),
       supabase
-        .schema("jg_app")
+        .schema("studio")
         .from("activity_tracker_activities")
         .select("id,name,is_active,created_at")
         .eq("user_id", userId)

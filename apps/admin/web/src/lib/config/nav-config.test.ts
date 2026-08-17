@@ -44,12 +44,12 @@ describe("Admin navigation domains", () => {
     ).toBe(false);
   });
 
-  it("keeps operational domains restricted to super admins", () => {
+  it("keeps mutation-only domains separate while viewers retain read access", () => {
     expect(
-      getVisibleAdminNavigationDomains("admin").map((domain) => domain.id),
-    ).toEqual(["portfolio"]);
+      getVisibleAdminNavigationDomains("viewer").map((domain) => domain.id),
+    ).toEqual(["portfolio", "system"]);
     expect(
-      getVisibleAdminNavigationDomains("super_admin").map(
+      getVisibleAdminNavigationDomains("full_access").map(
         (domain) => domain.id,
       ),
     ).toEqual(["portfolio", "system"]);

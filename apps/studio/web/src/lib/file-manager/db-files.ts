@@ -16,10 +16,10 @@ import type {
 export async function getFileByPath(
   supabase: SupabaseClient,
   userId: string,
-  filePath: string
+  filePath: string,
 ): Promise<FileRecord | null> {
   const { data, error } = await supabase
-    .schema("jg_app")
+    .schema("studio")
     .rpc("get_file_by_path", {
       p_user_id: userId,
       p_file_path: filePath,
@@ -37,21 +37,18 @@ export async function getFileByPath(
  * Generate storage path for a file
  * @param supabase - Supabase client instance
  * @param userId - User ID
- * @param filePath - File path
  * @param fileName - File name
  * @returns Storage path string or null if error
  */
 export async function generateStoragePath(
   supabase: SupabaseClient,
   userId: string,
-  filePath: string,
-  fileName: string
+  fileName: string,
 ): Promise<string | null> {
   const { data, error } = await supabase
-    .schema("jg_app")
+    .schema("studio")
     .rpc("generate_storage_path", {
       p_user_id: userId,
-      p_file_path: filePath,
       p_file_name: fileName,
     } as GenerateStoragePathParams);
 
@@ -73,18 +70,16 @@ export async function generateStoragePath(
 export async function createFileRecord(
   supabase: SupabaseClient,
   userId: string,
-  fileData: CreateFileData
+  fileData: CreateFileData,
 ): Promise<FileRecord | null> {
   const { data, error } = await supabase
-    .schema("jg_app")
-    .from("file_manager_files")
+    .schema("studio")
+    .from("file_entries")
     .insert({
       ...fileData,
       user_id: userId,
-      bucket_id: fileData.bucket_id || "private-files",
+      bucket_id: fileData.bucket_id || "studio-files",
       is_directory: false,
-      version: 1,
-      is_latest_version: true,
       is_deleted: false,
     })
     .select()
@@ -109,11 +104,11 @@ export async function createFileRecord(
 export async function deleteFile(
   supabase: SupabaseClient,
   fileId: string,
-  userId: string
+  userId: string,
 ): Promise<boolean> {
   // Try using RPC function first (if it exists)
   const { data: rpcData, error: rpcError } = await supabase
-    .schema("jg_app")
+    .schema("studio")
     .rpc("soft_delete_file", {
       p_file_id: fileId,
       p_user_id: userId,
@@ -125,8 +120,8 @@ export async function deleteFile(
 
   // Fallback to direct UPDATE (will work after RLS policy is fixed)
   const { data, error } = await supabase
-    .schema("jg_app")
-    .from("file_manager_files")
+    .schema("studio")
+    .from("file_entries")
     .update({
       is_deleted: true,
       deleted_at: new Date().toISOString(),
@@ -156,11 +151,13 @@ export async function updateFileMetadata(
   supabase: SupabaseClient,
   fileId: string,
   userId: string,
-  updates: Partial<Pick<FileRecord, "display_name" | "file_name" | "file_path">>
+  updates: Partial<
+    Pick<FileRecord, "display_name" | "file_name" | "file_path">
+  >,
 ): Promise<FileRecord | null> {
   const { data, error } = await supabase
-    .schema("jg_app")
-    .from("file_manager_files")
+    .schema("studio")
+    .from("file_entries")
     .update({
       ...updates,
       updated_at: new Date().toISOString(),

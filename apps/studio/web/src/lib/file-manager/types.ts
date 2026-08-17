@@ -1,5 +1,5 @@
 // Type definitions for the File Manager application
-// These types match the database schema in the jg_app schema
+// These types match the database schema in the studio schema
 
 // ============================================
 // File Type Categories
@@ -19,7 +19,7 @@ export type FileTypeCategory =
   | "directory";
 
 // ============================================
-// Database Types (matching jg_app.file_manager_files table)
+// Database Types (matching studio.file_entries table)
 // ============================================
 
 export interface FileRecord {
@@ -37,9 +37,6 @@ export interface FileRecord {
   file_type: FileTypeCategory;
   user_id: string; // UUID
   parent_id: string | null; // UUID
-  version: number;
-  is_latest_version: boolean;
-  file_hash: string | null;
   created_at: string; // ISO timestamp
   updated_at: string; // ISO timestamp
   deleted_at: string | null; // ISO timestamp
@@ -47,7 +44,7 @@ export interface FileRecord {
 }
 
 // ============================================
-// File Type Category (matching jg_app.file_manager_type_categories table)
+// File Type Category (matching studio.file_type_categories table)
 // ============================================
 
 export interface DirectoryTreeItem {
@@ -100,7 +97,6 @@ export interface GetFileByPathParams {
 
 export interface GenerateStoragePathParams {
   p_user_id: string;
-  p_file_path: string;
   p_file_name: string;
 }
 

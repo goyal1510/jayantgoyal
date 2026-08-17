@@ -47,8 +47,8 @@ export async function POST(
 
   const supabase = createSupabaseServiceRoleClient();
   const { data: session, error: sessionError } = await supabase
-    .schema("jg_app")
-    .from("game_hub_sessions")
+    .schema("studio")
+    .from("game_sessions")
     .select("*")
     .eq("room_code", roomCode)
     .eq("game_slug", "dare-x")
@@ -69,8 +69,8 @@ export async function POST(
   }
 
   const { data: participant } = await supabase
-    .schema("jg_app")
-    .from("game_hub_session_participants")
+    .schema("studio")
+    .from("game_session_participants")
     .select("*")
     .eq("session_id", session.id)
     .eq("user_id", user.id)
@@ -93,8 +93,8 @@ export async function POST(
   }
 
   const { data: participants } = await supabase
-    .schema("jg_app")
-    .from("game_hub_session_participants")
+    .schema("studio")
+    .from("game_session_participants")
     .select("id, display_name, seat")
     .eq("session_id", session.id)
     .is("left_at", null)
@@ -180,6 +180,7 @@ export async function POST(
 
   const moveNumber = (await getCurrentMoveNumber(supabase, session.id)) + 1;
   const { error: actionError } = await recordOnlineGameAction(supabase, {
+    actorUserId: user.id,
     sessionId: session.id,
     participantId: participant.id,
     moveNumber,

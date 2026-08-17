@@ -68,21 +68,21 @@ export const adminNavigationDomains: readonly AdminNavigationDomain[] = [
     label: "Portfolio",
     homeHref: "/portfolio",
     items: portfolioNavItems,
-    roles: ["admin", "super_admin"],
+    roles: ["viewer", "full_access"],
   },
   {
     id: "studio",
     label: "Studio",
     homeHref: null,
     items: [],
-    roles: ["super_admin"],
+    roles: ["full_access"],
   },
   {
     id: "system",
     label: "Operations",
     homeHref: "/users",
     items: [...systemNavItems, ...deploymentNavItems],
-    roles: ["super_admin"],
+    roles: ["viewer", "full_access"],
   },
 ];
 

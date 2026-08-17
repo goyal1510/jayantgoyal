@@ -8,6 +8,7 @@ export interface ProxyContext {
   user: User | null;
   pathname: string;
   isAuthed: boolean;
+  productAccess: boolean;
   termsAccepted: boolean;
   isPublic: boolean;
   /** AAL level from the JWT — "aal1" or "aal2". No network call needed. */
@@ -19,4 +20,6 @@ export interface ProxyContext {
  * Return a NextResponse to short-circuit (redirect/block).
  * Return null to pass through to the next middleware.
  */
-export type ProxyMiddleware = (ctx: ProxyContext) => Promise<NextResponse | null>;
+export type ProxyMiddleware = (
+  ctx: ProxyContext,
+) => Promise<NextResponse | null>;

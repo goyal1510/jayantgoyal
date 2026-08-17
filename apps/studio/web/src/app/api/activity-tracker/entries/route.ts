@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     const datesParam = url.searchParams.get("dates")?.trim();
 
     let query = supabase
-      .schema("jg_app")
+      .schema("studio")
       .from("activity_tracker_entries")
       .select(ENTRY_SELECT_COLUMNS)
       .eq("user_id", userId);
@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { data: ownedActivity, error: activityError } = await supabase
-      .schema("jg_app")
+      .schema("studio")
       .from("activity_tracker_activities")
       .select("id")
       .eq("id", activity_id)
@@ -162,7 +162,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { data: entry, error: upsertError } = await supabase
-      .schema("jg_app")
+      .schema("studio")
       .from("activity_tracker_entries")
       .upsert(
         {

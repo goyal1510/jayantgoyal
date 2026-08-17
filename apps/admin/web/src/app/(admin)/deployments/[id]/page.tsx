@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { DeploymentDetail } from "./deployment-detail";
+import { ADMIN_CAPABILITIES, authorizeAdminCapability } from "@/lib/access";
 
 export const metadata: Metadata = { title: "Deployment Detail" };
 
@@ -10,28 +10,22 @@ export default async function DeploymentDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const supabase = await createSupabaseServerClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  const access = await authorizeAdminCapability(
+    ADMIN_CAPABILITIES.deploymentsRead,
+  );
+  if (!access.authorized && access.status === 401) {
     redirect("/welcome");
   }
-
-  const { data: profile } = await supabase
-    .schema("jg_account")
-    .from("profiles")
-    .select("role")
-    .eq("user_id", user.id)
-    .single();
-
-  if (!profile || profile.role !== "super_admin") {
+  if (!access.authorized) {
     redirect("/");
   }
 
   const { id } = await params;
+  const mutationAccess = await authorizeAdminCapability(
+    ADMIN_CAPABILITIES.deploymentsUpdate,
+  );
 
-  return <DeploymentDetail deploymentId={id} />;
+  return (
+    <DeploymentDetail deploymentId={id} canManage={mutationAccess.authorized} />
+  );
 }

@@ -53,14 +53,8 @@ export function CalculationsHistory() {
           date: selectedDate || undefined,
         });
         const sortedEntries = [...response.items].sort((a, b) => {
-          const aDate =
-            parseISTTimestamp(
-              a.ist_timestamp || a.created_at || "",
-            )?.getTime() ?? 0;
-          const bDate =
-            parseISTTimestamp(
-              b.ist_timestamp || b.created_at || "",
-            )?.getTime() ?? 0;
+          const aDate = parseISTTimestamp(a.created_at || "")?.getTime() ?? 0;
+          const bDate = parseISTTimestamp(b.created_at || "")?.getTime() ?? 0;
           return bDate - aDate;
         });
 

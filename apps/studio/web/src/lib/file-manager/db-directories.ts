@@ -15,10 +15,10 @@ import type {
 export async function createDirectoryPath(
   supabase: SupabaseClient,
   userId: string,
-  directoryPath: string
+  directoryPath: string,
 ): Promise<string | null> {
   const { data, error } = await supabase
-    .schema("jg_app")
+    .schema("studio")
     .rpc("create_directory_path", {
       p_user_id: userId,
       p_directory_path: directoryPath,
@@ -42,10 +42,10 @@ export async function createDirectoryPath(
 export async function listDirectory(
   supabase: SupabaseClient,
   userId: string,
-  directoryPath: string = "/"
+  directoryPath: string = "/",
 ): Promise<DirectoryListingItem[] | null> {
   const { data, error } = await supabase
-    .schema("jg_app")
+    .schema("studio")
     .rpc("list_directory", {
       p_user_id: userId,
       p_directory_path: directoryPath,

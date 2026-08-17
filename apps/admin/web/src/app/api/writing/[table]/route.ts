@@ -7,10 +7,11 @@ import {
   revalidateWritingPublicContent,
   TABLES_WITH_SORT_ORDER,
 } from "./helpers";
+import { ADMIN_CAPABILITIES } from "@/lib/access";
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ table: string }> }
+  { params }: { params: Promise<{ table: string }> },
 ) {
   try {
     const { table } = await params;
@@ -18,7 +19,7 @@ export async function GET(
     const tableError = validateTable(table);
     if (tableError) return tableError;
 
-    const auth = await authorizeAndGetClient();
+    const auth = await authorizeAndGetClient(ADMIN_CAPABILITIES.portfolioRead);
     if ("error" in auth) return auth.error;
 
     const { searchParams } = new URL(request.url);
@@ -29,7 +30,7 @@ export async function GET(
 
     if (id) {
       const result = await auth.client
-        .schema("jg_app")
+        .schema("portfolio")
         .from(table)
         .select(getWritingAdminSelectColumns())
         .eq("id", id)
@@ -38,7 +39,7 @@ export async function GET(
       error = result.error;
     } else if (TABLES_WITH_SORT_ORDER.includes(table)) {
       const result = await auth.client
-        .schema("jg_app")
+        .schema("portfolio")
         .from(table)
         .select(getWritingAdminSelectColumns())
         .order("sort_order", { ascending: true });
@@ -46,7 +47,7 @@ export async function GET(
       error = result.error;
     } else {
       const result = await auth.client
-        .schema("jg_app")
+        .schema("portfolio")
         .from(table)
         .select(getWritingAdminSelectColumns());
       data = result.data;
@@ -59,17 +60,17 @@ export async function GET(
 
     return NextResponse.json({ data });
   } catch (error) {
-    console.error("Error fetching jg_app data:", error);
+    console.error("Error fetching Writing data:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function POST(
   request: Request,
-  { params }: { params: Promise<{ table: string }> }
+  { params }: { params: Promise<{ table: string }> },
 ) {
   try {
     const { table } = await params;
@@ -77,7 +78,9 @@ export async function POST(
     const tableError = validateTable(table);
     if (tableError) return tableError;
 
-    const auth = await authorizeAndGetClient();
+    const auth = await authorizeAndGetClient(
+      ADMIN_CAPABILITIES.portfolioCreate,
+    );
     if ("error" in auth) return auth.error;
 
     const body = await request.json();
@@ -85,7 +88,7 @@ export async function POST(
     if (payloadError) return payloadError;
 
     const { data, error } = await auth.client
-      .schema("jg_app")
+      .schema("portfolio")
       .from(table)
       .insert(body)
       .select(getWritingAdminSelectColumns())
@@ -98,17 +101,17 @@ export async function POST(
     revalidateWritingPublicContent();
     return NextResponse.json({ data });
   } catch (error) {
-    console.error("Error creating jg_app data:", error);
+    console.error("Error creating Writing data:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function PUT(
   request: Request,
-  { params }: { params: Promise<{ table: string }> }
+  { params }: { params: Promise<{ table: string }> },
 ) {
   try {
     const { table } = await params;
@@ -116,7 +119,9 @@ export async function PUT(
     const tableError = validateTable(table);
     if (tableError) return tableError;
 
-    const auth = await authorizeAndGetClient();
+    const auth = await authorizeAndGetClient(
+      ADMIN_CAPABILITIES.portfolioUpdate,
+    );
     if ("error" in auth) return auth.error;
 
     const { searchParams } = new URL(request.url);
@@ -125,7 +130,7 @@ export async function PUT(
     if (!id) {
       return NextResponse.json(
         { error: "ID is required for update" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -134,7 +139,7 @@ export async function PUT(
     if (payloadError) return payloadError;
 
     const { data, error } = await auth.client
-      .schema("jg_app")
+      .schema("portfolio")
       .from(table)
       .update(body)
       .eq("id", id)
@@ -148,17 +153,17 @@ export async function PUT(
     revalidateWritingPublicContent();
     return NextResponse.json({ data });
   } catch (error) {
-    console.error("Error updating jg_app data:", error);
+    console.error("Error updating Writing data:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ table: string }> }
+  { params }: { params: Promise<{ table: string }> },
 ) {
   try {
     const { table } = await params;
@@ -166,7 +171,9 @@ export async function DELETE(
     const tableError = validateTable(table);
     if (tableError) return tableError;
 
-    const auth = await authorizeAndGetClient();
+    const auth = await authorizeAndGetClient(
+      ADMIN_CAPABILITIES.portfolioDelete,
+    );
     if ("error" in auth) return auth.error;
 
     const { searchParams } = new URL(request.url);
@@ -175,12 +182,12 @@ export async function DELETE(
     if (!id) {
       return NextResponse.json(
         { error: "ID is required for delete" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const { error } = await auth.client
-      .schema("jg_app")
+      .schema("portfolio")
       .from(table)
       .delete()
       .eq("id", id);
@@ -192,10 +199,10 @@ export async function DELETE(
     revalidateWritingPublicContent();
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error deleting jg_app data:", error);
+    console.error("Error deleting Writing data:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

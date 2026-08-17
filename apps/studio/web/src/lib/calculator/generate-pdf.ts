@@ -54,7 +54,7 @@ export function generateCalculationPDF(
   const contentWidth = pageWidth - margin * 2;
   let y = margin;
 
-  const timestamp = calc.ist_timestamp || calc.created_at || "";
+  const timestamp = calc.created_at || "";
   const date = parseTimestamp(timestamp);
   const dateStr = date ? formatDate(date) : "N/A";
   const timeStr = date ? `${formatTime(date)} IST` : "N/A";

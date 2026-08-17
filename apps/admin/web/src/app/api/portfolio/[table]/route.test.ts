@@ -153,6 +153,9 @@ describe("Admin Portfolio table route contract", () => {
 
     expect(response.status).toBe(401);
     expect(await response.json()).toEqual({ error: "Unauthorized" });
+    expect(authorizeAndGetClientMock).toHaveBeenCalledWith(
+      "portfolio.content.read",
+    );
   });
 
   it("rejects a malformed typed payload before mutation or revalidation", async () => {
@@ -214,6 +217,9 @@ describe("Admin Portfolio table route contract", () => {
 
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ data: { id: "project-1" } });
+    expect(authorizeAndGetClientMock).toHaveBeenCalledWith(
+      "portfolio.content.create",
+    );
     expect(client.schema).toHaveBeenCalledWith("portfolio");
     expect(operations).toContainEqual({ operation: "insert", payload });
     expect(revalidateMock).toHaveBeenCalledOnce();

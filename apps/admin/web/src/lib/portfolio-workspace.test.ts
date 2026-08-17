@@ -32,9 +32,7 @@ function makeSupabaseMock({
       from: vi.fn((table: string) => {
         const key = `${schema}.${table}`;
         const queryRows = rows[key];
-        const queryError = errors[key]
-          ? { message: errors[key] }
-          : null;
+        const queryError = errors[key] ? { message: errors[key] } : null;
         let filter: { column: string; value: unknown } | null = null;
 
         const query = {
@@ -161,9 +159,9 @@ describe("Portfolio CMS workspace loaders", () => {
     const skills = await loadSkillsWorkspace(supabase as never);
 
     expect(about.education).toHaveLength(1);
-    expect(about.editorialBySection.education?.sectionContent?.section_key).toBe(
-      "education",
-    );
+    expect(
+      about.editorialBySection.education?.sectionContent?.section_key,
+    ).toBe("education");
     expect(skills.categories[0]?.skills).toEqual([
       { id: "skill-1", category_id: "category-1", name: "React" },
     ]);
@@ -175,7 +173,7 @@ describe("Portfolio CMS workspace loaders", () => {
         "portfolio.work": [{ id: "project-1", name: "Signal" }],
         "portfolio.section_content": editorialRows,
         "portfolio.nav_items": [],
-        "jg_app.writing_posts": [{ id: "post-1", slug: "hello" }],
+        "portfolio.writing_posts": [{ id: "post-1", slug: "hello" }],
       },
     });
 
@@ -185,9 +183,9 @@ describe("Portfolio CMS workspace loaders", () => {
     expect(work.work).toEqual([{ id: "project-1", name: "Signal" }]);
     expect(work.editorial.sectionContent?.section_key).toBe("work");
     expect(writing.posts).toEqual([{ id: "post-1", slug: "hello" }]);
-    expect(writing.editorialBySection.article?.sectionContent?.section_key).toBe(
-      "article",
-    );
+    expect(
+      writing.editorialBySection.article?.sectionContent?.section_key,
+    ).toBe("article");
   });
 
   it("loads Experience, GitHub, and Contact from their owning records", async () => {
@@ -199,8 +197,16 @@ describe("Portfolio CMS workspace loaders", () => {
         "portfolio.contact": [{ id: "contact-1", email: "hello@example.com" }],
         "portfolio.section_content": [
           ...editorialRows,
-          { section_key: "experience", eyebrow: "Experience", is_visible: true },
-          { section_key: "credentials", eyebrow: "Credentials", is_visible: true },
+          {
+            section_key: "experience",
+            eyebrow: "Experience",
+            is_visible: true,
+          },
+          {
+            section_key: "credentials",
+            eyebrow: "Credentials",
+            is_visible: true,
+          },
           { section_key: "activity", eyebrow: "GitHub", is_visible: true },
           { section_key: "contact", eyebrow: "Contact", is_visible: true },
         ],
@@ -218,9 +224,9 @@ describe("Portfolio CMS workspace loaders", () => {
     expect(experience.certificates).toEqual([
       { id: "certificate-1", name: "AWS" },
     ]);
-    expect(experience.editorialBySection.credentials?.sectionContent?.section_key).toBe(
-      "credentials",
-    );
+    expect(
+      experience.editorialBySection.credentials?.sectionContent?.section_key,
+    ).toBe("credentials");
     expect(activity.hero).toEqual({
       id: "hero-1",
       github_username: "goyal1510",

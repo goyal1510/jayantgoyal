@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getVerifiedRequestUserId } from "@/lib/auth/verified-request-user";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-const CALCULATION_SELECT_COLUMNS = "id,created_at,note,ist_timestamp,user_id";
+const CALCULATION_SELECT_COLUMNS = "id,created_at,note,user_id";
 const DENOMINATION_SELECT_COLUMNS =
   "id,calculation_id,denomination,count,bundle_count,open_count,total";
 
@@ -40,8 +40,8 @@ export async function GET(request: NextRequest) {
 
     const buildFilteredQuery = (columns: string, withCount = false) => {
       let scoped = supabase
-        .schema("jg_app")
-        .from("currency_calculator_calculations")
+        .schema("studio")
+        .from("currency_calculations")
         .select(columns, withCount ? { count: "exact" } : undefined)
         .eq("user_id", userId);
 
@@ -77,10 +77,9 @@ export async function GET(request: NextRequest) {
 
     type CalculationRow = {
       id: string;
-      created_at: string | null;
+      created_at: string;
       note: string | null;
-      ist_timestamp: string | null;
-      user_id: string | null;
+      user_id: string;
     };
 
     const normalizeCalculation = (calc: unknown): CalculationRow | null => {
@@ -96,17 +95,9 @@ export async function GET(request: NextRequest) {
 
       return {
         id: candidate.id as string,
-        created_at:
-          typeof candidate.created_at === "string"
-            ? candidate.created_at
-            : null,
+        created_at: candidate.created_at as string,
         note: typeof candidate.note === "string" ? candidate.note : null,
-        ist_timestamp:
-          typeof candidate.ist_timestamp === "string"
-            ? candidate.ist_timestamp
-            : null,
-        user_id:
-          typeof candidate.user_id === "string" ? candidate.user_id : null,
+        user_id: candidate.user_id as string,
       };
     };
 
@@ -117,8 +108,8 @@ export async function GET(request: NextRequest) {
     const calculationIds = calculationsTyped.map((calc) => calc.id);
     const { data: denominations, error: denomError } = calculationIds.length
       ? await supabase
-          .schema("jg_app")
-          .from("currency_calculator_denominations")
+          .schema("studio")
+          .from("currency_calculation_denominations")
           .select(DENOMINATION_SELECT_COLUMNS)
           .in("calculation_id", calculationIds)
           .order("denomination", { ascending: false })
@@ -244,14 +235,13 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { note, ist_timestamp, denominations } = body ?? {};
+    const { note, denominations } = body ?? {};
 
     const { data: calculation, error: calcError } = await supabase
-      .schema("jg_app")
-      .from("currency_calculator_calculations")
+      .schema("studio")
+      .from("currency_calculations")
       .insert({
         note: note || null,
-        ist_timestamp: ist_timestamp || null,
         user_id: userId,
       })
       .select(CALCULATION_SELECT_COLUMNS)
@@ -285,8 +275,8 @@ export async function POST(request: NextRequest) {
 
     const denominationsResult = denominationsToInsert.length
       ? await supabase
-          .schema("jg_app")
-          .from("currency_calculator_denominations")
+          .schema("studio")
+          .from("currency_calculation_denominations")
           .insert(denominationsToInsert)
           .select(DENOMINATION_SELECT_COLUMNS)
       : { data: [], error: null };

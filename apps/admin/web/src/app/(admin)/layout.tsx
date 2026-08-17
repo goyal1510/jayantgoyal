@@ -18,6 +18,8 @@ import {
   resolveProfileAvatar,
 } from "@jayantgoyal/web-auth/profile";
 import type { UserRole } from "@/lib/types";
+import { checkCapability } from "@jayantgoyal/web-auth/authorization";
+import { getAdminAccessLevel } from "@/lib/access";
 
 export default async function AdminLayout({
   children,
@@ -40,17 +42,20 @@ export default async function AdminLayout({
   }
 
   const { data: profile } = await supabase
-    .schema("jg_account")
+    .schema("iam")
     .from("profiles")
     .select(
-      "role, first_name, last_name, avatar_url, avatar_mode, avatar_storage_path",
+      "first_name, last_name, avatar_url, avatar_mode, avatar_storage_path",
     )
     .eq("user_id", user.id)
     .single();
 
-  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
+  const entryDecision = await checkCapability(supabase, "admin.console.enter");
+  if (!profile || !entryDecision.allowed) {
     redirect("/unauthorized");
   }
+
+  const accessLevel = await getAdminAccessLevel(supabase);
 
   const fullName = profileDisplayName(profile, "User");
   const avatarUrl = await resolveProfileAvatar(supabase, user, profile);
@@ -60,7 +65,7 @@ export default async function AdminLayout({
     email: user.email ?? "",
     name: fullName,
     avatarUrl,
-    role: profile.role as UserRole,
+    role: accessLevel as UserRole,
   };
 
   return (

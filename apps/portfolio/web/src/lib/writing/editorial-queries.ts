@@ -21,7 +21,7 @@ async function loadPublishedWritingPreviews(): Promise<WritingPreview[]> {
     auth: { persistSession: false, autoRefreshToken: false },
   });
   const { data, error } = await supabase
-    .schema("jg_app")
+    .schema("portfolio")
     .from("writing_posts")
     .select(PORTFOLIO_WRITING_PREVIEW_SELECT_COLUMNS)
     .eq("is_published", true)

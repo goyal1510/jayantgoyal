@@ -142,7 +142,7 @@ export default async function PortfolioPage() {
       .select(PORTFOLIO_ADMIN_SELECT_COLUMNS.contact)
       .maybeSingle(),
     supabase
-      .schema("jg_app")
+      .schema("portfolio")
       .from("writing_posts")
       .select(PORTFOLIO_WRITING_CMS_SELECT_COLUMNS),
     supabase

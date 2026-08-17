@@ -7,8 +7,8 @@ export async function getOnlineSessionBundle(
   sessionId: string,
 ): Promise<OnlineSessionBundle | null> {
   const { data: session, error: sessionError } = await supabase
-    .schema("jg_app")
-    .from("game_hub_sessions")
+    .schema("studio")
+    .from("game_sessions")
     .select("*")
     .eq("id", sessionId)
     .single();
@@ -18,21 +18,21 @@ export async function getOnlineSessionBundle(
   const [{ data: participants }, { data: moves }, { data: result }] =
     await Promise.all([
       supabase
-        .schema("jg_app")
-        .from("game_hub_session_participants")
+        .schema("studio")
+        .from("game_session_participants")
         .select("*")
         .eq("session_id", sessionId)
         .is("left_at", null)
         .order("joined_at", { ascending: true }),
       supabase
-        .schema("jg_app")
-        .from("game_hub_session_moves")
+        .schema("studio")
+        .from("game_session_moves")
         .select("*")
         .eq("session_id", sessionId)
         .order("move_number", { ascending: true }),
       supabase
-        .schema("jg_app")
-        .from("game_hub_session_results")
+        .schema("studio")
+        .from("game_session_results")
         .select("*")
         .eq("session_id", sessionId)
         .maybeSingle(),
@@ -51,8 +51,8 @@ export async function getCurrentMoveNumber(
   sessionId: string,
 ): Promise<number> {
   const { data } = await supabase
-    .schema("jg_app")
-    .from("game_hub_session_moves")
+    .schema("studio")
+    .from("game_session_moves")
     .select("move_number")
     .eq("session_id", sessionId)
     .order("move_number", { ascending: false })
@@ -65,6 +65,7 @@ export async function getCurrentMoveNumber(
 type GameSessionStatus = "waiting" | "active" | "completed" | "abandoned";
 
 interface RecordOnlineGameActionInput {
+  actorUserId: string;
   sessionId: string;
   participantId: string;
   moveNumber: number;
@@ -95,7 +96,8 @@ export async function recordOnlineGameAction(
     throw new Error("Invalid online game result outcome");
   }
 
-  return supabase.schema("jg_app").rpc("record_game_hub_action", {
+  return supabase.schema("studio").rpc("record_game_action", {
+    p_actor_user_id: input.actorUserId,
     p_session_id: input.sessionId,
     p_participant_id: input.participantId,
     p_move_number: input.moveNumber,

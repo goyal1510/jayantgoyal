@@ -36,6 +36,7 @@ function formatRelative(ts: number) {
 
 interface DeploymentsTableProps {
   deployments: VercelDeployment[];
+  canManage: boolean;
   actionLoading: string | null;
   onRedeploy: (deployment: VercelDeployment) => void;
   onRollback: (deployment: VercelDeployment) => void;
@@ -43,6 +44,7 @@ interface DeploymentsTableProps {
 
 export function DeploymentsTable({
   deployments,
+  canManage,
   actionLoading,
   onRedeploy,
   onRollback,
@@ -113,26 +115,30 @@ export function DeploymentsTable({
                         </a>
                       </Button>
                     )}
-                    <IconAction
-                      icon={isLoading ? Loader2 : Rocket}
-                      iconClassName={
-                        isLoading ? "size-3.5 animate-spin" : "size-3.5"
-                      }
-                      label={`Redeploy ${d.uid.slice(0, 12)}`}
-                      variant="ghost"
-                      onClick={() => onRedeploy(d)}
-                      disabled={isLoading}
-                    />
-                    {d.state === "READY" && d.target === "production" && (
+                    {canManage && (
                       <IconAction
-                        icon={RotateCcw}
-                        iconClassName="size-3.5"
-                        label={`Rollback ${d.uid.slice(0, 12)}`}
+                        icon={isLoading ? Loader2 : Rocket}
+                        iconClassName={
+                          isLoading ? "size-3.5 animate-spin" : "size-3.5"
+                        }
+                        label={`Redeploy ${d.uid.slice(0, 12)}`}
                         variant="ghost"
-                        onClick={() => onRollback(d)}
+                        onClick={() => onRedeploy(d)}
                         disabled={isLoading}
                       />
                     )}
+                    {canManage &&
+                      d.state === "READY" &&
+                      d.target === "production" && (
+                        <IconAction
+                          icon={RotateCcw}
+                          iconClassName="size-3.5"
+                          label={`Rollback ${d.uid.slice(0, 12)}`}
+                          variant="ghost"
+                          onClick={() => onRollback(d)}
+                          disabled={isLoading}
+                        />
+                      )}
                   </div>
                 </td>
               </tr>

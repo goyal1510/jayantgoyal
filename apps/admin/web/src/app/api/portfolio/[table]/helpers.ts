@@ -7,8 +7,9 @@ import {
   type PortfolioTable,
   validatePortfolioWriteInput,
 } from "@jayantgoyal/portfolio-contracts";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getPortfolioPublicRevalidationPaths } from "@/lib/portfolio-revalidation";
+import { authorizeAdminCapability } from "@/lib/access";
+import type { CapabilityKey } from "@jayantgoyal/web-auth/authorization";
 
 const ALLOWED_TABLES = PORTFOLIO_TABLES;
 
@@ -21,31 +22,6 @@ export const TABLES_WITH_SORT_ORDER = [
   "certificates",
   "nav_items",
 ];
-
-async function checkAdminAccess() {
-  const supabase = await createSupabaseServerClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { authorized: false as const, error: "Unauthorized", status: 401 };
-  }
-
-  const { data: profile } = await supabase
-    .schema("jg_account")
-    .from("profiles")
-    .select("role")
-    .eq("user_id", user.id)
-    .single();
-
-  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
-    return { authorized: false as const, error: "Forbidden", status: 403 };
-  }
-
-  return { authorized: true as const, user };
-}
 
 function getAdminClient() {
   try {
@@ -94,8 +70,8 @@ export function revalidatePortfolioPublicContent() {
   revalidatePath("/writing/[slug]", "page");
 }
 
-export async function authorizeAndGetClient() {
-  const authCheck = await checkAdminAccess();
+export async function authorizeAndGetClient(capability: CapabilityKey) {
+  const authCheck = await authorizeAdminCapability(capability);
   if (!authCheck.authorized) {
     return {
       error: NextResponse.json(

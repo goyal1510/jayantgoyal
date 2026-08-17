@@ -62,8 +62,8 @@ export async function POST(
 
   const supabase = createSupabaseServiceRoleClient();
   const { data: session, error: sessionError } = await supabase
-    .schema("jg_app")
-    .from("game_hub_sessions")
+    .schema("studio")
+    .from("game_sessions")
     .select("*")
     .eq("room_code", roomCode)
     .single();
@@ -80,8 +80,8 @@ export async function POST(
   }
 
   const { data: participant } = await supabase
-    .schema("jg_app")
-    .from("game_hub_session_participants")
+    .schema("studio")
+    .from("game_session_participants")
     .select("*")
     .eq("session_id", session.id)
     .eq("user_id", user.id)
@@ -107,8 +107,8 @@ export async function POST(
 
   if (nextParticipantId) {
     const { data: nextParticipant } = await supabase
-      .schema("jg_app")
-      .from("game_hub_session_participants")
+      .schema("studio")
+      .from("game_session_participants")
       .select("id")
       .eq("id", nextParticipantId)
       .eq("session_id", session.id)
@@ -136,8 +136,8 @@ export async function POST(
   if (completed) {
     if (winnerParticipantId) {
       const { data: winnerParticipant } = await supabase
-        .schema("jg_app")
-        .from("game_hub_session_participants")
+        .schema("studio")
+        .from("game_session_participants")
         .select("id")
         .eq("id", winnerParticipantId)
         .eq("session_id", session.id)
@@ -163,6 +163,7 @@ export async function POST(
   };
 
   const { error: actionError } = await recordOnlineGameAction(supabase, {
+    actorUserId: user.id,
     sessionId: session.id,
     participantId: participant.id,
     moveNumber,

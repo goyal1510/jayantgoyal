@@ -140,12 +140,8 @@ export function CalculationsTable({
                 filteredEntries.map((entry) => {
                   const total = getTotalAmount(entry.denominations);
                   const isActive = currentEntry?.id === entry.id;
-                  const dateLabel = formatDateDisplay(
-                    entry.ist_timestamp || entry.created_at,
-                  );
-                  const timeLabel = formatTimeDisplay(
-                    entry.ist_timestamp || entry.created_at,
-                  );
+                  const dateLabel = formatDateDisplay(entry.created_at);
+                  const timeLabel = formatTimeDisplay(entry.created_at);
 
                   return (
                     <tr

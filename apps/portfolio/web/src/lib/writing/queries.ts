@@ -14,7 +14,7 @@ export type WritingListPost = PortfolioWritingListRecord;
 async function loadPublishedWritingPosts(): Promise<WritingListPost[]> {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
-    .schema("jg_app")
+    .schema("portfolio")
     .from("writing_posts")
     .select(PORTFOLIO_WRITING_SELECT_COLUMNS)
     .eq("is_published", true)
@@ -38,7 +38,7 @@ async function loadWritingPostBySlug(
 ): Promise<WritingPost | null> {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
-    .schema("jg_app")
+    .schema("portfolio")
     .from("writing_posts")
     .select(PORTFOLIO_WRITING_DETAIL_SELECT_COLUMNS)
     .eq("slug", slug)
