@@ -109,7 +109,7 @@ account can reach the state required by later APIs.
 | `POST /api/files/upload/complete`   | Verify uploaded object and finalize metadata      |
 
 File APIs authorize the current user, validate paths/conflicts, coordinate
-`jg_app.file_manager_files` with `private-files`, and remove storage objects
+`studio.file_entries` with `studio-files`, and remove storage objects
 when a partially completed operation must be rolled back.
 
 ## Scratchpad and tool APIs

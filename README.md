@@ -13,6 +13,14 @@ The repository currently contains four independently deployed web clients:
 | Admin     | `apps/admin/web`     | 3002  | [admin.jayantgoyal.com](https://admin.jayantgoyal.com)   |
 | Auth      | `apps/auth/web`      | 3003  | [auth.jayantgoyal.com](https://auth.jayantgoyal.com)     |
 
+Shaamil is an approved mobile-first communication product definition. It has
+no implemented client, workspace, schema, bucket, host, or deployment yet. See
+the [Shaamil product boundary](docs/products/shaamil/README.md) and [database
+schema ownership contract](docs/shared-systems/data/schema-ownership.md).
+The approved prerequisite is to normalize the existing Supabase project around
+`iam`, `studio`, `portfolio`, and private `foundation` ownership before adding
+Shaamil backend objects.
+
 ## Repository map
 
 ```text

@@ -65,8 +65,8 @@ operations. User workspace CRUD should use the session client and RLS.
 | `VERCEL_PROJECT_ID_STUDIO` | server configuration | Allowlisted Studio project for deployment operations.                                     |
 | `VERCEL_PROJECT_ID_ADMIN`  | server configuration | Allowlisted Admin project for deployment operations.                                      |
 
-Admin's service-role key supports Portfolio/Writing/account operations only
-after a live role check. Vercel variables are not environment-editing access to
+Admin's service-role key supports Portfolio/Writing/IAM operations only after a
+live capability check. Vercel variables are not environment-editing access to
 arbitrary projects.
 
 ## Auth-only variables

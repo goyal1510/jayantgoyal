@@ -52,7 +52,8 @@ archived QA evidence.
 4. Check whether the callback is canonical or an intended compatibility alias.
 5. Test `/welcome` to a simple protected Studio route, then Admin admission for
    an authorized account.
-6. Do not broaden origin matching or disable MFA/role checks to restore access.
+6. Do not broaden origin matching or disable MFA/capability checks to restore
+   access.
 
 ## Portfolio content failure
 
@@ -79,8 +80,9 @@ archived QA evidence.
 ## Studio workspace data failure
 
 1. Identify the capability and current user-owned table/bucket.
-2. Confirm the request passed session, MFA, recovery, and terms policy.
-3. Verify the API selects `jg_app` explicitly and handles its Supabase error.
+2. Confirm the request passed current Studio membership, MFA, recovery, and
+   versioned terms policy.
+3. Verify the API selects `studio` explicitly and handles its Supabase error.
 4. Check RLS/object ownership before considering elevated access.
 5. For File Manager, reconcile metadata and Storage object state using only
    authorized paths; do not list other users' objects.
@@ -116,7 +118,7 @@ archived QA evidence.
    run blanket migration up.
 4. Review proposed SQL and use the dedicated disposable migration workflow only
    after approval.
-5. After apply, refresh/review all three canonical schema snapshots, remove
+5. After apply, refresh/review every affected canonical schema snapshot, remove
    pooler URL state, run database/application tests, and update the schema
    catalog.
 

@@ -4,29 +4,42 @@ Supabase provides authentication, Postgres, Realtime, and Storage. The
 canonical hosted project is `jayantgoyal` with reference
 `orwfvyditlguqvxvztkw`; verify both before every linked operation.
 
+Shaamil uses this existing project and Auth identity boundary. No second hosted
+Supabase project is approved for Shaamil. The IAM/product ownership
+normalization is deployed; Shaamil backend work must extend it without
+duplicating identity or placing communication data in another product schema.
+
 ## Ownership
 
-| Schema       | Ownership                                                           |
-| ------------ | ------------------------------------------------------------------- |
-| `jg_account` | Profiles, roles, terms acceptance, and account helpers              |
-| `portfolio`  | Public Portfolio CMS data and contact rate limiting                 |
-| `jg_app`     | Studio workspaces, games, usage data, and Portfolio Writing records |
+| Schema        | Ownership                                                              |
+| ------------- | ---------------------------------------------------------------------- |
+| `foundation`  | Private reusable database primitives                                   |
+| `iam`         | Profiles, product/workforce access, roles, capabilities, policy, audit |
+| `iam_private` | Private authorization predicates and provisioning helpers              |
+| `studio`      | Studio workspaces, games, personalization, and file metadata           |
+| `portfolio`   | Portfolio CMS, Writing, presentation, and contact-abuse state          |
 
-Canonical storage buckets are `private-files`, `portfolio-assets`, and
+Shaamil receives a product-owned `shaamil` schema only with its approved
+backend milestone.
+
+Canonical storage buckets are `studio-files`, `portfolio-assets`, and
 `profile-avatars`. Code must select the intended schema explicitly, handle
 every query error, and preserve RLS or an equivalent server authorization
 boundary.
 
-The current snapshots contain 28 application tables: one in `jg_account`, 15
-in `jg_app`, and 12 in `portfolio`. See the [schema
+The current snapshots contain 40 application tables: 13 in `iam`, 14 in
+`studio`, and 13 in `portfolio`. `foundation` and `iam_private` contain only
+functions. See the [schema
 catalog](schema-catalog.md) for table purpose, access model, database functions,
 and Storage ownership.
 
 ## Repository sources
 
 - `supabase/migrations/*.sql`: ordered forward database changes.
-- `supabase/schemas/jg_account.sql`: canonical account schema snapshot.
-- `supabase/schemas/jg_app.sql`: canonical product schema snapshot.
+- `supabase/schemas/foundation.sql`: private shared database primitives.
+- `supabase/schemas/iam.sql`: IAM tables and caller-facing functions.
+- `supabase/schemas/iam_private.sql`: private authorization helpers.
+- `supabase/schemas/studio.sql`: Studio schema snapshot.
 - `supabase/schemas/portfolio.sql`: canonical Portfolio schema snapshot.
 - `supabase/config.toml`: local CLI services and Auth/API parity.
 
@@ -43,13 +56,13 @@ exists now.
 
 ## Runtime access modes
 
-| Mode                   | Credential                       | Boundary                                                   |
-| ---------------------- | -------------------------------- | ---------------------------------------------------------- |
-| Public content read    | Supabase anonymous key           | Public RLS policies and explicit selected columns          |
-| User-owned workspace   | Authenticated session            | `auth.uid()` RLS plus route/object validation              |
-| Admin content write    | Authenticated admin session      | Admin authorization plus table/payload allowlists          |
-| Service-role operation | Server-only service-role key     | Live user and role authorization before client creation    |
-| Storage upload/read    | User/admin session or signed URL | Bucket policy, object ownership, MIME/size/path validation |
+| Mode                   | Credential                       | Boundary                                                      |
+| ---------------------- | -------------------------------- | ------------------------------------------------------------- |
+| Public content read    | Supabase anonymous key           | Public RLS policies and explicit selected columns             |
+| User-owned workspace   | Authenticated session            | `auth.uid()` RLS plus route/object validation                 |
+| Admin content write    | Authenticated Admin membership   | Operation capability plus table/payload allowlists            |
+| Service-role operation | Server-only service-role key     | Live user and capability authorization before client creation |
+| Storage upload/read    | User/admin session or signed URL | Bucket policy, object ownership, MIME/size/path validation    |
 
 The service role bypasses RLS and is therefore never a substitute for an
 authorization check. Portfolio and Auth do not use it.
@@ -62,9 +75,9 @@ authorization check. Portfolio and Auth do not use it.
 4. For an approved remote apply, use the dedicated clean disposable migration
    workflow. Do not apply from the protected source clone or an ordinary dirty
    worktree.
-5. After a successful apply, dump all three schemas, review the diffs for
-   schema-only content and secrets, and commit the refreshed snapshots with the
-   migration.
+5. After a successful apply, dump every application schema, review the diffs
+   for schema-only content and secrets, and commit the refreshed snapshots with
+   the migration.
 
 `supabase/.temp` is machine-local state and must never be committed or copied
 between worktrees. Remove any generated pooler URL after linked checks.
@@ -77,13 +90,21 @@ external mutation.
 
 A database change is not complete until the SQL is reviewed, the exact linked
 project is verified, migration history is inspected, the approved migration is
-applied through the disposable workflow, all three schema snapshots are
+applied through the disposable workflow, every affected schema snapshot is
 refreshed and reviewed, generated pooler data is removed, application
-contracts/tests pass, and the schema catalog is updated.
+contracts/tests pass, and the schema catalog and ownership page are updated.
 
 ## Local parity
 
-Local PostgREST exposes `public`, `graphql_public`, `jg_account`, `jg_app`, and
-`portfolio`. Local database reset applies migrations without a nonexistent seed
-file. Auth redirects cover the four local web clients; anonymous sign-in and
+The local and hosted Data API configuration exposes `public`,
+`graphql_public`, `iam`, `studio`, and `portfolio`. `foundation` and
+`iam_private` remain private.
+
+A fresh `supabase db reset` over the complete historical migration directory is
+currently blocked by the oldest retained migration, which assumes predecessor
+tables rather than creating them. Current-schema changes must therefore be
+validated in a disposable local project reconstructed from the canonical
+snapshots. Establishing a reset-safe baseline requires a separately reviewed
+migration-history strategy; never edit already-applied history to hide this
+drift. Auth redirects cover the four local web clients; anonymous sign-in and
 TOTP configuration must remain aligned with the product flows they exercise.

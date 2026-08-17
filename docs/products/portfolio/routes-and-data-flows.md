@@ -14,7 +14,7 @@ the Portfolio sitemap/robots rules.
 | `/resume`         | Resume presentation and PDF entry                             | Shell data and `/api/resume`             |
 | `/work`           | Visible work catalog                                          | Editorial work records                   |
 | `/work/[slug]`    | Published case study                                          | Work slug and publication guard          |
-| `/writing`        | Published Writing index                                       | `jg_app.writing_posts`                   |
+| `/writing`        | Published Writing index                                       | `portfolio.writing_posts`                |
 | `/writing/[slug]` | Published article                                             | Writing slug query and Markdown renderer |
 
 The app also owns `layout.tsx`, `error.tsx`, `not-found.tsx`, `manifest.ts`,
@@ -53,15 +53,15 @@ window.
 ```text
 Writing page
   → Writing query helper
-  → jg_app.writing_posts
+  → portfolio.writing_posts
   → published + visible filter
   → Portfolio Writing contract
   → safe Markdown/remark rendering
 ```
 
-Writing resides in `jg_app` for existing database ownership, but the product
-capability is owned by Portfolio. Admin's Writing workspace is the authorized
-editor. Publishing or unpublishing invalidates public Writing paths.
+Writing resides with its Portfolio owner. Admin's Writing workspace is the
+capability-authorized editor. Publishing or unpublishing invalidates public
+Writing paths.
 
 ## Contact flow
 
@@ -99,9 +99,9 @@ cache headers allow stale revalidation. `GITHUB_TOKEN` stays server-only.
 
 ```text
 Admin editor
-  → role-authorized Admin API
+  → capability-authorized Admin API
   → Portfolio contract validation
-  → portfolio table / jg_app.writing_posts / portfolio-assets
+  → portfolio table / portfolio.writing_posts / portfolio-assets
   → public path and tag revalidation
   → next Portfolio request reads canonical data
 ```

@@ -81,10 +81,11 @@ indexable.
 
 ## Data and storage
 
-Auth uses Supabase Auth plus `jg_account.profiles` and the private
-`profile-avatars` bucket. Profiles hold names, roles, terms state, and avatar
-selection metadata; Supabase Auth remains authoritative for identities,
-passwords, sessions, verification, and MFA factors.
+Auth uses Supabase Auth plus `iam.profiles`, versioned policy acceptance, and
+the private `profile-avatars` bucket. Profiles hold names, lifecycle status,
+and avatar selection metadata; roles and product memberships are separate IAM
+objects. Supabase Auth remains authoritative for identities, passwords,
+sessions, verification, and MFA factors.
 
 Auth uses the anonymous key with RLS and must never receive or import a
 service-role credential. Avatar uploads are limited to JPG, PNG, or WebP and

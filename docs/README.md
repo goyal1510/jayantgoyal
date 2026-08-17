@@ -59,10 +59,13 @@ prose.
 - [Studio](products/studio/README.md)
 - [Admin](products/admin/README.md)
 - [Auth](products/auth/README.md)
+- [Shaamil](products/shaamil/README.md) — defined product; no implemented client
+  or runtime yet
 
-Each product page links to its route, capability, runtime-flow, data, and
-operational detail. These pages describe the implemented clients; they do not
-invent clients or product capabilities that do not exist.
+Implemented product pages link to their route, capability, runtime-flow, data,
+and operational detail. A defined product page must distinguish accepted
+ownership and extension rules from runtime behavior and must not invent clients
+or capabilities that do not exist.
 
 ## Clients and shared systems
 
@@ -72,6 +75,7 @@ invent clients or product capabilities that do not exist.
 - [Shared web session and returns](shared-systems/authentication/cookie-and-return-contract.md)
 - [Data and Supabase](shared-systems/data/README.md)
 - [Database schema catalog](shared-systems/data/schema-catalog.md)
+- [Database schema ownership and evolution](shared-systems/data/schema-ownership.md)
 - [Design and brand](shared-systems/design-and-brand/README.md)
 - [Naming contract](shared-systems/design-and-brand/naming-contract.md)
 - [External integrations](shared-systems/integrations/README.md)

@@ -185,8 +185,8 @@ or PDF output. Rows are always user-owned through RLS.
 
 ### File Manager
 
-Metadata and directory hierarchy live in `jg_app.file_manager_files`; bytes
-live in `private-files`. APIs create folders, request signed upload URLs,
+Metadata and directory hierarchy live in `studio.file_entries`; bytes live in
+`studio-files`. APIs create folders, request signed upload URLs,
 complete uploads, list directories, rename, soft-delete, copy, and move. File
 conflicts are explicit UI flows. Storage cleanup accompanies failed/overwritten
 metadata operations where possible.

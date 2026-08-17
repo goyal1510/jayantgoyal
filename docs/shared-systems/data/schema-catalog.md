@@ -1,192 +1,159 @@
 # Database schema catalog
 
-This catalog describes the current canonical schema snapshots, not every table
-that ever appeared in migration history. The verified hosted project is
-`jayantgoyal` (`orwfvyditlguqvxvztkw`).
+This catalog describes the current canonical schema snapshots for the hosted
+`jayantgoyal` Supabase project (`orwfvyditlguqvxvztkw`). Historical migrations
+are not current APIs.
 
 ## Ownership summary
 
-| Schema       | Tables | Product/domain owner                   | Default access model                              |
-| ------------ | -----: | -------------------------------------- | ------------------------------------------------- |
-| `jg_account` |      1 | Auth/account policy                    | User self-service plus admin/super-admin policies |
-| `jg_app`     |     15 | Studio, except Portfolio-owned Writing | User-owned RLS; public published Writing          |
-| `portfolio`  |     12 | Portfolio                              | Public selected reads; authorized Admin writes    |
+| Schema        | Tables | Owner             | Default access model                                      |
+| ------------- | -----: | ----------------- | --------------------------------------------------------- |
+| `foundation`  |      0 | Shared data layer | Private primitives                                        |
+| `iam`         |     13 | Cross-product IAM | Intentional self/read RPCs; privileged service operations |
+| `iam_private` |      0 | Cross-product IAM | Private RLS and trusted authorization helpers             |
+| `studio`      |     14 | Studio            | Active membership, capabilities, and resource attributes  |
+| `portfolio`   |     13 | Portfolio         | Selected public reads; capability-authorized Admin writes |
 
-## Account schema
+Shaamil has no schema, table, function, publication, or Storage bucket yet. It
+receives a product-owned `shaamil` schema only with an approved backend
+milestone.
 
-### `jg_account.profiles`
+## Foundation
 
-One row per Supabase Auth identity. It stores names, `user_role` (`user`,
-`admin`, `super_admin`), terms acceptance, avatar selection/storage metadata,
-and timestamps. Users can read/update their own permitted profile fields.
-Admins can read profiles; super admins have the broader managed-write policies
-used by Admin operations.
+`foundation` contains no product data. Its three private helpers are
+`uuid_v7`, `set_updated_at`, and `is_nonblank_text_array`. Product schemas may
+depend on them; native or web clients do not query this schema.
 
-Important helpers:
+## IAM
 
-- `jg_account.handle_new_user`: creates/synchronizes a profile from Auth.
-- `jg_account.handle_updated_at`: maintains timestamps.
-- `jg_account.is_admin`: reusable database authorization predicate.
-- `jg_account.count_my_sessions`: account-session information for security UI.
+Supabase Auth owns credentials, identities, factors, refresh tokens, and
+sessions. IAM owns ecosystem identity and authorization state.
 
-Supabase Auth, not this table, owns passwords, email verification, identities,
-refresh tokens, sessions, and MFA factors.
+| Table                            | Responsibility                                                      |
+| -------------------------------- | ------------------------------------------------------------------- |
+| `iam.profiles`                   | Canonical profile and lifecycle state for one `auth.users` identity |
+| `iam.products`                   | Implemented product registry                                        |
+| `iam.product_memberships`        | Product entry entitlement, validity, and revocation                 |
+| `iam.workforces`                 | Operator-owned workforce boundary                                   |
+| `iam.workforce_memberships`      | User affiliation and status in a workforce                          |
+| `iam.roles`                      | Product- or workforce-scoped role definitions                       |
+| `iam.capabilities`               | Exact `product.resource.action` operations                          |
+| `iam.role_capabilities`          | Capabilities bundled by a role                                      |
+| `iam.product_role_assignments`   | User role assignments within a product membership                   |
+| `iam.workforce_role_assignments` | User role assignments within a workforce membership                 |
+| `iam.policy_versions`            | Versioned product policy documents                                  |
+| `iam.policy_acceptances`         | Acceptance of an exact policy version                               |
+| `iam.access_audit_events`        | Append-only evidence for privileged access changes                  |
 
-## Studio and Writing schema
+New Auth users receive an IAM profile and Auth membership only. Admin and
+Studio access require explicit active memberships and assignments.
+`admin.full_access` covers current product CRUD; workforce ownership transfer
+is granted separately through `operations.owner`.
 
-### Activity Tracker
+Caller-facing helpers are `has_product_access`, `has_capability`,
+`list_my_capabilities`, and `count_my_sessions`. `set_admin_access` and
+`revoke_admin_access` are service-role-only transactional commands that
+re-authorize the actor and write an audit event.
 
-| Table                                | Purpose                                   | Relationship/access               |
-| ------------------------------------ | ----------------------------------------- | --------------------------------- |
-| `jg_app.activity_tracker_activities` | User-defined activities and display order | Owner CRUD by `user_id`           |
-| `jg_app.activity_tracker_entries`    | Dated completion/notes for an activity    | Owner CRUD; activity relationship |
+`iam_private` contains the caller-bound and trusted predicates used by RLS, the
+new-user provisioning trigger, and the active-game-participant check. It is not
+part of the Data API schema list.
 
-Deleting an activity and its entry behavior must remain consistent with the
-foreign key and API transaction semantics. Statistics are computed from these
-canonical rows rather than stored as a second source of truth.
+## Studio
 
-### Currency Calculator
+### Activity Tracker and calculator
 
-| Table                                      | Purpose                                  | Relationship/access           |
-| ------------------------------------------ | ---------------------------------------- | ----------------------------- |
-| `jg_app.currency_calculator_calculations`  | One saved calculation, date, total, note | Owner CRUD                    |
-| `jg_app.currency_calculator_denominations` | Denomination/count/amount rows           | Child of an owned calculation |
+| Table                                       | Purpose                                     |
+| ------------------------------------------- | ------------------------------------------- |
+| `studio.activity_tracker_activities`        | User-defined activities and display order   |
+| `studio.activity_tracker_entries`           | Dated completion and notes for an activity  |
+| `studio.currency_calculations`              | One user-owned saved calculation            |
+| `studio.currency_calculation_denominations` | Validated denomination details for a result |
 
-The API persists the calculation and denomination set as one user operation.
-Generated PDF/detail output is derived from stored rows.
+Activity entries use a composite owner relationship so an entry cannot point
+to another user's activity. Calculator quantities enforce non-negative value
+invariants.
 
-### File Manager
+### Files
 
-| Table                                 | Purpose                                                                         | Relationship/access                      |
-| ------------------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------- |
-| `jg_app.file_manager_files`           | File/folder metadata, paths, parent, object path, version and soft-delete state | Owner CRUD; private Storage coordination |
-| `jg_app.file_manager_type_categories` | Shared file-type classification                                                 | Authenticated read                       |
+| Table                         | Purpose                                                    |
+| ----------------------------- | ---------------------------------------------------------- |
+| `studio.file_entries`         | User-owned file/folder paths, metadata, and deletion state |
+| `studio.file_type_categories` | Shared MIME/type classification                            |
 
-`file_manager_files` represents the root and directory tree as rows. File bytes
-live in `private-files`; directories have no Storage object. Relevant helpers
-include `create_directory_path`, `generate_storage_path`, `get_directory_tree`,
-`get_file_by_path`, `list_directory`, `copy_file`, `move_file`,
-`soft_delete_file`, child-count maintenance, and file-type validation.
+File bytes live in the private `studio-files` bucket under the user's ID
+prefix. Directories have no Storage object. Client-callable helpers bind the
+requested user to `auth.uid()`. Copy, move, upload, and delete object
+operations use the Storage API.
 
-### Game Hub
+### Games and personal workspaces
 
-| Table                                  | Purpose                                                       | Relationship/access                                      |
-| -------------------------------------- | ------------------------------------------------------------- | -------------------------------------------------------- |
-| `jg_app.game_hub_sessions`             | Room code, game slug, state, turn owner, status, host, winner | Joinable/joined read; participant-controlled transitions |
-| `jg_app.game_hub_session_participants` | User/seat/symbol/player state in a session                    | User joins as self; participant reads                    |
-| `jg_app.game_hub_session_moves`        | Ordered action payload and resulting state                    | Participants read; actor inserts through validated flow  |
-| `jg_app.game_hub_session_results`      | Final outcome and summary                                     | Participants read/insert through completion flow         |
-| `jg_app.game_hub_typing_speed_results` | User typing speed and accuracy history                        | Owner read/insert                                        |
+| Table                              | Purpose                                           |
+| ---------------------------------- | ------------------------------------------------- |
+| `studio.game_sessions`             | Room, game, state, turn, host, status, and winner |
+| `studio.game_session_participants` | User/seat/symbol state in a session               |
+| `studio.game_session_moves`        | Ordered action payload and resulting state        |
+| `studio.game_session_results`      | Final outcome and summary                         |
+| `studio.typing_test_results`       | User typing speed and accuracy history            |
+| `studio.scratchpad_entries`        | Realtime user-owned text or code content          |
+| `studio.tool_favorites`            | Unique favorite tool keys per user                |
+| `studio.tool_history`              | Recent user tool use                              |
 
-`jg_app.game_hub_session_status` is `waiting`, `active`, `completed`, or
-`abandoned`. `jg_app.record_game_hub_action` locks the current session,
-validates the active participant and move number, records the move, updates the
-session, and optionally records the result atomically.
+`game_session_status` is `waiting`, `active`, `completed`, or `abandoned`.
+`record_game_action` locks the session, validates capability, participant,
+turn, ordering, next participant, winner, and result, then commits the
+transition atomically. `scratchpad_entries` is explicitly published through
+`supabase_realtime`.
 
-### Sync Scratchpad
+Studio tables do not grant persistence to `anon`. Authenticated operations
+require an active Studio membership/capability and then apply ownership or
+participant attributes through RLS.
 
-`jg_app.scratchpad_entries` stores user-owned text or code content, optional
-language, read state, and timestamps. Owner CRUD policies isolate accounts.
-The table participates in Supabase Realtime for synchronized active clients.
+## Portfolio
 
-### Tool personalization
+### Presentation and editorial data
 
-| Table                   | Purpose                            | Relationship/access      |
-| ----------------------- | ---------------------------------- | ------------------------ |
-| `jg_app.tool_favorites` | Unique favorite tool keys per user | Owner read/insert/delete |
-| `jg_app.tool_history`   | Recent tool use and timestamps     | Owner CRUD               |
+| Table                                                    | Purpose                                                   |
+| -------------------------------------------------------- | --------------------------------------------------------- |
+| `portfolio.hero`, `portfolio.about`, `portfolio.contact` | Singleton public presentation records                     |
+| `portfolio.education`, `portfolio.experience`            | Ordered professional history                              |
+| `portfolio.certificates`                                 | Credentials and supporting assets                         |
+| `portfolio.skill_categories`, `portfolio.skills`         | Grouped skill evidence                                    |
+| `portfolio.work`                                         | Work summaries, links, images, and case studies           |
+| `portfolio.nav_items`                                    | Ordered public section navigation                         |
+| `portfolio.section_content`                              | Presentation copy for known sections                      |
+| `portfolio.writing_posts`                                | Portfolio-owned Writing publication and editorial content |
 
-Tool execution remains public/browser-local. These tables add optional account
-personalization rather than gating the utilities.
+Public policies expose only the intended visible data. Admin reads use
+`portfolio.content.read`; create, update, and delete are independent
+capabilities. The same operation split protects `portfolio-assets` mutations.
 
-### Writing
-
-`jg_app.writing_posts` stores slug, title, excerpt, Markdown content, tags,
-publication/visibility state, timestamps, optional cover metadata, and display
-fields. Public RLS exposes only published and visible rows. Admin-authorized
-writes use the Portfolio-owned Writing contract and revalidate public pages.
-
-Writing is a Portfolio product capability even though its table remains in the
-existing `jg_app` schema. A future schema move would need a reviewed migration
-and is not implied by product ownership alone.
-
-### Shared database helpers
-
-`jg_app.uuid_v7` is the standard application UUID default.
-`jg_app.update_updated_at` is the standard timestamp trigger.
-`jg_app.is_nonblank_text_array` is used by current constraints across schemas.
-
-## Portfolio schema
-
-### Singleton presentation records
-
-| Table               | Purpose                                                 | Access                   |
-| ------------------- | ------------------------------------------------------- | ------------------------ |
-| `portfolio.hero`    | Person/hero identity, actions, social/personal metadata | Public read; Admin write |
-| `portfolio.about`   | About narrative, principles, supporting profile data    | Public read; Admin write |
-| `portfolio.contact` | Public contact presentation and destination             | Public read; Admin write |
-
-Unique singleton indexes prevent multiple competing rows for these core
-records. Portfolio loaders fail when required singleton data is missing.
-
-### Ordered editorial collections
-
-| Table                        | Purpose                                           | Key rules                                              |
-| ---------------------------- | ------------------------------------------------- | ------------------------------------------------------ |
-| `portfolio.education`        | School, degree, period, location, detail          | Visibility and non-negative sort order                 |
-| `portfolio.experience`       | Company, role, period, outcomes and company links | Visibility, validated URLs/arrays, sort order          |
-| `portfolio.certificates`     | Credential title, issuer, date, links/assets      | Visibility and sort order                              |
-| `portfolio.skill_categories` | Named skill groups and descriptions               | Unique normalized title, sort order                    |
-| `portfolio.skills`           | Skill, proficiency, evidence                      | Category FK, allowed proficiency, unique category/name |
-| `portfolio.work`             | Work summaries, links, tags, images, case studies | Unique slug, case-study shape/publication constraints  |
-
-Public policies expose visible records; Admin policies permit authorized CMS
-operations. The public loader also selects only the contract's public columns.
-
-### Navigation and section presentation
-
-| Table                       | Purpose                                        | Key rules                        |
-| --------------------------- | ---------------------------------------------- | -------------------------------- |
-| `portfolio.nav_items`       | Ordered section labels/targets                 | Unique section ID and visibility |
-| `portfolio.section_content` | Eyebrow/headline/accent/copy per known section | Unique allowed section key       |
-
-`portfolio.save_section_presentation` atomically saves section copy and its
-navigation representation. Both payload halves are validated by the shared
-Portfolio contract and database constraints.
+`save_section_presentation` atomically saves presentation and navigation data.
+Case-study and JSON helper functions enforce the Portfolio contract at the
+database boundary.
 
 ### Contact abuse state
 
-`portfolio.contact_rate_limits` stores a secret-keyed hash, request count, and
-reset time for the public contact endpoint. `portfolio.consume_contact_rate_limit`
-performs the atomic decision. The endpoint fails closed when this function is
-unavailable.
-
-### Portfolio functions
-
-- `portfolio.update_updated_at_column`: standard timestamp maintenance.
-- `portfolio.is_exact_text_object_array`: JSON content constraint helper.
-- `portfolio.is_work_case_study_shape` and
-  `portfolio.is_complete_work_case_study`: Work case-study integrity.
-- `portfolio.save_section_presentation`: transactional CMS presentation save.
-- `portfolio.consume_contact_rate_limit`: public contact abuse control.
+`portfolio.contact_rate_limits` stores a secret-keyed hash, request count, and reset
+time. `consume_contact_rate_limit` performs the atomic public contact decision;
+the endpoint fails closed when it is unavailable.
 
 ## Storage buckets
 
-| Bucket             | Visibility               | Owner        | Current use                                                           |
-| ------------------ | ------------------------ | ------------ | --------------------------------------------------------------------- |
-| `private-files`    | private                  | Studio       | File Manager objects under user ownership                             |
-| `portfolio-assets` | public read, Admin write | Portfolio    | Work images, credential files/previews, Writing covers, Resume assets |
-| `profile-avatars`  | private                  | Auth/account | User avatar uploads under user-ID prefixes                            |
+| Bucket             | Visibility               | Owner     | Current use                                        |
+| ------------------ | ------------------------ | --------- | -------------------------------------------------- |
+| `studio-files`     | Private                  | Studio    | User-owned File Manager objects                    |
+| `portfolio-assets` | Public read, Admin write | Portfolio | Work, credential, Writing cover, and Resume assets |
+| `profile-avatars`  | Private                  | IAM/Auth  | User avatar uploads under user-ID prefixes         |
 
 Bucket policies and application validation are both required. A public bucket
-does not authorize arbitrary uploads. Signed uploads must be finalized against
-expected metadata, size, MIME type, and owner.
+does not authorize uploads. Uploads must validate owner, path, MIME type, size,
+and final metadata.
 
 ## Current versus historical objects
 
-Old migrations include jobs, commerce/subscription, messaging-conversation,
-custom-calculator-template, file-share, and media-conversion objects that later
-migrations removed or rolled back. They are not in the canonical snapshots and
-must not be documented or used as current APIs. If a future product implements
-one of those capabilities, design it from current requirements and add a new
-reviewed migration; do not revive historical tables by assumption.
+The retired `jg_account` and `jg_app` schemas no longer exist. Older migrations
+also contain jobs, commerce, messaging, file sharing, custom calculator
+templates, and media conversion that were later removed. Do not revive those
+objects by assumption; future capabilities require current product design and
+new reviewed migrations.

@@ -46,7 +46,7 @@ requires its own reason, tests, and product documentation.
 
 ## Backend and identity are client-independent boundaries
 
-Supabase Auth and the `jg_account`, `jg_app`, and `portfolio` schemas serve
+Supabase Auth and the coordinated `iam`, `studio`, and `portfolio` schemas serve
 product capabilities rather than a single UI technology. Clients still own
 their platform-specific session handling and product authorization. Database
 tables are not automatically cross-product APIs; their schema and product owner
