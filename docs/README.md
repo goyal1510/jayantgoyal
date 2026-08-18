@@ -97,6 +97,7 @@ or capabilities that do not exist.
 - [Reliability and observability](operations/reliability.md)
 - [Vercel deployment](operations/deployment/vercel.md)
 - [Operational runbooks](operations/runbooks.md)
+- [LinkedIn publishing operations](operations/linkedin-publishing.md)
 
 ## Reference
 

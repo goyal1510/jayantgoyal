@@ -87,5 +87,7 @@ strict types, Vitest, full builds, bundle budgets, and migration-history
 checks. GitHub Actions runs the core quality set for `main` and pull requests.
 Vercel independently deploys the four client roots from one repository.
 
-LinkedIn scripts remain manual tooling under `scripts/linkedin` and are outside
-the current restructure/documentation implementation scope.
+LinkedIn scripts remain manual tooling under `scripts/linkedin`. Their
+authentication, publishing, replacement, deletion, local-history, and failure
+recovery contracts are documented in [LinkedIn publishing
+operations](../operations/linkedin-publishing.md).

@@ -32,3 +32,22 @@ Run repository commands from the monorepo root unless a page says otherwise.
 `pnpm test:db:linked` mutates remote test records and is not a normal quality
 gate. Run it only with explicit authorization. `pnpm check:bundle-budgets`
 performs expensive builds and analysis for bundle-budget work.
+
+## LinkedIn publishing
+
+These commands operate the manual LinkedIn tooling documented in [LinkedIn
+publishing operations](../operations/linkedin-publishing.md).
+
+| Command                                                        | Purpose                                           |
+| -------------------------------------------------------------- | ------------------------------------------------- |
+| `node scripts/linkedin/auth.mjs`                               | Authorize or renew the local member access token  |
+| `node scripts/linkedin/post.mjs "Post text"`                   | Publish text and record it in local history       |
+| `node scripts/linkedin/post.mjs "Post text" --url <url>`       | Publish text with an attached article URL         |
+| `node scripts/linkedin/post.mjs --writing <slug>`              | Publish the default announcement for a writing    |
+| `node scripts/linkedin/manage.mjs list`                        | List tracked posts and their current indices      |
+| `node scripts/linkedin/manage.mjs edit <index> "New text"`     | Delete and replace a tracked post                 |
+| `node scripts/linkedin/manage.mjs delete <index>`              | Delete a tracked post and update local history    |
+
+The post command publishes immediately. The management `edit` command is a
+delete-and-repost operation, so it changes the post URL and loses existing
+reactions and comments.
