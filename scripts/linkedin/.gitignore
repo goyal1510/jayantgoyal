@@ -1,2 +1,4 @@
+.env
 .token.json
 .posts.json
+.supabase-token.json

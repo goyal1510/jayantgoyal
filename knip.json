@@ -1,9 +1,16 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "ignoreDependencies": ["vercel"],
-  "ignoreFiles": ["scripts/linkedin/*.mjs"],
   "ignoreUnresolved": ["^next$"],
   "workspaces": {
+    ".": {
+      "entry": [
+        "scripts/linkedin/auth.mjs",
+        "scripts/linkedin/database-auth.mjs",
+        "scripts/linkedin/manage.mjs",
+        "scripts/linkedin/post.mjs"
+      ]
+    },
     "apps/portfolio/web": {
       "entry": ["next.config.test.ts"]
     },

@@ -1,146 +1,138 @@
 #!/usr/bin/env node
-/**
- * Post to LinkedIn from the terminal.
- *
- * Usage:
- *   node scripts/linkedin/post.mjs "Your post text here"
- *   node scripts/linkedin/post.mjs "Check out my writing!" --url https://www.jayantgoyal.com/writing/my-post
- *   node scripts/linkedin/post.mjs --writing introducing-jayantgoyal-com
- *
- * Options:
- *   --url <url>      Attach a link to the post
- *   --writing <slug> Auto-generate a post from a writing slug
- */
 
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import {
+  createLedgerPost,
+  getLedgerPost,
+  publishedLedgerPatch,
+  updateLedgerPost,
+} from "./lib/ledger.mjs";
+import {
+  appendPost,
+  linkedinPostUrl,
+  loadLinkedInToken,
+} from "./lib/history.mjs";
+import { publishToLinkedIn } from "./lib/linkedin-api.mjs";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const TOKEN_FILE = path.join(__dirname, ".token.json");
-const POSTS_FILE = path.join(__dirname, ".posts.json");
-
-function loadToken() {
-  if (!fs.existsSync(TOKEN_FILE)) {
-    console.error("❌ No token found. Run: node scripts/linkedin/auth.mjs");
-    process.exit(1);
-  }
-  const token = JSON.parse(fs.readFileSync(TOKEN_FILE, "utf-8"));
-  if (new Date(token.expires_at) < new Date()) {
-    console.error("❌ Token expired. Run: node scripts/linkedin/auth.mjs");
-    process.exit(1);
-  }
-  return token;
-}
-
-function parseArgs() {
-  const args = process.argv.slice(2);
-  let text = "";
-  let url = "";
-  let writingSlug = "";
-
-  for (let i = 0; i < args.length; i++) {
-    if (args[i] === "--url" && args[i + 1]) {
-      url = args[++i];
-    } else if (args[i] === "--writing" && args[i + 1]) {
-      writingSlug = args[++i];
-    } else if (!args[i].startsWith("--")) {
-      text = args[i];
+export function parsePostArguments(args) {
+  const parsed = {
+    content: "",
+    articleUrl: "",
+    writingSlug: "",
+    recordId: "",
+  };
+  for (let index = 0; index < args.length; index += 1) {
+    const value = args[index];
+    if (value === "--url" && args[index + 1]) {
+      parsed.articleUrl = args[++index];
+    } else if (value === "--writing" && args[index + 1]) {
+      parsed.writingSlug = args[++index];
+    } else if (value === "--record" && args[index + 1]) {
+      parsed.recordId = args[++index];
+    } else if (!value.startsWith("--")) {
+      parsed.content = value;
     }
   }
-
-  return { text, url, writingSlug };
+  return parsed;
 }
 
-async function postToLinkedIn(accessToken, personId, text, articleUrl) {
-  const body = {
-    author: `urn:li:person:${personId}`,
-    lifecycleState: "PUBLISHED",
-    specificContent: {
-      "com.linkedin.ugc.ShareContent": {
-        shareCommentary: { text },
-        shareMediaCategory: articleUrl ? "ARTICLE" : "NONE",
-        ...(articleUrl && {
-          media: [
-            {
-              status: "READY",
-              originalUrl: articleUrl,
-            },
-          ],
-        }),
-      },
-    },
-    visibility: {
-      "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC",
-    },
-  };
+function publicationError(error) {
+  return error.message.slice(0, 2000);
+}
 
-  const res = await fetch("https://api.linkedin.com/v2/ugcPosts", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      "Content-Type": "application/json",
-      "X-Restli-Protocol-Version": "2.0.0",
-    },
-    body: JSON.stringify(body),
-  });
-
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(`LinkedIn API error (${res.status}): ${JSON.stringify(err)}`);
+async function resolvePublication(args) {
+  const parsed = parsePostArguments(args);
+  if (parsed.recordId) {
+    if (parsed.content || parsed.articleUrl || parsed.writingSlug) {
+      throw new Error(
+        "--record uses the saved ledger content and cannot be combined with content options.",
+      );
+    }
+    const record = await getLedgerPost(parsed.recordId);
+    if (!["planned", "scheduled", "failed"].includes(record.status)) {
+      throw new Error(
+        `Ledger record ${record.id} cannot be published from status ${record.status}.`,
+      );
+    }
+    return {
+      ledger: await updateLedgerPost(record.id, {
+        status: "publishing",
+        publication_error: null,
+      }),
+      content: record.content,
+      articleUrl: record.article_url,
+      writingSlug: record.writing_slug,
+      replacesId: record.replaces_id,
+    };
   }
-
-  const data = await res.json();
-  return data.id;
-}
-
-function loadPosts() {
-  if (!fs.existsSync(POSTS_FILE)) return [];
-  return JSON.parse(fs.readFileSync(POSTS_FILE, "utf-8"));
-}
-
-function savePost(entry) {
-  const posts = loadPosts();
-  posts.push(entry);
-  fs.writeFileSync(POSTS_FILE, JSON.stringify(posts, null, 2));
+  if (parsed.writingSlug) {
+    parsed.articleUrl = `https://jayantgoyal.com/writing/${parsed.writingSlug}`;
+    if (!parsed.content) {
+      parsed.content =
+        `📝 New writing!\n\nRead it here 👇\n${parsed.articleUrl}\n\n` +
+        "#webdev #developer #nextjs #coding";
+    }
+  }
+  if (!parsed.content) {
+    throw new Error(
+      'Usage: post.mjs "Post text" [--url <url>] | --writing <slug> | --record <uuid>',
+    );
+  }
+  const ledger = await createLedgerPost({
+    status: "publishing",
+    content: parsed.content,
+    articleUrl: parsed.articleUrl || null,
+    writingSlug: parsed.writingSlug || null,
+  });
+  return { ledger, ...parsed };
 }
 
 async function main() {
-  const token = loadToken();
-  let { text, url, writingSlug } = parseArgs();
+  const token = loadLinkedInToken();
+  const publication = await resolvePublication(process.argv.slice(2));
+  console.log(`\n--- Preview ---\n${publication.content}`);
+  if (publication.articleUrl) console.log(`\n${publication.articleUrl}`);
+  console.log("--- End ---\n\nPublishing to LinkedIn...");
 
-  // Auto-generate post from writing slug
-  if (writingSlug) {
-    url = `https://www.jayantgoyal.com/writing/${writingSlug}`;
-    if (!text) {
-      text = `📝 New writing!\n\nRead it here 👇\n${url}\n\n#webdev #developer #nextjs #coding`;
-    }
-  }
-
-  if (!text) {
-    console.error("Usage:");
-    console.error('  node scripts/linkedin/post.mjs "Your post text"');
-    console.error('  node scripts/linkedin/post.mjs "Text" --url https://example.com');
-    console.error("  node scripts/linkedin/post.mjs --writing my-post-slug");
-    process.exit(1);
-  }
-
-  console.log("\n📤 Posting to LinkedIn...");
-  console.log(`\n--- Preview ---\n${text}\n${url ? `🔗 ${url}\n` : ""}--- End ---\n`);
-
+  let postUrn;
   try {
-    const postId = await postToLinkedIn(token.access_token, token.person_id, text, url);
-    console.log(`✓ Posted successfully!`);
-    console.log(`  Post ID: ${postId}`);
-    console.log(`  View: https://www.linkedin.com/feed/`);
-
-    // Save to post history
-    savePost({ id: postId, text, url: url || null, writingSlug: writingSlug || null, createdAt: new Date().toISOString() });
-    console.log(`  Logged to history (${POSTS_FILE})`);
-  } catch (err) {
-    console.error(`❌ Failed to post: ${err.message}`);
-    process.exit(1);
+    postUrn = await publishToLinkedIn({
+      accessToken: token.access_token,
+      personId: token.person_id,
+      content: publication.content,
+      articleUrl: publication.articleUrl,
+    });
+  } catch (error) {
+    await updateLedgerPost(publication.ledger.id, {
+      status: "failed",
+      publication_error: publicationError(error),
+    });
+    throw error;
   }
+
+  const publishedAt = new Date().toISOString();
+  appendPost({
+    id: postUrn,
+    text: publication.content,
+    url: publication.articleUrl || null,
+    writingSlug: publication.writingSlug || null,
+    createdAt: publishedAt,
+    databaseId: publication.ledger.id,
+  });
+  await updateLedgerPost(
+    publication.ledger.id,
+    publishedLedgerPatch(postUrn, publishedAt),
+  );
+  if (publication.replacesId) {
+    await updateLedgerPost(publication.replacesId, { status: "replaced" });
+  }
+  console.log("Published and recorded in Supabase.");
+  console.log(linkedinPostUrl(postUrn));
 }
 
-main();
+const isMain = import.meta.url === `file://${process.argv[1]}`;
+if (isMain) {
+  main().catch((error) => {
+    console.error(error.message);
+    process.exitCode = 1;
+  });
+}
