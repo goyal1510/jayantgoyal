@@ -20,8 +20,7 @@ The project contains 41 application tables in five application schemas:
 | `studio`        |     14 | Studio workspaces, games, personalization, and file metadata        |
 | `portfolio`     |     14 | Portfolio, Writing, LinkedIn planning, and contact-abuse state      |
 
-The predecessor `jg_account` and `jg_app` schemas no longer exist. Shaamil has
-no current schema, table, publication, Storage bucket, or client.
+The predecessor `jg_account` and `jg_app` schemas no longer exist.
 
 ## Ownership model
 
@@ -32,7 +31,6 @@ no current schema, table, publication, Storage bucket, or client.
 | `iam_private` | Caller-bound and trusted authorization predicates used by RLS and transactional commands                                 | Private; never a Data API schema                                                          |
 | `studio`      | Studio tools, workspaces, games, personalization, and Studio file metadata                                               | RLS-protected operations with IAM product/capability checks                               |
 | `portfolio`   | Portfolio and Writing content, private LinkedIn publication planning, and abuse-control state                            | Selected public reads and capability-authorized Admin writes                              |
-| `shaamil`     | Future Shaamil communities, membership, communication, safety, sync, and notification state                              | Created only with an approved Shaamil backend milestone                                   |
 
 Supabase-managed `auth`, `storage`, `realtime`, and `extensions` retain their
 platform ownership. Application migrations must not rename or add arbitrary
@@ -70,26 +68,25 @@ authoritative decision.
 IAM consists of the smallest structures needed for the accepted
 access model:
 
-| IAM object                   | Responsibility                                                                                                           |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `profiles`                   | One canonical profile per `auth.users` identity; names, avatar state, and lifecycle status, but no embedded role         |
-| `products`                   | Stable keys for the implemented Auth, Portfolio, Studio, and Admin products; Shaamil is added with its backend milestone |
-| `product_memberships`        | Whether a user has active protected access to a product, including validity and revocation state                         |
-| `workforces`                 | Operator-owned workforce boundaries; not a generic public tenant system                                                  |
-| `workforce_memberships`      | User affiliation and workforce status                                                                                    |
-| `roles`                      | Named role definitions scoped to a product or workforce                                                                  |
-| `capabilities`               | Stable, product-owned `product.resource.action` vocabulary such as `studio.files.read`                                   |
-| `role_capabilities`          | Capabilities granted by a role                                                                                           |
-| `product_role_assignments`   | Typed product-scope role assignments with foreign keys                                                                   |
-| `workforce_role_assignments` | Typed workforce-scope role assignments with foreign keys                                                                 |
-| `policy_versions`            | Version registry for product policies such as Studio terms                                                               |
-| `policy_acceptances`         | User acceptance of an exact policy version, replacing an unversioned terms boolean                                       |
-| `access_audit_events`        | Append-only evidence for privileged entitlement and role changes                                                         |
+| IAM object                   | Responsibility                                                                                                   |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `profiles`                   | One canonical profile per `auth.users` identity; names, avatar state, and lifecycle status, but no embedded role |
+| `products`                   | Stable keys for the implemented Auth, Portfolio, Studio, and Admin products                                      |
+| `product_memberships`        | Whether a user has active protected access to a product, including validity and revocation state                 |
+| `workforces`                 | Operator-owned workforce boundaries; not a generic public tenant system                                          |
+| `workforce_memberships`      | User affiliation and workforce status                                                                            |
+| `roles`                      | Named role definitions scoped to a product or workforce                                                          |
+| `capabilities`               | Stable, product-owned `product.resource.action` vocabulary such as `studio.files.read`                           |
+| `role_capabilities`          | Capabilities granted by a role                                                                                   |
+| `product_role_assignments`   | Typed product-scope role assignments with foreign keys                                                           |
+| `workforce_role_assignments` | Typed workforce-scope role assignments with foreign keys                                                         |
+| `policy_versions`            | Version registry for product policies such as Studio terms                                                       |
+| `policy_acceptances`         | User acceptance of an exact policy version, replacing an unversioned terms boolean                               |
+| `access_audit_events`        | Append-only evidence for privileged entitlement and role changes                                                 |
 
 Typed product and workforce assignments are preferred over a polymorphic
 `scope_type`/`scope_id` pair without referential integrity. Product-local
-resource roles remain product-owned: for example, Shaamil community membership
-and community roles belong in `shaamil`, not in central IAM.
+resource roles remain product-owned rather than moving into central IAM.
 
 Roles are bundles, never part of a capability key. `admin.full_access` grants
 the current Admin, Portfolio CMS, deployment, and access-management CRUD;
@@ -105,12 +102,6 @@ Both have the same current read/create/update/delete product capabilities;
 workforce ownership transfer remains a separate audited capability granted only
 through `operations.owner`.
 
-Shaamil does not receive a duplicate mandatory profile. It uses the canonical
-IAM profile and stores only Shaamil-specific settings, memberships, privacy,
-and moderation state. A product persona table is justified later only if an
-approved Shaamil handle, display name, avatar override, or biography must
-differ from the canonical profile.
-
 ## Retired IAM predecessor mapping
 
 | Current object                   | Target                                   | Required change                                                                                                                    |
@@ -124,8 +115,8 @@ differ from the canonical profile.
 | `jg_account.handle_updated_at()` | `foundation.set_updated_at()`            | Consolidate the genuinely reused trigger primitive.                                                                                |
 
 The retired global `super_admin` value does not imply automatic read access to
-private Shaamil content. Emergency or operator control-plane capabilities are
-explicit, MFA-protected where appropriate, and audited.
+product-owned private content. Emergency or operator control-plane
+capabilities are explicit, MFA-protected where appropriate, and audited.
 
 ## Retired `jg_app` ownership mapping
 
@@ -229,16 +220,10 @@ The current buckets are `studio-files`, `portfolio-assets`, and
 - Rebuild Storage policies against user ownership plus the relevant IAM
   product capability. A service-role upload has no automatic user owner and
   therefore needs explicit application ownership validation.
-- Do not create a Shaamil attachment bucket during this normalization.
 
 `studio.scratchpad_entries` is explicitly included in `supabase_realtime`.
 Historical Messenger tables remain removed. Retained client subscriptions use
 the `studio` schema name.
-
-Existing Studio delivery may continue with bounded Postgres Changes. New
-Shaamil messaging should use private Broadcast plus durable cursor
-reconciliation; Supabase recommends Broadcast for scalability and security in
-[Subscribing to database changes](https://supabase.com/docs/guides/realtime/subscribing-to-database-changes).
 
 ## Evolution contract
 
@@ -252,6 +237,3 @@ reconciliation; Supabase recommends Broadcast for scalability and security in
 - Use a reviewed forward fix if hosted verification fails.
 - `pnpm test:db:linked` performs hosted writes and requires explicit
   authorization.
-
-Shaamil schema creation remains a separate reviewed migration tied to an
-approved backend milestone.

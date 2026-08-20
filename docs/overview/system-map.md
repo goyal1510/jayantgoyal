@@ -1,8 +1,8 @@
 # System map
 
-Jayant is one monorepo containing four implemented products and the defined
-Shaamil product. Each product owns its clients and policies; shared packages
-own only stable cross-product contracts.
+Jayant is one monorepo containing four implemented products. Each product owns
+its clients and policies; shared packages own only stable cross-product
+contracts.
 
 ```text
 Public users ──► Portfolio web ────────────► portfolio data
@@ -32,17 +32,6 @@ GitHub main ──────► Vercel projects ───────► indep
 Web is the only implemented client platform. Mobile, desktop, command-line,
 commerce, subscription, sales, and advertising clients/modules do not
 currently exist.
-
-## Defined product boundary
-
-Shaamil is an approved mobile-first communication product but is not part of
-the runtime diagram because no client or backend objects exist. When its first
-milestone begins, it remains in this monorepo, uses the existing Supabase Auth
-identity and project, and receives product-owned data rather than extending
-`studio` or `iam` with communication-specific tables. The IAM/Studio/Portfolio
-normalization is already deployed.
-See [Shaamil](../products/shaamil/README.md) and [Database schema ownership and
-evolution](../shared-systems/data/schema-ownership.md).
 
 ## Authority order
 

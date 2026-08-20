@@ -14,10 +14,6 @@ are not current APIs.
 | `studio`      |     14 | Studio            | Active membership, capabilities, and resource attributes  |
 | `portfolio`   |     14 | Portfolio         | Selected public reads; capability-authorized Admin writes |
 
-Shaamil has no schema, table, function, publication, or Storage bucket yet. It
-receives a product-owned `shaamil` schema only with an approved backend
-milestone.
-
 ## Foundation
 
 `foundation` contains no product data. Its three private helpers are

@@ -52,11 +52,6 @@ Every current client is Next.js 16, React 19, TypeScript 5.9, and Tailwind CSS
 v4. Next.js request middleware is `src/proxy.ts`, not `middleware.ts`. Use the
 application-local `@/*` alias for its `src/*` files.
 
-Shaamil is the approved name and `shaamil` is the technical slug for the
-defined mobile-first communication product. It has no implemented client or
-runtime yet. Do not create placeholders; read
-`docs/products/shaamil/README.md` before Shaamil work.
-
 ## Shared ownership
 
 - `@jayantgoyal/identity`: framework-neutral person, technical namespace,
@@ -88,8 +83,6 @@ work.
 - IAM owns
   profiles, product/workforce access, roles, and capabilities; products own
   resource-specific authorization and data.
-- Shaamil uses this existing project and receives an owned `shaamil` schema
-  only when its approved backend implementation begins.
 - Read `docs/shared-systems/data/schema-ownership.md` before moving or renaming
   any schema, table, function, policy, publication, or bucket.
 - Check every Supabase error.

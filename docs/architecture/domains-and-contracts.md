@@ -6,17 +6,16 @@ actually consumes it.
 
 ## Current domains
 
-| Domain                | Primary owner     | Shared boundary                                                               |
-| --------------------- | ----------------- | ----------------------------------------------------------------------------- |
-| Professional story    | Portfolio         | `@jayantgoyal/portfolio-contracts` shared with Admin                          |
-| Writing               | Portfolio         | Published data read by Portfolio, administered by Admin                       |
-| Product catalog       | Studio            | Studio runtime registries                                                     |
-| Personal workspace    | Studio            | `studio` tables, capability-aware RLS, Storage, and client APIs               |
-| Authentication        | Auth              | `@jayantgoyal/web-auth`, Supabase Auth, and `iam.profiles` access             |
-| Identity and access   | Cross-product IAM | Approved `iam` profile, entitlement, workforce, role, and capability boundary |
-| Administration        | Admin             | Capability-gated APIs over owned product/IAM/provider data                    |
-| Public identity       | Foundation        | `@jayantgoyal/identity` and web-brand projections                             |
-| Private communication | Shaamil           | Defined product boundary; no current runtime contract                         |
+| Domain              | Primary owner     | Shared boundary                                                               |
+| ------------------- | ----------------- | ----------------------------------------------------------------------------- |
+| Professional story  | Portfolio         | `@jayantgoyal/portfolio-contracts` shared with Admin                          |
+| Writing             | Portfolio         | Published data read by Portfolio, administered by Admin                       |
+| Product catalog     | Studio            | Studio runtime registries                                                     |
+| Personal workspace  | Studio            | `studio` tables, capability-aware RLS, Storage, and client APIs               |
+| Authentication      | Auth              | `@jayantgoyal/web-auth`, Supabase Auth, and `iam.profiles` access             |
+| Identity and access | Cross-product IAM | Approved `iam` profile, entitlement, workforce, role, and capability boundary |
+| Administration      | Admin             | Capability-gated APIs over owned product/IAM/provider data                    |
+| Public identity     | Foundation        | `@jayantgoyal/identity` and web-brand projections                             |
 
 ## Contract placement
 
@@ -45,8 +44,7 @@ evolution](../shared-systems/data/schema-ownership.md).
 
 IAM replaces the single global account role with product
 entitlements and scoped role/capability assignments. Products retain their own
-resource-level attributes and RLS; IAM does not absorb Studio resources or
-Shaamil community membership.
+resource-level attributes and RLS; IAM does not absorb Studio resources.
 
 Migrations are append-only change contracts; schema snapshots describe current
 structure. Runtime validation remains necessary at every client, server,

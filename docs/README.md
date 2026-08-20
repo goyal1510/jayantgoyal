@@ -59,15 +59,9 @@ prose.
 - [Studio](products/studio/README.md)
 - [Admin](products/admin/README.md)
 - [Auth](products/auth/README.md)
-- [Shaamil](products/shaamil/README.md) — defined product; no implemented client
-  or runtime yet
-  - [Platform and client architecture](products/shaamil/platform-and-client-architecture.md)
-  - [Domain, data, and messaging architecture](products/shaamil/domain-data-and-messaging.md)
-  - [Security, reliability, testing, and delivery](products/shaamil/security-reliability-and-delivery.md)
 
-Implemented product pages link to their route, capability, runtime-flow, data,
-and operational detail. A defined product page must distinguish accepted
-ownership and extension rules from runtime behavior and must not invent clients
+Product pages link to their route, capability, runtime-flow, data, and
+operational detail. They describe current behavior and must not invent clients
 or capabilities that do not exist.
 
 ## Clients and shared systems

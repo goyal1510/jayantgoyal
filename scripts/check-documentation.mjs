@@ -29,7 +29,6 @@ const requiredDocuments = [
   "docs/products/admin/routes-and-operations.md",
   "docs/products/auth/README.md",
   "docs/products/auth/flows-and-security.md",
-  "docs/products/shaamil/README.md",
   "docs/clients/README.md",
   "docs/clients/web/README.md",
   "docs/shared-systems/authentication/README.md",
@@ -105,15 +104,6 @@ const requiredSections = {
     "Portfolio",
     "Storage buckets",
     "Current versus historical objects",
-  ],
-  "docs/products/shaamil/README.md": [
-    "Product boundary",
-    "Initial client direction",
-    "Data and IAM boundary",
-    "First implementation boundary",
-    "Explicit non-goals",
-    "Naming and repository contract",
-    "Extension rules",
   ],
   "docs/shared-systems/data/schema-ownership.md": [
     "Current physical structure",

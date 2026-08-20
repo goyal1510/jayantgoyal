@@ -6,7 +6,6 @@
 | Product/tool/game inventory              | Studio web          | Studio inventory, surface, game, and tool registries |
 | Portfolio and Writing administration     | Admin web           | Admin workspaces and authorized APIs                 |
 | Entry, recovery, MFA, account security   | Auth web            | Auth routes/actions and `@jayantgoyal/web-auth`      |
-| Private communication product definition | Shaamil             | `docs/products/shaamil/README.md`                    |
 | Product-neutral identity                 | Foundation package  | `@jayantgoyal/identity`                              |
 | Web naming and metadata                  | Web brand package   | `@jayantgoyal/web-brand`                             |
 | Canonical application origins            | Web URL package     | `@jayantgoyal/web-urls`                              |

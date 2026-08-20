@@ -4,11 +4,6 @@ Supabase provides authentication, Postgres, Realtime, and Storage. The
 canonical hosted project is `jayantgoyal` with reference
 `orwfvyditlguqvxvztkw`; verify both before every linked operation.
 
-Shaamil uses this existing project and Auth identity boundary. No second hosted
-Supabase project is approved for Shaamil. The IAM/product ownership
-normalization is deployed; Shaamil backend work must extend it without
-duplicating identity or placing communication data in another product schema.
-
 ## Ownership
 
 | Schema        | Ownership                                                              |
@@ -18,9 +13,6 @@ duplicating identity or placing communication data in another product schema.
 | `iam_private` | Private authorization predicates and provisioning helpers              |
 | `studio`      | Studio workspaces, games, personalization, and file metadata           |
 | `portfolio`   | Portfolio CMS, Writing, LinkedIn planning, and contact-abuse state     |
-
-Shaamil receives a product-owned `shaamil` schema only with its approved
-backend milestone.
 
 Canonical storage buckets are `studio-files`, `portfolio-assets`, and
 `profile-avatars`. Code must select the intended schema explicitly, handle
