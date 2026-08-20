@@ -406,6 +406,40 @@ CREATE TABLE IF NOT EXISTS "portfolio"."hero" (
 ALTER TABLE "portfolio"."hero" OWNER TO "postgres";
 
 
+CREATE TABLE IF NOT EXISTS "portfolio"."linkedin_posts" (
+    "id" "uuid" DEFAULT "foundation"."uuid_v7"() NOT NULL,
+    "status" "text" DEFAULT 'planned'::"text" NOT NULL,
+    "topic" "text",
+    "content" "text" NOT NULL,
+    "article_url" "text",
+    "writing_slug" "text",
+    "linkedin_post_urn" "text",
+    "linkedin_post_url" "text",
+    "scheduled_for" timestamp with time zone,
+    "published_at" timestamp with time zone,
+    "deleted_at" timestamp with time zone,
+    "replaces_id" "uuid",
+    "publication_error" "text",
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    CONSTRAINT "linkedin_posts_article_url_check" CHECK ((("article_url" IS NULL) OR ("article_url" ~ '^https://'::"text"))),
+    CONSTRAINT "linkedin_posts_content_check" CHECK ((("char_length"("btrim"("content")) >= 1) AND ("char_length"("btrim"("content")) <= 3000))),
+    CONSTRAINT "linkedin_posts_error_check" CHECK ((("publication_error" IS NULL) OR ("char_length"("publication_error") <= 2000))),
+    CONSTRAINT "linkedin_posts_publication_check" CHECK ((("status" <> ALL (ARRAY['published'::"text", 'replaced'::"text", 'deleted'::"text"])) OR (("linkedin_post_urn" IS NOT NULL) AND ("linkedin_post_url" IS NOT NULL) AND ("published_at" IS NOT NULL)))),
+    CONSTRAINT "linkedin_posts_removal_check" CHECK ((("status" = ANY (ARRAY['replaced'::"text", 'deleted'::"text"])) = ("deleted_at" IS NOT NULL))),
+    CONSTRAINT "linkedin_posts_replacement_check" CHECK (("replaces_id" IS DISTINCT FROM "id")),
+    CONSTRAINT "linkedin_posts_schedule_check" CHECK ((("status" <> 'scheduled'::"text") OR ("scheduled_for" IS NOT NULL))),
+    CONSTRAINT "linkedin_posts_status_check" CHECK (("status" = ANY (ARRAY['planned'::"text", 'scheduled'::"text", 'publishing'::"text", 'published'::"text", 'replaced'::"text", 'deleted'::"text", 'failed'::"text"]))),
+    CONSTRAINT "linkedin_posts_topic_check" CHECK ((("topic" IS NULL) OR (("char_length"("btrim"("topic")) >= 1) AND ("char_length"("btrim"("topic")) <= 160)))),
+    CONSTRAINT "linkedin_posts_url_check" CHECK ((("linkedin_post_url" IS NULL) OR ("linkedin_post_url" ~ '^https://www[.]linkedin[.]com/feed/update/urn:li:(share|ugcPost):[0-9]+/?$'::"text"))),
+    CONSTRAINT "linkedin_posts_urn_check" CHECK ((("linkedin_post_urn" IS NULL) OR ("linkedin_post_urn" ~ '^urn:li:(share|ugcPost):[0-9]+$'::"text"))),
+    CONSTRAINT "linkedin_posts_writing_slug_check" CHECK ((("writing_slug" IS NULL) OR ("writing_slug" ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'::"text")))
+);
+
+
+ALTER TABLE "portfolio"."linkedin_posts" OWNER TO "postgres";
+
+
 CREATE TABLE IF NOT EXISTS "portfolio"."nav_items" (
     "id" "uuid" DEFAULT "foundation"."uuid_v7"() NOT NULL,
     "section_id" "text" NOT NULL,
@@ -569,6 +603,21 @@ ALTER TABLE ONLY "portfolio"."hero"
 
 
 
+ALTER TABLE ONLY "portfolio"."linkedin_posts"
+    ADD CONSTRAINT "linkedin_posts_linkedin_post_urn_key" UNIQUE ("linkedin_post_urn");
+
+
+
+ALTER TABLE ONLY "portfolio"."linkedin_posts"
+    ADD CONSTRAINT "linkedin_posts_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "portfolio"."linkedin_posts"
+    ADD CONSTRAINT "linkedin_posts_replaces_id_key" UNIQUE ("replaces_id");
+
+
+
 ALTER TABLE ONLY "portfolio"."nav_items"
     ADD CONSTRAINT "nav_items_pkey" PRIMARY KEY ("id");
 
@@ -640,6 +689,14 @@ CREATE INDEX "idx_writing_published" ON "portfolio"."writing_posts" USING "btree
 
 
 
+CREATE INDEX "linkedin_posts_published_at_idx" ON "portfolio"."linkedin_posts" USING "btree" ("published_at" DESC) WHERE ("published_at" IS NOT NULL);
+
+
+
+CREATE INDEX "linkedin_posts_queue_idx" ON "portfolio"."linkedin_posts" USING "btree" ("status", "scheduled_for", "created_at");
+
+
+
 CREATE UNIQUE INDEX "portfolio_about_singleton_key" ON "portfolio"."about" USING "btree" ((true));
 
 
@@ -696,6 +753,10 @@ CREATE OR REPLACE TRIGGER "hero_updated_at" BEFORE UPDATE ON "portfolio"."hero" 
 
 
 
+CREATE OR REPLACE TRIGGER "linkedin_posts_updated_at" BEFORE UPDATE ON "portfolio"."linkedin_posts" FOR EACH ROW EXECUTE FUNCTION "foundation"."set_updated_at"();
+
+
+
 CREATE OR REPLACE TRIGGER "nav_items_updated_at" BEFORE UPDATE ON "portfolio"."nav_items" FOR EACH ROW EXECUTE FUNCTION "portfolio"."update_updated_at_column"();
 
 
@@ -720,6 +781,11 @@ CREATE OR REPLACE TRIGGER "work_updated_at" BEFORE UPDATE ON "portfolio"."work" 
 
 
 
+ALTER TABLE ONLY "portfolio"."linkedin_posts"
+    ADD CONSTRAINT "linkedin_posts_replaces_id_fkey" FOREIGN KEY ("replaces_id") REFERENCES "portfolio"."linkedin_posts"("id") ON DELETE SET NULL;
+
+
+
 ALTER TABLE ONLY "portfolio"."nav_items"
     ADD CONSTRAINT "nav_items_section_id_fkey" FOREIGN KEY ("section_id") REFERENCES "portfolio"."section_content"("section_key") ON UPDATE CASCADE ON DELETE RESTRICT;
 
@@ -727,6 +793,18 @@ ALTER TABLE ONLY "portfolio"."nav_items"
 
 ALTER TABLE ONLY "portfolio"."skills"
     ADD CONSTRAINT "skills_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "portfolio"."skill_categories"("id") ON DELETE CASCADE;
+
+
+
+CREATE POLICY "Admin LinkedIn create" ON "portfolio"."linkedin_posts" FOR INSERT TO "authenticated" WITH CHECK (( SELECT "iam_private"."has_capability"('portfolio.content.create'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin LinkedIn read" ON "portfolio"."linkedin_posts" FOR SELECT TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.read'::"text") AS "has_capability"));
+
+
+
+CREATE POLICY "Admin LinkedIn update" ON "portfolio"."linkedin_posts" FOR UPDATE TO "authenticated" USING (( SELECT "iam_private"."has_capability"('portfolio.content.update'::"text") AS "has_capability")) WITH CHECK (( SELECT "iam_private"."has_capability"('portfolio.content.update'::"text") AS "has_capability"));
 
 
 
@@ -995,6 +1073,9 @@ ALTER TABLE "portfolio"."experience" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "portfolio"."hero" ENABLE ROW LEVEL SECURITY;
 
 
+ALTER TABLE "portfolio"."linkedin_posts" ENABLE ROW LEVEL SECURITY;
+
+
 ALTER TABLE "portfolio"."nav_items" ENABLE ROW LEVEL SECURITY;
 
 
@@ -1086,6 +1167,11 @@ GRANT ALL ON TABLE "portfolio"."experience" TO "service_role";
 GRANT SELECT ON TABLE "portfolio"."hero" TO "anon";
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "portfolio"."hero" TO "authenticated";
 GRANT ALL ON TABLE "portfolio"."hero" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "portfolio"."linkedin_posts" TO "service_role";
+GRANT SELECT,INSERT,UPDATE ON TABLE "portfolio"."linkedin_posts" TO "authenticated";
 
 
 

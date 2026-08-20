@@ -182,7 +182,7 @@ function main() {
     );
     run(
       "supabase",
-      ["link", "--project-ref", projectRef, "--yes"],
+      ["link", "--project-ref", projectRef, "--yes", "--dns-resolver", "https"],
       tempProject,
     );
 
