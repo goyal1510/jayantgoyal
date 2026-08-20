@@ -17,7 +17,7 @@ duplicating identity or placing communication data in another product schema.
 | `iam`         | Profiles, product/workforce access, roles, capabilities, policy, audit |
 | `iam_private` | Private authorization predicates and provisioning helpers              |
 | `studio`      | Studio workspaces, games, personalization, and file metadata           |
-| `portfolio`   | Portfolio CMS, Writing, presentation, and contact-abuse state          |
+| `portfolio`   | Portfolio CMS, Writing, LinkedIn planning, and contact-abuse state     |
 
 Shaamil receives a product-owned `shaamil` schema only with its approved
 backend milestone.
@@ -27,8 +27,8 @@ Canonical storage buckets are `studio-files`, `portfolio-assets`, and
 every query error, and preserve RLS or an equivalent server authorization
 boundary.
 
-The current snapshots contain 40 application tables: 13 in `iam`, 14 in
-`studio`, and 13 in `portfolio`. `foundation` and `iam_private` contain only
+The current snapshots contain 41 application tables: 13 in `iam`, 14 in
+`studio`, and 14 in `portfolio`. `foundation` and `iam_private` contain only
 functions. See the [schema
 catalog](schema-catalog.md) for table purpose, access model, database functions,
 and Storage ownership.

@@ -73,7 +73,7 @@ Frequently changing inventories should be edited in their runtime owners:
 
 ## Database inventory
 
-Current schema snapshots contain 40 application tables and 31 application
+Current schema snapshots contain 41 application tables and 31 application
 functions across `foundation`, `iam`, `iam_private`, `studio`, and `portfolio`, plus three active
 Storage buckets documented in the [schema
 catalog](../shared-systems/data/schema-catalog.md). Supabase has no repository
@@ -87,7 +87,7 @@ strict types, Vitest, full builds, bundle budgets, and migration-history
 checks. GitHub Actions runs the core quality set for `main` and pull requests.
 Vercel independently deploys the four client roots from one repository.
 
-LinkedIn scripts remain manual tooling under `scripts/linkedin`. Their
-authentication, publishing, replacement, deletion, local-history, and failure
-recovery contracts are documented in [LinkedIn publishing
+LinkedIn scripts remain manual tooling under `scripts/linkedin`. Their private
+Supabase queue, authenticated publishing, replacement, deletion, legacy
+backfill, and failure-recovery contracts are documented in [LinkedIn publishing
 operations](../operations/linkedin-publishing.md).

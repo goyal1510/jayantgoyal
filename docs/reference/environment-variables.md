@@ -76,6 +76,20 @@ Auth uses the shared Supabase/session variables plus `NEXT_PUBLIC_SITE_URL`,
 `NEXT_PUBLIC_ADMIN_URL`, and `NEXT_PUBLIC_AUTH_RETURN_ORIGINS`. It intentionally
 has no `SUPABASE_SERVICE_ROLE_KEY`.
 
+## LinkedIn operator variables
+
+| Variable                        | Exposure            | Requirement/fallback                                                                   |
+| ------------------------------- | ------------------- | -------------------------------------------------------------------------------------- |
+| `LINKEDIN_CLIENT_ID`            | local configuration | Required by `scripts/linkedin/auth.mjs`; stored only in the ignored LinkedIn env file. |
+| `LINKEDIN_CLIENT_SECRET`        | secret/local        | Required for OAuth token exchange; never committed, printed, or passed as an argument. |
+| `LINKEDIN_REDIRECT_URI`         | local configuration | Optional; defaults to `http://localhost:3333/callback`.                                |
+| `NEXT_PUBLIC_SUPABASE_URL`      | public              | Reused from Admin local configuration for authenticated ledger requests.               |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | public              | Reused with a normal user session; RLS enforces Portfolio capabilities.                |
+
+The tooling never accepts a service-role key. LinkedIn and Supabase tokens are
+stored in separate ignored owner-only files so either provider can be renewed
+without coupling the credentials.
+
 ## Rotation and incident rule
 
 If a secret may have been exposed, rotate/revoke it at the provider first,

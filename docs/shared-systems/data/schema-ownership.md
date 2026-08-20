@@ -10,7 +10,7 @@ second Supabase project is not part of the approved architecture.
 
 ## Current physical structure
 
-The project contains 40 application tables in five application schemas:
+The project contains 41 application tables in five application schemas:
 
 | Physical schema | Tables | Current contents                                                    |
 | --------------- | -----: | ------------------------------------------------------------------- |
@@ -18,7 +18,7 @@ The project contains 40 application tables in five application schemas:
 | `iam`           |     13 | Profiles, access, workforce, roles, capabilities, policy, and audit |
 | `iam_private`   |      0 | Private authorization, provisioning, and RLS predicates             |
 | `studio`        |     14 | Studio workspaces, games, personalization, and file metadata        |
-| `portfolio`     |     13 | Portfolio presentation, CMS, Writing, and contact-abuse state       |
+| `portfolio`     |     14 | Portfolio, Writing, LinkedIn planning, and contact-abuse state      |
 
 The predecessor `jg_account` and `jg_app` schemas no longer exist. Shaamil has
 no current schema, table, publication, Storage bucket, or client.
@@ -31,7 +31,7 @@ no current schema, table, publication, Storage bucket, or client.
 | `iam`         | Canonical profiles, product entitlements, workforce membership, roles, capabilities, policy acceptance, and access audit | Expose only intentional self-service/read operations; privileged mutation remains trusted |
 | `iam_private` | Caller-bound and trusted authorization predicates used by RLS and transactional commands                                 | Private; never a Data API schema                                                          |
 | `studio`      | Studio tools, workspaces, games, personalization, and Studio file metadata                                               | RLS-protected operations with IAM product/capability checks                               |
-| `portfolio`   | Portfolio and Writing content plus Portfolio abuse-control state                                                         | Selected public reads and capability-authorized Admin writes                              |
+| `portfolio`   | Portfolio and Writing content, private LinkedIn publication planning, and abuse-control state                            | Selected public reads and capability-authorized Admin writes                              |
 | `shaamil`     | Future Shaamil communities, membership, communication, safety, sync, and notification state                              | Created only with an approved Shaamil backend milestone                                   |
 
 Supabase-managed `auth`, `storage`, `realtime`, and `extensions` retain their

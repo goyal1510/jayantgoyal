@@ -12,7 +12,7 @@ are not current APIs.
 | `iam`         |     13 | Cross-product IAM | Intentional self/read RPCs; privileged service operations |
 | `iam_private` |      0 | Cross-product IAM | Private RLS and trusted authorization helpers             |
 | `studio`      |     14 | Studio            | Active membership, capabilities, and resource attributes  |
-| `portfolio`   |     13 | Portfolio         | Selected public reads; capability-authorized Admin writes |
+| `portfolio`   |     14 | Portfolio         | Selected public reads; capability-authorized Admin writes |
 
 Shaamil has no schema, table, function, publication, or Storage bucket yet. It
 receives a product-owned `shaamil` schema only with an approved backend
@@ -123,10 +123,16 @@ participant attributes through RLS.
 | `portfolio.nav_items`                                    | Ordered public section navigation                         |
 | `portfolio.section_content`                              | Presentation copy for known sections                      |
 | `portfolio.writing_posts`                                | Portfolio-owned Writing publication and editorial content |
+| `portfolio.linkedin_posts`                               | Private LinkedIn queue and publication lifecycle ledger   |
 
 Public policies expose only the intended visible data. Admin reads use
 `portfolio.content.read`; create, update, and delete are independent
 capabilities. The same operation split protects `portfolio-assets` mutations.
+
+The LinkedIn ledger has no anonymous grants or public-read policy. Authenticated
+operators use the existing Portfolio read/create/update capabilities. Rows are
+retained across replacement and deletion so the publication record is durable;
+planned timestamps do not imply an automatic scheduler.
 
 `save_section_presentation` atomically saves presentation and navigation data.
 Case-study and JSON helper functions enforce the Portfolio contract at the
