@@ -18,6 +18,9 @@ import type {
 } from "@/lib/portfolio/editorial-data";
 import type { WritingListPost, WritingPost } from "@/lib/writing/queries";
 
+import { getMermaidSource } from "./markdown-code";
+import { MermaidDiagram } from "./mermaid-diagram";
+
 type NextPost = Pick<
   WritingListPost,
   "title" | "slug" | "excerpt" | "published_at"
@@ -120,13 +123,15 @@ const markdownComponents: Components = {
   ol: ({ children }) => <ol>{children}</ol>,
   li: ({ children }) => <li>{children}</li>,
   blockquote: ({ children }) => <blockquote>{children}</blockquote>,
-  code: ({ children, className }) =>
-    className ? (
-      <code className={className}>{children}</code>
-    ) : (
-      <code>{children}</code>
-    ),
-  pre: ({ children }) => <pre>{children}</pre>,
+  code: ({ children, className }) => (
+    <code className={className}>{children}</code>
+  ),
+  pre: ({ children }) => {
+    const mermaidSource = getMermaidSource(children);
+    if (mermaidSource !== null) return <MermaidDiagram source={mermaidSource} />;
+
+    return <pre>{children}</pre>;
+  },
   hr: () => <hr />,
   img: ({ src, alt }) => <img src={src} alt={alt ?? ""} />,
   table: ({ children }) => (
