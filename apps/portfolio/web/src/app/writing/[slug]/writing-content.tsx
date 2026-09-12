@@ -128,7 +128,8 @@ const markdownComponents: Components = {
   ),
   pre: ({ children }) => {
     const mermaidSource = getMermaidSource(children);
-    if (mermaidSource !== null) return <MermaidDiagram source={mermaidSource} />;
+    if (mermaidSource !== null)
+      return <MermaidDiagram source={mermaidSource} />;
 
     return <pre>{children}</pre>;
   },
@@ -229,7 +230,7 @@ export function WritingContent({
         {post.cover_image ? (
           <img
             src={post.cover_image}
-            alt=""
+            alt={`Cover illustration for ${post.title}`}
             className="editorial-article__cover"
           />
         ) : null}
