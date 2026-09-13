@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   Rocket,
   BookOpen,
+  SearchCheck,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -23,8 +24,8 @@ export interface NavItem {
 }
 
 export interface AdminNavigationDomain {
-  id: "portfolio" | "studio" | "system";
-  label: "Portfolio" | "Studio" | "Operations";
+  id: "portfolio" | "studio" | "career" | "system";
+  label: "Portfolio" | "Studio" | "Career" | "Operations";
   homeHref: string | null;
   items: readonly NavItem[];
   roles: readonly UserRole[];
@@ -58,6 +59,10 @@ const systemNavItems: NavItem[] = [
   { label: "Users", href: "/users", icon: Users },
 ];
 
+const careerNavItems: NavItem[] = [
+  { label: "Job pipeline", href: "/career", icon: SearchCheck },
+];
+
 const deploymentNavItems: NavItem[] = [
   { label: "Deployments", href: "/deployments", icon: Rocket },
 ];
@@ -76,6 +81,13 @@ export const adminNavigationDomains: readonly AdminNavigationDomain[] = [
     homeHref: null,
     items: [],
     roles: ["full_access"],
+  },
+  {
+    id: "career",
+    label: "Career",
+    homeHref: "/career",
+    items: careerNavItems,
+    roles: ["viewer", "full_access"],
   },
   {
     id: "system",

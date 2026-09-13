@@ -5,19 +5,19 @@ monorepo.
 
 ## Root inventory
 
-| Path                     | Responsibility                                                 | Authoritative contents                                    |
-| ------------------------ | -------------------------------------------------------------- | --------------------------------------------------------- |
-| `apps/`                  | Product clients and product-owned contracts                    | Four web clients; Portfolio contract                      |
-| `packages/foundation/`   | Framework-neutral foundation concepts                          | Person/product identity                                   |
-| `packages/web/`          | Stable cross-product web contracts                             | Auth, brand, URLs, SEO, UI, Tailwind                      |
-| `packages/integrations/` | Shared provider adapters                                       | GitHub                                                    |
-| `packages/tooling/`      | Shared compiler/lint configuration                             | ESLint and TypeScript                                     |
-| `assets/brand/`          | Canonical web icon and social-preview sources                  | Copies verified in each client                            |
-| `supabase/migrations/`   | Ordered forward database changes                               | Reviewed SQL history                                      |
-| `supabase/schemas/`      | Current application schema snapshots                           | `foundation`, `iam`, `iam_private`, `studio`, `portfolio` |
-| `scripts/`               | Architecture, health, build, database, and provider automation | Root quality gates                                        |
-| `docs/`                  | Central current-state knowledge base                           | No app-local detailed READMEs                             |
-| `.github/workflows/`     | Repository CI                                                  | Quality workflow for push/PR                              |
+| Path                     | Responsibility                                                 | Authoritative contents                                              |
+| ------------------------ | -------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `apps/`                  | Product clients and product-owned contracts                    | Four web clients; Portfolio contract                                |
+| `packages/foundation/`   | Framework-neutral foundation concepts                          | Person/product identity                                             |
+| `packages/web/`          | Stable cross-product web contracts                             | Auth, brand, URLs, SEO, UI, Tailwind                                |
+| `packages/integrations/` | Shared provider adapters                                       | GitHub                                                              |
+| `packages/tooling/`      | Shared compiler/lint configuration                             | ESLint and TypeScript                                               |
+| `assets/brand/`          | Canonical web icon and social-preview sources                  | Copies verified in each client                                      |
+| `supabase/migrations/`   | Ordered forward database changes                               | Reviewed SQL history                                                |
+| `supabase/schemas/`      | Current application schema snapshots                           | `foundation`, `iam`, `iam_private`, `studio`, `portfolio`, `career` |
+| `scripts/`               | Architecture, health, build, database, and provider automation | Root quality gates                                                  |
+| `docs/`                  | Central current-state knowledge base                           | No app-local detailed READMEs                                       |
+| `.github/workflows/`     | Repository CI                                                  | Quality workflow for push/PR                                        |
 
 Root `package.json`, `pnpm-workspace.yaml`, `turbo.json`, `vitest.config.ts`,
 `knip.json`, and lockfile define the workspace/build/test dependency graph.

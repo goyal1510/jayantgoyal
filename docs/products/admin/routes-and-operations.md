@@ -5,21 +5,22 @@ admission paths, and privileged route handlers.
 
 ## Active page routes
 
-| Route                   | Minimum capability       | Purpose                                         |
-| ----------------------- | ------------------------ | ----------------------------------------------- |
-| `/`                     | `admin.console.enter`    | Admin landing/dashboard                         |
-| `/portfolio`            | `portfolio.content.read` | Portfolio CMS overview and section presentation |
-| `/portfolio/home`       | `portfolio.content.read` | Hero/home editorial content                     |
-| `/portfolio/about`      | `portfolio.content.read` | About and education content                     |
-| `/portfolio/skills`     | `portfolio.content.read` | Skill categories and skills                     |
-| `/portfolio/experience` | `portfolio.content.read` | Experience and credentials                      |
-| `/portfolio/activity`   | `portfolio.content.read` | GitHub/activity presentation content            |
-| `/portfolio/work`       | `portfolio.content.read` | Work records, images, and case studies          |
-| `/portfolio/writing`    | `portfolio.content.read` | Writing records and publication                 |
-| `/portfolio/contact`    | `portfolio.content.read` | Contact presentation and destination            |
-| `/users`                | `admin.users.read`       | Identities and Admin access assignments         |
-| `/deployments`          | `admin.deployments.read` | Vercel deployment list and redeploy entry       |
-| `/deployments/[id]`     | `admin.deployments.read` | Deployment detail and events                    |
+| Route                   | Minimum capability       | Purpose                                          |
+| ----------------------- | ------------------------ | ------------------------------------------------ |
+| `/`                     | `admin.console.enter`    | Admin landing/dashboard                          |
+| `/portfolio`            | `portfolio.content.read` | Portfolio CMS overview and section presentation  |
+| `/portfolio/home`       | `portfolio.content.read` | Hero/home editorial content                      |
+| `/portfolio/about`      | `portfolio.content.read` | About and education content                      |
+| `/portfolio/skills`     | `portfolio.content.read` | Skill categories and skills                      |
+| `/portfolio/experience` | `portfolio.content.read` | Experience and credentials                       |
+| `/portfolio/activity`   | `portfolio.content.read` | GitHub/activity presentation content             |
+| `/portfolio/work`       | `portfolio.content.read` | Work records, images, and case studies           |
+| `/portfolio/writing`    | `portfolio.content.read` | Writing records and publication                  |
+| `/portfolio/contact`    | `portfolio.content.read` | Contact presentation and destination             |
+| `/users`                | `admin.users.read`       | Identities and Admin access assignments          |
+| `/deployments`          | `admin.deployments.read` | Vercel deployment list and redeploy entry        |
+| `/deployments/[id]`     | `admin.deployments.read` | Deployment detail and events                     |
+| `/career`               | `admin.career.read`      | Private job, application, outreach, and run view |
 
 `/deployments/env` exists as a page route but is not an active navigation
 destination or an environment-secret editor. Do not expose Vercel environment
@@ -82,6 +83,16 @@ Successful mutations revalidate Portfolio content or Writing paths.
 
 Account APIs recheck the live capability before creating a service-role client.
 Assignable roles are limited to `admin.viewer` and `admin.full_access`.
+
+## Career API
+
+| Method and route  | Minimum capability  | Scope                                             |
+| ----------------- | ------------------- | ------------------------------------------------- |
+| `GET /api/career` | `admin.career.read` | Read the bounded private career-pipeline overview |
+
+Trusted local automation writes directly to the `career` schema with a service
+role. The browser-facing route is read-only and never exposes contact email
+fields or application-message bodies.
 
 ## Deployment APIs
 

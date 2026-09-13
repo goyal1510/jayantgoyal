@@ -1,0 +1,4 @@
+interface:
+  display_name: "Job Search Pipeline"
+  short_description: "Discover, prepare, track, and check job applications"
+  default_prompt: "Use $job-search-pipeline to run my multi-source job discovery, application, referral, or status-check workflow."

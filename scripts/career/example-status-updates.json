@@ -1,0 +1,18 @@
+{
+  "applications": [
+    {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "status": "in_review",
+      "source_status_text": "Application in review",
+      "last_checked_at": "2026-09-13T18:00:00Z"
+    }
+  ],
+  "outreach": [
+    {
+      "id": "00000000-0000-0000-0000-000000000002",
+      "status": "replied",
+      "last_checked_at": "2026-09-13T18:00:00Z",
+      "replied_at": "2026-09-13T18:00:00Z"
+    }
+  ]
+}

@@ -13,6 +13,7 @@ are not current APIs.
 | `iam_private` |      0 | Cross-product IAM | Private RLS and trusted authorization helpers             |
 | `studio`      |     14 | Studio            | Active membership, capabilities, and resource attributes  |
 | `portfolio`   |     14 | Portfolio         | Selected public reads; capability-authorized Admin writes |
+| `career`      |      8 | Career operations | Private service operations after Admin authorization      |
 
 ## Foundation
 
@@ -139,6 +140,28 @@ database boundary.
 `portfolio.contact_rate_limits` stores a secret-keyed hash, request count, and reset
 time. `consume_contact_rate_limit` performs the atomic public contact decision;
 the endpoint fails closed when it is unavailable.
+
+## Career operations
+
+The private `career` schema owns Jayant's job-search workflow. It is exposed to
+PostgREST only for the service role and grants nothing to anonymous or
+authenticated browser clients. Admin reauthorizes `admin.career.read` before
+loading the tracker; trusted local automation uses the service role directly.
+
+| Table                       | Responsibility                                            |
+| --------------------------- | --------------------------------------------------------- |
+| `career.companies`          | Deduplicated employer and canonical career-page identity  |
+| `career.opportunities`      | Multi-source job facts, fit evidence, and pipeline state  |
+| `career.application_drafts` | Versioned application notes and answer drafts             |
+| `career.applications`       | Verified submissions and observed application status      |
+| `career.contacts`           | Public professional contacts with contact-data provenance |
+| `career.outreach`           | Referral and introduction drafts, sends, and replies      |
+| `career.automation_runs`    | Discovery and nightly status-sync run health              |
+| `career.pipeline_events`    | Append-only cross-entity activity timeline                |
+
+The schema distinguishes preparation, approval, and verified submission. A
+draft or filled form is not an application. Public email addresses require a
+source URL, and private-address enrichment is outside the contract.
 
 ## Storage buckets
 

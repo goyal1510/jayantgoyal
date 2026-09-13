@@ -10,7 +10,7 @@ second Supabase project is not part of the approved architecture.
 
 ## Current physical structure
 
-The project contains 41 application tables in five application schemas:
+The project contains 49 application tables in six application schemas:
 
 | Physical schema | Tables | Current contents                                                    |
 | --------------- | -----: | ------------------------------------------------------------------- |
@@ -19,6 +19,7 @@ The project contains 41 application tables in five application schemas:
 | `iam_private`   |      0 | Private authorization, provisioning, and RLS predicates             |
 | `studio`        |     14 | Studio workspaces, games, personalization, and file metadata        |
 | `portfolio`     |     14 | Portfolio, Writing, LinkedIn planning, and contact-abuse state      |
+| `career`        |      8 | Private job discovery, applications, contacts, outreach, and runs   |
 
 The predecessor `jg_account` and `jg_app` schemas no longer exist.
 
@@ -31,6 +32,7 @@ The predecessor `jg_account` and `jg_app` schemas no longer exist.
 | `iam_private` | Caller-bound and trusted authorization predicates used by RLS and transactional commands                                 | Private; never a Data API schema                                                          |
 | `studio`      | Studio tools, workspaces, games, personalization, and Studio file metadata                                               | RLS-protected operations with IAM product/capability checks                               |
 | `portfolio`   | Portfolio and Writing content, private LinkedIn publication planning, and abuse-control state                            | Selected public reads and capability-authorized Admin writes                              |
+| `career`      | Job opportunities, application state, professional contacts, outreach drafts, and automation evidence                    | Service-role only after Admin authorization or from trusted local automation              |
 
 Supabase-managed `auth`, `storage`, `realtime`, and `extensions` retain their
 platform ownership. Application migrations must not rename or add arbitrary

@@ -36,7 +36,7 @@ export function AdminCommandPalette({ role }: { role: UserRole }) {
     <ApplicationCommandPalette
       ariaLabel="Search Admin"
       title="Search Admin"
-      description="Search Portfolio workspaces and Admin operations"
+      description="Search Portfolio, Career, and Admin operations"
       placeholder="Search Admin workspaces…"
       emptyMessage="No Admin destination found."
       groups={groups}

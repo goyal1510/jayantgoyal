@@ -1,0 +1,19 @@
+{
+  "company": {
+    "name": "Example Company",
+    "canonical_url": "https://example.com",
+    "careers_url": "https://example.com/careers"
+  },
+  "opportunity": {
+    "source": "career_page",
+    "source_url": "https://example.com/careers/software-engineer",
+    "apply_url": "https://example.com/careers/software-engineer/apply",
+    "title": "Software Engineer",
+    "location_text": "India · Remote",
+    "work_policy": "remote",
+    "skills": ["TypeScript", "React", "Node.js"],
+    "fit_score": 82,
+    "fit_summary": "Example only. Replace this with evidence from the role and candidate profile.",
+    "status": "shortlisted"
+  }
+}

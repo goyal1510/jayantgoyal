@@ -15,6 +15,7 @@
     "check:identity": "node scripts/check-identity-contract.mjs",
     "check:seo": "vitest run packages/web/seo/src/index.test.ts apps/studio/web/src/seo-remediation.test.ts",
     "check:source-health": "node scripts/check-source-health.mjs",
+    "career:pipeline": "node scripts/career/pipeline.mjs",
     "check:service-role": "node scripts/check-service-role-boundaries.mjs",
     "db:migrations:apply": "node scripts/supabase/migration-workflow.mjs --apply",
     "db:migrations:check": "node scripts/supabase/migration-workflow.mjs --check",

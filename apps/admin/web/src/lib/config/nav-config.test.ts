@@ -18,10 +18,11 @@ import {
 } from "./portfolio-route-map";
 
 describe("Admin navigation domains", () => {
-  it("uses the approved Portfolio, Studio, and Operations organization", () => {
+  it("uses the approved Portfolio, Studio, Career, and Operations organization", () => {
     expect(adminNavigationDomains.map((domain) => domain.label)).toEqual([
       "Portfolio",
       "Studio",
+      "Career",
       "Operations",
     ]);
     expect(
@@ -47,12 +48,12 @@ describe("Admin navigation domains", () => {
   it("keeps mutation-only domains separate while viewers retain read access", () => {
     expect(
       getVisibleAdminNavigationDomains("viewer").map((domain) => domain.id),
-    ).toEqual(["portfolio", "system"]);
+    ).toEqual(["portfolio", "career", "system"]);
     expect(
       getVisibleAdminNavigationDomains("full_access").map(
         (domain) => domain.id,
       ),
-    ).toEqual(["portfolio", "system"]);
+    ).toEqual(["portfolio", "career", "system"]);
   });
 
   it("maps routes to their app-owned breadcrumb domain", () => {
@@ -60,6 +61,7 @@ describe("Admin navigation domains", () => {
     expect(getAdminNavigationContext("/writing")?.pageLabel).toBe("Writing");
     expect(getAdminNavigationContext("/deployments")?.domain.id).toBe("system");
     expect(getAdminNavigationContext("/users")?.domain.id).toBe("system");
+    expect(getAdminNavigationContext("/career")?.domain.id).toBe("career");
     expect(getAdminNavigationContext("/deployments/env")).toBeNull();
     expect(getAdminNavigationContext("/deployments/example")?.pageLabel).toBe(
       "Deployment Detail",

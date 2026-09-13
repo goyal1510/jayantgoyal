@@ -33,6 +33,7 @@ and Storage ownership.
 - `supabase/schemas/iam_private.sql`: private authorization helpers.
 - `supabase/schemas/studio.sql`: Studio schema snapshot.
 - `supabase/schemas/portfolio.sql`: canonical Portfolio schema snapshot.
+- `supabase/schemas/career.sql`: canonical private Career operations snapshot.
 - `supabase/config.toml`: local CLI services and Auth/API parity.
 
 Never edit an applied migration. Historical migrations may contain historical
@@ -89,7 +90,7 @@ contracts/tests pass, and the schema catalog and ownership page are updated.
 ## Local parity
 
 The local and hosted Data API configuration exposes `public`,
-`graphql_public`, `iam`, `studio`, and `portfolio`. `foundation` and
+`graphql_public`, `iam`, `studio`, `portfolio`, and `career`. `foundation` and
 `iam_private` remain private.
 
 A fresh `supabase db reset` over the complete historical migration directory is

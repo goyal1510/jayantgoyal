@@ -17,6 +17,8 @@ of the domains it administers. Its current responsibilities are:
 - Portfolio Work, Writing, and public asset administration;
 - identity profile and Admin access administration;
 - Vercel deployment listing, inspection, events, and redeployment actions.
+- private career-pipeline visibility across opportunities, applications,
+  professional contacts, outreach, and automation health.
 
 Portfolio owns its public content contract. Auth owns credentials, MFA, and
 account security. Studio owns its product capabilities even though a reserved
@@ -47,6 +49,7 @@ callback compatibility path are the only public destinations.
 | ---------- | --------------------------------------------------------------------------- | -------------------------- | ---------------------------------- |
 | Portfolio  | Overview, Home, About, Skills, Experience, Activity, Work, Writing, Contact | Read unpublished content   | Read and mutate canonical CMS data |
 | Operations | Users, deployments, and deployment detail                                   | Read users and deployments | Manage access and deployments      |
+| Career     | Job pipeline, referral outreach, and automation runs                        | Read private tracker       | Read private tracker               |
 | Studio     | None                                                                        | No implemented workspace   | No implemented workspace           |
 
 Several older granular URLs redirect to the current section-owned workspaces;
@@ -67,6 +70,11 @@ service-role-only IAM functions that re-evaluate the actor's capability and
 write an audit event. Deployment
 operations use server-only Vercel credentials and are currently scoped to the
 Studio and Admin project IDs.
+
+Career operations read the product-owned private `career` schema only after an
+`admin.career.read` check. Browser clients receive no direct grants. Scheduled
+automation may maintain this schema from Jayant's trusted local environment;
+application and outreach sends remain explicit user-approved actions.
 
 The Portfolio hero editor treats public person identity as read-only shared
 configuration. It edits mutable positioning and SEO-description content, then

@@ -204,7 +204,10 @@ function resolveLocalTarget(sourceFile, rawTarget) {
 }
 
 const repositoryFiles = listRepositoryFiles();
-const markdownFiles = repositoryFiles.filter((file) => file.endsWith(".md"));
+// Skill Markdown requires YAML frontmatter and is validated by the skill validator.
+const markdownFiles = repositoryFiles.filter(
+  (file) => file.endsWith(".md") && !file.startsWith(".agents/skills/"),
+);
 const documentationFiles = markdownFiles.filter((file) =>
   file.startsWith("docs/"),
 );
