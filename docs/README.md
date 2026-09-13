@@ -60,6 +60,13 @@ prose.
 - [Admin](products/admin/README.md)
 - [Auth](products/auth/README.md)
 
+## Proposed products
+
+- [PumpAxis](products/pumpaxis/README.md): proposed modular petrol-pump
+  operations product, including Loyalty and Shift Close & Reconciliation
+  requirements. No PumpAxis client or production data system is implemented in
+  this repository yet.
+
 Product pages link to their route, capability, runtime-flow, data, and
 operational detail. They describe current behavior and must not invent clients
 or capabilities that do not exist.
