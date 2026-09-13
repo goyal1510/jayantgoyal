@@ -1,0 +1,4 @@
+interface:
+  display_name: "Wellfound Job Applications"
+  short_description: "Shortlist and prepare tailored startup applications"
+  default_prompt: "Use $wellfound-job-applications to find and prepare strong Wellfound startup applications for me."
