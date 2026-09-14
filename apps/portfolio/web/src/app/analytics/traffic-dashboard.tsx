@@ -127,8 +127,8 @@ function TrafficChart({
           contentStyle={{
             background: "var(--analytics-tooltip)",
             border: "1px solid var(--analytics-line)",
-            borderRadius: 10,
-            color: "var(--analytics-text)",
+            borderRadius: 0,
+            color: "var(--paper-bright)",
             fontSize: 12,
           }}
           cursor={{ stroke: "var(--analytics-accent)", strokeOpacity: 0.45 }}
@@ -180,10 +180,13 @@ export function TrafficDashboard({ snapshot }: { snapshot: TrafficSnapshot }) {
       </div>
 
       <div className={styles.metricList}>
-        {METRICS.map((metric) => (
+        {METRICS.map((metric, index) => (
           <article className={styles.metricCard} key={metric.key}>
             <div className={styles.metricSummary}>
-              <h2>{metric.label}</h2>
+              <div className={styles.metricLabel}>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <h2>{metric.label}</h2>
+              </div>
               <strong>{metric.format(snapshot.totals[metric.key])}</strong>
             </div>
             <TrafficChart metric={metric} snapshot={snapshot} />

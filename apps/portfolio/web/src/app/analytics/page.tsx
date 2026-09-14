@@ -39,14 +39,14 @@ export default async function AnalyticsPage({
 
       <section className={`shell ${styles.hero}`}>
         <div>
-          <span className={styles.eyebrow}>Public telemetry / Cloudflare</span>
-          <h1 id="traffic-heading">The portfolio, in motion.</h1>
+          <span className={styles.eyebrow}>Live site analytics</span>
+          <h1 id="traffic-heading">See the site at work.</h1>
         </div>
         <div className={styles.heroNote}>
-          <span className={styles.liveIndicator}>Live edge data</span>
+          <span className={styles.liveIndicator}>Cloudflare / live</span>
           <p>
-            A transparent look at how this site moves across the web—visits,
-            requests, cache efficiency, and bandwidth.
+            A public, privacy-conscious view of visits, requests, cache
+            efficiency, and bandwidth across the portfolio.
           </p>
         </div>
       </section>

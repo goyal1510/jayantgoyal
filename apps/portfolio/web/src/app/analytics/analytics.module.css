@@ -1,55 +1,53 @@
 .page {
-  --analytics-bg: #171918;
-  --analytics-panel: #1c1f1e;
-  --analytics-panel-hover: #202322;
-  --analytics-text: #f3f0e8;
-  --analytics-muted: #aaa59a;
-  --analytics-line: rgba(243, 240, 232, 0.12);
-  --analytics-grid: rgba(220, 233, 243, 0.13);
-  --analytics-accent: #b8d5f2;
-  --analytics-area: #9fbfe0;
-  --analytics-tooltip: #252827;
-  background: var(--analytics-bg);
-  color: var(--analytics-text);
+  --analytics-text: var(--ink);
+  --analytics-muted: var(--folio-muted);
+  --analytics-line: rgba(20, 21, 21, 0.22);
+  --analytics-grid: rgba(20, 21, 21, 0.14);
+  --analytics-accent: var(--signal);
+  --analytics-area: var(--signal-soft);
+  --analytics-tooltip: var(--ink);
+  background: var(--paper);
+  color: var(--ink);
 }
 
 .hero {
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
   gap: clamp(32px, 6vw, 96px);
-  align-items: end;
-  padding-block: clamp(56px, 7vw, 104px) clamp(42px, 5vw, 72px);
-  border-bottom: 1px solid var(--analytics-line);
+  min-height: clamp(430px, 58svh, 650px);
+  align-items: center;
+  padding-block: clamp(76px, 9vw, 132px) clamp(64px, 8vw, 112px);
 }
 
 .eyebrow {
   display: block;
   margin-bottom: 18px;
-  color: var(--analytics-muted);
+  color: var(--signal);
   font-size: 0.7rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
 .hero h1 {
-  max-width: 9ch;
+  max-width: 8.5ch;
   margin: 0;
   font-family: var(--font-serif), serif;
   font-size: clamp(3.7rem, 7vw, 7.4rem);
   font-weight: 400;
   letter-spacing: -0.065em;
-  line-height: 0.83;
+  line-height: 0.86;
 }
 
 .heroNote {
-  padding-top: 22px;
-  border-top: 1px solid var(--analytics-line);
+  align-self: end;
+  padding: 26px 0 4px 28px;
+  border-left: 1px solid var(--ink);
 }
 
 .heroNote p {
   max-width: 36rem;
   margin: 18px 0 0;
-  color: var(--analytics-muted);
+  color: var(--ink-soft);
   font-size: clamp(1rem, 1.35vw, 1.22rem);
   line-height: 1.55;
 }
@@ -57,17 +55,18 @@
 .liveIndicator {
   display: inline-flex;
   align-items: center;
-  color: var(--signal-soft);
+  color: var(--signal);
+  font-weight: 600;
   font-size: 0.72rem;
   letter-spacing: 0.13em;
   text-transform: uppercase;
 }
 
 .dashboard {
-  width: calc(100% - clamp(48px, 8vw, 160px));
-  max-width: 1440px;
-  margin-inline: auto;
-  padding-block: clamp(32px, 4vw, 56px) 48px;
+  width: 100%;
+  padding: clamp(38px, 5vw, 72px) clamp(24px, 4vw, 64px) 48px;
+  border-top: 1px solid var(--ink);
+  background: var(--sky);
 }
 
 .toolbar {
@@ -75,21 +74,20 @@
   gap: 24px;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
+  max-width: 1440px;
+  margin: 0 auto 28px;
 }
 
 .ranges {
   display: inline-flex;
-  padding: 4px;
-  border: 1px solid var(--analytics-line);
-  border-radius: 12px;
-  background: var(--analytics-panel);
+  border: 1px solid var(--ink);
+  background: var(--paper-bright);
 }
 
 .ranges a {
-  padding: 10px 16px;
-  border-radius: 8px;
-  color: var(--analytics-muted);
+  padding: 11px 17px;
+  border-right: 1px solid var(--analytics-line);
+  color: var(--ink-soft);
   font-size: 0.88rem;
   white-space: nowrap;
   transition:
@@ -97,9 +95,14 @@
     background 180ms ease;
 }
 
+.ranges a:last-child {
+  border-right: 0;
+}
+
 .ranges a:hover,
 .ranges a:focus-visible {
-  color: var(--analytics-text);
+  background: var(--paper);
+  color: var(--signal);
 }
 
 .ranges a:focus-visible {
@@ -108,8 +111,8 @@
 }
 
 .ranges .selectedRange {
-  background: #121413;
-  color: var(--analytics-text);
+  background: var(--signal);
+  color: var(--paper-bright);
 }
 
 .rangeMeta {
@@ -131,43 +134,56 @@
 
 .metricList {
   display: grid;
-  gap: 18px;
+  max-width: 1440px;
+  margin-inline: auto;
+  border-top: 1px solid var(--ink);
 }
 
 .metricCard {
   display: grid;
-  min-height: 230px;
+  min-height: 236px;
   grid-template-columns: minmax(190px, 0.22fr) minmax(0, 1fr);
   gap: clamp(24px, 4vw, 60px);
   align-items: center;
-  padding: 26px 32px 20px;
-  border: 1px solid transparent;
-  border-radius: 14px;
-  background: var(--analytics-panel);
-  transition:
-    border-color 180ms ease,
-    background 180ms ease;
+  padding: 30px 32px 22px;
+  border-bottom: 1px solid var(--ink);
+  background: rgba(255, 253, 247, 0.72);
+  transition: background 180ms ease;
 }
 
 .metricCard:hover {
-  border-color: var(--analytics-line);
-  background: var(--analytics-panel-hover);
+  background: var(--paper-bright);
 }
 
 .metricSummary {
   align-self: center;
 }
 
+.metricLabel {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  margin-bottom: 20px;
+}
+
+.metricLabel span {
+  color: var(--signal);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+}
+
 .metricSummary h2 {
-  margin: 0 0 7px;
+  margin: 0;
   color: var(--analytics-muted);
-  font-size: 0.86rem;
+  font-size: 0.72rem;
   font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .metricSummary strong {
   display: block;
-  color: var(--analytics-text);
+  color: var(--ink);
   font-family: var(--font-serif), serif;
   font-size: clamp(2.2rem, 3.3vw, 3.8rem);
   font-weight: 400;
@@ -183,11 +199,11 @@
 
 .disclosure {
   max-width: 720px;
-  margin: 28px 0 0 auto;
+  margin: 28px auto 0;
   color: var(--analytics-muted);
   font-size: 0.76rem;
   line-height: 1.55;
-  text-align: right;
+  text-align: center;
 }
 
 .unavailable {
@@ -196,7 +212,7 @@
 }
 
 .unavailable span {
-  color: var(--signal-soft);
+  color: var(--signal);
   font-size: 0.72rem;
   letter-spacing: 0.13em;
   text-transform: uppercase;
@@ -223,6 +239,7 @@
 
   .heroNote {
     max-width: 560px;
+    align-self: auto;
   }
 
   .metricCard {
@@ -242,7 +259,7 @@
 
 @media (max-width: 640px) {
   .dashboard {
-    width: calc(100% - 32px);
+    padding-inline: 16px;
   }
 
   .hero {
@@ -278,7 +295,7 @@
     min-height: 310px;
     grid-template-columns: 1fr;
     gap: 18px;
-    padding: 24px 16px 18px;
+    padding: 26px 16px 18px;
   }
 
   .metricSummary {
