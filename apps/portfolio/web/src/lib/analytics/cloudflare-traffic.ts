@@ -18,6 +18,7 @@ export interface CountryTraffic {
   name: string;
   requests: number;
   bytes: number;
+  threats: number;
 }
 
 interface TrafficTotals {
