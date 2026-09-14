@@ -3,7 +3,12 @@ import type { Metadata } from "next";
 import { PortfolioExperience } from "@/components/editorial/portfolio-experience";
 import { getPublishedWritingPreviews } from "@/lib/writing/editorial-queries";
 import { getEditorialPortfolioData } from "@/lib/portfolio/editorial-server";
-import { DEFAULT_OG_IMAGE, DEFAULT_OG_IMAGE_METADATA } from "@/lib/seo/config";
+import {
+  DEFAULT_OG_IMAGE,
+  DEFAULT_OG_IMAGE_METADATA,
+  PERSON_NAME,
+  SITE_URL,
+} from "@/lib/seo/config";
 
 export const revalidate = 60;
 
@@ -42,6 +47,22 @@ export default async function PortfolioPage() {
     getEditorialPortfolioData(),
     getPublishedWritingPreviews(),
   ]);
+  const personJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: PERSON_NAME,
+    url: SITE_URL,
+    jobTitle: portfolio.profile.role,
+    sameAs: portfolio.profile.socials.map((social) => social.href),
+  };
 
-  return <PortfolioExperience data={portfolio} writingPosts={publishedPosts} />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+      />
+      <PortfolioExperience data={portfolio} writingPosts={publishedPosts} />
+    </>
+  );
 }

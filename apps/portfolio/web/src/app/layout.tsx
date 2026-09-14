@@ -3,11 +3,11 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { DM_Sans, Instrument_Serif, Jost } from "next/font/google";
 import Script from "next/script";
+import { APP_BRANDS } from "@jayantgoyal/web-brand";
 import { buildAppRootMetadata } from "@jayantgoyal/web-seo";
 
 import { PageScrollProgress } from "@/components/editorial/page-scroll-progress";
 import { PortfolioAnalytics } from "@/components/editorial/portfolio-analytics";
-import { getPortfolioShellData } from "@/lib/portfolio/editorial-server";
 import { PERSON_NAME, SITE_URL } from "@/lib/seo/config";
 
 const sans = DM_Sans({
@@ -32,16 +32,15 @@ const wordmark = Jost({
 
 export const revalidate = 60;
 
-export async function generateMetadata(): Promise<Metadata> {
+export function generateMetadata(): Metadata {
   const shouldIndex = process.env.VERCEL_ENV === "production";
-  const { profile } = await getPortfolioShellData();
 
   return buildAppRootMetadata({
     appId: "portfolio",
     siteUrl: SITE_URL,
     canonicalUrl: SITE_URL,
-    title: profile.seoTitle,
-    description: profile.seoDescription,
+    title: APP_BRANDS.portfolio.defaultTitle,
+    description: APP_BRANDS.portfolio.description,
     type: "profile",
     keywords: [
       PERSON_NAME,
@@ -59,19 +58,9 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const { profile } = await getPortfolioShellData();
-  const personJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Person",
-    name: PERSON_NAME,
-    url: SITE_URL,
-    jobTitle: profile.role,
-    sameAs: profile.socials.map((social) => social.href),
-  };
-
   return (
     <html lang="en">
       <head>
@@ -83,10 +72,6 @@ export default async function RootLayout({
         <Script id="google-analytics" strategy="afterInteractive">
           {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-YVBSLSQXFJ');`}
         </Script>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
-        />
       </head>
       <body
         className={`${sans.variable} ${serif.variable} ${wordmark.variable}`}
