@@ -99,7 +99,8 @@ cache headers allow stale revalidation. `GITHUB_TOKEN` stays server-only.
 ## Cloudflare analytics flow
 
 The public `/analytics` page accepts only the fixed `24h`, `7d`, and `30d`
-ranges. Portfolio queries Cloudflare from a server-only module using a
+range options and is exposed through the shared desktop and mobile Portfolio
+navigation. Portfolio queries Cloudflare from a server-only module using a
 zone-scoped Analytics Read token and caches each range for 15 minutes. The
 24-hour view uses complete hourly groups; longer views use daily groups to stay
 within Cloudflare's hourly-query duration limit.
