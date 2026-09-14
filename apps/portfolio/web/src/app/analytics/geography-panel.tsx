@@ -53,7 +53,6 @@ export function GeographyPanel({
     countries.find((country) => country.code === selectedCode) ?? countries[0];
   const hovered = countries.find((country) => country.code === hoveredCode);
   const maximum = countries[0]?.requests ?? 1;
-  const topCountries = countries.slice(0, 8);
   const byNumericCode = useMemo(
     () =>
       new Map(
@@ -97,7 +96,7 @@ export function GeographyPanel({
           >
             <Sphere
               fill="var(--paper-bright)"
-              stroke="var(--ink)"
+              stroke="var(--analytics-secondary)"
               strokeWidth={0.35}
             />
             <Geographies geography={worldTopology}>
@@ -134,7 +133,11 @@ export function GeographyPanel({
                       onMouseEnter={() => setHoveredCode(country?.code ?? null)}
                       onMouseLeave={() => setHoveredCode(null)}
                       role={country ? "button" : undefined}
-                      stroke={isSelected ? "var(--ink)" : "var(--paper-bright)"}
+                      stroke={
+                        isSelected
+                          ? "var(--analytics-secondary)"
+                          : "var(--paper-bright)"
+                      }
                       strokeWidth={isSelected ? 1.2 : 0.45}
                       tabIndex={country ? 0 : -1}
                     />
@@ -168,7 +171,7 @@ export function GeographyPanel({
 
         <aside className={styles.countryInspector} aria-live="polite">
           {selected ? (
-            <>
+            <div className={styles.countryInspectorContent} key={selected.code}>
               <div className={styles.countryDetailHeader}>
                 <span>Selected country</span>
                 <h3>{selected.name}</h3>
@@ -249,32 +252,8 @@ export function GeographyPanel({
                   country-level Web Vitals are withheld.
                 </p>
               )}
-            </>
+            </div>
           ) : null}
-
-          <ol
-            className={styles.countryList}
-            aria-label="Top countries by requests"
-          >
-            {topCountries.map((country, index) => (
-              <li key={country.code}>
-                <button
-                  aria-pressed={country.code === selected?.code}
-                  onClick={() => setSelectedCode(country.code)}
-                  type="button"
-                >
-                  <span className={styles.countryRank}>
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <span className={styles.countryName}>{country.name}</span>
-                  <span className={styles.countryMetric}>
-                    <strong>{formatCompactNumber(country.requests)}</strong>
-                    <small>{formatBytes(country.bytes)}</small>
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ol>
         </aside>
       </div>
     </section>

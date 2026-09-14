@@ -111,8 +111,9 @@ dataset limits.
 Only aggregate visitors, requests, bytes, cached bytes, country totals, threat
 request counts, Web Vital rating distributions, and P75 LCP, INP, CLS, FCP, and
 TTFB measurements reach client chart components. The traffic dashboard combines
-request bars with a visitor trend and compares cached with uncached delivery.
-The map exposes aggregate hover summaries and a selectable country inspector;
+request and visitor line trends and compares cached with uncached delivery as
+distinct line series. The map exposes aggregate hover summaries and a single
+animated country inspector without a competing ranked-country list;
 country-level Web Vitals appear only after ten measured visits. The experience
 explorer explains P75, applies the published good/poor thresholds, and lets the
 visitor select one metric trend at a time.
