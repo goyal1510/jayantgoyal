@@ -32,6 +32,18 @@ import {
 } from "./experience-config";
 import sectionStyles from "./analytics-section.module.css";
 
+const CHART_TOOLTIP_CURSOR = {
+  stroke: "var(--analytics-secondary)",
+  strokeDasharray: "4 4",
+};
+const CHART_TOOLTIP_STYLE = {
+  background: "var(--analytics-tooltip)",
+  border: 0,
+  borderRadius: 0,
+  color: "var(--analytics-tooltip-text)",
+  fontSize: 12,
+};
+
 function VitalTrend({
   snapshot,
   vital,
@@ -97,13 +109,8 @@ function VitalTrend({
           y={thresholds.poor}
         />
         <Tooltip
-          contentStyle={{
-            background: "var(--analytics-tooltip)",
-            border: 0,
-            borderRadius: 0,
-            color: "var(--paper-bright)",
-            fontSize: 12,
-          }}
+          cursor={CHART_TOOLTIP_CURSOR}
+          contentStyle={CHART_TOOLTIP_STYLE}
           formatter={(value) => [
             vital.format(Number(value)),
             `${vital.label} · P75`,
@@ -157,13 +164,7 @@ function DistributionChart({
         <XAxis hide domain={[0, 100]} type="number" />
         <YAxis hide dataKey="name" type="category" />
         <Tooltip
-          contentStyle={{
-            background: "var(--analytics-tooltip)",
-            border: 0,
-            borderRadius: 0,
-            color: "var(--paper-bright)",
-            fontSize: 12,
-          }}
+          contentStyle={CHART_TOOLTIP_STYLE}
           formatter={(value, name) => [
             `${Number(value).toFixed(1)}%`,
             String(name)

@@ -2,11 +2,9 @@
 
 import Link from "next/link";
 import {
-  Bar,
-  BarChart,
   CartesianGrid,
-  ComposedChart,
   Line,
+  LineChart,
   Tooltip,
   XAxis,
   YAxis,
@@ -35,7 +33,7 @@ function TrafficVolumeChart({ snapshot }: { snapshot: TrafficSnapshot }) {
       role="img"
       aria-label={`Requests and unique visitors over the last ${RANGE_LABELS[snapshot.range].toLowerCase()}`}
     >
-      <ComposedChart
+      <LineChart
         accessibilityLayer
         data={snapshot.points}
         margin={{ top: 16, right: 10, bottom: 0, left: 4 }}
@@ -73,11 +71,15 @@ function TrafficVolumeChart({ snapshot }: { snapshot: TrafficSnapshot }) {
           yAxisId="visitors"
         />
         <Tooltip
+          cursor={{
+            stroke: "var(--analytics-secondary)",
+            strokeDasharray: "4 4",
+          }}
           contentStyle={{
             background: "var(--analytics-tooltip)",
             border: 0,
             borderRadius: 0,
-            color: "var(--paper-bright)",
+            color: "var(--analytics-tooltip-text)",
             fontSize: 12,
           }}
           formatter={(value, name) => [
@@ -88,23 +90,25 @@ function TrafficVolumeChart({ snapshot }: { snapshot: TrafficSnapshot }) {
             formatBucket(String(value), snapshot.range)
           }
         />
-        <Bar
+        <Line
           dataKey="requests"
-          fill="var(--analytics-area)"
+          dot={{ fill: "var(--paper-bright)", r: 2.5, strokeWidth: 2 }}
           isAnimationActive={false}
-          maxBarSize={38}
+          stroke="var(--signal)"
+          strokeWidth={2.5}
+          type="monotone"
           yAxisId="requests"
         />
         <Line
           dataKey="visitors"
           dot={{ fill: "var(--paper-bright)", r: 2.5, strokeWidth: 2 }}
           isAnimationActive={false}
-          stroke="var(--ink)"
+          stroke="var(--analytics-secondary)"
           strokeWidth={2.25}
           type="monotone"
           yAxisId="visitors"
         />
-      </ComposedChart>
+      </LineChart>
     </div>
   );
 }
@@ -121,7 +125,7 @@ function DeliveryMixChart({ snapshot }: { snapshot: TrafficSnapshot }) {
       role="img"
       aria-label={`Cached and uncached bandwidth over the last ${RANGE_LABELS[snapshot.range].toLowerCase()}`}
     >
-      <BarChart
+      <LineChart
         accessibilityLayer
         data={points}
         margin={{ top: 16, right: 8, bottom: 0, left: 4 }}
@@ -149,11 +153,15 @@ function DeliveryMixChart({ snapshot }: { snapshot: TrafficSnapshot }) {
           width={66}
         />
         <Tooltip
+          cursor={{
+            stroke: "var(--analytics-secondary)",
+            strokeDasharray: "4 4",
+          }}
           contentStyle={{
             background: "var(--analytics-tooltip)",
             border: 0,
             borderRadius: 0,
-            color: "var(--paper-bright)",
+            color: "var(--analytics-tooltip-text)",
             fontSize: 12,
           }}
           formatter={(value, name) => [
@@ -164,21 +172,24 @@ function DeliveryMixChart({ snapshot }: { snapshot: TrafficSnapshot }) {
             formatBucket(String(value), snapshot.range)
           }
         />
-        <Bar
+        <Line
           dataKey="cachedBytes"
-          fill="var(--signal)"
+          dot={{ fill: "var(--paper-bright)", r: 2.5, strokeWidth: 2 }}
           isAnimationActive={false}
-          maxBarSize={38}
-          stackId="delivery"
+          stroke="var(--signal)"
+          strokeWidth={2.5}
+          type="monotone"
         />
-        <Bar
+        <Line
           dataKey="uncachedBytes"
-          fill="var(--analytics-area)"
+          dot={{ fill: "var(--paper-bright)", r: 2.5, strokeWidth: 2 }}
           isAnimationActive={false}
-          maxBarSize={38}
-          stackId="delivery"
+          stroke="var(--analytics-secondary)"
+          strokeDasharray="6 4"
+          strokeWidth={2.25}
+          type="monotone"
         />
-      </BarChart>
+      </LineChart>
     </div>
   );
 }

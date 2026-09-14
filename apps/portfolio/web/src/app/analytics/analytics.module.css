@@ -5,7 +5,10 @@
   --analytics-grid: rgba(20, 21, 21, 0.14);
   --analytics-accent: var(--signal);
   --analytics-area: var(--signal-soft);
-  --analytics-tooltip: var(--ink);
+  --analytics-secondary: #356f82;
+  --analytics-secondary-soft: #dbeaec;
+  --analytics-tooltip: #315b6d;
+  --analytics-tooltip-text: #fffdf7;
   --rating-good: #3c6b5b;
   --rating-needs: #c5893c;
   --rating-poor: #b64e3a;
@@ -235,17 +238,16 @@
 }
 
 .chartLegend [data-series="requests"]::before,
-.chartLegend [data-series="uncached"]::before {
-  background: var(--analytics-area);
-}
-
-.chartLegend [data-series="visitors"]::before {
-  border-radius: 50%;
-  background: var(--ink);
-}
-
 .chartLegend [data-series="cached"]::before {
+  border-color: var(--signal);
   background: var(--signal);
+}
+
+.chartLegend [data-series="visitors"]::before,
+.chartLegend [data-series="uncached"]::before {
+  border-color: var(--analytics-secondary);
+  border-radius: 50%;
+  background: var(--analytics-secondary);
 }
 
 .overviewChart {

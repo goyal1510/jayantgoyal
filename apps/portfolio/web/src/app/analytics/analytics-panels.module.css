@@ -26,12 +26,14 @@
   outline: none;
   transition:
     fill 140ms ease,
-    fill-opacity 140ms ease;
+    fill-opacity 140ms ease,
+    stroke 140ms ease,
+    stroke-width 140ms ease;
 }
 
 .mapCountry:hover,
 .mapCountry:focus-visible {
-  fill: var(--ink);
+  fill: var(--analytics-secondary);
   fill-opacity: 1;
 }
 
@@ -72,8 +74,19 @@
 }
 
 .countryInspector {
+  display: flex;
   min-width: 0;
-  border-top: 1px solid var(--ink);
+  align-self: stretch;
+  align-items: center;
+  padding: clamp(20px, 2.5vw, 34px);
+  border-top: 3px solid var(--analytics-secondary);
+  background: var(--analytics-secondary-soft);
+  box-shadow: 12px 12px 0 rgba(53, 111, 130, 0.14);
+}
+
+.countryInspectorContent {
+  width: 100%;
+  animation: country-detail-in 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .countryDetailHeader {
@@ -106,7 +119,7 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   margin: 0;
-  border-bottom: 1px solid var(--ink);
+  border-bottom: 1px solid var(--analytics-secondary);
 }
 
 .countryFacts div {
@@ -136,64 +149,16 @@
   font-size: 1.25rem;
 }
 
-.countryList {
-  margin: 0;
-  padding: 18px 0 0;
-  list-style: none;
-}
+@keyframes country-detail-in {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
 
-.countryList button {
-  display: grid;
-  width: 100%;
-  grid-template-columns: 30px minmax(0, 1fr) auto;
-  gap: 12px;
-  align-items: center;
-  min-height: 58px;
-  padding: 0 8px;
-  border: 0;
-  border-bottom: 1px solid var(--analytics-line);
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
-  font: inherit;
-  text-align: left;
-}
-
-.countryList button:hover,
-.countryList button:focus-visible,
-.countryList button[aria-pressed="true"] {
-  background: var(--signal-soft);
-}
-
-.countryList button:focus-visible {
-  outline: 2px solid var(--signal);
-  outline-offset: -2px;
-}
-
-.countryRank {
-  color: var(--signal);
-  font-size: 0.62rem;
-}
-
-.countryName {
-  font-size: 0.9rem;
-}
-
-.countryMetric {
-  display: flex;
-  align-items: flex-end;
-  flex-direction: column;
-}
-
-.countryMetric strong {
-  font-family: var(--font-serif), serif;
-  font-size: 1.2rem;
-  font-weight: 400;
-}
-
-.countryMetric small {
-  color: var(--analytics-muted);
-  font-size: 0.62rem;
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .vitalSelector {
@@ -323,18 +288,6 @@
     grid-template-columns: 1fr;
   }
 
-  .countryInspector {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: 28px;
-  }
-
-  .countryList {
-    grid-column: 2;
-    grid-row: 1 / span 3;
-    padding-top: 0;
-  }
-
   .vitalSelector {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -342,11 +295,7 @@
 
 @media (max-width: 640px) {
   .countryInspector {
-    display: block;
-  }
-
-  .countryList {
-    padding-top: 18px;
+    align-items: flex-start;
   }
 
   .vitalSelector {
@@ -374,5 +323,11 @@
   }
   .mapLegend {
     padding-inline: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .countryInspectorContent {
+    animation: none;
   }
 }

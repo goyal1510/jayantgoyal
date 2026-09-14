@@ -7,9 +7,28 @@
   min-width: 180px;
   gap: 4px;
   padding: 14px 16px;
-  background: var(--ink);
-  color: var(--paper-bright);
+  background: var(--analytics-tooltip);
+  color: var(--analytics-tooltip-text);
   pointer-events: none;
+  animation: tooltip-in 160ms ease-out both;
+}
+
+@keyframes tooltip-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mapTooltip {
+    animation: none;
+  }
 }
 
 .mapTooltip strong {
