@@ -12,6 +12,14 @@ export interface TrafficPoint {
   cachedBytes: number;
 }
 
+export interface CountryTraffic {
+  code: string;
+  numericCode: string | null;
+  name: string;
+  requests: number;
+  bytes: number;
+}
+
 interface TrafficTotals {
   visitors: number;
   requests: number;
@@ -27,6 +35,7 @@ export interface TrafficSnapshot {
   end: string;
   generatedAt: string;
   points: TrafficPoint[];
+  countries: CountryTraffic[];
   totals: TrafficTotals;
 }
 
