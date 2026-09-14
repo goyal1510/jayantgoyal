@@ -30,8 +30,6 @@ const wordmark = Jost({
   variable: "--font-wordmark",
 });
 
-export const revalidate = 60;
-
 export function generateMetadata(): Metadata {
   const shouldIndex = process.env.VERCEL_ENV === "production";
 

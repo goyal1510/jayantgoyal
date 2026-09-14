@@ -121,8 +121,8 @@ Countries with fewer than five requests in the selected range are withheld.
 Provider credentials, IP addresses, query strings, URLs, and request-level
 records are never returned to the browser. Edge failure renders a safe page
 fallback; missing or unavailable RUM configuration degrades only the experience
-panel while keeping traffic analytics visible. The main editorial routes use a
-60-second revalidation window, and the Resume's embedded PDF loads lazily so it
+panel while keeping traffic analytics visible. Shared editorial loaders retain
+their 60-second data cache, while the Resume's embedded PDF loads lazily so it
 does not compete with above-the-fold content.
 
 ## Admin write propagation

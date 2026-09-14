@@ -7,7 +7,7 @@ import { EditorialSubpageHeader } from "@/components/editorial/subpage-header";
 import { getEditorialPortfolioData } from "@/lib/portfolio/editorial-server";
 import { buildPublicPageMetadata } from "@/lib/seo/config";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { sectionContent } = await getEditorialPortfolioData();
