@@ -8,7 +8,7 @@ import { EditorialSubpageHeader } from "@/components/editorial/subpage-header";
 import { getPortfolioShellData } from "@/lib/portfolio/editorial-server";
 import { buildPublicPageMetadata } from "@/lib/seo/config";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   const { sectionContent } = await getPortfolioShellData();
@@ -60,6 +60,7 @@ export default async function ResumePage() {
           <p>Read the current PDF here or download a copy for later.</p>
         </div>
         <iframe
+          loading="lazy"
           src={resumeHref}
           title="Jayant resume PDF"
           className="editorial-resume__frame"

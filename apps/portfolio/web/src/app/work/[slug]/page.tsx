@@ -5,7 +5,7 @@ import { CaseStudyContent } from "@/components/editorial/case-study-content";
 import { getEditorialPortfolioData } from "@/lib/portfolio/editorial-server";
 import { buildPublicPageMetadata } from "@/lib/seo/config";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 async function getPublishedCaseStudy(slug: string) {
   const portfolio = await getEditorialPortfolioData();

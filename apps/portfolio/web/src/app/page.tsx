@@ -5,7 +5,7 @@ import { getPublishedWritingPreviews } from "@/lib/writing/editorial-queries";
 import { getEditorialPortfolioData } from "@/lib/portfolio/editorial-server";
 import { DEFAULT_OG_IMAGE, DEFAULT_OG_IMAGE_METADATA } from "@/lib/seo/config";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   const { profile } = await getEditorialPortfolioData();

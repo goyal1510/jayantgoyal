@@ -1,93 +1,57 @@
 "use client";
 
+import { useState } from "react";
 import {
-  Area,
-  AreaChart,
+  Bar,
+  BarChart,
   CartesianGrid,
+  Line,
+  LineChart,
+  ReferenceLine,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
 
 import {
-  formatLayoutShift,
-  formatMilliseconds,
+  getWebVitalRating,
+  WEB_VITAL_THRESHOLDS,
   type WebVitalKey,
   type WebVitalsResult,
   type WebVitalsSnapshot,
 } from "@/lib/analytics/cloudflare-rum";
 
 import styles from "./analytics-panels.module.css";
+import detailStyles from "./experience-detail.module.css";
+import {
+  formatCompactSamples,
+  formatExperienceBucket,
+  RATING_LABELS,
+  VITALS,
+  type VitalDefinition,
+} from "./experience-config";
+import sectionStyles from "./analytics-section.module.css";
 
-interface VitalDefinition {
-  key: WebVitalKey;
-  label: string;
-  description: string;
-  format: (value: number | null) => string;
-}
-
-const VITALS: VitalDefinition[] = [
-  {
-    key: "lcp",
-    label: "LCP",
-    description: "Loading",
-    format: formatMilliseconds,
-  },
-  {
-    key: "inp",
-    label: "INP",
-    description: "Interaction",
-    format: formatMilliseconds,
-  },
-  {
-    key: "cls",
-    label: "CLS",
-    description: "Visual stability",
-    format: formatLayoutShift,
-  },
-  {
-    key: "fcp",
-    label: "FCP",
-    description: "First content",
-    format: formatMilliseconds,
-  },
-  {
-    key: "ttfb",
-    label: "TTFB",
-    description: "Server response",
-    format: formatMilliseconds,
-  },
-];
-
-function formatBucket(value: string, snapshot: WebVitalsSnapshot): string {
-  const date = new Date(value.length === 10 ? `${value}T00:00:00Z` : value);
-  return new Intl.DateTimeFormat("en-US", {
-    ...(snapshot.granularity === "hour"
-      ? { hour: "numeric" as const }
-      : { month: "short" as const, day: "numeric" as const }),
-    timeZone: "UTC",
-  }).format(date);
-}
-
-function VitalChart({
-  vital,
+function VitalTrend({
   snapshot,
+  vital,
 }: {
-  vital: VitalDefinition;
   snapshot: WebVitalsSnapshot;
+  vital: VitalDefinition;
 }) {
+  const thresholds = WEB_VITAL_THRESHOLDS[vital.key];
   return (
     <div
-      className={styles.vitalChart}
+      className={styles.vitalTrend}
       role="img"
-      aria-label={`${vital.label} 75th percentile trend`}
+      aria-label={`${vital.name} 75th percentile trend with quality thresholds`}
     >
-      <AreaChart
+      <LineChart
         accessibilityLayer
         data={snapshot.points}
+        margin={{ top: 22, right: 18, bottom: 0, left: 8 }}
         responsive
         style={{ width: "100%", height: "100%" }}
-        margin={{ top: 8, right: 4, bottom: 0, left: 0 }}
       >
         <CartesianGrid
           vertical={false}
@@ -98,11 +62,40 @@ function VitalChart({
           axisLine={false}
           dataKey="bucket"
           minTickGap={34}
-          tick={{ fill: "var(--analytics-muted)", fontSize: 10 }}
-          tickFormatter={(value: string) => formatBucket(value, snapshot)}
+          tick={{ fill: "var(--analytics-muted)", fontSize: 11 }}
+          tickFormatter={(value: string) =>
+            formatExperienceBucket(value, snapshot)
+          }
           tickLine={false}
         />
-        <YAxis hide domain={["auto", "auto"]} />
+        <YAxis
+          axisLine={false}
+          domain={[0, "auto"]}
+          tick={{ fill: "var(--analytics-muted)", fontSize: 11 }}
+          tickFormatter={(value: number) => vital.format(value)}
+          tickLine={false}
+          width={64}
+        />
+        <ReferenceLine
+          label={{
+            value: "Good target",
+            fill: "var(--analytics-muted)",
+            fontSize: 10,
+          }}
+          stroke="var(--rating-good)"
+          strokeDasharray="5 4"
+          y={thresholds.good}
+        />
+        <ReferenceLine
+          label={{
+            value: "Poor",
+            fill: "var(--analytics-muted)",
+            fontSize: 10,
+          }}
+          stroke="var(--rating-poor)"
+          strokeDasharray="3 5"
+          y={thresholds.poor}
+        />
         <Tooltip
           contentStyle={{
             background: "var(--analytics-tooltip)",
@@ -115,55 +108,179 @@ function VitalChart({
             vital.format(Number(value)),
             `${vital.label} · P75`,
           ]}
-          labelFormatter={(value) => formatBucket(String(value), snapshot)}
+          labelFormatter={(value) =>
+            formatExperienceBucket(String(value), snapshot)
+          }
         />
-        <Area
+        <Line
           connectNulls
           dataKey={vital.key}
-          fill="var(--analytics-area)"
-          fillOpacity={0.18}
+          dot={{ fill: "var(--paper-bright)", r: 3, strokeWidth: 2 }}
           isAnimationActive={false}
           stroke="var(--signal)"
-          strokeWidth={2}
+          strokeWidth={2.5}
           type="monotone"
         />
-      </AreaChart>
+      </LineChart>
+    </div>
+  );
+}
+
+function DistributionChart({
+  snapshot,
+  vital,
+}: {
+  snapshot: WebVitalsSnapshot;
+  vital: VitalDefinition;
+}) {
+  const distribution = snapshot.distributions[vital.key];
+  const total = distribution.total || 1;
+  const data = [
+    {
+      name: vital.label,
+      good: (distribution.good / total) * 100,
+      needsImprovement: (distribution.needsImprovement / total) * 100,
+      poor: (distribution.poor / total) * 100,
+    },
+  ];
+
+  return (
+    <div className={detailStyles.distributionChart}>
+      <BarChart
+        accessibilityLayer
+        data={data}
+        layout="vertical"
+        margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
+        responsive
+        style={{ width: "100%", height: "100%" }}
+      >
+        <XAxis hide domain={[0, 100]} type="number" />
+        <YAxis hide dataKey="name" type="category" />
+        <Tooltip
+          contentStyle={{
+            background: "var(--analytics-tooltip)",
+            border: 0,
+            borderRadius: 0,
+            color: "var(--paper-bright)",
+            fontSize: 12,
+          }}
+          formatter={(value, name) => [
+            `${Number(value).toFixed(1)}%`,
+            String(name)
+              .replace(/([A-Z])/g, " $1")
+              .trim(),
+          ]}
+        />
+        <Bar
+          dataKey="good"
+          fill="var(--rating-good)"
+          isAnimationActive={false}
+          stackId="rating"
+        />
+        <Bar
+          dataKey="needsImprovement"
+          fill="var(--rating-needs)"
+          isAnimationActive={false}
+          stackId="rating"
+        />
+        <Bar
+          dataKey="poor"
+          fill="var(--rating-poor)"
+          isAnimationActive={false}
+          stackId="rating"
+        />
+      </BarChart>
     </div>
   );
 }
 
 export function ExperiencePanel({ result }: { result: WebVitalsResult }) {
+  const [selectedKey, setSelectedKey] = useState<WebVitalKey>("lcp");
+  const selectedVital =
+    VITALS.find((vital) => vital.key === selectedKey) ?? VITALS[0]!;
+
   return (
-    <section className={styles.section} aria-labelledby="experience-heading">
-      <div className={styles.sectionHeading}>
+    <section
+      className={sectionStyles.section}
+      aria-labelledby="experience-heading"
+    >
+      <div className={sectionStyles.sectionHeading}>
         <div>
-          <span className={styles.kicker}>Real user experience</span>
+          <span className={sectionStyles.kicker}>Real user experience</span>
           <h2 id="experience-heading">How the site feels</h2>
         </div>
         <p>
-          Browser-measured performance at the 75th percentile. LCP, INP, and CLS
-          are the Core Web Vitals; FCP and TTFB add delivery context.
+          P75 means three out of four measured visits were this fast or faster;
+          the slowest quarter took longer. Select a metric to compare its live
+          trend with the recommended target.
         </p>
       </div>
 
       {result.ok ? (
-        <div className={styles.vitalGrid}>
-          {VITALS.map((vital) => (
-            <article className={styles.vitalCard} key={vital.key}>
-              <div className={styles.vitalSummary}>
-                <span>{vital.description}</span>
-                <h3>{vital.label}</h3>
-                <strong>
-                  {vital.format(result.snapshot.totals[vital.key])}
-                </strong>
-                <small>75th percentile</small>
+        <>
+          <div className={styles.vitalSelector}>
+            {VITALS.map((vital) => {
+              const value = result.snapshot.totals[vital.key];
+              const rating = getWebVitalRating(vital.key, value);
+              return (
+                <button
+                  aria-pressed={vital.key === selectedKey}
+                  className={styles.vitalCard}
+                  data-rating={rating}
+                  key={vital.key}
+                  onClick={() => setSelectedKey(vital.key)}
+                  type="button"
+                >
+                  <span>{vital.name}</span>
+                  <strong>{vital.format(value)}</strong>
+                  <small>{RATING_LABELS[rating]}</small>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className={styles.vitalExplorer}>
+            <div className={styles.vitalExplorerHeading}>
+              <div>
+                <span>{selectedVital.label} · P75 trend</span>
+                <h3>{selectedVital.name}</h3>
+                <p>{selectedVital.description}</p>
               </div>
-              <VitalChart vital={vital} snapshot={result.snapshot} />
-            </article>
-          ))}
-        </div>
+              <div className={styles.vitalTarget}>
+                <span>Good target</span>
+                <strong>
+                  ≤{" "}
+                  {selectedVital.format(
+                    WEB_VITAL_THRESHOLDS[selectedVital.key].good,
+                  )}
+                </strong>
+              </div>
+            </div>
+            <VitalTrend snapshot={result.snapshot} vital={selectedVital} />
+            <div className={detailStyles.distributionRow}>
+              <div>
+                <span>Measured experience mix</span>
+                <strong>
+                  {formatCompactSamples(
+                    result.snapshot.distributions[selectedVital.key].total,
+                  )}{" "}
+                  samples
+                </strong>
+              </div>
+              <DistributionChart
+                snapshot={result.snapshot}
+                vital={selectedVital}
+              />
+              <div className={detailStyles.ratingLegend} aria-hidden="true">
+                <span data-rating="good">Good</span>
+                <span data-rating="needs-improvement">Needs improvement</span>
+                <span data-rating="poor">Poor</span>
+              </div>
+            </div>
+          </div>
+        </>
       ) : (
-        <div className={styles.pendingPanel}>
+        <div className={detailStyles.pendingPanel}>
           <span>
             {result.reason === "collecting"
               ? "Collecting measurements"

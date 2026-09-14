@@ -59,7 +59,12 @@ export default async function AnalyticsPage({
       {traffic.ok ? (
         <>
           <TrafficDashboard snapshot={traffic.snapshot} />
-          <GeographyPanel countries={traffic.snapshot.countries} />
+          <GeographyPanel
+            countries={traffic.snapshot.countries}
+            range={traffic.snapshot.range}
+            totalRequests={traffic.snapshot.totals.requests}
+            webVitals={webVitals.ok ? webVitals.snapshot.countries : []}
+          />
           <ExperiencePanel result={webVitals} />
         </>
       ) : (

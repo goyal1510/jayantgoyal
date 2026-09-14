@@ -12,7 +12,7 @@ import { DEFAULT_OG_IMAGE, PERSON_NAME, SITE_URL } from "@/lib/seo/config";
 
 import { WritingContent } from "./writing-content";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export async function generateMetadata({
   params,

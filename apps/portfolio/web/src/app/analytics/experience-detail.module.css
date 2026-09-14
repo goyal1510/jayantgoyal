@@ -1,0 +1,89 @@
+.distributionRow {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.25fr) minmax(220px, 1fr) auto;
+  gap: 24px;
+  align-items: center;
+  margin-top: 16px;
+  padding-top: 18px;
+  border-top: 1px solid var(--analytics-line);
+}
+
+.distributionRow span {
+  color: var(--analytics-muted);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.distributionRow strong {
+  display: block;
+  margin-top: 5px;
+  font-family: var(--font-serif), serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+}
+
+.distributionChart {
+  height: 42px;
+}
+
+.ratingLegend {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.ratingLegend span::before {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 5px;
+  content: "";
+}
+
+.ratingLegend [data-rating="good"]::before {
+  background: var(--rating-good);
+}
+
+.ratingLegend [data-rating="needs-improvement"]::before {
+  background: var(--rating-needs);
+}
+
+.ratingLegend [data-rating="poor"]::before {
+  background: var(--rating-poor);
+}
+
+.pendingPanel {
+  max-width: 1440px;
+  margin-inline: auto;
+  padding: clamp(34px, 5vw, 70px);
+  border: 1px solid var(--ink);
+  background: var(--paper-bright);
+}
+
+.pendingPanel span {
+  color: var(--signal);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.pendingPanel p {
+  max-width: 52rem;
+  margin: 18px 0 0;
+  font-family: var(--font-serif), serif;
+  font-size: clamp(1.55rem, 3vw, 3rem);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+@media (max-width: 900px) {
+  .distributionRow {
+    grid-template-columns: 1fr;
+  }
+
+  .ratingLegend {
+    justify-content: flex-start;
+  }
+}

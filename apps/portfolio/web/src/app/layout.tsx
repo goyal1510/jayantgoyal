@@ -1,7 +1,6 @@
 import "./globals.css";
 
 import type { Metadata } from "next";
-import { headers } from "next/headers";
 import { DM_Sans, Instrument_Serif, Jost } from "next/font/google";
 import Script from "next/script";
 import { buildAppRootMetadata } from "@jayantgoyal/web-seo";
@@ -9,11 +8,7 @@ import { buildAppRootMetadata } from "@jayantgoyal/web-seo";
 import { PageScrollProgress } from "@/components/editorial/page-scroll-progress";
 import { PortfolioAnalytics } from "@/components/editorial/portfolio-analytics";
 import { getPortfolioShellData } from "@/lib/portfolio/editorial-server";
-import {
-  isCanonicalProductionHost,
-  PERSON_NAME,
-  SITE_URL,
-} from "@/lib/seo/config";
+import { PERSON_NAME, SITE_URL } from "@/lib/seo/config";
 
 const sans = DM_Sans({
   subsets: ["latin"],
@@ -35,9 +30,10 @@ const wordmark = Jost({
   variable: "--font-wordmark",
 });
 
+export const revalidate = 60;
+
 export async function generateMetadata(): Promise<Metadata> {
-  const requestHeaders = await headers();
-  const shouldIndex = isCanonicalProductionHost(requestHeaders.get("host"));
+  const shouldIndex = process.env.VERCEL_ENV === "production";
   const { profile } = await getPortfolioShellData();
 
   return buildAppRootMetadata({
