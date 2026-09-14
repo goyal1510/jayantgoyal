@@ -36,6 +36,8 @@ routing, not to create a second production identity registry.
 | ------------------------------------ | ----------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | `CONTACT_RATE_LIMIT_SECRET`          | secret/server                 | Required for `/api/contact`; missing/invalid value fails closed with unavailable.                                   |
 | `GITHUB_TOKEN`                       | secret/server                 | Required for live GitHub contribution/code data; provider routes return safe unavailable state when absent/failing. |
+| `CLOUDFLARE_API_TOKEN`               | secret/server                 | Zone-scoped Analytics Read token for `/analytics`; missing/failing configuration renders a safe unavailable state.  |
+| `CLOUDFLARE_ZONE_ID`                 | server configuration          | Exact Portfolio zone selected by the server-only Cloudflare GraphQL query.                                          |
 | `RESEND_API_KEY`                     | secret/server                 | Required to deliver contact enquiries; contact UI may render without it but delivery fails safely.                  |
 | `RESEND_FROM_EMAIL`                  | server configuration          | Optional sender identity; code has a Resend onboarding fallback for development.                                    |
 | `GOOGLE_RESUME_DOCUMENT_ID`          | secret-adjacent server config | Optional as a complete Google export group; missing group serves checked-in/CMS fallback.                           |
