@@ -24,6 +24,7 @@
     "react-activity-calendar": "^3.0.5",
     "react-dom": "^19.2.1",
     "react-markdown": "^10.1.0",
+    "recharts": "^3.7.0",
     "remark-gfm": "^4.0.1",
     "resend": "^6.17.2"
   },
