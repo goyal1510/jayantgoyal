@@ -7,8 +7,10 @@
   --analytics-area: var(--signal-soft);
   --analytics-secondary: #356f82;
   --analytics-secondary-soft: #dbeaec;
-  --analytics-tooltip: #315b6d;
-  --analytics-tooltip-text: #fffdf7;
+  --analytics-tooltip: #fffaf0;
+  --analytics-tooltip-border: #9bb5bb;
+  --analytics-tooltip-shadow: rgba(53, 111, 130, 0.16);
+  --analytics-tooltip-text: #202526;
   --rating-good: #3c6b5b;
   --rating-needs: #c5893c;
   --rating-poor: #b64e3a;
@@ -252,7 +254,59 @@
 
 .overviewChart {
   width: 100%;
-  height: 290px;
+  height: 340px;
+}
+
+.trafficSmallMultiples {
+  display: grid;
+  height: 340px;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.miniChart {
+  min-height: 0;
+}
+
+.miniChart + .miniChart {
+  padding-top: 10px;
+  border-top: 1px solid var(--analytics-line);
+}
+
+.axisLabel {
+  display: flex;
+  min-height: 20px;
+  gap: 7px;
+  align-items: baseline;
+  padding-left: 58px;
+  color: var(--analytics-muted);
+  font-size: 0.58rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.axisLabel strong {
+  color: var(--analytics-text);
+  font-size: inherit;
+  font-weight: 600;
+}
+
+.miniChart[data-series="requests"] .axisLabel strong {
+  color: var(--signal);
+}
+
+.miniChart[data-series="visitors"] .axisLabel strong {
+  color: var(--analytics-secondary);
+}
+
+.miniChartPlot {
+  width: 100%;
+  height: calc(100% - 20px);
+}
+
+.deliveryChartPlot {
+  width: 100%;
+  height: calc(100% - 20px);
 }
 
 .disclosure {

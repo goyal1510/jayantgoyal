@@ -38,8 +38,9 @@ const CHART_TOOLTIP_CURSOR = {
 };
 const CHART_TOOLTIP_STYLE = {
   background: "var(--analytics-tooltip)",
-  border: 0,
+  border: "1px solid var(--analytics-tooltip-border)",
   borderRadius: 0,
+  boxShadow: "6px 6px 0 var(--analytics-tooltip-shadow)",
   color: "var(--analytics-tooltip-text)",
   fontSize: 12,
 };
@@ -118,6 +119,8 @@ function VitalTrend({
           labelFormatter={(value) =>
             formatExperienceBucket(String(value), snapshot)
           }
+          itemStyle={{ color: "var(--analytics-tooltip-text)" }}
+          labelStyle={{ color: "var(--analytics-tooltip-text)" }}
         />
         <Line
           connectNulls
@@ -171,6 +174,8 @@ function DistributionChart({
               .replace(/([A-Z])/g, " $1")
               .trim(),
           ]}
+          itemStyle={{ color: "var(--analytics-tooltip-text)" }}
+          labelStyle={{ color: "var(--analytics-tooltip-text)" }}
         />
         <Bar
           dataKey="good"
@@ -199,6 +204,7 @@ export function ExperiencePanel({ result }: { result: WebVitalsResult }) {
   const [selectedKey, setSelectedKey] = useState<WebVitalKey>("lcp");
   const selectedVital =
     VITALS.find((vital) => vital.key === selectedKey) ?? VITALS[0]!;
+  const goodTarget = WEB_VITAL_THRESHOLDS[selectedVital.key].good;
 
   return (
     <section
@@ -249,12 +255,7 @@ export function ExperiencePanel({ result }: { result: WebVitalsResult }) {
               </div>
               <div className={styles.vitalTarget}>
                 <span>Good target</span>
-                <strong>
-                  ≤{" "}
-                  {selectedVital.format(
-                    WEB_VITAL_THRESHOLDS[selectedVital.key].good,
-                  )}
-                </strong>
+                <strong>≤ {selectedVital.format(goodTarget)}</strong>
               </div>
             </div>
             <VitalTrend snapshot={result.snapshot} vital={selectedVital} />
