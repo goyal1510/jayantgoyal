@@ -5,7 +5,10 @@ import {
   formatBytes,
   parseTrafficRange,
 } from "@/lib/analytics/cloudflare-traffic";
-import { normalizeRumDuration } from "@/lib/analytics/cloudflare-rum";
+import {
+  getWebVitalRating,
+  normalizeRumDuration,
+} from "@/lib/analytics/cloudflare-rum";
 import { getRumQueryWindow } from "@/lib/analytics/cloudflare-rum-server";
 import { getTrafficQueryWindow } from "@/lib/analytics/cloudflare-server";
 
@@ -28,7 +31,16 @@ describe("Cloudflare traffic presentation", () => {
 
   it("normalizes Cloudflare RUM duration aggregates to milliseconds", () => {
     expect(normalizeRumDuration(2_700_000)).toBe(2700);
+    expect(normalizeRumDuration(-1)).toBeNull();
     expect(normalizeRumDuration(null)).toBeNull();
+  });
+
+  it("rates field metrics against published experience thresholds", () => {
+    expect(getWebVitalRating("lcp", 2500)).toBe("good");
+    expect(getWebVitalRating("lcp", 2700)).toBe("needs-improvement");
+    expect(getWebVitalRating("fcp", 4168)).toBe("poor");
+    expect(getWebVitalRating("inp", 24)).toBe("good");
+    expect(getWebVitalRating("cls", null)).toBe("unknown");
   });
 
   it("uses completed hours for the 24-hour view", () => {

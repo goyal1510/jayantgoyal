@@ -1,7 +1,10 @@
 import { unstable_cache } from "next/cache";
 
+import { APP_BRANDS } from "@jayantgoyal/web-brand";
+
 import {
   normalizeRumDuration,
+  type CountryWebVitals,
   type WebVitalPoint,
   type WebVitalsResult,
   type WebVitalsSnapshot,
@@ -11,10 +14,43 @@ import type {
   TrafficRange,
 } from "@/lib/analytics/cloudflare-traffic";
 
+import {
+  DAILY_RUM_QUERY,
+  HOURLY_RUM_QUERY,
+  RUM_BREAKDOWN_QUERY,
+} from "./cloudflare-rum-queries";
+
 const CLOUDFLARE_GRAPHQL_URL = "https://api.cloudflare.com/client/v4/graphql";
 
 interface RumGroup {
-  dimensions?: { date?: string; datetimeHour?: string };
+  dimensions?: {
+    countryName?: string;
+    date?: string;
+    datetimeHour?: string;
+  };
+  sum?: {
+    visits: number;
+    clsGood: number;
+    clsNeedsImprovement: number;
+    clsPoor: number;
+    clsTotal: number;
+    fcpGood: number;
+    fcpNeedsImprovement: number;
+    fcpPoor: number;
+    fcpTotal: number;
+    inpGood: number;
+    inpNeedsImprovement: number;
+    inpPoor: number;
+    inpTotal: number;
+    lcpGood: number;
+    lcpNeedsImprovement: number;
+    lcpPoor: number;
+    lcpTotal: number;
+    ttfbGood: number;
+    ttfbNeedsImprovement: number;
+    ttfbPoor: number;
+    ttfbTotal: number;
+  };
   quantiles: {
     cumulativeLayoutShiftP75: number | null;
     firstContentfulPaintP75: number | null;
@@ -27,7 +63,11 @@ interface RumGroup {
 interface RumResponse {
   data?: {
     viewer?: {
-      accounts?: Array<{ series?: RumGroup[]; totals?: RumGroup[] }>;
+      accounts?: Array<{
+        countries?: RumGroup[];
+        series?: RumGroup[];
+        totals?: RumGroup[];
+      }>;
     };
   };
   errors?: Array<{ message?: string }>;
@@ -39,58 +79,6 @@ interface RumQueryWindow {
   granularity: TrafficGranularity;
   query: string;
 }
-
-const WEB_VITAL_FIELDS = `
-  quantiles {
-    largestContentfulPaintP75
-    interactionToNextPaintP75
-    cumulativeLayoutShiftP75
-    firstContentfulPaintP75
-    timeToFirstByteP75
-  }
-`;
-
-const HOURLY_QUERY = `
-  query WebVitals($accountTag: string, $siteTag: string, $start: Time, $end: Time) {
-    viewer {
-      accounts(filter: { accountTag: $accountTag }) {
-        series: rumWebVitalsEventsAdaptiveGroups(
-          limit: 48
-          orderBy: [datetimeHour_ASC]
-          filter: { siteTag: $siteTag, datetime_geq: $start, datetime_lt: $end }
-        ) {
-          dimensions { datetimeHour }
-          ${WEB_VITAL_FIELDS}
-        }
-        totals: rumWebVitalsEventsAdaptiveGroups(
-          limit: 1
-          filter: { siteTag: $siteTag, datetime_geq: $start, datetime_lt: $end }
-        ) { ${WEB_VITAL_FIELDS} }
-      }
-    }
-  }
-`;
-
-const DAILY_QUERY = `
-  query WebVitals($accountTag: string, $siteTag: string, $start: Time, $end: Time) {
-    viewer {
-      accounts(filter: { accountTag: $accountTag }) {
-        series: rumWebVitalsEventsAdaptiveGroups(
-          limit: 31
-          orderBy: [date_ASC]
-          filter: { siteTag: $siteTag, datetime_geq: $start, datetime_lt: $end }
-        ) {
-          dimensions { date }
-          ${WEB_VITAL_FIELDS}
-        }
-        totals: rumWebVitalsEventsAdaptiveGroups(
-          limit: 1
-          filter: { siteTag: $siteTag, datetime_geq: $start, datetime_lt: $end }
-        ) { ${WEB_VITAL_FIELDS} }
-      }
-    }
-  }
-`;
 
 export function getRumQueryWindow(
   range: TrafficRange,
@@ -106,7 +94,7 @@ export function getRumQueryWindow(
       start: startDate.toISOString(),
       end: endDate.toISOString(),
       granularity: "hour",
-      query: HOURLY_QUERY,
+      query: HOURLY_RUM_QUERY,
     };
   }
 
@@ -119,12 +107,14 @@ export function getRumQueryWindow(
     start: startDate.toISOString(),
     end: endDate.toISOString(),
     granularity: "day",
-    query: DAILY_QUERY,
+    query: DAILY_RUM_QUERY,
   };
 }
 
 function finiteOrNull(value: number | null): number | null {
-  return typeof value === "number" && Number.isFinite(value) ? value : null;
+  return typeof value === "number" && Number.isFinite(value) && value >= 0
+    ? value
+    : null;
 }
 
 function mapVitals(group: RumGroup): Omit<WebVitalPoint, "bucket"> {
@@ -135,6 +125,59 @@ function mapVitals(group: RumGroup): Omit<WebVitalPoint, "bucket"> {
     fcp: normalizeRumDuration(group.quantiles.firstContentfulPaintP75),
     ttfb: normalizeRumDuration(group.quantiles.timeToFirstByteP75),
   };
+}
+
+function mapDistribution(group: RumGroup) {
+  const sum = group.sum;
+  const empty = { good: 0, needsImprovement: 0, poor: 0, total: 0 };
+  if (!sum) {
+    return { lcp: empty, inp: empty, cls: empty, fcp: empty, ttfb: empty };
+  }
+  return {
+    lcp: {
+      good: sum.lcpGood,
+      needsImprovement: sum.lcpNeedsImprovement,
+      poor: sum.lcpPoor,
+      total: sum.lcpTotal,
+    },
+    inp: {
+      good: sum.inpGood,
+      needsImprovement: sum.inpNeedsImprovement,
+      poor: sum.inpPoor,
+      total: sum.inpTotal,
+    },
+    cls: {
+      good: sum.clsGood,
+      needsImprovement: sum.clsNeedsImprovement,
+      poor: sum.clsPoor,
+      total: sum.clsTotal,
+    },
+    fcp: {
+      good: sum.fcpGood,
+      needsImprovement: sum.fcpNeedsImprovement,
+      poor: sum.fcpPoor,
+      total: sum.fcpTotal,
+    },
+    ttfb: {
+      good: sum.ttfbGood,
+      needsImprovement: sum.ttfbNeedsImprovement,
+      poor: sum.ttfbPoor,
+      total: sum.ttfbTotal,
+    },
+  };
+}
+
+function mapCountryVitals(groups: RumGroup[]): CountryWebVitals[] {
+  return groups
+    .filter(
+      (group) =>
+        group.dimensions?.countryName && (group.sum?.visits ?? 0) >= 10,
+    )
+    .map((group) => ({
+      code: group.dimensions?.countryName ?? "",
+      visits: group.sum?.visits ?? 0,
+      ...mapVitals(group),
+    }));
 }
 
 async function requestCloudflareWebVitals(
@@ -148,35 +191,56 @@ async function requestCloudflareWebVitals(
   }
 
   const window = getRumQueryWindow(range);
+  const variables = {
+    accountTag,
+    siteTag,
+    host: new URL(APP_BRANDS.portfolio.canonicalOrigin).hostname,
+    start: window.start,
+    end: window.end,
+  };
 
   try {
-    const response = await fetch(CLOUDFLARE_GRAPHQL_URL, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query: window.query,
-        variables: {
-          accountTag,
-          siteTag,
-          start: window.start,
-          end: window.end,
+    const request = (query: string) =>
+      fetch(CLOUDFLARE_GRAPHQL_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
-      }),
-    });
+        body: JSON.stringify({ query, variables }),
+      });
+    const [response, breakdownResponse] = await Promise.all([
+      request(window.query),
+      request(RUM_BREAKDOWN_QUERY),
+    ]);
 
-    if (!response.ok) return { ok: false, reason: "provider" };
-
-    const payload = (await response.json()) as RumResponse;
-    const account = payload.data?.viewer?.accounts?.[0];
-    const total = account?.totals?.[0];
-    if (payload.errors?.length || !account) {
-      console.error("Cloudflare Web Analytics returned no usable account data");
+    if (!response.ok || !breakdownResponse.ok) {
       return { ok: false, reason: "provider" };
     }
-    if (!total) return { ok: false, reason: "collecting" };
+
+    const payload = (await response.json()) as RumResponse;
+    const breakdownPayload = (await breakdownResponse.json()) as RumResponse;
+    const account = payload.data?.viewer?.accounts?.[0];
+    const breakdownAccount = breakdownPayload.data?.viewer?.accounts?.[0];
+    const total = account?.totals?.[0];
+    const breakdownTotal = breakdownAccount?.totals?.[0];
+    const errors = [
+      ...(payload.errors ?? []),
+      ...(breakdownPayload.errors ?? []),
+    ];
+    if (errors.length || !account || !breakdownAccount) {
+      console.error(
+        "Cloudflare Web Analytics returned no usable account data",
+        errors
+          .map(({ message }) => message)
+          .filter(Boolean)
+          .join("; "),
+      );
+      return { ok: false, reason: "provider" };
+    }
+    if (!total || !breakdownTotal) {
+      return { ok: false, reason: "collecting" };
+    }
 
     const totals = mapVitals(total);
     const snapshot: WebVitalsSnapshot = {
@@ -190,6 +254,8 @@ async function requestCloudflareWebVitals(
         ...mapVitals(group),
       })),
       totals,
+      distributions: mapDistribution(breakdownTotal),
+      countries: mapCountryVitals(breakdownAccount.countries ?? []),
     };
 
     return { ok: true, snapshot };

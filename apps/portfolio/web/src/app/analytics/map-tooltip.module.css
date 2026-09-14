@@ -1,0 +1,31 @@
+.mapTooltip {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 2;
+  display: grid;
+  min-width: 180px;
+  gap: 4px;
+  padding: 14px 16px;
+  background: var(--ink);
+  color: var(--paper-bright);
+  pointer-events: none;
+}
+
+.mapTooltip strong {
+  font-family: var(--font-serif), serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+}
+
+.mapTooltip span {
+  font-size: 0.72rem;
+}
+
+.mapTooltip small {
+  margin-top: 4px;
+  color: rgba(255, 253, 247, 0.66);
+  font-size: 0.58rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}

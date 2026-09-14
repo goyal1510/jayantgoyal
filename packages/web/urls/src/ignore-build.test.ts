@@ -123,6 +123,7 @@ function runDetector(
   appDirectory: string,
   previousSha: string | undefined,
   commitSha: string,
+  vercelEnvironment?: string,
 ) {
   const result = spawnSync(process.execPath, [SCRIPT_PATH, appDirectory], {
     cwd: repository,
@@ -131,6 +132,7 @@ function runDetector(
       ...process.env,
       VERCEL_GIT_COMMIT_SHA: commitSha,
       VERCEL_GIT_PREVIOUS_SHA: previousSha,
+      VERCEL_ENV: vercelEnvironment,
     },
   });
 
@@ -147,6 +149,21 @@ afterEach(() => {
 });
 
 describe("Vercel ignored build detection", () => {
+  it("always builds production even when the prior deployment used the same commit", () => {
+    const { repository, base } = createRepository();
+
+    const result = runDetector(
+      repository,
+      "apps/portfolio/web",
+      base,
+      base,
+      "production",
+    );
+
+    expect(result.status).toBe(1);
+    expect(result.output).toContain("Production deployments are never skipped");
+  });
+
   it("builds only the application changed in the deployment range", () => {
     const { repository, base } = createRepository();
     appendFileSync(join(repository, "apps/studio/web/app.ts"), "changed\n");

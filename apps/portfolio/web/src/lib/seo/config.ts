@@ -4,7 +4,7 @@ import {
   APP_SOCIAL_PREVIEW_IMAGES,
   PERSON_BRAND,
 } from "@jayantgoyal/web-brand";
-import { applicationOrigin, isApplicationHost } from "@jayantgoyal/web-urls";
+import { applicationOrigin } from "@jayantgoyal/web-urls";
 import { buildPublicPageMetadata as buildSharedPageMetadata } from "@jayantgoyal/web-seo";
 
 export const SITE_URL = applicationOrigin(
@@ -38,8 +38,4 @@ export function buildPublicPageMetadata({
       type: DEFAULT_OG_IMAGE_METADATA.type,
     },
   });
-}
-
-export function isCanonicalProductionHost(host: string | null): boolean {
-  return isApplicationHost("portfolio", host);
 }

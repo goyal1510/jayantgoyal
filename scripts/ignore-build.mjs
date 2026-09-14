@@ -178,6 +178,13 @@ function main() {
   const headSha = process.env.VERCEL_GIT_COMMIT_SHA ?? "HEAD";
   const previousSha = process.env.VERCEL_GIT_PREVIOUS_SHA;
 
+  if (
+    process.env.VERCEL_ENV === "production" ||
+    process.env.VERCEL_TARGET_ENV === "production"
+  ) {
+    buildSafely("Production deployments are never skipped");
+  }
+
   if (!previousSha) {
     buildSafely("VERCEL_GIT_PREVIOUS_SHA is unavailable");
   }

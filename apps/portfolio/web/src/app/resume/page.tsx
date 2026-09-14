@@ -60,6 +60,7 @@ export default async function ResumePage() {
           <p>Read the current PDF here or download a copy for later.</p>
         </div>
         <iframe
+          loading="lazy"
           src={resumeHref}
           title="Jayant resume PDF"
           className="editorial-resume__frame"

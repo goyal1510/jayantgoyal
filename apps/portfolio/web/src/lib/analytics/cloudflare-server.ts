@@ -23,6 +23,7 @@ interface CloudflareGroup {
       bytes: number;
       clientCountryName: string;
       requests: number;
+      threats: number;
     }>;
   };
   uniq: { uniques: number };
@@ -68,7 +69,7 @@ const HOURLY_QUERY = `
             requests
             bytes
             cachedBytes
-            countryMap { clientCountryName requests bytes }
+            countryMap { clientCountryName requests bytes threats }
           }
           uniq { uniques }
         }
@@ -98,7 +99,7 @@ const DAILY_QUERY = `
             requests
             bytes
             cachedBytes
-            countryMap { clientCountryName requests bytes }
+            countryMap { clientCountryName requests bytes threats }
           }
           uniq { uniques }
         }
@@ -161,7 +162,7 @@ function mapCountries(group: CloudflareGroup): CountryTraffic[] {
     .filter(
       ({ clientCountryName, requests }) => clientCountryName && requests >= 5,
     )
-    .map(({ bytes, clientCountryName, requests }) => ({
+    .map(({ bytes, clientCountryName, requests, threats }) => ({
       code: clientCountryName,
       numericCode: countries.alpha2ToNumeric(clientCountryName) ?? null,
       name:
@@ -169,6 +170,7 @@ function mapCountries(group: CloudflareGroup): CountryTraffic[] {
         clientCountryName,
       requests,
       bytes,
+      threats: threats ?? 0,
     }))
     .sort((left, right) => right.requests - left.requests);
 }

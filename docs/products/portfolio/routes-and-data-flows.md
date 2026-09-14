@@ -104,16 +104,26 @@ navigation. Portfolio queries Cloudflare from server-only modules and caches
 each fixed range for 15 minutes. A zone-scoped Analytics Read token supplies
 edge traffic, cache, bandwidth, and country request aggregates. A separate,
 least-privilege Account Analytics Read token supplies Web Analytics real-user
-measurements for the exact configured site tag. The 24-hour view uses complete
-hourly groups; longer views use daily groups to stay within dataset limits.
+measurements filtered to the canonical `jayantgoyal.com` host. The 24-hour view
+uses complete hourly groups; longer views use daily groups to stay within
+dataset limits.
 
-Only aggregate visitors, requests, bytes, cached bytes, country totals, and P75
-LCP, INP, CLS, FCP, and TTFB measurements reach client chart components.
+Only aggregate visitors, requests, bytes, cached bytes, country totals, threat
+request counts, Web Vital rating distributions, and P75 LCP, INP, CLS, FCP, and
+TTFB measurements reach client chart components. The traffic dashboard combines
+request bars with a visitor trend and compares cached with uncached delivery.
+The map exposes aggregate hover summaries and a selectable country inspector;
+country-level Web Vitals appear only after ten measured visits. The experience
+explorer explains P75, applies the published good/poor thresholds, and lets the
+visitor select one metric trend at a time.
+
 Countries with fewer than five requests in the selected range are withheld.
 Provider credentials, IP addresses, query strings, URLs, and request-level
 records are never returned to the browser. Edge failure renders a safe page
 fallback; missing or unavailable RUM configuration degrades only the experience
-panel while keeping traffic analytics visible.
+panel while keeping traffic analytics visible. Shared editorial loaders retain
+their 60-second data cache, while the Resume's embedded PDF loads lazily so it
+does not compete with above-the-fold content.
 
 ## Admin write propagation
 

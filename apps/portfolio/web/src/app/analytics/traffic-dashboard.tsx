@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import {
-  Area,
-  AreaChart,
+  Bar,
+  BarChart,
   CartesianGrid,
+  ComposedChart,
+  Line,
   Tooltip,
   XAxis,
   YAxis,
@@ -14,92 +16,29 @@ import {
   formatBytes,
   formatCompactNumber,
   TRAFFIC_RANGES,
-  type TrafficPoint,
-  type TrafficRange,
   type TrafficSnapshot,
 } from "@/lib/analytics/cloudflare-traffic";
 
 import styles from "./analytics.module.css";
+import {
+  formatBucket,
+  formatRange,
+  formatUpdatedAt,
+  METRICS,
+  RANGE_LABELS,
+} from "./traffic-dashboard-config";
 
-interface MetricDefinition {
-  key: keyof Pick<
-    TrafficPoint,
-    "visitors" | "requests" | "cachedPercent" | "bytes" | "cachedBytes"
-  >;
-  label: string;
-  format: (value: number) => string;
-}
-
-const RANGE_LABELS: Record<TrafficRange, string> = {
-  "24h": "24 Hours",
-  "7d": "7 Days",
-  "30d": "30 Days",
-};
-
-const METRICS: MetricDefinition[] = [
-  { key: "visitors", label: "Unique Visitors", format: formatCompactNumber },
-  { key: "requests", label: "Total Requests", format: formatCompactNumber },
-  {
-    key: "cachedPercent",
-    label: "Percent Cached",
-    format: (value) => `${value.toFixed(2)}%`,
-  },
-  { key: "bytes", label: "Total Data Served", format: formatBytes },
-  { key: "cachedBytes", label: "Data Cached", format: formatBytes },
-];
-
-function asUtcDate(value: string): Date {
-  return new Date(value.length === 10 ? `${value}T00:00:00.000Z` : value);
-}
-
-function formatBucket(value: string, range: TrafficRange): string {
-  const date = asUtcDate(value);
-  return new Intl.DateTimeFormat("en-US", {
-    ...(range === "24h"
-      ? { hour: "numeric" as const }
-      : { month: "short" as const, day: "numeric" as const }),
-    timeZone: "UTC",
-  }).format(date);
-}
-
-function formatRange(snapshot: TrafficSnapshot): string {
-  const formatter = new Intl.DateTimeFormat("en-US", {
-    day: "numeric",
-    month: "long",
-    timeZone: "UTC",
-  });
-
-  return `${formatter.format(asUtcDate(snapshot.start))} — ${formatter.format(
-    asUtcDate(snapshot.end),
-  )}`;
-}
-
-function formatUpdatedAt(value: string): string {
-  return new Intl.DateTimeFormat("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    timeZone: "UTC",
-    timeZoneName: "short",
-  }).format(new Date(value));
-}
-
-function TrafficChart({
-  metric,
-  snapshot,
-}: {
-  metric: MetricDefinition;
-  snapshot: TrafficSnapshot;
-}) {
+function TrafficVolumeChart({ snapshot }: { snapshot: TrafficSnapshot }) {
   return (
     <div
-      className={styles.chart}
+      className={styles.overviewChart}
       role="img"
-      aria-label={`${metric.label} over the last ${RANGE_LABELS[snapshot.range].toLowerCase()}`}
+      aria-label={`Requests and unique visitors over the last ${RANGE_LABELS[snapshot.range].toLowerCase()}`}
     >
-      <AreaChart
+      <ComposedChart
         accessibilityLayer
         data={snapshot.points}
-        margin={{ top: 12, right: 8, bottom: 0, left: 4 }}
+        margin={{ top: 16, right: 10, bottom: 0, left: 4 }}
         responsive
         style={{ width: "100%", height: "100%" }}
       >
@@ -112,41 +51,134 @@ function TrafficChart({
           axisLine={false}
           dataKey="bucket"
           minTickGap={42}
-          tick={{ fill: "var(--analytics-muted)", fontSize: 12 }}
+          tick={{ fill: "var(--analytics-muted)", fontSize: 11 }}
           tickFormatter={(value: string) => formatBucket(value, snapshot.range)}
           tickLine={false}
         />
         <YAxis
           axisLine={false}
-          tick={{ fill: "var(--analytics-muted)", fontSize: 12 }}
-          tickFormatter={(value: number) => metric.format(value)}
+          tick={{ fill: "var(--analytics-muted)", fontSize: 11 }}
+          tickFormatter={formatCompactNumber}
           tickLine={false}
-          width={70}
+          width={54}
+          yAxisId="requests"
+        />
+        <YAxis
+          axisLine={false}
+          orientation="right"
+          tick={{ fill: "var(--analytics-muted)", fontSize: 11 }}
+          tickFormatter={formatCompactNumber}
+          tickLine={false}
+          width={46}
+          yAxisId="visitors"
         />
         <Tooltip
           contentStyle={{
             background: "var(--analytics-tooltip)",
-            border: "1px solid var(--analytics-line)",
+            border: 0,
             borderRadius: 0,
             color: "var(--paper-bright)",
             fontSize: 12,
           }}
-          cursor={{ stroke: "var(--analytics-accent)", strokeOpacity: 0.45 }}
-          formatter={(value) => [metric.format(Number(value)), metric.label]}
+          formatter={(value, name) => [
+            formatCompactNumber(Number(value)),
+            name === "requests" ? "Requests" : "Unique visitors",
+          ]}
           labelFormatter={(value) =>
             formatBucket(String(value), snapshot.range)
           }
         />
-        <Area
-          dataKey={metric.key}
+        <Bar
+          dataKey="requests"
           fill="var(--analytics-area)"
-          fillOpacity={0.22}
           isAnimationActive={false}
-          stroke="var(--analytics-accent)"
-          strokeWidth={2.5}
-          type="linear"
+          maxBarSize={38}
+          yAxisId="requests"
         />
-      </AreaChart>
+        <Line
+          dataKey="visitors"
+          dot={{ fill: "var(--paper-bright)", r: 2.5, strokeWidth: 2 }}
+          isAnimationActive={false}
+          stroke="var(--ink)"
+          strokeWidth={2.25}
+          type="monotone"
+          yAxisId="visitors"
+        />
+      </ComposedChart>
+    </div>
+  );
+}
+
+function DeliveryMixChart({ snapshot }: { snapshot: TrafficSnapshot }) {
+  const points = snapshot.points.map((point) => ({
+    ...point,
+    uncachedBytes: Math.max(point.bytes - point.cachedBytes, 0),
+  }));
+
+  return (
+    <div
+      className={styles.overviewChart}
+      role="img"
+      aria-label={`Cached and uncached bandwidth over the last ${RANGE_LABELS[snapshot.range].toLowerCase()}`}
+    >
+      <BarChart
+        accessibilityLayer
+        data={points}
+        margin={{ top: 16, right: 8, bottom: 0, left: 4 }}
+        responsive
+        style={{ width: "100%", height: "100%" }}
+      >
+        <CartesianGrid
+          vertical={false}
+          stroke="var(--analytics-grid)"
+          strokeDasharray="5 4"
+        />
+        <XAxis
+          axisLine={false}
+          dataKey="bucket"
+          minTickGap={42}
+          tick={{ fill: "var(--analytics-muted)", fontSize: 11 }}
+          tickFormatter={(value: string) => formatBucket(value, snapshot.range)}
+          tickLine={false}
+        />
+        <YAxis
+          axisLine={false}
+          tick={{ fill: "var(--analytics-muted)", fontSize: 11 }}
+          tickFormatter={formatBytes}
+          tickLine={false}
+          width={66}
+        />
+        <Tooltip
+          contentStyle={{
+            background: "var(--analytics-tooltip)",
+            border: 0,
+            borderRadius: 0,
+            color: "var(--paper-bright)",
+            fontSize: 12,
+          }}
+          formatter={(value, name) => [
+            formatBytes(Number(value)),
+            name === "cachedBytes" ? "Cached" : "Uncached",
+          ]}
+          labelFormatter={(value) =>
+            formatBucket(String(value), snapshot.range)
+          }
+        />
+        <Bar
+          dataKey="cachedBytes"
+          fill="var(--signal)"
+          isAnimationActive={false}
+          maxBarSize={38}
+          stackId="delivery"
+        />
+        <Bar
+          dataKey="uncachedBytes"
+          fill="var(--analytics-area)"
+          isAnimationActive={false}
+          maxBarSize={38}
+          stackId="delivery"
+        />
+      </BarChart>
     </div>
   );
 }
@@ -179,19 +211,44 @@ export function TrafficDashboard({ snapshot }: { snapshot: TrafficSnapshot }) {
         </div>
       </div>
 
-      <div className={styles.metricList}>
+      <div className={styles.metricStrip}>
         {METRICS.map((metric, index) => (
-          <article className={styles.metricCard} key={metric.key}>
-            <div className={styles.metricSummary}>
-              <div className={styles.metricLabel}>
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                <h2>{metric.label}</h2>
-              </div>
-              <strong>{metric.format(snapshot.totals[metric.key])}</strong>
-            </div>
-            <TrafficChart metric={metric} snapshot={snapshot} />
+          <article key={metric.key}>
+            <span>{String(index + 1).padStart(2, "0")}</span>
+            <h2>{metric.label}</h2>
+            <strong>{metric.format(snapshot.totals[metric.key])}</strong>
           </article>
         ))}
+      </div>
+
+      <div className={styles.trafficVisualGrid}>
+        <article className={styles.visualCard}>
+          <div className={styles.visualHeading}>
+            <div>
+              <span>Traffic volume</span>
+              <h2>Requests and visitors</h2>
+            </div>
+            <div className={styles.chartLegend} aria-hidden="true">
+              <span data-series="requests">Requests</span>
+              <span data-series="visitors">Visitors</span>
+            </div>
+          </div>
+          <TrafficVolumeChart snapshot={snapshot} />
+        </article>
+
+        <article className={styles.visualCard}>
+          <div className={styles.visualHeading}>
+            <div>
+              <span>Delivery composition</span>
+              <h2>Cached versus uncached</h2>
+            </div>
+            <div className={styles.chartLegend} aria-hidden="true">
+              <span data-series="cached">Cached</span>
+              <span data-series="uncached">Uncached</span>
+            </div>
+          </div>
+          <DeliveryMixChart snapshot={snapshot} />
+        </article>
       </div>
 
       <p className={styles.disclosure}>
