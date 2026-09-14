@@ -137,10 +137,11 @@
 
   .portfolio-mobile-menu__list a {
     display: grid;
-    min-height: 72px;
-    grid-template-columns: 30px minmax(0, 1fr) auto;
-    gap: 12px;
+    min-height: 82px;
+    grid-template-columns: 30px minmax(0, 1fr);
+    gap: 4px 12px;
     align-items: center;
+    padding-block: 14px;
     transition:
       color 180ms ease,
       padding 220ms ease;
@@ -160,6 +161,15 @@
     font-size: 0.6rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
+  }
+
+  .portfolio-mobile-menu__index {
+    grid-row: 1 / span 2;
+  }
+
+  .portfolio-mobile-menu__note {
+    grid-column: 2;
+    line-height: 1.35;
   }
 
   .portfolio-mobile-menu__list strong {
