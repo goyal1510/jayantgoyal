@@ -5,6 +5,8 @@ import {
   formatBytes,
   parseTrafficRange,
 } from "@/lib/analytics/cloudflare-traffic";
+import { normalizeRumDuration } from "@/lib/analytics/cloudflare-rum";
+import { getRumQueryWindow } from "@/lib/analytics/cloudflare-rum-server";
 import { getTrafficQueryWindow } from "@/lib/analytics/cloudflare-server";
 
 describe("Cloudflare traffic presentation", () => {
@@ -22,6 +24,11 @@ describe("Cloudflare traffic presentation", () => {
   it("formats decimal bandwidth units used by Cloudflare", () => {
     expect(formatBytes(0)).toBe("0 B");
     expect(formatBytes(57_440_876)).toBe("57.4 MB");
+  });
+
+  it("normalizes Cloudflare RUM duration aggregates to milliseconds", () => {
+    expect(normalizeRumDuration(2_700_000)).toBe(2700);
+    expect(normalizeRumDuration(null)).toBeNull();
   });
 
   it("uses completed hours for the 24-hour view", () => {
@@ -43,6 +50,17 @@ describe("Cloudflare traffic presentation", () => {
 
     expect(window.start).toBe("2026-08-16");
     expect(window.end).toBe("2026-09-14");
+    expect(window.granularity).toBe("day");
+  });
+
+  it("uses complete UTC days for 30-day RUM trends", () => {
+    const window = getRumQueryWindow(
+      "30d",
+      new Date("2026-09-14T03:37:22.000Z"),
+    );
+
+    expect(window.start).toBe("2026-08-16T00:00:00.000Z");
+    expect(window.end).toBe("2026-09-15T00:00:00.000Z");
     expect(window.granularity).toBe("day");
   });
 });

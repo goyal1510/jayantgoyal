@@ -1,7 +1,9 @@
 import { unstable_cache } from "next/cache";
+import countries from "i18n-iso-countries";
 
 import {
   calculateCachedPercent,
+  type CountryTraffic,
   type TrafficGranularity,
   type TrafficPoint,
   type TrafficRange,
@@ -13,7 +15,16 @@ const CLOUDFLARE_GRAPHQL_URL = "https://api.cloudflare.com/client/v4/graphql";
 
 interface CloudflareGroup {
   dimensions: { date?: string; datetime?: string };
-  sum: { bytes: number; cachedBytes: number; requests: number };
+  sum: {
+    bytes: number;
+    cachedBytes: number;
+    requests: number;
+    countryMap?: Array<{
+      bytes: number;
+      clientCountryName: string;
+      requests: number;
+    }>;
+  };
   uniq: { uniques: number };
 }
 
@@ -53,7 +64,12 @@ const HOURLY_QUERY = `
           limit: 1
           filter: { datetime_geq: $start, datetime_lt: $end }
         ) {
-          sum { requests bytes cachedBytes }
+          sum {
+            requests
+            bytes
+            cachedBytes
+            countryMap { clientCountryName requests bytes }
+          }
           uniq { uniques }
         }
       }
@@ -78,7 +94,12 @@ const DAILY_QUERY = `
           limit: 1
           filter: { date_geq: $start, date_leq: $end }
         ) {
-          sum { requests bytes cachedBytes }
+          sum {
+            requests
+            bytes
+            cachedBytes
+            countryMap { clientCountryName requests bytes }
+          }
           uniq { uniques }
         }
       }
@@ -135,6 +156,23 @@ function mapPoint(group: CloudflareGroup): TrafficPoint {
   };
 }
 
+function mapCountries(group: CloudflareGroup): CountryTraffic[] {
+  return (group.sum.countryMap ?? [])
+    .filter(
+      ({ clientCountryName, requests }) => clientCountryName && requests >= 5,
+    )
+    .map(({ bytes, clientCountryName, requests }) => ({
+      code: clientCountryName,
+      numericCode: countries.alpha2ToNumeric(clientCountryName) ?? null,
+      name:
+        countries.getName(clientCountryName, "en", { select: "alias" }) ??
+        clientCountryName,
+      requests,
+      bytes,
+    }))
+    .sort((left, right) => right.requests - left.requests);
+}
+
 async function requestCloudflareTraffic(
   range: TrafficRange,
 ): Promise<TrafficResult> {
@@ -183,6 +221,7 @@ async function requestCloudflareTraffic(
       end: window.end,
       generatedAt: new Date().toISOString(),
       points: (zone.series ?? []).map(mapPoint),
+      countries: mapCountries(total),
       totals: {
         visitors: total.uniq.uniques,
         requests: total.sum.requests,

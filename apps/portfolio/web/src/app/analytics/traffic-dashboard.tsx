@@ -195,8 +195,9 @@ export function TrafficDashboard({ snapshot }: { snapshot: TrafficSnapshot }) {
       </div>
 
       <p className={styles.disclosure}>
-        Aggregated edge traffic from Cloudflare. Times are shown in UTC; no
-        visitor identities, IP addresses, or request-level records are exposed.
+        Aggregated edge traffic from Cloudflare. Times are shown in UTC. Unique
+        visitors are estimated by Cloudflare; no identities, IP addresses, or
+        request-level records are exposed.
       </p>
     </section>
   );

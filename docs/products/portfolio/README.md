@@ -16,7 +16,7 @@ Portfolio owns the professional narrative presented to public visitors:
 - Resume presentation and PDF delivery;
 - contact enquiry validation, rate limiting, and email delivery;
 - public GitHub contribution and code-statistic presentation;
-- public, aggregate Cloudflare traffic and cache analytics;
+- public, aggregate Cloudflare traffic, geography, cache, and real-user performance analytics;
 - public SEO, structured data, sitemap, robots, and web manifest behavior.
 
 Portfolio does not own account entry, private Studio workspaces, access
@@ -37,7 +37,7 @@ flows](routes-and-data-flows.md).
 | Writing        | `/writing`, `/writing/[slug]`                  | Published `portfolio.writing_posts`          |
 | Resume         | `/resume`, `/api/resume`                       | CMS shell plus Google/static PDF delivery    |
 | Contact        | `/contact`, `/api/contact`                     | CMS contact data plus Resend delivery        |
-| Analytics      | `/analytics`                                   | Aggregate Cloudflare zone analytics          |
+| Analytics      | `/analytics`                                   | Aggregate Cloudflare edge and Web Analytics  |
 | GitHub         | `/api/github-contributions`, `/api/github-loc` | GitHub provider APIs with caching            |
 | Discovery      | `/llms.txt`                                    | Registry-derived product summary             |
 
@@ -81,7 +81,7 @@ Portfolio also consumes:
 - `@jayantgoyal/web-urls` for canonical application origins;
 - `@jayantgoyal/web-seo` for metadata and indexability helpers;
 - `@jayantgoyal/github` for shared server-side GitHub statistics;
-- Cloudflare's GraphQL Analytics API for aggregate site traffic;
+- Cloudflare's GraphQL Analytics API for aggregate edge traffic and Web Analytics RUM;
 - shared Tailwind, ESLint, and TypeScript configuration.
 
 It deliberately does not consume `@jayantgoyal/web-auth`, `@jayantgoyal/web-ui`, or a
