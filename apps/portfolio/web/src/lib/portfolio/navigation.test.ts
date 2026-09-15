@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   getPortfolioNavigationHref,
+  includeAnalyticsNavigation,
   isPortfolioNavigationItemCurrent,
 } from "./navigation";
 
@@ -21,6 +22,24 @@ describe("Portfolio navigation", () => {
   it("routes Resume to its dedicated page from every surface", () => {
     expect(getPortfolioNavigationHref("resume", "home")).toBe("/resume");
     expect(getPortfolioNavigationHref("resume", "subpage")).toBe("/resume");
+  });
+
+  it("exposes Analytics as a canonical destination", () => {
+    expect(getPortfolioNavigationHref("analytics", "home")).toBe("/analytics");
+    expect(isPortfolioNavigationItemCurrent("analytics", "/analytics")).toBe(
+      true,
+    );
+  });
+
+  it("adds Analytics to CMS navigation exactly once", () => {
+    const items = [{ key: "work", label: "Work", note: "Selected work" }];
+    const withAnalytics = includeAnalyticsNavigation(items);
+
+    expect(withAnalytics).toEqual([
+      ...items,
+      { key: "analytics", label: "Analytics", note: "Live site traffic" },
+    ]);
+    expect(includeAnalyticsNavigation(withAnalytics)).toBe(withAnalytics);
   });
 
   it("marks dedicated destinations as current", () => {

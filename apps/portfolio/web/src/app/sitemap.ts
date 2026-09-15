@@ -48,6 +48,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly",
       priority: 0.7,
     },
+    {
+      url: `${SITE_URL}/analytics`,
+      lastModified: LAST_SIGNIFICANT_UPDATE,
+      changeFrequency: "daily",
+      priority: 0.6,
+    },
     ...posts.map((post) => ({
       url: `${SITE_URL}/writing/${post.slug}`,
       lastModified: post.updated_at,

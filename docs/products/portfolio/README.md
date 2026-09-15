@@ -16,6 +16,7 @@ Portfolio owns the professional narrative presented to public visitors:
 - Resume presentation and PDF delivery;
 - contact enquiry validation, rate limiting, and email delivery;
 - public GitHub contribution and code-statistic presentation;
+- public, aggregate Cloudflare traffic, interactive geography, cache, security-signal, and real-user performance analytics;
 - public SEO, structured data, sitemap, robots, and web manifest behavior.
 
 Portfolio does not own account entry, private Studio workspaces, access
@@ -24,7 +25,7 @@ not become the owner of the Portfolio contract.
 
 ## Current web surface
 
-The client has eight public pages and five public route handlers. The complete
+The client has nine public pages and five public route handlers. The complete
 route behavior and request flows are in [routes and data
 flows](routes-and-data-flows.md).
 
@@ -36,6 +37,7 @@ flows](routes-and-data-flows.md).
 | Writing        | `/writing`, `/writing/[slug]`                  | Published `portfolio.writing_posts`          |
 | Resume         | `/resume`, `/api/resume`                       | CMS shell plus Google/static PDF delivery    |
 | Contact        | `/contact`, `/api/contact`                     | CMS contact data plus Resend delivery        |
+| Analytics      | `/analytics`                                   | Aggregate Cloudflare edge and Web Analytics  |
 | GitHub         | `/api/github-contributions`, `/api/github-loc` | GitHub provider APIs with caching            |
 | Discovery      | `/llms.txt`                                    | Registry-derived product summary             |
 
@@ -79,6 +81,7 @@ Portfolio also consumes:
 - `@jayantgoyal/web-urls` for canonical application origins;
 - `@jayantgoyal/web-seo` for metadata and indexability helpers;
 - `@jayantgoyal/github` for shared server-side GitHub statistics;
+- Cloudflare's GraphQL Analytics API for aggregate edge traffic and host-filtered Web Analytics RUM;
 - shared Tailwind, ESLint, and TypeScript configuration.
 
 It deliberately does not consume `@jayantgoyal/web-auth`, `@jayantgoyal/web-ui`, or a
@@ -104,7 +107,7 @@ to the current public narrative.
 
 `apps/portfolio/web/.env.example` is the client contract. It covers canonical
 site origins, Supabase anonymous access, contact rate-limit hashing, GitHub,
-Resend, and optional Google Resume export. Exact exposure, requirement, and
+Cloudflare analytics, Resend, and optional Google Resume export. Exact exposure, requirement, and
 failure behavior is listed in the [environment variable
 reference](../../reference/environment-variables.md).
 
@@ -122,6 +125,8 @@ provider credentials remain in server-only modules.
   resume URL, before returning unavailable.
 - GitHub endpoints bound cache size and return unavailable responses when the
   provider fails.
+- Cloudflare traffic uses a zone-scoped read token, exposes only aggregate
+  metrics, and degrades without returning provider details.
 
 ## Change checklist
 

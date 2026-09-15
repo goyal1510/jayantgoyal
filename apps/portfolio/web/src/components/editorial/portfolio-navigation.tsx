@@ -8,6 +8,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import type { PortfolioNavigationItem } from "@/lib/portfolio/editorial-data";
 import {
   getPortfolioNavigationHref,
+  includeAnalyticsNavigation,
   isPortfolioNavigationItemCurrent,
   type PortfolioNavigationSurface,
 } from "@/lib/portfolio/navigation";
@@ -28,7 +29,7 @@ export function PortfolioNavigation({
   const menuRef = useRef<HTMLDivElement>(null);
   const firstLinkRef = useRef<HTMLAnchorElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
-  const navigationItems = items;
+  const navigationItems = includeAnalyticsNavigation(items);
 
   useEffect(() => {
     if (!menuOpen) return;

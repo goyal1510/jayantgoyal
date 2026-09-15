@@ -11,12 +11,13 @@
     "check-types": "next typegen && tsc --noEmit"
   },
   "dependencies": {
-    "@jayantgoyal/web-brand": "workspace:*",
     "@jayantgoyal/github": "workspace:*",
-    "@jayantgoyal/web-urls": "workspace:*",
     "@jayantgoyal/portfolio-contracts": "workspace:*",
+    "@jayantgoyal/web-brand": "workspace:*",
     "@jayantgoyal/web-seo": "workspace:*",
+    "@jayantgoyal/web-urls": "workspace:*",
     "@supabase/supabase-js": "^2.110.7",
+    "i18n-iso-countries": "^7.14.0",
     "lucide-react": "^0.554.0",
     "mermaid": "^12.0.0",
     "next": "^16.2.10",
@@ -24,8 +25,11 @@
     "react-activity-calendar": "^3.0.5",
     "react-dom": "^19.2.1",
     "react-markdown": "^10.1.0",
+    "react-simple-maps": "^5.0.5",
+    "recharts": "^3.7.0",
     "remark-gfm": "^4.0.1",
-    "resend": "^6.17.2"
+    "resend": "^6.17.2",
+    "world-atlas": "^2.0.2"
   },
   "devDependencies": {
     "@jayantgoyal/eslint-config": "workspace:*",

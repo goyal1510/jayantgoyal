@@ -1,0 +1,434 @@
+.page {
+  --analytics-text: var(--ink);
+  --analytics-muted: var(--folio-muted);
+  --analytics-line: rgba(20, 21, 21, 0.22);
+  --analytics-grid: rgba(20, 21, 21, 0.14);
+  --analytics-accent: var(--signal);
+  --analytics-area: var(--signal-soft);
+  --analytics-secondary: #356f82;
+  --analytics-secondary-soft: #dbeaec;
+  --analytics-tooltip: #fffaf0;
+  --analytics-tooltip-border: #9bb5bb;
+  --analytics-tooltip-shadow: rgba(53, 111, 130, 0.16);
+  --analytics-tooltip-text: #202526;
+  --rating-good: #3c6b5b;
+  --rating-needs: #c5893c;
+  --rating-poor: #b64e3a;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+  gap: clamp(32px, 6vw, 96px);
+  min-height: clamp(430px, 58svh, 650px);
+  align-items: center;
+  padding-block: clamp(76px, 9vw, 132px) clamp(64px, 8vw, 112px);
+}
+
+.eyebrow {
+  display: block;
+  margin-bottom: 18px;
+  color: var(--signal);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  max-width: 8.5ch;
+  margin: 0;
+  font-family: var(--font-serif), serif;
+  font-size: clamp(3.7rem, 7vw, 7.4rem);
+  font-weight: 400;
+  letter-spacing: -0.065em;
+  line-height: 0.86;
+}
+
+.heroNote {
+  align-self: end;
+  padding: 26px 0 4px 28px;
+  border-left: 1px solid var(--ink);
+}
+
+.heroNote p {
+  max-width: 36rem;
+  margin: 18px 0 0;
+  color: var(--ink-soft);
+  font-size: clamp(1rem, 1.35vw, 1.22rem);
+  line-height: 1.55;
+}
+
+.liveIndicator {
+  display: inline-flex;
+  align-items: center;
+  color: var(--signal);
+  font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.dashboard {
+  width: 100%;
+  padding: clamp(38px, 5vw, 72px) clamp(24px, 4vw, 64px) 48px;
+  border-top: 1px solid var(--ink);
+  background: var(--sky);
+}
+
+.toolbar {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1440px;
+  margin: 0 auto 28px;
+}
+
+.ranges {
+  display: inline-flex;
+  border: 1px solid var(--ink);
+  background: var(--paper-bright);
+}
+
+.ranges a {
+  padding: 11px 17px;
+  border-right: 1px solid var(--analytics-line);
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+  white-space: nowrap;
+  transition:
+    color 180ms ease,
+    background 180ms ease;
+}
+
+.ranges a:last-child {
+  border-right: 0;
+}
+
+.ranges a:hover,
+.ranges a:focus-visible {
+  background: var(--paper);
+  color: var(--signal);
+}
+
+.ranges a:focus-visible {
+  outline: 2px solid var(--analytics-accent);
+  outline-offset: 2px;
+}
+
+.ranges .selectedRange {
+  background: var(--signal);
+  color: var(--paper-bright);
+}
+
+.rangeMeta {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  color: var(--analytics-muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.09em;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.rangeMeta span + span::before {
+  margin-right: 8px;
+  content: "/";
+  opacity: 0.45;
+}
+
+.metricStrip {
+  display: grid;
+  max-width: 1440px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin-inline: auto;
+  border-top: 1px solid var(--ink);
+  border-left: 1px solid var(--ink);
+}
+
+.metricStrip article {
+  min-width: 0;
+  padding: 24px 20px 26px;
+  border-right: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+  background: rgba(255, 253, 247, 0.72);
+}
+
+.metricStrip article > span {
+  color: var(--signal);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+}
+
+.metricStrip h2 {
+  min-height: 2.4em;
+  margin: 12px 0 18px;
+  color: var(--analytics-muted);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.metricStrip strong {
+  display: block;
+  color: var(--ink);
+  font-family: var(--font-serif), serif;
+  font-size: clamp(1.9rem, 2.8vw, 3.2rem);
+  font-weight: 400;
+  letter-spacing: -0.045em;
+  line-height: 0.95;
+}
+
+.trafficVisualGrid {
+  display: grid;
+  max-width: 1440px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin: 20px auto 0;
+}
+
+.visualCard {
+  min-width: 0;
+  padding: 24px 22px 14px;
+  border: 1px solid var(--ink);
+  background: var(--paper-bright);
+}
+
+.visualHeading {
+  display: flex;
+  gap: 24px;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.visualHeading > div > span {
+  color: var(--signal);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.visualHeading h2 {
+  margin: 8px 0 0;
+  font-family: var(--font-serif), serif;
+  font-size: clamp(1.6rem, 2.4vw, 2.7rem);
+  font-weight: 400;
+  letter-spacing: -0.035em;
+}
+
+.chartLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  color: var(--analytics-muted);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+}
+
+.chartLegend span::before {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-right: 6px;
+  border: 1px solid var(--ink);
+  content: "";
+}
+
+.chartLegend [data-series="requests"]::before,
+.chartLegend [data-series="cached"]::before {
+  border-color: var(--signal);
+  background: var(--signal);
+}
+
+.chartLegend [data-series="visitors"]::before,
+.chartLegend [data-series="uncached"]::before {
+  border-color: var(--analytics-secondary);
+  border-radius: 50%;
+  background: var(--analytics-secondary);
+}
+
+.overviewChart {
+  width: 100%;
+  height: 340px;
+}
+
+.trafficSmallMultiples {
+  display: grid;
+  height: 340px;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.miniChart {
+  min-height: 0;
+}
+
+.miniChart + .miniChart {
+  padding-top: 10px;
+  border-top: 1px solid var(--analytics-line);
+}
+
+.axisLabel {
+  display: flex;
+  min-height: 20px;
+  gap: 7px;
+  align-items: baseline;
+  padding-left: 58px;
+  color: var(--analytics-muted);
+  font-size: 0.58rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.axisLabel strong {
+  color: var(--analytics-text);
+  font-size: inherit;
+  font-weight: 600;
+}
+
+.miniChart[data-series="requests"] .axisLabel strong {
+  color: var(--signal);
+}
+
+.miniChart[data-series="visitors"] .axisLabel strong {
+  color: var(--analytics-secondary);
+}
+
+.miniChartPlot {
+  width: 100%;
+  height: calc(100% - 20px);
+}
+
+.deliveryChartPlot {
+  width: 100%;
+  height: calc(100% - 20px);
+}
+
+.disclosure {
+  max-width: 720px;
+  margin: 28px auto 0;
+  color: var(--analytics-muted);
+  font-size: 0.76rem;
+  line-height: 1.55;
+  text-align: center;
+}
+
+.unavailable {
+  min-height: 52svh;
+  padding-block: clamp(64px, 10vw, 140px);
+}
+
+.unavailable span {
+  color: var(--signal);
+  font-size: 0.72rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.unavailable h2 {
+  max-width: 14ch;
+  margin: 20px 0;
+  font-family: var(--font-serif), serif;
+  font-size: clamp(2.5rem, 5vw, 5rem);
+  font-weight: 400;
+  letter-spacing: -0.05em;
+  line-height: 0.95;
+}
+
+.unavailable p {
+  color: var(--analytics-muted);
+}
+
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: 1fr;
+  }
+
+  .heroNote {
+    max-width: 560px;
+    align-self: auto;
+  }
+
+  .metricStrip {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .trafficVisualGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .rangeMeta {
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .rangeMeta span + span::before {
+    content: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard {
+    padding-inline: 16px;
+  }
+
+  .hero {
+    width: calc(100% - 32px);
+    padding-top: 48px;
+  }
+
+  .hero h1 {
+    font-size: clamp(3.5rem, 19vw, 5.5rem);
+  }
+
+  .toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .ranges {
+    width: 100%;
+  }
+
+  .ranges a {
+    flex: 1;
+    padding-inline: 8px;
+    text-align: center;
+  }
+
+  .rangeMeta {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .metricStrip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .metricStrip article:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .visualCard {
+    padding-inline: 10px;
+  }
+
+  .visualHeading {
+    align-items: flex-start;
+    flex-direction: column;
+    padding-inline: 10px;
+  }
+
+  .overviewChart {
+    height: 260px;
+  }
+
+  .disclosure {
+    text-align: left;
+  }
+}

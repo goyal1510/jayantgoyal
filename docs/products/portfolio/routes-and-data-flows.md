@@ -6,16 +6,17 @@ the Portfolio sitemap/robots rules.
 
 ## Page routes
 
-| Route             | Responsibility                                                | Primary runtime source                   |
-| ----------------- | ------------------------------------------------------------- | ---------------------------------------- |
-| `/`               | Full editorial home                                           | `getEditorialPortfolioData()`            |
-| `/about`          | Detailed profile, experience, skill, and credential narrative | Editorial data                           |
-| `/contact`        | Public enquiry interface                                      | Shell/contact CMS data                   |
-| `/resume`         | Resume presentation and PDF entry                             | Shell data and `/api/resume`             |
-| `/work`           | Visible work catalog                                          | Editorial work records                   |
-| `/work/[slug]`    | Published case study                                          | Work slug and publication guard          |
-| `/writing`        | Published Writing index                                       | `portfolio.writing_posts`                |
-| `/writing/[slug]` | Published article                                             | Writing slug query and Markdown renderer |
+| Route             | Responsibility                                                   | Primary runtime source                   |
+| ----------------- | ---------------------------------------------------------------- | ---------------------------------------- |
+| `/`               | Full editorial home                                              | `getEditorialPortfolioData()`            |
+| `/about`          | Detailed profile, experience, skill, and credential narrative    | Editorial data                           |
+| `/contact`        | Public enquiry interface                                         | Shell/contact CMS data                   |
+| `/resume`         | Resume presentation and PDF entry                                | Shell data and `/api/resume`             |
+| `/analytics`      | Aggregate traffic, geography, caching, and real-user performance | Cloudflare GraphQL Analytics API         |
+| `/work`           | Visible work catalog                                             | Editorial work records                   |
+| `/work/[slug]`    | Published case study                                             | Work slug and publication guard          |
+| `/writing`        | Published Writing index                                          | `portfolio.writing_posts`                |
+| `/writing/[slug]` | Published article                                                | Writing slug query and Markdown renderer |
 
 The app also owns `layout.tsx`, `error.tsx`, `not-found.tsx`, `manifest.ts`,
 `robots.ts`, and `sitemap.ts` for global presentation and discoverability.
@@ -94,6 +95,37 @@ instead of redirecting back to itself.
 Both GitHub handlers validate the public username before provider access. The
 in-process response cache has a one-hour TTL and a 25-entry bound; public edge
 cache headers allow stale revalidation. `GITHUB_TOKEN` stays server-only.
+
+## Cloudflare analytics flow
+
+The public `/analytics` page accepts only the fixed `24h`, `7d`, and `30d`
+range options and is exposed through the shared desktop and mobile Portfolio
+navigation. Portfolio queries Cloudflare from server-only modules and caches
+each fixed range for 15 minutes. A zone-scoped Analytics Read token supplies
+edge traffic, cache, bandwidth, and country request aggregates. A separate,
+least-privilege Account Analytics Read token supplies Web Analytics real-user
+measurements filtered to the canonical `jayantgoyal.com` host. The 24-hour view
+uses complete hourly groups; longer views use daily groups to stay within
+dataset limits.
+
+Only aggregate visitors, requests, bytes, cached bytes, country totals, threat
+request counts, Web Vital rating distributions, and P75 LCP, INP, CLS, FCP, and
+TTFB measurements reach client chart components. The traffic dashboard separates
+request bars and a visitor area into aligned, single-scale plots and compares
+cached with uncached delivery in a stacked area. The map exposes aggregate hover
+summaries and a single animated country inspector without a competing
+ranked-country list;
+country-level Web Vitals appear only after ten measured visits. The experience
+explorer explains P75, applies the published good/poor thresholds, and lets the
+visitor select one metric trend at a time.
+
+Countries with fewer than five requests in the selected range are withheld.
+Provider credentials, IP addresses, query strings, URLs, and request-level
+records are never returned to the browser. Edge failure renders a safe page
+fallback; missing or unavailable RUM configuration degrades only the experience
+panel while keeping traffic analytics visible. Shared editorial loaders retain
+their 60-second data cache, while the Resume's embedded PDF loads lazily so it
+does not compete with above-the-fold content.
 
 ## Admin write propagation
 

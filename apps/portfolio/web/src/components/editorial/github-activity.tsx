@@ -1,3 +1,6 @@
+import { ArrowUpRight } from "lucide-react";
+import Link from "next/link";
+
 import { EditorialReveal } from "@/components/editorial/editorial-reveal";
 import { GithubCodeStats } from "@/components/editorial/github-code-stats";
 import { GithubContributions } from "@/components/editorial/github-contributions";
@@ -21,6 +24,12 @@ export function GithubActivity({
           <div>
             <h2>GitHub Activity</h2>
             <p>{content.description}</p>
+            <Link
+              className="text-link github-activity__analytics-link"
+              href="/analytics"
+            >
+              Live site analytics <ArrowUpRight aria-hidden="true" />
+            </Link>
           </div>
         </EditorialReveal>
 

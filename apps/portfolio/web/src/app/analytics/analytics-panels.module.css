@@ -1,0 +1,333 @@
+.mapLayout {
+  display: grid;
+  max-width: 1440px;
+  grid-template-columns: minmax(0, 1.7fr) minmax(260px, 0.55fr);
+  gap: clamp(30px, 5vw, 72px);
+  align-items: center;
+  margin-inline: auto;
+}
+
+.mapFrame {
+  position: relative;
+  min-width: 0;
+  padding: clamp(16px, 2.5vw, 34px);
+  border: 1px solid var(--ink);
+  background: var(--paper-bright);
+}
+
+.mapFrame svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.mapCountry {
+  cursor: pointer;
+  outline: none;
+  transition:
+    fill 140ms ease,
+    fill-opacity 140ms ease,
+    stroke 140ms ease,
+    stroke-width 140ms ease;
+}
+
+.mapCountry:hover,
+.mapCountry:focus-visible {
+  fill: var(--analytics-secondary);
+  fill-opacity: 1;
+}
+
+.mapCountry:focus-visible {
+  stroke: var(--signal);
+  stroke-width: 2;
+}
+
+.mapLegend {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 12px;
+  color: var(--analytics-muted);
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.mapLegend i {
+  width: 18px;
+  height: 7px;
+  background: var(--signal);
+}
+
+.mapLegend i:nth-of-type(1) {
+  opacity: 0.18;
+}
+.mapLegend i:nth-of-type(2) {
+  opacity: 0.42;
+}
+.mapLegend i:nth-of-type(3) {
+  opacity: 0.68;
+}
+.mapLegend i:nth-of-type(4) {
+  opacity: 1;
+}
+
+.countryInspector {
+  display: flex;
+  min-width: 0;
+  align-self: stretch;
+  align-items: center;
+  padding: clamp(20px, 2.5vw, 34px);
+  border-top: 3px solid var(--analytics-secondary);
+  background: var(--analytics-secondary-soft);
+  box-shadow: 12px 12px 0 rgba(53, 111, 130, 0.14);
+}
+
+.countryInspectorContent {
+  width: 100%;
+  animation: country-detail-in 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.countryDetailHeader {
+  padding: 22px 0 18px;
+  border-bottom: 1px solid var(--analytics-line);
+}
+
+.countryDetailHeader span,
+.countryDetailHeader p {
+  color: var(--analytics-muted);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.countryDetailHeader h3 {
+  margin: 8px 0 4px;
+  font-family: var(--font-serif), serif;
+  font-size: clamp(2.1rem, 3.5vw, 3.8rem);
+  font-weight: 400;
+  letter-spacing: -0.045em;
+  line-height: 0.95;
+}
+
+.countryDetailHeader p {
+  margin: 0;
+}
+
+.countryFacts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  border-bottom: 1px solid var(--analytics-secondary);
+}
+
+.countryFacts div {
+  min-width: 0;
+  padding: 14px 10px 14px 0;
+  border-bottom: 1px solid var(--analytics-line);
+}
+
+.countryFacts div:nth-child(odd) {
+  border-right: 1px solid var(--analytics-line);
+}
+
+.countryFacts div:nth-child(even) {
+  padding-left: 12px;
+}
+
+.countryFacts dt {
+  color: var(--analytics-muted);
+  font-size: 0.58rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.countryFacts dd {
+  margin: 5px 0 0;
+  font-family: var(--font-serif), serif;
+  font-size: 1.25rem;
+}
+
+@keyframes country-detail-in {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.vitalSelector {
+  display: grid;
+  max-width: 1440px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin-inline: auto;
+  border-top: 1px solid var(--ink);
+  border-left: 1px solid var(--ink);
+}
+
+.vitalCard {
+  display: flex;
+  min-width: 0;
+  min-height: 150px;
+  align-items: flex-start;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px 18px;
+  border: 0;
+  border-right: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+  background: var(--paper-bright);
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.vitalCard:hover,
+.vitalCard:focus-visible,
+.vitalCard[aria-pressed="true"] {
+  background: var(--signal-soft);
+}
+
+.vitalCard:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: -3px;
+}
+
+.vitalCard > span,
+.vitalCard small {
+  color: var(--analytics-muted);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.vitalCard strong {
+  display: block;
+  margin: 12px 0 6px;
+  font-family: var(--font-serif), serif;
+  font-size: clamp(2rem, 3vw, 3.4rem);
+  font-weight: 400;
+  letter-spacing: -0.045em;
+  line-height: 1;
+}
+
+.vitalCard[data-rating="good"] small {
+  color: var(--rating-good);
+}
+
+.vitalCard[data-rating="needs-improvement"] small {
+  color: var(--rating-needs);
+}
+
+.vitalCard[data-rating="poor"] small {
+  color: var(--rating-poor);
+}
+
+.vitalExplorer {
+  max-width: 1440px;
+  margin: 20px auto 0;
+  padding: clamp(22px, 3vw, 38px);
+  border: 1px solid var(--ink);
+  background: var(--paper-bright);
+}
+
+.vitalExplorerHeading {
+  display: flex;
+  gap: 32px;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.vitalExplorerHeading span,
+.vitalTarget span {
+  color: var(--analytics-muted);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.vitalExplorerHeading h3 {
+  margin: 8px 0 0;
+  font-family: var(--font-serif), serif;
+  font-size: clamp(2rem, 3.4vw, 4rem);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+}
+
+.vitalExplorerHeading p {
+  margin: 8px 0 0;
+  color: var(--analytics-muted);
+  font-size: 0.78rem;
+}
+
+.vitalTarget {
+  text-align: right;
+}
+
+.vitalTarget strong {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--font-serif), serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+
+.vitalTrend {
+  width: 100%;
+  height: 310px;
+  margin-top: 28px;
+}
+
+@media (max-width: 900px) {
+  .mapLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .vitalSelector {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .countryInspector {
+    align-items: flex-start;
+  }
+
+  .vitalSelector {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .vitalCard:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .vitalExplorerHeading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .vitalTarget {
+    text-align: left;
+  }
+
+  .vitalTrend {
+    height: 250px;
+  }
+  .mapFrame {
+    padding-inline: 4px;
+  }
+  .mapLegend {
+    padding-inline: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .countryInspectorContent {
+    animation: none;
+  }
+}
