@@ -7,6 +7,7 @@ Use this file as a maintained matching baseline. Verify details from the live We
 - Full-stack, frontend, backend, product, or software engineer at a product-focused startup.
 - Best seniority range: roughly 1–3 years. Consider a 2–5 year role when the practical requirements align; skip roles centered on 5+ years, staff, lead, or people-management experience.
 - Preferred location: remote roles hiring in India or worldwide, plus Hyderabad on-site or hybrid roles.
+- Application sources: Wellfound and LinkedIn only. Skip company career pages, third-party job boards, and platform listings that redirect to an external application form.
 - Hold Bengaluru, Mumbai, or other relocation-dependent roles for the user's explicit choice.
 - Prefer full-time paid employment. Skip internships, teaching roles, manual QA/SDET roles, and unpaid or equity-only roles unless the user changes these preferences.
 
