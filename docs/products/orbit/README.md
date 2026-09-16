@@ -27,12 +27,14 @@ Read sections 1–5 to decide the product and access model; sections 6–9 for f
 ---
 
 > **Repository status:** Orbit ships as `@jayantgoyal/orbit-web` with IAM
-> registration, workspace/board/card flows, invitations, labels, assignees,
-> attachments, checklists, saved views, watches/snooze, dependencies, recurrence,
-> bulk moves, board/column settings, member management, archive/trash restore,
-> inbox notifications with Realtime, Studio launcher entry, and Admin Orbit
-> access management. Host `orbit.jayantgoyal.com` and the outbox worker remain
-> deployment-controlled.
+> registration, workspace/board/card flows, invitations (including guest board
+> scope), labels, assignees, attachments, checklists, saved views, watches/snooze,
+> dependencies, recurrence with worker, bulk move/archive/trash, board favorites,
+> template save/apply, workspace settings (archive, transfer, deletion, export),
+> board/column settings, member management, archive/trash restore, inbox
+> notifications with Realtime, Studio launcher entry, Admin Orbit access
+> management, QA seed users, and API smoke tests. Host `orbit.jayantgoyal.com`
+> and background workers (outbox, recurrence, export) remain deployment-controlled.
 >
 > The focused pages in this directory preserve the complete proposal while separating product, authorization, implementation, and operational concerns. Start with this page, then use the linked topic pages.
 

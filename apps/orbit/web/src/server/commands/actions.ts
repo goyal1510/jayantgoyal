@@ -109,6 +109,7 @@ export async function createWorkspaceInvitationAction(input: {
   workspaceId: string;
   email: string;
   role?: "member" | "viewer" | "guest";
+  boardScope?: string[];
 }): Promise<ActionResult> {
   const token = randomBytes(32).toString("hex");
   const supabase = await createSupabaseServerClient();
@@ -117,6 +118,7 @@ export async function createWorkspaceInvitationAction(input: {
     p_email: input.email.trim(),
     p_role: input.role ?? "member",
     p_token_hash: token,
+    p_board_scope: input.boardScope ?? [],
   });
 
   if (error) return { ok: false, error: error.message };

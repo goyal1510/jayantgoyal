@@ -197,3 +197,108 @@ export async function bulkMoveCardsAction(input: {
   revalidatePath(`/boards/${input.boardId}`);
   return { ok: true };
 }
+
+export async function bulkArchiveCardsAction(input: {
+  boardId: string;
+  cardIds: string[];
+}): Promise<ActionResult> {
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.schema("orbit").rpc("bulk_archive_cards", {
+    p_board_id: input.boardId,
+    p_card_ids: input.cardIds,
+  });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/boards/${input.boardId}`);
+  revalidatePath(`/boards/${input.boardId}/archive`);
+  return { ok: true };
+}
+
+export async function bulkTrashCardsAction(input: {
+  boardId: string;
+  cardIds: string[];
+}): Promise<ActionResult> {
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.schema("orbit").rpc("bulk_trash_cards", {
+    p_board_id: input.boardId,
+    p_card_ids: input.cardIds,
+  });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/boards/${input.boardId}`);
+  revalidatePath(`/boards/${input.boardId}/archive`);
+  return { ok: true };
+}
+
+export async function transferWorkspaceOwnershipAction(input: {
+  workspaceId: string;
+  targetUserId: string;
+}): Promise<ActionResult> {
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.schema("orbit").rpc("transfer_workspace_ownership", {
+    p_workspace_id: input.workspaceId,
+    p_target_user_id: input.targetUserId,
+  });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/workspaces/${input.workspaceId}/settings`);
+  revalidatePath("/home");
+  return { ok: true };
+}
+
+export async function archiveWorkspaceAction(workspaceId: string): Promise<ActionResult> {
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.schema("orbit").rpc("archive_workspace", {
+    p_workspace_id: workspaceId,
+  });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/workspaces/${workspaceId}/settings`);
+  revalidatePath("/home");
+  return { ok: true };
+}
+
+export async function restoreWorkspaceAction(workspaceId: string): Promise<ActionResult> {
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.schema("orbit").rpc("restore_workspace", {
+    p_workspace_id: workspaceId,
+  });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/workspaces/${workspaceId}/settings`);
+  revalidatePath("/home");
+  return { ok: true };
+}
+
+export async function requestWorkspaceDeletionAction(
+  workspaceId: string,
+): Promise<ActionResult> {
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.schema("orbit").rpc("request_workspace_deletion", {
+    p_workspace_id: workspaceId,
+  });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/workspaces/${workspaceId}/settings`);
+  revalidatePath("/home");
+  return { ok: true };
+}
+
+export async function cancelWorkspaceDeletionAction(
+  workspaceId: string,
+): Promise<ActionResult> {
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.schema("orbit").rpc("cancel_workspace_deletion", {
+    p_workspace_id: workspaceId,
+  });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/workspaces/${workspaceId}/settings`);
+  revalidatePath("/home");
+  return { ok: true };
+}
+
+export async function requestWorkspaceExportAction(
+  workspaceId: string,
+): Promise<ActionResult & { jobId?: string }> {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.schema("orbit").rpc("request_workspace_export", {
+    p_workspace_id: workspaceId,
+  });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/workspaces/${workspaceId}/settings`);
+  return { ok: true, jobId: data as string };
+}

@@ -146,6 +146,25 @@ export async function saveBoardTemplateAction(input: {
   });
   if (error) return { ok: false, error: error.message };
   revalidatePath(`/boards/${input.boardId}/settings`);
+  revalidatePath("/home");
+  return { ok: true, id: data as string };
+}
+
+export async function createBoardFromTemplateAction(input: {
+  workspaceId: string;
+  templateId: string;
+  name: string;
+  key: string;
+}): Promise<ActionResult> {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.schema("orbit").rpc("create_board_from_template", {
+    p_workspace_id: input.workspaceId,
+    p_template_id: input.templateId,
+    p_name: input.name,
+    p_key: input.key,
+  });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/home");
   return { ok: true, id: data as string };
 }
 

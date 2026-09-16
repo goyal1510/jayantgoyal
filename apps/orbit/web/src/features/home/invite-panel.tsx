@@ -9,15 +9,18 @@ import { Input } from "@jayantgoyal/web-ui/input";
 import { Label } from "@jayantgoyal/web-ui/label";
 
 import { createWorkspaceInvitationAction } from "@/server/commands/actions";
+import type { BoardSummary } from "@/lib/orbit/types";
 
 type InvitePanelProps = {
   workspaceId: string;
+  boards?: BoardSummary[];
 };
 
-export function InvitePanel({ workspaceId }: InvitePanelProps) {
+export function InvitePanel({ workspaceId, boards = [] }: InvitePanelProps) {
   const [pending, startTransition] = useTransition();
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<"member" | "viewer" | "guest">("member");
+  const [boardScope, setBoardScope] = useState<string[]>([]);
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
 
   function handleInvite() {
@@ -26,6 +29,7 @@ export function InvitePanel({ workspaceId }: InvitePanelProps) {
         workspaceId,
         email,
         role,
+        boardScope: role === "guest" ? boardScope : undefined,
       });
       if (!result.ok) {
         toast.error(result.error);
@@ -77,13 +81,46 @@ export function InvitePanel({ workspaceId }: InvitePanelProps) {
         </div>
         <div className="flex items-end">
           <Button
-            disabled={pending || !email.includes("@")}
+            disabled={
+              pending ||
+              !email.includes("@") ||
+              (role === "guest" && boardScope.length === 0)
+            }
             onClick={handleInvite}
           >
             Invite
           </Button>
         </div>
       </div>
+      {role === "guest" && boards.length > 0 ? (
+        <div className="space-y-2">
+          <Label>Board access</Label>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {boards.map((board) => {
+              const checked = boardScope.includes(board.id);
+              return (
+                <label
+                  key={board.id}
+                  className="flex items-center gap-2 rounded-md border px-3 py-2 text-sm"
+                >
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={(event) => {
+                      setBoardScope((current) =>
+                        event.target.checked
+                          ? [...current, board.id]
+                          : current.filter((id) => id !== board.id),
+                      );
+                    }}
+                  />
+                  {board.name}
+                </label>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
       {inviteUrl ? (
         <div className="flex flex-col gap-2 rounded-md border bg-muted/30 p-3 text-sm">
           <p className="text-muted-foreground">

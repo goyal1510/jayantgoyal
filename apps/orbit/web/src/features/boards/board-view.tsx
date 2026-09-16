@@ -22,7 +22,11 @@ import {
   createCardAction,
   moveCardAction,
 } from "@/server/commands/actions";
-import { bulkMoveCardsAction } from "@/server/commands/lifecycle-actions";
+import {
+  bulkArchiveCardsAction,
+  bulkMoveCardsAction,
+  bulkTrashCardsAction,
+} from "@/server/commands/lifecycle-actions";
 import { createSavedViewAction } from "@/server/commands/feature-actions";
 import { loadCardCommentsAction } from "@/server/queries/load-card-comments";
 import type {
@@ -195,6 +199,38 @@ export function BoardView({
     });
   }
 
+  function handleBulkArchive() {
+    if (selectedIds.length === 0) return;
+    startTransition(async () => {
+      const result = await bulkArchiveCardsAction({
+        boardId: board.id,
+        cardIds: selectedIds,
+      });
+      if (!result.ok) toast.error(result.error);
+      else {
+        toast.success("Cards archived");
+        setSelectedIds([]);
+        router.refresh();
+      }
+    });
+  }
+
+  function handleBulkTrash() {
+    if (selectedIds.length === 0) return;
+    startTransition(async () => {
+      const result = await bulkTrashCardsAction({
+        boardId: board.id,
+        cardIds: selectedIds,
+      });
+      if (!result.ok) toast.error(result.error);
+      else {
+        toast.success("Cards trashed");
+        setSelectedIds([]);
+        router.refresh();
+      }
+    });
+  }
+
   function handleAddComment(cardId: string) {
     const body = commentDrafts[cardId]?.trim();
     if (!body) return;
@@ -310,6 +346,12 @@ export function BoardView({
               </option>
             ))}
           </select>
+          <Button variant="outline" size="sm" disabled={pending} onClick={handleBulkArchive}>
+            Archive
+          </Button>
+          <Button variant="destructive" size="sm" disabled={pending} onClick={handleBulkTrash}>
+            Trash
+          </Button>
         </div>
       ) : null}
 

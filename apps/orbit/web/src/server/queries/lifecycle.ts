@@ -1,7 +1,11 @@
 import type { createSupabaseServerClient } from "@/lib/supabase/server";
 import { profileDisplayName } from "@jayantgoyal/web-auth/profile";
 
-import type { CardSummary, MemberSummary } from "@/lib/orbit/types";
+import type {
+  BoardTemplateSummary,
+  CardSummary,
+  MemberSummary,
+} from "@/lib/orbit/types";
 
 type OrbitSupabaseClient = Awaited<ReturnType<typeof createSupabaseServerClient>>;
 
@@ -97,4 +101,24 @@ export async function listFavoriteBoardIds(
 
   if (error) throw error;
   return (data ?? []).map((row) => row.board_id as string);
+}
+
+/** Lists board templates saved in a workspace. */
+export async function listWorkspaceBoardTemplates(
+  supabase: OrbitSupabaseClient,
+  workspaceId: string,
+): Promise<BoardTemplateSummary[]> {
+  const { data, error } = await supabase
+    .schema("orbit")
+    .from("board_templates")
+    .select("id, name, description")
+    .eq("workspace_id", workspaceId)
+    .order("name", { ascending: true });
+
+  if (error) throw error;
+  return (data ?? []).map((template) => ({
+    id: template.id as string,
+    name: template.name as string,
+    description: (template.description as string | null) ?? null,
+  }));
 }

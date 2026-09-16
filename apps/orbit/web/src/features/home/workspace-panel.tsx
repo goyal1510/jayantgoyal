@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LayoutGrid, Plus, Users } from "lucide-react";
+import { LayoutGrid, Plus, Settings, Star, Users } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@jayantgoyal/web-ui/button";
@@ -21,16 +21,26 @@ import {
   createBoardAction,
   createWorkspaceAction,
 } from "@/server/commands/actions";
-import type { BoardSummary, WorkspaceSummary } from "@/lib/orbit/types";
+import { toggleBoardFavoriteAction } from "@/server/commands/lifecycle-actions";
+import { createBoardFromTemplateAction } from "@/server/commands/feature-actions";
+import type {
+  BoardSummary,
+  BoardTemplateSummary,
+  WorkspaceSummary,
+} from "@/lib/orbit/types";
 
 type WorkspacePanelProps = {
   workspaces: WorkspaceSummary[];
   boardsByWorkspace: Record<string, BoardSummary[]>;
+  favoriteBoardIdsByWorkspace: Record<string, string[]>;
+  templatesByWorkspace: Record<string, BoardTemplateSummary[]>;
 };
 
 export function WorkspacePanel({
   workspaces,
   boardsByWorkspace,
+  favoriteBoardIdsByWorkspace,
+  templatesByWorkspace,
 }: WorkspacePanelProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -40,6 +50,11 @@ export function WorkspacePanel({
   );
   const [boardName, setBoardName] = useState("");
   const [boardKey, setBoardKey] = useState("");
+  const [templateBoardName, setTemplateBoardName] = useState("");
+  const [templateBoardKey, setTemplateBoardKey] = useState("");
+  const [selectedTemplateId, setSelectedTemplateId] = useState("");
+
+  const workspaceTemplates = templatesByWorkspace[selectedWorkspaceId] ?? [];
 
   function handleCreateWorkspace() {
     startTransition(async () => {
@@ -73,6 +88,35 @@ export function WorkspacePanel({
     });
   }
 
+  function handleCreateFromTemplate() {
+    if (!selectedWorkspaceId || !selectedTemplateId) return;
+    startTransition(async () => {
+      const result = await createBoardFromTemplateAction({
+        workspaceId: selectedWorkspaceId,
+        templateId: selectedTemplateId,
+        name: templateBoardName.trim(),
+        key: templateBoardKey.trim(),
+      });
+      if (!result.ok) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success("Board created from template");
+      setTemplateBoardName("");
+      setTemplateBoardKey("");
+      if (result.id) router.push(`/boards/${result.id}`);
+      else router.refresh();
+    });
+  }
+
+  function handleToggleFavorite(boardId: string, favorite: boolean) {
+    startTransition(async () => {
+      const result = await toggleBoardFavoriteAction({ boardId, favorite });
+      if (!result.ok) toast.error(result.error);
+      else router.refresh();
+    });
+  }
+
   return (
     <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
       <div className="space-y-4">
@@ -88,6 +132,12 @@ export function WorkspacePanel({
         ) : (
           workspaces.map((workspace) => {
             const boards = boardsByWorkspace[workspace.id] ?? [];
+            const favorites = new Set(favoriteBoardIdsByWorkspace[workspace.id] ?? []);
+            const sortedBoards = [...boards].sort((left, right) => {
+              const leftFav = favorites.has(left.id) ? 0 : 1;
+              const rightFav = favorites.has(right.id) ? 0 : 1;
+              return leftFav - rightFav || left.name.localeCompare(right.name);
+            });
             return (
               <Card key={workspace.id} className="overflow-hidden">
                 <CardHeader className="border-b bg-muted/30 pb-4">
@@ -100,12 +150,20 @@ export function WorkspacePanel({
                         </CardDescription>
                       ) : null}
                     </div>
-                    <Button variant="outline" size="sm" asChild>
-                      <Link href={`/workspaces/${workspace.id}/members`}>
-                        <Users className="mr-2 h-4 w-4" />
-                        Members
-                      </Link>
-                    </Button>
+                    <div className="flex flex-wrap gap-2">
+                      <Button variant="outline" size="sm" asChild>
+                        <Link href={`/workspaces/${workspace.id}/settings`}>
+                          <Settings className="mr-2 h-4 w-4" />
+                          Settings
+                        </Link>
+                      </Button>
+                      <Button variant="outline" size="sm" asChild>
+                        <Link href={`/workspaces/${workspace.id}/members`}>
+                          <Users className="mr-2 h-4 w-4" />
+                          Members
+                        </Link>
+                      </Button>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent className="pt-4">
@@ -115,25 +173,42 @@ export function WorkspacePanel({
                     </p>
                   ) : (
                     <div className="grid gap-2 sm:grid-cols-2">
-                      {boards.map((board) => (
-                        <Link
-                          key={board.id}
-                          href={`/boards/${board.id}`}
-                          className="group flex items-center justify-between rounded-lg border bg-background px-4 py-3 transition hover:border-primary/40 hover:bg-primary/5 hover:shadow-sm"
-                        >
-                          <div className="min-w-0">
-                            <p className="truncate font-medium group-hover:text-primary">
-                              {board.name}
-                            </p>
-                            <p className="text-xs text-muted-foreground capitalize">
-                              {board.visibility}
-                            </p>
+                      {sortedBoards.map((board) => {
+                        const isFavorite = favorites.has(board.id);
+                        return (
+                          <div
+                            key={board.id}
+                            className="group flex items-center justify-between rounded-lg border bg-background px-4 py-3 transition hover:border-primary/40 hover:bg-primary/5 hover:shadow-sm"
+                          >
+                            <Link href={`/boards/${board.id}`} className="min-w-0 flex-1">
+                              <p className="truncate font-medium group-hover:text-primary">
+                                {board.name}
+                              </p>
+                              <p className="text-xs text-muted-foreground capitalize">
+                                {board.visibility}
+                              </p>
+                            </Link>
+                            <div className="ml-3 flex shrink-0 items-center gap-2">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                disabled={pending}
+                                aria-label={isFavorite ? "Unfavorite board" : "Favorite board"}
+                                onClick={() => handleToggleFavorite(board.id, !isFavorite)}
+                              >
+                                <Star
+                                  className={`h-4 w-4 ${isFavorite ? "fill-primary text-primary" : ""}`}
+                                />
+                              </Button>
+                              <span className="rounded-md bg-muted px-2 py-1 font-mono text-xs">
+                                {board.key}
+                              </span>
+                            </div>
                           </div>
-                          <span className="ml-3 shrink-0 rounded-md bg-muted px-2 py-1 font-mono text-xs">
-                            {board.key}
-                          </span>
-                        </Link>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </CardContent>
@@ -228,6 +303,55 @@ export function WorkspacePanel({
             </Button>
           </CardContent>
         </Card>
+
+        {workspaceTemplates.length > 0 ? (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">From template</CardTitle>
+              <CardDescription>
+                Create a board using a saved workspace template.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <select
+                className="flex h-10 w-full rounded-md border bg-background px-3 text-sm"
+                value={selectedTemplateId || workspaceTemplates[0]?.id}
+                onChange={(event) => setSelectedTemplateId(event.target.value)}
+              >
+                {workspaceTemplates.map((template) => (
+                  <option key={template.id} value={template.id}>
+                    {template.name}
+                  </option>
+                ))}
+              </select>
+              <Input
+                value={templateBoardName}
+                onChange={(event) => setTemplateBoardName(event.target.value)}
+                placeholder="Board name"
+              />
+              <Input
+                value={templateBoardKey}
+                onChange={(event) =>
+                  setTemplateBoardKey(event.target.value.toUpperCase())
+                }
+                placeholder="Key"
+                maxLength={8}
+              />
+              <Button
+                className="w-full"
+                variant="secondary"
+                disabled={
+                  pending ||
+                  templateBoardName.trim().length < 2 ||
+                  templateBoardKey.trim().length < 2
+                }
+                onClick={handleCreateFromTemplate}
+              >
+                Create from template
+              </Button>
+            </CardContent>
+          </Card>
+        ) : null}
       </div>
     </div>
   );

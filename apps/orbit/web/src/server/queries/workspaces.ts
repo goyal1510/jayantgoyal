@@ -23,7 +23,7 @@ export async function listMyWorkspaces(
   const { data: workspaces, error } = await supabase
     .schema("orbit")
     .from("workspaces")
-    .select("id, name, description, owner_user_id")
+    .select("id, name, description, owner_user_id, lifecycle")
     .in("id", workspaceIds)
     .order("name", { ascending: true });
 
@@ -34,5 +34,6 @@ export async function listMyWorkspaces(
     name: workspace.name as string,
     description: (workspace.description as string | null) ?? null,
     ownerUserId: workspace.owner_user_id as string,
+    lifecycle: workspace.lifecycle as string,
   }));
 }

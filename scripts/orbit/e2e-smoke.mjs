@@ -6,7 +6,6 @@ import { fileURLToPath } from "node:url";
 
 import {
   createDatabaseBoundaryHttp,
-  databaseAuthHeaders as authHeaders,
 } from "../lib/database-boundary-http.mjs";
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "../..");
@@ -14,6 +13,7 @@ const credPath = join(repoRoot, "supabase/.temp/orbit-test-users.json");
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/+$/, "");
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !anonKey) {
   console.error("Missing Supabase URL or anon key.");
@@ -34,7 +34,7 @@ async function tokenFor(email) {
   return body.access_token;
 }
 
-async function rpc(token, profile, name, payload = {}) {
+async function rpc(token, profile, name, payload = {}, statuses = [200, 204]) {
   const response = await request(`/rest/v1/rpc/${name}`, {
     method: "POST",
     headers: {
@@ -46,7 +46,7 @@ async function rpc(token, profile, name, payload = {}) {
     },
     body: JSON.stringify(payload),
   });
-  return expectStatus(response, [200, 204], `${profile}.${name}`);
+  return expectStatus(response, statuses, `${profile}.${name}`);
 }
 
 async function select(token, profile, table, query) {
@@ -58,6 +58,24 @@ async function select(token, profile, table, query) {
     },
   });
   return expectStatus(response, [200], `${profile}.${table}`);
+}
+
+async function serviceRpc(profile, name, payload = {}) {
+  if (!serviceRoleKey) {
+    throw new Error("SUPABASE_SERVICE_ROLE_KEY required for worker smoke tests");
+  }
+  const response = await request(`/rest/v1/rpc/${name}`, {
+    method: "POST",
+    headers: {
+      apikey: serviceRoleKey,
+      authorization: `Bearer ${serviceRoleKey}`,
+      "content-type": "application/json",
+      "accept-profile": profile,
+      "content-profile": profile,
+    },
+    body: JSON.stringify(payload),
+  });
+  return expectStatus(response, [200, 204], `${profile}.${name}`);
 }
 
 async function run(name, fn) {
@@ -124,6 +142,121 @@ await run("test3 inbox after assign", async () => {
   const token = await tokenFor("test3@jayantgoyal.com");
   const notes = await select(token, "orbit", "notifications", "select=id&limit=5");
   if (!notes.length) throw new Error("expected assignment notification");
+});
+
+await run("board favorite toggle", async () => {
+  const token = await tokenFor("test1@jayantgoyal.com");
+  const boardId = creds.demo.boardId;
+  await rpc(token, "orbit", "toggle_board_favorite", {
+    p_board_id: boardId,
+    p_favorite: true,
+  });
+  const favorites = await select(
+    token,
+    "orbit",
+    "board_favorites",
+    `select=board_id&board_id=eq.${boardId}`,
+  );
+  if (!favorites.length) throw new Error("favorite not persisted");
+});
+
+await run("save and apply board template", async () => {
+  const token = await tokenFor("test1@jayantgoyal.com");
+  const boardId = creds.demo.boardId;
+  const workspaceId = creds.demo.workspaceId;
+  const templateId = await rpc(token, "orbit", "save_board_template", {
+    p_board_id: boardId,
+    p_name: `Smoke template ${Date.now()}`,
+  });
+  const newBoardId = await rpc(token, "orbit", "create_board_from_template", {
+    p_workspace_id: workspaceId,
+    p_template_id: templateId,
+    p_name: "Smoke Template Board",
+    p_key: `T${String(Date.now()).slice(-4)}`,
+  });
+  const columns = await select(
+    token,
+    "orbit",
+    "columns",
+    `select=id&board_id=eq.${newBoardId}`,
+  );
+  if (!columns.length) throw new Error("template board missing columns");
+});
+
+await run("bulk archive and trash", async () => {
+  const token = await tokenFor("test1@jayantgoyal.com");
+  const boardId = creds.demo.boardId;
+  const columns = await select(token, "orbit", "columns", `select=id&board_id=eq.${boardId}`);
+  const archiveCardId = await rpc(token, "orbit", "create_card", {
+    p_board_id: boardId,
+    p_column_id: columns[0].id,
+    p_title: `Bulk archive ${Date.now()}`,
+  });
+  const trashCardId = await rpc(token, "orbit", "create_card", {
+    p_board_id: boardId,
+    p_column_id: columns[0].id,
+    p_title: `Bulk trash ${Date.now()}`,
+  });
+  const archived = await rpc(token, "orbit", "bulk_archive_cards", {
+    p_board_id: boardId,
+    p_card_ids: [archiveCardId],
+  });
+  const trashed = await rpc(token, "orbit", "bulk_trash_cards", {
+    p_board_id: boardId,
+    p_card_ids: [trashCardId],
+  });
+  if (!archived || !trashed) throw new Error("bulk operations returned zero");
+});
+
+await run("workspace export request", async () => {
+  const token = await tokenFor("test1@jayantgoyal.com");
+  const workspaceId = creds.demo.workspaceId;
+  const jobId = await rpc(token, "orbit", "request_workspace_export", {
+    p_workspace_id: workspaceId,
+  });
+  if (!jobId) throw new Error("export job id missing");
+});
+
+await run("guest invitation with board scope", async () => {
+  const token = await tokenFor("test1@jayantgoyal.com");
+  const workspaceId = creds.demo.workspaceId;
+  const boardId = creds.demo.boardId;
+  const invitationId = await rpc(token, "orbit", "create_workspace_invitation", {
+    p_workspace_id: workspaceId,
+    p_email: `guest-smoke-${Date.now()}@jayantgoyal.com`,
+    p_role: "guest",
+    p_token_hash: `smoke-${Date.now()}`,
+    p_board_scope: [boardId],
+  });
+  if (!invitationId) throw new Error("invitation not created");
+});
+
+await run("recurrence worker", async () => {
+  const token = await tokenFor("test1@jayantgoyal.com");
+  const boardId = creds.demo.boardId;
+  const columns = await select(token, "orbit", "columns", `select=id&board_id=eq.${boardId}`);
+  const cardId = await rpc(token, "orbit", "create_card", {
+    p_board_id: boardId,
+    p_column_id: columns[0].id,
+    p_title: `Recurrence ${Date.now()}`,
+  });
+  await rpc(token, "orbit", "set_card_recurrence", {
+    p_card_id: cardId,
+    p_cadence: "daily",
+    p_interval_count: 1,
+  });
+  await serviceRpc("orbit", "process_due_recurrences_worker");
+});
+
+await run("test2 admin can update member role", async () => {
+  const token = await tokenFor("test2@jayantgoyal.com");
+  const test5 = creds.users.find((u) => u.email === "test5@jayantgoyal.com");
+  if (!test5) throw new Error("test5 missing from creds");
+  await rpc(token, "orbit", "update_workspace_member", {
+    p_workspace_id: creds.demo.workspaceId,
+    p_user_id: test5.userId,
+    p_role: "member",
+  });
 });
 
 const failed = results.filter((entry) => !entry.ok);

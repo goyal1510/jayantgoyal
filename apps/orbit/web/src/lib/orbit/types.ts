@@ -3,6 +3,13 @@ export type WorkspaceSummary = {
   name: string;
   description: string | null;
   ownerUserId: string;
+  lifecycle?: string;
+};
+
+export type BoardTemplateSummary = {
+  id: string;
+  name: string;
+  description: string | null;
 };
 
 export type BoardSummary = {
