@@ -54,6 +54,30 @@ export type MemberSummary = {
   userId: string;
   role: string;
   displayName: string;
+  status?: string;
+};
+
+export type ChecklistSummary = {
+  id: string;
+  cardId: string;
+  title: string;
+  items: Array<{ id: string; body: string; completed: boolean }>;
+};
+
+export type DependencySummary = {
+  id: string;
+  dependsOnCardId: string;
+  dependencyType: string;
+  dependsOnTitle: string;
+  dependsOnNumber: number;
+};
+
+export type SavedViewSummary = {
+  id: string;
+  name: string;
+  filters: Record<string, unknown>;
+  isShared: boolean;
+  isOwner: boolean;
 };
 
 export type AttachmentSummary = {

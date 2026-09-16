@@ -71,6 +71,49 @@ $$;
 ALTER FUNCTION "orbit_private"."can_edit_board"("p_board_id" "uuid", "p_user_id" "uuid") OWNER TO "postgres";
 
 
+CREATE OR REPLACE FUNCTION "orbit_private"."can_manage_board"("p_board_id" "uuid", "p_user_id" "uuid" DEFAULT "orbit_private"."current_user_id"()) RETURNS boolean
+    LANGUAGE "sql" STABLE SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+  select exists (
+    select 1
+    from orbit.boards board
+    where board.id = p_board_id
+      and board.lifecycle = 'active'
+      and (
+        orbit_private.is_workspace_admin(board.workspace_id, p_user_id)
+        or exists (
+          select 1
+          from orbit.board_members board_member
+          where board_member.board_id = board.id
+            and board_member.user_id = p_user_id
+            and board_member.role = 'manager'
+        )
+        or (
+          board.visibility = 'workspace'
+          and exists (
+            select 1
+            from orbit.workspace_members member
+            where member.workspace_id = board.workspace_id
+              and member.user_id = p_user_id
+              and member.status = 'active'
+              and member.role in ('admin', 'member')
+          )
+          and not exists (
+            select 1
+            from orbit.board_members board_member
+            where board_member.board_id = board.id
+              and board_member.user_id = p_user_id
+          )
+        )
+      )
+  );
+$$;
+
+
+ALTER FUNCTION "orbit_private"."can_manage_board"("p_board_id" "uuid", "p_user_id" "uuid") OWNER TO "postgres";
+
+
 CREATE OR REPLACE FUNCTION "orbit_private"."can_read_board"("p_board_id" "uuid", "p_user_id" "uuid" DEFAULT "orbit_private"."current_user_id"()) RETURNS boolean
     LANGUAGE "sql" STABLE SECURITY DEFINER
     SET "search_path" TO ''
@@ -142,6 +185,41 @@ $$;
 
 
 ALTER FUNCTION "orbit_private"."is_workspace_admin"("p_workspace_id" "uuid", "p_user_id" "uuid") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit_private"."notify_card_event"("p_recipient_id" "uuid", "p_workspace_id" "uuid", "p_board_id" "uuid", "p_card_id" "uuid", "p_event_id" "uuid", "p_reason" "text") RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+begin
+  if p_recipient_id is null or p_recipient_id = orbit_private.current_user_id() then
+    return;
+  end if;
+
+  insert into orbit.notifications (
+    recipient_id,
+    workspace_id,
+    board_id,
+    subject_type,
+    subject_id,
+    event_id,
+    reason
+  )
+  values (
+    p_recipient_id,
+    p_workspace_id,
+    p_board_id,
+    'card',
+    p_card_id,
+    p_event_id,
+    p_reason
+  )
+  on conflict (recipient_id, event_id, reason) do nothing;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit_private"."notify_card_event"("p_recipient_id" "uuid", "p_workspace_id" "uuid", "p_board_id" "uuid", "p_card_id" "uuid", "p_event_id" "uuid", "p_reason" "text") OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "orbit_private"."require_orbit_access"() RETURNS "void"
@@ -341,6 +419,12 @@ GRANT ALL ON FUNCTION "orbit_private"."can_edit_board"("p_board_id" "uuid", "p_u
 
 
 
+REVOKE ALL ON FUNCTION "orbit_private"."can_manage_board"("p_board_id" "uuid", "p_user_id" "uuid") FROM PUBLIC;
+GRANT ALL ON FUNCTION "orbit_private"."can_manage_board"("p_board_id" "uuid", "p_user_id" "uuid") TO "authenticated";
+GRANT ALL ON FUNCTION "orbit_private"."can_manage_board"("p_board_id" "uuid", "p_user_id" "uuid") TO "service_role";
+
+
+
 REVOKE ALL ON FUNCTION "orbit_private"."can_read_board"("p_board_id" "uuid", "p_user_id" "uuid") FROM PUBLIC;
 GRANT ALL ON FUNCTION "orbit_private"."can_read_board"("p_board_id" "uuid", "p_user_id" "uuid") TO "authenticated";
 GRANT ALL ON FUNCTION "orbit_private"."can_read_board"("p_board_id" "uuid", "p_user_id" "uuid") TO "service_role";
@@ -356,6 +440,12 @@ GRANT ALL ON FUNCTION "orbit_private"."is_active_workspace_member"("p_workspace_
 REVOKE ALL ON FUNCTION "orbit_private"."is_workspace_admin"("p_workspace_id" "uuid", "p_user_id" "uuid") FROM PUBLIC;
 GRANT ALL ON FUNCTION "orbit_private"."is_workspace_admin"("p_workspace_id" "uuid", "p_user_id" "uuid") TO "authenticated";
 GRANT ALL ON FUNCTION "orbit_private"."is_workspace_admin"("p_workspace_id" "uuid", "p_user_id" "uuid") TO "service_role";
+
+
+
+REVOKE ALL ON FUNCTION "orbit_private"."notify_card_event"("p_recipient_id" "uuid", "p_workspace_id" "uuid", "p_board_id" "uuid", "p_card_id" "uuid", "p_event_id" "uuid", "p_reason" "text") FROM PUBLIC;
+GRANT ALL ON FUNCTION "orbit_private"."notify_card_event"("p_recipient_id" "uuid", "p_workspace_id" "uuid", "p_board_id" "uuid", "p_card_id" "uuid", "p_event_id" "uuid", "p_reason" "text") TO "authenticated";
+GRANT ALL ON FUNCTION "orbit_private"."notify_card_event"("p_recipient_id" "uuid", "p_workspace_id" "uuid", "p_board_id" "uuid", "p_card_id" "uuid", "p_event_id" "uuid", "p_reason" "text") TO "service_role";
 
 
 

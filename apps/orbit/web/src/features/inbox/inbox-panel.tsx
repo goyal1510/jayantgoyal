@@ -4,6 +4,8 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
+import { useInboxRealtime } from "@/lib/orbit/use-inbox-realtime";
+
 import { Button } from "@jayantgoyal/web-ui/button";
 import {
   Card,
@@ -19,12 +21,15 @@ import {
 import type { NotificationSummary } from "@/lib/orbit/types";
 
 type InboxPanelProps = {
+  userId: string;
   notifications: NotificationSummary[];
 };
 
-export function InboxPanel({ notifications }: InboxPanelProps) {
+export function InboxPanel({ userId, notifications }: InboxPanelProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
+
+  useInboxRealtime(userId);
 
   function markRead(id: string) {
     startTransition(async () => {

@@ -4,6 +4,11 @@ import type { NotificationSummary } from "@/lib/orbit/types";
 
 export default async function InboxPage() {
   const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+
   const { data: notifications } = await supabase
     .schema("orbit")
     .from("notifications")
@@ -29,7 +34,7 @@ export default async function InboxPage() {
           In-app notifications from your workspaces.
         </p>
       </div>
-      <InboxPanel notifications={summaries} />
+      <InboxPanel userId={user.id} notifications={summaries} />
     </div>
   );
 }

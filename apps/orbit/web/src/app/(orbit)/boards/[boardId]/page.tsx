@@ -11,6 +11,12 @@ import {
   listWorkspaceMembers,
   loadBoardView,
 } from "@/server/queries/boards";
+import {
+  listBoardChecklistsByCard,
+  listBoardDependenciesByCard,
+  listBoardSavedViews,
+  listWatchedCardIds,
+} from "@/server/queries/features";
 
 type BoardPageProps = {
   params: Promise<{ boardId: string }>;
@@ -19,9 +25,12 @@ type BoardPageProps = {
 export default async function BoardPage({ params }: BoardPageProps) {
   const { boardId } = await params;
   const supabase = await createSupabaseServerClient();
-  const { board, columns, cards } = await loadBoardView(supabase, boardId);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (!board) notFound();
+  const { board, columns, cards } = await loadBoardView(supabase, boardId);
+  if (!board || !user) notFound();
 
   const [
     labels,
@@ -29,12 +38,20 @@ export default async function BoardPage({ params }: BoardPageProps) {
     labelIdsByCard,
     assigneeIdsByCard,
     attachmentsByCard,
+    checklistsByCard,
+    dependenciesByCard,
+    watchedCardIds,
+    savedViews,
   ] = await Promise.all([
     listWorkspaceLabels(supabase, board.workspaceId),
     listWorkspaceMembers(supabase, board.workspaceId),
     listBoardCardLabelIds(supabase, boardId),
     listBoardAssigneeIds(supabase, boardId),
     listBoardAttachments(supabase, boardId),
+    listBoardChecklistsByCard(supabase, boardId),
+    listBoardDependenciesByCard(supabase, boardId),
+    listWatchedCardIds(supabase, boardId, user.id),
+    listBoardSavedViews(supabase, boardId, user.id),
   ]);
 
   const commentsByCard: Record<
@@ -59,6 +76,10 @@ export default async function BoardPage({ params }: BoardPageProps) {
       members={members}
       assigneeIdsByCard={assigneeIdsByCard}
       attachmentsByCard={attachmentsByCard}
+      checklistsByCard={checklistsByCard}
+      dependenciesByCard={dependenciesByCard}
+      watchedCardIds={watchedCardIds}
+      savedViews={savedViews}
     />
   );
 }

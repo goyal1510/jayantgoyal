@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 
 import { Badge } from "@jayantgoyal/web-ui/badge";
@@ -18,9 +19,12 @@ import {
   updateCardAction,
   uploadCardAttachmentAction,
 } from "@/server/commands/actions";
+import { CardDetailExtras } from "@/features/boards/card-detail-extras";
 import type {
   AttachmentSummary,
   CardSummary,
+  ChecklistSummary,
+  DependencySummary,
   LabelSummary,
   MemberSummary,
 } from "@/lib/orbit/types";
@@ -35,6 +39,10 @@ type CardDetailPanelProps = {
   members: MemberSummary[];
   assigneeIds: string[];
   attachments: AttachmentSummary[];
+  checklists: ChecklistSummary[];
+  dependencies: DependencySummary[];
+  watched: boolean;
+  allCards: Array<{ id: string; number: number; title: string }>;
   onClose: () => void;
 };
 
@@ -48,6 +56,10 @@ export function CardDetailPanel({
   members,
   assigneeIds,
   attachments,
+  checklists,
+  dependencies,
+  watched,
+  allCards,
   onClose,
 }: CardDetailPanelProps) {
   const router = useRouter();
@@ -62,9 +74,37 @@ export function CardDetailPanel({
   );
   const [newLabelName, setNewLabelName] = useState("");
 
+  const [showPreview, setShowPreview] = useState(false);
+
   function refresh() {
     router.refresh();
   }
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      if (
+        title === card.title &&
+        description === (card.description ?? "") &&
+        priority === card.priority &&
+        (dueDate || "") === (card.dueDate?.slice(0, 10) ?? "")
+      ) {
+        return;
+      }
+      void updateCardAction({
+        boardId,
+        cardId: card.id,
+        title,
+        description,
+        priority,
+        dueDate: dueDate || null,
+        expectedVersion: card.version,
+      }).then((result) => {
+        if (!result.ok) toast.error(result.error);
+        else refresh();
+      });
+    }, 1200);
+    return () => window.clearTimeout(timer);
+  }, [title, description, priority, dueDate, boardId, card.id, card.version, card.title, card.description, card.priority, card.dueDate]);
 
   function saveDetails() {
     startTransition(async () => {
@@ -232,6 +272,19 @@ export function CardDetailPanel({
               value={description}
               onChange={(event) => setDescription(event.target.value)}
             />
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              onClick={() => setShowPreview((current) => !current)}
+            >
+              {showPreview ? "Edit markdown" : "Preview markdown"}
+            </Button>
+            {showPreview ? (
+              <div className="prose prose-sm max-w-none rounded-md border p-3 dark:prose-invert">
+                <ReactMarkdown>{description || "_No description_"}</ReactMarkdown>
+              </div>
+            ) : null}
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
@@ -356,6 +409,16 @@ export function CardDetailPanel({
               Trash
             </Button>
           </div>
+
+          <CardDetailExtras
+            boardId={boardId}
+            cardId={card.id}
+            checklists={checklists}
+            dependencies={dependencies}
+            attachments={attachments}
+            watched={watched}
+            allCards={allCards}
+          />
         </div>
       </div>
     </div>

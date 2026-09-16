@@ -7,9 +7,9 @@ import { applicationOrigin } from "@jayantgoyal/web-urls";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-export type ActionResult =
-  | { ok: true; id?: string; inviteUrl?: string; workspaceId?: string }
-  | { ok: false; error: string };
+import type { ActionResult } from "./types";
+
+export type { ActionResult } from "./types";
 
 /** Creates a workspace when the caller holds orbit.workspace.create. */
 export async function createWorkspaceAction(input: {

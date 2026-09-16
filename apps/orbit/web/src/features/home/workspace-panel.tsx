@@ -114,6 +114,14 @@ export function WorkspacePanel({
                     </Link>
                   ))
                 )}
+                <div className="flex flex-wrap gap-2 pt-2">
+                  <Link
+                    href={`/workspaces/${workspace.id}/members`}
+                    className="text-sm text-primary underline"
+                  >
+                    Manage members
+                  </Link>
+                </div>
                 <InvitePanel workspaceId={workspace.id} />
               </CardContent>
             </Card>
