@@ -7,24 +7,22 @@ export default async function OrbitHomePage() {
   const supabase = await createSupabaseServerClient();
   const workspaces = await listMyWorkspaces(supabase);
 
-  const boardsByWorkspace: Record<
-    string,
-    Awaited<ReturnType<typeof listWorkspaceBoards>>
-  > = {};
-
-  for (const workspace of workspaces) {
-    boardsByWorkspace[workspace.id] = await listWorkspaceBoards(
-      supabase,
+  const boardEntries = await Promise.all(
+    workspaces.map(async (workspace) => [
       workspace.id,
-    );
-  }
+      await listWorkspaceBoards(supabase, workspace.id),
+    ] as const),
+  );
+
+  const boardsByWorkspace = Object.fromEntries(boardEntries);
 
   return (
     <div className="space-y-6">
-      <div>
+      <div className="rounded-xl border bg-gradient-to-br from-primary/5 via-background to-background p-6">
         <h1 className="text-2xl font-semibold tracking-tight">Home</h1>
-        <p className="text-sm text-muted-foreground">
-          Your workspaces, boards, and active work.
+        <p className="mt-1 max-w-xl text-sm text-muted-foreground">
+          Your workspaces, boards, and active work. Open a board to drag cards,
+          assign teammates, and track progress.
         </p>
       </div>
       <WorkspacePanel

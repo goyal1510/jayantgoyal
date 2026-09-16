@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -24,6 +24,7 @@ import {
 } from "@/server/commands/actions";
 import { bulkMoveCardsAction } from "@/server/commands/lifecycle-actions";
 import { createSavedViewAction } from "@/server/commands/feature-actions";
+import { loadCardCommentsAction } from "@/server/queries/load-card-comments";
 import type {
   AttachmentSummary,
   BoardSummary,
@@ -41,7 +42,6 @@ type BoardViewProps = {
   board: BoardSummary;
   columns: ColumnSummary[];
   cards: CardSummary[];
-  commentsByCard: Record<string, CommentSummary[]>;
   labels: LabelSummary[];
   labelIdsByCard: Record<string, string[]>;
   members: MemberSummary[];
@@ -57,7 +57,6 @@ export function BoardView({
   board,
   columns,
   cards: initialCards,
-  commentsByCard,
   labels,
   labelIdsByCard,
   members,
@@ -75,6 +74,10 @@ export function BoardView({
   const [newTitles, setNewTitles] = useState<Record<string, string>>({});
   const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>({});
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
+  const [commentsByCard, setCommentsByCard] = useState<
+    Record<string, CommentSummary[]>
+  >({});
+  const loadingComments = useRef(new Set<string>());
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [draggedCardId, setDraggedCardId] = useState<string | null>(null);
   const [viewName, setViewName] = useState("");
@@ -105,6 +108,25 @@ export function BoardView({
   }, [visibleCards, columns]);
 
   const activeCard = cards.find((card) => card.id === activeCardId) ?? null;
+
+  async function ensureComments(cardId: string) {
+    if (commentsByCard[cardId] || loadingComments.current.has(cardId)) return;
+    loadingComments.current.add(cardId);
+    const result = await loadCardCommentsAction(cardId);
+    loadingComments.current.delete(cardId);
+    if (result.ok) {
+      setCommentsByCard((current) => ({
+        ...current,
+        [cardId]: result.comments,
+      }));
+    }
+  }
+
+  useEffect(() => {
+    if (activeCardId) void ensureComments(activeCardId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- load once per opened card
+  }, [activeCardId]);
+
   const cardPicker = cards.map((card) => ({
     id: card.id,
     number: card.number,
@@ -180,9 +202,14 @@ export function BoardView({
       const result = await addCommentAction({ boardId: board.id, cardId, body });
       if (!result.ok) toast.error(result.error);
       else {
-        toast.success("Comment added");
-        setCommentDrafts((current) => ({ ...current, [cardId]: "" }));
-        router.refresh();
+      toast.success("Comment added");
+      setCommentDrafts((current) => ({ ...current, [cardId]: "" }));
+      setCommentsByCard((current) => {
+        const next = { ...current };
+        delete next[cardId];
+        return next;
+      });
+      void ensureComments(cardId);
       }
     });
   }
@@ -207,12 +234,15 @@ export function BoardView({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-start justify-between gap-3">
+      <div className="flex flex-wrap items-start justify-between gap-3 rounded-xl border bg-muted/20 p-4">
         <div>
           <p className="font-mono text-xs uppercase tracking-wide text-muted-foreground">
             {board.key}
           </p>
           <h1 className="text-2xl font-semibold">{board.name}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {cards.length} cards · {columns.length} columns
+          </p>
         </div>
         <div className="flex flex-wrap gap-2 text-sm">
           <Link href={`/boards/${board.id}/settings`} className="underline">
@@ -315,9 +345,14 @@ export function BoardView({
               setDraggedCardId(null);
             }}
           >
-            <Card className="h-full bg-muted/20">
+            <Card className="h-full border-muted-foreground/10 bg-muted/20 shadow-none">
               <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium">{column.name}</CardTitle>
+                <CardTitle className="flex items-center justify-between text-sm font-medium">
+                  <span>{column.name}</span>
+                  <span className="rounded-full bg-background px-2 py-0.5 text-xs text-muted-foreground">
+                    {(cardsByColumn[column.id] ?? []).length}
+                  </span>
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {(cardsByColumn[column.id] ?? []).map((card) => (
@@ -326,7 +361,7 @@ export function BoardView({
                     draggable
                     onDragStart={() => setDraggedCardId(card.id)}
                     onDragEnd={() => setDraggedCardId(null)}
-                    className="rounded-lg border bg-background p-3 shadow-sm"
+                    className="cursor-grab rounded-lg border bg-background p-3 shadow-sm transition hover:border-primary/30 hover:shadow-md active:cursor-grabbing"
                   >
                     <div className="mb-2 flex items-start justify-between gap-2">
                       <div className="space-y-1">
@@ -356,9 +391,11 @@ export function BoardView({
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() =>
-                          setActiveCardId(activeCardId === card.id ? null : card.id)
-                        }
+                        onClick={() => {
+                          const next = activeCardId === card.id ? null : card.id;
+                          setActiveCardId(next);
+                          if (next) void ensureComments(next);
+                        }}
                       >
                         Open
                       </Button>

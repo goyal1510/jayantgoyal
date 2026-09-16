@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Plus } from "lucide-react";
+import { LayoutGrid, Plus, Users } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@jayantgoyal/web-ui/button";
@@ -22,7 +22,6 @@ import {
   createWorkspaceAction,
 } from "@/server/commands/actions";
 import type { BoardSummary, WorkspaceSummary } from "@/lib/orbit/types";
-import { InvitePanel } from "@/features/home/invite-panel";
 
 type WorkspacePanelProps = {
   workspaces: WorkspaceSummary[];
@@ -75,10 +74,10 @@ export function WorkspacePanel({
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+    <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
       <div className="space-y-4">
         {workspaces.length === 0 ? (
-          <Card>
+          <Card className="border-dashed">
             <CardHeader>
               <CardTitle>No workspaces yet</CardTitle>
               <CardDescription>
@@ -87,52 +86,70 @@ export function WorkspacePanel({
             </CardHeader>
           </Card>
         ) : (
-          workspaces.map((workspace) => (
-            <Card key={workspace.id}>
-              <CardHeader>
-                <CardTitle>{workspace.name}</CardTitle>
-                {workspace.description ? (
-                  <CardDescription>{workspace.description}</CardDescription>
-                ) : null}
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {(boardsByWorkspace[workspace.id] ?? []).length === 0 ? (
-                  <p className="text-sm text-muted-foreground">
-                    No boards yet in this workspace.
-                  </p>
-                ) : (
-                  (boardsByWorkspace[workspace.id] ?? []).map((board) => (
-                    <Link
-                      key={board.id}
-                      href={`/boards/${board.id}`}
-                      className="flex items-center justify-between rounded-md border px-3 py-2 text-sm hover:bg-muted/50"
-                    >
-                      <span>{board.name}</span>
-                      <span className="font-mono text-xs text-muted-foreground">
-                        {board.key}
-                      </span>
-                    </Link>
-                  ))
-                )}
-                <div className="flex flex-wrap gap-2 pt-2">
-                  <Link
-                    href={`/workspaces/${workspace.id}/members`}
-                    className="text-sm text-primary underline"
-                  >
-                    Manage members
-                  </Link>
-                </div>
-                <InvitePanel workspaceId={workspace.id} />
-              </CardContent>
-            </Card>
-          ))
+          workspaces.map((workspace) => {
+            const boards = boardsByWorkspace[workspace.id] ?? [];
+            return (
+              <Card key={workspace.id} className="overflow-hidden">
+                <CardHeader className="border-b bg-muted/30 pb-4">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <CardTitle>{workspace.name}</CardTitle>
+                      {workspace.description ? (
+                        <CardDescription className="mt-1">
+                          {workspace.description}
+                        </CardDescription>
+                      ) : null}
+                    </div>
+                    <Button variant="outline" size="sm" asChild>
+                      <Link href={`/workspaces/${workspace.id}/members`}>
+                        <Users className="mr-2 h-4 w-4" />
+                        Members
+                      </Link>
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-4">
+                  {boards.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                      No boards yet in this workspace.
+                    </p>
+                  ) : (
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      {boards.map((board) => (
+                        <Link
+                          key={board.id}
+                          href={`/boards/${board.id}`}
+                          className="group flex items-center justify-between rounded-lg border bg-background px-4 py-3 transition hover:border-primary/40 hover:bg-primary/5 hover:shadow-sm"
+                        >
+                          <div className="min-w-0">
+                            <p className="truncate font-medium group-hover:text-primary">
+                              {board.name}
+                            </p>
+                            <p className="text-xs text-muted-foreground capitalize">
+                              {board.visibility}
+                            </p>
+                          </div>
+                          <span className="ml-3 shrink-0 rounded-md bg-muted px-2 py-1 font-mono text-xs">
+                            {board.key}
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })
         )}
       </div>
 
       <div className="space-y-4">
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">New workspace</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Plus className="h-4 w-4" />
+              New workspace
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="space-y-2">
@@ -149,7 +166,6 @@ export function WorkspacePanel({
               disabled={pending || workspaceName.trim().length < 2}
               onClick={handleCreateWorkspace}
             >
-              <Plus className="mr-2 h-4 w-4" />
               Create workspace
             </Button>
           </CardContent>
@@ -157,7 +173,10 @@ export function WorkspacePanel({
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">New board</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <LayoutGrid className="h-4 w-4" />
+              New board
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="space-y-2">

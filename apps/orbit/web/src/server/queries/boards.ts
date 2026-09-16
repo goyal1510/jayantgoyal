@@ -133,6 +133,36 @@ export async function listCardComments(
   }));
 }
 
+/** Lists all board comments in one query, grouped by card id. */
+export async function listBoardCommentsByCard(
+  supabase: OrbitSupabaseClient,
+  boardId: string,
+): Promise<Record<string, CommentSummary[]>> {
+  const { data, error } = await supabase
+    .schema("orbit")
+    .from("comments")
+    .select("id, card_id, author_id, body, created_at")
+    .eq("board_id", boardId)
+    .is("deleted_at", null)
+    .order("created_at", { ascending: true });
+
+  if (error) throw error;
+
+  const grouped: Record<string, CommentSummary[]> = {};
+  for (const comment of data ?? []) {
+    const cardId = comment.card_id as string;
+    grouped[cardId] ??= [];
+    grouped[cardId].push({
+      id: comment.id as string,
+      cardId,
+      authorId: comment.author_id as string,
+      body: comment.body as string,
+      createdAt: comment.created_at as string,
+    });
+  }
+  return grouped;
+}
+
 /** Lists workspace-scoped labels available for cards. */
 export async function listWorkspaceLabels(
   supabase: OrbitSupabaseClient,

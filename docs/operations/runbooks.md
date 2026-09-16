@@ -42,6 +42,11 @@ archived QA evidence.
    `node scripts/orbit/process-outbox.mjs`. Optional `RESEND_API_KEY` and
    `ORBIT_INVITE_FROM` send invitation emails; without Resend, the worker still
    completes events and copy-link invites remain available in the UI.
+7. Provision QA test users (no invitation flow):
+   `node --env-file=apps/admin/web/.env.local scripts/orbit/seed-test-users.mjs`.
+   Credentials land in `supabase/.temp/orbit-test-users.json` (gitignored).
+8. Run Orbit API smoke tests (skips invitations):
+   `node --env-file=apps/admin/web/.env.local scripts/orbit/e2e-smoke.mjs`.
 
 ## Production deployment failure
 

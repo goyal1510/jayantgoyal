@@ -1082,6 +1082,22 @@ $$;
 ALTER FUNCTION "orbit"."save_board_template"("p_board_id" "uuid", "p_name" "text", "p_description" "text") OWNER TO "postgres";
 
 
+CREATE OR REPLACE FUNCTION "orbit"."seed_qa_workspace_member"("p_workspace_id" "uuid", "p_user_id" "uuid", "p_role" "orbit"."workspace_member_role" DEFAULT 'member'::"orbit"."workspace_member_role") RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+begin
+  insert into orbit.workspace_members (workspace_id, user_id, role, status)
+  values (p_workspace_id, p_user_id, p_role, 'active')
+  on conflict (workspace_id, user_id) do update
+  set role = excluded.role, status = 'active', removed_at = null;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."seed_qa_workspace_member"("p_workspace_id" "uuid", "p_user_id" "uuid", "p_role" "orbit"."workspace_member_role") OWNER TO "postgres";
+
+
 CREATE OR REPLACE FUNCTION "orbit"."set_card_assignee"("p_card_id" "uuid", "p_user_id" "uuid", "p_attach" boolean DEFAULT true) RETURNS "void"
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO ''
@@ -2752,6 +2768,11 @@ GRANT ALL ON FUNCTION "orbit"."restore_card"("p_card_id" "uuid") TO "authenticat
 
 
 GRANT ALL ON FUNCTION "orbit"."save_board_template"("p_board_id" "uuid", "p_name" "text", "p_description" "text") TO "authenticated";
+
+
+
+REVOKE ALL ON FUNCTION "orbit"."seed_qa_workspace_member"("p_workspace_id" "uuid", "p_user_id" "uuid", "p_role" "orbit"."workspace_member_role") FROM PUBLIC;
+GRANT ALL ON FUNCTION "orbit"."seed_qa_workspace_member"("p_workspace_id" "uuid", "p_user_id" "uuid", "p_role" "orbit"."workspace_member_role") TO "service_role";
 
 
 

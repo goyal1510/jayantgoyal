@@ -16,6 +16,7 @@ import {
 } from "@jayantgoyal/web-ui/lib/sidebar-preferences";
 import { RouteChangeProvider } from "@jayantgoyal/web-ui/route-change-provider";
 
+import { OrbitNav } from "@/features/orbit/orbit-nav";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export default async function OrbitAppLayout({
@@ -58,20 +59,7 @@ export default async function OrbitAppLayout({
             <OrbitIcon className="h-5 w-5 text-primary" aria-hidden />
             <span className="font-semibold">Orbit</span>
           </div>
-          <nav className="flex flex-col gap-1 text-sm">
-            <Link
-              href="/home"
-              className="rounded-md px-3 py-2 hover:bg-sidebar-accent"
-            >
-              Home
-            </Link>
-            <Link
-              href="/inbox"
-              className="rounded-md px-3 py-2 hover:bg-sidebar-accent"
-            >
-              Inbox
-            </Link>
-          </nav>
+          <OrbitNav />
           <div className="mt-auto space-y-2 border-t pt-4 text-xs text-muted-foreground">
             <p className="truncate px-2">{fullName}</p>
             <Button variant="outline" size="sm" className="w-full" asChild>

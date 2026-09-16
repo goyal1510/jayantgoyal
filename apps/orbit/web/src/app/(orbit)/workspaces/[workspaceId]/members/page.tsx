@@ -31,7 +31,14 @@ export default async function WorkspaceMembersPage({ params }: MembersPageProps)
           Back to home
         </Link>
       </div>
-      <InvitePanel workspaceId={workspaceId} />
+      <details className="rounded-lg border p-4">
+        <summary className="cursor-pointer text-sm font-medium">
+          Invitations (test separately)
+        </summary>
+        <div className="mt-3">
+          <InvitePanel workspaceId={workspaceId} />
+        </div>
+      </details>
       <MembersPanel workspaceId={workspaceId} members={members} />
     </div>
   );

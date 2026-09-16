@@ -6,7 +6,6 @@ import {
   listBoardAssigneeIds,
   listBoardAttachments,
   listBoardCardLabelIds,
-  listCardComments,
   listWorkspaceLabels,
   listWorkspaceMembers,
   loadBoardView,
@@ -54,23 +53,11 @@ export default async function BoardPage({ params }: BoardPageProps) {
     listBoardSavedViews(supabase, boardId, user.id),
   ]);
 
-  const commentsByCard: Record<
-    string,
-    Awaited<ReturnType<typeof listCardComments>>
-  > = {};
-
-  await Promise.all(
-    cards.map(async (card) => {
-      commentsByCard[card.id] = await listCardComments(supabase, card.id);
-    }),
-  );
-
   return (
     <BoardView
       board={board}
       columns={columns}
       cards={cards}
-      commentsByCard={commentsByCard}
       labels={labels}
       labelIdsByCard={labelIdsByCard}
       members={members}
