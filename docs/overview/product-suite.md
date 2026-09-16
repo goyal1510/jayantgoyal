@@ -26,3 +26,14 @@ for stable responsibilities used across products.
 
 Current product routes and feature registries remain more precise than prose.
 The important sources are linked from each product document.
+
+## Proposed products
+
+Proposed products may be documented before implementation when every page is
+explicit about that status and does not claim that clients, routes, schemas,
+hosts, or deployments exist.
+
+| Product                                    | Status   | Intended audience                                            | Proposed responsibility                                                                  |
+| ------------------------------------------ | -------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
+| [Orbit](../products/orbit/README.md)       | Proposed | Individuals and selected collaborators                       | Workspaces, boards, task cards, assignments, discussions, attachments, and team progress |
+| [PumpAxis](../products/pumpaxis/README.md) | Proposed | Petrol-pump owners, staff, customers, and fleet participants | Modular pump operations, loyalty, reconciliation, and future adjacent capabilities       |

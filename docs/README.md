@@ -62,6 +62,10 @@ prose.
 
 ## Proposed products
 
+- [Orbit](products/orbit/README.md): proposed board-and-card work-management
+  product with shared Auth/IAM integration, workspace and board authorization,
+  and a staged private-alpha-to-extension scope. No Orbit client, schema, host,
+  or deployment is implemented yet.
 - [PumpAxis](products/pumpaxis/README.md): proposed modular petrol-pump
   operations product, including Loyalty and Shift Close & Reconciliation
   requirements. No PumpAxis client or production data system is implemented in
