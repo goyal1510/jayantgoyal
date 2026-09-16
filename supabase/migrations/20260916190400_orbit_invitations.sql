@@ -111,9 +111,9 @@ begin
     values ('orbit', v_user_id, 'active')
     on conflict (product_key, user_id) do update set status = 'active';
 
-    insert into iam.product_role_assignments (product_key, user_id, role_key, status)
-    values ('orbit', v_user_id, 'orbit.participant', 'active')
-    on conflict (product_key, user_id, role_key) do update set status = 'active';
+    insert into iam.product_role_assignments (product_key, user_id, role_key)
+    values ('orbit', v_user_id, 'orbit.participant')
+    on conflict (product_key, user_id, role_key) do nothing;
   end if;
 
   v_workspace_id := v_invitation.workspace_id;

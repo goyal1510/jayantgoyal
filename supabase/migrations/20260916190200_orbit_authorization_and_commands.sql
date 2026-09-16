@@ -1,8 +1,5 @@
 begin;
 
-alter table orbit.cards add constraint cards_workspace_board_id_unique unique (workspace_id, board_id, id);
-alter table orbit.labels add constraint labels_workspace_id_unique unique (workspace_id, id);
-
 create or replace function orbit_private.current_user_id()
 returns uuid
 language sql

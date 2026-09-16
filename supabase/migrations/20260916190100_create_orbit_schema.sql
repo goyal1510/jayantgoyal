@@ -82,6 +82,8 @@ create table orbit.boards (
   unique (workspace_id, key)
 );
 
+alter table orbit.boards add constraint boards_workspace_id_unique unique (workspace_id, id);
+
 create table orbit.board_members (
   workspace_id uuid not null,
   board_id uuid not null references orbit.boards (id) on delete cascade,
@@ -93,8 +95,6 @@ create table orbit.board_members (
   foreign key (workspace_id, board_id)
     references orbit.boards (workspace_id, id) on delete cascade
 );
-
-alter table orbit.boards add constraint boards_workspace_id_unique unique (workspace_id, id);
 
 create table orbit.columns (
   id uuid primary key default foundation.uuid_v7(),
@@ -142,6 +142,8 @@ create table orbit.cards (
     references orbit.columns (board_id, id) on delete restrict
 );
 
+alter table orbit.cards add constraint cards_workspace_board_id_unique unique (workspace_id, board_id, id);
+
 create table orbit.card_assignees (
   workspace_id uuid not null,
   board_id uuid not null,
@@ -159,9 +161,13 @@ create table orbit.labels (
   workspace_id uuid not null references orbit.workspaces (id) on delete cascade,
   name text not null check (char_length(trim(name)) between 1 and 40),
   color_token text not null default 'slate',
-  created_at timestamptz not null default now(),
-  unique (workspace_id, lower(name))
+  created_at timestamptz not null default now()
 );
+
+create unique index labels_workspace_name_idx
+  on orbit.labels (workspace_id, lower(name));
+
+alter table orbit.labels add constraint labels_workspace_id_unique unique (workspace_id, id);
 
 create table orbit.card_labels (
   workspace_id uuid not null,

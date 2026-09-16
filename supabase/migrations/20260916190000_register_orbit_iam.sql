@@ -58,10 +58,9 @@ with preserved_users as (
   from auth.users
   where lower(email) in ('goyal151002@gmail.com', 'gacbbl@gmail.com')
 )
-insert into iam.product_role_assignments (product_key, user_id, role_key, status)
-select 'orbit', id, 'orbit.creator', 'active'
+insert into iam.product_role_assignments (product_key, user_id, role_key)
+select 'orbit', id, 'orbit.creator'
 from preserved_users
-on conflict (product_key, user_id, role_key) do update
-set status = excluded.status;
+on conflict (product_key, user_id, role_key) do nothing;
 
 commit;

@@ -1020,3 +1020,7 @@ GRANT ALL ON TABLE "iam"."workforce_role_assignments" TO "service_role";
 
 GRANT SELECT ON TABLE "iam"."workforces" TO "authenticated";
 GRANT ALL ON TABLE "iam"."workforces" TO "service_role";
+
+
+
+
