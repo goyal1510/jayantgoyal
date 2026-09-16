@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
+import { Badge } from "@jayantgoyal/web-ui/badge";
 import { Button } from "@jayantgoyal/web-ui/button";
 import { Input } from "@jayantgoyal/web-ui/input";
 import {
@@ -13,16 +14,21 @@ import {
   CardTitle,
 } from "@jayantgoyal/web-ui/card";
 
+import { CardDetailPanel } from "@/features/boards/card-detail-panel";
+import { useBoardRealtime } from "@/lib/orbit/use-board-realtime";
 import {
   addCommentAction,
   createCardAction,
   moveCardAction,
 } from "@/server/commands/actions";
 import type {
+  AttachmentSummary,
   BoardSummary,
   CardSummary,
   ColumnSummary,
   CommentSummary,
+  LabelSummary,
+  MemberSummary,
 } from "@/lib/orbit/types";
 
 type BoardViewProps = {
@@ -30,6 +36,11 @@ type BoardViewProps = {
   columns: ColumnSummary[];
   cards: CardSummary[];
   commentsByCard: Record<string, CommentSummary[]>;
+  labels: LabelSummary[];
+  labelIdsByCard: Record<string, string[]>;
+  members: MemberSummary[];
+  assigneeIdsByCard: Record<string, string[]>;
+  attachmentsByCard: Record<string, AttachmentSummary[]>;
 };
 
 export function BoardView({
@@ -37,6 +48,11 @@ export function BoardView({
   columns,
   cards: initialCards,
   commentsByCard,
+  labels,
+  labelIdsByCard,
+  members,
+  assigneeIdsByCard,
+  attachmentsByCard,
 }: BoardViewProps) {
   const router = useRouter();
   const [cards, setCards] = useState(initialCards);
@@ -47,6 +63,17 @@ export function BoardView({
     {},
   );
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
+
+  useBoardRealtime(board.id);
+
+  useEffect(() => {
+    setCards(initialCards);
+  }, [initialCards]);
+
+  const labelById = useMemo(
+    () => new Map(labels.map((label) => [label.id, label])),
+    [labels],
+  );
 
   const visibleCards = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -62,6 +89,8 @@ export function BoardView({
     }
     return grouped;
   }, [visibleCards, columns]);
+
+  const activeCard = cards.find((card) => card.id === activeCardId) ?? null;
 
   function handleCreateCard(columnId: string) {
     const title = newTitles[columnId]?.trim();
@@ -146,6 +175,21 @@ export function BoardView({
         className="max-w-sm"
       />
 
+      {activeCard ? (
+        <CardDetailPanel
+          boardId={board.id}
+          workspaceId={board.workspaceId}
+          boardKey={board.key}
+          card={activeCard}
+          labels={labels}
+          labelIds={labelIdsByCard[activeCard.id] ?? []}
+          members={members}
+          assigneeIds={assigneeIdsByCard[activeCard.id] ?? []}
+          attachments={attachmentsByCard[activeCard.id] ?? []}
+          onClose={() => setActiveCardId(null)}
+        />
+      ) : null}
+
       <div className="flex gap-4 overflow-x-auto pb-4">
         {columns.map((column) => (
           <div key={column.id} className="min-w-[280px] max-w-[320px] flex-1">
@@ -162,11 +206,29 @@ export function BoardView({
                     className="rounded-lg border bg-background p-3 shadow-sm"
                   >
                     <div className="mb-2 flex items-start justify-between gap-2">
-                      <div>
+                      <div className="space-y-1">
                         <p className="font-mono text-[10px] text-muted-foreground">
                           {board.key}-{card.number}
                         </p>
                         <p className="font-medium">{card.title}</p>
+                        {card.dueDate ? (
+                          <p className="text-xs text-muted-foreground">
+                            Due {card.dueDate.slice(0, 10)}
+                          </p>
+                        ) : null}
+                        {(labelIdsByCard[card.id] ?? []).length > 0 ? (
+                          <div className="flex flex-wrap gap-1">
+                            {(labelIdsByCard[card.id] ?? []).map((labelId) => {
+                              const label = labelById.get(labelId);
+                              if (!label) return null;
+                              return (
+                                <Badge key={labelId} variant="secondary">
+                                  {label.name}
+                                </Badge>
+                              );
+                            })}
+                          </div>
+                        ) : null}
                       </div>
                       <Button
                         variant="ghost"
@@ -177,7 +239,7 @@ export function BoardView({
                           )
                         }
                       >
-                        Notes
+                        Open
                       </Button>
                     </div>
                     <label className="sr-only" htmlFor={`move-${card.id}`}>

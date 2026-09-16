@@ -2,7 +2,15 @@ import { notFound } from "next/navigation";
 
 import { BoardView } from "@/features/boards/board-view";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { loadBoardView, listCardComments } from "@/server/queries/boards";
+import {
+  listBoardAssigneeIds,
+  listBoardAttachments,
+  listBoardCardLabelIds,
+  listCardComments,
+  listWorkspaceLabels,
+  listWorkspaceMembers,
+  loadBoardView,
+} from "@/server/queries/boards";
 
 type BoardPageProps = {
   params: Promise<{ boardId: string }>;
@@ -15,14 +23,30 @@ export default async function BoardPage({ params }: BoardPageProps) {
 
   if (!board) notFound();
 
+  const [
+    labels,
+    members,
+    labelIdsByCard,
+    assigneeIdsByCard,
+    attachmentsByCard,
+  ] = await Promise.all([
+    listWorkspaceLabels(supabase, board.workspaceId),
+    listWorkspaceMembers(supabase, board.workspaceId),
+    listBoardCardLabelIds(supabase, boardId),
+    listBoardAssigneeIds(supabase, boardId),
+    listBoardAttachments(supabase, boardId),
+  ]);
+
   const commentsByCard: Record<
     string,
     Awaited<ReturnType<typeof listCardComments>>
   > = {};
 
-  for (const card of cards) {
-    commentsByCard[card.id] = await listCardComments(supabase, card.id);
-  }
+  await Promise.all(
+    cards.map(async (card) => {
+      commentsByCard[card.id] = await listCardComments(supabase, card.id);
+    }),
+  );
 
   return (
     <BoardView
@@ -30,6 +54,11 @@ export default async function BoardPage({ params }: BoardPageProps) {
       columns={columns}
       cards={cards}
       commentsByCard={commentsByCard}
+      labels={labels}
+      labelIdsByCard={labelIdsByCard}
+      members={members}
+      assigneeIdsByCard={assigneeIdsByCard}
+      attachmentsByCard={attachmentsByCard}
     />
   );
 }

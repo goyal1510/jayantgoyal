@@ -236,6 +236,8 @@ CREATE TABLE IF NOT EXISTS "orbit_private"."upload_reservations" (
     "expires_at" timestamp with time zone NOT NULL,
     "status" "text" DEFAULT 'reserved'::"text" NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "original_name" "text",
+    "mime" "text",
     CONSTRAINT "upload_reservations_reserved_bytes_check" CHECK (("reserved_bytes" > 0)),
     CONSTRAINT "upload_reservations_status_check" CHECK (("status" = ANY (ARRAY['reserved'::"text", 'finalized'::"text", 'expired'::"text", 'cancelled'::"text"])))
 );

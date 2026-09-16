@@ -94,7 +94,9 @@ declare
   v_invitation orbit_private.invitations%rowtype;
   v_workspace_id uuid;
 begin
-  perform orbit_private.require_orbit_access();
+  if v_user_id is null then
+    raise exception 'authentication required' using errcode = '42501';
+  end if;
 
   select email into v_email
   from auth.users
@@ -115,6 +117,14 @@ begin
     raise exception 'invitation email mismatch' using errcode = '42501';
   end if;
 
+  insert into iam.product_memberships (product_key, user_id, status)
+  values ('orbit', v_user_id, 'active')
+  on conflict (product_key, user_id) do update set status = 'active';
+
+  insert into iam.product_role_assignments (product_key, user_id, role_key)
+  values ('orbit', v_user_id, 'orbit.participant')
+  on conflict (product_key, user_id, role_key) do nothing;
+
   insert into orbit.workspace_members (workspace_id, user_id, role, status)
   values (v_invitation.workspace_id, v_user_id, v_invitation.workspace_role, 'active')
   on conflict (workspace_id, user_id) do update
@@ -123,16 +133,6 @@ begin
   update orbit_private.invitations
   set status = 'accepted'
   where id = v_invitation.id;
-
-  if not iam_private.user_has_product_access(v_user_id, 'orbit') then
-    insert into iam.product_memberships (product_key, user_id, status)
-    values ('orbit', v_user_id, 'active')
-    on conflict (product_key, user_id) do update set status = 'active';
-
-    insert into iam.product_role_assignments (product_key, user_id, role_key)
-    values ('orbit', v_user_id, 'orbit.participant')
-    on conflict (product_key, user_id, role_key) do nothing;
-  end if;
 
   v_workspace_id := v_invitation.workspace_id;
   return v_workspace_id;
@@ -208,6 +208,42 @@ $$;
 
 
 ALTER FUNCTION "orbit"."add_comment"("p_card_id" "uuid", "p_body" "text") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."archive_card"("p_card_id" "uuid", "p_expected_version" integer) RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+  v_board_id uuid;
+begin
+  perform orbit_private.require_orbit_access();
+
+  select board_id into v_board_id
+  from orbit.cards
+  where id = p_card_id and deleted_at is null;
+
+  if v_board_id is null then
+    raise exception 'card not found' using errcode = 'P0002';
+  end if;
+
+  if not orbit_private.can_edit_board(v_board_id, v_user_id) then
+    raise exception 'board edit access required' using errcode = '42501';
+  end if;
+
+  update orbit.cards
+  set archived_at = now(), version = version + 1
+  where id = p_card_id and version = p_expected_version;
+
+  if not found then
+    raise exception 'stale card version' using errcode = '40001';
+  end if;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."archive_card"("p_card_id" "uuid", "p_expected_version" integer) OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "orbit"."create_board"("p_workspace_id" "uuid", "p_name" "text", "p_key" "text", "p_visibility" "orbit"."board_visibility" DEFAULT 'workspace'::"orbit"."board_visibility") RETURNS "uuid"
@@ -375,6 +411,32 @@ $$;
 ALTER FUNCTION "orbit"."create_card"("p_board_id" "uuid", "p_column_id" "uuid", "p_title" "text") OWNER TO "postgres";
 
 
+CREATE OR REPLACE FUNCTION "orbit"."create_label"("p_workspace_id" "uuid", "p_name" "text", "p_color_token" "text" DEFAULT 'slate'::"text") RETURNS "uuid"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+  v_label_id uuid;
+begin
+  perform orbit_private.require_orbit_access();
+
+  if not orbit_private.is_active_workspace_member(p_workspace_id, v_user_id) then
+    raise exception 'workspace membership required' using errcode = '42501';
+  end if;
+
+  insert into orbit.labels (workspace_id, name, color_token)
+  values (p_workspace_id, trim(p_name), coalesce(nullif(trim(p_color_token), ''), 'slate'))
+  returning id into v_label_id;
+
+  return v_label_id;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."create_label"("p_workspace_id" "uuid", "p_name" "text", "p_color_token" "text") OWNER TO "postgres";
+
+
 CREATE OR REPLACE FUNCTION "orbit"."create_workspace"("p_name" "text", "p_description" "text" DEFAULT NULL::"text", "p_idempotency_key" "text" DEFAULT NULL::"text") RETURNS "uuid"
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO ''
@@ -466,6 +528,115 @@ $$;
 ALTER FUNCTION "orbit"."create_workspace_invitation"("p_workspace_id" "uuid", "p_email" "text", "p_role" "orbit"."workspace_member_role", "p_token_hash" "text") OWNER TO "postgres";
 
 
+CREATE OR REPLACE FUNCTION "orbit"."finalize_attachment_upload"("p_reservation_id" "uuid", "p_checksum" "text" DEFAULT NULL::"text") RETURNS "uuid"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+  v_reservation orbit_private.upload_reservations%rowtype;
+  v_attachment_id uuid;
+begin
+  perform orbit_private.require_orbit_access();
+
+  select * into v_reservation
+  from orbit_private.upload_reservations
+  where id = p_reservation_id
+    and uploader_id = v_user_id
+    and status = 'reserved'
+    and expires_at > now()
+  for update;
+
+  if not found then
+    raise exception 'reservation invalid or expired' using errcode = 'P0002';
+  end if;
+
+  insert into orbit.attachments (
+    workspace_id,
+    board_id,
+    card_id,
+    uploader_id,
+    object_key,
+    original_name,
+    mime,
+    bytes,
+    checksum,
+    status
+  )
+  values (
+    v_reservation.workspace_id,
+    v_reservation.board_id,
+    v_reservation.card_id,
+    v_user_id,
+    v_reservation.object_key,
+    coalesce(v_reservation.original_name, 'attachment'),
+    coalesce(v_reservation.mime, 'application/octet-stream'),
+    v_reservation.reserved_bytes,
+    p_checksum,
+    'ready'
+  )
+  returning id into v_attachment_id;
+
+  update orbit_private.upload_reservations
+  set status = 'finalized'
+  where id = p_reservation_id;
+
+  return v_attachment_id;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."finalize_attachment_upload"("p_reservation_id" "uuid", "p_checksum" "text") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."mark_all_notifications_read"() RETURNS integer
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+  v_count integer;
+begin
+  perform orbit_private.require_orbit_access();
+
+  update orbit.notifications
+  set read_at = now()
+  where recipient_id = v_user_id
+    and read_at is null;
+
+  get diagnostics v_count = row_count;
+  return v_count;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."mark_all_notifications_read"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."mark_notification_read"("p_notification_id" "uuid") RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+begin
+  perform orbit_private.require_orbit_access();
+
+  update orbit.notifications
+  set read_at = coalesce(read_at, now())
+  where id = p_notification_id
+    and recipient_id = v_user_id;
+
+  if not found then
+    raise exception 'notification not found' using errcode = 'P0002';
+  end if;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."mark_notification_read"("p_notification_id" "uuid") OWNER TO "postgres";
+
+
 CREATE OR REPLACE FUNCTION "orbit"."move_card"("p_card_id" "uuid", "p_target_column_id" "uuid", "p_rank" "text", "p_expected_version" integer) RETURNS "void"
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO ''
@@ -514,6 +685,233 @@ $$;
 
 
 ALTER FUNCTION "orbit"."move_card"("p_card_id" "uuid", "p_target_column_id" "uuid", "p_rank" "text", "p_expected_version" integer) OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."reserve_attachment_upload"("p_card_id" "uuid", "p_original_name" "text", "p_mime" "text", "p_bytes" bigint) RETURNS "jsonb"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+  v_workspace_id uuid;
+  v_board_id uuid;
+  v_reservation_id uuid;
+  v_object_key text;
+begin
+  perform orbit_private.require_orbit_access();
+
+  if p_bytes <= 0 or p_bytes > 10485760 then
+    raise exception 'invalid upload size' using errcode = '22023';
+  end if;
+
+  select workspace_id, board_id into v_workspace_id, v_board_id
+  from orbit.cards
+  where id = p_card_id and deleted_at is null;
+
+  if v_board_id is null then
+    raise exception 'card not found' using errcode = 'P0002';
+  end if;
+
+  if not orbit_private.can_edit_board(v_board_id, v_user_id) then
+    raise exception 'board edit access required' using errcode = '42501';
+  end if;
+
+  v_object_key := v_user_id::text || '/' || foundation.uuid_v7()::text || '/' ||
+    regexp_replace(trim(p_original_name), '[^a-zA-Z0-9._-]', '_', 'g');
+
+  insert into orbit_private.upload_reservations (
+    workspace_id,
+    board_id,
+    card_id,
+    uploader_id,
+    object_key,
+    original_name,
+    mime,
+    reserved_bytes,
+    expires_at
+  )
+  values (
+    v_workspace_id,
+    v_board_id,
+    p_card_id,
+    v_user_id,
+    v_object_key,
+    trim(p_original_name),
+    trim(p_mime),
+    p_bytes,
+    now() + interval '15 minutes'
+  )
+  returning id into v_reservation_id;
+
+  return jsonb_build_object(
+    'reservation_id', v_reservation_id,
+    'object_key', v_object_key,
+    'bucket', 'orbit-attachments'
+  );
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."reserve_attachment_upload"("p_card_id" "uuid", "p_original_name" "text", "p_mime" "text", "p_bytes" bigint) OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."set_card_assignee"("p_card_id" "uuid", "p_user_id" "uuid", "p_attach" boolean DEFAULT true) RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_actor_id uuid := orbit_private.current_user_id();
+  v_workspace_id uuid;
+  v_board_id uuid;
+begin
+  perform orbit_private.require_orbit_access();
+
+  select workspace_id, board_id into v_workspace_id, v_board_id
+  from orbit.cards
+  where id = p_card_id and deleted_at is null;
+
+  if v_board_id is null then
+    raise exception 'card not found' using errcode = 'P0002';
+  end if;
+
+  if not orbit_private.can_edit_board(v_board_id, v_actor_id) then
+    raise exception 'board edit access required' using errcode = '42501';
+  end if;
+
+  if p_attach then
+    insert into orbit.card_assignees (
+      workspace_id, board_id, card_id, user_id, assigned_by
+    )
+    values (v_workspace_id, v_board_id, p_card_id, p_user_id, v_actor_id)
+    on conflict (card_id, user_id) do nothing;
+  else
+    delete from orbit.card_assignees
+    where card_id = p_card_id and user_id = p_user_id;
+  end if;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."set_card_assignee"("p_card_id" "uuid", "p_user_id" "uuid", "p_attach" boolean) OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."toggle_card_label"("p_card_id" "uuid", "p_label_id" "uuid", "p_attach" boolean DEFAULT true) RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+  v_workspace_id uuid;
+  v_board_id uuid;
+begin
+  perform orbit_private.require_orbit_access();
+
+  select workspace_id, board_id into v_workspace_id, v_board_id
+  from orbit.cards
+  where id = p_card_id and deleted_at is null;
+
+  if v_board_id is null then
+    raise exception 'card not found' using errcode = 'P0002';
+  end if;
+
+  if not orbit_private.can_edit_board(v_board_id, v_user_id) then
+    raise exception 'board edit access required' using errcode = '42501';
+  end if;
+
+  if p_attach then
+    insert into orbit.card_labels (workspace_id, board_id, card_id, label_id)
+    values (v_workspace_id, v_board_id, p_card_id, p_label_id)
+    on conflict (card_id, label_id) do nothing;
+  else
+    delete from orbit.card_labels
+    where card_id = p_card_id and label_id = p_label_id;
+  end if;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."toggle_card_label"("p_card_id" "uuid", "p_label_id" "uuid", "p_attach" boolean) OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."trash_card"("p_card_id" "uuid", "p_expected_version" integer) RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+  v_board_id uuid;
+begin
+  perform orbit_private.require_orbit_access();
+
+  select board_id into v_board_id
+  from orbit.cards
+  where id = p_card_id and deleted_at is null;
+
+  if v_board_id is null then
+    raise exception 'card not found' using errcode = 'P0002';
+  end if;
+
+  if not orbit_private.can_edit_board(v_board_id, v_user_id) then
+    raise exception 'board edit access required' using errcode = '42501';
+  end if;
+
+  update orbit.cards
+  set deleted_at = now(), version = version + 1
+  where id = p_card_id and version = p_expected_version;
+
+  if not found then
+    raise exception 'stale card version' using errcode = '40001';
+  end if;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."trash_card"("p_card_id" "uuid", "p_expected_version" integer) OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."update_card"("p_card_id" "uuid", "p_title" "text" DEFAULT NULL::"text", "p_description" "text" DEFAULT NULL::"text", "p_priority" "orbit"."card_priority" DEFAULT NULL::"orbit"."card_priority", "p_due_date" "date" DEFAULT NULL::"date", "p_expected_version" integer DEFAULT NULL::integer) RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+  v_board_id uuid;
+begin
+  perform orbit_private.require_orbit_access();
+
+  select board_id into v_board_id
+  from orbit.cards
+  where id = p_card_id and deleted_at is null;
+
+  if v_board_id is null then
+    raise exception 'card not found' using errcode = 'P0002';
+  end if;
+
+  if not orbit_private.can_edit_board(v_board_id, v_user_id) then
+    raise exception 'board edit access required' using errcode = '42501';
+  end if;
+
+  update orbit.cards
+  set
+    title = coalesce(nullif(trim(p_title), ''), title),
+    description = case
+      when p_description is null then description
+      else nullif(trim(p_description), '')
+    end,
+    priority = coalesce(p_priority, priority),
+    due_date = coalesce(p_due_date, due_date),
+    version = version + 1
+  where id = p_card_id
+    and (p_expected_version is null or version = p_expected_version);
+
+  if not found then
+    raise exception 'stale card version' using errcode = '40001';
+  end if;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."update_card"("p_card_id" "uuid", "p_title" "text", "p_description" "text", "p_priority" "orbit"."card_priority", "p_due_date" "date", "p_expected_version" integer) OWNER TO "postgres";
 
 SET default_tablespace = '';
 
@@ -1146,6 +1544,10 @@ CREATE POLICY "activity_select_reader" ON "orbit"."activity_events" FOR SELECT T
 ALTER TABLE "orbit"."attachments" ENABLE ROW LEVEL SECURITY;
 
 
+CREATE POLICY "attachments_select_reader" ON "orbit"."attachments" FOR SELECT TO "authenticated" USING (("orbit_private"."can_read_board"("board_id") AND ("status" = 'ready'::"text") AND ("deleted_at" IS NULL)));
+
+
+
 ALTER TABLE "orbit"."board_favorites" ENABLE ROW LEVEL SECURITY;
 
 
@@ -1162,7 +1564,15 @@ CREATE POLICY "boards_select_reader" ON "orbit"."boards" FOR SELECT TO "authenti
 ALTER TABLE "orbit"."card_assignees" ENABLE ROW LEVEL SECURITY;
 
 
+CREATE POLICY "card_assignees_select_reader" ON "orbit"."card_assignees" FOR SELECT TO "authenticated" USING ("orbit_private"."can_read_board"("board_id"));
+
+
+
 ALTER TABLE "orbit"."card_labels" ENABLE ROW LEVEL SECURITY;
+
+
+CREATE POLICY "card_labels_select_reader" ON "orbit"."card_labels" FOR SELECT TO "authenticated" USING ("orbit_private"."can_read_board"("board_id"));
+
 
 
 ALTER TABLE "orbit"."cards" ENABLE ROW LEVEL SECURITY;
@@ -1236,6 +1646,11 @@ GRANT ALL ON FUNCTION "orbit"."add_comment"("p_card_id" "uuid", "p_body" "text")
 
 
 
+REVOKE ALL ON FUNCTION "orbit"."archive_card"("p_card_id" "uuid", "p_expected_version" integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION "orbit"."archive_card"("p_card_id" "uuid", "p_expected_version" integer) TO "authenticated";
+
+
+
 REVOKE ALL ON FUNCTION "orbit"."create_board"("p_workspace_id" "uuid", "p_name" "text", "p_key" "text", "p_visibility" "orbit"."board_visibility") FROM PUBLIC;
 GRANT ALL ON FUNCTION "orbit"."create_board"("p_workspace_id" "uuid", "p_name" "text", "p_key" "text", "p_visibility" "orbit"."board_visibility") TO "authenticated";
 
@@ -1243,6 +1658,11 @@ GRANT ALL ON FUNCTION "orbit"."create_board"("p_workspace_id" "uuid", "p_name" "
 
 REVOKE ALL ON FUNCTION "orbit"."create_card"("p_board_id" "uuid", "p_column_id" "uuid", "p_title" "text") FROM PUBLIC;
 GRANT ALL ON FUNCTION "orbit"."create_card"("p_board_id" "uuid", "p_column_id" "uuid", "p_title" "text") TO "authenticated";
+
+
+
+REVOKE ALL ON FUNCTION "orbit"."create_label"("p_workspace_id" "uuid", "p_name" "text", "p_color_token" "text") FROM PUBLIC;
+GRANT ALL ON FUNCTION "orbit"."create_label"("p_workspace_id" "uuid", "p_name" "text", "p_color_token" "text") TO "authenticated";
 
 
 
@@ -1256,8 +1676,48 @@ GRANT ALL ON FUNCTION "orbit"."create_workspace_invitation"("p_workspace_id" "uu
 
 
 
+REVOKE ALL ON FUNCTION "orbit"."finalize_attachment_upload"("p_reservation_id" "uuid", "p_checksum" "text") FROM PUBLIC;
+GRANT ALL ON FUNCTION "orbit"."finalize_attachment_upload"("p_reservation_id" "uuid", "p_checksum" "text") TO "authenticated";
+
+
+
+REVOKE ALL ON FUNCTION "orbit"."mark_all_notifications_read"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "orbit"."mark_all_notifications_read"() TO "authenticated";
+
+
+
+REVOKE ALL ON FUNCTION "orbit"."mark_notification_read"("p_notification_id" "uuid") FROM PUBLIC;
+GRANT ALL ON FUNCTION "orbit"."mark_notification_read"("p_notification_id" "uuid") TO "authenticated";
+
+
+
 REVOKE ALL ON FUNCTION "orbit"."move_card"("p_card_id" "uuid", "p_target_column_id" "uuid", "p_rank" "text", "p_expected_version" integer) FROM PUBLIC;
 GRANT ALL ON FUNCTION "orbit"."move_card"("p_card_id" "uuid", "p_target_column_id" "uuid", "p_rank" "text", "p_expected_version" integer) TO "authenticated";
+
+
+
+REVOKE ALL ON FUNCTION "orbit"."reserve_attachment_upload"("p_card_id" "uuid", "p_original_name" "text", "p_mime" "text", "p_bytes" bigint) FROM PUBLIC;
+GRANT ALL ON FUNCTION "orbit"."reserve_attachment_upload"("p_card_id" "uuid", "p_original_name" "text", "p_mime" "text", "p_bytes" bigint) TO "authenticated";
+
+
+
+REVOKE ALL ON FUNCTION "orbit"."set_card_assignee"("p_card_id" "uuid", "p_user_id" "uuid", "p_attach" boolean) FROM PUBLIC;
+GRANT ALL ON FUNCTION "orbit"."set_card_assignee"("p_card_id" "uuid", "p_user_id" "uuid", "p_attach" boolean) TO "authenticated";
+
+
+
+REVOKE ALL ON FUNCTION "orbit"."toggle_card_label"("p_card_id" "uuid", "p_label_id" "uuid", "p_attach" boolean) FROM PUBLIC;
+GRANT ALL ON FUNCTION "orbit"."toggle_card_label"("p_card_id" "uuid", "p_label_id" "uuid", "p_attach" boolean) TO "authenticated";
+
+
+
+REVOKE ALL ON FUNCTION "orbit"."trash_card"("p_card_id" "uuid", "p_expected_version" integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION "orbit"."trash_card"("p_card_id" "uuid", "p_expected_version" integer) TO "authenticated";
+
+
+
+REVOKE ALL ON FUNCTION "orbit"."update_card"("p_card_id" "uuid", "p_title" "text", "p_description" "text", "p_priority" "orbit"."card_priority", "p_due_date" "date", "p_expected_version" integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION "orbit"."update_card"("p_card_id" "uuid", "p_title" "text", "p_description" "text", "p_priority" "orbit"."card_priority", "p_due_date" "date", "p_expected_version" integer) TO "authenticated";
 
 
 

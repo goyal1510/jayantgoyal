@@ -39,7 +39,9 @@ archived QA evidence.
    `apps/orbit/web`, then map `orbit.jayantgoyal.com`.
 5. Add `NEXT_PUBLIC_ORBIT_URL` to Auth return-origin configuration.
 6. Run the outbox worker from a trusted environment with service-role access:
-   `node scripts/orbit/process-outbox.mjs`.
+   `node scripts/orbit/process-outbox.mjs`. Optional `RESEND_API_KEY` and
+   `ORBIT_INVITE_FROM` send invitation emails; without Resend, the worker still
+   completes events and copy-link invites remain available in the UI.
 
 ## Production deployment failure
 

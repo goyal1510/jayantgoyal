@@ -1,11 +1,6 @@
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@jayantgoyal/web-ui/card";
-
+import { InboxPanel } from "@/features/inbox/inbox-panel";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import type { NotificationSummary } from "@/lib/orbit/types";
 
 export default async function InboxPage() {
   const supabase = await createSupabaseServerClient();
@@ -16,6 +11,16 @@ export default async function InboxPage() {
     .order("created_at", { ascending: false })
     .limit(20);
 
+  const summaries: NotificationSummary[] = (notifications ?? []).map(
+    (notification) => ({
+      id: notification.id as string,
+      reason: notification.reason as string,
+      subjectType: notification.subject_type as string,
+      createdAt: notification.created_at as string,
+      readAt: (notification.read_at as string | null) ?? null,
+    }),
+  );
+
   return (
     <div className="space-y-4">
       <div>
@@ -24,28 +29,7 @@ export default async function InboxPage() {
           In-app notifications from your workspaces.
         </p>
       </div>
-      {(notifications ?? []).length === 0 ? (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">All caught up</CardTitle>
-            <CardDescription>
-              New mentions, assignments, and activity will appear here.
-            </CardDescription>
-          </CardHeader>
-        </Card>
-      ) : (
-        (notifications ?? []).map((notification) => (
-          <Card key={notification.id}>
-            <CardHeader>
-              <CardTitle className="text-base">{notification.reason}</CardTitle>
-              <CardDescription>
-                {notification.subject_type} ·{" "}
-                {new Date(notification.created_at).toLocaleString()}
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        ))
-      )}
+      <InboxPanel notifications={summaries} />
     </div>
   );
 }

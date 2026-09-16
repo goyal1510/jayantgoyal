@@ -32,6 +32,7 @@ export type CardSummary = {
   rank: string;
   version: number;
   dueDate: string | null;
+  archivedAt?: string | null;
 };
 
 export type CommentSummary = {
@@ -40,4 +41,34 @@ export type CommentSummary = {
   authorId: string;
   body: string;
   createdAt: string;
+};
+
+export type LabelSummary = {
+  id: string;
+  workspaceId: string;
+  name: string;
+  colorToken: string;
+};
+
+export type MemberSummary = {
+  userId: string;
+  role: string;
+  displayName: string;
+};
+
+export type AttachmentSummary = {
+  id: string;
+  cardId: string;
+  originalName: string;
+  mime: string;
+  bytes: number;
+  objectKey: string;
+};
+
+export type NotificationSummary = {
+  id: string;
+  reason: string;
+  subjectType: string;
+  createdAt: string;
+  readAt: string | null;
 };

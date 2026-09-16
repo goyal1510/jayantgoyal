@@ -148,3 +148,176 @@ export async function acceptWorkspaceInvitationAction(input: {
   revalidatePath("/home");
   return { ok: true, workspaceId: data as string };
 }
+
+/** Updates editable card fields with optimistic versioning. */
+export async function updateCardAction(input: {
+  boardId: string;
+  cardId: string;
+  title?: string;
+  description?: string;
+  priority?: "none" | "low" | "medium" | "high" | "urgent";
+  dueDate?: string | null;
+  expectedVersion: number;
+}): Promise<ActionResult> {
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.schema("orbit").rpc("update_card", {
+    p_card_id: input.cardId,
+    p_title: input.title ?? null,
+    p_description: input.description ?? null,
+    p_priority: input.priority ?? null,
+    p_due_date: input.dueDate ?? null,
+    p_expected_version: input.expectedVersion,
+  });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/boards/${input.boardId}`);
+  return { ok: true };
+}
+
+export async function trashCardAction(input: {
+  boardId: string;
+  cardId: string;
+  expectedVersion: number;
+}): Promise<ActionResult> {
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.schema("orbit").rpc("trash_card", {
+    p_card_id: input.cardId,
+    p_expected_version: input.expectedVersion,
+  });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/boards/${input.boardId}`);
+  return { ok: true };
+}
+
+export async function archiveCardAction(input: {
+  boardId: string;
+  cardId: string;
+  expectedVersion: number;
+}): Promise<ActionResult> {
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.schema("orbit").rpc("archive_card", {
+    p_card_id: input.cardId,
+    p_expected_version: input.expectedVersion,
+  });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/boards/${input.boardId}`);
+  return { ok: true };
+}
+
+export async function createLabelAction(input: {
+  workspaceId: string;
+  boardId: string;
+  name: string;
+  colorToken?: string;
+}): Promise<ActionResult> {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.schema("orbit").rpc("create_label", {
+    p_workspace_id: input.workspaceId,
+    p_name: input.name,
+    p_color_token: input.colorToken ?? "slate",
+  });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/boards/${input.boardId}`);
+  return { ok: true, id: data as string };
+}
+
+export async function toggleCardLabelAction(input: {
+  boardId: string;
+  cardId: string;
+  labelId: string;
+  attach: boolean;
+}): Promise<ActionResult> {
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.schema("orbit").rpc("toggle_card_label", {
+    p_card_id: input.cardId,
+    p_label_id: input.labelId,
+    p_attach: input.attach,
+  });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/boards/${input.boardId}`);
+  return { ok: true };
+}
+
+export async function setCardAssigneeAction(input: {
+  boardId: string;
+  cardId: string;
+  userId: string;
+  attach: boolean;
+}): Promise<ActionResult> {
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.schema("orbit").rpc("set_card_assignee", {
+    p_card_id: input.cardId,
+    p_user_id: input.userId,
+    p_attach: input.attach,
+  });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/boards/${input.boardId}`);
+  return { ok: true };
+}
+
+export async function markNotificationReadAction(
+  notificationId: string,
+): Promise<ActionResult> {
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase
+    .schema("orbit")
+    .rpc("mark_notification_read", { p_notification_id: notificationId });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/inbox");
+  return { ok: true };
+}
+
+export async function markAllNotificationsReadAction(): Promise<ActionResult> {
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.schema("orbit").rpc("mark_all_notifications_read");
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/inbox");
+  return { ok: true };
+}
+
+export async function uploadCardAttachmentAction(input: {
+  boardId: string;
+  cardId: string;
+  fileName: string;
+  mime: string;
+  bytes: number;
+  fileBase64: string;
+}): Promise<ActionResult> {
+  const supabase = await createSupabaseServerClient();
+  const { data: reservation, error: reserveError } = await supabase
+    .schema("orbit")
+    .rpc("reserve_attachment_upload", {
+      p_card_id: input.cardId,
+      p_original_name: input.fileName,
+      p_mime: input.mime,
+      p_bytes: input.bytes,
+    });
+
+  if (reserveError) return { ok: false, error: reserveError.message };
+
+  const payload = reservation as {
+    reservation_id: string;
+    object_key: string;
+    bucket: string;
+  };
+
+  const fileBuffer = Buffer.from(input.fileBase64, "base64");
+  const { error: uploadError } = await supabase.storage
+    .from(payload.bucket)
+    .upload(payload.object_key, fileBuffer, {
+      contentType: input.mime,
+      upsert: false,
+    });
+
+  if (uploadError) return { ok: false, error: uploadError.message };
+
+  const { error: finalizeError } = await supabase
+    .schema("orbit")
+    .rpc("finalize_attachment_upload", {
+      p_reservation_id: payload.reservation_id,
+    });
+
+  if (finalizeError) return { ok: false, error: finalizeError.message };
+
+  revalidatePath(`/boards/${input.boardId}`);
+  return { ok: true };
+}

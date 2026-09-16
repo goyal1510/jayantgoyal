@@ -2,7 +2,7 @@
 
 ## Product requirements, permissions, architecture, and implementation specification
 
-**Version:** 1.0 — proposed product, not an implemented system
+**Version:** 1.0 — private alpha in this repository
 **Prepared for:** Jayant
 **Prepared:** September 16, 2026
 **Working application name:** Orbit
@@ -26,10 +26,12 @@ Read sections 1–5 to decide the product and access model; sections 6–9 for f
 
 ---
 
-> **Repository status:** Orbit is implemented in this repository as
-> `@jayantgoyal/orbit-web` with local migrations for IAM registration and
-> `orbit`/`orbit_private` schemas. Production host mapping, remote migration
-> apply, and operator provisioning remain deployment-controlled.
+> **Repository status:** Orbit ships as `@jayantgoyal/orbit-web` with IAM
+> registration, `orbit`/`orbit_private` migrations, workspace/board/card flows,
+> invitations, labels, assignees, attachments, inbox, Realtime board refresh,
+> and Admin Orbit access management. Host `orbit.jayantgoyal.com` and remote
+> migration apply are deployment-controlled; run the outbox worker for optional
+> invitation email delivery.
 >
 > The focused pages in this directory preserve the complete proposal while separating product, authorization, implementation, and operational concerns. Start with this page, then use the linked topic pages.
 
