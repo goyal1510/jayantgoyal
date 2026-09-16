@@ -1,0 +1,77 @@
+.editorial-prose__diagram {
+  margin: 2.5em 0;
+  overflow-x: auto;
+  padding: clamp(18px, 4vw, 42px);
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--line) 32%, transparent) 1px, transparent 1px),
+    linear-gradient(color-mix(in srgb, var(--line) 32%, transparent) 1px, transparent 1px),
+    var(--paper);
+  background-size: 24px 24px;
+}
+
+.editorial-prose__diagram svg {
+  display: block;
+  width: 100%;
+  min-width: 620px;
+  height: auto;
+  margin: 0 auto;
+}
+
+.editorial-prose__diagram svg text,
+.editorial-prose__diagram svg .nodeLabel,
+.editorial-prose__diagram svg .edgeLabel,
+.editorial-prose__diagram svg .messageText,
+.editorial-prose__diagram svg .labelText,
+.editorial-prose__diagram svg .loopText,
+.editorial-prose__diagram svg .sectionTitle,
+.editorial-prose__diagram svg .noteText,
+.editorial-prose__diagram svg text.actor > tspan {
+  color: var(--ink) !important;
+  fill: var(--ink) !important;
+}
+
+.editorial-prose__diagram svg .node rect,
+.editorial-prose__diagram svg .node polygon,
+.editorial-prose__diagram svg .node circle,
+.editorial-prose__diagram svg .actor,
+.editorial-prose__diagram svg .labelBox,
+.editorial-prose__diagram svg .actorPopupMenuPanel {
+  fill: var(--paper-bright) !important;
+  stroke: var(--ink) !important;
+}
+
+.editorial-prose__diagram svg .actor-line,
+.editorial-prose__diagram svg .loopLine {
+  stroke: color-mix(in srgb, var(--ink) 72%, transparent) !important;
+}
+
+.editorial-prose__diagram svg .flowchart-link,
+.editorial-prose__diagram svg .messageLine0,
+.editorial-prose__diagram svg .messageLine1 {
+  stroke: var(--signal) !important;
+}
+
+.editorial-prose__diagram svg marker path,
+.editorial-prose__diagram svg [id$="-arrowhead"] path,
+.editorial-prose__diagram svg [id$="-crosshead"] path {
+  fill: var(--signal) !important;
+  stroke: var(--signal) !important;
+}
+
+.editorial-prose__diagram svg .activation0,
+.editorial-prose__diagram svg .activation1,
+.editorial-prose__diagram svg .activation2 {
+  fill: var(--signal-soft) !important;
+  stroke: var(--signal) !important;
+}
+
+.editorial-prose__diagram svg .note {
+  fill: color-mix(in srgb, var(--electric) 34%, var(--paper-bright)) !important;
+  stroke: var(--signal) !important;
+}
+
+.editorial-prose__diagram svg .edgeLabel rect,
+.editorial-prose__diagram svg .labelBkg {
+  fill: var(--paper-bright) !important;
+}

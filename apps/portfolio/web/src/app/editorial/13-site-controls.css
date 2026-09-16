@@ -95,16 +95,21 @@
   bottom: clamp(18px, 3vw, 42px);
   z-index: 80;
   display: flex;
-  width: 138px;
+  width: 48px;
   height: 48px;
-  gap: 9px;
+  gap: 0;
+  align-items: center;
   justify-content: center;
-  border-radius: 999px;
+  overflow: hidden;
+  border-radius: 50%;
   opacity: 0;
   pointer-events: none;
   transform: translateY(12px);
   white-space: nowrap;
   transition:
+    width 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    gap 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 240ms ease,
     border-color 180ms ease,
     background 180ms ease,
     color 180ms ease,
@@ -113,9 +118,18 @@
 }
 
 .scroll-to-top span {
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
   font-size: 0.78rem;
   font-weight: 600;
+  line-height: 1;
   letter-spacing: 0.02em;
+  transform: translateX(-4px);
+  transition:
+    max-width 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 140ms ease,
+    transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .scroll-to-top.is-visible {
@@ -126,7 +140,17 @@
 
 .scroll-to-top.is-visible:hover,
 .scroll-to-top.is-visible:focus-visible {
+  width: 148px;
+  gap: 8px;
+  border-radius: 999px;
   transform: translateY(-3px);
+}
+
+.scroll-to-top.is-visible:hover span,
+.scroll-to-top.is-visible:focus-visible span {
+  max-width: 94px;
+  opacity: 1;
+  transform: translateX(0);
 }
 
 @media (max-width: 760px) {
@@ -151,14 +175,20 @@
   .scroll-to-top {
     right: 16px;
     bottom: 16px;
-    width: 126px;
+    width: 44px;
     height: 44px;
+  }
+
+  .scroll-to-top.is-visible:hover,
+  .scroll-to-top.is-visible:focus-visible {
+    width: 142px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .color-theme-toggle,
-  .scroll-to-top {
+  .scroll-to-top,
+  .scroll-to-top span {
     transition: none;
   }
 }

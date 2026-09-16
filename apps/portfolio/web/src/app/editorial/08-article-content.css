@@ -341,26 +341,6 @@
   line-height: 1.65;
 }
 
-.editorial-prose__diagram {
-  margin: 2.5em 0;
-  overflow-x: auto;
-  padding: clamp(18px, 4vw, 42px);
-  border: 1px solid var(--line);
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--line) 32%, transparent) 1px, transparent 1px),
-    linear-gradient(color-mix(in srgb, var(--line) 32%, transparent) 1px, transparent 1px),
-    var(--paper);
-  background-size: 24px 24px;
-}
-
-.editorial-prose__diagram svg {
-  display: block;
-  width: 100%;
-  min-width: 620px;
-  height: auto;
-  margin: 0 auto;
-}
-
 .editorial-prose :not(pre) > code {
   padding: 0.15em 0.35em;
   background: var(--paper-deep);

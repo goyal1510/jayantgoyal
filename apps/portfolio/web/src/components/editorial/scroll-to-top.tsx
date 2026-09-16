@@ -30,12 +30,11 @@ export function ScrollToTop() {
       type="button"
       className={`scroll-to-top${visible ? " is-visible" : ""}`}
       aria-label="Scroll to top"
-      title="Scroll to top"
       tabIndex={visible ? 0 : -1}
       onClick={scrollToTop}
     >
       <ArrowUp aria-hidden="true" />
-      <span aria-hidden="true">Scroll to top</span>
+      <span aria-hidden="true">Scroll To Top</span>
     </button>
   );
 }
