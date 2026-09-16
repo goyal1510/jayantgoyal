@@ -47,6 +47,7 @@ Run `pnpm check:architecture` after ownership or dependency changes.
 | Studio    | `@jayantgoyal/studio-web`    | Product catalog, utilities, games, workspaces   |
 | Admin     | `@jayantgoyal/admin-web`     | Portfolio CMS, users, deployment operations     |
 | Auth      | `@jayantgoyal/auth-web`      | Sign-in, recovery, MFA, profile, account safety |
+| Orbit     | `@jayantgoyal/orbit-web`     | Workspaces, boards, cards, and team progress    |
 
 Every current client is Next.js 16, React 19, TypeScript 5.9, and Tailwind CSS
 v4. Next.js request middleware is `src/proxy.ts`, not `middleware.ts`. Use the
@@ -126,6 +127,7 @@ pnpm --filter @jayantgoyal/portfolio-web dev
 pnpm --filter @jayantgoyal/studio-web dev
 pnpm --filter @jayantgoyal/admin-web dev
 pnpm --filter @jayantgoyal/auth-web dev
+pnpm --filter @jayantgoyal/orbit-web dev
 
 pnpm check:architecture
 pnpm check:brand-assets

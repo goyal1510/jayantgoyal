@@ -20,6 +20,7 @@ describe("foundation identity", () => {
     expect(PRODUCT_IDENTITIES.studio.name).toBe("Studio");
     expect(PRODUCT_IDENTITIES.admin.name).toBe("Admin");
     expect(PRODUCT_IDENTITIES.auth.name).toBe("Auth");
+    expect(PRODUCT_IDENTITIES.orbit.name).toBe("Orbit");
   });
 
   it("owns canonical origins and hosts without inventing an umbrella brand", () => {
@@ -29,6 +30,9 @@ describe("foundation identity", () => {
     expect(PRODUCT_IDENTITIES.auth.canonicalHosts).toEqual([
       "auth.jayantgoyal.com",
     ]);
+    expect(PRODUCT_IDENTITIES.orbit.developmentOrigin).toBe(
+      "http://localhost:3004",
+    );
   });
 
   it("does not use the short mark as written product branding", () => {

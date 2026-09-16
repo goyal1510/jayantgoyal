@@ -13,9 +13,11 @@ canonical hosted project is `jayantgoyal` with reference
 | `iam_private` | Private authorization predicates and provisioning helpers              |
 | `studio`      | Studio workspaces, games, personalization, and file metadata           |
 | `portfolio`   | Portfolio CMS, Writing, LinkedIn planning, and contact-abuse state     |
+| `orbit`       | Workspaces, boards, cards, collaboration, and command entrypoints      |
+| `orbit_private` | Invitation secrets, command receipts, sequences, and outbox jobs     |
 
-Canonical storage buckets are `studio-files`, `portfolio-assets`, and
-`profile-avatars`. Code must select the intended schema explicitly, handle
+Canonical storage buckets are `studio-files`, `portfolio-assets`,
+`profile-avatars`, and `orbit-attachments`. Code must select the intended schema explicitly, handle
 every query error, and preserve RLS or an equivalent server authorization
 boundary.
 

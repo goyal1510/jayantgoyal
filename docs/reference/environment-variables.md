@@ -1,18 +1,19 @@
 # Environment variables
 
-This is the exact secret-free ownership reference for all four current web
+This is the exact secret-free ownership reference for all five current web
 clients. The `.env.example` files remain the executable contract.
 
 ## Shared Supabase and Auth variables
 
 | Variable                         | Clients                        | Exposure      | Purpose and missing behavior                                                                                      |
 | -------------------------------- | ------------------------------ | ------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `NEXT_PUBLIC_SUPABASE_URL`       | Portfolio, Studio, Admin, Auth | public        | Supabase project origin. Required for canonical data/auth; product-specific public fallbacks are limited.         |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY`  | Portfolio, Studio, Admin, Auth | public        | RLS-bound anonymous key. It is not a service-role secret.                                                         |
+| `NEXT_PUBLIC_SUPABASE_URL`       | Portfolio, Studio, Admin, Auth, Orbit | public        | Supabase project origin. Required for canonical data/auth; product-specific public fallbacks are limited.         |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY`  | Portfolio, Studio, Admin, Auth, Orbit | public        | RLS-bound anonymous key. It is not a service-role secret.                                                         |
 | `SUPABASE_SERVICE_ROLE_KEY`      | Studio, Admin                  | secret/server | Elevated operations after independent authorization. Never used by Portfolio/Auth or client modules.              |
-| `NEXT_PUBLIC_AUTH_SESSION_MODE`  | Studio, Admin, Auth            | public        | `platform`, `compatibility`, or `legacy`; defaults to shared `platform`.                                          |
-| `NEXT_PUBLIC_AUTH_COOKIE_DOMAIN` | Studio, Admin, Auth            | public        | Optional validated `.localhost`/`.test` shared development domain; production domain is code-owned.               |
-| `NEXT_PUBLIC_AUTH_URL`           | Studio, Admin                  | public        | Canonical/local Auth entry origin; strict resolution falls back to canonical production or recognized local Auth. |
+| `NEXT_PUBLIC_AUTH_SESSION_MODE`  | Studio, Admin, Auth, Orbit     | public        | `platform`, `compatibility`, or `legacy`; defaults to shared `platform`.                                          |
+| `NEXT_PUBLIC_AUTH_COOKIE_DOMAIN` | Studio, Admin, Auth, Orbit     | public        | Optional validated `.localhost`/`.test` shared development domain; production domain is code-owned.               |
+| `NEXT_PUBLIC_AUTH_URL`           | Studio, Admin, Orbit           | public        | Canonical/local Auth entry origin; strict resolution falls back to canonical production or recognized local Auth. |
+| `NEXT_PUBLIC_ORBIT_URL`          | Orbit, Auth                    | public        | Orbit links and allowed Auth return origin.                                                                       |
 
 ## Application origin variables
 

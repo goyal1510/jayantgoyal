@@ -142,6 +142,7 @@ manifests and export maps remain executable sources of truth.
 | `@jayantgoyal/studio-web`    | web auth, brand, URLs, SEO, UI; GitHub                        |
 | `@jayantgoyal/admin-web`     | identity; web auth, brand, URLs, SEO, UI; Portfolio contracts |
 | `@jayantgoyal/auth-web`      | web auth, brand, URLs, SEO, UI                                |
+| `@jayantgoyal/orbit-web`     | web auth, brand, URLs, SEO, UI                                |
 
 All applications also consume shared web styling and tooling configuration.
 No application imports another application's source.

@@ -29,6 +29,18 @@ archived QA evidence.
    routes, environment availability, and bundle output.
 6. Rerun the focused failure, then the full required gate set.
 
+## Orbit private-alpha rollout
+
+1. Apply reviewed Orbit migrations through the dedicated remote-migration
+   workflow; never apply from an ordinary worktree without review.
+2. Refresh affected schema snapshots after apply.
+3. Grant Orbit product membership through IAM before expecting `/home` access.
+4. Deploy `@jayantgoyal/orbit-web` as an independent Vercel project rooted at
+   `apps/orbit/web`, then map `orbit.jayantgoyal.com`.
+5. Add `NEXT_PUBLIC_ORBIT_URL` to Auth return-origin configuration.
+6. Run the outbox worker from a trusted environment with service-role access:
+   `node scripts/orbit/process-outbox.mjs`.
+
 ## Production deployment failure
 
 1. Confirm which client project and source commit failed.

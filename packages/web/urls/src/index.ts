@@ -7,6 +7,7 @@ const APPLICATION_HOSTS: Record<ApplicationId, readonly string[]> = {
   studio: PRODUCT_IDENTITIES.studio.canonicalHosts,
   admin: PRODUCT_IDENTITIES.admin.canonicalHosts,
   auth: PRODUCT_IDENTITIES.auth.canonicalHosts,
+  orbit: PRODUCT_IDENTITIES.orbit.canonicalHosts,
 };
 
 export function normalizeHostname(host: string | null | undefined): string {

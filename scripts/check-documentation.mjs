@@ -287,7 +287,7 @@ for (const documentationFile of documentationFiles) {
 }
 
 const productDocumentation = new Map();
-for (const product of ["portfolio", "studio", "admin", "auth"]) {
+for (const product of ["portfolio", "studio", "admin", "auth", "orbit"]) {
   const productFiles = documentationFiles.filter((file) =>
     file.startsWith(`docs/products/${product}/`),
   );

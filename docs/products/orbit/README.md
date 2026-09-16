@@ -26,12 +26,16 @@ Read sections 1–5 to decide the product and access model; sections 6–9 for f
 
 ---
 
-> **Repository status:** Orbit is a proposed future product. No Orbit application, host, schema, bucket, deployment, entitlement, or live integration is claimed to exist.
+> **Repository status:** Orbit is implemented in this repository as
+> `@jayantgoyal/orbit-web` with local migrations for IAM registration and
+> `orbit`/`orbit_private` schemas. Production host mapping, remote migration
+> apply, and operator provisioning remain deployment-controlled.
 >
 > The focused pages in this directory preserve the complete proposal while separating product, authorization, implementation, and operational concerns. Start with this page, then use the linked topic pages.
 
 ## Orbit documentation map
 
+- [Routes and APIs](routes-and-apis.md)
 - [Authorization and roles](authorization-and-roles.md)
 - [Capability catalog](capability-catalog.md)
 - [Domain lifecycle and experience](domain-lifecycle-and-experience.md)
@@ -67,7 +71,7 @@ The owner should approve the final name before registering hosts, packages, or d
 
 **Verified baseline:** the repository distinguishes the public identity `Jayant`, compact mark `jg`, technical namespace `jayantgoyal`, package scope `@jayantgoyal/*`, and standalone products. It explicitly rejects treating the repository name as an umbrella brand. [R2]
 
-Therefore use **Orbit by Jayant**, not “JayantGoyal Platform,” “Jayant Goyal Workspace,” or a new umbrella account brand. Account copy should say “your account” or identify Auth explicitly. Add Orbit to the identity registry and derive all runtime hosts, URLs, labels, and metadata from the shared packages.
+Therefore use **Orbit by Jayant**, not “JayantGoyal Platform,” an expanded-personal-name workspace brand, or a new umbrella account brand. Account copy should say “your account” or identify Auth explicitly. Add Orbit to the identity registry and derive all runtime hosts, URLs, labels, and metadata from the shared packages.
 
 ### 1.3 Relationship to Fizzy
 

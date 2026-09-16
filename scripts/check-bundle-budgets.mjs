@@ -10,6 +10,7 @@ const clientBudgets = [
   { app: "studio", maximumKiB: 525 },
   { app: "admin", maximumKiB: 385 },
   { app: "auth", maximumKiB: 320 },
+  { app: "orbit", maximumKiB: 360 },
 ];
 
 const routeBudgets = [

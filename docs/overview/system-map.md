@@ -1,6 +1,6 @@
 # System map
 
-Jayant is one monorepo containing four implemented products. Each product owns
+Jayant is one monorepo containing five implemented products. Each product owns
 its clients and policies; shared packages own only stable cross-product
 contracts.
 
@@ -28,6 +28,7 @@ GitHub main ──────► Vercel projects ───────► indep
 | Studio    | Web            | Public and account holders | Products, utilities, games, workspaces |
 | Admin     | Web            | Authorized operators       | Content, access, deployment operations |
 | Auth      | Web            | Account holders            | Entry, recovery, MFA, account security |
+| Orbit     | Web            | Invited account holders    | Workspaces, boards, cards, collaboration |
 
 Web is the only implemented client platform. Mobile, desktop, command-line,
 commerce, subscription, sales, and advertising clients/modules do not

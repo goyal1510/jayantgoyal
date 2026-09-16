@@ -10,7 +10,7 @@ second Supabase project is not part of the approved architecture.
 
 ## Current physical structure
 
-The project contains 49 application tables in six application schemas:
+The project contains Orbit tables in eight application schemas:
 
 | Physical schema | Tables | Current contents                                                    |
 | --------------- | -----: | ------------------------------------------------------------------- |
@@ -20,6 +20,8 @@ The project contains 49 application tables in six application schemas:
 | `studio`        |     14 | Studio workspaces, games, personalization, and file metadata        |
 | `portfolio`     |     14 | Portfolio, Writing, LinkedIn planning, and contact-abuse state      |
 | `career`        |      8 | Private job discovery, applications, contacts, outreach, and runs   |
+| `orbit`         |     14 | Workspaces, boards, cards, collaboration, and notifications         |
+| `orbit_private` |      5 | Invitations, command receipts, sequences, outbox, upload reservations |
 
 The predecessor `jg_account` and `jg_app` schemas no longer exist.
 
@@ -33,6 +35,8 @@ The predecessor `jg_account` and `jg_app` schemas no longer exist.
 | `studio`      | Studio tools, workspaces, games, personalization, and Studio file metadata                                               | RLS-protected operations with IAM product/capability checks                               |
 | `portfolio`   | Portfolio and Writing content, private LinkedIn publication planning, and abuse-control state                            | Selected public reads and capability-authorized Admin writes                              |
 | `career`      | Job opportunities, application state, professional contacts, outreach drafts, and automation evidence                    | Service-role only after Admin authorization or from trusted local automation              |
+| `orbit`       | Work-management workspaces, boards, cards, comments, activity, notifications, attachments, and command RPCs              | RLS-protected operations with IAM product access and workspace/board authorization        |
+| `orbit_private` | Invitation secrets, command receipts, sequences, outbox jobs, and upload reservations                                | Private; never a Data API schema                                                          |
 
 Supabase-managed `auth`, `storage`, `realtime`, and `extensions` retain their
 platform ownership. Application migrations must not rename or add arbitrary
@@ -212,8 +216,8 @@ Level Security](https://supabase.com/docs/guides/database/postgres/row-level-sec
 
 ## Storage and Realtime
 
-The current buckets are `studio-files`, `portfolio-assets`, and
-`profile-avatars`.
+The current buckets are `studio-files`, `portfolio-assets`,
+`profile-avatars`, and `orbit-attachments`.
 
 - `portfolio-assets` and `profile-avatars` retain their explicit ownership.
 - `studio-files` is the private Studio object boundary. File-object upload,

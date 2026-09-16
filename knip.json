@@ -8,7 +8,8 @@
         "scripts/linkedin/auth.mjs",
         "scripts/linkedin/database-auth.mjs",
         "scripts/linkedin/manage.mjs",
-        "scripts/linkedin/post.mjs"
+        "scripts/linkedin/post.mjs",
+        "scripts/orbit/process-outbox.mjs"
       ]
     },
     "apps/portfolio/web": {

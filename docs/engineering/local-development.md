@@ -34,6 +34,7 @@ pnpm --filter @jayantgoyal/portfolio-web dev  # http://localhost:3000
 pnpm --filter @jayantgoyal/studio-web dev     # http://localhost:3001
 pnpm --filter @jayantgoyal/admin-web dev      # http://localhost:3002
 pnpm --filter @jayantgoyal/auth-web dev       # http://localhost:3003
+pnpm --filter @jayantgoyal/orbit-web dev      # http://localhost:3004
 ```
 
 ## Vercel environment pull
