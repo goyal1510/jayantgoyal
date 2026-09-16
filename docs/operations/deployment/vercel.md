@@ -41,6 +41,7 @@ Portfolio: node ../../../scripts/ignore-build.mjs apps/portfolio/web
 Studio:    node ../../../scripts/ignore-build.mjs apps/studio/web
 Admin:     node ../../../scripts/ignore-build.mjs apps/admin/web
 Auth:      node ../../../scripts/ignore-build.mjs apps/auth/web
+Orbit:     node ../../../scripts/ignore-build.mjs apps/orbit/web
 ```
 
 Keep Vercel's monorepo **Skip deployment** setting enabled for every project so
