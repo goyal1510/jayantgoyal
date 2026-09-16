@@ -92,8 +92,8 @@ contracts/tests pass, and the schema catalog and ownership page are updated.
 ## Local parity
 
 The local and hosted Data API configuration exposes `public`,
-`graphql_public`, `iam`, `studio`, `portfolio`, and `career`. `foundation` and
-`iam_private` remain private.
+`graphql_public`, `iam`, `studio`, `portfolio`, `career`, and `orbit`.
+`foundation`, `iam_private`, and `orbit_private` remain private.
 
 A fresh `supabase db reset` over the complete historical migration directory is
 currently blocked by the oldest retained migration, which assumes predecessor
