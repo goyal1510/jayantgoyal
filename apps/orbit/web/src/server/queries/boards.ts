@@ -37,6 +37,44 @@ export async function listWorkspaceBoards(
   }));
 }
 
+/** Lists active boards in a workspace with their columns for cross-board moves. */
+export async function listWorkspaceBoardsWithColumns(
+  supabase: OrbitSupabaseClient,
+  workspaceId: string,
+): Promise<Array<{ board: BoardSummary; columns: ColumnSummary[] }>> {
+  const boards = await listWorkspaceBoards(supabase, workspaceId);
+  if (!boards.length) return [];
+
+  const boardIds = boards.map((board) => board.id);
+  const { data: columns, error } = await supabase
+    .schema("orbit")
+    .from("columns")
+    .select("id, board_id, name, category, rank")
+    .in("board_id", boardIds)
+    .order("rank", { ascending: true });
+
+  if (error) throw error;
+
+  const columnsByBoard = new Map<string, ColumnSummary[]>();
+  for (const column of columns ?? []) {
+    const boardId = column.board_id as string;
+    const list = columnsByBoard.get(boardId) ?? [];
+    list.push({
+      id: column.id as string,
+      boardId,
+      name: column.name as string,
+      category: column.category as string,
+      rank: column.rank as string,
+    });
+    columnsByBoard.set(boardId, list);
+  }
+
+  return boards.map((board) => ({
+    board,
+    columns: columnsByBoard.get(board.id) ?? [],
+  }));
+}
+
 /** Loads a board shell with columns and active cards for rendering. */
 export async function loadBoardView(
   supabase: OrbitSupabaseClient,

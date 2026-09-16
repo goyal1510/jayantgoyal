@@ -5,9 +5,11 @@ import { BoardSettingsShell } from "@/features/boards/board-settings-shell";
 import { OrbitPageHeader } from "@/features/orbit/orbit-page-header";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { loadBoardView, listWorkspaceLabels } from "@/server/queries/boards";
+import { toJobStatusRows } from "@/lib/orbit/job-rows";
 import {
   getPublishedBoardForBoard,
   listBoardAutomationRules,
+  listBoardImportJobs,
   loadBoardReports,
 } from "@/server/queries/p2";
 
@@ -21,11 +23,12 @@ export default async function BoardSettingsPage({ params }: SettingsPageProps) {
   const { board, columns } = await loadBoardView(supabase, boardId);
   if (!board) notFound();
 
-  const [labels, automationRules, publishedBoard, reports] = await Promise.all([
+  const [labels, automationRules, publishedBoard, reports, importJobs] = await Promise.all([
     listWorkspaceLabels(supabase, board.workspaceId),
     listBoardAutomationRules(supabase, boardId),
     getPublishedBoardForBoard(supabase, boardId),
     loadBoardReports(supabase, boardId),
+    listBoardImportJobs(supabase, boardId),
   ]);
 
   return (
@@ -50,6 +53,7 @@ export default async function BoardSettingsPage({ params }: SettingsPageProps) {
         automationRules={automationRules}
         publishedBoard={publishedBoard}
         reports={reports}
+        importJobs={toJobStatusRows(importJobs)}
       />
     </div>
   );

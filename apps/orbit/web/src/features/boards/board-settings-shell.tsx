@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { BoardP2Panel } from "@/features/boards/board-p2-panel";
 import { BoardSettingsPanel } from "@/features/boards/board-settings-panel";
+import type { JobStatusRow } from "@/features/orbit/job-status-list";
 import { SettingsTabs } from "@/features/orbit/settings-tabs";
 import type {
   AutomationRuleSummary,
@@ -24,6 +25,7 @@ type BoardSettingsShellProps = {
     backlog: Record<string, unknown>;
     staleCards: Array<Record<string, unknown>>;
   };
+  importJobs: JobStatusRow[];
 };
 
 export function BoardSettingsShell(props: BoardSettingsShellProps) {
@@ -45,11 +47,13 @@ export function BoardSettingsShell(props: BoardSettingsShellProps) {
           content: (
             <BoardP2Panel
               boardId={props.board.id}
+              boardKey={props.board.key}
               columns={props.columns}
               labels={props.labels}
               automationRules={props.automationRules}
               publishedBoard={props.publishedBoard}
               reports={props.reports}
+              importJobs={props.importJobs}
               mode="automation"
             />
           ),
@@ -60,11 +64,13 @@ export function BoardSettingsShell(props: BoardSettingsShellProps) {
           content: (
             <BoardP2Panel
               boardId={props.board.id}
+              boardKey={props.board.key}
               columns={props.columns}
               labels={props.labels}
               automationRules={props.automationRules}
               publishedBoard={props.publishedBoard}
               reports={props.reports}
+              importJobs={props.importJobs}
               mode="reports"
             />
           ),
@@ -75,11 +81,13 @@ export function BoardSettingsShell(props: BoardSettingsShellProps) {
           content: (
             <BoardP2Panel
               boardId={props.board.id}
+              boardKey={props.board.key}
               columns={props.columns}
               labels={props.labels}
               automationRules={props.automationRules}
               publishedBoard={props.publishedBoard}
               reports={props.reports}
+              importJobs={props.importJobs}
               mode="publish"
             />
           ),

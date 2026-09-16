@@ -151,14 +151,43 @@ declare
   v_user_id uuid := orbit_private.current_user_id();
   v_workspace_id uuid;
   v_board_id uuid;
+  v_target_board_id uuid;
   v_id uuid;
 begin
   perform orbit_private.require_orbit_access();
+  if p_card_id = p_depends_on_card_id then
+    raise exception 'card cannot depend on itself' using errcode = '22023';
+  end if;
+
   select workspace_id, board_id into v_workspace_id, v_board_id
   from orbit.cards where id = p_card_id and deleted_at is null;
+  if v_board_id is null then
+    raise exception 'card not found' using errcode = 'P0002';
+  end if;
+
+  select board_id into v_target_board_id
+  from orbit.cards where id = p_depends_on_card_id and deleted_at is null;
+  if v_target_board_id is null or v_target_board_id <> v_board_id then
+    raise exception 'dependencies must stay within one board' using errcode = '22023';
+  end if;
+
   if not orbit_private.can_edit_board(v_board_id) then
     raise exception 'board edit access required' using errcode = '42501';
   end if;
+
+  if exists (
+    with recursive chain as (
+      select p_depends_on_card_id as card_id
+      union
+      select d.depends_on_card_id
+      from orbit.card_dependencies d
+      join chain c on d.card_id = c.card_id
+    )
+    select 1 from chain where card_id = p_card_id
+  ) then
+    raise exception 'dependency cycle detected' using errcode = '22023';
+  end if;
+
   insert into orbit.card_dependencies (
     workspace_id, board_id, card_id, depends_on_card_id, dependency_type, created_by
   )
@@ -322,6 +351,107 @@ $$;
 ALTER FUNCTION "orbit"."archive_card"("p_card_id" "uuid", "p_expected_version" integer) OWNER TO "postgres";
 
 
+CREATE OR REPLACE FUNCTION "orbit"."archive_workspace"("p_workspace_id" "uuid") RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+begin
+  perform orbit_private.require_orbit_access();
+  if not orbit_private.is_workspace_admin(p_workspace_id, v_user_id) then
+    raise exception 'workspace admin required' using errcode = '42501';
+  end if;
+  update orbit.workspaces set lifecycle = 'archived' where id = p_workspace_id;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."archive_workspace"("p_workspace_id" "uuid") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."board_backlog_report"("p_board_id" "uuid") RETURNS "jsonb"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+begin
+  perform orbit_private.require_orbit_access();
+  if not orbit_private.can_read_board(p_board_id, v_user_id) then
+    raise exception 'board read access required' using errcode = '42501';
+  end if;
+  return jsonb_build_object(
+    'metric', 'Backlog age',
+    'definition', 'Average days since creation for cards not in done/cancelled columns.',
+    'average_age_days', coalesce((
+      select round(avg(extract(epoch from (now() - c.created_at)) / 86400.0)::numeric, 1)
+      from orbit.cards c
+      join orbit.columns col on col.id = c.column_id
+      where c.board_id = p_board_id
+        and c.deleted_at is null
+        and col.category not in ('done', 'cancelled')
+    ), 0)
+  );
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."board_backlog_report"("p_board_id" "uuid") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."board_completion_report"("p_board_id" "uuid", "p_days" integer DEFAULT 30) RETURNS "jsonb"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+begin
+  perform orbit_private.require_orbit_access();
+  if not orbit_private.can_read_board(p_board_id, v_user_id) then
+    raise exception 'board read access required' using errcode = '42501';
+  end if;
+  return jsonb_build_object(
+    'metric', 'Cards completed in period',
+    'definition', 'Counts cards with completed_at within the last N days on visible columns.',
+    'days', p_days,
+    'completed_count', (
+      select count(*) from orbit.cards
+      where board_id = p_board_id
+        and completed_at >= now() - make_interval(days => greatest(p_days, 1))
+        and deleted_at is null
+    )
+  );
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."board_completion_report"("p_board_id" "uuid", "p_days" integer) OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."bulk_archive_cards"("p_board_id" "uuid", "p_card_ids" "uuid"[]) RETURNS integer
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_count integer;
+begin
+  perform orbit_private.require_orbit_access();
+  if not orbit_private.can_edit_board(p_board_id) then
+    raise exception 'board edit access required' using errcode = '42501';
+  end if;
+  update orbit.cards
+  set archived_at = coalesce(archived_at, now()), version = version + 1
+  where board_id = p_board_id and id = any (p_card_ids) and deleted_at is null;
+  get diagnostics v_count = row_count;
+  return v_count;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."bulk_archive_cards"("p_board_id" "uuid", "p_card_ids" "uuid"[]) OWNER TO "postgres";
+
+
 CREATE OR REPLACE FUNCTION "orbit"."bulk_move_cards"("p_board_id" "uuid", "p_card_ids" "uuid"[], "p_target_column_id" "uuid") RETURNS integer
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO ''
@@ -346,6 +476,160 @@ $$;
 
 
 ALTER FUNCTION "orbit"."bulk_move_cards"("p_board_id" "uuid", "p_card_ids" "uuid"[], "p_target_column_id" "uuid") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."bulk_trash_cards"("p_board_id" "uuid", "p_card_ids" "uuid"[]) RETURNS integer
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_count integer;
+begin
+  perform orbit_private.require_orbit_access();
+  if not orbit_private.can_edit_board(p_board_id) then
+    raise exception 'board edit access required' using errcode = '42501';
+  end if;
+  update orbit.cards
+  set deleted_at = coalesce(deleted_at, now()), version = version + 1
+  where board_id = p_board_id and id = any (p_card_ids) and deleted_at is null;
+  get diagnostics v_count = row_count;
+  return v_count;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."bulk_trash_cards"("p_board_id" "uuid", "p_card_ids" "uuid"[]) OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."cancel_workspace_deletion"("p_workspace_id" "uuid") RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+begin
+  perform orbit_private.require_orbit_access();
+  if not exists (
+    select 1 from orbit.workspaces where id = p_workspace_id and owner_user_id = v_user_id
+  ) then
+    raise exception 'workspace owner required' using errcode = '42501';
+  end if;
+  update orbit.workspaces
+  set lifecycle = 'active', deletion_requested_at = null
+  where id = p_workspace_id and lifecycle = 'pending_deletion';
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."cancel_workspace_deletion"("p_workspace_id" "uuid") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."claim_webhook_deliveries"("p_limit" integer DEFAULT 25) RETURNS "jsonb"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_delivery orbit_private.webhook_deliveries%rowtype;
+  v_rows jsonb := '[]'::jsonb;
+  v_limit integer := greatest(coalesce(p_limit, 25), 1);
+begin
+  for v_delivery in
+    select d.*
+    from orbit_private.webhook_deliveries d
+    join orbit_private.webhook_subscriptions s on s.id = d.subscription_id
+    where d.status = 'pending'
+      and d.next_attempt_at <= now()
+      and s.enabled
+    order by d.created_at
+    limit v_limit
+    for update of d skip locked
+  loop
+    update orbit_private.webhook_deliveries
+    set status = 'processing', attempts = attempts + 1
+    where id = v_delivery.id;
+
+    v_rows := v_rows || jsonb_build_array(jsonb_build_object(
+      'id', v_delivery.id,
+      'event_type', v_delivery.event_type,
+      'payload', v_delivery.payload,
+      'attempts', v_delivery.attempts + 1,
+      'url', (
+        select s.url
+        from orbit_private.webhook_subscriptions s
+        where s.id = v_delivery.subscription_id
+      ),
+      'signing_secret', (
+        select s.signing_secret
+        from orbit_private.webhook_subscriptions s
+        where s.id = v_delivery.subscription_id
+      )
+    ));
+  end loop;
+
+  return v_rows;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."claim_webhook_deliveries"("p_limit" integer) OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."create_api_token"("p_workspace_id" "uuid", "p_name" "text", "p_token_hash" "text", "p_token_prefix" "text", "p_scopes" "text"[] DEFAULT ARRAY['boards:read'::"text", 'cards:read'::"text"], "p_expires_at" timestamp with time zone DEFAULT NULL::timestamp with time zone) RETURNS "uuid"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+  v_id uuid;
+begin
+  perform orbit_private.require_orbit_access();
+  if not orbit_private.is_workspace_admin(p_workspace_id, v_user_id) then
+    raise exception 'workspace admin required' using errcode = '42501';
+  end if;
+  insert into orbit_private.api_tokens (
+    workspace_id, user_id, name, token_hash, token_prefix, scopes, expires_at
+  )
+  values (
+    p_workspace_id, v_user_id, trim(p_name), p_token_hash, p_token_prefix,
+    coalesce(p_scopes, array['boards:read', 'cards:read']), p_expires_at
+  )
+  returning id into v_id;
+  return v_id;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."create_api_token"("p_workspace_id" "uuid", "p_name" "text", "p_token_hash" "text", "p_token_prefix" "text", "p_scopes" "text"[], "p_expires_at" timestamp with time zone) OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."create_automation_rule"("p_board_id" "uuid", "p_name" "text", "p_trigger_type" "text", "p_trigger_config" "jsonb", "p_action_type" "text", "p_action_config" "jsonb") RETURNS "uuid"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+  v_workspace_id uuid;
+  v_id uuid;
+begin
+  perform orbit_private.require_orbit_access();
+  if not orbit_private.can_manage_board(p_board_id) then
+    raise exception 'board manager access required' using errcode = '42501';
+  end if;
+  select workspace_id into v_workspace_id from orbit.boards where id = p_board_id;
+  insert into orbit.automation_rules (
+    workspace_id, board_id, name, trigger_type, trigger_config, action_type, action_config, created_by
+  )
+  values (
+    v_workspace_id, p_board_id, trim(p_name), p_trigger_type, p_trigger_config,
+    p_action_type, p_action_config, v_user_id
+  )
+  returning id into v_id;
+  return v_id;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."create_automation_rule"("p_board_id" "uuid", "p_name" "text", "p_trigger_type" "text", "p_trigger_config" "jsonb", "p_action_type" "text", "p_action_config" "jsonb") OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "orbit"."create_board"("p_workspace_id" "uuid", "p_name" "text", "p_key" "text", "p_visibility" "orbit"."board_visibility" DEFAULT 'workspace'::"orbit"."board_visibility") RETURNS "uuid"
@@ -443,6 +727,77 @@ $$;
 
 
 ALTER FUNCTION "orbit"."create_board"("p_workspace_id" "uuid", "p_name" "text", "p_key" "text", "p_visibility" "orbit"."board_visibility") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."create_board_from_template"("p_workspace_id" "uuid", "p_template_id" "uuid", "p_name" "text", "p_key" "text") RETURNS "uuid"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+  v_template orbit.board_templates%rowtype;
+  v_board_id uuid;
+  v_column jsonb;
+  v_done_column_id uuid;
+begin
+  perform orbit_private.require_orbit_access();
+  if not orbit_private.is_active_workspace_member(p_workspace_id, v_user_id) then
+    raise exception 'workspace membership required' using errcode = '42501';
+  end if;
+
+  select * into v_template from orbit.board_templates where id = p_template_id;
+  if not found then
+    raise exception 'template not found' using errcode = 'P0002';
+  end if;
+
+  v_board_id := orbit.create_board(
+    p_workspace_id,
+    trim(p_name),
+    upper(trim(p_key)),
+    'workspace'::orbit.board_visibility
+  );
+
+  update orbit.boards set default_done_column_id = null where id = v_board_id;
+  delete from orbit.columns where board_id = v_board_id;
+
+  for v_column in
+    select * from jsonb_array_elements(coalesce(v_template.template_data->'columns', '[]'::jsonb))
+  loop
+    perform orbit.create_column(
+      v_board_id,
+      v_column->>'name',
+      coalesce((v_column->>'category')::orbit.column_category, 'active'::orbit.column_category)
+    );
+  end loop;
+
+  if not exists (select 1 from orbit.columns where board_id = v_board_id) then
+    perform orbit.create_column(v_board_id, 'To do', 'backlog'::orbit.column_category);
+  end if;
+
+  select id into v_done_column_id
+  from orbit.columns
+  where board_id = v_board_id and category = 'done'
+  order by rank
+  limit 1;
+
+  if v_done_column_id is null then
+    select id into v_done_column_id
+    from orbit.columns
+    where board_id = v_board_id
+    order by rank desc
+    limit 1;
+  end if;
+
+  update orbit.boards
+  set default_done_column_id = v_done_column_id
+  where id = v_board_id;
+
+  return v_board_id;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."create_board_from_template"("p_workspace_id" "uuid", "p_template_id" "uuid", "p_name" "text", "p_key" "text") OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "orbit"."create_card"("p_board_id" "uuid", "p_column_id" "uuid", "p_title" "text") RETURNS "uuid"
@@ -617,6 +972,38 @@ $$;
 ALTER FUNCTION "orbit"."create_saved_view"("p_workspace_id" "uuid", "p_board_id" "uuid", "p_name" "text", "p_filters" "jsonb", "p_is_shared" boolean) OWNER TO "postgres";
 
 
+CREATE OR REPLACE FUNCTION "orbit"."create_webhook_subscription"("p_workspace_id" "uuid", "p_url" "text", "p_secret_hash" "text", "p_signing_secret" "text" DEFAULT NULL::"text", "p_events" "text"[] DEFAULT ARRAY['card.created'::"text", 'card.moved'::"text"]) RETURNS "uuid"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+  v_id uuid;
+begin
+  perform orbit_private.require_orbit_access();
+  if not orbit_private.is_workspace_admin(p_workspace_id, v_user_id) then
+    raise exception 'workspace admin required' using errcode = '42501';
+  end if;
+  insert into orbit_private.webhook_subscriptions (
+    workspace_id, url, secret_hash, signing_secret, events, created_by
+  )
+  values (
+    p_workspace_id,
+    trim(p_url),
+    p_secret_hash,
+    nullif(trim(p_signing_secret), ''),
+    coalesce(p_events, array['card.moved']),
+    v_user_id
+  )
+  returning id into v_id;
+  return v_id;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."create_webhook_subscription"("p_workspace_id" "uuid", "p_url" "text", "p_secret_hash" "text", "p_signing_secret" "text", "p_events" "text"[]) OWNER TO "postgres";
+
+
 CREATE OR REPLACE FUNCTION "orbit"."create_workspace"("p_name" "text", "p_description" "text" DEFAULT NULL::"text", "p_idempotency_key" "text" DEFAULT NULL::"text") RETURNS "uuid"
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO ''
@@ -654,7 +1041,7 @@ $$;
 ALTER FUNCTION "orbit"."create_workspace"("p_name" "text", "p_description" "text", "p_idempotency_key" "text") OWNER TO "postgres";
 
 
-CREATE OR REPLACE FUNCTION "orbit"."create_workspace_invitation"("p_workspace_id" "uuid", "p_email" "text", "p_role" "orbit"."workspace_member_role" DEFAULT 'member'::"orbit"."workspace_member_role", "p_token_hash" "text" DEFAULT NULL::"text") RETURNS "uuid"
+CREATE OR REPLACE FUNCTION "orbit"."create_workspace_invitation"("p_workspace_id" "uuid", "p_email" "text", "p_role" "orbit"."workspace_member_role" DEFAULT 'member'::"orbit"."workspace_member_role", "p_token_hash" "text" DEFAULT NULL::"text", "p_board_scope" "jsonb" DEFAULT '[]'::"jsonb") RETURNS "uuid"
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO ''
     AS $$
@@ -676,36 +1063,48 @@ begin
     raise exception 'only the owner may invite admins' using errcode = '42501';
   end if;
 
+  if p_role = 'guest' and jsonb_array_length(coalesce(p_board_scope, '[]'::jsonb)) = 0 then
+    raise exception 'guest invites require board scope' using errcode = '22023';
+  end if;
+
   insert into orbit_private.invitations (
-    workspace_id,
-    email_normalized,
-    workspace_role,
-    token_hash,
-    inviter_id,
-    expires_at
+    workspace_id, email_normalized, workspace_role, token_hash, inviter_id, expires_at, board_scope
   )
   values (
-    p_workspace_id,
-    lower(trim(p_email)),
-    p_role,
-    v_hash,
-    v_user_id,
-    now() + interval '7 days'
+    p_workspace_id, lower(trim(p_email)), p_role, v_hash, v_user_id,
+    now() + interval '7 days', coalesce(p_board_scope, '[]'::jsonb)
   )
   returning id into v_invitation_id;
 
   insert into orbit_private.outbox_events (event_type, payload)
-  values (
-    'invitation.created',
-    jsonb_build_object('invitation_id', v_invitation_id)
-  );
+  values ('invitation.created', jsonb_build_object('invitation_id', v_invitation_id));
 
   return v_invitation_id;
 end;
 $$;
 
 
-ALTER FUNCTION "orbit"."create_workspace_invitation"("p_workspace_id" "uuid", "p_email" "text", "p_role" "orbit"."workspace_member_role", "p_token_hash" "text") OWNER TO "postgres";
+ALTER FUNCTION "orbit"."create_workspace_invitation"("p_workspace_id" "uuid", "p_email" "text", "p_role" "orbit"."workspace_member_role", "p_token_hash" "text", "p_board_scope" "jsonb") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."delete_automation_rule"("p_rule_id" "uuid") RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_board_id uuid;
+begin
+  perform orbit_private.require_orbit_access();
+  select board_id into v_board_id from orbit.automation_rules where id = p_rule_id;
+  if not orbit_private.can_manage_board(v_board_id) then
+    raise exception 'board manager access required' using errcode = '42501';
+  end if;
+  delete from orbit.automation_rules where id = p_rule_id;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."delete_automation_rule"("p_rule_id" "uuid") OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "orbit"."delete_column"("p_column_id" "uuid", "p_destination_column_id" "uuid") RETURNS "void"
@@ -803,6 +1202,333 @@ $$;
 ALTER FUNCTION "orbit"."finalize_attachment_upload"("p_reservation_id" "uuid", "p_checksum" "text") OWNER TO "postgres";
 
 
+CREATE OR REPLACE FUNCTION "orbit"."finalize_webhook_delivery"("p_delivery_id" "uuid", "p_success" boolean, "p_http_status" integer DEFAULT NULL::integer, "p_error" "text" DEFAULT NULL::"text") RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_attempts integer;
+begin
+  select attempts into v_attempts
+  from orbit_private.webhook_deliveries
+  where id = p_delivery_id;
+
+  if not found then
+    raise exception 'delivery not found' using errcode = 'P0002';
+  end if;
+
+  if p_success then
+    update orbit_private.webhook_deliveries
+    set
+      status = 'completed',
+      processed_at = now(),
+      http_status = p_http_status,
+      last_error = null
+    where id = p_delivery_id;
+    return;
+  end if;
+
+  update orbit_private.webhook_deliveries
+  set
+    status = case when v_attempts >= 5 then 'failed' else 'pending' end,
+    http_status = p_http_status,
+    last_error = left(coalesce(p_error, 'delivery failed'), 500),
+    next_attempt_at = now() + make_interval(mins => least(60, 5 * v_attempts))
+  where id = p_delivery_id;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."finalize_webhook_delivery"("p_delivery_id" "uuid", "p_success" boolean, "p_http_status" integer, "p_error" "text") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."get_published_board"("p_slug" "text") RETURNS "jsonb"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_row orbit.published_boards%rowtype;
+begin
+  select * into v_row
+  from orbit.published_boards
+  where slug = lower(trim(p_slug)) and revoked_at is null;
+  if not found then
+    return null;
+  end if;
+  return jsonb_build_object(
+    'slug', v_row.slug,
+    'published_at', v_row.published_at,
+    'projection', v_row.projection
+  );
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."get_published_board"("p_slug" "text") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."get_workspace_export_manifest"("p_job_id" "uuid") RETURNS "jsonb"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+  v_job orbit_private.export_jobs%rowtype;
+begin
+  perform orbit_private.require_orbit_access();
+
+  select * into v_job
+  from orbit_private.export_jobs
+  where id = p_job_id;
+
+  if not found then
+    raise exception 'export job not found' using errcode = 'P0002';
+  end if;
+
+  if not orbit_private.is_active_workspace_member(v_job.workspace_id, v_user_id) then
+    raise exception 'workspace membership required' using errcode = '42501';
+  end if;
+
+  if v_job.requester_id <> v_user_id
+     and not orbit_private.is_workspace_admin(v_job.workspace_id, v_user_id) then
+    raise exception 'export access denied' using errcode = '42501';
+  end if;
+
+  if v_job.status <> 'ready' then
+    raise exception 'export not ready' using errcode = '22023';
+  end if;
+
+  if v_job.expires_at is not null and v_job.expires_at <= now() then
+    raise exception 'export expired' using errcode = '22023';
+  end if;
+
+  return jsonb_build_object(
+    'id', v_job.id,
+    'workspace_id', v_job.workspace_id,
+    'manifest', v_job.manifest,
+    'processed_at', v_job.processed_at,
+    'expires_at', v_job.expires_at
+  );
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."get_workspace_export_manifest"("p_job_id" "uuid") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."link_card_github_issue"("p_card_id" "uuid", "p_issue_url" "text", "p_issue_title" "text" DEFAULT NULL::"text") RETURNS "uuid"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+  v_workspace_id uuid;
+  v_board_id uuid;
+  v_repo text;
+  v_number integer;
+  v_id uuid;
+begin
+  perform orbit_private.require_orbit_access();
+  select workspace_id, board_id into v_workspace_id, v_board_id
+  from orbit.cards where id = p_card_id and deleted_at is null;
+  if not orbit_private.can_edit_board(v_board_id) then
+    raise exception 'board edit access required' using errcode = '42501';
+  end if;
+
+  v_repo := (regexp_match(lower(trim(p_issue_url)), 'github\.com/([^/]+/[^/]+)/issues/([0-9]+)'))[1];
+  v_number := (regexp_match(lower(trim(p_issue_url)), 'github\.com/([^/]+/[^/]+)/issues/([0-9]+)'))[2]::integer;
+  if v_repo is null or v_number is null then
+    raise exception 'unsupported GitHub issue URL' using errcode = '22023';
+  end if;
+
+  insert into orbit.card_github_links (
+    workspace_id, board_id, card_id, repo_full_name, issue_number, issue_url, issue_title, created_by
+  )
+  values (v_workspace_id, v_board_id, p_card_id, v_repo, v_number, trim(p_issue_url), p_issue_title, v_user_id)
+  returning id into v_id;
+  return v_id;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."link_card_github_issue"("p_card_id" "uuid", "p_issue_url" "text", "p_issue_title" "text") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."list_board_automation_rules"("p_board_id" "uuid") RETURNS "jsonb"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+begin
+  perform orbit_private.require_orbit_access();
+  if not orbit_private.can_read_board(p_board_id, v_user_id) then
+    raise exception 'board read access required' using errcode = '42501';
+  end if;
+  return coalesce((
+    select jsonb_agg(jsonb_build_object(
+      'id', r.id, 'name', r.name, 'enabled', r.enabled,
+      'trigger_type', r.trigger_type, 'trigger_config', r.trigger_config,
+      'action_type', r.action_type, 'action_config', r.action_config
+    ) order by r.created_at)
+    from orbit.automation_rules r where r.board_id = p_board_id
+  ), '[]'::jsonb);
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."list_board_automation_rules"("p_board_id" "uuid") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."list_stale_cards"("p_board_id" "uuid", "p_days" integer DEFAULT 14) RETURNS "jsonb"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+begin
+  perform orbit_private.require_orbit_access();
+  if not orbit_private.can_read_board(p_board_id, v_user_id) then
+    raise exception 'board read access required' using errcode = '42501';
+  end if;
+  return coalesce((
+    select jsonb_agg(jsonb_build_object(
+      'id', c.id, 'number', c.number, 'title', c.title, 'updated_at', c.updated_at
+    ) order by c.updated_at)
+    from orbit.cards c
+    join orbit.columns col on col.id = c.column_id
+    where c.board_id = p_board_id
+      and c.deleted_at is null
+      and c.archived_at is null
+      and col.category not in ('done', 'cancelled')
+      and c.updated_at < now() - make_interval(days => greatest(p_days, 1))
+  ), '[]'::jsonb);
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."list_stale_cards"("p_board_id" "uuid", "p_days" integer) OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."list_webhook_deliveries"("p_workspace_id" "uuid", "p_limit" integer DEFAULT 25) RETURNS "jsonb"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+begin
+  perform orbit_private.require_orbit_access();
+  if not orbit_private.is_workspace_admin(p_workspace_id, v_user_id) then
+    raise exception 'workspace admin required' using errcode = '42501';
+  end if;
+
+  return coalesce((
+    select jsonb_agg(jsonb_build_object(
+      'id', d.id,
+      'event_type', d.event_type,
+      'status', d.status,
+      'attempts', d.attempts,
+      'http_status', d.http_status,
+      'last_error', d.last_error,
+      'created_at', d.created_at,
+      'processed_at', d.processed_at,
+      'url', s.url
+    ) order by d.created_at desc)
+    from orbit_private.webhook_deliveries d
+    join orbit_private.webhook_subscriptions s on s.id = d.subscription_id
+    where s.workspace_id = p_workspace_id
+    limit greatest(coalesce(p_limit, 25), 1)
+  ), '[]'::jsonb);
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."list_webhook_deliveries"("p_workspace_id" "uuid", "p_limit" integer) OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."list_workspace_api_tokens"("p_workspace_id" "uuid") RETURNS "jsonb"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+begin
+  perform orbit_private.require_orbit_access();
+  if not orbit_private.is_workspace_admin(p_workspace_id, v_user_id) then
+    raise exception 'workspace admin required' using errcode = '42501';
+  end if;
+  return coalesce((
+    select jsonb_agg(jsonb_build_object(
+      'id', t.id, 'name', t.name, 'token_prefix', t.token_prefix,
+      'scopes', t.scopes, 'expires_at', t.expires_at, 'revoked_at', t.revoked_at, 'created_at', t.created_at
+    ) order by t.created_at desc)
+    from orbit_private.api_tokens t
+    where t.workspace_id = p_workspace_id
+  ), '[]'::jsonb);
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."list_workspace_api_tokens"("p_workspace_id" "uuid") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."list_workspace_export_jobs"("p_workspace_id" "uuid") RETURNS "jsonb"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+begin
+  perform orbit_private.require_orbit_access();
+  if not orbit_private.is_active_workspace_member(p_workspace_id, v_user_id) then
+    raise exception 'workspace membership required' using errcode = '42501';
+  end if;
+
+  return coalesce((
+    select jsonb_agg(jsonb_build_object(
+      'id', j.id,
+      'status', j.status,
+      'created_at', j.created_at,
+      'processed_at', j.processed_at,
+      'expires_at', j.expires_at,
+      'requester_id', j.requester_id
+    ) order by j.created_at desc)
+    from orbit_private.export_jobs j
+    where j.workspace_id = p_workspace_id
+      and (j.requester_id = v_user_id or orbit_private.is_workspace_admin(p_workspace_id, v_user_id))
+  ), '[]'::jsonb);
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."list_workspace_export_jobs"("p_workspace_id" "uuid") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."list_workspace_webhooks"("p_workspace_id" "uuid") RETURNS "jsonb"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+begin
+  perform orbit_private.require_orbit_access();
+  if not orbit_private.is_workspace_admin(p_workspace_id, v_user_id) then
+    raise exception 'workspace admin required' using errcode = '42501';
+  end if;
+  return coalesce((
+    select jsonb_agg(jsonb_build_object(
+      'id', s.id, 'url', s.url, 'events', s.events, 'enabled', s.enabled, 'created_at', s.created_at
+    ) order by s.created_at desc)
+    from orbit_private.webhook_subscriptions s
+    where s.workspace_id = p_workspace_id
+  ), '[]'::jsonb);
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."list_workspace_webhooks"("p_workspace_id" "uuid") OWNER TO "postgres";
+
+
 CREATE OR REPLACE FUNCTION "orbit"."mark_all_notifications_read"() RETURNS integer
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO ''
@@ -858,13 +1584,13 @@ CREATE OR REPLACE FUNCTION "orbit"."move_card"("p_card_id" "uuid", "p_target_col
 declare
   v_user_id uuid := orbit_private.current_user_id();
   v_board_id uuid;
+  v_workspace_id uuid;
 begin
   perform orbit_private.require_orbit_access();
 
-  select board_id into v_board_id
+  select board_id, workspace_id into v_board_id, v_workspace_id
   from orbit.cards
-  where id = p_card_id
-    and deleted_at is null;
+  where id = p_card_id and deleted_at is null;
 
   if v_board_id is null then
     raise exception 'card not found' using errcode = 'P0002';
@@ -881,24 +1607,549 @@ begin
     version = version + 1,
     completed_at = case
       when exists (
-        select 1
-        from orbit.columns column_row
-        where column_row.id = p_target_column_id
-          and column_row.category = 'done'
+        select 1 from orbit.columns column_row
+        where column_row.id = p_target_column_id and column_row.category = 'done'
       ) then coalesce(completed_at, now())
       else null
     end
-  where id = p_card_id
-    and version = p_expected_version;
+  where id = p_card_id and version = p_expected_version;
 
   if not found then
     raise exception 'stale card version' using errcode = '40001';
   end if;
+
+  insert into orbit.activity_events (
+    workspace_id, board_id, card_id, actor_id, event_type, safe_metadata
+  )
+  values (
+    v_workspace_id, v_board_id, p_card_id, v_user_id, 'card.moved',
+    jsonb_build_object('target_column_id', p_target_column_id)
+  );
+
+  perform orbit_private.queue_webhook_event(v_workspace_id, 'card.moved', jsonb_build_object(
+    'board_id', v_board_id, 'card_id', p_card_id, 'target_column_id', p_target_column_id
+  ));
 end;
 $$;
 
 
 ALTER FUNCTION "orbit"."move_card"("p_card_id" "uuid", "p_target_column_id" "uuid", "p_rank" "text", "p_expected_version" integer) OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."move_card_to_board"("p_card_id" "uuid", "p_target_board_id" "uuid", "p_target_column_id" "uuid", "p_rank" "text", "p_expected_version" integer) RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+  v_workspace_id uuid;
+  v_source_board_id uuid;
+  v_number integer;
+begin
+  perform orbit_private.require_orbit_access();
+
+  select workspace_id, board_id into v_workspace_id, v_source_board_id
+  from orbit.cards
+  where id = p_card_id and deleted_at is null;
+
+  if v_source_board_id is null then
+    raise exception 'card not found' using errcode = 'P0002';
+  end if;
+
+  if v_source_board_id = p_target_board_id then
+    perform orbit.move_card(p_card_id, p_target_column_id, p_rank, p_expected_version);
+    return;
+  end if;
+
+  if not orbit_private.can_edit_board(v_source_board_id, v_user_id)
+     or not orbit_private.can_edit_board(p_target_board_id, v_user_id) then
+    raise exception 'board edit access required' using errcode = '42501';
+  end if;
+
+  if not exists (
+    select 1 from orbit.boards b
+    where b.id = p_target_board_id and b.workspace_id = v_workspace_id
+  ) then
+    raise exception 'target board must be in the same workspace' using errcode = '22023';
+  end if;
+
+  if not exists (
+    select 1 from orbit.columns c
+    where c.id = p_target_column_id and c.board_id = p_target_board_id
+  ) then
+    raise exception 'target column not found' using errcode = 'P0002';
+  end if;
+
+  delete from orbit.card_dependencies d
+  where d.card_id = p_card_id
+     or d.depends_on_card_id = p_card_id;
+
+  set constraints all deferred;
+
+  update orbit_private.board_sequences
+  set next_number = next_number + 1
+  where board_id = p_target_board_id
+  returning next_number - 1 into v_number;
+
+  update orbit.card_labels
+  set board_id = p_target_board_id
+  where card_id = p_card_id;
+
+  update orbit.card_assignees
+  set board_id = p_target_board_id
+  where card_id = p_card_id;
+
+  update orbit.comments
+  set board_id = p_target_board_id
+  where card_id = p_card_id;
+
+  update orbit.checklists
+  set board_id = p_target_board_id
+  where card_id = p_card_id;
+
+  update orbit.attachments
+  set board_id = p_target_board_id
+  where card_id = p_card_id;
+
+  update orbit.card_watches
+  set board_id = p_target_board_id
+  where card_id = p_card_id;
+
+  update orbit.card_recurrence
+  set board_id = p_target_board_id
+  where card_id = p_card_id;
+
+  update orbit.card_github_links
+  set board_id = p_target_board_id
+  where card_id = p_card_id;
+
+  update orbit.cards
+  set
+    board_id = p_target_board_id,
+    column_id = p_target_column_id,
+    number = v_number,
+    rank = p_rank,
+    version = version + 1,
+    completed_at = case
+      when exists (
+        select 1 from orbit.columns column_row
+        where column_row.id = p_target_column_id and column_row.category = 'done'
+      ) then coalesce(completed_at, now())
+      else null
+    end
+  where id = p_card_id and version = p_expected_version;
+
+  if not found then
+    raise exception 'stale card version' using errcode = '40001';
+  end if;
+
+  insert into orbit.activity_events (
+    workspace_id, board_id, card_id, actor_id, event_type, safe_metadata
+  )
+  values (
+    v_workspace_id, p_target_board_id, p_card_id, v_user_id, 'card.moved',
+    jsonb_build_object(
+      'source_board_id', v_source_board_id,
+      'target_board_id', p_target_board_id,
+      'target_column_id', p_target_column_id
+    )
+  );
+
+  perform orbit_private.queue_webhook_event(v_workspace_id, 'card.moved', jsonb_build_object(
+    'board_id', p_target_board_id,
+    'card_id', p_card_id,
+    'source_board_id', v_source_board_id,
+    'target_column_id', p_target_column_id
+  ));
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."move_card_to_board"("p_card_id" "uuid", "p_target_board_id" "uuid", "p_target_column_id" "uuid", "p_rank" "text", "p_expected_version" integer) OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."pause_card_recurrence"("p_card_id" "uuid") RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_board_id uuid;
+begin
+  perform orbit_private.require_orbit_access();
+  select board_id into v_board_id from orbit.cards where id = p_card_id;
+  if not orbit_private.can_manage_board(v_board_id) then
+    raise exception 'board manager access required' using errcode = '42501';
+  end if;
+  update orbit.card_recurrence set active = false where card_id = p_card_id;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."pause_card_recurrence"("p_card_id" "uuid") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."process_due_recurrences_worker"() RETURNS integer
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+begin
+  return orbit_private.process_due_recurrences();
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."process_due_recurrences_worker"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."process_expired_trashed_cards"("p_limit" integer DEFAULT 100) RETURNS integer
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_card_id uuid;
+  v_count integer := 0;
+  v_limit integer := greatest(coalesce(p_limit, 100), 1);
+begin
+  for v_card_id in
+    select id
+    from orbit.cards
+    where deleted_at is not null
+      and deleted_at <= now() - interval '30 days'
+    order by deleted_at
+    limit v_limit
+    for update skip locked
+  loop
+    delete from orbit.cards where id = v_card_id;
+    v_count := v_count + 1;
+  end loop;
+
+  return v_count;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."process_expired_trashed_cards"("p_limit" integer) OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."process_pending_automation_events"("p_limit" integer DEFAULT 50) RETURNS integer
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_event orbit.activity_events%rowtype;
+  v_rule orbit.automation_rules%rowtype;
+  v_count integer := 0;
+  v_label_id uuid;
+begin
+  for v_event in
+    select *
+    from orbit.activity_events
+    where event_type = 'card.moved'
+      and created_at >= now() - interval '1 day'
+    order by created_at desc
+    limit greatest(p_limit, 1)
+  loop
+    for v_rule in
+      select * from orbit.automation_rules
+      where board_id = v_event.board_id and enabled and trigger_type = 'card_moved'
+    loop
+      if exists (
+        select 1 from orbit_private.automation_runs
+        where rule_id = v_rule.id and detail->>'event_id' = v_event.id::text
+      ) then
+        continue;
+      end if;
+
+      if (v_rule.trigger_config->>'column_id') is not null
+        and (v_rule.trigger_config->>'column_id') <> (v_event.safe_metadata->>'target_column_id') then
+        continue;
+      end if;
+
+      if v_rule.action_type = 'set_label' then
+        v_label_id := (v_rule.action_config->>'label_id')::uuid;
+        if v_label_id is not null then
+          insert into orbit.card_labels (workspace_id, board_id, card_id, label_id)
+          select c.workspace_id, c.board_id, c.id, v_label_id
+          from orbit.cards c where c.id = v_event.card_id
+          on conflict do nothing;
+        end if;
+      elsif v_rule.action_type = 'add_comment' then
+        insert into orbit.comments (workspace_id, board_id, card_id, author_id, body)
+        select c.workspace_id, c.board_id, c.id, v_rule.created_by, coalesce(v_rule.action_config->>'body', 'Automation note')
+        from orbit.cards c where c.id = v_event.card_id;
+      end if;
+
+      insert into orbit_private.automation_runs (rule_id, card_id, status, detail)
+      values (v_rule.id, v_event.card_id, 'completed', jsonb_build_object('event_id', v_event.id));
+      v_count := v_count + 1;
+    end loop;
+  end loop;
+  return v_count;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."process_pending_automation_events"("p_limit" integer) OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."process_pending_export_jobs"("p_limit" integer DEFAULT 10) RETURNS integer
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_job orbit_private.export_jobs%rowtype;
+  v_count integer := 0;
+  v_manifest jsonb;
+begin
+  for v_job in
+    select *
+    from orbit_private.export_jobs
+    where status = 'pending'
+    order by created_at
+    limit greatest(p_limit, 1)
+    for update skip locked
+  loop
+    update orbit_private.export_jobs set status = 'processing' where id = v_job.id;
+
+    select jsonb_build_object(
+      'exportedAt', now(),
+      'workspace', (
+        select to_jsonb(w)
+        from orbit.workspaces w
+        where w.id = v_job.workspace_id
+      ),
+      'boards', coalesce((
+        select jsonb_agg(to_jsonb(b))
+        from orbit.boards b
+        where b.workspace_id = v_job.workspace_id
+      ), '[]'::jsonb),
+      'cards', coalesce((
+        select jsonb_agg(to_jsonb(c))
+        from orbit.cards c
+        where c.workspace_id = v_job.workspace_id
+      ), '[]'::jsonb),
+      'members', coalesce((
+        select jsonb_agg(to_jsonb(m))
+        from orbit.workspace_members m
+        where m.workspace_id = v_job.workspace_id
+      ), '[]'::jsonb)
+    )
+    into v_manifest;
+
+    update orbit_private.export_jobs
+    set
+      status = 'ready',
+      manifest = v_manifest,
+      processed_at = now(),
+      expires_at = now() + interval '7 days'
+    where id = v_job.id;
+
+    v_count := v_count + 1;
+  end loop;
+
+  return v_count;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."process_pending_export_jobs"("p_limit" integer) OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."process_pending_import_jobs"("p_limit" integer DEFAULT 5) RETURNS integer
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_job orbit_private.import_jobs%rowtype;
+  v_count integer := 0;
+  v_card jsonb;
+  v_column_id uuid;
+  v_created integer := 0;
+  v_number integer;
+begin
+  for v_job in
+    select * from orbit_private.import_jobs
+    where status = 'pending'
+    order by created_at
+    limit greatest(p_limit, 1)
+    for update skip locked
+  loop
+    update orbit_private.import_jobs set status = 'processing' where id = v_job.id;
+    v_created := 0;
+
+    select id into v_column_id
+    from orbit.columns where board_id = v_job.board_id order by rank limit 1;
+
+    for v_card in
+      select * from jsonb_array_elements(coalesce(v_job.payload->'cards', '[]'::jsonb))
+    loop
+      if v_column_id is null then
+        continue;
+      end if;
+
+      update orbit_private.board_sequences
+      set next_number = next_number + 1
+      where board_id = v_job.board_id
+      returning next_number - 1 into v_number;
+
+      insert into orbit.cards (
+        workspace_id, board_id, column_id, number, title, created_by
+      )
+      values (
+        v_job.workspace_id,
+        v_job.board_id,
+        v_column_id,
+        v_number,
+        coalesce(v_card->>'title', 'Imported card'),
+        v_job.requester_id
+      );
+      v_created := v_created + 1;
+    end loop;
+
+    update orbit_private.import_jobs
+    set status = 'ready',
+        result = jsonb_build_object('imported_count', v_created),
+        processed_at = now()
+    where id = v_job.id;
+    v_count := v_count + 1;
+  end loop;
+  return v_count;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."process_pending_import_jobs"("p_limit" integer) OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."process_pending_webhook_deliveries"("p_limit" integer DEFAULT 25) RETURNS integer
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_delivery orbit_private.webhook_deliveries%rowtype;
+  v_count integer := 0;
+begin
+  for v_delivery in
+    select * from orbit_private.webhook_deliveries
+    where status = 'pending'
+    order by created_at
+    limit greatest(p_limit, 1)
+    for update skip locked
+  loop
+    update orbit_private.webhook_deliveries
+    set status = 'completed', attempts = attempts + 1, processed_at = now()
+    where id = v_delivery.id;
+    v_count := v_count + 1;
+  end loop;
+  return v_count;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."process_pending_webhook_deliveries"("p_limit" integer) OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."process_pending_workspace_purges"("p_limit" integer DEFAULT 5) RETURNS integer
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_workspace orbit.workspaces%rowtype;
+  v_count integer := 0;
+  v_limit integer := greatest(coalesce(p_limit, 5), 1);
+begin
+  for v_workspace in
+    select *
+    from orbit.workspaces
+    where lifecycle = 'pending_deletion'
+      and deletion_requested_at is not null
+      and deletion_requested_at <= now() - interval '30 days'
+    order by deletion_requested_at
+    limit v_limit
+    for update skip locked
+  loop
+    delete from orbit.workspaces where id = v_workspace.id;
+    v_count := v_count + 1;
+  end loop;
+
+  return v_count;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."process_pending_workspace_purges"("p_limit" integer) OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."publish_board"("p_board_id" "uuid", "p_slug" "text") RETURNS "uuid"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+  v_workspace_id uuid;
+  v_projection jsonb;
+  v_id uuid;
+begin
+  perform orbit_private.require_orbit_access();
+  select workspace_id into v_workspace_id from orbit.boards where id = p_board_id;
+  if not exists (
+    select 1 from orbit.workspaces where id = v_workspace_id and owner_user_id = v_user_id
+  ) then
+    raise exception 'workspace owner required' using errcode = '42501';
+  end if;
+
+  select jsonb_build_object(
+    'board', jsonb_build_object('name', b.name, 'key', b.key),
+    'columns', coalesce((
+      select jsonb_agg(jsonb_build_object('id', c.id, 'name', c.name, 'category', c.category) order by c.rank)
+      from orbit.columns c where c.board_id = p_board_id
+    ), '[]'::jsonb),
+    'cards', coalesce((
+      select jsonb_agg(jsonb_build_object(
+        'number', card.number, 'title', card.title, 'column_id', card.column_id, 'priority', card.priority
+      ) order by card.rank)
+      from orbit.cards card
+      where card.board_id = p_board_id and card.deleted_at is null and card.archived_at is null
+    ), '[]'::jsonb)
+  )
+  into v_projection
+  from orbit.boards b where b.id = p_board_id;
+
+  insert into orbit.published_boards (workspace_id, board_id, slug, projection, published_by, revoked_at)
+  values (v_workspace_id, p_board_id, lower(trim(p_slug)), v_projection, v_user_id, null)
+  on conflict (board_id) do update
+  set slug = excluded.slug,
+      projection = excluded.projection,
+      published_by = excluded.published_by,
+      published_at = now(),
+      revoked_at = null
+  returning id into v_id;
+  return v_id;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."publish_board"("p_board_id" "uuid", "p_slug" "text") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."remove_card_dependency"("p_dependency_id" "uuid") RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_board_id uuid;
+begin
+  perform orbit_private.require_orbit_access();
+  select board_id into v_board_id from orbit.card_dependencies where id = p_dependency_id;
+  if not orbit_private.can_edit_board(v_board_id) then
+    raise exception 'board edit access required' using errcode = '42501';
+  end if;
+  delete from orbit.card_dependencies where id = p_dependency_id;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."remove_card_dependency"("p_dependency_id" "uuid") OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "orbit"."remove_workspace_member"("p_workspace_id" "uuid", "p_user_id" "uuid") RETURNS "void"
@@ -932,6 +2183,82 @@ $$;
 
 
 ALTER FUNCTION "orbit"."remove_workspace_member"("p_workspace_id" "uuid", "p_user_id" "uuid") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."request_board_import"("p_board_id" "uuid", "p_payload" "jsonb") RETURNS "uuid"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+  v_workspace_id uuid;
+  v_id uuid;
+begin
+  perform orbit_private.require_orbit_access();
+  select workspace_id into v_workspace_id from orbit.boards where id = p_board_id;
+  if not orbit_private.is_workspace_admin(v_workspace_id, v_user_id) then
+    raise exception 'workspace admin required' using errcode = '42501';
+  end if;
+  insert into orbit_private.import_jobs (workspace_id, board_id, requester_id, payload)
+  values (v_workspace_id, p_board_id, v_user_id, coalesce(p_payload, '{}'::jsonb))
+  returning id into v_id;
+  return v_id;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."request_board_import"("p_board_id" "uuid", "p_payload" "jsonb") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."request_workspace_deletion"("p_workspace_id" "uuid") RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+begin
+  perform orbit_private.require_orbit_access();
+  if not exists (
+    select 1 from orbit.workspaces where id = p_workspace_id and owner_user_id = v_user_id
+  ) then
+    raise exception 'workspace owner required' using errcode = '42501';
+  end if;
+  update orbit.workspaces
+  set lifecycle = 'pending_deletion', deletion_requested_at = now()
+  where id = p_workspace_id;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."request_workspace_deletion"("p_workspace_id" "uuid") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."request_workspace_export"("p_workspace_id" "uuid") RETURNS "uuid"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+  v_job_id uuid;
+begin
+  perform orbit_private.require_orbit_access();
+  if not orbit_private.is_workspace_admin(p_workspace_id, v_user_id) then
+    raise exception 'workspace admin required' using errcode = '42501';
+  end if;
+
+  insert into orbit_private.export_jobs (workspace_id, requester_id, status)
+  values (p_workspace_id, v_user_id, 'pending')
+  returning id into v_job_id;
+
+  insert into orbit_private.outbox_events (event_type, payload)
+  values ('export.requested', jsonb_build_object('export_job_id', v_job_id));
+
+  return v_job_id;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."request_workspace_export"("p_workspace_id" "uuid") OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "orbit"."reserve_attachment_upload"("p_card_id" "uuid", "p_original_name" "text", "p_mime" "text", "p_bytes" bigint) RETURNS "jsonb"
@@ -1050,6 +2377,113 @@ $$;
 ALTER FUNCTION "orbit"."restore_card"("p_card_id" "uuid") OWNER TO "postgres";
 
 
+CREATE OR REPLACE FUNCTION "orbit"."restore_workspace"("p_workspace_id" "uuid") RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+begin
+  perform orbit_private.require_orbit_access();
+  if not orbit_private.is_workspace_admin(p_workspace_id, v_user_id) then
+    raise exception 'workspace admin required' using errcode = '42501';
+  end if;
+  update orbit.workspaces
+  set lifecycle = 'active', deletion_requested_at = null
+  where id = p_workspace_id;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."restore_workspace"("p_workspace_id" "uuid") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."resume_card_recurrence"("p_card_id" "uuid") RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_board_id uuid;
+begin
+  perform orbit_private.require_orbit_access();
+  select board_id into v_board_id from orbit.cards where id = p_card_id;
+  if not orbit_private.can_manage_board(v_board_id) then
+    raise exception 'board manager access required' using errcode = '42501';
+  end if;
+  update orbit.card_recurrence set active = true where card_id = p_card_id;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."resume_card_recurrence"("p_card_id" "uuid") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."revoke_api_token"("p_token_id" "uuid") RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_workspace_id uuid;
+  v_user_id uuid := orbit_private.current_user_id();
+begin
+  perform orbit_private.require_orbit_access();
+  select workspace_id into v_workspace_id from orbit_private.api_tokens where id = p_token_id;
+  if not orbit_private.is_workspace_admin(v_workspace_id, v_user_id) then
+    raise exception 'workspace admin required' using errcode = '42501';
+  end if;
+  update orbit_private.api_tokens set revoked_at = now() where id = p_token_id;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."revoke_api_token"("p_token_id" "uuid") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."revoke_published_board"("p_board_id" "uuid") RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_workspace_id uuid;
+  v_user_id uuid := orbit_private.current_user_id();
+begin
+  perform orbit_private.require_orbit_access();
+  select workspace_id into v_workspace_id from orbit.boards where id = p_board_id;
+  if not exists (
+    select 1 from orbit.workspaces where id = v_workspace_id and owner_user_id = v_user_id
+  ) then
+    raise exception 'workspace owner required' using errcode = '42501';
+  end if;
+  update orbit.published_boards set revoked_at = now() where board_id = p_board_id and revoked_at is null;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."revoke_published_board"("p_board_id" "uuid") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."revoke_webhook_subscription"("p_subscription_id" "uuid") RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_workspace_id uuid;
+  v_user_id uuid := orbit_private.current_user_id();
+begin
+  perform orbit_private.require_orbit_access();
+  select workspace_id into v_workspace_id
+  from orbit_private.webhook_subscriptions where id = p_subscription_id;
+  if not orbit_private.is_workspace_admin(v_workspace_id, v_user_id) then
+    raise exception 'workspace admin required' using errcode = '42501';
+  end if;
+  delete from orbit_private.webhook_subscriptions where id = p_subscription_id;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."revoke_webhook_subscription"("p_subscription_id" "uuid") OWNER TO "postgres";
+
+
 CREATE OR REPLACE FUNCTION "orbit"."save_board_template"("p_board_id" "uuid", "p_name" "text", "p_description" "text" DEFAULT NULL::"text") RETURNS "uuid"
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO ''
@@ -1096,6 +2530,28 @@ $$;
 
 
 ALTER FUNCTION "orbit"."seed_qa_workspace_member"("p_workspace_id" "uuid", "p_user_id" "uuid", "p_role" "orbit"."workspace_member_role") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."set_ai_preference"("p_workspace_id" "uuid", "p_enabled" boolean) RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+begin
+  perform orbit_private.require_orbit_access();
+  if not orbit_private.is_active_workspace_member(p_workspace_id, v_user_id) then
+    raise exception 'workspace membership required' using errcode = '42501';
+  end if;
+  insert into orbit.ai_preferences (user_id, workspace_id, enabled, updated_at)
+  values (v_user_id, p_workspace_id, p_enabled, now())
+  on conflict (user_id, workspace_id) do update
+  set enabled = excluded.enabled, updated_at = now();
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."set_ai_preference"("p_workspace_id" "uuid", "p_enabled" boolean) OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "orbit"."set_card_assignee"("p_card_id" "uuid", "p_user_id" "uuid", "p_attach" boolean DEFAULT true) RETURNS "void"
@@ -1163,7 +2619,7 @@ $$;
 ALTER FUNCTION "orbit"."set_card_assignee"("p_card_id" "uuid", "p_user_id" "uuid", "p_attach" boolean) OWNER TO "postgres";
 
 
-CREATE OR REPLACE FUNCTION "orbit"."set_card_recurrence"("p_card_id" "uuid", "p_cadence" "text", "p_interval_count" integer DEFAULT 1) RETURNS "uuid"
+CREATE OR REPLACE FUNCTION "orbit"."set_card_recurrence"("p_card_id" "uuid", "p_cadence" "text", "p_interval_count" integer DEFAULT 1, "p_timezone" "text" DEFAULT 'UTC'::"text", "p_title_template" "text" DEFAULT NULL::"text") RETURNS "uuid"
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO ''
     AS $$
@@ -1177,20 +2633,26 @@ begin
   perform orbit_private.require_orbit_access();
   select workspace_id, board_id into v_workspace_id, v_board_id
   from orbit.cards where id = p_card_id and deleted_at is null;
-  if not orbit_private.can_edit_board(v_board_id) then
-    raise exception 'board edit access required' using errcode = '42501';
+  if not orbit_private.can_manage_board(v_board_id) then
+    raise exception 'board manager access required' using errcode = '42501';
   end if;
-  if p_cadence = 'weekly' then v_next := now() + interval '7 days';
-  elsif p_cadence = 'monthly' then v_next := now() + interval '30 days';
+  if p_cadence = 'weekly' then v_next := now() + make_interval(days => 7 * p_interval_count);
+  elsif p_cadence = 'monthly' then v_next := now() + make_interval(days => 30 * p_interval_count);
+  else v_next := now() + make_interval(days => p_interval_count);
   end if;
   insert into orbit.card_recurrence (
-    workspace_id, board_id, card_id, cadence, interval_count, next_run_at, created_by
+    workspace_id, board_id, card_id, cadence, interval_count, next_run_at, created_by, timezone, title_template, active
   )
-  values (v_workspace_id, v_board_id, p_card_id, p_cadence, p_interval_count, v_next, v_user_id)
+  values (
+    v_workspace_id, v_board_id, p_card_id, p_cadence, p_interval_count, v_next, v_user_id,
+    coalesce(nullif(trim(p_timezone), ''), 'UTC'), p_title_template, true
+  )
   on conflict (card_id) do update
   set cadence = excluded.cadence,
       interval_count = excluded.interval_count,
       next_run_at = excluded.next_run_at,
+      timezone = excluded.timezone,
+      title_template = excluded.title_template,
       active = true
   returning id into v_id;
   return v_id;
@@ -1198,7 +2660,7 @@ end;
 $$;
 
 
-ALTER FUNCTION "orbit"."set_card_recurrence"("p_card_id" "uuid", "p_cadence" "text", "p_interval_count" integer) OWNER TO "postgres";
+ALTER FUNCTION "orbit"."set_card_recurrence"("p_card_id" "uuid", "p_cadence" "text", "p_interval_count" integer, "p_timezone" "text", "p_title_template" "text") OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "orbit"."snooze_card"("p_card_id" "uuid", "p_snooze_until" timestamp with time zone) RETURNS "void"
@@ -1217,6 +2679,42 @@ $$;
 
 
 ALTER FUNCTION "orbit"."snooze_card"("p_card_id" "uuid", "p_snooze_until" timestamp with time zone) OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."summarize_card"("p_card_id" "uuid") RETURNS "text"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+  v_board_id uuid;
+  v_workspace_id uuid;
+  v_title text;
+  v_description text;
+  v_enabled boolean := false;
+begin
+  perform orbit_private.require_orbit_access();
+  select workspace_id, board_id, title, description
+  into v_workspace_id, v_board_id, v_title, v_description
+  from orbit.cards where id = p_card_id and deleted_at is null;
+  if not orbit_private.can_read_board(v_board_id, v_user_id) then
+    raise exception 'board read access required' using errcode = '42501';
+  end if;
+  select enabled into v_enabled from orbit.ai_preferences
+  where user_id = v_user_id and workspace_id = v_workspace_id;
+  if coalesce(v_enabled, false) is not true then
+    raise exception 'AI assistance is not enabled for this workspace' using errcode = '42501';
+  end if;
+  return trim(format(
+    'Summary for "%s": %s',
+    v_title,
+    coalesce(nullif(left(regexp_replace(coalesce(v_description, ''), '\s+', ' ', 'g'), 240), ''), 'No description provided.')
+  ));
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."summarize_card"("p_card_id" "uuid") OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "orbit"."toggle_board_favorite"("p_board_id" "uuid", "p_favorite" boolean DEFAULT true) RETURNS "void"
@@ -1352,6 +2850,40 @@ $$;
 ALTER FUNCTION "orbit"."toggle_checklist_item"("p_item_id" "uuid", "p_completed" boolean) OWNER TO "postgres";
 
 
+CREATE OR REPLACE FUNCTION "orbit"."transfer_workspace_ownership"("p_workspace_id" "uuid", "p_target_user_id" "uuid") RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_user_id uuid := orbit_private.current_user_id();
+begin
+  perform orbit_private.require_orbit_access();
+
+  if not exists (
+    select 1 from orbit.workspaces
+    where id = p_workspace_id and owner_user_id = v_user_id
+  ) then
+    raise exception 'workspace owner required' using errcode = '42501';
+  end if;
+
+  if not orbit_private.is_active_workspace_member(p_workspace_id, p_target_user_id) then
+    raise exception 'target must be an active member' using errcode = '22023';
+  end if;
+
+  update orbit.workspaces set owner_user_id = p_target_user_id where id = p_workspace_id;
+
+  update orbit.workspace_members set role = 'admin'
+  where workspace_id = p_workspace_id and user_id = v_user_id;
+
+  update orbit.workspace_members set role = 'member'
+  where workspace_id = p_workspace_id and user_id = p_target_user_id;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."transfer_workspace_ownership"("p_workspace_id" "uuid", "p_target_user_id" "uuid") OWNER TO "postgres";
+
+
 CREATE OR REPLACE FUNCTION "orbit"."trash_board"("p_board_id" "uuid") RETURNS "void"
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO ''
@@ -1438,6 +2970,26 @@ $$;
 
 
 ALTER FUNCTION "orbit"."unarchive_card"("p_card_id" "uuid", "p_expected_version" integer) OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "orbit"."unlink_card_github_link"("p_link_id" "uuid") RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_board_id uuid;
+begin
+  perform orbit_private.require_orbit_access();
+  select board_id into v_board_id from orbit.card_github_links where id = p_link_id;
+  if not orbit_private.can_edit_board(v_board_id) then
+    raise exception 'board edit access required' using errcode = '42501';
+  end if;
+  delete from orbit.card_github_links where id = p_link_id;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."unlink_card_github_link"("p_link_id" "uuid") OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "orbit"."update_board"("p_board_id" "uuid", "p_name" "text" DEFAULT NULL::"text", "p_description" "text" DEFAULT NULL::"text", "p_visibility" "orbit"."board_visibility" DEFAULT NULL::"orbit"."board_visibility", "p_expected_revision" integer DEFAULT NULL::integer) RETURNS "void"
@@ -1549,6 +3101,29 @@ $$;
 ALTER FUNCTION "orbit"."update_column"("p_column_id" "uuid", "p_name" "text", "p_category" "orbit"."column_category") OWNER TO "postgres";
 
 
+CREATE OR REPLACE FUNCTION "orbit"."update_github_link_metadata"("p_link_id" "uuid", "p_issue_title" "text", "p_issue_state" "text") RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_board_id uuid;
+begin
+  perform orbit_private.require_orbit_access();
+  select board_id into v_board_id from orbit.card_github_links where id = p_link_id;
+  if not orbit_private.can_edit_board(v_board_id) then
+    raise exception 'board edit access required' using errcode = '42501';
+  end if;
+  update orbit.card_github_links
+  set issue_title = coalesce(p_issue_title, issue_title),
+      issue_state = coalesce(p_issue_state, issue_state)
+  where id = p_link_id;
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."update_github_link_metadata"("p_link_id" "uuid", "p_issue_title" "text", "p_issue_state" "text") OWNER TO "postgres";
+
+
 CREATE OR REPLACE FUNCTION "orbit"."update_workspace_member"("p_workspace_id" "uuid", "p_user_id" "uuid", "p_role" "orbit"."workspace_member_role") RETURNS "void"
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO ''
@@ -1580,6 +3155,34 @@ $$;
 
 ALTER FUNCTION "orbit"."update_workspace_member"("p_workspace_id" "uuid", "p_user_id" "uuid", "p_role" "orbit"."workspace_member_role") OWNER TO "postgres";
 
+
+CREATE OR REPLACE FUNCTION "orbit"."verify_api_token"("p_token_hash" "text") RETURNS "jsonb"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_row orbit_private.api_tokens%rowtype;
+begin
+  select * into v_row
+  from orbit_private.api_tokens
+  where token_hash = p_token_hash
+    and revoked_at is null
+    and (expires_at is null or expires_at > now());
+  if not found then
+    return null;
+  end if;
+  return jsonb_build_object(
+    'token_id', v_row.id,
+    'workspace_id', v_row.workspace_id,
+    'user_id', v_row.user_id,
+    'scopes', v_row.scopes
+  );
+end;
+$$;
+
+
+ALTER FUNCTION "orbit"."verify_api_token"("p_token_hash" "text") OWNER TO "postgres";
+
 SET default_tablespace = '';
 
 SET default_table_access_method = "heap";
@@ -1599,6 +3202,17 @@ CREATE TABLE IF NOT EXISTS "orbit"."activity_events" (
 
 
 ALTER TABLE "orbit"."activity_events" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "orbit"."ai_preferences" (
+    "user_id" "uuid" NOT NULL,
+    "workspace_id" "uuid" NOT NULL,
+    "enabled" boolean DEFAULT false NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL
+);
+
+
+ALTER TABLE "orbit"."ai_preferences" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "orbit"."attachments" (
@@ -1621,6 +3235,26 @@ CREATE TABLE IF NOT EXISTS "orbit"."attachments" (
 
 
 ALTER TABLE "orbit"."attachments" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "orbit"."automation_rules" (
+    "id" "uuid" DEFAULT "foundation"."uuid_v7"() NOT NULL,
+    "workspace_id" "uuid" NOT NULL,
+    "board_id" "uuid" NOT NULL,
+    "name" "text" NOT NULL,
+    "enabled" boolean DEFAULT true NOT NULL,
+    "trigger_type" "text" NOT NULL,
+    "trigger_config" "jsonb" DEFAULT '{}'::"jsonb" NOT NULL,
+    "action_type" "text" NOT NULL,
+    "action_config" "jsonb" DEFAULT '{}'::"jsonb" NOT NULL,
+    "created_by" "uuid" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    CONSTRAINT "automation_rules_action_type_check" CHECK (("action_type" = ANY (ARRAY['set_label'::"text", 'add_comment'::"text"]))),
+    CONSTRAINT "automation_rules_trigger_type_check" CHECK (("trigger_type" = ANY (ARRAY['card_moved'::"text", 'card_created'::"text"])))
+);
+
+
+ALTER TABLE "orbit"."automation_rules" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "orbit"."board_favorites" (
@@ -1715,6 +3349,24 @@ CREATE TABLE IF NOT EXISTS "orbit"."card_dependencies" (
 ALTER TABLE "orbit"."card_dependencies" OWNER TO "postgres";
 
 
+CREATE TABLE IF NOT EXISTS "orbit"."card_github_links" (
+    "id" "uuid" DEFAULT "foundation"."uuid_v7"() NOT NULL,
+    "workspace_id" "uuid" NOT NULL,
+    "board_id" "uuid" NOT NULL,
+    "card_id" "uuid" NOT NULL,
+    "repo_full_name" "text" NOT NULL,
+    "issue_number" integer NOT NULL,
+    "issue_url" "text" NOT NULL,
+    "issue_title" "text",
+    "issue_state" "text",
+    "created_by" "uuid" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL
+);
+
+
+ALTER TABLE "orbit"."card_github_links" OWNER TO "postgres";
+
+
 CREATE TABLE IF NOT EXISTS "orbit"."card_labels" (
     "workspace_id" "uuid" NOT NULL,
     "board_id" "uuid" NOT NULL,
@@ -1737,6 +3389,8 @@ CREATE TABLE IF NOT EXISTS "orbit"."card_recurrence" (
     "active" boolean DEFAULT true NOT NULL,
     "created_by" "uuid" NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "timezone" "text" DEFAULT 'UTC'::"text" NOT NULL,
+    "title_template" "text",
     CONSTRAINT "card_recurrence_cadence_check" CHECK (("cadence" = ANY (ARRAY['daily'::"text", 'weekly'::"text", 'monthly'::"text"]))),
     CONSTRAINT "card_recurrence_interval_count_check" CHECK (("interval_count" > 0))
 );
@@ -1894,6 +3548,22 @@ CREATE TABLE IF NOT EXISTS "orbit"."notifications" (
 ALTER TABLE "orbit"."notifications" OWNER TO "postgres";
 
 
+CREATE TABLE IF NOT EXISTS "orbit"."published_boards" (
+    "id" "uuid" DEFAULT "foundation"."uuid_v7"() NOT NULL,
+    "workspace_id" "uuid" NOT NULL,
+    "board_id" "uuid" NOT NULL,
+    "slug" "text" NOT NULL,
+    "projection" "jsonb" DEFAULT '{}'::"jsonb" NOT NULL,
+    "field_allowlist" "text"[] DEFAULT ARRAY['title'::"text", 'column'::"text", 'priority'::"text"] NOT NULL,
+    "published_by" "uuid" NOT NULL,
+    "published_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "revoked_at" timestamp with time zone
+);
+
+
+ALTER TABLE "orbit"."published_boards" OWNER TO "postgres";
+
+
 CREATE TABLE IF NOT EXISTS "orbit"."saved_views" (
     "id" "uuid" DEFAULT "foundation"."uuid_v7"() NOT NULL,
     "workspace_id" "uuid" NOT NULL,
@@ -1963,6 +3633,11 @@ ALTER TABLE ONLY "orbit"."activity_events"
 
 
 
+ALTER TABLE ONLY "orbit"."ai_preferences"
+    ADD CONSTRAINT "ai_preferences_pkey" PRIMARY KEY ("user_id", "workspace_id");
+
+
+
 ALTER TABLE ONLY "orbit"."attachments"
     ADD CONSTRAINT "attachments_object_key_key" UNIQUE ("object_key");
 
@@ -1970,6 +3645,11 @@ ALTER TABLE ONLY "orbit"."attachments"
 
 ALTER TABLE ONLY "orbit"."attachments"
     ADD CONSTRAINT "attachments_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "orbit"."automation_rules"
+    ADD CONSTRAINT "automation_rules_pkey" PRIMARY KEY ("id");
 
 
 
@@ -2015,6 +3695,16 @@ ALTER TABLE ONLY "orbit"."card_dependencies"
 
 ALTER TABLE ONLY "orbit"."card_dependencies"
     ADD CONSTRAINT "card_dependencies_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "orbit"."card_github_links"
+    ADD CONSTRAINT "card_github_links_card_id_issue_url_key" UNIQUE ("card_id", "issue_url");
+
+
+
+ALTER TABLE ONLY "orbit"."card_github_links"
+    ADD CONSTRAINT "card_github_links_pkey" PRIMARY KEY ("id");
 
 
 
@@ -2108,6 +3798,21 @@ ALTER TABLE ONLY "orbit"."notifications"
 
 
 
+ALTER TABLE ONLY "orbit"."published_boards"
+    ADD CONSTRAINT "published_boards_board_id_key" UNIQUE ("board_id");
+
+
+
+ALTER TABLE ONLY "orbit"."published_boards"
+    ADD CONSTRAINT "published_boards_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "orbit"."published_boards"
+    ADD CONSTRAINT "published_boards_slug_key" UNIQUE ("slug");
+
+
+
 ALTER TABLE ONLY "orbit"."saved_views"
     ADD CONSTRAINT "saved_views_pkey" PRIMARY KEY ("id");
 
@@ -2128,6 +3833,10 @@ ALTER TABLE ONLY "orbit"."workspaces"
 
 
 
+CREATE INDEX "automation_rules_board_idx" ON "orbit"."automation_rules" USING "btree" ("board_id", "enabled");
+
+
+
 CREATE INDEX "boards_workspace_visibility_idx" ON "orbit"."boards" USING "btree" ("workspace_id", "visibility", "lifecycle");
 
 
@@ -2141,6 +3850,10 @@ CREATE UNIQUE INDEX "labels_workspace_name_idx" ON "orbit"."labels" USING "btree
 
 
 CREATE INDEX "notifications_recipient_read_idx" ON "orbit"."notifications" USING "btree" ("recipient_id", "read_at", "created_at" DESC);
+
+
+
+CREATE INDEX "published_boards_active_idx" ON "orbit"."published_boards" USING "btree" ("slug") WHERE ("revoked_at" IS NULL);
 
 
 
@@ -2184,6 +3897,16 @@ ALTER TABLE ONLY "orbit"."activity_events"
 
 
 
+ALTER TABLE ONLY "orbit"."ai_preferences"
+    ADD CONSTRAINT "ai_preferences_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "iam"."profiles"("user_id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "orbit"."ai_preferences"
+    ADD CONSTRAINT "ai_preferences_workspace_id_fkey" FOREIGN KEY ("workspace_id") REFERENCES "orbit"."workspaces"("id") ON DELETE CASCADE;
+
+
+
 ALTER TABLE ONLY "orbit"."attachments"
     ADD CONSTRAINT "attachments_card_id_fkey" FOREIGN KEY ("card_id") REFERENCES "orbit"."cards"("id") ON DELETE CASCADE;
 
@@ -2195,7 +3918,22 @@ ALTER TABLE ONLY "orbit"."attachments"
 
 
 ALTER TABLE ONLY "orbit"."attachments"
-    ADD CONSTRAINT "attachments_workspace_id_board_id_card_id_fkey" FOREIGN KEY ("workspace_id", "board_id", "card_id") REFERENCES "orbit"."cards"("workspace_id", "board_id", "id") ON DELETE CASCADE;
+    ADD CONSTRAINT "attachments_workspace_id_board_id_card_id_fkey" FOREIGN KEY ("workspace_id", "board_id", "card_id") REFERENCES "orbit"."cards"("workspace_id", "board_id", "id") ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED;
+
+
+
+ALTER TABLE ONLY "orbit"."automation_rules"
+    ADD CONSTRAINT "automation_rules_board_id_fkey" FOREIGN KEY ("board_id") REFERENCES "orbit"."boards"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "orbit"."automation_rules"
+    ADD CONSTRAINT "automation_rules_created_by_fkey" FOREIGN KEY ("created_by") REFERENCES "iam"."profiles"("user_id") ON DELETE RESTRICT;
+
+
+
+ALTER TABLE ONLY "orbit"."automation_rules"
+    ADD CONSTRAINT "automation_rules_workspace_id_fkey" FOREIGN KEY ("workspace_id") REFERENCES "orbit"."workspaces"("id") ON DELETE CASCADE;
 
 
 
@@ -2275,7 +4013,7 @@ ALTER TABLE ONLY "orbit"."card_assignees"
 
 
 ALTER TABLE ONLY "orbit"."card_assignees"
-    ADD CONSTRAINT "card_assignees_workspace_id_board_id_card_id_fkey" FOREIGN KEY ("workspace_id", "board_id", "card_id") REFERENCES "orbit"."cards"("workspace_id", "board_id", "id") ON DELETE CASCADE;
+    ADD CONSTRAINT "card_assignees_workspace_id_board_id_card_id_fkey" FOREIGN KEY ("workspace_id", "board_id", "card_id") REFERENCES "orbit"."cards"("workspace_id", "board_id", "id") ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED;
 
 
 
@@ -2295,7 +4033,22 @@ ALTER TABLE ONLY "orbit"."card_dependencies"
 
 
 ALTER TABLE ONLY "orbit"."card_dependencies"
-    ADD CONSTRAINT "card_dependencies_workspace_id_board_id_card_id_fkey" FOREIGN KEY ("workspace_id", "board_id", "card_id") REFERENCES "orbit"."cards"("workspace_id", "board_id", "id") ON DELETE CASCADE;
+    ADD CONSTRAINT "card_dependencies_workspace_id_board_id_card_id_fkey" FOREIGN KEY ("workspace_id", "board_id", "card_id") REFERENCES "orbit"."cards"("workspace_id", "board_id", "id") ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED;
+
+
+
+ALTER TABLE ONLY "orbit"."card_github_links"
+    ADD CONSTRAINT "card_github_links_card_id_fkey" FOREIGN KEY ("card_id") REFERENCES "orbit"."cards"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "orbit"."card_github_links"
+    ADD CONSTRAINT "card_github_links_created_by_fkey" FOREIGN KEY ("created_by") REFERENCES "iam"."profiles"("user_id") ON DELETE RESTRICT;
+
+
+
+ALTER TABLE ONLY "orbit"."card_github_links"
+    ADD CONSTRAINT "card_github_links_workspace_id_board_id_card_id_fkey" FOREIGN KEY ("workspace_id", "board_id", "card_id") REFERENCES "orbit"."cards"("workspace_id", "board_id", "id") ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED;
 
 
 
@@ -2325,7 +4078,7 @@ ALTER TABLE ONLY "orbit"."card_recurrence"
 
 
 ALTER TABLE ONLY "orbit"."card_recurrence"
-    ADD CONSTRAINT "card_recurrence_workspace_id_board_id_card_id_fkey" FOREIGN KEY ("workspace_id", "board_id", "card_id") REFERENCES "orbit"."cards"("workspace_id", "board_id", "id") ON DELETE CASCADE;
+    ADD CONSTRAINT "card_recurrence_workspace_id_board_id_card_id_fkey" FOREIGN KEY ("workspace_id", "board_id", "card_id") REFERENCES "orbit"."cards"("workspace_id", "board_id", "id") ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED;
 
 
 
@@ -2350,7 +4103,7 @@ ALTER TABLE ONLY "orbit"."card_watches"
 
 
 ALTER TABLE ONLY "orbit"."card_watches"
-    ADD CONSTRAINT "card_watches_workspace_id_board_id_card_id_fkey" FOREIGN KEY ("workspace_id", "board_id", "card_id") REFERENCES "orbit"."cards"("workspace_id", "board_id", "id") ON DELETE CASCADE;
+    ADD CONSTRAINT "card_watches_workspace_id_board_id_card_id_fkey" FOREIGN KEY ("workspace_id", "board_id", "card_id") REFERENCES "orbit"."cards"("workspace_id", "board_id", "id") ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED;
 
 
 
@@ -2390,7 +4143,7 @@ ALTER TABLE ONLY "orbit"."checklists"
 
 
 ALTER TABLE ONLY "orbit"."checklists"
-    ADD CONSTRAINT "checklists_workspace_id_board_id_card_id_fkey" FOREIGN KEY ("workspace_id", "board_id", "card_id") REFERENCES "orbit"."cards"("workspace_id", "board_id", "id") ON DELETE CASCADE;
+    ADD CONSTRAINT "checklists_workspace_id_board_id_card_id_fkey" FOREIGN KEY ("workspace_id", "board_id", "card_id") REFERENCES "orbit"."cards"("workspace_id", "board_id", "id") ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED;
 
 
 
@@ -2415,7 +4168,7 @@ ALTER TABLE ONLY "orbit"."comments"
 
 
 ALTER TABLE ONLY "orbit"."comments"
-    ADD CONSTRAINT "comments_workspace_id_board_id_card_id_fkey" FOREIGN KEY ("workspace_id", "board_id", "card_id") REFERENCES "orbit"."cards"("workspace_id", "board_id", "id") ON DELETE CASCADE;
+    ADD CONSTRAINT "comments_workspace_id_board_id_card_id_fkey" FOREIGN KEY ("workspace_id", "board_id", "card_id") REFERENCES "orbit"."cards"("workspace_id", "board_id", "id") ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED;
 
 
 
@@ -2441,6 +4194,21 @@ ALTER TABLE ONLY "orbit"."notifications"
 
 ALTER TABLE ONLY "orbit"."notifications"
     ADD CONSTRAINT "notifications_workspace_id_fkey" FOREIGN KEY ("workspace_id") REFERENCES "orbit"."workspaces"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "orbit"."published_boards"
+    ADD CONSTRAINT "published_boards_board_id_fkey" FOREIGN KEY ("board_id") REFERENCES "orbit"."boards"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "orbit"."published_boards"
+    ADD CONSTRAINT "published_boards_published_by_fkey" FOREIGN KEY ("published_by") REFERENCES "iam"."profiles"("user_id") ON DELETE RESTRICT;
+
+
+
+ALTER TABLE ONLY "orbit"."published_boards"
+    ADD CONSTRAINT "published_boards_workspace_id_fkey" FOREIGN KEY ("workspace_id") REFERENCES "orbit"."workspaces"("id") ON DELETE CASCADE;
 
 
 
@@ -2491,10 +4259,28 @@ CREATE POLICY "activity_select_reader" ON "orbit"."activity_events" FOR SELECT T
 
 
 
+ALTER TABLE "orbit"."ai_preferences" ENABLE ROW LEVEL SECURITY;
+
+
+CREATE POLICY "ai_preferences_self" ON "orbit"."ai_preferences" TO "authenticated" USING (("user_id" = "orbit_private"."current_user_id"())) WITH CHECK (("user_id" = "orbit_private"."current_user_id"()));
+
+
+
 ALTER TABLE "orbit"."attachments" ENABLE ROW LEVEL SECURITY;
 
 
 CREATE POLICY "attachments_select_reader" ON "orbit"."attachments" FOR SELECT TO "authenticated" USING (("orbit_private"."can_read_board"("board_id") AND ("status" = 'ready'::"text") AND ("deleted_at" IS NULL)));
+
+
+
+ALTER TABLE "orbit"."automation_rules" ENABLE ROW LEVEL SECURITY;
+
+
+CREATE POLICY "automation_rules_manage" ON "orbit"."automation_rules" TO "authenticated" USING ("orbit_private"."can_manage_board"("board_id")) WITH CHECK ("orbit_private"."can_manage_board"("board_id"));
+
+
+
+CREATE POLICY "automation_rules_select" ON "orbit"."automation_rules" FOR SELECT TO "authenticated" USING ("orbit_private"."can_read_board"("board_id"));
 
 
 
@@ -2533,6 +4319,17 @@ ALTER TABLE "orbit"."card_dependencies" ENABLE ROW LEVEL SECURITY;
 
 
 CREATE POLICY "card_dependencies_select" ON "orbit"."card_dependencies" FOR SELECT TO "authenticated" USING ("orbit_private"."can_read_board"("board_id"));
+
+
+
+ALTER TABLE "orbit"."card_github_links" ENABLE ROW LEVEL SECURITY;
+
+
+CREATE POLICY "card_github_links_manage" ON "orbit"."card_github_links" TO "authenticated" USING ("orbit_private"."can_edit_board"("board_id")) WITH CHECK ("orbit_private"."can_edit_board"("board_id"));
+
+
+
+CREATE POLICY "card_github_links_select" ON "orbit"."card_github_links" FOR SELECT TO "authenticated" USING ("orbit_private"."can_read_board"("board_id"));
 
 
 
@@ -2619,6 +4416,21 @@ CREATE POLICY "notifications_select_self" ON "orbit"."notifications" FOR SELECT 
 
 
 
+ALTER TABLE "orbit"."published_boards" ENABLE ROW LEVEL SECURITY;
+
+
+CREATE POLICY "published_boards_manage" ON "orbit"."published_boards" TO "authenticated" USING ((EXISTS ( SELECT 1
+   FROM "orbit"."workspaces" "w"
+  WHERE (("w"."id" = "published_boards"."workspace_id") AND ("w"."owner_user_id" = "orbit_private"."current_user_id"()))))) WITH CHECK ((EXISTS ( SELECT 1
+   FROM "orbit"."workspaces" "w"
+  WHERE (("w"."id" = "published_boards"."workspace_id") AND ("w"."owner_user_id" = "orbit_private"."current_user_id"())))));
+
+
+
+CREATE POLICY "published_boards_select" ON "orbit"."published_boards" FOR SELECT TO "authenticated" USING ("orbit_private"."is_active_workspace_member"("workspace_id", "orbit_private"."current_user_id"()));
+
+
+
 ALTER TABLE "orbit"."saved_views" ENABLE ROW LEVEL SECURITY;
 
 
@@ -2680,12 +4492,54 @@ GRANT ALL ON FUNCTION "orbit"."archive_card"("p_card_id" "uuid", "p_expected_ver
 
 
 
+GRANT ALL ON FUNCTION "orbit"."archive_workspace"("p_workspace_id" "uuid") TO "authenticated";
+
+
+
+GRANT ALL ON FUNCTION "orbit"."board_backlog_report"("p_board_id" "uuid") TO "authenticated";
+
+
+
+GRANT ALL ON FUNCTION "orbit"."board_completion_report"("p_board_id" "uuid", "p_days" integer) TO "authenticated";
+
+
+
+GRANT ALL ON FUNCTION "orbit"."bulk_archive_cards"("p_board_id" "uuid", "p_card_ids" "uuid"[]) TO "authenticated";
+
+
+
 GRANT ALL ON FUNCTION "orbit"."bulk_move_cards"("p_board_id" "uuid", "p_card_ids" "uuid"[], "p_target_column_id" "uuid") TO "authenticated";
+
+
+
+GRANT ALL ON FUNCTION "orbit"."bulk_trash_cards"("p_board_id" "uuid", "p_card_ids" "uuid"[]) TO "authenticated";
+
+
+
+GRANT ALL ON FUNCTION "orbit"."cancel_workspace_deletion"("p_workspace_id" "uuid") TO "authenticated";
+
+
+
+REVOKE ALL ON FUNCTION "orbit"."claim_webhook_deliveries"("p_limit" integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION "orbit"."claim_webhook_deliveries"("p_limit" integer) TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "orbit"."create_api_token"("p_workspace_id" "uuid", "p_name" "text", "p_token_hash" "text", "p_token_prefix" "text", "p_scopes" "text"[], "p_expires_at" timestamp with time zone) TO "authenticated";
+
+
+
+GRANT ALL ON FUNCTION "orbit"."create_automation_rule"("p_board_id" "uuid", "p_name" "text", "p_trigger_type" "text", "p_trigger_config" "jsonb", "p_action_type" "text", "p_action_config" "jsonb") TO "authenticated";
 
 
 
 REVOKE ALL ON FUNCTION "orbit"."create_board"("p_workspace_id" "uuid", "p_name" "text", "p_key" "text", "p_visibility" "orbit"."board_visibility") FROM PUBLIC;
 GRANT ALL ON FUNCTION "orbit"."create_board"("p_workspace_id" "uuid", "p_name" "text", "p_key" "text", "p_visibility" "orbit"."board_visibility") TO "authenticated";
+
+
+
+REVOKE ALL ON FUNCTION "orbit"."create_board_from_template"("p_workspace_id" "uuid", "p_template_id" "uuid", "p_name" "text", "p_key" "text") FROM PUBLIC;
+GRANT ALL ON FUNCTION "orbit"."create_board_from_template"("p_workspace_id" "uuid", "p_template_id" "uuid", "p_name" "text", "p_key" "text") TO "authenticated";
 
 
 
@@ -2717,8 +4571,12 @@ GRANT ALL ON FUNCTION "orbit"."create_workspace"("p_name" "text", "p_description
 
 
 
-REVOKE ALL ON FUNCTION "orbit"."create_workspace_invitation"("p_workspace_id" "uuid", "p_email" "text", "p_role" "orbit"."workspace_member_role", "p_token_hash" "text") FROM PUBLIC;
-GRANT ALL ON FUNCTION "orbit"."create_workspace_invitation"("p_workspace_id" "uuid", "p_email" "text", "p_role" "orbit"."workspace_member_role", "p_token_hash" "text") TO "authenticated";
+REVOKE ALL ON FUNCTION "orbit"."create_workspace_invitation"("p_workspace_id" "uuid", "p_email" "text", "p_role" "orbit"."workspace_member_role", "p_token_hash" "text", "p_board_scope" "jsonb") FROM PUBLIC;
+GRANT ALL ON FUNCTION "orbit"."create_workspace_invitation"("p_workspace_id" "uuid", "p_email" "text", "p_role" "orbit"."workspace_member_role", "p_token_hash" "text", "p_board_scope" "jsonb") TO "authenticated";
+
+
+
+GRANT ALL ON FUNCTION "orbit"."delete_automation_rule"("p_rule_id" "uuid") TO "authenticated";
 
 
 
@@ -2729,6 +4587,49 @@ GRANT ALL ON FUNCTION "orbit"."delete_column"("p_column_id" "uuid", "p_destinati
 
 REVOKE ALL ON FUNCTION "orbit"."finalize_attachment_upload"("p_reservation_id" "uuid", "p_checksum" "text") FROM PUBLIC;
 GRANT ALL ON FUNCTION "orbit"."finalize_attachment_upload"("p_reservation_id" "uuid", "p_checksum" "text") TO "authenticated";
+
+
+
+REVOKE ALL ON FUNCTION "orbit"."finalize_webhook_delivery"("p_delivery_id" "uuid", "p_success" boolean, "p_http_status" integer, "p_error" "text") FROM PUBLIC;
+GRANT ALL ON FUNCTION "orbit"."finalize_webhook_delivery"("p_delivery_id" "uuid", "p_success" boolean, "p_http_status" integer, "p_error" "text") TO "service_role";
+
+
+
+REVOKE ALL ON FUNCTION "orbit"."get_published_board"("p_slug" "text") FROM PUBLIC;
+GRANT ALL ON FUNCTION "orbit"."get_published_board"("p_slug" "text") TO "anon";
+GRANT ALL ON FUNCTION "orbit"."get_published_board"("p_slug" "text") TO "authenticated";
+
+
+
+GRANT ALL ON FUNCTION "orbit"."get_workspace_export_manifest"("p_job_id" "uuid") TO "authenticated";
+
+
+
+GRANT ALL ON FUNCTION "orbit"."link_card_github_issue"("p_card_id" "uuid", "p_issue_url" "text", "p_issue_title" "text") TO "authenticated";
+
+
+
+GRANT ALL ON FUNCTION "orbit"."list_board_automation_rules"("p_board_id" "uuid") TO "authenticated";
+
+
+
+GRANT ALL ON FUNCTION "orbit"."list_stale_cards"("p_board_id" "uuid", "p_days" integer) TO "authenticated";
+
+
+
+GRANT ALL ON FUNCTION "orbit"."list_webhook_deliveries"("p_workspace_id" "uuid", "p_limit" integer) TO "authenticated";
+
+
+
+GRANT ALL ON FUNCTION "orbit"."list_workspace_api_tokens"("p_workspace_id" "uuid") TO "authenticated";
+
+
+
+GRANT ALL ON FUNCTION "orbit"."list_workspace_export_jobs"("p_workspace_id" "uuid") TO "authenticated";
+
+
+
+GRANT ALL ON FUNCTION "orbit"."list_workspace_webhooks"("p_workspace_id" "uuid") TO "authenticated";
 
 
 
@@ -2747,8 +4648,71 @@ GRANT ALL ON FUNCTION "orbit"."move_card"("p_card_id" "uuid", "p_target_column_i
 
 
 
+GRANT ALL ON FUNCTION "orbit"."move_card_to_board"("p_card_id" "uuid", "p_target_board_id" "uuid", "p_target_column_id" "uuid", "p_rank" "text", "p_expected_version" integer) TO "authenticated";
+
+
+
+GRANT ALL ON FUNCTION "orbit"."pause_card_recurrence"("p_card_id" "uuid") TO "authenticated";
+
+
+
+REVOKE ALL ON FUNCTION "orbit"."process_due_recurrences_worker"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "orbit"."process_due_recurrences_worker"() TO "service_role";
+
+
+
+REVOKE ALL ON FUNCTION "orbit"."process_expired_trashed_cards"("p_limit" integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION "orbit"."process_expired_trashed_cards"("p_limit" integer) TO "service_role";
+
+
+
+REVOKE ALL ON FUNCTION "orbit"."process_pending_automation_events"("p_limit" integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION "orbit"."process_pending_automation_events"("p_limit" integer) TO "service_role";
+
+
+
+REVOKE ALL ON FUNCTION "orbit"."process_pending_export_jobs"("p_limit" integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION "orbit"."process_pending_export_jobs"("p_limit" integer) TO "service_role";
+
+
+
+REVOKE ALL ON FUNCTION "orbit"."process_pending_import_jobs"("p_limit" integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION "orbit"."process_pending_import_jobs"("p_limit" integer) TO "service_role";
+
+
+
+REVOKE ALL ON FUNCTION "orbit"."process_pending_webhook_deliveries"("p_limit" integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION "orbit"."process_pending_webhook_deliveries"("p_limit" integer) TO "service_role";
+
+
+
+REVOKE ALL ON FUNCTION "orbit"."process_pending_workspace_purges"("p_limit" integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION "orbit"."process_pending_workspace_purges"("p_limit" integer) TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "orbit"."publish_board"("p_board_id" "uuid", "p_slug" "text") TO "authenticated";
+
+
+
+GRANT ALL ON FUNCTION "orbit"."remove_card_dependency"("p_dependency_id" "uuid") TO "authenticated";
+
+
+
 REVOKE ALL ON FUNCTION "orbit"."remove_workspace_member"("p_workspace_id" "uuid", "p_user_id" "uuid") FROM PUBLIC;
 GRANT ALL ON FUNCTION "orbit"."remove_workspace_member"("p_workspace_id" "uuid", "p_user_id" "uuid") TO "authenticated";
+
+
+
+GRANT ALL ON FUNCTION "orbit"."request_board_import"("p_board_id" "uuid", "p_payload" "jsonb") TO "authenticated";
+
+
+
+GRANT ALL ON FUNCTION "orbit"."request_workspace_deletion"("p_workspace_id" "uuid") TO "authenticated";
+
+
+
+GRANT ALL ON FUNCTION "orbit"."request_workspace_export"("p_workspace_id" "uuid") TO "authenticated";
 
 
 
@@ -2767,6 +4731,26 @@ GRANT ALL ON FUNCTION "orbit"."restore_card"("p_card_id" "uuid") TO "authenticat
 
 
 
+GRANT ALL ON FUNCTION "orbit"."restore_workspace"("p_workspace_id" "uuid") TO "authenticated";
+
+
+
+GRANT ALL ON FUNCTION "orbit"."resume_card_recurrence"("p_card_id" "uuid") TO "authenticated";
+
+
+
+GRANT ALL ON FUNCTION "orbit"."revoke_api_token"("p_token_id" "uuid") TO "authenticated";
+
+
+
+GRANT ALL ON FUNCTION "orbit"."revoke_published_board"("p_board_id" "uuid") TO "authenticated";
+
+
+
+GRANT ALL ON FUNCTION "orbit"."revoke_webhook_subscription"("p_subscription_id" "uuid") TO "authenticated";
+
+
+
 GRANT ALL ON FUNCTION "orbit"."save_board_template"("p_board_id" "uuid", "p_name" "text", "p_description" "text") TO "authenticated";
 
 
@@ -2776,16 +4760,20 @@ GRANT ALL ON FUNCTION "orbit"."seed_qa_workspace_member"("p_workspace_id" "uuid"
 
 
 
+GRANT ALL ON FUNCTION "orbit"."set_ai_preference"("p_workspace_id" "uuid", "p_enabled" boolean) TO "authenticated";
+
+
+
 REVOKE ALL ON FUNCTION "orbit"."set_card_assignee"("p_card_id" "uuid", "p_user_id" "uuid", "p_attach" boolean) FROM PUBLIC;
 GRANT ALL ON FUNCTION "orbit"."set_card_assignee"("p_card_id" "uuid", "p_user_id" "uuid", "p_attach" boolean) TO "authenticated";
 
 
 
-GRANT ALL ON FUNCTION "orbit"."set_card_recurrence"("p_card_id" "uuid", "p_cadence" "text", "p_interval_count" integer) TO "authenticated";
-
-
-
 GRANT ALL ON FUNCTION "orbit"."snooze_card"("p_card_id" "uuid", "p_snooze_until" timestamp with time zone) TO "authenticated";
+
+
+
+GRANT ALL ON FUNCTION "orbit"."summarize_card"("p_card_id" "uuid") TO "authenticated";
 
 
 
@@ -2807,6 +4795,10 @@ GRANT ALL ON FUNCTION "orbit"."toggle_checklist_item"("p_item_id" "uuid", "p_com
 
 
 
+GRANT ALL ON FUNCTION "orbit"."transfer_workspace_ownership"("p_workspace_id" "uuid", "p_target_user_id" "uuid") TO "authenticated";
+
+
+
 REVOKE ALL ON FUNCTION "orbit"."trash_board"("p_board_id" "uuid") FROM PUBLIC;
 GRANT ALL ON FUNCTION "orbit"."trash_board"("p_board_id" "uuid") TO "authenticated";
 
@@ -2819,6 +4811,10 @@ GRANT ALL ON FUNCTION "orbit"."trash_card"("p_card_id" "uuid", "p_expected_versi
 
 REVOKE ALL ON FUNCTION "orbit"."unarchive_card"("p_card_id" "uuid", "p_expected_version" integer) FROM PUBLIC;
 GRANT ALL ON FUNCTION "orbit"."unarchive_card"("p_card_id" "uuid", "p_expected_version" integer) TO "authenticated";
+
+
+
+GRANT ALL ON FUNCTION "orbit"."unlink_card_github_link"("p_link_id" "uuid") TO "authenticated";
 
 
 
@@ -2837,8 +4833,17 @@ GRANT ALL ON FUNCTION "orbit"."update_column"("p_column_id" "uuid", "p_name" "te
 
 
 
+GRANT ALL ON FUNCTION "orbit"."update_github_link_metadata"("p_link_id" "uuid", "p_issue_title" "text", "p_issue_state" "text") TO "authenticated";
+
+
+
 REVOKE ALL ON FUNCTION "orbit"."update_workspace_member"("p_workspace_id" "uuid", "p_user_id" "uuid", "p_role" "orbit"."workspace_member_role") FROM PUBLIC;
 GRANT ALL ON FUNCTION "orbit"."update_workspace_member"("p_workspace_id" "uuid", "p_user_id" "uuid", "p_role" "orbit"."workspace_member_role") TO "authenticated";
+
+
+
+REVOKE ALL ON FUNCTION "orbit"."verify_api_token"("p_token_hash" "text") FROM PUBLIC;
+GRANT ALL ON FUNCTION "orbit"."verify_api_token"("p_token_hash" "text") TO "service_role";
 
 
 
@@ -2846,7 +4851,15 @@ GRANT SELECT ON TABLE "orbit"."activity_events" TO "authenticated";
 
 
 
+GRANT SELECT ON TABLE "orbit"."ai_preferences" TO "authenticated";
+
+
+
 GRANT SELECT ON TABLE "orbit"."attachments" TO "authenticated";
+
+
+
+GRANT SELECT ON TABLE "orbit"."automation_rules" TO "authenticated";
 
 
 
@@ -2871,6 +4884,10 @@ GRANT SELECT ON TABLE "orbit"."card_assignees" TO "authenticated";
 
 
 GRANT SELECT ON TABLE "orbit"."card_dependencies" TO "authenticated";
+
+
+
+GRANT SELECT ON TABLE "orbit"."card_github_links" TO "authenticated";
 
 
 
@@ -2915,6 +4932,10 @@ GRANT SELECT ON TABLE "orbit"."labels" TO "authenticated";
 
 
 GRANT SELECT ON TABLE "orbit"."notifications" TO "authenticated";
+
+
+
+GRANT SELECT ON TABLE "orbit"."published_boards" TO "authenticated";
 
 
 

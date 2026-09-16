@@ -159,6 +159,7 @@ export async function createWebhookSubscriptionAction(input: {
     p_workspace_id: input.workspaceId,
     p_url: input.url.trim(),
     p_secret_hash: secretHash,
+    p_signing_secret: secret,
   });
   if (error) return { ok: false, error: error.message };
   revalidatePath(`/workspaces/${input.workspaceId}/settings`);
@@ -259,6 +260,45 @@ export async function setAiPreferenceAction(input: {
   });
   if (error) return { ok: false, error: error.message };
   revalidatePath(`/workspaces/${input.workspaceId}/settings`);
+  return { ok: true };
+}
+
+export async function refreshGithubLinkAction(input: {
+  boardId: string;
+  linkId: string;
+  repoFullName: string;
+  issueNumber: number;
+}): Promise<ActionResult> {
+  const token = process.env.GITHUB_TOKEN;
+  if (!token) {
+    return { ok: false, error: "GitHub metadata refresh is not configured" };
+  }
+
+  const response = await fetch(
+    `https://api.github.com/repos/${input.repoFullName}/issues/${input.issueNumber}`,
+    {
+      headers: {
+        Accept: "application/vnd.github+json",
+        Authorization: `Bearer ${token}`,
+        "User-Agent": "Orbit-by-Jayant",
+      },
+      signal: AbortSignal.timeout(10_000),
+    },
+  );
+
+  if (!response.ok) {
+    return { ok: false, error: `GitHub API returned ${response.status}` };
+  }
+
+  const issue = (await response.json()) as { title?: string; state?: string };
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.schema("orbit").rpc("update_github_link_metadata", {
+    p_link_id: input.linkId,
+    p_issue_title: issue.title ?? null,
+    p_issue_state: issue.state ?? null,
+  });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/boards/${input.boardId}`);
   return { ok: true };
 }
 

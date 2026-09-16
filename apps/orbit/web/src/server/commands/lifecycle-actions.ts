@@ -302,3 +302,14 @@ export async function requestWorkspaceExportAction(
   revalidatePath(`/workspaces/${workspaceId}/settings`);
   return { ok: true, jobId: data as string };
 }
+
+export async function downloadWorkspaceExportAction(
+  jobId: string,
+): Promise<ActionResult & { exportData?: Record<string, unknown> }> {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.schema("orbit").rpc("get_workspace_export_manifest", {
+    p_job_id: jobId,
+  });
+  if (error) return { ok: false, error: error.message };
+  return { ok: true, exportData: data as Record<string, unknown> };
+}

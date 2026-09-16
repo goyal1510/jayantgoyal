@@ -55,6 +55,7 @@ type BoardViewProps = {
   dependenciesByCard: Record<string, DependencySummary[]>;
   watchedCardIds: string[];
   savedViews: SavedViewSummary[];
+  workspaceBoards: Array<{ board: BoardSummary; columns: ColumnSummary[] }>;
 };
 
 export function BoardView({
@@ -70,6 +71,7 @@ export function BoardView({
   dependenciesByCard,
   watchedCardIds,
   savedViews,
+  workspaceBoards,
 }: BoardViewProps) {
   const router = useRouter();
   const [cards, setCards] = useState(initialCards);
@@ -342,29 +344,33 @@ export function BoardView({
       ) : null}
 
       {activeCard ? (
-        <CardDetailPanel
-          boardId={board.id}
-          workspaceId={board.workspaceId}
-          boardKey={board.key}
-          card={activeCard}
-          labels={labels}
-          labelIds={labelIdsByCard[activeCard.id] ?? []}
-          members={members}
-          assigneeIds={assigneeIdsByCard[activeCard.id] ?? []}
-          attachments={attachmentsByCard[activeCard.id] ?? []}
-          checklists={checklistsByCard[activeCard.id] ?? []}
-          dependencies={dependenciesByCard[activeCard.id] ?? []}
-          watched={watchedSet.has(activeCard.id)}
-          allCards={cardPicker}
-          onClose={() => setActiveCardId(null)}
-        />
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-background p-3 sm:p-4 md:static md:z-auto md:overflow-visible md:bg-transparent md:p-0">
+          <CardDetailPanel
+            boardId={board.id}
+            workspaceId={board.workspaceId}
+            boardKey={board.key}
+            card={activeCard}
+            labels={labels}
+            labelIds={labelIdsByCard[activeCard.id] ?? []}
+            members={members}
+            assigneeIds={assigneeIdsByCard[activeCard.id] ?? []}
+            attachments={attachmentsByCard[activeCard.id] ?? []}
+            checklists={checklistsByCard[activeCard.id] ?? []}
+            dependencies={dependenciesByCard[activeCard.id] ?? []}
+            watched={watchedSet.has(activeCard.id)}
+            allCards={cardPicker}
+            workspaceBoards={workspaceBoards}
+            onClose={() => setActiveCardId(null)}
+          />
+        </div>
       ) : null}
 
-      <div className="flex gap-4 overflow-x-auto pb-4">
+      <p className="text-xs text-muted-foreground md:hidden">Swipe horizontally to browse columns.</p>
+      <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-4 sm:mx-0 sm:gap-4 sm:px-0">
         {columns.map((column) => (
           <div
             key={column.id}
-            className="min-w-[280px] max-w-[320px] flex-1"
+            className="min-w-[85vw] max-w-[85vw] flex-none snap-center sm:min-w-[280px] sm:max-w-[320px] sm:flex-1"
             onDragOver={(event) => event.preventDefault()}
             onDrop={() => {
               if (!draggedCardId) return;

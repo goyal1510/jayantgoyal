@@ -13,6 +13,7 @@ import { Label } from "@jayantgoyal/web-ui/label";
 import {
   archiveCardAction,
   createLabelAction,
+  moveCardToBoardAction,
   setCardAssigneeAction,
   toggleCardLabelAction,
   trashCardAction,
@@ -22,8 +23,10 @@ import {
 import { CardDetailExtras } from "@/features/boards/card-detail-extras";
 import type {
   AttachmentSummary,
+  BoardSummary,
   CardSummary,
   ChecklistSummary,
+  ColumnSummary,
   DependencySummary,
   LabelSummary,
   MemberSummary,
@@ -43,6 +46,7 @@ type CardDetailPanelProps = {
   dependencies: DependencySummary[];
   watched: boolean;
   allCards: Array<{ id: string; number: number; title: string }>;
+  workspaceBoards: Array<{ board: BoardSummary; columns: ColumnSummary[] }>;
   onClose: () => void;
 };
 
@@ -60,6 +64,7 @@ export function CardDetailPanel({
   dependencies,
   watched,
   allCards,
+  workspaceBoards,
   onClose,
 }: CardDetailPanelProps) {
   const router = useRouter();
@@ -73,8 +78,13 @@ export function CardDetailPanel({
     card.dueDate ? card.dueDate.slice(0, 10) : "",
   );
   const [newLabelName, setNewLabelName] = useState("");
+  const [targetBoardId, setTargetBoardId] = useState("");
+  const [targetColumnId, setTargetColumnId] = useState("");
 
   const [showPreview, setShowPreview] = useState(false);
+
+  const otherBoards = workspaceBoards.filter((entry) => entry.board.id !== boardId);
+  const targetBoard = otherBoards.find((entry) => entry.board.id === targetBoardId);
 
   function refresh() {
     router.refresh();
@@ -241,7 +251,7 @@ export function CardDetailPanel({
   }
 
   return (
-    <div className="rounded-lg border bg-card p-4 shadow-sm">
+    <div className="mx-auto max-w-5xl rounded-lg border bg-card p-4 shadow-sm md:shadow-sm">
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
           <p className="font-mono text-xs text-muted-foreground">
@@ -409,6 +419,67 @@ export function CardDetailPanel({
               Trash
             </Button>
           </div>
+
+          {otherBoards.length > 0 ? (
+            <div className="space-y-2 rounded-md border p-3">
+              <p className="text-sm font-medium">Move to another board</p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                <select
+                  className="h-10 rounded-md border bg-background px-2 text-sm"
+                  value={targetBoardId}
+                  onChange={(event) => {
+                    setTargetBoardId(event.target.value);
+                    setTargetColumnId("");
+                  }}
+                >
+                  <option value="">Select board</option>
+                  {otherBoards.map((entry) => (
+                    <option key={entry.board.id} value={entry.board.id}>
+                      {entry.board.name} ({entry.board.key})
+                    </option>
+                  ))}
+                </select>
+                <select
+                  className="h-10 rounded-md border bg-background px-2 text-sm"
+                  value={targetColumnId}
+                  onChange={(event) => setTargetColumnId(event.target.value)}
+                  disabled={!targetBoard}
+                >
+                  <option value="">Select column</option>
+                  {(targetBoard?.columns ?? []).map((column) => (
+                    <option key={column.id} value={column.id}>
+                      {column.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <Button
+                variant="secondary"
+                disabled={pending || !targetBoardId || !targetColumnId}
+                onClick={() =>
+                  startTransition(async () => {
+                    const result = await moveCardToBoardAction({
+                      sourceBoardId: boardId,
+                      targetBoardId,
+                      cardId: card.id,
+                      targetColumnId,
+                      rank: card.rank,
+                      expectedVersion: card.version,
+                    });
+                    if (!result.ok) {
+                      toast.error(result.error);
+                      return;
+                    }
+                    toast.success("Card moved");
+                    onClose();
+                    router.push(`/boards/${targetBoardId}`);
+                  })
+                }
+              >
+                Move card
+              </Button>
+            </div>
+          ) : null}
 
           <CardDetailExtras
             boardId={boardId}

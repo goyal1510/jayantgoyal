@@ -9,6 +9,8 @@ import { Button } from "@jayantgoyal/web-ui/button";
 import { Input } from "@jayantgoyal/web-ui/input";
 import { Label } from "@jayantgoyal/web-ui/label";
 
+import { BoardReportsPanel } from "@/features/boards/board-reports-panel";
+import { JobStatusList, type JobStatusRow } from "@/features/orbit/job-status-list";
 import {
   createAutomationRuleAction,
   deleteAutomationRuleAction,
@@ -25,6 +27,7 @@ import type {
 
 type BoardP2PanelProps = {
   boardId: string;
+  boardKey: string;
   columns: ColumnSummary[];
   labels: LabelSummary[];
   automationRules: AutomationRuleSummary[];
@@ -34,16 +37,19 @@ type BoardP2PanelProps = {
     backlog: Record<string, unknown>;
     staleCards: Array<Record<string, unknown>>;
   };
+  importJobs?: JobStatusRow[];
   mode?: "all" | "automation" | "reports" | "publish";
 };
 
 export function BoardP2Panel({
   boardId,
+  boardKey,
   columns,
   labels,
   automationRules,
   publishedBoard,
   reports,
+  importJobs = [],
   mode = "all",
 }: BoardP2PanelProps) {
   const router = useRouter();
@@ -149,36 +155,7 @@ export function BoardP2Panel({
       ) : null}
 
       {showReports ? (
-        <section className="space-y-3 rounded-lg border p-4">
-          <h2 className="font-semibold">Reporting</h2>
-          <p className="text-sm text-muted-foreground">
-            {(reports.completion.definition as string) ?? ""}
-          </p>
-          <p className="text-sm">
-            Completed (30d):{" "}
-            <strong>{String(reports.completion.completed_count ?? 0)}</strong>
-          </p>
-          <p className="text-sm text-muted-foreground">
-            {(reports.backlog.definition as string) ?? ""}
-          </p>
-          <p className="text-sm">
-            Average backlog age:{" "}
-            <strong>{String(reports.backlog.average_age_days ?? 0)} days</strong>
-          </p>
-          {reports.staleCards.length > 0 ? (
-            <ul className="text-sm text-muted-foreground">
-              {reports.staleCards.slice(0, 5).map((card) => (
-                <li key={String(card.id)}>
-                  #{String(card.number)} {String(card.title)}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              No stale cards in the last 14 days.
-            </p>
-          )}
-        </section>
+        <BoardReportsPanel boardId={boardId} boardKey={boardKey} reports={reports} compact />
       ) : null}
 
       {showPublish ? (
@@ -249,6 +226,19 @@ export function BoardP2Panel({
               value={importJson}
               onChange={(e) => setImportJson(e.target.value)}
             />
+            <Input
+              type="file"
+              accept="application/json,.json"
+              disabled={pending}
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (!file) return;
+                void file.text().then((text) => {
+                  setImportJson(text);
+                  toast.success("Import file loaded");
+                });
+              }}
+            />
             <Button
               disabled={pending}
               onClick={() =>
@@ -257,7 +247,10 @@ export function BoardP2Panel({
                     const payload = JSON.parse(importJson) as Record<string, unknown>;
                     const result = await requestBoardImportAction({ boardId, payload });
                     if (!result.ok) toast.error(result.error);
-                    else toast.success("Import job queued");
+                    else {
+                      toast.success("Import job queued");
+                      refresh();
+                    }
                   } catch {
                     toast.error("Invalid JSON payload");
                   }
@@ -266,6 +259,7 @@ export function BoardP2Panel({
             >
               Queue import
             </Button>
+            <JobStatusList jobs={importJobs} emptyLabel="No import jobs yet." />
           </section>
         </>
       ) : null}

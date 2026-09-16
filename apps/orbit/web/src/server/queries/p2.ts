@@ -106,18 +106,46 @@ export async function listWorkspaceIntegrations(
   supabase: OrbitSupabaseClient,
   workspaceId: string,
 ) {
-  const [webhooks, tokens] = await Promise.all([
+  const [webhooks, tokens, deliveries] = await Promise.all([
     supabase.schema("orbit").rpc("list_workspace_webhooks", {
       p_workspace_id: workspaceId,
     }),
     supabase.schema("orbit").rpc("list_workspace_api_tokens", {
       p_workspace_id: workspaceId,
     }),
+    supabase.schema("orbit").rpc("list_webhook_deliveries", {
+      p_workspace_id: workspaceId,
+      p_limit: 25,
+    }),
   ]);
   if (webhooks.error) throw webhooks.error;
   if (tokens.error) throw tokens.error;
+  if (deliveries.error) throw deliveries.error;
   return {
     webhooks: (webhooks.data as Array<Record<string, unknown>> | null) ?? [],
     tokens: (tokens.data as Array<Record<string, unknown>> | null) ?? [],
+    deliveries: (deliveries.data as Array<Record<string, unknown>> | null) ?? [],
   };
+}
+
+export async function listWorkspaceExportJobs(
+  supabase: OrbitSupabaseClient,
+  workspaceId: string,
+) {
+  const { data, error } = await supabase.schema("orbit").rpc("list_workspace_export_jobs", {
+    p_workspace_id: workspaceId,
+  });
+  if (error) throw error;
+  return (data as Array<Record<string, unknown>> | null) ?? [];
+}
+
+export async function listBoardImportJobs(
+  supabase: OrbitSupabaseClient,
+  boardId: string,
+) {
+  const { data, error } = await supabase.schema("orbit").rpc("list_board_import_jobs", {
+    p_board_id: boardId,
+  });
+  if (error) throw error;
+  return (data as Array<Record<string, unknown>> | null) ?? [];
 }

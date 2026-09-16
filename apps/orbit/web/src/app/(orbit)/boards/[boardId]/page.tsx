@@ -8,6 +8,7 @@ import {
   listBoardCardLabelIds,
   listWorkspaceLabels,
   listWorkspaceMembers,
+  listWorkspaceBoardsWithColumns,
   loadBoardView,
 } from "@/server/queries/boards";
 import {
@@ -41,6 +42,7 @@ export default async function BoardPage({ params }: BoardPageProps) {
     dependenciesByCard,
     watchedCardIds,
     savedViews,
+    workspaceBoards,
   ] = await Promise.all([
     listWorkspaceLabels(supabase, board.workspaceId),
     listWorkspaceMembers(supabase, board.workspaceId),
@@ -51,6 +53,7 @@ export default async function BoardPage({ params }: BoardPageProps) {
     listBoardDependenciesByCard(supabase, boardId),
     listWatchedCardIds(supabase, boardId, user.id),
     listBoardSavedViews(supabase, boardId, user.id),
+    listWorkspaceBoardsWithColumns(supabase, board.workspaceId),
   ]);
 
   return (
@@ -67,6 +70,7 @@ export default async function BoardPage({ params }: BoardPageProps) {
       dependenciesByCard={dependenciesByCard}
       watchedCardIds={watchedCardIds}
       savedViews={savedViews}
+      workspaceBoards={workspaceBoards}
     />
   );
 }

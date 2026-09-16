@@ -20,6 +20,7 @@ type WorkspaceIntegrationsPanelProps = {
   workspaceId: string;
   webhooks: Array<Record<string, unknown>>;
   tokens: Array<Record<string, unknown>>;
+  webhookDeliveries: Array<Record<string, unknown>>;
   aiEnabled: boolean;
 };
 
@@ -27,6 +28,7 @@ export function WorkspaceIntegrationsPanel({
   workspaceId,
   webhooks,
   tokens,
+  webhookDeliveries,
   aiEnabled,
 }: WorkspaceIntegrationsPanelProps) {
   const router = useRouter();
@@ -98,6 +100,31 @@ export function WorkspaceIntegrationsPanel({
             Signing secret (copy now): {revealedSecret}
           </p>
         ) : null}
+      </section>
+
+      <section className="space-y-3 rounded-lg border p-4">
+        <h2 className="font-semibold">Recent webhook deliveries</h2>
+        {webhookDeliveries.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No deliveries yet.</p>
+        ) : (
+          <ul className="space-y-2 text-sm">
+            {webhookDeliveries.map((delivery) => (
+              <li key={String(delivery.id)} className="rounded-md border px-3 py-2">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="font-medium">{String(delivery.event_type)}</span>
+                  <span className="capitalize text-muted-foreground">{String(delivery.status)}</span>
+                </div>
+                <p className="truncate text-muted-foreground">{String(delivery.url)}</p>
+                {delivery.http_status ? (
+                  <p className="text-xs text-muted-foreground">HTTP {String(delivery.http_status)}</p>
+                ) : null}
+                {delivery.last_error ? (
+                  <p className="text-xs text-destructive">{String(delivery.last_error)}</p>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
       <section className="space-y-3 rounded-lg border p-4">

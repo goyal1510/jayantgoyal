@@ -87,6 +87,30 @@ export async function moveCardAction(input: {
   return { ok: true };
 }
 
+/** Moves a card to another board in the same workspace. */
+export async function moveCardToBoardAction(input: {
+  sourceBoardId: string;
+  targetBoardId: string;
+  cardId: string;
+  targetColumnId: string;
+  rank: string;
+  expectedVersion: number;
+}): Promise<ActionResult> {
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.schema("orbit").rpc("move_card_to_board", {
+    p_card_id: input.cardId,
+    p_target_board_id: input.targetBoardId,
+    p_target_column_id: input.targetColumnId,
+    p_rank: input.rank,
+    p_expected_version: input.expectedVersion,
+  });
+
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/boards/${input.sourceBoardId}`);
+  revalidatePath(`/boards/${input.targetBoardId}`);
+  return { ok: true };
+}
+
 /** Appends a comment to a card when the caller can read the board. */
 export async function addCommentAction(input: {
   boardId: string;

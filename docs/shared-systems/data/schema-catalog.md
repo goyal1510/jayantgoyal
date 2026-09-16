@@ -14,8 +14,8 @@ are not current APIs.
 | `studio`      |     14 | Studio            | Active membership, capabilities, and resource attributes  |
 | `portfolio`   |     14 | Portfolio         | Selected public reads; capability-authorized Admin writes |
 | `career`      |      8 | Career operations | Private service operations after Admin authorization      |
-| `orbit`       |     14 | Orbit             | IAM product access plus workspace/board authorization     |
-| `orbit_private` |    5 | Orbit             | Private invitations, receipts, sequences, and outbox      |
+| `orbit`       |     27 | Orbit             | IAM product access plus workspace/board authorization     |
+| `orbit_private` |   12 | Orbit             | Private jobs, integrations, invitations, and outbox       |
 
 ## Foundation
 
@@ -187,14 +187,27 @@ entry. Workspace membership and board roles live in the `orbit` schema.
 | `orbit.user_preferences`      | Per-user Orbit preferences                          |
 | `orbit.board_favorites`       | Personal board favorites                            |
 | `orbit.attachments`           | Private attachment metadata                         |
+| `orbit.checklists`            | Card checklist groups                               |
+| `orbit.checklist_items`       | Checklist item rows                                 |
+| `orbit.saved_views`           | Personal saved board filters                        |
+| `orbit.card_watches`          | Per-user card watch subscriptions                   |
+| `orbit.card_snoozes`          | Personal card snooze timestamps                     |
+| `orbit.card_dependencies`     | Within-board card dependency links                  |
+| `orbit.card_recurrence`       | Recurrence templates and next-run metadata          |
+| `orbit.board_templates`       | Saved board structure templates                     |
+| `orbit.automation_rules`        | Board automation trigger/action rules               |
+| `orbit.card_github_links`     | Linked GitHub issue metadata on cards               |
+| `orbit.published_boards`      | Public read-only board projections                  |
+| `orbit.ai_preferences`          | Opt-in local AI summary preference                  |
 
 Command entrypoints include `create_workspace`, `create_board`, `create_card`,
-`move_card`, `add_comment`, `create_workspace_invitation`, and
-`accept_workspace_invitation`. Browser DML on command-controlled tables is not
-part of the supported contract.
+`move_card`, `move_card_to_board`, `add_comment`, `create_workspace_invitation`,
+and `accept_workspace_invitation`. Browser DML on command-controlled tables is
+not part of the supported contract.
 
 `orbit_private` stores invitation secrets, command receipts, board sequences,
-outbox events, and upload reservations.
+outbox events, upload reservations, export/import jobs, webhook subscriptions,
+API tokens, and automation run logs.
 
 | Table                                  | Responsibility                                      |
 | -------------------------------------- | --------------------------------------------------- |
@@ -203,6 +216,13 @@ outbox events, and upload reservations.
 | `orbit_private.board_sequences`        | Per-board monotonic card number allocation          |
 | `orbit_private.outbox_events`          | Durable async notification/outbox queue             |
 | `orbit_private.upload_reservations`    | Pre-upload attachment reservation rows              |
+| `orbit_private.export_jobs`            | Workspace export manifests and expiry               |
+| `orbit_private.import_jobs`            | Board JSON import jobs                              |
+| `orbit_private.webhook_subscriptions`  | Outgoing webhook endpoints and signing secrets      |
+| `orbit_private.webhook_deliveries`     | Outgoing webhook delivery queue and status          |
+| `orbit_private.api_tokens`             | Hashed workspace API tokens                         |
+| `orbit_private.automation_runs`        | Automation execution audit rows                     |
+| `orbit_private.recurrence_occurrences` | Idempotent recurrence occurrence ledger             |
 
 ## Storage buckets
 

@@ -208,13 +208,18 @@ await run("bulk archive and trash", async () => {
   if (!archived || !trashed) throw new Error("bulk operations returned zero");
 });
 
-await run("workspace export request", async () => {
+await run("workspace export download", async () => {
   const token = await tokenFor("test1@jayantgoyal.com");
   const workspaceId = creds.demo.workspaceId;
   const jobId = await rpc(token, "orbit", "request_workspace_export", {
     p_workspace_id: workspaceId,
   });
   if (!jobId) throw new Error("export job id missing");
+  await serviceRpc("orbit", "process_pending_export_jobs");
+  const manifest = await rpc(token, "orbit", "get_workspace_export_manifest", {
+    p_job_id: jobId,
+  });
+  if (!manifest?.manifest) throw new Error("export manifest missing");
 });
 
 await run("guest invitation with board scope", async () => {
@@ -323,12 +328,19 @@ await run("github link and reporting", async () => {
 await run("webhook and api token", async () => {
   const token = await tokenFor("test1@jayantgoyal.com");
   const workspaceId = creds.demo.workspaceId;
+  const signingSecret = `secret-${Date.now()}`;
   const webhookId = await rpc(token, "orbit", "create_webhook_subscription", {
     p_workspace_id: workspaceId,
     p_url: "https://example.com/orbit-webhook",
     p_secret_hash: `hash-${Date.now()}`,
+    p_signing_secret: signingSecret,
   });
   if (!webhookId) throw new Error("webhook not created");
+  const deliveries = await rpc(token, "orbit", "list_webhook_deliveries", {
+    p_workspace_id: workspaceId,
+    p_limit: 5,
+  });
+  if (!Array.isArray(deliveries)) throw new Error("webhook deliveries missing");
   const tokenId = await rpc(token, "orbit", "create_api_token", {
     p_workspace_id: workspaceId,
     p_name: "Smoke token",
@@ -336,6 +348,48 @@ await run("webhook and api token", async () => {
     p_token_prefix: "orb_smoke",
   });
   if (!tokenId) throw new Error("api token not created");
+});
+
+await run("cross-board card move", async () => {
+  const token = await tokenFor("test1@jayantgoyal.com");
+  const workspaceId = creds.demo.workspaceId;
+  const sourceBoardId = creds.demo.boardId;
+  const targetBoardId = await rpc(token, "orbit", "create_board", {
+    p_workspace_id: workspaceId,
+    p_name: `Move Target ${Date.now()}`,
+    p_key: `MV${String(Date.now()).slice(-4)}`,
+  });
+  const sourceColumns = await select(
+    token,
+    "orbit",
+    "columns",
+    `select=id&board_id=eq.${sourceBoardId}`,
+  );
+  const targetColumns = await select(
+    token,
+    "orbit",
+    "columns",
+    `select=id&board_id=eq.${targetBoardId}`,
+  );
+  const cardId = await rpc(token, "orbit", "create_card", {
+    p_board_id: sourceBoardId,
+    p_column_id: sourceColumns[0].id,
+    p_title: `Cross-board ${Date.now()}`,
+  });
+  await rpc(token, "orbit", "move_card_to_board", {
+    p_card_id: cardId,
+    p_target_board_id: targetBoardId,
+    p_target_column_id: targetColumns[0].id,
+    p_rank: "a0",
+    p_expected_version: 1,
+  });
+  const moved = await select(token, "orbit", "cards", `select=board_id&id=eq.${cardId}`);
+  if (moved[0]?.board_id !== targetBoardId) throw new Error("card not moved");
+});
+
+await run("retention purge workers", async () => {
+  await serviceRpc("orbit", "process_pending_workspace_purges");
+  await serviceRpc("orbit", "process_expired_trashed_cards");
 });
 
 await run("import job worker", async () => {
@@ -347,6 +401,8 @@ await run("import job worker", async () => {
   });
   if (!jobId) throw new Error("import job missing");
   await serviceRpc("orbit", "process_pending_import_jobs");
+  const jobs = await rpc(token, "orbit", "list_board_import_jobs", { p_board_id: boardId });
+  if (!Array.isArray(jobs) || !jobs.length) throw new Error("import jobs list missing");
 });
 
 await run("ai preference and summary", async () => {

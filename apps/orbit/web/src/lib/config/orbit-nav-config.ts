@@ -1,6 +1,8 @@
 import {
   Archive,
+  BarChart3,
   Bell,
+  BellRing,
   Home,
   Kanban,
   LayoutGrid,
@@ -62,6 +64,13 @@ const staticNavItems: OrbitStaticNavItem[] = [
     href: "/inbox",
     icon: Bell,
     match: (pathname) => pathname === "/inbox" || pathname.startsWith("/inbox/"),
+  },
+  {
+    id: "preferences",
+    label: "Notifications",
+    href: "/preferences",
+    icon: BellRing,
+    match: (pathname) => pathname === "/preferences",
   },
 ];
 
@@ -197,6 +206,8 @@ export function buildOrbitBreadcrumbItems(
       items.push({ id: "settings", label: "Settings" });
     } else if (subpath === "archive") {
       items.push({ id: "archive", label: "Archive" });
+    } else if (subpath === "reports") {
+      items.push({ id: "reports", label: "Reports" });
     }
     return items;
   }
@@ -243,6 +254,13 @@ export function buildOrbitCommandPaletteGroups(
       value: "inbox notifications",
       href: "/inbox",
       icon: Bell,
+    },
+    {
+      id: "go-preferences",
+      label: "Notification preferences",
+      value: "notifications preferences email digest",
+      href: "/preferences",
+      icon: BellRing,
     },
   ];
 
@@ -292,6 +310,13 @@ export function buildOrbitCommandPaletteGroups(
           value: `${board.name} archive trash`,
           href: `/boards/${board.id}/archive`,
           icon: Archive,
+        },
+        {
+          id: `board-${board.id}-reports`,
+          label: `${board.name} reports`,
+          value: `${board.name} reports analytics stale cards`,
+          href: `/boards/${board.id}/reports`,
+          icon: BarChart3,
         },
       ]),
   );

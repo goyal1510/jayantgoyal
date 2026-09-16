@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { InboxPanel } from "@/features/inbox/inbox-panel";
 import { OrbitPageHeader } from "@/features/orbit/orbit-page-header";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -32,6 +34,14 @@ export default async function InboxPage() {
       <OrbitPageHeader
         title="Inbox"
         description="Assignment and activity notifications from your workspaces."
+        actions={
+          <Link
+            href="/preferences"
+            className="inline-flex h-9 items-center rounded-md border px-3 text-sm hover:bg-muted"
+          >
+            Notification preferences
+          </Link>
+        }
       />
       <InboxPanel userId={user.id} notifications={summaries} />
     </div>

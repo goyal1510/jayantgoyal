@@ -19,6 +19,7 @@ import {
 import {
   linkGithubIssueAction,
   loadCardGithubLinksAction,
+  refreshGithubLinkAction,
   pauseCardRecurrenceAction,
   removeCardDependencyAction,
   resumeCardRecurrenceAction,
@@ -336,22 +337,47 @@ export function CardDetailExtras({
           {githubLinks.map((link) => (
             <li key={link.id} className="flex items-center justify-between gap-2">
               <a href={link.issueUrl} className="text-primary underline" target="_blank" rel="noreferrer">
-                {link.repoFullName}#{link.issueNumber}
+                {link.issueTitle ?? `${link.repoFullName}#${link.issueNumber}`}
               </a>
-              <Button
-                size="sm"
-                variant="ghost"
-                disabled={pending}
-                onClick={() =>
-                  startTransition(async () => {
-                    const result = await unlinkGithubLinkAction({ boardId, linkId: link.id });
-                    if (!result.ok) toast.error(result.error);
-                    else setGithubLinks((current) => current.filter((entry) => entry.id !== link.id));
-                  })
-                }
-              >
-                Remove
-              </Button>
+              <div className="flex gap-1">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={pending}
+                  onClick={() =>
+                    startTransition(async () => {
+                      const result = await refreshGithubLinkAction({
+                        boardId,
+                        linkId: link.id,
+                        repoFullName: link.repoFullName,
+                        issueNumber: link.issueNumber,
+                      });
+                      if (!result.ok) toast.error(result.error);
+                      else {
+                        const links = await loadCardGithubLinksAction(cardId);
+                        if (links.ok) setGithubLinks(links.links);
+                        toast.success("GitHub metadata refreshed");
+                      }
+                    })
+                  }
+                >
+                  Refresh
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  disabled={pending}
+                  onClick={() =>
+                    startTransition(async () => {
+                      const result = await unlinkGithubLinkAction({ boardId, linkId: link.id });
+                      if (!result.ok) toast.error(result.error);
+                      else setGithubLinks((current) => current.filter((entry) => entry.id !== link.id));
+                    })
+                  }
+                >
+                  Remove
+                </Button>
+              </div>
             </li>
           ))}
         </ul>

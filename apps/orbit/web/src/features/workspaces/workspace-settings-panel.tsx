@@ -7,11 +7,13 @@ import { toast } from "sonner";
 import { Button } from "@jayantgoyal/web-ui/button";
 import { Label } from "@jayantgoyal/web-ui/label";
 
+import { JobStatusList, type JobStatusRow } from "@/features/orbit/job-status-list";
 import { createBoardFromTemplateAction } from "@/server/commands/feature-actions";
 import {
   archiveWorkspaceAction,
   cancelWorkspaceDeletionAction,
   requestWorkspaceDeletionAction,
+  downloadWorkspaceExportAction,
   requestWorkspaceExportAction,
   restoreWorkspaceAction,
   transferWorkspaceOwnershipAction,
@@ -23,6 +25,7 @@ type WorkspaceSettingsPanelProps = {
   members: MemberSummary[];
   templates: BoardTemplateSummary[];
   currentUserId: string;
+  exportJobs: JobStatusRow[];
 };
 
 export function WorkspaceSettingsPanel({
@@ -30,6 +33,7 @@ export function WorkspaceSettingsPanel({
   members,
   templates,
   currentUserId,
+  exportJobs,
 }: WorkspaceSettingsPanelProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -161,6 +165,34 @@ export function WorkspaceSettingsPanel({
         >
           Request export
         </Button>
+        <JobStatusList
+          jobs={exportJobs}
+          emptyLabel="No export jobs yet."
+          downloadPending={pending}
+          onDownload={(jobId) =>
+            startTransition(async () => {
+              const result = await downloadWorkspaceExportAction(jobId);
+              if (!result.ok) {
+                toast.error("error" in result ? result.error : "Export unavailable");
+                return;
+              }
+              if (!result.exportData) {
+                toast.error("Export unavailable");
+                return;
+              }
+              const blob = new Blob([JSON.stringify(result.exportData, null, 2)], {
+                type: "application/json",
+              });
+              const url = URL.createObjectURL(blob);
+              const anchor = document.createElement("a");
+              anchor.href = url;
+              anchor.download = `orbit-export-${jobId}.json`;
+              anchor.click();
+              URL.revokeObjectURL(url);
+              toast.success("Export downloaded");
+            })
+          }
+        />
       </div>
 
       {templates.length > 0 ? (

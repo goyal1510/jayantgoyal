@@ -8,7 +8,8 @@ import {
   listWorkspaceBoardTemplates,
   listWorkspaceMembersDetailed,
 } from "@/server/queries/lifecycle";
-import { listWorkspaceIntegrations } from "@/server/queries/p2";
+import { toJobStatusRows } from "@/lib/orbit/job-rows";
+import { listWorkspaceExportJobs, listWorkspaceIntegrations } from "@/server/queries/p2";
 import { listMyWorkspaces } from "@/server/queries/workspaces";
 
 type SettingsPageProps = {
@@ -27,10 +28,11 @@ export default async function WorkspaceSettingsPage({ params }: SettingsPageProp
   const workspace = workspaces.find((entry) => entry.id === workspaceId);
   if (!workspace) notFound();
 
-  const [members, templates, integrations, aiPreference] = await Promise.all([
+  const [members, templates, integrations, exportJobs, aiPreference] = await Promise.all([
     listWorkspaceMembersDetailed(supabase, workspaceId),
     listWorkspaceBoardTemplates(supabase, workspaceId),
     listWorkspaceIntegrations(supabase, workspaceId),
+    listWorkspaceExportJobs(supabase, workspaceId),
     supabase
       .schema("orbit")
       .from("ai_preferences")
@@ -61,6 +63,8 @@ export default async function WorkspaceSettingsPage({ params }: SettingsPageProp
         currentUserId={user.id}
         webhooks={integrations.webhooks}
         tokens={integrations.tokens}
+        webhookDeliveries={integrations.deliveries}
+        exportJobs={toJobStatusRows(exportJobs)}
         aiEnabled={aiPreference.data?.enabled ?? false}
       />
     </div>
