@@ -5,7 +5,7 @@ import { CaseStudyContent } from "@/components/editorial/case-study-content";
 import { getEditorialPortfolioData } from "@/lib/portfolio/editorial-server";
 import { buildPublicPageMetadata } from "@/lib/seo/config";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 async function getPublishedCaseStudy(slug: string) {
   const portfolio = await getEditorialPortfolioData();
@@ -13,6 +13,13 @@ async function getPublishedCaseStudy(slug: string) {
 
   if (!project?.caseStudy) return null;
   return { portfolio, project };
+}
+
+export async function generateStaticParams() {
+  const portfolio = await getEditorialPortfolioData();
+  return portfolio.work
+    .filter((project) => project.caseStudy)
+    .map((project) => ({ slug: project.id }));
 }
 
 export async function generateMetadata({

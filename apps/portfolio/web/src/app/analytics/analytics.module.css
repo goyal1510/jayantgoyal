@@ -1,8 +1,8 @@
 .page {
   --analytics-text: var(--ink);
   --analytics-muted: var(--folio-muted);
-  --analytics-line: rgba(20, 21, 21, 0.22);
-  --analytics-grid: rgba(20, 21, 21, 0.14);
+  --analytics-line: var(--line);
+  --analytics-grid: var(--subtle-ink);
   --analytics-accent: var(--signal);
   --analytics-area: var(--signal-soft);
   --analytics-secondary: #356f82;
@@ -11,11 +11,26 @@
   --analytics-tooltip-border: #9bb5bb;
   --analytics-tooltip-shadow: rgba(53, 111, 130, 0.16);
   --analytics-tooltip-text: #202526;
+  --analytics-on-accent: #fffdf7;
+  --analytics-secondary-shadow: rgba(53, 111, 130, 0.14);
   --rating-good: #3c6b5b;
   --rating-needs: #c5893c;
   --rating-poor: #b64e3a;
   background: var(--paper);
   color: var(--ink);
+}
+
+:global(.dark) .page {
+  --analytics-secondary: #79b8cc;
+  --analytics-secondary-soft: #263c43;
+  --analytics-tooltip: #202424;
+  --analytics-tooltip-border: #60808a;
+  --analytics-tooltip-shadow: rgba(0, 0, 0, 0.34);
+  --analytics-tooltip-text: #f2efe7;
+  --analytics-secondary-shadow: rgba(0, 0, 0, 0.28);
+  --rating-good: #74c5a4;
+  --rating-needs: #e1aa61;
+  --rating-poor: #ee806c;
 }
 
 .hero {
@@ -120,7 +135,7 @@
 
 .ranges .selectedRange {
   background: var(--signal);
-  color: var(--paper-bright);
+  color: var(--analytics-on-accent);
 }
 
 .rangeMeta {
@@ -154,7 +169,7 @@
   padding: 24px 20px 26px;
   border-right: 1px solid var(--ink);
   border-bottom: 1px solid var(--ink);
-  background: rgba(255, 253, 247, 0.72);
+  background: color-mix(in srgb, var(--paper-bright) 82%, transparent);
 }
 
 .metricStrip article > span {

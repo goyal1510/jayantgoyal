@@ -1,0 +1,47 @@
+:root {
+  --paper: #f3f0e8;
+  --paper-bright: #fffdf7;
+  --paper-deep: #e7e0d4;
+  --ink: #141515;
+  --ink-soft: #242625;
+  --folio-muted: #666159;
+  --line: rgba(20, 21, 21, 0.2);
+  --line-light: rgba(243, 240, 232, 0.22);
+  --signal: #f04d2e;
+  --signal-soft: #ffc6b8;
+  --electric: #d9ef54;
+  --sky: #dce9f3;
+  --header-background: rgba(243, 240, 232, 0.88);
+  --subtle-ink: rgba(20, 21, 21, 0.13);
+  --mobile-menu-background: #f3f0e8;
+  --mobile-menu-foreground: #141515;
+  --mobile-menu-muted: rgba(20, 21, 21, 0.62);
+  --mobile-menu-subtle: rgba(20, 21, 21, 0.48);
+  --mobile-menu-line: rgba(20, 21, 21, 0.2);
+  --mobile-menu-border: rgba(20, 21, 21, 0.14);
+  --pointer-x: -100px;
+  --pointer-y: -100px;
+}
+
+:root.dark {
+  --paper: #141616;
+  --paper-bright: #1d2020;
+  --paper-deep: #0e1010;
+  --ink: #f2efe7;
+  --ink-soft: #dedad1;
+  --folio-muted: #aaa59b;
+  --line: rgba(242, 239, 231, 0.22);
+  --line-light: rgba(242, 239, 231, 0.18);
+  --signal: #ff7256;
+  --signal-soft: #6b3025;
+  --electric: #b9cd43;
+  --sky: #223038;
+  --header-background: rgba(20, 22, 22, 0.9);
+  --subtle-ink: rgba(242, 239, 231, 0.14);
+  --mobile-menu-background: #0e1010;
+  --mobile-menu-foreground: #f2efe7;
+  --mobile-menu-muted: rgba(242, 239, 231, 0.6);
+  --mobile-menu-subtle: rgba(242, 239, 231, 0.46);
+  --mobile-menu-line: rgba(242, 239, 231, 0.24);
+  --mobile-menu-border: rgba(242, 239, 231, 0.14);
+}

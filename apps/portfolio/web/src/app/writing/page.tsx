@@ -10,7 +10,7 @@ import { getPublishedWritingPosts } from "@/lib/writing/queries";
 import { getPortfolioShellData } from "@/lib/portfolio/editorial-server";
 import { buildPublicPageMetadata } from "@/lib/seo/config";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   const { sectionContent } = await getPortfolioShellData();

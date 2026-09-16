@@ -23,6 +23,15 @@ export function ContactSection({
 }) {
   const heading = getCompactSectionHeading(content.eyebrow, content.headline);
   const Heading = headingLevel;
+  const headingContent = (
+    <>
+      <span className="section-index">{heading.label}</span>
+      <div>
+        <Heading>{heading.title}</Heading>
+        <p>{content.description}</p>
+      </div>
+    </>
+  );
   const emailCodePoints = Array.from(profile.email, (character) =>
     character.codePointAt(0),
   ).filter((codePoint): codePoint is number => codePoint !== undefined);
@@ -30,13 +39,15 @@ export function ContactSection({
   return (
     <section id="contact" className="contact-section">
       <div className="shell">
-        <EditorialReveal className="section-heading section-heading--contact">
-          <span className="section-index">{heading.label}</span>
-          <div>
-            <Heading>{heading.title}</Heading>
-            <p>{content.description}</p>
+        {headingLevel === "h1" ? (
+          <div className="section-heading section-heading--contact">
+            {headingContent}
           </div>
-        </EditorialReveal>
+        ) : (
+          <EditorialReveal className="section-heading section-heading--contact">
+            {headingContent}
+          </EditorialReveal>
+        )}
 
         <div className="contact-section__grid">
           <EditorialReveal className="contact-section__copy">

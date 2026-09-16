@@ -2,12 +2,13 @@ import { describe, expect, it } from "vitest";
 
 import {
   getPortfolioNavigationHref,
-  includeAnalyticsNavigation,
+  includePortfolioNavigation,
   isPortfolioNavigationItemCurrent,
 } from "./navigation";
 
 describe("Portfolio navigation", () => {
   it("routes homepage navigation to canonical destinations", () => {
+    expect(getPortfolioNavigationHref("home", "home")).toBe("/");
     expect(getPortfolioNavigationHref("about", "home")).toBe("/about");
     expect(getPortfolioNavigationHref("work", "home")).toBe("/work");
     expect(getPortfolioNavigationHref("writing", "home")).toBe("/writing");
@@ -31,18 +32,23 @@ describe("Portfolio navigation", () => {
     );
   });
 
-  it("adds Analytics to CMS navigation exactly once", () => {
+  it("adds Home and Analytics to CMS navigation exactly once", () => {
     const items = [{ key: "work", label: "Work", note: "Selected work" }];
-    const withAnalytics = includeAnalyticsNavigation(items);
+    const completeNavigation = includePortfolioNavigation(items);
 
-    expect(withAnalytics).toEqual([
+    expect(completeNavigation).toEqual([
+      { key: "home", label: "Home", note: "Portfolio overview" },
       ...items,
       { key: "analytics", label: "Analytics", note: "Live site traffic" },
     ]);
-    expect(includeAnalyticsNavigation(withAnalytics)).toBe(withAnalytics);
+    expect(includePortfolioNavigation(completeNavigation)).toBe(
+      completeNavigation,
+    );
   });
 
   it("marks dedicated destinations as current", () => {
+    expect(isPortfolioNavigationItemCurrent("home", "/")).toBe(true);
+    expect(isPortfolioNavigationItemCurrent("home", "/about")).toBe(false);
     expect(isPortfolioNavigationItemCurrent("work", "/work")).toBe(true);
     expect(isPortfolioNavigationItemCurrent("writing", "/writing/auth")).toBe(
       true,

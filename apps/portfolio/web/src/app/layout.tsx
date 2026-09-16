@@ -10,6 +10,7 @@ import { buildAppRootMetadata } from "@jayantgoyal/web-seo";
 import { PageScrollProgress } from "@/components/editorial/page-scroll-progress";
 import { PortfolioAnalytics } from "@/components/editorial/portfolio-analytics";
 import { PortfolioFooter } from "@/components/editorial/portfolio-footer";
+import { ScrollToTop } from "@/components/editorial/scroll-to-top";
 import { PERSON_NAME, SITE_URL } from "@/lib/seo/config";
 
 const sans = DM_Sans({
@@ -31,6 +32,8 @@ const wordmark = Jost({
   display: "swap",
   variable: "--font-wordmark",
 });
+
+const colorThemeScript = `(() => { try { const saved = localStorage.getItem("portfolio-color-theme"); const dark = saved === "dark" || (saved !== "light" && matchMedia("(prefers-color-scheme: dark)").matches); document.documentElement.classList.toggle("dark", dark); document.documentElement.style.colorScheme = dark ? "dark" : "light"; } catch {} })();`;
 
 export function generateMetadata(): Metadata {
   const shouldIndex = process.env.VERCEL_ENV === "production";
@@ -62,8 +65,11 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
+        <Script id="portfolio-color-theme" strategy="beforeInteractive">
+          {colorThemeScript}
+        </Script>
         <Script
           async
           src="https://www.googletagmanager.com/gtag/js?id=G-YVBSLSQXFJ"
@@ -78,6 +84,7 @@ export default function RootLayout({
       >
         <PortfolioAnalytics />
         <PageScrollProgress />
+        <ScrollToTop />
         <div className="portfolio-site__content">{children}</div>
         <Suspense fallback={null}>
           <PortfolioFooter />

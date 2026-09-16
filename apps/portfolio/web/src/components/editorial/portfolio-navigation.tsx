@@ -6,9 +6,10 @@ import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 
 import type { PortfolioNavigationItem } from "@/lib/portfolio/editorial-data";
+import { ColorThemeToggle } from "@/components/editorial/color-theme-toggle";
 import {
   getPortfolioNavigationHref,
-  includeAnalyticsNavigation,
+  includePortfolioNavigation,
   isPortfolioNavigationItemCurrent,
   type PortfolioNavigationSurface,
 } from "@/lib/portfolio/navigation";
@@ -29,7 +30,7 @@ export function PortfolioNavigation({
   const menuRef = useRef<HTMLDivElement>(null);
   const firstLinkRef = useRef<HTMLAnchorElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
-  const navigationItems = includeAnalyticsNavigation(items);
+  const navigationItems = includePortfolioNavigation(items);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -100,6 +101,7 @@ export function PortfolioNavigation({
             </Link>
           ))}
         </div>
+        <ColorThemeToggle />
         <button
           ref={toggleRef}
           type="button"

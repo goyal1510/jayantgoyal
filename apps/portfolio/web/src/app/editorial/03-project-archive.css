@@ -24,6 +24,10 @@
   transition: opacity 500ms ease;
 }
 
+:root.dark .project-media-gallery__image {
+  filter: invert(0.88) hue-rotate(180deg) brightness(0.82) contrast(0.96);
+}
+
 .project-media-gallery__image--active {
   opacity: 1;
 }

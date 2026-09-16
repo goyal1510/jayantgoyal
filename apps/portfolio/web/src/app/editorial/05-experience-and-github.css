@@ -155,7 +155,7 @@
   inset: 8% 10%;
   z-index: -2;
   border: 1px solid rgba(20, 21, 21, 0.18);
-  background: #ebe6da;
+  background: var(--paper-deep);
   box-shadow: 0 20px 48px rgba(0, 0, 0, 0.2);
 }
 
@@ -165,7 +165,7 @@
 
 .certificate-deck__back--right {
   z-index: -1;
-  background: #f7f2e7;
+  background: var(--paper);
   transform: translate(7%, 1%) rotate(4deg);
 }
 
@@ -179,7 +179,7 @@
   display: block;
   width: 100%;
   height: auto;
-  background: #fff;
+  background: var(--paper-bright);
   box-shadow: 0 32px 70px rgba(0, 0, 0, 0.34);
   object-fit: contain;
 }
@@ -287,9 +287,14 @@
 }
 
 .github-activity {
+  --github-accent: #1266b0;
   padding: clamp(72px, 7vw, 104px) 0 clamp(68px, 6vw, 92px);
   background: var(--paper-bright);
   color: var(--ink);
+}
+
+:root.dark .github-activity {
+  --github-accent: #7fb9eb;
 }
 
 .github-activity__heading {
@@ -300,7 +305,7 @@
 }
 
 .github-activity__heading .section-index {
-  color: #1266b0;
+  color: var(--github-accent);
   font-weight: 600;
 }
 
@@ -320,7 +325,7 @@
 
 .github-activity__analytics-link {
   margin-top: 18px;
-  color: #1266b0;
+  color: var(--github-accent);
 }
 
 .github-activity__ledger {

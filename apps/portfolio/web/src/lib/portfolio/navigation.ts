@@ -2,6 +2,12 @@ import type { PortfolioNavigationItem } from "./editorial-data";
 
 export type PortfolioNavigationSurface = "home" | "subpage";
 
+const HOME_NAVIGATION_ITEM: PortfolioNavigationItem = {
+  key: "home",
+  label: "Home",
+  note: "Portfolio overview",
+};
+
 const ANALYTICS_NAVIGATION_ITEM: PortfolioNavigationItem = {
   key: "analytics",
   label: "Analytics",
@@ -9,6 +15,7 @@ const ANALYTICS_NAVIGATION_ITEM: PortfolioNavigationItem = {
 };
 
 const PORTFOLIO_DESTINATIONS: Record<string, string> = {
+  home: "/",
   about: "/about",
   work: "/work",
   writing: "/writing",
@@ -43,11 +50,15 @@ export function isPortfolioNavigationItemCurrent(
     : false;
 }
 
-/** Adds the product-owned Analytics destination without duplicating CMS entries. */
-export function includeAnalyticsNavigation(
+/** Adds product-owned destinations without duplicating CMS-managed entries. */
+export function includePortfolioNavigation(
   items: PortfolioNavigationItem[],
 ): PortfolioNavigationItem[] {
-  return items.some((item) => item.key === ANALYTICS_NAVIGATION_ITEM.key)
+  const withHome = items.some((item) => item.key === HOME_NAVIGATION_ITEM.key)
     ? items
-    : [...items, ANALYTICS_NAVIGATION_ITEM];
+    : [HOME_NAVIGATION_ITEM, ...items];
+
+  return withHome.some((item) => item.key === ANALYTICS_NAVIGATION_ITEM.key)
+    ? withHome
+    : [...withHome, ANALYTICS_NAVIGATION_ITEM];
 }

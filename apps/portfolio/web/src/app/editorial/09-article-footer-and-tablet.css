@@ -131,7 +131,12 @@
   height: min(1100px, 120svh);
   margin-top: 28px;
   border: 1px solid var(--line);
-  background: #fff;
+  background: var(--paper-bright);
+  transition: filter 220ms ease;
+}
+
+:root.dark .editorial-resume__frame {
+  filter: invert(0.9) hue-rotate(180deg) brightness(0.88) contrast(0.96);
 }
 
 .profile-section--preview {

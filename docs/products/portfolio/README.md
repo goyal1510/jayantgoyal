@@ -67,6 +67,20 @@ Portfolio owns an editorial component and CSS system under
 `src/components/editorial` and `src/app/editorial`. This is intentionally not
 the same application shell used by Studio, Admin, and Auth. Shared identity,
 URLs, metadata helpers, and genuinely shared providers remain packages.
+The editorial shell supplies Home navigation, a persisted light/dark color
+theme control, dark-adapted project and résumé previews, and a scroll-to-top
+pill across every public page. The GitHub activity calendar follows the active
+theme with distinct contribution palettes. Analytics owns light and dark chart,
+map, inspector, tooltip, rating, and dashboard palettes.
+The responsive navigation uses dedicated light and dark menu palettes so its
+hamburger, overlay, dividers, metadata, and links follow the active theme and
+remain legible in both modes.
+CMS-backed public pages use incremental static regeneration with a one-minute
+freshness window, including pre-rendered Work and Writing detail routes. Pages
+whose output depends on request-time query parameters, including Contact and
+Analytics, remain dynamic while their provider reads stay independently cached.
+Initial-viewport headings render without scroll-linked reveal animation so text
+paint is not delayed; below-the-fold editorial sections retain reveal motion.
 
 ## Contracts and dependencies
 

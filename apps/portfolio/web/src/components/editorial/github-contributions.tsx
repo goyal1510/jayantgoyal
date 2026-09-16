@@ -20,6 +20,7 @@ const ActivityCalendar = dynamic(
 );
 
 type ContributionPeriod = number | "last";
+type CalendarColorScheme = "light" | "dark";
 
 type ContributionResponse =
   | ({ available: true } & ContributionCalendarData)
@@ -60,6 +61,7 @@ export function GithubContributions({
   const [status, setStatus] = useState<"loading" | "ready" | "unavailable">(
     "loading",
   );
+  const [colorScheme, setColorScheme] = useState<CalendarColorScheme>("light");
   const years = useMemo<ContributionPeriod[]>(
     () => [
       "last",
@@ -67,6 +69,18 @@ export function GithubContributions({
     ],
     [currentYear],
   );
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const syncColorScheme = () => {
+      setColorScheme(root.classList.contains("dark") ? "dark" : "light");
+    };
+    const observer = new MutationObserver(syncColorScheme);
+
+    syncColorScheme();
+    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -148,7 +162,7 @@ export function GithubContributions({
         {status === "ready" && calendar ? (
           <ActivityCalendar
             data={calendar.activities}
-            colorScheme="light"
+            colorScheme={colorScheme}
             blockSize={14}
             blockMargin={6}
             blockRadius={0}
@@ -160,7 +174,7 @@ export function GithubContributions({
             weekStart={1}
             theme={{
               light: ["#ebe8df", "#d9e8c9", "#a9ce88", "#6ea74e", "#2d6c31"],
-              dark: ["#ebe8df", "#d9e8c9", "#a9ce88", "#6ea74e", "#2d6c31"],
+              dark: ["#242727", "#304536", "#426c49", "#62a768", "#91d596"],
             }}
           />
         ) : null}

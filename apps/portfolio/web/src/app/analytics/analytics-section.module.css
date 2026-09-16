@@ -5,6 +5,10 @@
   background: var(--paper);
 }
 
+:global(.dark) .section {
+  --map-empty: rgba(242, 239, 231, 0.12);
+}
+
 .section:nth-of-type(even) {
   background: var(--sky);
 }

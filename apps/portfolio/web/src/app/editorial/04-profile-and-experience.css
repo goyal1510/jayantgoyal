@@ -232,7 +232,7 @@
 }
 
 .education-stop__period {
-  color: rgba(20, 21, 21, 0.13);
+  color: var(--subtle-ink);
   font-family: var(--font-serif), serif;
   font-size: clamp(3.8rem, 6vw, 7.5rem);
   letter-spacing: -0.055em;
@@ -350,7 +350,7 @@
 }
 
 .experience-stop__period {
-  color: rgba(20, 21, 21, 0.13);
+  color: var(--subtle-ink);
   font-family: var(--font-serif), serif;
   font-size: clamp(3.2rem, 4.8vw, 6.5rem);
   letter-spacing: -0.055em;

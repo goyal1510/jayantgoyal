@@ -81,7 +81,7 @@
   padding: clamp(20px, 2.5vw, 34px);
   border-top: 3px solid var(--analytics-secondary);
   background: var(--analytics-secondary-soft);
-  box-shadow: 12px 12px 0 rgba(53, 111, 130, 0.14);
+  box-shadow: 12px 12px 0 var(--analytics-secondary-shadow);
 }
 
 .countryInspectorContent {
