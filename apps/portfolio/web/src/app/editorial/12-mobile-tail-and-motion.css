@@ -2,15 +2,6 @@
   .contact-form__submit p {
     text-align: left;
   }
-
-  .contact-section__footer {
-    grid-template-columns: 1fr auto;
-    gap: 20px;
-  }
-
-  .contact-section__footer > span:nth-child(2) {
-    display: none;
-  }
 }
 
 @media (max-width: 420px) {

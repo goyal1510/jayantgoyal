@@ -21,6 +21,21 @@ the Portfolio sitemap/robots rules.
 The app also owns `layout.tsx`, `error.tsx`, `not-found.tsx`, `manifest.ts`,
 `robots.ts`, and `sitemap.ts` for global presentation and discoverability.
 
+The root layout renders one shared footer after the page content on every
+Portfolio page, including Contact and article/case-study detail pages. It uses
+the cached shell profile for the copyright name, location, social links, and
+hydrated email link. The footer stays at the bottom of short pages and follows
+longer content in normal document flow; the Contact section owns only the
+contact details and enquiry form.
+
+The shared footer retains the original Contact footer's font size, icon sizes,
+copyright, location, and circular social/email links. It uses a warm beige
+surface with dark text and borders, a thin divider flush with the top edge,
+and 8px above and below the content row. At 760px and below, the location is
+hidden and the copyright and icons share one row. Contact owns the spacing
+below its enquiry form; that spacing does not add empty space to the shared
+footer on other pages.
+
 ## Route handlers
 
 | Method and route                | Input and authorization                  | Operation                                                                               | Failure/degradation                       |

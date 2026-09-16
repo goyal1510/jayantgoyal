@@ -86,50 +86,7 @@
   color: #b92e17;
 }
 
-.contact-section__footer {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  margin-top: clamp(56px, 5vw, 76px);
-  padding-top: 24px;
-  border-top: 1px solid rgba(255, 255, 255, 0.45);
-  font-size: 0.7rem;
-}
-
-.contact-section__footer > span:nth-child(2) {
-  justify-self: center;
-}
-
-.contact-section__footer > div {
-  display: flex;
-  justify-self: end;
-  gap: 14px;
-}
-
-.contact-section__footer a {
-  display: grid;
-  width: 36px;
-  height: 36px;
-  place-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.45);
-  border-radius: 50%;
-  transition:
-    background 180ms ease,
-    color 180ms ease;
-}
-
-.contact-section__footer a:hover {
-  background: #fff;
-  color: var(--signal);
-}
-
-.contact-section__footer svg {
-  width: 14px;
-  height: 14px;
-}
-
 .editorial-page {
-  min-height: 100svh;
   background: var(--paper);
 }
 

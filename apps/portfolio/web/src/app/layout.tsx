@@ -1,6 +1,7 @@
 import "./globals.css";
 
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { DM_Sans, Instrument_Serif, Jost } from "next/font/google";
 import Script from "next/script";
 import { APP_BRANDS } from "@jayantgoyal/web-brand";
@@ -8,6 +9,7 @@ import { buildAppRootMetadata } from "@jayantgoyal/web-seo";
 
 import { PageScrollProgress } from "@/components/editorial/page-scroll-progress";
 import { PortfolioAnalytics } from "@/components/editorial/portfolio-analytics";
+import { PortfolioFooter } from "@/components/editorial/portfolio-footer";
 import { PERSON_NAME, SITE_URL } from "@/lib/seo/config";
 
 const sans = DM_Sans({
@@ -72,11 +74,14 @@ export default function RootLayout({
         </Script>
       </head>
       <body
-        className={`${sans.variable} ${serif.variable} ${wordmark.variable}`}
+        className={`portfolio-site ${sans.variable} ${serif.variable} ${wordmark.variable}`}
       >
         <PortfolioAnalytics />
         <PageScrollProgress />
-        {children}
+        <div className="portfolio-site__content">{children}</div>
+        <Suspense fallback={null}>
+          <PortfolioFooter />
+        </Suspense>
       </body>
     </html>
   );

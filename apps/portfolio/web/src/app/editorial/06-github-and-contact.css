@@ -234,7 +234,7 @@
 }
 
 .contact-section {
-  padding: clamp(72px, 7vw, 104px) 0 28px;
+  padding: clamp(72px, 7vw, 104px) 0 clamp(32px, 4vw, 56px);
   background: var(--signal);
   color: #fff;
 }
