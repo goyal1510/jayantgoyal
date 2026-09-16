@@ -10,6 +10,7 @@ groups such as `(orbit)` do not appear in public URLs.
 | `/`                | Product introduction and Auth continue entry         |
 | `/welcome`         | Redirect alias to Auth login                         |
 | `/no-access`       | Signed-in user without Orbit product entitlement     |
+| `/invite/accept`   | Accept a workspace invitation token                  |
 | `/auth/callback`   | OAuth/session exchange and MFA handoff               |
 | `GET /robots.txt`  | Disallow indexing                                    |
 
@@ -33,5 +34,7 @@ Mutations use reviewed `orbit` schema RPCs from server actions:
 - `orbit.create_card`
 - `orbit.move_card`
 - `orbit.add_comment`
+- `orbit.create_workspace_invitation`
+- `orbit.accept_workspace_invitation`
 
 Direct table writes from the browser are not part of the supported contract.

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { Button } from "@jayantgoyal/web-ui/button";
@@ -37,22 +38,30 @@ export function BoardView({
   cards: initialCards,
   commentsByCard,
 }: BoardViewProps) {
+  const router = useRouter();
   const [cards, setCards] = useState(initialCards);
   const [pending, startTransition] = useTransition();
+  const [searchQuery, setSearchQuery] = useState("");
   const [newTitles, setNewTitles] = useState<Record<string, string>>({});
   const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>(
     {},
   );
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
 
+  const visibleCards = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return cards;
+    return cards.filter((card) => card.title.toLowerCase().includes(query));
+  }, [cards, searchQuery]);
+
   const cardsByColumn = useMemo(() => {
     const grouped: Record<string, CardSummary[]> = {};
     for (const column of columns) grouped[column.id] = [];
-    for (const card of cards) {
+    for (const card of visibleCards) {
       grouped[card.columnId]?.push(card);
     }
     return grouped;
-  }, [cards, columns]);
+  }, [visibleCards, columns]);
 
   function handleCreateCard(columnId: string) {
     const title = newTitles[columnId]?.trim();
@@ -70,6 +79,7 @@ export function BoardView({
       }
       toast.success("Card created");
       setNewTitles((current) => ({ ...current, [columnId]: "" }));
+      router.refresh();
     });
   }
 
@@ -116,6 +126,7 @@ export function BoardView({
       }
       toast.success("Comment added");
       setCommentDrafts((current) => ({ ...current, [cardId]: "" }));
+      router.refresh();
     });
   }
 
@@ -127,6 +138,13 @@ export function BoardView({
         </p>
         <h1 className="text-2xl font-semibold">{board.name}</h1>
       </div>
+
+      <Input
+        value={searchQuery}
+        onChange={(event) => setSearchQuery(event.target.value)}
+        placeholder="Search cards"
+        className="max-w-sm"
+      />
 
       <div className="flex gap-4 overflow-x-auto pb-4">
         {columns.map((column) => (

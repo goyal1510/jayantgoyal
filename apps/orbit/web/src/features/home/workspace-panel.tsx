@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 
@@ -21,6 +22,7 @@ import {
   createWorkspaceAction,
 } from "@/server/commands/actions";
 import type { BoardSummary, WorkspaceSummary } from "@/lib/orbit/types";
+import { InvitePanel } from "@/features/home/invite-panel";
 
 type WorkspacePanelProps = {
   workspaces: WorkspaceSummary[];
@@ -31,6 +33,7 @@ export function WorkspacePanel({
   workspaces,
   boardsByWorkspace,
 }: WorkspacePanelProps) {
+  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [workspaceName, setWorkspaceName] = useState("");
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState(
@@ -48,6 +51,7 @@ export function WorkspacePanel({
       }
       toast.success("Workspace created");
       setWorkspaceName("");
+      router.refresh();
     });
   }
 
@@ -66,6 +70,7 @@ export function WorkspacePanel({
       toast.success("Board created");
       setBoardName("");
       setBoardKey("");
+      router.refresh();
     });
   }
 
@@ -109,6 +114,7 @@ export function WorkspacePanel({
                     </Link>
                   ))
                 )}
+                <InvitePanel workspaceId={workspace.id} />
               </CardContent>
             </Card>
           ))

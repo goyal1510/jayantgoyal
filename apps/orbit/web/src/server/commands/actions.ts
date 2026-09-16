@@ -1,11 +1,14 @@
 "use server";
 
+import { randomBytes } from "node:crypto";
 import { revalidatePath } from "next/cache";
+
+import { applicationOrigin } from "@jayantgoyal/web-urls";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export type ActionResult =
-  | { ok: true; id?: string }
+  | { ok: true; id?: string; inviteUrl?: string; workspaceId?: string }
   | { ok: false; error: string };
 
 /** Creates a workspace when the caller holds orbit.workspace.create. */
@@ -99,4 +102,49 @@ export async function addCommentAction(input: {
   if (error) return { ok: false, error: error.message };
   revalidatePath(`/boards/${input.boardId}`);
   return { ok: true, id: data as string };
+}
+
+/** Creates a workspace invitation and returns a shareable accept URL. */
+export async function createWorkspaceInvitationAction(input: {
+  workspaceId: string;
+  email: string;
+  role?: "member" | "viewer" | "guest";
+}): Promise<ActionResult> {
+  const token = randomBytes(32).toString("hex");
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.schema("orbit").rpc("create_workspace_invitation", {
+    p_workspace_id: input.workspaceId,
+    p_email: input.email.trim(),
+    p_role: input.role ?? "member",
+    p_token_hash: token,
+  });
+
+  if (error) return { ok: false, error: error.message };
+
+  const origin = applicationOrigin(
+    "orbit",
+    process.env.NEXT_PUBLIC_ORBIT_URL,
+  );
+  const inviteUrl = new URL("/invite/accept", `${origin}/`);
+  inviteUrl.searchParams.set("token", token);
+
+  revalidatePath("/home");
+  return { ok: true, inviteUrl: inviteUrl.toString() };
+}
+
+/** Accepts a pending workspace invitation for the signed-in account. */
+export async function acceptWorkspaceInvitationAction(input: {
+  token: string;
+}): Promise<ActionResult> {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase
+    .schema("orbit")
+    .rpc("accept_workspace_invitation", {
+      p_token_hash: input.token.trim(),
+    });
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/home");
+  return { ok: true, workspaceId: data as string };
 }

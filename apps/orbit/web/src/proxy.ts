@@ -26,6 +26,7 @@ function withAuthState(source: NextResponse, target: NextResponse) {
 }
 
 const PUBLIC_PATHS = new Set(["/", "/welcome", "/no-access", "/auth/callback"]);
+const AUTHENTICATED_ENTRY_PATHS = new Set(["/invite/accept"]);
 
 export default async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -135,6 +136,14 @@ export default async function proxy(request: NextRequest) {
     "x-orbit-access",
     productAccess ? "granted" : "denied",
   );
+
+  if (
+    isAuthed &&
+    AUTHENTICATED_ENTRY_PATHS.has(pathname) &&
+    !productAccess
+  ) {
+    return response;
+  }
 
   if (!isPublic && !productAccess) {
     if (pathname.startsWith("/api/")) {

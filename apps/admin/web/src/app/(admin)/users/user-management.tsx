@@ -14,6 +14,7 @@ import {
 } from "@jayantgoyal/web-ui/card";
 import type { AdminRoleKey, Profile } from "@/lib/types";
 import { AddUserDialog } from "./add-user-dialog";
+import { OrbitAccessPanel } from "./orbit-access-panel";
 import { UsersTable } from "./users-table";
 
 interface AvailableUser {
@@ -254,6 +255,11 @@ export function UserManagement({
             return removeUser(pendingRemoval.userId);
           }
         }}
+      />
+
+      <OrbitAccessPanel
+        currentUserId={currentUserId}
+        canManageAccess={canManageAccess}
       />
     </div>
   );
