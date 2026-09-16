@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -12,15 +12,25 @@ import {
   addChecklistItemAction,
   createChecklistAction,
   getAttachmentDownloadUrlAction,
-  setCardRecurrenceAction,
   snoozeCardAction,
   toggleCardWatchAction,
   toggleChecklistItemAction,
 } from "@/server/commands/feature-actions";
+import {
+  linkGithubIssueAction,
+  loadCardGithubLinksAction,
+  pauseCardRecurrenceAction,
+  removeCardDependencyAction,
+  resumeCardRecurrenceAction,
+  setCardRecurrenceDetailedAction,
+  summarizeCardAction,
+  unlinkGithubLinkAction,
+} from "@/server/commands/p2-actions";
 import type {
   AttachmentSummary,
   ChecklistSummary,
   DependencySummary,
+  GithubLinkSummary,
 } from "@/lib/orbit/types";
 
 type CardDetailExtrasProps = {
@@ -47,6 +57,15 @@ export function CardDetailExtras({
   const [checklistTitle, setChecklistTitle] = useState("");
   const [itemDrafts, setItemDrafts] = useState<Record<string, string>>({});
   const [dependsOnId, setDependsOnId] = useState("");
+  const [githubUrl, setGithubUrl] = useState("");
+  const [githubLinks, setGithubLinks] = useState<GithubLinkSummary[]>([]);
+  const [summary, setSummary] = useState<string | null>(null);
+
+  useEffect(() => {
+    void loadCardGithubLinksAction(cardId).then((result) => {
+      if (result.ok) setGithubLinks(result.links);
+    });
+  }, [cardId]);
 
   function refresh() {
     router.refresh();
@@ -130,11 +149,50 @@ export function CardDetailExtras({
     });
   }
 
+  function removeDependency(dependencyId: string) {
+    startTransition(async () => {
+      const result = await removeCardDependencyAction({ boardId, dependencyId });
+      if (!result.ok) toast.error(result.error);
+      else refresh();
+    });
+  }
+
   function setRecurrence(cadence: "daily" | "weekly" | "monthly") {
     startTransition(async () => {
-      const result = await setCardRecurrenceAction({ boardId, cardId, cadence });
+      const result = await setCardRecurrenceDetailedAction({
+        boardId,
+        cardId,
+        cadence,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      });
       if (!result.ok) toast.error(result.error);
       else toast.success(`Recurrence set to ${cadence}`);
+    });
+  }
+
+  function linkGithub() {
+    if (!githubUrl.trim()) return;
+    startTransition(async () => {
+      const result = await linkGithubIssueAction({
+        boardId,
+        cardId,
+        issueUrl: githubUrl.trim(),
+      });
+      if (!result.ok) toast.error(result.error);
+      else {
+        setGithubUrl("");
+        const links = await loadCardGithubLinksAction(cardId);
+        if (links.ok) setGithubLinks(links.links);
+        refresh();
+      }
+    });
+  }
+
+  function summarize() {
+    startTransition(async () => {
+      const result = await summarizeCardAction({ boardId, cardId });
+      if (!result.ok) toast.error(result.error);
+      else setSummary(result.summary ?? null);
     });
   }
 
@@ -158,10 +216,38 @@ export function CardDetailExtras({
         <Button size="sm" variant="outline" disabled={pending} onClick={() => snooze(1)}>
           Snooze 1d
         </Button>
+        <Button size="sm" variant="outline" disabled={pending} onClick={() => setRecurrence("daily")}>
+          Daily
+        </Button>
         <Button size="sm" variant="outline" disabled={pending} onClick={() => setRecurrence("weekly")}>
-          Repeat weekly
+          Weekly
+        </Button>
+        <Button size="sm" variant="outline" disabled={pending} onClick={() => setRecurrence("monthly")}>
+          Monthly
+        </Button>
+        <Button size="sm" variant="outline" disabled={pending} onClick={() =>
+          startTransition(async () => {
+            const result = await pauseCardRecurrenceAction({ boardId, cardId });
+            if (!result.ok) toast.error(result.error);
+            else toast.success("Recurrence paused");
+          })
+        }>
+          Pause recurrence
+        </Button>
+        <Button size="sm" variant="outline" disabled={pending} onClick={() =>
+          startTransition(async () => {
+            const result = await resumeCardRecurrenceAction({ boardId, cardId });
+            if (!result.ok) toast.error(result.error);
+            else toast.success("Recurrence resumed");
+          })
+        }>
+          Resume recurrence
+        </Button>
+        <Button size="sm" variant="secondary" disabled={pending} onClick={summarize}>
+          AI summary
         </Button>
       </div>
+      {summary ? <p className="rounded-md border bg-muted/30 p-3 text-sm">{summary}</p> : null}
 
       <div>
         <p className="mb-2 text-sm font-medium">Checklists</p>
@@ -210,11 +296,16 @@ export function CardDetailExtras({
       </div>
 
       <div>
-        <p className="mb-2 text-sm font-medium">Dependencies</p>
+        <p className="mb-2 text-sm font-medium">Dependencies (blocked by)</p>
         <ul className="mb-2 space-y-1 text-sm text-muted-foreground">
           {dependencies.map((dep) => (
-            <li key={dep.id}>
-              Blocks #{dep.dependsOnNumber} — {dep.dependsOnTitle}
+            <li key={dep.id} className="flex items-center justify-between gap-2">
+              <span>
+                Blocks #{dep.dependsOnNumber} — {dep.dependsOnTitle}
+              </span>
+              <Button size="sm" variant="ghost" disabled={pending} onClick={() => removeDependency(dep.id)}>
+                Remove
+              </Button>
             </li>
           ))}
         </ul>
@@ -235,6 +326,43 @@ export function CardDetailExtras({
           </select>
           <Button size="sm" disabled={pending || !dependsOnId} onClick={addDependency}>
             Add
+          </Button>
+        </div>
+      </div>
+
+      <div>
+        <p className="mb-2 text-sm font-medium">GitHub links</p>
+        <ul className="mb-2 space-y-1 text-sm">
+          {githubLinks.map((link) => (
+            <li key={link.id} className="flex items-center justify-between gap-2">
+              <a href={link.issueUrl} className="text-primary underline" target="_blank" rel="noreferrer">
+                {link.repoFullName}#{link.issueNumber}
+              </a>
+              <Button
+                size="sm"
+                variant="ghost"
+                disabled={pending}
+                onClick={() =>
+                  startTransition(async () => {
+                    const result = await unlinkGithubLinkAction({ boardId, linkId: link.id });
+                    if (!result.ok) toast.error(result.error);
+                    else setGithubLinks((current) => current.filter((entry) => entry.id !== link.id));
+                  })
+                }
+              >
+                Remove
+              </Button>
+            </li>
+          ))}
+        </ul>
+        <div className="flex gap-2">
+          <Input
+            value={githubUrl}
+            onChange={(e) => setGithubUrl(e.target.value)}
+            placeholder="https://github.com/org/repo/issues/1"
+          />
+          <Button size="sm" disabled={pending || !githubUrl.includes("github.com")} onClick={linkGithub}>
+            Link
           </Button>
         </div>
       </div>

@@ -87,6 +87,29 @@ export type SavedViewSummary = {
   isOwner: boolean;
 };
 
+export type AutomationRuleSummary = {
+  id: string;
+  name: string;
+  enabled: boolean;
+  trigger_type: string;
+  trigger_config: Record<string, unknown>;
+  action_type: string;
+  action_config: Record<string, unknown>;
+};
+
+export type GithubLinkSummary = {
+  id: string;
+  issueUrl: string;
+  issueTitle: string | null;
+  repoFullName: string;
+  issueNumber: number;
+};
+
+export type PublishedBoardSummary = {
+  slug: string;
+  publishedAt: string;
+};
+
 export type AttachmentSummary = {
   id: string;
   cardId: string;

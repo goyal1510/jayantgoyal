@@ -421,6 +421,9 @@ export function BoardView({
                         {watchedSet.has(card.id) ? (
                           <Badge variant="outline">Watching</Badge>
                         ) : null}
+                        {(dependenciesByCard[card.id] ?? []).length > 0 ? (
+                          <Badge variant="outline">Blocked by {(dependenciesByCard[card.id] ?? []).length}</Badge>
+                        ) : null}
                         {(labelIdsByCard[card.id] ?? []).map((labelId) => {
                           const label = labelById.get(labelId);
                           return label ? (

@@ -26,6 +26,10 @@ function withAuthState(source: NextResponse, target: NextResponse) {
 }
 
 const PUBLIC_PATHS = new Set(["/", "/welcome", "/no-access", "/auth/callback"]);
+
+function isPublicPath(pathname: string) {
+  return PUBLIC_PATHS.has(pathname) || pathname.startsWith("/public/");
+}
 const AUTHENTICATED_ENTRY_PATHS = new Set(["/invite/accept"]);
 
 export default async function proxy(request: NextRequest) {
@@ -52,7 +56,7 @@ export default async function proxy(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   const response = NextResponse.next({ request: { headers: request.headers } });
-  const isPublic = PUBLIC_PATHS.has(pathname);
+  const isPublic = isPublicPath(pathname);
 
   if (!supabaseUrl || !supabaseAnonKey) {
     if (isPublic) return response;

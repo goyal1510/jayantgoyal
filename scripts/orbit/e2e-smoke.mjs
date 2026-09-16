@@ -259,6 +259,118 @@ await run("test2 admin can update member role", async () => {
   });
 });
 
+await run("dependency cycle rejected", async () => {
+  const token = await tokenFor("test1@jayantgoyal.com");
+  const boardId = creds.demo.boardId;
+  const columns = await select(token, "orbit", "columns", `select=id&board_id=eq.${boardId}`);
+  const cardA = await rpc(token, "orbit", "create_card", {
+    p_board_id: boardId,
+    p_column_id: columns[0].id,
+    p_title: `Dep A ${Date.now()}`,
+  });
+  const cardB = await rpc(token, "orbit", "create_card", {
+    p_board_id: boardId,
+    p_column_id: columns[0].id,
+    p_title: `Dep B ${Date.now()}`,
+  });
+  await rpc(token, "orbit", "add_card_dependency", {
+    p_card_id: cardA,
+    p_depends_on_card_id: cardB,
+  });
+  try {
+    await rpc(token, "orbit", "add_card_dependency", {
+      p_card_id: cardB,
+      p_depends_on_card_id: cardA,
+    });
+    throw new Error("expected cycle rejection");
+  } catch (error) {
+    if (!String(error.message).includes("cycle")) throw error;
+  }
+});
+
+await run("publish public board projection", async () => {
+  const token = await tokenFor("test1@jayantgoyal.com");
+  const boardId = creds.demo.boardId;
+  const slug = `qa-demo-${Date.now()}`;
+  await rpc(token, "orbit", "publish_board", { p_board_id: boardId, p_slug: slug });
+  const published = await rpc(token, "orbit", "get_published_board", { p_slug: slug });
+  if (!published?.projection) throw new Error("published projection missing");
+});
+
+await run("github link and reporting", async () => {
+  const token = await tokenFor("test1@jayantgoyal.com");
+  const boardId = creds.demo.boardId;
+  const columns = await select(token, "orbit", "columns", `select=id&board_id=eq.${boardId}`);
+  const cardId = await rpc(token, "orbit", "create_card", {
+    p_board_id: boardId,
+    p_column_id: columns[0].id,
+    p_title: `GitHub ${Date.now()}`,
+  });
+  await rpc(token, "orbit", "link_card_github_issue", {
+    p_card_id: cardId,
+    p_issue_url: "https://github.com/goyal1510/jayantgoyal/issues/1",
+    p_issue_title: "Smoke issue",
+  });
+  const report = await rpc(token, "orbit", "board_completion_report", {
+    p_board_id: boardId,
+    p_days: 30,
+  });
+  if (!report?.completed_count && report?.completed_count !== 0) {
+    throw new Error("completion report missing");
+  }
+});
+
+await run("webhook and api token", async () => {
+  const token = await tokenFor("test1@jayantgoyal.com");
+  const workspaceId = creds.demo.workspaceId;
+  const webhookId = await rpc(token, "orbit", "create_webhook_subscription", {
+    p_workspace_id: workspaceId,
+    p_url: "https://example.com/orbit-webhook",
+    p_secret_hash: `hash-${Date.now()}`,
+  });
+  if (!webhookId) throw new Error("webhook not created");
+  const tokenId = await rpc(token, "orbit", "create_api_token", {
+    p_workspace_id: workspaceId,
+    p_name: "Smoke token",
+    p_token_hash: `token-hash-${Date.now()}`,
+    p_token_prefix: "orb_smoke",
+  });
+  if (!tokenId) throw new Error("api token not created");
+});
+
+await run("import job worker", async () => {
+  const token = await tokenFor("test1@jayantgoyal.com");
+  const boardId = creds.demo.boardId;
+  const jobId = await rpc(token, "orbit", "request_board_import", {
+    p_board_id: boardId,
+    p_payload: { cards: [{ title: `Import ${Date.now()}` }] },
+  });
+  if (!jobId) throw new Error("import job missing");
+  await serviceRpc("orbit", "process_pending_import_jobs");
+});
+
+await run("ai preference and summary", async () => {
+  const token = await tokenFor("test1@jayantgoyal.com");
+  const boardId = creds.demo.boardId;
+  const workspaceId = creds.demo.workspaceId;
+  const columns = await select(token, "orbit", "columns", `select=id&board_id=eq.${boardId}`);
+  const cardId = await rpc(token, "orbit", "create_card", {
+    p_board_id: boardId,
+    p_column_id: columns[0].id,
+    p_title: "AI summary card",
+  });
+  await rpc(token, "orbit", "update_card", {
+    p_card_id: cardId,
+    p_description: "This card has enough text for a local summary.",
+    p_expected_version: 1,
+  });
+  await rpc(token, "orbit", "set_ai_preference", { p_workspace_id: workspaceId, p_enabled: true });
+  const summary = await rpc(token, "orbit", "summarize_card", { p_card_id: cardId });
+  if (!summary || !String(summary).includes("AI summary card")) {
+    throw new Error("summary missing card title");
+  }
+});
+
 const failed = results.filter((entry) => !entry.ok);
 console.log(`\n${results.length - failed.length}/${results.length} passed`);
 process.exit(failed.length ? 1 : 0);

@@ -40,7 +40,9 @@ archived QA evidence.
 5. Add `NEXT_PUBLIC_ORBIT_URL` to Auth return-origin configuration.
 6. Run the outbox worker from a trusted environment with service-role access:
    `node scripts/orbit/process-outbox.mjs`, `node scripts/orbit/process-recurrence.mjs`,
-   and `node scripts/orbit/process-exports.mjs`. Optional `RESEND_API_KEY` and
+   `node scripts/orbit/process-exports.mjs`, `node scripts/orbit/process-automations.mjs`,
+   `node scripts/orbit/process-webhooks.mjs`, and `node scripts/orbit/process-imports.mjs`.
+   Optional `RESEND_API_KEY` and
    `ORBIT_INVITE_FROM` send invitation emails; without Resend, the worker still
    completes events and copy-link invites remain available in the UI.
 7. Provision QA test users (no invitation flow):

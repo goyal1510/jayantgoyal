@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { WorkspaceIntegrationsPanel } from "@/features/workspaces/workspace-integrations-panel";
 import { WorkspaceSettingsPanel } from "@/features/workspaces/workspace-settings-panel";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   listWorkspaceBoardTemplates,
   listWorkspaceMembersDetailed,
 } from "@/server/queries/lifecycle";
+import { listWorkspaceIntegrations } from "@/server/queries/p2";
 import { listMyWorkspaces } from "@/server/queries/workspaces";
 
 type SettingsPageProps = {
@@ -25,9 +27,17 @@ export default async function WorkspaceSettingsPage({ params }: SettingsPageProp
   const workspace = workspaces.find((entry) => entry.id === workspaceId);
   if (!workspace) notFound();
 
-  const [members, templates] = await Promise.all([
+  const [members, templates, integrations, aiPreference] = await Promise.all([
     listWorkspaceMembersDetailed(supabase, workspaceId),
     listWorkspaceBoardTemplates(supabase, workspaceId),
+    listWorkspaceIntegrations(supabase, workspaceId),
+    supabase
+      .schema("orbit")
+      .from("ai_preferences")
+      .select("enabled")
+      .eq("workspace_id", workspaceId)
+      .eq("user_id", user.id)
+      .maybeSingle(),
   ]);
 
   return (
@@ -46,6 +56,12 @@ export default async function WorkspaceSettingsPage({ params }: SettingsPageProp
         members={members}
         templates={templates}
         currentUserId={user.id}
+      />
+      <WorkspaceIntegrationsPanel
+        workspaceId={workspaceId}
+        webhooks={integrations.webhooks}
+        tokens={integrations.tokens}
+        aiEnabled={aiPreference.data?.enabled ?? false}
       />
     </div>
   );
