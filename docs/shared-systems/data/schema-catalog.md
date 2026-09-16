@@ -196,6 +196,14 @@ part of the supported contract.
 `orbit_private` stores invitation secrets, command receipts, board sequences,
 outbox events, and upload reservations.
 
+| Table                                  | Responsibility                                      |
+| -------------------------------------- | --------------------------------------------------- |
+| `orbit_private.invitations`            | Hashed workspace invite tokens and board scope      |
+| `orbit_private.command_receipts`       | Idempotent command deduplication receipts           |
+| `orbit_private.board_sequences`        | Per-board monotonic card number allocation          |
+| `orbit_private.outbox_events`          | Durable async notification/outbox queue             |
+| `orbit_private.upload_reservations`    | Pre-upload attachment reservation rows              |
+
 ## Storage buckets
 
 | Bucket             | Visibility               | Owner     | Current use                                        |
