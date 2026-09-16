@@ -1,4 +1,5 @@
 import { InboxPanel } from "@/features/inbox/inbox-panel";
+import { OrbitPageHeader } from "@/features/orbit/orbit-page-header";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { NotificationSummary } from "@/lib/orbit/types";
 
@@ -27,13 +28,11 @@ export default async function InboxPage() {
   );
 
   return (
-    <div className="space-y-4">
-      <div>
-        <h1 className="text-2xl font-semibold">Inbox</h1>
-        <p className="text-sm text-muted-foreground">
-          In-app notifications from your workspaces.
-        </p>
-      </div>
+    <div className="mx-auto max-w-3xl space-y-6">
+      <OrbitPageHeader
+        title="Inbox"
+        description="Assignment and activity notifications from your workspaces."
+      />
       <InboxPanel userId={user.id} notifications={summaries} />
     </div>
   );

@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { BoardP2Panel } from "@/features/boards/board-p2-panel";
-import { BoardSettingsPanel } from "@/features/boards/board-settings-panel";
+import { BoardSettingsShell } from "@/features/boards/board-settings-shell";
+import { OrbitPageHeader } from "@/features/orbit/orbit-page-header";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { loadBoardView, listWorkspaceLabels } from "@/server/queries/boards";
 import {
@@ -29,19 +29,22 @@ export default async function BoardSettingsPage({ params }: SettingsPageProps) {
   ]);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Board settings</h1>
-          <p className="text-sm text-muted-foreground">{board.name}</p>
-        </div>
-        <Link href={`/boards/${boardId}`} className="text-sm text-primary underline">
-          Back to board
-        </Link>
-      </div>
-      <BoardSettingsPanel board={board} columns={columns} />
-      <BoardP2Panel
-        boardId={boardId}
+    <div className="mx-auto max-w-3xl space-y-6">
+      <OrbitPageHeader
+        eyebrow={board.key}
+        title="Board settings"
+        description="Manage columns, automation, reporting, publication, and imports."
+        actions={
+          <Link
+            href={`/boards/${boardId}`}
+            className="inline-flex h-9 items-center rounded-md border px-3 text-sm hover:bg-muted"
+          >
+            Back to board
+          </Link>
+        }
+      />
+      <BoardSettingsShell
+        board={board}
         columns={columns}
         labels={labels}
         automationRules={automationRules}

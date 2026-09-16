@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -15,6 +14,7 @@ import {
   CardTitle,
 } from "@jayantgoyal/web-ui/card";
 
+import { BoardToolbar } from "@/features/boards/board-toolbar";
 import { CardDetailPanel } from "@/features/boards/card-detail-panel";
 import { useBoardRealtime } from "@/lib/orbit/use-board-realtime";
 import {
@@ -270,30 +270,16 @@ export function BoardView({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-start justify-between gap-3 rounded-xl border bg-muted/20 p-4">
-        <div>
-          <p className="font-mono text-xs uppercase tracking-wide text-muted-foreground">
-            {board.key}
-          </p>
-          <h1 className="text-2xl font-semibold">{board.name}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {cards.length} cards · {columns.length} columns
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2 text-sm">
-          <Link href={`/boards/${board.id}/settings`} className="underline">
-            Settings
-          </Link>
-          <Link href={`/boards/${board.id}/archive`} className="underline">
-            Archive
-          </Link>
-          <Link href={`/workspaces/${board.workspaceId}/members`} className="underline">
-            Members
-          </Link>
-        </div>
-      </div>
+      <BoardToolbar
+        boardId={board.id}
+        workspaceId={board.workspaceId}
+        boardKey={board.key}
+        boardName={board.name}
+        cardCount={cards.length}
+        columnCount={columns.length}
+      />
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap items-center gap-2 rounded-lg border bg-muted/20 p-3">
         <Input
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.target.value)}

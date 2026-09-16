@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { WorkspaceIntegrationsPanel } from "@/features/workspaces/workspace-integrations-panel";
-import { WorkspaceSettingsPanel } from "@/features/workspaces/workspace-settings-panel";
+import { OrbitPageHeader } from "@/features/orbit/orbit-page-header";
+import { WorkspaceSettingsShell } from "@/features/workspaces/workspace-settings-shell";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   listWorkspaceBoardTemplates,
@@ -41,24 +41,24 @@ export default async function WorkspaceSettingsPage({ params }: SettingsPageProp
   ]);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Workspace settings</h1>
-          <p className="text-sm text-muted-foreground">{workspace.name}</p>
-        </div>
-        <Link href="/home" className="text-sm text-primary underline">
-          Back to home
-        </Link>
-      </div>
-      <WorkspaceSettingsPanel
+    <div className="mx-auto max-w-3xl space-y-6">
+      <OrbitPageHeader
+        title="Workspace settings"
+        description="Lifecycle, ownership, exports, templates, webhooks, API tokens, and AI preferences."
+        actions={
+          <Link
+            href="/home"
+            className="inline-flex h-9 items-center rounded-md border px-3 text-sm hover:bg-muted"
+          >
+            Back to home
+          </Link>
+        }
+      />
+      <WorkspaceSettingsShell
         workspace={workspace}
         members={members}
         templates={templates}
         currentUserId={user.id}
-      />
-      <WorkspaceIntegrationsPanel
-        workspaceId={workspaceId}
         webhooks={integrations.webhooks}
         tokens={integrations.tokens}
         aiEnabled={aiPreference.data?.enabled ?? false}

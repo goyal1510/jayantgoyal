@@ -1,14 +1,11 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { cookies } from "next/headers";
-import { Orbit as OrbitIcon } from "lucide-react";
 
 import { checkProductAccess } from "@jayantgoyal/web-auth/authorization";
 import { profileDisplayName } from "@jayantgoyal/web-auth/profile";
-import { applicationUrl } from "@jayantgoyal/web-urls";
 import { ApplicationShell } from "@jayantgoyal/web-ui/application-shell";
 import { ApplicationTopbar } from "@jayantgoyal/web-ui/application-topbar";
-import { Button } from "@jayantgoyal/web-ui/button";
+import { LazyMotionProvider } from "@jayantgoyal/web-ui/lazy-motion-provider";
 import {
   SIDEBAR_STATE_COOKIE_NAME,
   SIDEBAR_WIDTH_COOKIE_NAME,
@@ -16,8 +13,11 @@ import {
 } from "@jayantgoyal/web-ui/lib/sidebar-preferences";
 import { RouteChangeProvider } from "@jayantgoyal/web-ui/route-change-provider";
 
-import { OrbitNav } from "@/features/orbit/orbit-nav";
+import { OrbitAppSidebar } from "@/features/orbit/app-sidebar";
+import { OrbitCommandPalette } from "@/features/orbit/command-palette";
+import { OrbitDynamicBreadcrumb } from "@/features/orbit/dynamic-breadcrumb";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { loadOrbitNavSnapshot } from "@/server/queries/nav-snapshot";
 
 export default async function OrbitAppLayout({
   children,
@@ -40,47 +40,44 @@ export default async function OrbitAppLayout({
   const productAccess = (await checkProductAccess(supabase, "orbit")).allowed;
   if (!productAccess) redirect("/no-access");
 
-  const { data: profile } = await supabase
-    .schema("iam")
-    .from("profiles")
-    .select(
-      "first_name, last_name, avatar_url, avatar_mode, avatar_storage_path",
-    )
-    .eq("user_id", user.id)
-    .single();
+  const [{ data: profile }, navSnapshot] = await Promise.all([
+    supabase
+      .schema("iam")
+      .from("profiles")
+      .select(
+        "first_name, last_name, avatar_url, avatar_mode, avatar_storage_path",
+      )
+      .eq("user_id", user.id)
+      .single(),
+    loadOrbitNavSnapshot(supabase),
+  ]);
 
-  const fullName = profile ? profileDisplayName(profile, "User") : "User";
+  const menuUser = {
+    name: profile ? profileDisplayName(profile, "User") : "User",
+    email: user.email ?? "",
+    avatarUrl: profile?.avatar_url as string | null | undefined,
+  };
 
   return (
     <ApplicationShell
-      sidebar={
-        <aside className="flex h-full flex-col gap-4 border-r bg-sidebar p-4 text-sidebar-foreground">
-          <div className="flex items-center gap-2 px-2 py-1">
-            <OrbitIcon className="h-5 w-5 text-primary" aria-hidden />
-            <span className="font-semibold">Orbit</span>
-          </div>
-          <OrbitNav />
-          <div className="mt-auto space-y-2 border-t pt-4 text-xs text-muted-foreground">
-            <p className="truncate px-2">{fullName}</p>
-            <Button variant="outline" size="sm" className="w-full" asChild>
-              <a href={applicationUrl("auth", "/account/security")}>Account</a>
-            </Button>
-          </div>
-        </aside>
-      }
+      sidebar={<OrbitAppSidebar snapshot={navSnapshot} user={menuUser} />}
       header={
         <ApplicationTopbar
+          className="border-border/70 bg-background/90 px-4"
           breadcrumb={
-            <span className="text-sm font-medium text-muted-foreground">
-              Keep work moving · {fullName}
-            </span>
+            <div className="w-full [&_[data-slot=breadcrumb-link]]:inline-flex [&_[data-slot=breadcrumb-link]]:h-8 [&_[data-slot=breadcrumb-link]]:items-center [&_[data-slot=breadcrumb-link]]:justify-center [&_[data-slot=breadcrumb-link]]:rounded-md [&_[data-slot=breadcrumb-link]]:px-2 [&_[data-slot=breadcrumb-link]]:hover:bg-accent [&_[data-slot=breadcrumb-link]]:hover:text-accent-foreground">
+              <OrbitDynamicBreadcrumb snapshot={navSnapshot} />
+            </div>
           }
+          actions={<OrbitCommandPalette snapshot={navSnapshot} />}
         />
       }
-      contentClassName="gap-4 p-4 sm:p-6"
+      contentClassName="gap-4 p-4 sm:p-6 lg:p-8"
       {...sidebarPreferences}
     >
-      <RouteChangeProvider>{children}</RouteChangeProvider>
+      <LazyMotionProvider>
+        <RouteChangeProvider>{children}</RouteChangeProvider>
+      </LazyMotionProvider>
     </ApplicationShell>
   );
 }

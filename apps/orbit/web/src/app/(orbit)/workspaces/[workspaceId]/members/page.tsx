@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { InvitePanel } from "@/features/home/invite-panel";
+import { OrbitPageHeader } from "@/features/orbit/orbit-page-header";
 import { MembersPanel } from "@/features/workspaces/members-panel";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { listWorkspaceBoards } from "@/server/queries/boards";
@@ -25,25 +26,28 @@ export default async function WorkspaceMembersPage({ params }: MembersPageProps)
   ]);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Members</h1>
-          <p className="text-sm text-muted-foreground">{workspace.name}</p>
-        </div>
-        <Link href="/home" className="text-sm text-primary underline">
-          Back to home
-        </Link>
-      </div>
+    <div className="mx-auto max-w-3xl space-y-6">
+      <OrbitPageHeader
+        title="Members"
+        description={`Manage roles and invitations for ${workspace.name}.`}
+        actions={
+          <Link
+            href={`/workspaces/${workspaceId}/settings`}
+            className="inline-flex h-9 items-center rounded-md border px-3 text-sm hover:bg-muted"
+          >
+            Workspace settings
+          </Link>
+        }
+      />
+      <MembersPanel workspaceId={workspaceId} members={members} />
       <details className="rounded-lg border p-4">
         <summary className="cursor-pointer text-sm font-medium">
-          Invitations (test separately)
+          Invitations
         </summary>
         <div className="mt-3">
           <InvitePanel workspaceId={workspaceId} boards={boards} />
         </div>
       </details>
-      <MembersPanel workspaceId={workspaceId} members={members} />
     </div>
   );
 }

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { BoardArchivePanel } from "@/features/boards/board-archive-panel";
+import { OrbitPageHeader } from "@/features/orbit/orbit-page-header";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { loadBoardView } from "@/server/queries/boards";
 import { listBoardLifecycleCards } from "@/server/queries/lifecycle";
@@ -26,19 +27,37 @@ export default async function BoardArchivePage({
   const cards = await listBoardLifecycleCards(supabase, boardId, mode);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold capitalize">{mode} cards</h1>
-          <p className="text-sm text-muted-foreground">{board.name}</p>
-        </div>
-        <Link href={`/boards/${boardId}`} className="text-sm text-primary underline">
-          Back to board
+    <div className="mx-auto max-w-3xl space-y-6">
+      <OrbitPageHeader
+        eyebrow={board.key}
+        title={`${mode === "trashed" ? "Trashed" : "Archived"} cards`}
+        description={board.name}
+        actions={
+          <Link
+            href={`/boards/${boardId}`}
+            className="inline-flex h-9 items-center rounded-md border px-3 text-sm hover:bg-muted"
+          >
+            Back to board
+          </Link>
+        }
+      />
+      <div className="flex gap-2">
+        <Link
+          href={`/boards/${boardId}/archive?mode=archived`}
+          className={`rounded-md px-3 py-1.5 text-sm ${
+            mode === "archived" ? "bg-primary text-primary-foreground" : "border hover:bg-muted"
+          }`}
+        >
+          Archived
         </Link>
-      </div>
-      <div className="flex gap-2 text-sm">
-        <Link href={`/boards/${boardId}/archive?mode=archived`}>Archived</Link>
-        <Link href={`/boards/${boardId}/archive?mode=trashed`}>Trashed</Link>
+        <Link
+          href={`/boards/${boardId}/archive?mode=trashed`}
+          className={`rounded-md px-3 py-1.5 text-sm ${
+            mode === "trashed" ? "bg-primary text-primary-foreground" : "border hover:bg-muted"
+          }`}
+        >
+          Trashed
+        </Link>
       </div>
       <BoardArchivePanel
         boardId={boardId}

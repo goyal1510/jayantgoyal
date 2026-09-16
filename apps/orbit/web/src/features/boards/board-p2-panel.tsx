@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -33,6 +34,7 @@ type BoardP2PanelProps = {
     backlog: Record<string, unknown>;
     staleCards: Array<Record<string, unknown>>;
   };
+  mode?: "all" | "automation" | "reports" | "publish";
 };
 
 export function BoardP2Panel({
@@ -42,6 +44,7 @@ export function BoardP2Panel({
   automationRules,
   publishedBoard,
   reports,
+  mode = "all",
 }: BoardP2PanelProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -55,172 +58,217 @@ export function BoardP2Panel({
     router.refresh();
   }
 
+  const showAutomation = mode === "all" || mode === "automation";
+  const showReports = mode === "all" || mode === "reports";
+  const showPublish = mode === "all" || mode === "publish";
+
   return (
     <div className="space-y-6">
-      <section className="space-y-3 rounded-lg border p-4">
-        <h2 className="font-semibold">Automation</h2>
-        <p className="text-sm text-muted-foreground">
-          When a card moves to a column, apply a label automatically.
-        </p>
-        {automationRules.map((rule) => (
-          <div key={rule.id} className="flex items-center justify-between rounded-md border px-3 py-2 text-sm">
-            <span>{rule.name}</span>
-            <Button
-              size="sm"
-              variant="outline"
-              disabled={pending}
-              onClick={() =>
-                startTransition(async () => {
-                  const result = await deleteAutomationRuleAction({ boardId, ruleId: rule.id });
-                  if (!result.ok) toast.error(result.error);
-                  else refresh();
-                })
-              }
-            >
-              Remove
-            </Button>
-          </div>
-        ))}
-        <div className="grid gap-2 sm:grid-cols-3">
-          <Input value={ruleName} onChange={(e) => setRuleName(e.target.value)} placeholder="Rule name" />
-          <select
-            className="h-10 rounded-md border bg-background px-2 text-sm"
-            value={columnId}
-            onChange={(e) => setColumnId(e.target.value)}
-          >
-            {columns.map((column) => (
-              <option key={column.id} value={column.id}>{column.name}</option>
-            ))}
-          </select>
-          <select
-            className="h-10 rounded-md border bg-background px-2 text-sm"
-            value={labelId}
-            onChange={(e) => setLabelId(e.target.value)}
-          >
-            {labels.map((label) => (
-              <option key={label.id} value={label.id}>{label.name}</option>
-            ))}
-          </select>
-        </div>
-        <Button
-          disabled={pending || !ruleName.trim() || !columnId || !labelId}
-          onClick={() =>
-            startTransition(async () => {
-              const result = await createAutomationRuleAction({
-                boardId,
-                name: ruleName.trim(),
-                columnId,
-                labelId,
-              });
-              if (!result.ok) toast.error(result.error);
-              else {
-                setRuleName("");
-                toast.success("Automation rule created");
-                refresh();
-              }
-            })
-          }
-        >
-          Add rule
-        </Button>
-      </section>
-
-      <section className="space-y-3 rounded-lg border p-4">
-        <h2 className="font-semibold">Reporting</h2>
-        <p className="text-sm text-muted-foreground">
-          {(reports.completion.definition as string) ?? ""}
-        </p>
-        <p className="text-sm">
-          Completed (30d): <strong>{String(reports.completion.completed_count ?? 0)}</strong>
-        </p>
-        <p className="text-sm text-muted-foreground">
-          {(reports.backlog.definition as string) ?? ""}
-        </p>
-        <p className="text-sm">
-          Average backlog age: <strong>{String(reports.backlog.average_age_days ?? 0)} days</strong>
-        </p>
-        {reports.staleCards.length > 0 ? (
-          <ul className="text-sm text-muted-foreground">
-            {reports.staleCards.slice(0, 5).map((card) => (
-              <li key={String(card.id)}>
-                #{String(card.number)} {String(card.title)}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-sm text-muted-foreground">No stale cards in the last 14 days.</p>
-        )}
-      </section>
-
-      <section className="space-y-3 rounded-lg border p-4">
-        <h2 className="font-semibold">Public read-only board</h2>
-        {publishedBoard ? (
-          <p className="text-sm">
-            Published at <code>/public/boards/{publishedBoard.slug}</code>
+      {showAutomation ? (
+        <section className="space-y-3 rounded-lg border p-4">
+          <h2 className="font-semibold">Automation</h2>
+          <p className="text-sm text-muted-foreground">
+            When a card moves to a column, apply a label automatically.
           </p>
-        ) : null}
-        <div className="flex gap-2">
-          <Input value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="public-slug" />
+          {automationRules.map((rule) => (
+            <div
+              key={rule.id}
+              className="flex items-center justify-between rounded-md border px-3 py-2 text-sm"
+            >
+              <span>{rule.name}</span>
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={pending}
+                onClick={() =>
+                  startTransition(async () => {
+                    const result = await deleteAutomationRuleAction({
+                      boardId,
+                      ruleId: rule.id,
+                    });
+                    if (!result.ok) toast.error(result.error);
+                    else refresh();
+                  })
+                }
+              >
+                Remove
+              </Button>
+            </div>
+          ))}
+          <div className="grid gap-2 sm:grid-cols-3">
+            <Input
+              value={ruleName}
+              onChange={(e) => setRuleName(e.target.value)}
+              placeholder="Rule name"
+            />
+            <select
+              className="h-10 rounded-md border bg-background px-2 text-sm"
+              value={columnId}
+              onChange={(e) => setColumnId(e.target.value)}
+            >
+              {columns.map((column) => (
+                <option key={column.id} value={column.id}>
+                  {column.name}
+                </option>
+              ))}
+            </select>
+            <select
+              className="h-10 rounded-md border bg-background px-2 text-sm"
+              value={labelId}
+              onChange={(e) => setLabelId(e.target.value)}
+            >
+              {labels.map((label) => (
+                <option key={label.id} value={label.id}>
+                  {label.name}
+                </option>
+              ))}
+            </select>
+          </div>
           <Button
-            disabled={pending || slug.trim().length < 3}
+            disabled={pending || !ruleName.trim() || !columnId || !labelId}
             onClick={() =>
               startTransition(async () => {
-                const result = await publishBoardAction({ boardId, slug: slug.trim() });
+                const result = await createAutomationRuleAction({
+                  boardId,
+                  name: ruleName.trim(),
+                  columnId,
+                  labelId,
+                });
                 if (!result.ok) toast.error(result.error);
                 else {
-                  toast.success("Board published");
+                  setRuleName("");
+                  toast.success("Automation rule created");
                   refresh();
                 }
               })
             }
           >
-            Publish
+            Add rule
           </Button>
-          {publishedBoard ? (
+        </section>
+      ) : null}
+
+      {showReports ? (
+        <section className="space-y-3 rounded-lg border p-4">
+          <h2 className="font-semibold">Reporting</h2>
+          <p className="text-sm text-muted-foreground">
+            {(reports.completion.definition as string) ?? ""}
+          </p>
+          <p className="text-sm">
+            Completed (30d):{" "}
+            <strong>{String(reports.completion.completed_count ?? 0)}</strong>
+          </p>
+          <p className="text-sm text-muted-foreground">
+            {(reports.backlog.definition as string) ?? ""}
+          </p>
+          <p className="text-sm">
+            Average backlog age:{" "}
+            <strong>{String(reports.backlog.average_age_days ?? 0)} days</strong>
+          </p>
+          {reports.staleCards.length > 0 ? (
+            <ul className="text-sm text-muted-foreground">
+              {reports.staleCards.slice(0, 5).map((card) => (
+                <li key={String(card.id)}>
+                  #{String(card.number)} {String(card.title)}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              No stale cards in the last 14 days.
+            </p>
+          )}
+        </section>
+      ) : null}
+
+      {showPublish ? (
+        <>
+          <section className="space-y-3 rounded-lg border p-4">
+            <h2 className="font-semibold">Public read-only board</h2>
+            {publishedBoard ? (
+              <p className="text-sm">
+                Published at{" "}
+                <Link
+                  href={`/public/boards/${publishedBoard.slug}`}
+                  className="text-primary underline"
+                  target="_blank"
+                >
+                  /public/boards/{publishedBoard.slug}
+                </Link>
+              </p>
+            ) : null}
+            <div className="flex flex-wrap gap-2">
+              <Input
+                value={slug}
+                onChange={(e) => setSlug(e.target.value)}
+                placeholder="public-slug"
+                className="max-w-xs"
+              />
+              <Button
+                disabled={pending || slug.trim().length < 3}
+                onClick={() =>
+                  startTransition(async () => {
+                    const result = await publishBoardAction({
+                      boardId,
+                      slug: slug.trim(),
+                    });
+                    if (!result.ok) toast.error(result.error);
+                    else {
+                      toast.success("Board published");
+                      refresh();
+                    }
+                  })
+                }
+              >
+                Publish
+              </Button>
+              {publishedBoard ? (
+                <Button
+                  variant="outline"
+                  disabled={pending}
+                  onClick={() =>
+                    startTransition(async () => {
+                      const result = await revokePublishedBoardAction(boardId);
+                      if (!result.ok) toast.error(result.error);
+                      else refresh();
+                    })
+                  }
+                >
+                  Revoke
+                </Button>
+              ) : null}
+            </div>
+          </section>
+
+          <section className="space-y-3 rounded-lg border p-4">
+            <h2 className="font-semibold">Import (Orbit JSON)</h2>
+            <Label htmlFor="import-json">Payload</Label>
+            <textarea
+              id="import-json"
+              className="min-h-[120px] w-full rounded-md border bg-background px-3 py-2 font-mono text-xs"
+              value={importJson}
+              onChange={(e) => setImportJson(e.target.value)}
+            />
             <Button
-              variant="outline"
               disabled={pending}
               onClick={() =>
                 startTransition(async () => {
-                  const result = await revokePublishedBoardAction(boardId);
-                  if (!result.ok) toast.error(result.error);
-                  else refresh();
+                  try {
+                    const payload = JSON.parse(importJson) as Record<string, unknown>;
+                    const result = await requestBoardImportAction({ boardId, payload });
+                    if (!result.ok) toast.error(result.error);
+                    else toast.success("Import job queued");
+                  } catch {
+                    toast.error("Invalid JSON payload");
+                  }
                 })
               }
             >
-              Revoke
+              Queue import
             </Button>
-          ) : null}
-        </div>
-      </section>
-
-      <section className="space-y-3 rounded-lg border p-4">
-        <h2 className="font-semibold">Import (Orbit JSON)</h2>
-        <Label htmlFor="import-json">Payload</Label>
-        <textarea
-          id="import-json"
-          className="min-h-[120px] w-full rounded-md border bg-background px-3 py-2 font-mono text-xs"
-          value={importJson}
-          onChange={(e) => setImportJson(e.target.value)}
-        />
-        <Button
-          disabled={pending}
-          onClick={() =>
-            startTransition(async () => {
-              try {
-                const payload = JSON.parse(importJson) as Record<string, unknown>;
-                const result = await requestBoardImportAction({ boardId, payload });
-                if (!result.ok) toast.error(result.error);
-                else toast.success("Import job queued");
-              } catch {
-                toast.error("Invalid JSON payload");
-              }
-            })
-          }
-        >
-          Queue import
-        </Button>
-      </section>
+          </section>
+        </>
+      ) : null}
     </div>
   );
 }
