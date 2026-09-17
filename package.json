@@ -28,7 +28,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
-    "@next/bundle-analyzer": "16.2.10",
+    "@next/bundle-analyzer": "16.3.5",
     "knip": "^6.32.2",
     "prettier": "^3.6.0",
     "turbo": "^2.6.1",
@@ -42,7 +42,7 @@
       "minimatch@3.1.2": "3.1.5",
       "minimatch@9.0.5": "9.0.9",
       "minimatch@10.1.1": "10.2.5",
-      "next": "^16.2.10",
+      "next": "^16.3.5",
       "path-to-regexp@8.2.0": "8.4.2",
       "path-to-regexp@8.3.0": "8.4.2",
       "picomatch@2.3.1": "2.3.2",

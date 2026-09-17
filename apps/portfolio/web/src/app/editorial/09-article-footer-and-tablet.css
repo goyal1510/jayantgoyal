@@ -49,7 +49,7 @@
 
 .editorial-article__next:hover p,
 .editorial-article__next:hover .section-index {
-  color: rgba(243, 240, 232, 0.64);
+  color: color-mix(in srgb, var(--paper) 68%, transparent);
 }
 
 .editorial-article__next-action {
