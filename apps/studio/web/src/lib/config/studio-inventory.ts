@@ -175,24 +175,6 @@ export const STUDIO_PRODUCTS: readonly StudioProduct[] = [
     featured: false,
   },
   {
-    id: "orbit",
-    name: STUDIO_SURFACES.orbit.name,
-    description:
-      "Workspaces, boards, and cards for focused team progress and task management.",
-    href: STUDIO_SURFACES.orbit.href,
-    icon: STUDIO_SURFACES.orbit.icon,
-    access: "external",
-    type: "app",
-    status: "beta",
-    capability: "Work management",
-    highlights: [
-      "Workspace and board views",
-      "Assignments and notifications",
-      "Shared Auth entry",
-    ],
-    featured: true,
-  },
-  {
     id: "scratchpad",
     name: STUDIO_SURFACES.scratchpad.name,
     description:

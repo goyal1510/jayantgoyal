@@ -8,14 +8,13 @@ import {
   Github,
   LayoutGrid,
   MessageSquare,
-  Orbit,
   Target,
   User,
   Wrench,
   type LucideIcon,
 } from "lucide-react";
 
-import { PORTFOLIO_URL, orbitUrl, portfolioUrl } from "@/lib/platform/urls";
+import { PORTFOLIO_URL, portfolioUrl } from "@/lib/platform/urls";
 
 type StudioSurfaceSection =
   | "discover"
@@ -193,18 +192,6 @@ export const STUDIO_SURFACES = {
     isPublic: true,
     external: true,
     searchKeywords: ["portfolio", "jayant", "work"],
-  },
-  orbit: {
-    id: "orbit",
-    name: "Orbit",
-    navLabel: "Orbit",
-    href: orbitUrl("/home"),
-    icon: Orbit,
-    color: "text-sky-500 dark:text-sky-400",
-    section: "external",
-    isPublic: false,
-    external: true,
-    searchKeywords: ["orbit", "boards", "tasks", "workspaces"],
   },
 } as const satisfies Record<string, StudioSurfaceDefinition>;
 

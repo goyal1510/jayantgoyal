@@ -11,12 +11,10 @@ const LOCAL_APPLICATION_ORIGINS = [
   "http://localhost:3001",
   "http://localhost:3002",
   "http://localhost:3003",
-  "http://localhost:3004",
   "http://127.0.0.1:3000",
   "http://127.0.0.1:3001",
   "http://127.0.0.1:3002",
   "http://127.0.0.1:3003",
-  "http://127.0.0.1:3004",
 ] as const;
 
 function configuredReturnOrigins(): string[] {
@@ -31,7 +29,6 @@ function authReturnOrigins(): string[] {
     applicationOrigin("portfolio", process.env.NEXT_PUBLIC_PORTFOLIO_URL),
     applicationOrigin("studio", process.env.NEXT_PUBLIC_STUDIO_URL),
     applicationOrigin("admin", process.env.NEXT_PUBLIC_ADMIN_URL),
-    applicationOrigin("orbit", process.env.NEXT_PUBLIC_ORBIT_URL),
     applicationOrigin("auth", process.env.NEXT_PUBLIC_SITE_URL),
     ...LOCAL_APPLICATION_ORIGINS,
     ...configuredReturnOrigins(),

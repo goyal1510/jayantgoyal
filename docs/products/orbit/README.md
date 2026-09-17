@@ -26,12 +26,10 @@ Read sections 1–5 to decide the product and access model; sections 6–9 for f
 
 ---
 
-> **Repository status:** Orbit ships as `@jayantgoyal/orbit-web` through P2:
-> P0/P1 core workflows plus dependencies/recurrence (cycle-safe), automation rules,
-> GitHub issue links, outgoing webhooks, scoped API tokens, public read-only board
-> publication, Orbit JSON import jobs, reporting/stale-card views, opt-in local AI
-> summaries, workspace integrations, and expanded QA smoke tests. Host
-> `orbit.jayantgoyal.com` and background workers remain deployment-controlled.
+> **Repository status:** Archived specification only. The Orbit application,
+> database schemas, workers, and integrations were removed from this repository.
+> These pages preserve the original product proposal for reference; they do not
+> describe deployed clients, routes, schemas, or hosts.
 >
 > The focused pages in this directory preserve the complete proposal while separating product, authorization, implementation, and operational concerns. Start with this page, then use the linked topic pages.
 

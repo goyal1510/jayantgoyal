@@ -7,14 +7,14 @@ monorepo.
 
 | Path                     | Responsibility                                                 | Authoritative contents                                              |
 | ------------------------ | -------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `apps/`                  | Product clients and product-owned contracts                    | Five web clients; Portfolio contract                                |
+| `apps/`                  | Product clients and product-owned contracts                    | Four web clients; Portfolio contract                                |
 | `packages/foundation/`   | Framework-neutral foundation concepts                          | Person/product identity                                             |
 | `packages/web/`          | Stable cross-product web contracts                             | Auth, brand, URLs, SEO, UI, Tailwind                                |
 | `packages/integrations/` | Shared provider adapters                                       | GitHub                                                              |
 | `packages/tooling/`      | Shared compiler/lint configuration                             | ESLint and TypeScript                                               |
 | `assets/brand/`          | Canonical web icon and social-preview sources                  | Copies verified in each client                                      |
 | `supabase/migrations/`   | Ordered forward database changes                               | Reviewed SQL history                                                |
-| `supabase/schemas/`      | Current application schema snapshots                           | `foundation`, `iam`, `iam_private`, `studio`, `portfolio`, `career`, `orbit`, `orbit_private` |
+| `supabase/schemas/`      | Current application schema snapshots                           | `foundation`, `iam`, `iam_private`, `studio`, `portfolio`, `career` |
 | `scripts/`               | Architecture, health, build, database, and provider automation | Root quality gates                                                  |
 | `docs/`                  | Central current-state knowledge base                           | No app-local detailed READMEs                                       |
 | `.github/workflows/`     | Repository CI                                                  | Quality workflow for push/PR                                        |
@@ -30,7 +30,6 @@ Root `package.json`, `pnpm-workspace.yaml`, `turbo.json`, `vitest.config.ts`,
 | Studio    | `@jayantgoyal/studio-web`    | `apps/studio/web`    |   125 |             40 | Public utilities plus account workspaces/games   |
 | Admin     | `@jayantgoyal/admin-web`     | `apps/admin/web`     |    27 |             10 | CMS, roles, deployments                          |
 | Auth      | `@jayantgoyal/auth-web`      | `apps/auth/web`      |    15 |              3 | Entry, recovery, MFA, profile, providers, logout |
-| Orbit     | `@jayantgoyal/orbit-web`     | `apps/orbit/web`     |     7 |              1 | Workspaces, boards, cards, inbox, shared SSO     |
 
 Counts reflect `page.tsx` and `route.ts` files. Route groups and framework
 special files do not add URL segments. Product route documents explain access

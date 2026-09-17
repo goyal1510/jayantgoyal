@@ -9,7 +9,6 @@ repository and deployed from `main`.
 | Studio    | `apps/studio/web`     | `studio.jayantgoyal.com`   |
 | Admin     | `apps/admin/web`      | `admin.jayantgoyal.com`    |
 | Auth      | `apps/auth/web`       | `auth.jayantgoyal.com`     |
-| Orbit     | `apps/orbit/web`      | `orbit.jayantgoyal.com`    |
 
 The install command uses the repository lockfile. The client build command is
 its normal workspace/Next.js build; application-specific environment values
@@ -41,7 +40,6 @@ Portfolio: node ../../../scripts/ignore-build.mjs apps/portfolio/web
 Studio:    node ../../../scripts/ignore-build.mjs apps/studio/web
 Admin:     node ../../../scripts/ignore-build.mjs apps/admin/web
 Auth:      node ../../../scripts/ignore-build.mjs apps/auth/web
-Orbit:     node ../../../scripts/ignore-build.mjs apps/orbit/web
 ```
 
 Keep Vercel's monorepo **Skip deployment** setting enabled for every project so

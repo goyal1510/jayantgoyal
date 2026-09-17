@@ -6,7 +6,6 @@
 | Studio    | `@jayantgoyal/studio-web`    | `apps/studio/web`    | `http://localhost:3001` | `https://studio.jayantgoyal.com` |
 | Admin     | `@jayantgoyal/admin-web`     | `apps/admin/web`     | `http://localhost:3002` | `https://admin.jayantgoyal.com`  |
 | Auth      | `@jayantgoyal/auth-web`      | `apps/auth/web`      | `http://localhost:3003` | `https://auth.jayantgoyal.com`   |
-| Orbit     | `@jayantgoyal/orbit-web`     | `apps/orbit/web`     | `http://localhost:3004` | `https://orbit.jayantgoyal.com`  |
 
 All are independently deployed Next.js web clients sourced from the same
 repository and `main` branch. Their `.env.example`, `turbo.json`, route tree,

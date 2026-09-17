@@ -37,14 +37,6 @@ export const PRODUCT_IDENTITIES = {
     canonicalHosts: [`auth.${primaryDomain}`],
     developmentOrigin: "http://localhost:3003",
   },
-  orbit: {
-    id: "orbit",
-    name: "Orbit",
-    publicName: `Orbit by ${PERSON_IDENTITY.displayName}`,
-    canonicalOrigin: `https://orbit.${primaryDomain}`,
-    canonicalHosts: [`orbit.${primaryDomain}`],
-    developmentOrigin: "http://localhost:3004",
-  },
 } as const;
 
 export type ProductId = keyof typeof PRODUCT_IDENTITIES;

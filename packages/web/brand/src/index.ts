@@ -40,14 +40,6 @@ export const APP_BRANDS = {
     titleTemplate: "%s | Auth",
     description: `Secure sign-in and account security for ${PERSON_IDENTITY.displayName}'s applications.`,
   },
-  orbit: {
-    ...PRODUCT_IDENTITIES.orbit,
-    canonicalUrl: PRODUCT_IDENTITIES.orbit.canonicalOrigin,
-    defaultTitle: `Orbit by ${PERSON_IDENTITY.displayName}`,
-    titleTemplate: "%s | Orbit",
-    description:
-      "A focused workspace for projects, tasks, and team progress. Keep work moving.",
-  },
 } as const satisfies Record<ProductId, object>;
 
 const SOCIAL_PREVIEW_VERSION = "20260816";
@@ -80,13 +72,6 @@ export const APP_SOCIAL_PREVIEW_IMAGES = {
     height: 630,
     type: "image/jpeg",
     alt: `Auth account security application by ${PERSON_IDENTITY.displayName}`,
-  },
-  orbit: {
-    url: `${PRODUCT_IDENTITIES.orbit.canonicalOrigin}/images/social/orbit-preview.jpg?v=${SOCIAL_PREVIEW_VERSION}`,
-    width: 1200,
-    height: 630,
-    type: "image/jpeg",
-    alt: `Orbit work-management workspace by ${PERSON_IDENTITY.displayName}`,
   },
 } as const;
 

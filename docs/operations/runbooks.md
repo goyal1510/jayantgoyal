@@ -29,38 +29,6 @@ archived QA evidence.
    routes, environment availability, and bundle output.
 6. Rerun the focused failure, then the full required gate set.
 
-## Orbit private-alpha rollout
-
-1. Apply reviewed Orbit migrations through the dedicated remote-migration
-   workflow; never apply from an ordinary worktree without review.
-2. Refresh affected schema snapshots after apply.
-3. Grant Orbit product membership through IAM before expecting `/home` access.
-4. Deploy `@jayantgoyal/orbit-web` as an independent Vercel project rooted at
-   `apps/orbit/web`, then map `orbit.jayantgoyal.com`.
-5. Add `NEXT_PUBLIC_ORBIT_URL` to Auth return-origin configuration.
-6. Schedule Orbit workers every 15 minutes through GitHub Actions
-   (`.github/workflows/orbit-workers.yml`) or run manually from a trusted
-   environment with service-role access:
-   `node scripts/orbit/process-all-workers.mjs` (runs outbox, recurrence,
-   exports, automations, webhooks, imports, and purge retention). Individual
-   scripts remain available under `scripts/orbit/`. Configure repository secrets
-   `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, optional
-   `RESEND_API_KEY`, `ORBIT_INVITE_FROM`, and `NEXT_PUBLIC_ORBIT_URL`.
-   Webhook delivery requires subscriptions created after the signing-secret
-   migration; outbound POSTs use HMAC signatures and SSRF-safe URL checks.
-   Optional `RESEND_API_KEY` and `ORBIT_INVITE_FROM` send invitation emails;
-   without Resend, the worker still completes events and copy-link invites
-   remain available in the UI. Set `ORBIT_INBOUND_WEBHOOK_SECRET` on Orbit
-   Vercel for inbound integration routes and optional `GITHUB_TOKEN` for GitHub
-   link metadata refresh.
-7. Provision QA test users (no invitation flow):
-   `node --env-file=apps/admin/web/.env.local scripts/orbit/seed-test-users.mjs`.
-   Credentials land in `supabase/.temp/orbit-test-users.json` (gitignored).
-8. Run Orbit API smoke tests (includes guest invite RPC, workers need service role):
-   `node --env-file=apps/admin/web/.env.local scripts/orbit/e2e-smoke.mjs`.
-9. Run Orbit database boundary checks when validating RLS changes:
-   `node --env-file=apps/admin/web/.env.local scripts/orbit/orbit-db-boundary.mjs`.
-
 ## Production deployment failure
 
 1. Confirm which client project and source commit failed.

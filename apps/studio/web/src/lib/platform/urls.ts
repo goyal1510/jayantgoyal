@@ -10,19 +10,10 @@ export const STUDIO_URL = applicationOrigin(
   process.env.NEXT_PUBLIC_STUDIO_URL,
 );
 
-export const ORBIT_URL = applicationOrigin(
-  "orbit",
-  process.env.NEXT_PUBLIC_ORBIT_URL,
-);
-
 export function portfolioUrl(pathname = "/") {
   return applicationUrl("portfolio", pathname, PORTFOLIO_URL);
 }
 
 export function studioUrl(pathname = "/") {
   return applicationUrl("studio", pathname, STUDIO_URL);
-}
-
-export function orbitUrl(pathname = "/") {
-  return applicationUrl("orbit", pathname, ORBIT_URL);
 }

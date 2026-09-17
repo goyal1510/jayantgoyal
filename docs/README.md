@@ -59,11 +59,11 @@ prose.
 - [Studio](products/studio/README.md)
 - [Admin](products/admin/README.md)
 - [Auth](products/auth/README.md)
-- [Orbit](products/orbit/README.md): board-and-card work management with shared
-  Auth/IAM integration, workspace and board authorization, and private-alpha
-  scope. Production host and remote migration apply remain operator-controlled.
 
 ## Proposed products
+
+- [Orbit](products/orbit/README.md): archived board-and-card work-management
+  specification. No Orbit client, schema, or deployment exists in this repository.
 - [PumpAxis](products/pumpaxis/README.md): proposed modular petrol-pump
   operations product, including Loyalty and Shift Close & Reconciliation
   requirements. No PumpAxis client or production data system is implemented in
