@@ -10,6 +10,7 @@ import {
   readStringArray,
   PORTFOLIO_SELECT_COLUMNS,
   PORTFOLIO_SECTION_KEYS,
+  normalizeSectionLabels,
   type PortfolioAboutPublicRow,
   type PortfolioCertificatePublicRow,
   type PortfolioContactPublicRow,
@@ -201,6 +202,7 @@ function mapSectionContent(
           accent: row.accent ?? "",
           description: row.description ?? "",
           supportingText: row.supporting_text ?? "",
+          labels: normalizeSectionLabels(row.labels) ?? {},
           isVisible: row.is_visible,
         },
       ];

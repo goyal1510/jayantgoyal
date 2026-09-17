@@ -366,6 +366,7 @@ describe("portfolio data guards", () => {
           accent: "",
           description: "Description",
           supporting_text: "Supporting text",
+          labels: {},
           is_visible: true,
         },
         navigation: {
@@ -386,6 +387,7 @@ describe("portfolio data guards", () => {
           accent: "",
           description: "",
           supporting_text: "",
+          labels: {},
           is_visible: true,
         },
         navigation: {
@@ -413,6 +415,7 @@ describe("portfolio data guards", () => {
           accent: "",
           description: "Description",
           supporting_text: "Supporting text",
+          labels: { factBuilding: "Building" },
           is_visible: true,
         },
         navigation: {

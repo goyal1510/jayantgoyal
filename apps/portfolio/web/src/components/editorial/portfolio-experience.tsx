@@ -1,3 +1,4 @@
+import { getSectionLabel } from "@jayantgoyal/portfolio-contracts";
 import { ArrowDown, ArrowUpRight, FileText, Mail } from "lucide-react";
 import Link from "next/link";
 
@@ -14,7 +15,7 @@ import type {
   PortfolioSectionKey,
 } from "@/lib/portfolio/editorial-data";
 import { getProductProofPoints } from "@/lib/portfolio/product-proof";
-import { getCompactSectionHeading, splitCmsParts } from "@/lib/portfolio/section-heading";
+import { getCompactSectionHeading } from "@/lib/portfolio/section-heading";
 
 function HeroHeadline({ headline }: { headline: string }) {
   const accentPhrase = "ambitious";
@@ -58,10 +59,12 @@ function WritingSection({
   content: PortfolioSectionContent;
 }) {
   const heading = getCompactSectionHeading(content.eyebrow, content.headline);
-  const writingActions = splitCmsParts(content.accent, 2);
-  const allArticlesLabel =
-    writingActions[0] || content.accent || "All articles";
-  const readArticleLabel = writingActions[1] || "Read article";
+  const allArticlesLabel = content.accent || "All articles";
+  const readArticleLabel = getSectionLabel(
+    content.labels,
+    "readCta",
+    "Read article",
+  );
 
   return (
     <section id="writing" className="writing-section">
@@ -189,11 +192,12 @@ export function PortfolioExperience({
     const content = sectionContent[item.key as PortfolioSectionKey];
     return content?.isVisible ?? true;
   });
-  const heroFactLabels = splitCmsParts(sectionContent.hero.headline, 3);
-  const [buildingLabel, workingAsLabel, basedInLabel] =
-    heroFactLabels.length === 3
-      ? heroFactLabels
-      : ["Building", "Working as", "Based in"];
+  const heroFactLabels = [
+    getSectionLabel(sectionContent.hero.labels, "factBuilding", "Building"),
+    getSectionLabel(sectionContent.hero.labels, "factWorkingAs", "Working as"),
+    getSectionLabel(sectionContent.hero.labels, "factBasedIn", "Based in"),
+  ];
+  const [buildingLabel, workingAsLabel, basedInLabel] = heroFactLabels;
 
   return (
     <main>

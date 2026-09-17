@@ -35,6 +35,7 @@ const validCopy = {
   accent: "practice",
   description: "Description",
   supporting_text: "Supporting text",
+  labels: {},
   is_visible: true,
 };
 

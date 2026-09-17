@@ -9,6 +9,7 @@ const NAVIGATION_MIGRATION_SUFFIX = "_refine_primary_navigation.sql";
 const CASE_STUDY_MIGRATION_SUFFIX = "_add_project_case_studies.sql";
 const OPPORTUNITY_MIGRATION_SUFFIX = "_qualify_portfolio_opportunities.sql";
 const PRESENTATION_MIGRATION_SUFFIX = "_transactional_section_presentation.sql";
+const SECTION_LABELS_MIGRATION_SUFFIX = "_section_content_named_labels.sql";
 const RATE_LIMIT_MIGRATION_SUFFIX = "_persist_contact_rate_limits.sql";
 const STORAGE_MIGRATION_SUFFIX = "_harden_private_file_storage.sql";
 const GAME_ACTION_MIGRATION_SUFFIX = "_transactional_game_actions.sql";
@@ -176,6 +177,17 @@ describe("Portfolio database foundation migration", () => {
     expect(presentationSql).toContain("on conflict (section_key) do update");
     expect(presentationSql).toContain("on conflict (section_id) do update");
     expect(presentationSql).toContain("to service_role");
+  });
+
+  it("stores extra section chrome as named labels rather than encoded copy", async () => {
+    const labelsSql = await readMigrationBySuffix(
+      SECTION_LABELS_MIGRATION_SUFFIX,
+    );
+
+    expect(labelsSql).toContain("add column if not exists labels jsonb");
+    expect(labelsSql).toContain("jsonb_typeof(labels) = 'object'");
+    expect(labelsSql).toContain("p_copy -> 'labels'");
+    expect(labelsSql).toContain("to service_role");
   });
 
   it("persists contact throttling without exposing raw network identifiers", async () => {

@@ -1,4 +1,8 @@
 import {
+  normalizeSectionLabels,
+  validateSectionLabels,
+} from "./section-copy";
+import {
   PORTFOLIO_PUBLIC_NAVIGATION_KEYS,
   PORTFOLIO_SECTION_KEYS,
   type PortfolioSectionKey,
@@ -14,6 +18,7 @@ export interface PortfolioSectionPresentationCopyInput {
   accent: string;
   description: string;
   supporting_text: string;
+  labels: Record<string, string>;
   is_visible: boolean;
 }
 
@@ -82,6 +87,7 @@ export function validatePortfolioSectionPresentationInput(
           "accent",
           "description",
           "supporting_text",
+          "labels",
           "is_visible",
         ],
         "copy",
@@ -100,6 +106,17 @@ export function validatePortfolioSectionPresentationInput(
     }
     if (typeof copy.eyebrow === "string" && copy.eyebrow.trim() === "") {
       errors.push("copy.eyebrow is required");
+    }
+    const labels = normalizeSectionLabels(copy.labels);
+    if (!labels) {
+      errors.push("copy.labels must be an object of strings");
+    } else if (
+      typeof sectionKey === "string" &&
+      PORTFOLIO_SECTION_KEYS.includes(sectionKey as PortfolioSectionKey)
+    ) {
+      errors.push(
+        ...validateSectionLabels(sectionKey as PortfolioSectionKey, labels),
+      );
     }
     if (typeof copy.is_visible !== "boolean") {
       errors.push("copy.is_visible must be a boolean");

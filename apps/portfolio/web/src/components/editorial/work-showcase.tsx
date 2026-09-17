@@ -7,7 +7,7 @@ import type {
   PortfolioSectionContent,
 } from "@/lib/portfolio/editorial-data";
 import { getFeaturedWork } from "@/lib/portfolio/featured-work";
-import { getCompactSectionHeading, splitCmsParts } from "@/lib/portfolio/section-heading";
+import { getCompactSectionHeading } from "@/lib/portfolio/section-heading";
 
 function WorkArtwork({
   project,
@@ -98,7 +98,6 @@ export function FeaturedWork({
 }) {
   const featuredWork = getFeaturedWork(work);
   const heading = getCompactSectionHeading(content.eyebrow, content.headline);
-  const [archiveNote] = splitCmsParts(content.supportingText, 2);
 
   return (
     <section id="work" className="project-desk project-desk--featured">
@@ -146,7 +145,7 @@ export function FeaturedWork({
         </div>
 
         <div className="featured-projects__archive-link">
-          <span>{archiveNote || content.supportingText}</span>
+          <span>{content.supportingText}</span>
           <Link href="/work" data-cursor="Explore">
             {content.accent || "Browse the archive"}
             <ArrowUpRight aria-hidden="true" />

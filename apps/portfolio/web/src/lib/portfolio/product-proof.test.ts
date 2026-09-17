@@ -7,7 +7,11 @@ const cmsCopy = {
   headline: "Brief to production",
   accent: "Backend depth",
   description: "Auth · PostgreSQL · Storage · Realtime",
-  supportingText: "Delivery system|CMS · CI · independent deploys",
+  supportingText: "",
+  labels: {
+    deliveryLabel: "Delivery system",
+    deliveryValue: "CMS · CI · independent deploys",
+  },
   isVisible: true,
 };
 

@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { getSectionLabel } from "@jayantgoyal/portfolio-contracts";
 import { WorkArchive } from "@/components/editorial/work-showcase";
 import { EditorialSubpageHeader } from "@/components/editorial/subpage-header";
 import { getEditorialPortfolioData } from "@/lib/portfolio/editorial-server";
-import { splitCmsParts } from "@/lib/portfolio/section-heading";
 import { buildPublicPageMetadata } from "@/lib/seo/config";
 
 export const revalidate = 60;
@@ -25,8 +25,7 @@ export default async function WorkPage() {
   const portfolio = await getEditorialPortfolioData();
   const content = portfolio.sectionContent.work;
   if (!content.isVisible) notFound();
-  const countNoun =
-    splitCmsParts(content.supportingText, 2)[1] || "public systems";
+  const countNoun = getSectionLabel(content.labels, "countNoun", "public systems");
 
   return (
     <main className="editorial-page editorial-work-page">

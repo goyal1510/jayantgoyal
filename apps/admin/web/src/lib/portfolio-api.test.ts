@@ -97,6 +97,7 @@ describe("Admin Portfolio API adapter", () => {
         accent: "",
         description: "A small set of shipped work.",
         supporting_text: "",
+        labels: {},
         is_visible: true,
       },
       navigation: {

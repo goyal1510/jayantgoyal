@@ -56,13 +56,12 @@ registry supplies `Jayant` to the public view model, and the SEO title is
 derived from that identity plus the CMS-owned role. Admin can still edit the
 role, headline, current title, availability, Resume URL, GitHub username, and
 SEO description. It cannot edit the public name or a duplicate SEO title.
+`portfolio.hero` does not store a public name; identity stays in the shared
+brand registry.
 
-The existing `portfolio.hero` identity columns remain in the database only as
-a compatibility boundary: Admin injects their fixed values when creating the
-singleton row, while public Portfolio selects no longer depend on them. A
-future reviewed migration may remove those columns only after the deployed
-read/write paths are verified; this restructure does not rewrite migration
-history or mutate the remote database.
+Section presentation copy lives on `portfolio.section_content`. Extra chrome
+that is not a headline, accent, or supporting paragraph is stored in the
+`labels` JSON object with named keys, not encoded into pipe-separated fields.
 
 Portfolio owns an editorial component and CSS system under
 `src/components/editorial` and `src/app/editorial`. This is intentionally not

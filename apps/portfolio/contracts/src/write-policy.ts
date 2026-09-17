@@ -99,6 +99,7 @@ export const PORTFOLIO_WRITE_KEYS: Record<PortfolioTable, readonly string[]> = {
     "accent",
     "description",
     "supporting_text",
+    "labels",
     "is_visible",
   ],
 };

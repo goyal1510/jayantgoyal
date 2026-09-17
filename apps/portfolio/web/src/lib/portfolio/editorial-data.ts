@@ -124,6 +124,7 @@ export type PortfolioSectionContent = {
   accent: string;
   description: string;
   supportingText: string;
+  labels: Record<string, string>;
   isVisible: boolean;
 };
 

@@ -286,6 +286,7 @@ export interface PortfolioSectionContentRecord {
   accent: string | null;
   description: string | null;
   supporting_text: string | null;
+  labels: Record<string, string>;
   is_visible: boolean;
   created_at: string;
   updated_at: string;
@@ -298,6 +299,7 @@ export interface PortfolioSectionContentPublicRow {
   accent: string | null;
   description: string | null;
   supporting_text: string | null;
+  labels: Record<string, string>;
   is_visible: boolean;
 }
 
@@ -356,7 +358,7 @@ export const PORTFOLIO_SELECT_COLUMNS: Record<PortfolioTable, string> = {
   contact: "email, phone, location, socials",
   nav_items: "section_id, label, note",
   section_content:
-    "section_key, eyebrow, headline, accent, description, supporting_text, is_visible",
+    "section_key, eyebrow, headline, accent, description, supporting_text, labels, is_visible",
 };
 
 /** Full CMS rows for authenticated Admin editors, including generated metadata. */
@@ -379,7 +381,7 @@ export const PORTFOLIO_ADMIN_SELECT_COLUMNS: Record<PortfolioTable, string> = {
   nav_items:
     "id, section_id, label, note, sort_order, is_visible, created_at, updated_at",
   section_content:
-    "id, section_key, eyebrow, headline, accent, description, supporting_text, is_visible, created_at, updated_at",
+    "id, section_key, eyebrow, headline, accent, description, supporting_text, labels, is_visible, created_at, updated_at",
 };
 
 type WithoutGeneratedColumns<T> = Omit<T, "id" | "created_at" | "updated_at">;

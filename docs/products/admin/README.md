@@ -79,8 +79,6 @@ application and outreach sends remain explicit user-approved actions.
 The Portfolio hero editor treats public person identity as read-only shared
 configuration. It edits mutable positioning and SEO-description content, then
 derives the preview title from the shared person name and the selected role.
-Legacy database identity columns are populated only on singleton creation for
-schema compatibility and are not accepted from Admin clients.
 
 ## Internal architecture
 

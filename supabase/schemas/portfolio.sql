@@ -175,7 +175,12 @@ CREATE OR REPLACE FUNCTION "portfolio"."save_section_presentation"("p_section_ke
 declare
   saved_copy portfolio.section_content%rowtype;
   saved_navigation portfolio.nav_items%rowtype;
+  copy_labels jsonb := coalesce(p_copy -> 'labels', '{}'::jsonb);
 begin
+  if jsonb_typeof(copy_labels) <> 'object' then
+    raise exception 'section labels must be a JSON object';
+  end if;
+
   insert into portfolio.section_content (
     section_key,
     eyebrow,
@@ -183,6 +188,7 @@ begin
     accent,
     description,
     supporting_text,
+    labels,
     is_visible
   )
   values (
@@ -192,6 +198,7 @@ begin
     p_copy ->> 'accent',
     p_copy ->> 'description',
     p_copy ->> 'supporting_text',
+    copy_labels,
     (p_copy ->> 'is_visible')::boolean
   )
   on conflict (section_key) do update
@@ -201,6 +208,7 @@ begin
     accent = excluded.accent,
     description = excluded.description,
     supporting_text = excluded.supporting_text,
+    labels = excluded.labels,
     is_visible = excluded.is_visible
   returning * into saved_copy;
 
@@ -469,6 +477,8 @@ CREATE TABLE IF NOT EXISTS "portfolio"."section_content" (
     "is_visible" boolean DEFAULT true NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "labels" "jsonb" DEFAULT '{}'::"jsonb" NOT NULL,
+    CONSTRAINT "section_content_labels_object_check" CHECK (("jsonb_typeof"("labels") = 'object'::"text")),
     CONSTRAINT "section_content_required_fields_nonblank_check" CHECK ((("btrim"("section_key") <> ''::"text") AND ("btrim"("eyebrow") <> ''::"text"))),
     CONSTRAINT "section_content_section_key_check" CHECK (("section_key" = ANY (ARRAY['hero'::"text", 'home'::"text", 'about'::"text", 'skills'::"text", 'education'::"text", 'experience'::"text", 'credentials'::"text", 'github_activity'::"text", 'analytics'::"text", 'work'::"text", 'contact'::"text", 'writing'::"text", 'article'::"text", 'resume'::"text", 'studio'::"text", 'case-studies'::"text", 'engineering'::"text"])))
 );
@@ -1218,3 +1228,7 @@ ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "portfolio" GRANT SELECT,
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "portfolio" GRANT SELECT ON TABLES TO "anon";
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "portfolio" GRANT SELECT ON TABLES TO "authenticated";
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "portfolio" GRANT ALL ON TABLES TO "service_role";
+
+
+
+

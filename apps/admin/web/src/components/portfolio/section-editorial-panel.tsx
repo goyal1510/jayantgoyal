@@ -5,7 +5,13 @@ import { useRouter } from "next/navigation";
 import { ExternalLink, Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
 
-import type { PortfolioSectionKey } from "@jayantgoyal/portfolio-contracts";
+import {
+  emptySectionLabels,
+  getSectionCopyHints,
+  PORTFOLIO_SECTION_LABEL_FIELDS,
+  normalizeSectionLabels,
+  type PortfolioSectionKey,
+} from "@jayantgoyal/portfolio-contracts";
 import { APP_BRANDS } from "@jayantgoyal/web-brand";
 import { Button } from "@jayantgoyal/web-ui/button";
 import {
@@ -60,6 +66,7 @@ function serializePresentation(
     accent: string;
     description: string;
     supporting_text: string;
+    labels: Record<string, string>;
     is_visible: boolean;
   },
   navigation: {
@@ -95,6 +102,10 @@ export function SectionEditorialPanel({
     accent: sectionContent?.accent ?? "",
     description: sectionContent?.description ?? "",
     supporting_text: sectionContent?.supporting_text ?? "",
+    labels: {
+      ...emptySectionLabels(sectionKey),
+      ...(normalizeSectionLabels(sectionContent?.labels) ?? {}),
+    },
     is_visible: sectionContent?.is_visible ?? true,
   });
   const [nav, setNav] = useState({
@@ -106,6 +117,8 @@ export function SectionEditorialPanel({
   const [savedSnapshot, setSavedSnapshot] = useState(() =>
     serializePresentation(copy, nav),
   );
+  const hints = getSectionCopyHints(sectionKey);
+  const extraFields = PORTFOLIO_SECTION_LABEL_FIELDS[sectionKey] ?? [];
   const currentSnapshot = serializePresentation(copy, nav);
   const isDirty = currentSnapshot !== savedSnapshot;
 
@@ -200,7 +213,9 @@ export function SectionEditorialPanel({
         <AccessibleForm onSubmit={save} className="space-y-5">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor={`${sectionKey}-eyebrow`}>Eyebrow</Label>
+              <Label htmlFor={`${sectionKey}-eyebrow`}>
+                {hints.eyebrow.label}
+              </Label>
               <Input
                 id={`${sectionKey}-eyebrow`}
                 value={copy.eyebrow}
@@ -208,66 +223,135 @@ export function SectionEditorialPanel({
                 aria-describedby={
                   fieldErrors.eyebrow
                     ? `${sectionKey}-eyebrow-error`
-                    : undefined
+                    : `${sectionKey}-eyebrow-help`
                 }
                 onChange={(event) =>
                   setCopy({ ...copy, eyebrow: event.target.value })
                 }
                 placeholder="A small framing label"
               />
+              <p
+                id={`${sectionKey}-eyebrow-help`}
+                className="text-xs text-muted-foreground"
+              >
+                {hints.eyebrow.help}
+              </p>
               <FormMessage id={`${sectionKey}-eyebrow-error`}>
                 {fieldErrors.eyebrow}
               </FormMessage>
             </div>
             <div className="space-y-2">
-              <Label htmlFor={`${sectionKey}-accent`}>Accent</Label>
+              <Label htmlFor={`${sectionKey}-accent`}>{hints.accent.label}</Label>
               <Input
                 id={`${sectionKey}-accent`}
                 value={copy.accent}
+                aria-describedby={`${sectionKey}-accent-help`}
                 onChange={(event) =>
                   setCopy({ ...copy, accent: event.target.value })
                 }
                 placeholder="Optional highlighted phrase"
               />
+              <p
+                id={`${sectionKey}-accent-help`}
+                className="text-xs text-muted-foreground"
+              >
+                {hints.accent.help}
+              </p>
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor={`${sectionKey}-headline`}>Public headline</Label>
+            <Label htmlFor={`${sectionKey}-headline`}>
+              {hints.headline.label}
+            </Label>
             <Input
               id={`${sectionKey}-headline`}
               value={copy.headline}
+              aria-describedby={`${sectionKey}-headline-help`}
               onChange={(event) =>
                 setCopy({ ...copy, headline: event.target.value })
               }
               placeholder="The section's main editorial statement"
             />
+            <p
+              id={`${sectionKey}-headline-help`}
+              className="text-xs text-muted-foreground"
+            >
+              {hints.headline.help}
+            </p>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor={`${sectionKey}-description`}>Description</Label>
+              <Label htmlFor={`${sectionKey}-description`}>
+                {hints.description.label}
+              </Label>
               <Textarea
                 id={`${sectionKey}-description`}
                 value={copy.description}
+                aria-describedby={`${sectionKey}-description-help`}
                 onChange={(event) =>
                   setCopy({ ...copy, description: event.target.value })
                 }
                 rows={4}
               />
+              <p
+                id={`${sectionKey}-description-help`}
+                className="text-xs text-muted-foreground"
+              >
+                {hints.description.help}
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor={`${sectionKey}-supporting`}>
-                Supporting text
+                {hints.supporting_text.label}
               </Label>
               <Textarea
                 id={`${sectionKey}-supporting`}
                 value={copy.supporting_text}
+                aria-describedby={`${sectionKey}-supporting-help`}
                 onChange={(event) =>
                   setCopy({ ...copy, supporting_text: event.target.value })
                 }
                 rows={4}
               />
+              <p
+                id={`${sectionKey}-supporting-help`}
+                className="text-xs text-muted-foreground"
+              >
+                {hints.supporting_text.help}
+              </p>
             </div>
           </div>
+          {extraFields.length > 0 ? (
+            <div className="grid gap-4 rounded-xl border bg-background p-4 md:grid-cols-2">
+              {extraFields.map((field) => (
+                <div className="space-y-2" key={field.key}>
+                  <Label htmlFor={`${sectionKey}-${field.key}`}>
+                    {field.label}
+                  </Label>
+                  <Input
+                    id={`${sectionKey}-${field.key}`}
+                    value={copy.labels[field.key] ?? ""}
+                    aria-describedby={`${sectionKey}-${field.key}-help`}
+                    onChange={(event) =>
+                      setCopy({
+                        ...copy,
+                        labels: {
+                          ...copy.labels,
+                          [field.key]: event.target.value,
+                        },
+                      })
+                    }
+                  />
+                  <p
+                    id={`${sectionKey}-${field.key}-help`}
+                    className="text-xs text-muted-foreground"
+                  >
+                    {field.help}
+                  </p>
+                </div>
+              ))}
+            </div>
+          ) : null}
           {navigation ? (
             <div className="grid gap-4 rounded-xl border bg-background p-4 md:grid-cols-[1fr_1fr_120px_auto] md:items-end">
               <div className="space-y-2">
