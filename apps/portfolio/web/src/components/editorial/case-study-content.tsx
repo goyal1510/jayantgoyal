@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight, Github } from "lucide-react";
 
+import { CaseStudyMarkdown } from "@/components/editorial/case-study-markdown";
 import { ProjectMediaGallery } from "@/components/editorial/project-media-gallery";
 import { EditorialSubpageHeader } from "@/components/editorial/subpage-header";
 import { trackPortfolioEvent } from "@/lib/analytics/events";
@@ -220,7 +221,7 @@ export function CaseStudyContent({
                     ))}
                   </ol>
                 ) : (
-                  <p>{section.content}</p>
+                  <CaseStudyMarkdown content={section.content} />
                 )}
               </section>
             ))}

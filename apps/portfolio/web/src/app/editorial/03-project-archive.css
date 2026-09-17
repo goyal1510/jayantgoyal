@@ -71,6 +71,12 @@
   clip-path: none;
 }
 
+.editorial-work-article__image-frame .project-media-gallery__image {
+  object-fit: contain;
+  object-position: center top;
+  background: var(--paper-bright);
+}
+
 /* The published Work surfaces use rectangular product evidence. The older
    torn-paper selectors above remain for legacy scrapbook sections, but must
    not win for the current project artwork. */

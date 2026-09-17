@@ -115,6 +115,10 @@
   line-height: 1.75;
 }
 
+.editorial-case-study-prose > section .editorial-prose__diagram {
+  margin-top: 32px;
+}
+
 .editorial-case-study-prose > section:nth-child(3) > p,
 .editorial-case-study-prose > section:nth-child(7) > p {
   font-family: var(--font-serif), serif;
