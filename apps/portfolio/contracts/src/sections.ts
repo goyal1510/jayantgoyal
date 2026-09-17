@@ -36,16 +36,6 @@ export const PORTFOLIO_PUBLIC_NAVIGATION_KEYS = [
 export type PortfolioNavigationKey =
   (typeof PORTFOLIO_PUBLIC_NAVIGATION_KEYS)[number];
 
-export const PORTFOLIO_PUBLIC_SECTION_ORDER = [
-  "about",
-  "skills",
-  "experience",
-  "github_activity",
-  "work",
-  "writing",
-  "contact",
-] as const satisfies readonly PortfolioSectionKey[];
-
 export type PortfolioWorkspaceKey =
   | "home"
   | "about"

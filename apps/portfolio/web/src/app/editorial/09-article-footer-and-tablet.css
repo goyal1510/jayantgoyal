@@ -145,20 +145,41 @@
 
 .home-contact-prompt {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 24px;
-  align-items: end;
+  gap: 18px;
   padding-top: clamp(56px, 7vw, 100px);
   padding-bottom: clamp(72px, 8vw, 120px);
   border-top: 1px solid var(--line);
 }
 
-.home-contact-prompt .section-heading {
-  margin: 0;
+.home-contact-prompt__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(220px, 0.7fr) auto;
+  gap: clamp(24px, 4vw, 56px);
+  align-items: end;
 }
 
 .home-contact-prompt h2 {
   max-width: 18ch;
+  margin: 0;
+  font-family: var(--font-serif), serif;
+  font-size: clamp(2.4rem, 3.4vw, 3.8rem);
+  font-weight: 400;
+  letter-spacing: -0.045em;
+  line-height: 0.94;
+}
+
+.home-contact-prompt p {
+  max-width: 42ch;
+  margin: 0;
+  color: var(--folio-muted);
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+.home-contact-prompt__action {
+  align-self: end;
+  white-space: nowrap;
+  padding-bottom: 0.12em;
 }
 
 .credential-list {

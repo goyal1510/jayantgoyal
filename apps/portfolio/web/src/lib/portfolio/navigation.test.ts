@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 
 import {
   getPortfolioNavigationHref,
-  includePortfolioNavigation,
   isPortfolioNavigationItemCurrent,
 } from "./navigation";
 
@@ -45,16 +44,6 @@ describe("Portfolio navigation", () => {
     expect(getPortfolioNavigationHref("github_activity", "home")).toBe(
       "/#github-activity",
     );
-  });
-
-  it("keeps CMS navigation order without injecting extra items", () => {
-    const items = [
-      { key: "home", label: "Home", note: "Portfolio overview" },
-      { key: "work", label: "Work", note: "Selected work" },
-      { key: "analytics", label: "Analytics", note: "Live site traffic" },
-    ];
-
-    expect(includePortfolioNavigation(items)).toEqual(items);
   });
 
   it("marks dedicated destinations as current", () => {

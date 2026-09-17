@@ -12,7 +12,6 @@ import type {
 import { ColorThemeToggle } from "@/components/editorial/color-theme-toggle";
 import {
   getPortfolioNavigationHref,
-  includePortfolioNavigation,
   isPortfolioNavigationItemCurrent,
   type PortfolioNavigationSurface,
 } from "@/lib/portfolio/navigation";
@@ -35,7 +34,7 @@ export function PortfolioNavigation({
   const menuRef = useRef<HTMLDivElement>(null);
   const firstLinkRef = useRef<HTMLAnchorElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
-  const navigationItems = includePortfolioNavigation(items);
+  const navigationItems = items;
 
   useEffect(() => {
     if (!menuOpen) return;

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { getCompactSectionHeading } from "./section-heading";
+import { getCompactSectionHeading, splitCmsParts } from "./section-heading";
 
 describe("getCompactSectionHeading", () => {
   it("turns slash-separated editorial copy into a concise label and title", () => {
@@ -29,5 +29,18 @@ describe("getCompactSectionHeading", () => {
       label: "Contact",
       title: "Start here",
     });
+  });
+
+  it("splits pipe-separated CMS labels only when the count matches", () => {
+    expect(splitCmsParts("Building|Working as|Based in", 3)).toEqual([
+      "Building",
+      "Working as",
+      "Based in",
+    ]);
+    expect(splitCmsParts("Four featured systems|public systems", 2)).toEqual([
+      "Four featured systems",
+      "public systems",
+    ]);
+    expect(splitCmsParts("Building|Working as", 3)).toEqual([]);
   });
 });

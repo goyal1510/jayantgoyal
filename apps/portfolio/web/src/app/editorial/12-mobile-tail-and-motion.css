@@ -50,11 +50,24 @@
 }
 
 @media (max-width: 760px) {
-  .editorial-resume__viewer-heading,
-  .home-contact-prompt {
+  .editorial-resume__viewer-heading {
     align-items: flex-start;
     grid-template-columns: 1fr;
     flex-direction: column;
+  }
+
+  .home-contact-prompt__body {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 16px;
+  }
+
+  .home-contact-prompt__action {
+    white-space: normal;
+  }
+
+  .technology-stack--principles .technology-stack__groups {
+    grid-template-columns: 1fr;
   }
 
   .editorial-resume__frame {

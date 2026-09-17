@@ -2,6 +2,7 @@ import { ArrowDown, ArrowUpRight, FileText, Mail } from "lucide-react";
 import Link from "next/link";
 
 import { CursorOrbit } from "@/components/editorial/cursor-orbit";
+import { EditorialCtaBand } from "@/components/editorial/editorial-cta-band";
 import { EditorialReveal } from "@/components/editorial/editorial-reveal";
 import { GithubActivity } from "@/components/editorial/github-activity";
 import { PortfolioNavigation } from "@/components/editorial/portfolio-navigation";
@@ -13,7 +14,7 @@ import type {
   PortfolioSectionKey,
 } from "@/lib/portfolio/editorial-data";
 import { getProductProofPoints } from "@/lib/portfolio/product-proof";
-import { getCompactSectionHeading } from "@/lib/portfolio/section-heading";
+import { getCompactSectionHeading, splitCmsParts } from "@/lib/portfolio/section-heading";
 
 function HeroHeadline({ headline }: { headline: string }) {
   const accentPhrase = "ambitious";
@@ -57,6 +58,10 @@ function WritingSection({
   content: PortfolioSectionContent;
 }) {
   const heading = getCompactSectionHeading(content.eyebrow, content.headline);
+  const writingActions = splitCmsParts(content.accent, 2);
+  const allArticlesLabel =
+    writingActions[0] || content.accent || "All articles";
+  const readArticleLabel = writingActions[1] || "Read article";
 
   return (
     <section id="writing" className="writing-section">
@@ -69,8 +74,7 @@ function WritingSection({
               <div className="writing-block__heading-meta">
                 <p>{content.description}</p>
                 <Link href="/writing">
-                  {content.accent || "All articles"}{" "}
-                  <ArrowUpRight aria-hidden="true" />
+                  {allArticlesLabel} <ArrowUpRight aria-hidden="true" />
                 </Link>
               </div>
             </div>
@@ -101,7 +105,8 @@ function WritingSection({
                   </div>
                   <p className="writing-entry__excerpt">{post.excerpt}</p>
                   <span className="writing-entry__action">
-                    Read article <ArrowUpRight aria-hidden="true" />
+                    {readArticleLabel}{" "}
+                    <ArrowUpRight aria-hidden="true" />
                   </span>
                 </Link>
               </EditorialReveal>
@@ -161,18 +166,14 @@ function ContactPrompt({ content }: { content: PortfolioSectionContent }) {
   const heading = getCompactSectionHeading(content.eyebrow, content.headline);
 
   return (
-    <section id="contact" className="shell home-contact-prompt">
-      <div className="section-heading">
-        <span className="section-index">{heading.label}</span>
-        <div>
-          <h2>{heading.title}</h2>
-          <p>{content.description}</p>
-        </div>
-      </div>
-      <Link href="/contact" className="text-link">
-        {content.supportingText} <ArrowUpRight aria-hidden="true" />
-      </Link>
-    </section>
+    <EditorialCtaBand
+      id="contact"
+      eyebrow={heading.label}
+      title={heading.title}
+      description={content.description}
+      href="/contact"
+      actionLabel={content.supportingText}
+    />
   );
 }
 
@@ -188,6 +189,11 @@ export function PortfolioExperience({
     const content = sectionContent[item.key as PortfolioSectionKey];
     return content?.isVisible ?? true;
   });
+  const heroFactLabels = splitCmsParts(sectionContent.hero.headline, 3);
+  const [buildingLabel, workingAsLabel, basedInLabel] =
+    heroFactLabels.length === 3
+      ? heroFactLabels
+      : ["Building", "Working as", "Based in"];
 
   return (
     <main>
@@ -230,7 +236,10 @@ export function PortfolioExperience({
                   <ArrowDown aria-hidden="true" />
                 </Link>
                 <Link href="/resume" className="text-link">
-                  Résumé <FileText aria-hidden="true" />
+                  {sectionContent.hero.accent ||
+                    sectionContent.resume.eyebrow ||
+                    "Resume"}{" "}
+                  <FileText aria-hidden="true" />
                 </Link>
                 {sectionContent.contact.isVisible ? (
                   <Link href="/contact" className="text-link">
@@ -247,15 +256,15 @@ export function PortfolioExperience({
               <p>{profile.availability}</p>
               <dl>
                 <div>
-                  <dt>Building</dt>
+                  <dt>{buildingLabel}</dt>
                   <dd>{profile.focus}</dd>
                 </div>
                 <div>
-                  <dt>Working as</dt>
+                  <dt>{workingAsLabel}</dt>
                   <dd>{profile.currentRole}</dd>
                 </div>
                 <div>
-                  <dt>Based in</dt>
+                  <dt>{basedInLabel}</dt>
                   <dd>{profile.location}</dd>
                 </div>
               </dl>

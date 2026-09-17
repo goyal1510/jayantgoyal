@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { WorkArchive } from "@/components/editorial/work-showcase";
 import { EditorialSubpageHeader } from "@/components/editorial/subpage-header";
 import { getEditorialPortfolioData } from "@/lib/portfolio/editorial-server";
+import { splitCmsParts } from "@/lib/portfolio/section-heading";
 import { buildPublicPageMetadata } from "@/lib/seo/config";
 
 export const revalidate = 60;
@@ -24,6 +25,8 @@ export default async function WorkPage() {
   const portfolio = await getEditorialPortfolioData();
   const content = portfolio.sectionContent.work;
   if (!content.isVisible) notFound();
+  const countNoun =
+    splitCmsParts(content.supportingText, 2)[1] || "public systems";
 
   return (
     <main className="editorial-page editorial-work-page">
@@ -38,13 +41,18 @@ export default async function WorkPage() {
           <p>{content.description}</p>
           <div className="editorial-work-hero__meta">
             <span>
-              {String(portfolio.work.length).padStart(2, "0")} public systems
+              {String(portfolio.work.length).padStart(2, "0")} {countNoun}
             </span>
             <Link href="#work-archive">{content.accent || "Browse the archive"}</Link>
           </div>
         </div>
       </section>
-      <WorkArchive work={portfolio.work} />
+      <WorkArchive
+        work={portfolio.work}
+        backLabel={
+          portfolio.sectionContent.home.supportingText || "Back to home"
+        }
+      />
     </main>
   );
 }

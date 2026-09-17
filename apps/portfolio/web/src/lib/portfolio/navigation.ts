@@ -1,5 +1,3 @@
-import type { PortfolioNavigationItem } from "./editorial-data";
-
 export type PortfolioNavigationSurface = "home" | "subpage";
 
 const PORTFOLIO_DESTINATIONS: Record<string, string> = {
@@ -37,11 +35,4 @@ export function isPortfolioNavigationItemCurrent(
   return destination
     ? pathname === destination || pathname.startsWith(`${destination}/`)
     : false;
-}
-
-/** CMS nav is the public menu. Kept as a named pass-through for the header. */
-export function includePortfolioNavigation(
-  items: PortfolioNavigationItem[],
-): PortfolioNavigationItem[] {
-  return items;
 }

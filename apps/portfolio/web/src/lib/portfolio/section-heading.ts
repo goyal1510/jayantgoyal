@@ -19,3 +19,14 @@ export function getCompactSectionHeading(
     title: title || fallbackTitle,
   };
 }
+
+/** Split CMS copy stored as `one|two|three` into trimmed parts. */
+export function splitCmsParts(value: string, count: number): string[] {
+  const parts = value
+    .split("|")
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  return parts.length === count ? parts : [];
+}
+

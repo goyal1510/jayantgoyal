@@ -135,6 +135,29 @@
   color: var(--signal);
 }
 
+.technology-stack--principles .technology-stack__groups {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: clamp(28px, 4vw, 64px);
+}
+
+.technology-stack--principles .technology-stack__group {
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 14px 18px;
+  padding: 22px 0;
+}
+
+.technology-stack--principles .technology-stack__copy h3 {
+  font-size: clamp(1.15rem, 1.5vw, 1.5rem);
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.technology-stack--principles .technology-stack__copy p {
+  max-width: none;
+  margin-top: 8px;
+}
+
 .education-block {
   display: grid;
   grid-template-columns: minmax(220px, 0.48fr) minmax(0, 1.52fr);

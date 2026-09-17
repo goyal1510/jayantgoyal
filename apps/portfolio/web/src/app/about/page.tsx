@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowUpRight, FileText, Mail } from "lucide-react";
 
 import { CertificateDeck } from "@/components/editorial/certificate-deck";
+import { EditorialCtaBand } from "@/components/editorial/editorial-cta-band";
 import { EditorialSubpageHeader } from "@/components/editorial/subpage-header";
 import { getEditorialPortfolioData } from "@/lib/portfolio/editorial-server";
 import { buildPublicPageMetadata } from "@/lib/seo/config";
@@ -75,7 +76,10 @@ export default async function AboutPage() {
       </section>
 
       {portfolio.principles.length > 0 ? (
-        <section className="shell technology-stack" aria-label="Working principles">
+        <section
+          className="shell technology-stack technology-stack--principles"
+          aria-label="Working principles"
+        >
           <div className="section-heading">
             <span className="section-index">
               {sectionContent.about.accent || "Principles"}
@@ -248,21 +252,13 @@ export default async function AboutPage() {
         </section>
       ) : null}
 
-      <section className="shell home-contact-prompt">
-        <div className="section-heading">
-          <span className="section-index">
-            {sectionContent.work.eyebrow.split("/")[0]?.trim() || "Work"}
-          </span>
-          <div>
-            <h2>{sectionContent.work.headline}</h2>
-            <p>{sectionContent.work.description}</p>
-          </div>
-        </div>
-        <Link href="/work" className="text-link">
-          {sectionContent.work.accent || "Browse the archive"}{" "}
-          <ArrowUpRight aria-hidden="true" />
-        </Link>
-      </section>
+      <EditorialCtaBand
+        eyebrow={sectionContent.work.eyebrow.split("/")[0]?.trim() || "Work"}
+        title={sectionContent.work.headline}
+        description={sectionContent.work.description}
+        href="/work"
+        actionLabel={sectionContent.work.accent || "Browse the archive"}
+      />
     </main>
   );
 }
