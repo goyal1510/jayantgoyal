@@ -131,8 +131,12 @@ export interface ExperienceWorkspaceData {
   editorialBySection: PortfolioWorkspaceEditorialMap;
 }
 
-export interface ActivityWorkspaceData {
+export interface GithubActivityWorkspaceData {
   hero: Pick<Hero, "id" | "github_username"> | null;
+  editorial: PortfolioWorkspaceEditorial;
+}
+
+export interface AnalyticsWorkspaceData {
   editorial: PortfolioWorkspaceEditorial;
 }
 
@@ -174,7 +178,7 @@ export async function loadHomeWorkspace(
       .from("hero")
       .select(PORTFOLIO_ADMIN_SELECT_COLUMNS.hero)
       .maybeSingle(),
-    getSectionEditorialContexts(supabase, ["hero", "resume"]),
+    getSectionEditorialContexts(supabase, ["home", "hero", "resume"]),
   ]);
   throwWorkspaceLoadError("Home", [heroResult.error]);
 
@@ -282,16 +286,16 @@ export async function loadExperienceWorkspace(
 }
 
 /** Load GitHub's editable source and its editorial framing. */
-export async function loadActivityWorkspace(
+export async function loadGithubActivityWorkspace(
   supabase: AdminSupabaseClient,
-): Promise<ActivityWorkspaceData> {
+): Promise<GithubActivityWorkspaceData> {
   const [heroResult, editorial] = await Promise.all([
     supabase
       .schema("portfolio")
       .from("hero")
       .select(PORTFOLIO_ADMIN_SELECT_COLUMNS.hero)
       .maybeSingle(),
-    getSectionEditorialContext(supabase, "activity"),
+    getSectionEditorialContext(supabase, "github_activity"),
   ]);
   throwWorkspaceLoadError("GitHub", [heroResult.error]);
 
@@ -299,6 +303,15 @@ export async function loadActivityWorkspace(
   return {
     hero: hero ? { id: hero.id, github_username: hero.github_username } : null,
     editorial,
+  };
+}
+
+/** Load public Analytics presentation independently of GitHub activity. */
+export async function loadAnalyticsWorkspace(
+  supabase: AdminSupabaseClient,
+): Promise<AnalyticsWorkspaceData> {
+  return {
+    editorial: await getSectionEditorialContext(supabase, "analytics"),
   };
 }
 

@@ -118,7 +118,7 @@ participant attributes through RLS.
 | `portfolio.skill_categories`, `portfolio.skills`         | Grouped skill evidence                                    |
 | `portfolio.work`                                         | Work summaries, links, images, and case studies           |
 | `portfolio.nav_items`                                    | Ordered public section navigation                         |
-| `portfolio.section_content`                              | Presentation copy for known sections                      |
+| `portfolio.section_content`                              | Presentation copy for known sections, including Home and Analytics |
 | `portfolio.writing_posts`                                | Portfolio-owned Writing publication and editorial content |
 | `portfolio.linkedin_posts`                               | Private LinkedIn queue and publication lifecycle ledger   |
 

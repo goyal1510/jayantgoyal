@@ -1,18 +1,28 @@
 import { describe, expect, it } from "vitest";
 
-import { PRODUCT_PROOF_POINTS } from "./product-proof";
+import { getProductProofPoints } from "./product-proof";
+
+const cmsCopy = {
+  eyebrow: "Product ownership",
+  headline: "Brief to production",
+  accent: "Backend depth",
+  description: "Auth · PostgreSQL · Storage · Realtime",
+  supportingText: "Delivery system|CMS · CI · independent deploys",
+  isVisible: true,
+};
 
 describe("portfolio product proof", () => {
   it("keeps the proof strip tied to the canonical application registry", () => {
-    expect(PRODUCT_PROOF_POINTS).toHaveLength(4);
-    expect(PRODUCT_PROOF_POINTS[1]).toEqual({
+    const points = getProductProofPoints(cmsCopy);
+    expect(points).toHaveLength(4);
+    expect(points[1]).toEqual({
       label: "Platform architecture",
       value: "4 purpose-built applications",
     });
   });
 
-  it("describes meaningful ownership and system depth", () => {
-    expect(PRODUCT_PROOF_POINTS.map((point) => point.label)).toEqual([
+  it("reads ownership and depth copy from CMS fields", () => {
+    expect(getProductProofPoints(cmsCopy).map((point) => point.label)).toEqual([
       "Product ownership",
       "Platform architecture",
       "Backend depth",

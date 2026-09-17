@@ -1,11 +1,13 @@
 export const PORTFOLIO_SECTION_KEYS = [
   "hero",
+  "home",
   "about",
   "skills",
   "education",
   "experience",
   "credentials",
-  "activity",
+  "github_activity",
+  "analytics",
   "work",
   "contact",
   "writing",
@@ -19,12 +21,13 @@ export const PORTFOLIO_SECTION_KEYS = [
 export type PortfolioSectionKey = (typeof PORTFOLIO_SECTION_KEYS)[number];
 
 export const PORTFOLIO_PUBLIC_NAVIGATION_KEYS = [
+  "home",
   "about",
   "studio",
   "work",
   "case-studies",
   "engineering",
-  "activity",
+  "analytics",
   "writing",
   "resume",
   "contact",
@@ -37,7 +40,7 @@ export const PORTFOLIO_PUBLIC_SECTION_ORDER = [
   "about",
   "skills",
   "experience",
-  "activity",
+  "github_activity",
   "work",
   "writing",
   "contact",
@@ -48,7 +51,8 @@ export type PortfolioWorkspaceKey =
   | "about"
   | "skills"
   | "experience"
-  | "activity"
+  | "github_activity"
+  | "analytics"
   | "work"
   | "writing"
   | "contact";
@@ -58,12 +62,14 @@ export const PORTFOLIO_SECTION_WORKSPACES: Record<
   PortfolioWorkspaceKey
 > = {
   hero: "home",
+  home: "home",
   about: "about",
   skills: "skills",
   education: "about",
   experience: "experience",
   credentials: "experience",
-  activity: "activity",
+  github_activity: "github_activity",
+  analytics: "analytics",
   work: "work",
   contact: "contact",
   writing: "writing",
@@ -80,7 +86,8 @@ export const PORTFOLIO_WORKSPACE_ROUTES: Record<PortfolioWorkspaceKey, string> =
     about: "/portfolio/about",
     skills: "/portfolio/skills",
     experience: "/portfolio/experience",
-    activity: "/portfolio/activity",
+    github_activity: "/portfolio/github",
+    analytics: "/portfolio/analytics",
     work: "/portfolio/work",
     writing: "/portfolio/writing",
     contact: "/portfolio/contact",

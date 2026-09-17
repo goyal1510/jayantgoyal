@@ -2,32 +2,21 @@ import type { PortfolioNavigationItem } from "./editorial-data";
 
 export type PortfolioNavigationSurface = "home" | "subpage";
 
-const HOME_NAVIGATION_ITEM: PortfolioNavigationItem = {
-  key: "home",
-  label: "Home",
-  note: "Portfolio overview",
-};
-
-const ANALYTICS_NAVIGATION_ITEM: PortfolioNavigationItem = {
-  key: "analytics",
-  label: "Analytics",
-  note: "Live site traffic",
-};
-
 const PORTFOLIO_DESTINATIONS: Record<string, string> = {
   home: "/",
+  hero: "/",
   about: "/about",
   work: "/work",
   writing: "/writing",
   resume: "/resume",
   analytics: "/analytics",
+  github_activity: "/#github-activity",
   contact: "/contact",
 };
 
 const LEGACY_PORTFOLIO_DESTINATIONS: Record<string, string> = {
   projects: "/work",
   blog: "/writing",
-  activity: "/#activity",
 };
 
 export function getPortfolioNavigationHref(
@@ -50,15 +39,9 @@ export function isPortfolioNavigationItemCurrent(
     : false;
 }
 
-/** Adds product-owned destinations without duplicating CMS-managed entries. */
+/** CMS nav is the public menu. Kept as a named pass-through for the header. */
 export function includePortfolioNavigation(
   items: PortfolioNavigationItem[],
 ): PortfolioNavigationItem[] {
-  const withHome = items.some((item) => item.key === HOME_NAVIGATION_ITEM.key)
-    ? items
-    : [HOME_NAVIGATION_ITEM, ...items];
-
-  return withHome.some((item) => item.key === ANALYTICS_NAVIGATION_ITEM.key)
-    ? withHome
-    : [...withHome, ANALYTICS_NAVIGATION_ITEM];
+  return items;
 }

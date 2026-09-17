@@ -14,7 +14,7 @@ export const SITE_URL = applicationOrigin(
 export const PERSON_NAME = PERSON_BRAND.displayName;
 export const DEFAULT_OG_IMAGE = APP_SOCIAL_PREVIEW_IMAGES.portfolio.url;
 export const DEFAULT_OG_IMAGE_METADATA = APP_SOCIAL_PREVIEW_IMAGES.portfolio;
-export const LAST_SIGNIFICANT_UPDATE = "2026-07-24T00:00:00.000Z";
+export const LAST_SIGNIFICANT_UPDATE = "2026-09-14T00:00:00.000Z";
 
 export function buildPublicPageMetadata({
   title,

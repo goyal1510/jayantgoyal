@@ -18,6 +18,10 @@ build
 .swc/
 next-env.d.ts
 
+# Next.js `next dev` regenerates these in each app; the repo contract is root AGENTS.md
+apps/*/web/AGENTS.md
+apps/*/web/CLAUDE.md
+
 # misc
 .DS_Store
 *.pem

@@ -30,6 +30,7 @@ export default async function ResumePage() {
       <EditorialSubpageHeader
         brandLabel={shell.brandLabel}
         navigation={shell.navigation}
+        contact={shell.sectionContent.contact}
       />
       <section className="shell editorial-page-hero editorial-resume-hero">
         <div>
@@ -56,8 +57,13 @@ export default async function ResumePage() {
       </section>
       <section className="shell editorial-resume__viewer">
         <div className="editorial-resume__viewer-heading">
-          <span className="section-index">PDF preview</span>
-          <p>Read the current PDF here or download a copy for later.</p>
+          <span className="section-index">
+            {content.accent || "PDF preview"}
+          </span>
+          <p>
+            {content.supportingText ||
+              "Read the current PDF here or download a copy for later."}
+          </p>
         </div>
         <iframe
           loading="lazy"

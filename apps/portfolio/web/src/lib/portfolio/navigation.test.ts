@@ -32,18 +32,29 @@ describe("Portfolio navigation", () => {
     );
   });
 
-  it("adds Home and Analytics to CMS navigation exactly once", () => {
-    const items = [{ key: "work", label: "Work", note: "Selected work" }];
-    const completeNavigation = includePortfolioNavigation(items);
-
-    expect(completeNavigation).toEqual([
-      { key: "home", label: "Home", note: "Portfolio overview" },
-      ...items,
-      { key: "analytics", label: "Analytics", note: "Live site traffic" },
-    ]);
-    expect(includePortfolioNavigation(completeNavigation)).toBe(
-      completeNavigation,
+  it("routes homepage and analytics from CMS section keys", () => {
+    expect(getPortfolioNavigationHref("home", "subpage")).toBe("/");
+    expect(getPortfolioNavigationHref("hero", "home")).toBe("/");
+    expect(getPortfolioNavigationHref("analytics", "subpage")).toBe(
+      "/analytics",
     );
+    expect(isPortfolioNavigationItemCurrent("home", "/")).toBe(true);
+    expect(isPortfolioNavigationItemCurrent("analytics", "/analytics")).toBe(
+      true,
+    );
+    expect(getPortfolioNavigationHref("github_activity", "home")).toBe(
+      "/#github-activity",
+    );
+  });
+
+  it("keeps CMS navigation order without injecting extra items", () => {
+    const items = [
+      { key: "home", label: "Home", note: "Portfolio overview" },
+      { key: "work", label: "Work", note: "Selected work" },
+      { key: "analytics", label: "Analytics", note: "Live site traffic" },
+    ];
+
+    expect(includePortfolioNavigation(items)).toEqual(items);
   });
 
   it("marks dedicated destinations as current", () => {

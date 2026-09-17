@@ -15,6 +15,12 @@ export default async function HomeWorkspacePage() {
   return (
     <div className="mx-auto w-full max-w-5xl space-y-6">
       <PortfolioWorkspaceHeader workspace="home" />
+      <SectionEditorialPanel
+        sectionKey="home"
+        title="Home navigation"
+        description="The public Home menu item. Visibility here is independent of the hero story below."
+        {...editorialBySection.home!}
+      />
       <SectionEditorialPanel sectionKey="hero" {...editorial} />
       <HeroForm initialData={hero} />
       <SectionEditorialPanel

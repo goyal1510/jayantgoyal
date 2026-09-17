@@ -13,7 +13,8 @@ admission paths, and privileged route handlers.
 | `/portfolio/about`      | `portfolio.content.read` | About and education content                      |
 | `/portfolio/skills`     | `portfolio.content.read` | Skill categories and skills                      |
 | `/portfolio/experience` | `portfolio.content.read` | Experience and credentials                       |
-| `/portfolio/activity`   | `portfolio.content.read` | GitHub/activity presentation content             |
+| `/portfolio/github`     | `portfolio.content.read` | GitHub contribution source and presentation      |
+| `/portfolio/analytics`  | `portfolio.content.read` | Public Analytics page copy and navigation        |
 | `/portfolio/work`       | `portfolio.content.read` | Work records, images, and case studies           |
 | `/portfolio/writing`    | `portfolio.content.read` | Writing records and publication                  |
 | `/portfolio/contact`    | `portfolio.content.read` | Contact presentation and destination             |
@@ -32,7 +33,7 @@ values through this route.
 | ------------------------- | ----------------------- |
 | `/portfolio/hero`         | `/portfolio/home`       |
 | `/portfolio/projects`     | `/portfolio/work`       |
-| `/portfolio/github`       | `/portfolio/activity`   |
+| `/portfolio/activity`     | `/portfolio/github`     |
 | `/portfolio/education`    | `/portfolio/about`      |
 | `/portfolio/certificates` | `/portfolio/experience` |
 | `/portfolio/blog`         | `/portfolio/writing`    |

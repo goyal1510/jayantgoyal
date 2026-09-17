@@ -34,7 +34,7 @@ describe("portfolio data guards", () => {
   });
 
   it("keeps section ownership and active table registries exhaustive", () => {
-    expect(PORTFOLIO_SECTION_KEYS).toHaveLength(15);
+    expect(PORTFOLIO_SECTION_KEYS).toHaveLength(17);
     expect(new Set(PORTFOLIO_TABLES).size).toBe(11);
     expect(Object.keys(PORTFOLIO_SECTION_WORKSPACES).sort()).toEqual(
       [...PORTFOLIO_SECTION_KEYS].sort(),
@@ -44,7 +44,8 @@ describe("portfolio data guards", () => {
       "about",
       "skills",
       "experience",
-      "activity",
+      "github_activity",
+      "analytics",
       "work",
       "writing",
       "contact",

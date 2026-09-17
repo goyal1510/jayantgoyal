@@ -12,7 +12,7 @@ import type {
   PortfolioSectionContent,
   PortfolioSectionKey,
 } from "@/lib/portfolio/editorial-data";
-import { PRODUCT_PROOF_POINTS } from "@/lib/portfolio/product-proof";
+import { getProductProofPoints } from "@/lib/portfolio/product-proof";
 import { getCompactSectionHeading } from "@/lib/portfolio/section-heading";
 
 function HeroHeadline({ headline }: { headline: string }) {
@@ -32,12 +32,12 @@ function HeroHeadline({ headline }: { headline: string }) {
   );
 }
 
-function ProductProofStrip() {
+function ProductProofStrip({ content }: { content: PortfolioSectionContent }) {
   return (
     <section className="product-proof" aria-label="Product engineering proof">
       <div className="shell">
         <dl className="product-proof__grid">
-          {PRODUCT_PROOF_POINTS.map((point) => (
+          {getProductProofPoints(content).map((point) => (
             <div key={point.label}>
               <dt>{point.label}</dt>
               <dd>{point.value}</dd>
@@ -69,7 +69,8 @@ function WritingSection({
               <div className="writing-block__heading-meta">
                 <p>{content.description}</p>
                 <Link href="/writing">
-                  All articles <ArrowUpRight aria-hidden="true" />
+                  {content.accent || "All articles"}{" "}
+                  <ArrowUpRight aria-hidden="true" />
                 </Link>
               </div>
             </div>
@@ -77,7 +78,7 @@ function WritingSection({
           <div className="writing-index">
             {writingPosts.length === 0 ? (
               <div className="editorial-writing-index__empty">
-                <p>No published notes yet.</p>
+                <p>{content.supportingText || "No published notes yet."}</p>
               </div>
             ) : null}
             {writingPosts.map((post) => (
@@ -115,9 +116,11 @@ function WritingSection({
 function AboutPreview({
   about,
   content,
+  workCta,
 }: {
   about: PortfolioEditorialData["about"];
   content: PortfolioSectionContent;
+  workCta: string;
 }) {
   const heading = getCompactSectionHeading(content.eyebrow, about.headline);
 
@@ -135,8 +138,7 @@ function AboutPreview({
           <EditorialReveal className="profile-story">
             <p className="profile-story__lead">{about.lead}</p>
             <Link href="/about" className="text-link">
-              About, experience, and education{" "}
-              <ArrowUpRight aria-hidden="true" />
+              {workCta} <ArrowUpRight aria-hidden="true" />
             </Link>
           </EditorialReveal>
           <div className="profile-facts">
@@ -155,18 +157,20 @@ function AboutPreview({
   );
 }
 
-function ContactPrompt() {
+function ContactPrompt({ content }: { content: PortfolioSectionContent }) {
+  const heading = getCompactSectionHeading(content.eyebrow, content.headline);
+
   return (
-    <section className="shell home-contact-prompt">
+    <section id="contact" className="shell home-contact-prompt">
       <div className="section-heading">
-        <span className="section-index">Contact</span>
+        <span className="section-index">{heading.label}</span>
         <div>
-          <h2>Have a product worth making real?</h2>
-          <p>Share the brief, the current stage, and the outcome you need.</p>
+          <h2>{heading.title}</h2>
+          <p>{content.description}</p>
         </div>
       </div>
       <Link href="/contact" className="text-link">
-        Start a product conversation <ArrowUpRight aria-hidden="true" />
+        {content.supportingText} <ArrowUpRight aria-hidden="true" />
       </Link>
     </section>
   );
@@ -198,10 +202,12 @@ export function PortfolioExperience({
             surface="home"
             ariaLabel="Primary navigation"
             items={visibleNavigation}
+            contact={sectionContent.contact}
           />
           {sectionContent.contact.isVisible ? (
             <Link className="header-contact" href="/contact">
-              Let&apos;s talk <ArrowDown aria-hidden="true" />
+              {sectionContent.contact.supportingText || "Get in touch"}{" "}
+              <ArrowDown aria-hidden="true" />
             </Link>
           ) : null}
         </div>
@@ -220,14 +226,17 @@ export function PortfolioExperience({
               <p>{profile.introduction}</p>
               <div className="hero-actions">
                 <Link href="/work" className="text-link" data-cursor="Explore">
-                  Explore Work <ArrowDown aria-hidden="true" />
+                  {sectionContent.home.accent || "Explore Work"}{" "}
+                  <ArrowDown aria-hidden="true" />
                 </Link>
                 <Link href="/resume" className="text-link">
                   Résumé <FileText aria-hidden="true" />
                 </Link>
                 {sectionContent.contact.isVisible ? (
                   <Link href="/contact" className="text-link">
-                    Discuss a product <Mail aria-hidden="true" />
+                    {sectionContent.contact.accent ||
+                      sectionContent.contact.supportingText}{" "}
+                    <Mail aria-hidden="true" />
                   </Link>
                 ) : null}
               </div>
@@ -257,13 +266,16 @@ export function PortfolioExperience({
         <div id="top" />
       )}
 
-      <ProductProofStrip />
+      <ProductProofStrip content={sectionContent.engineering} />
 
       {sectionContent.work.isVisible ? (
         <FeaturedWork work={work} content={sectionContent.work} />
       ) : null}
-      {sectionContent.activity.isVisible ? (
-        <GithubActivity profile={profile} content={sectionContent.activity} />
+      {sectionContent.github_activity.isVisible ? (
+        <GithubActivity
+          profile={profile}
+          content={sectionContent.github_activity}
+        />
       ) : null}
       {sectionContent.writing.isVisible ? (
         <WritingSection
@@ -273,9 +285,18 @@ export function PortfolioExperience({
       ) : null}
 
       {sectionContent.about.isVisible ? (
-        <AboutPreview about={about} content={sectionContent.about} />
+        <AboutPreview
+          about={about}
+          content={sectionContent.about}
+          workCta={
+            navigation.find((item) => item.key === "about")?.note ||
+            "About, experience, and education"
+          }
+        />
       ) : null}
-      {sectionContent.contact.isVisible ? <ContactPrompt /> : null}
+      {sectionContent.contact.isVisible ? (
+        <ContactPrompt content={sectionContent.contact} />
+      ) : null}
     </main>
   );
 }

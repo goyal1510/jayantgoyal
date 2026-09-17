@@ -36,6 +36,7 @@ export default async function WritingPage() {
       <EditorialSubpageHeader
         brandLabel={shell.brandLabel}
         navigation={shell.navigation}
+        contact={shell.sectionContent.contact}
       />
       <section className="shell editorial-page-hero">
         <div>

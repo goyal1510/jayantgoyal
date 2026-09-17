@@ -8,7 +8,7 @@ vi.mock("@/lib/supabase/server", () => ({
 }));
 
 import {
-  loadActivityWorkspace,
+  loadGithubActivityWorkspace,
   loadAboutWorkspace,
   loadContactWorkspace,
   loadExperienceWorkspace,
@@ -78,6 +78,11 @@ function makeSupabaseMock({
 
 const editorialRows = [
   {
+    section_key: "home",
+    eyebrow: "Home",
+    is_visible: true,
+  },
+  {
     section_key: "hero",
     eyebrow: "Home",
     is_visible: true,
@@ -138,6 +143,9 @@ describe("Portfolio CMS workspace loaders", () => {
     expect(result.editorial.sectionContent?.section_key).toBe("hero");
     expect(result.editorialBySection.resume?.sectionContent?.section_key).toBe(
       "resume",
+    );
+    expect(result.editorialBySection.home?.sectionContent?.section_key).toBe(
+      "home",
     );
   });
 
@@ -207,7 +215,7 @@ describe("Portfolio CMS workspace loaders", () => {
             eyebrow: "Credentials",
             is_visible: true,
           },
-          { section_key: "activity", eyebrow: "GitHub", is_visible: true },
+          { section_key: "github_activity", eyebrow: "GitHub", is_visible: true },
           { section_key: "contact", eyebrow: "Contact", is_visible: true },
         ],
         "portfolio.nav_items": [],
@@ -215,7 +223,7 @@ describe("Portfolio CMS workspace loaders", () => {
     });
 
     const experience = await loadExperienceWorkspace(supabase as never);
-    const activity = await loadActivityWorkspace(supabase as never);
+    const activity = await loadGithubActivityWorkspace(supabase as never);
     const contact = await loadContactWorkspace(supabase as never);
 
     expect(experience.experience).toEqual([
@@ -231,7 +239,9 @@ describe("Portfolio CMS workspace loaders", () => {
       id: "hero-1",
       github_username: "goyal1510",
     });
-    expect(activity.editorial.sectionContent?.section_key).toBe("activity");
+    expect(activity.editorial.sectionContent?.section_key).toBe(
+      "github_activity",
+    );
     expect(contact.contact).toEqual({
       id: "contact-1",
       email: "hello@example.com",

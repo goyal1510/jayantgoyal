@@ -450,7 +450,7 @@ CREATE TABLE IF NOT EXISTS "portfolio"."nav_items" (
     "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "note" "text",
     CONSTRAINT "nav_items_required_fields_nonblank_check" CHECK ((("btrim"("section_id") <> ''::"text") AND ("btrim"("label") <> ''::"text"))),
-    CONSTRAINT "nav_items_section_id_check" CHECK (("section_id" = ANY (ARRAY['hero'::"text", 'about'::"text", 'skills'::"text", 'education'::"text", 'experience'::"text", 'credentials'::"text", 'activity'::"text", 'work'::"text", 'contact'::"text", 'writing'::"text", 'article'::"text", 'resume'::"text", 'studio'::"text", 'case-studies'::"text", 'engineering'::"text"]))),
+    CONSTRAINT "nav_items_section_id_check" CHECK (("section_id" = ANY (ARRAY['hero'::"text", 'home'::"text", 'about'::"text", 'skills'::"text", 'education'::"text", 'experience'::"text", 'credentials'::"text", 'github_activity'::"text", 'analytics'::"text", 'work'::"text", 'contact'::"text", 'writing'::"text", 'article'::"text", 'resume'::"text", 'studio'::"text", 'case-studies'::"text", 'engineering'::"text"]))),
     CONSTRAINT "nav_items_sort_order_nonnegative_check" CHECK (("sort_order" >= 0))
 );
 
@@ -470,7 +470,7 @@ CREATE TABLE IF NOT EXISTS "portfolio"."section_content" (
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     CONSTRAINT "section_content_required_fields_nonblank_check" CHECK ((("btrim"("section_key") <> ''::"text") AND ("btrim"("eyebrow") <> ''::"text"))),
-    CONSTRAINT "section_content_section_key_check" CHECK (("section_key" = ANY (ARRAY['hero'::"text", 'about'::"text", 'skills'::"text", 'education'::"text", 'experience'::"text", 'credentials'::"text", 'activity'::"text", 'work'::"text", 'contact'::"text", 'writing'::"text", 'article'::"text", 'resume'::"text", 'studio'::"text", 'case-studies'::"text", 'engineering'::"text"])))
+    CONSTRAINT "section_content_section_key_check" CHECK (("section_key" = ANY (ARRAY['hero'::"text", 'home'::"text", 'about'::"text", 'skills'::"text", 'education'::"text", 'experience'::"text", 'credentials'::"text", 'github_activity'::"text", 'analytics'::"text", 'work'::"text", 'contact'::"text", 'writing'::"text", 'article'::"text", 'resume'::"text", 'studio'::"text", 'case-studies'::"text", 'engineering'::"text"])))
 );
 
 
@@ -1034,7 +1034,7 @@ CREATE POLICY "Public read access" ON "portfolio"."nav_items" FOR SELECT USING (
 
 
 
-CREATE POLICY "Public read access" ON "portfolio"."section_content" FOR SELECT TO "authenticated", "anon" USING (true);
+CREATE POLICY "Public read access" ON "portfolio"."section_content" FOR SELECT TO "anon", "authenticated" USING (true);
 
 
 

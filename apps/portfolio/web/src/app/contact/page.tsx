@@ -36,6 +36,7 @@ export default async function ContactPage({
       <EditorialSubpageHeader
         brandLabel={portfolio.profile.displayName}
         navigation={portfolio.navigation}
+        contact={portfolio.sectionContent.contact}
       />
       <ContactSection
         profile={portfolio.profile}

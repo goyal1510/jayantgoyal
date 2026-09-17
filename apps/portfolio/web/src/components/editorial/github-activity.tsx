@@ -8,6 +8,7 @@ import type {
   PortfolioProfile,
   PortfolioSectionContent,
 } from "@/lib/portfolio/editorial-data";
+import { getCompactSectionHeading } from "@/lib/portfolio/section-heading";
 
 export function GithubActivity({
   profile,
@@ -16,13 +17,15 @@ export function GithubActivity({
   profile: PortfolioProfile;
   content: PortfolioSectionContent;
 }) {
+  const heading = getCompactSectionHeading(content.eyebrow, content.headline);
+
   return (
-    <section id="activity" className="github-activity">
+    <section id="github-activity" className="github-activity">
       <div className="shell">
         <EditorialReveal className="section-heading github-activity__heading">
-          <span className="section-index">Activity</span>
+          <span className="section-index">{heading.label}</span>
           <div>
-            <h2>GitHub Activity</h2>
+            <h2>{heading.title}</h2>
             <p>{content.description}</p>
             <Link
               className="text-link github-activity__analytics-link"

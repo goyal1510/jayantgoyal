@@ -47,7 +47,8 @@ Server components load canonical data through
 `src/lib/portfolio/editorial-server.ts` and Writing query helpers. The loader
 selects explicit public columns, maps database records into editorial view
 models, and is cached with the `portfolio-content` tag. Core `hero`, `about`,
-and `contact` records are required; query failures and missing core records
+and `contact` records are required; Home and Analytics menu copy live on their
+own `section_content` keys, not on Hero or Activity. Query failures and missing core records
 surface as errors rather than using duplicated static content.
 
 Public person identity is deliberately not CMS content. The shared identity

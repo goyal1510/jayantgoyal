@@ -11,6 +11,7 @@ import {
   Home,
   Mail,
   UserRound,
+  LineChart,
 } from "lucide-react";
 
 import {
@@ -70,12 +71,20 @@ const workspaces = [
     key: "experience",
   },
   {
-    label: "Activity",
+    label: "GitHub",
     description:
       "The live GitHub signal and the editorial framing around the work happening in public.",
-    href: PORTFOLIO_WORKSPACE_ROUTES.activity,
+    href: PORTFOLIO_WORKSPACE_ROUTES.github_activity,
     icon: Github,
-    key: "activity",
+    key: "github_activity",
+  },
+  {
+    label: "Analytics",
+    description:
+      "Public live-site analytics copy and the menu item that opens /analytics.",
+    href: PORTFOLIO_WORKSPACE_ROUTES.analytics,
+    icon: LineChart,
+    key: "analytics",
   },
   {
     label: "Work",
@@ -177,7 +186,7 @@ export default async function PortfolioPage() {
     about: Boolean(about.data),
     skills: (skills.data ?? []).length > 0,
     experience: (experience.data ?? []).length > 0,
-    activity: Boolean(
+    github_activity: Boolean(
       (
         hero.data as unknown as { github_username?: string | null } | null
       )?.github_username?.trim(),
@@ -185,6 +194,12 @@ export default async function PortfolioPage() {
     work: (work.data ?? []).length > 0,
     writing: (writing.data ?? []).length > 0,
     contact: Boolean(contact.data),
+    analytics: (
+      (sectionContent.data ?? []) as Array<{
+        section_key?: string;
+        is_visible?: boolean;
+      }>
+    ).some((row) => row.section_key === "analytics" && row.is_visible),
   } as const;
   const completed = Object.values(records).filter(Boolean).length;
   const heroRecord = hero.data as unknown as PortfolioHeroPublicRow | null;
@@ -281,7 +296,7 @@ export default async function PortfolioPage() {
         </div>
         <div className="grid min-w-64 grid-cols-2 gap-3">
           <div className="rounded-xl border bg-muted/30 p-4">
-            <p className="text-3xl font-semibold tabular-nums">{completed}/8</p>
+            <p className="text-3xl font-semibold tabular-nums">{completed}/9</p>
             <p className="mt-1 text-xs uppercase tracking-[0.16em] text-muted-foreground">
               content areas ready
             </p>

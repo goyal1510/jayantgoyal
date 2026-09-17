@@ -30,6 +30,7 @@ export default async function AboutPage() {
       <EditorialSubpageHeader
         brandLabel={portfolio.profile.displayName}
         navigation={portfolio.navigation}
+        contact={portfolio.sectionContent.contact}
       />
 
       <section className="shell editorial-page-hero editorial-about-hero">
@@ -72,6 +73,32 @@ export default async function AboutPage() {
           </div>
         </div>
       </section>
+
+      {portfolio.principles.length > 0 ? (
+        <section className="shell technology-stack" aria-label="Working principles">
+          <div className="section-heading">
+            <span className="section-index">
+              {sectionContent.about.accent || "Principles"}
+            </span>
+            <div>
+              <h2>{about.lead}</h2>
+            </div>
+          </div>
+          <div className="technology-stack__groups">
+            {portfolio.principles.map((principle, index) => (
+              <article className="technology-stack__group" key={principle.title}>
+                <span className="technology-stack__index" aria-hidden="true">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <div className="technology-stack__copy">
+                  <h3>{principle.title}</h3>
+                  <p>{principle.copy}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       {sectionContent.skills.isVisible && technologyGroups.length > 0 ? (
         <section
@@ -223,16 +250,17 @@ export default async function AboutPage() {
 
       <section className="shell home-contact-prompt">
         <div className="section-heading">
-          <span className="section-index">Next</span>
+          <span className="section-index">
+            {sectionContent.work.eyebrow.split("/")[0]?.trim() || "Work"}
+          </span>
           <div>
-            <h2>See the systems I have built.</h2>
-            <p>
-              Move from the story behind the work into the products themselves.
-            </p>
+            <h2>{sectionContent.work.headline}</h2>
+            <p>{sectionContent.work.description}</p>
           </div>
         </div>
         <Link href="/work" className="text-link">
-          Explore Work <ArrowUpRight aria-hidden="true" />
+          {sectionContent.work.accent || "Browse the archive"}{" "}
+          <ArrowUpRight aria-hidden="true" />
         </Link>
       </section>
     </main>

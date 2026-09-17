@@ -7,6 +7,7 @@ import {
   Code2,
   Mail,
   LayoutDashboard,
+  LineChart,
   Rocket,
   BookOpen,
   SearchCheck,
@@ -42,9 +43,14 @@ const portfolioNavItems: NavItem[] = [
     icon: Briefcase,
   },
   {
-    label: "Activity",
-    href: PORTFOLIO_WORKSPACE_ROUTES.activity,
+    label: "GitHub",
+    href: PORTFOLIO_WORKSPACE_ROUTES.github_activity,
     icon: Github,
+  },
+  {
+    label: "Analytics",
+    href: PORTFOLIO_WORKSPACE_ROUTES.analytics,
+    icon: LineChart,
   },
   { label: "Work", href: PORTFOLIO_WORKSPACE_ROUTES.work, icon: FolderKanban },
   {

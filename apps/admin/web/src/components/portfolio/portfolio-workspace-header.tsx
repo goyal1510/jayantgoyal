@@ -5,6 +5,7 @@ import {
   Code2,
   FolderKanban,
   Mail,
+  LineChart,
   UserRound,
   type LucideIcon,
 } from "lucide-react";
@@ -57,13 +58,21 @@ const WORKSPACE_COPY: Record<
     tone: "sand",
     detail: "Timeline, outcomes, credentials, and verification links",
   },
-  activity: {
-    title: "Activity",
+  github_activity: {
+    title: "GitHub",
     description:
-      "Configure the source for live GitHub activity while keeping contribution data derived, current, and trustworthy.",
+      "Configure the source for live GitHub contributions while keeping that data derived, current, and trustworthy.",
     icon: Github,
     tone: "sage",
     detail: "GitHub identity and activity presentation",
+  },
+  analytics: {
+    title: "Analytics",
+    description:
+      "Shape the public live-site analytics page without mixing it with GitHub activity.",
+    icon: LineChart,
+    tone: "blue",
+    detail: "Traffic page copy and public Analytics menu item",
   },
   work: {
     title: "Work",

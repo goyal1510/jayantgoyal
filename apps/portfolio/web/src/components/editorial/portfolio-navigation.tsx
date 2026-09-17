@@ -5,7 +5,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 
-import type { PortfolioNavigationItem } from "@/lib/portfolio/editorial-data";
+import type {
+  PortfolioNavigationItem,
+  PortfolioSectionContent,
+} from "@/lib/portfolio/editorial-data";
 import { ColorThemeToggle } from "@/components/editorial/color-theme-toggle";
 import {
   getPortfolioNavigationHref,
@@ -18,10 +21,12 @@ export function PortfolioNavigation({
   surface,
   ariaLabel,
   items,
+  contact,
 }: {
   surface: PortfolioNavigationSurface;
   ariaLabel: string;
   items: PortfolioNavigationItem[];
+  contact?: PortfolioSectionContent;
 }) {
   const pathname = usePathname();
   const menuId = useId();
@@ -164,12 +169,15 @@ export function PortfolioNavigation({
             </ol>
 
             <div className="portfolio-mobile-menu__footer">
-              <p>Have an idea worth making real?</p>
+              <p>
+                {contact?.headline || "Have a role or a product to discuss?"}
+              </p>
               <Link
-                href={surface === "home" ? "#contact" : "/#contact"}
+                href={surface === "home" ? "#contact" : "/contact"}
                 onClick={() => setMenuOpen(false)}
               >
-                Let&apos;s talk <ArrowDownRight aria-hidden="true" />
+                {contact?.accent || contact?.supportingText || "Get in touch"}{" "}
+                <ArrowDownRight aria-hidden="true" />
               </Link>
             </div>
           </div>

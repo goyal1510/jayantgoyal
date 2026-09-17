@@ -12,7 +12,7 @@ the Portfolio sitemap/robots rules.
 | `/about`          | Detailed profile, experience, skill, and credential narrative    | Editorial data                           |
 | `/contact`        | Public enquiry interface                                         | Shell/contact CMS data                   |
 | `/resume`         | Resume presentation and PDF entry                                | Shell data and `/api/resume`             |
-| `/analytics`      | Aggregate traffic, geography, caching, and real-user performance | Cloudflare GraphQL Analytics API         |
+| `/analytics`      | Aggregate traffic, geography, caching, and real-user performance | CMS `analytics` section plus Cloudflare |
 | `/work`           | Visible work catalog                                             | Editorial work records                   |
 | `/work/[slug]`    | Published case study                                             | Work slug and publication guard          |
 | `/writing`        | Published Writing index                                          | `portfolio.writing_posts`                |

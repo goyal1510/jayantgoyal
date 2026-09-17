@@ -2,14 +2,19 @@ import { ArrowDown } from "lucide-react";
 import Link from "next/link";
 
 import { PortfolioNavigation } from "@/components/editorial/portfolio-navigation";
-import type { PortfolioNavigationItem } from "@/lib/portfolio/editorial-data";
+import type {
+  PortfolioNavigationItem,
+  PortfolioSectionContent,
+} from "@/lib/portfolio/editorial-data";
 
 export function EditorialSubpageHeader({
   brandLabel,
   navigation,
+  contact,
 }: {
   brandLabel: string;
   navigation: PortfolioNavigationItem[];
+  contact?: PortfolioSectionContent;
 }) {
   return (
     <header className="editorial-subpage-header">
@@ -21,6 +26,7 @@ export function EditorialSubpageHeader({
           surface="subpage"
           ariaLabel="Portfolio navigation"
           items={navigation}
+          contact={contact}
         />
         <Link
           className="editorial-subpage-header__contact"
@@ -29,7 +35,8 @@ export function EditorialSubpageHeader({
           data-analytics-source="subpage_header"
           data-analytics-destination="contact_form"
         >
-          Let&apos;s talk <ArrowDown aria-hidden="true" />
+          {contact?.accent || contact?.supportingText || "Get in touch"}{" "}
+          <ArrowDown aria-hidden="true" />
         </Link>
       </div>
     </header>

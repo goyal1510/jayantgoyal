@@ -64,6 +64,8 @@ export default async function WorkCaseStudyPage({
       navigation={portfolio.navigation}
       project={project}
       nextProject={nextProject}
+      contactContent={portfolio.sectionContent.contact}
+      studyContent={portfolio.sectionContent["case-studies"]}
     />
   );
 }

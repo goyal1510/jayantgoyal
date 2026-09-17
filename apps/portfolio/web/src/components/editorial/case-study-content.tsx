@@ -10,8 +10,10 @@ import { EditorialSubpageHeader } from "@/components/editorial/subpage-header";
 import { trackPortfolioEvent } from "@/lib/analytics/events";
 import type {
   PortfolioNavigationItem,
+  PortfolioSectionContent,
   PortfolioWork,
 } from "@/lib/portfolio/editorial-data";
+import { getCompactSectionHeading } from "@/lib/portfolio/section-heading";
 
 type CaseStudyContent = NonNullable<PortfolioWork["caseStudy"]>;
 
@@ -89,14 +91,22 @@ export function CaseStudyContent({
   navigation,
   project,
   nextProject,
+  contactContent,
+  studyContent,
 }: {
   brandLabel: string;
   navigation: PortfolioNavigationItem[];
   project: PortfolioWork;
   nextProject: PortfolioWork | null;
+  contactContent: PortfolioSectionContent;
+  studyContent: PortfolioSectionContent;
 }) {
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const caseStudy = project.caseStudy;
+  const studyHeading = getCompactSectionHeading(
+    studyContent.eyebrow,
+    studyContent.headline,
+  );
   const sections = useMemo(
     () => (caseStudy ? buildSections(caseStudy) : []),
     [caseStudy],
@@ -136,7 +146,11 @@ export function CaseStudyContent({
 
   return (
     <main className="editorial-page editorial-case-study editorial-work-article-page">
-      <EditorialSubpageHeader brandLabel={brandLabel} navigation={navigation} />
+      <EditorialSubpageHeader
+        brandLabel={brandLabel}
+        navigation={navigation}
+        contact={contactContent}
+      />
 
       <article className="shell editorial-article editorial-work-article">
         <header className="editorial-article__header">
@@ -284,11 +298,10 @@ export function CaseStudyContent({
 
         <footer className="editorial-article__footer">
           <div className="editorial-article__signoff">
-            <span className="section-index">Build with intent</span>
-            <h2>Have a product with this kind of problem?</h2>
+            <span className="section-index">{studyHeading.label}</span>
+            <h2>{studyContent.accent}</h2>
             <p>
-              {project.impact} Start with the constraints, then make the system
-              dependable.
+              {project.impact} {studyContent.supportingText}
             </p>
             <div className="editorial-article__signoff-actions">
               <Link
@@ -299,7 +312,8 @@ export function CaseStudyContent({
                 data-analytics-item-id={project.id}
                 data-analytics-item-name={project.title}
               >
-                Discuss a product <ArrowUpRight aria-hidden="true" />
+                {contactContent.accent || contactContent.supportingText}{" "}
+                <ArrowUpRight aria-hidden="true" />
               </Link>
               <Link
                 href="/resume"

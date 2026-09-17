@@ -88,6 +88,11 @@ export default async function WritingPostPage({
         profileName={shell.profile.name}
         profileRole={shell.profile.role}
         articleContent={shell.sectionContent.article}
+        contactCta={
+          shell.sectionContent.contact.supportingText ||
+          shell.sectionContent.contact.accent
+        }
+        contactContent={shell.sectionContent.contact}
       />
     </>
   );

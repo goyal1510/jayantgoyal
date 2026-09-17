@@ -184,11 +184,6 @@
     justify-self: center;
   }
 
-  .portfolio-navigation [data-nav-key="experience"],
-  .portfolio-navigation [data-nav-key="activity"] {
-    display: none;
-  }
-
   .hero__grid {
     grid-template-columns: minmax(0, 1.1fr) minmax(290px, 0.9fr);
     gap: 44px;

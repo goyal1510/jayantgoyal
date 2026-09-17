@@ -34,13 +34,15 @@ interface SectionEditorialPanelProps {
 }
 
 const PUBLIC_SECTION_PATHS: Record<PortfolioSectionKey, string> = {
-  hero: "/#top",
-  about: "/#about",
+  hero: "/",
+  home: "/",
+  about: "/about",
   skills: "/#skills",
   education: "/#about",
   experience: "/#experience",
   credentials: "/#experience",
-  activity: "/#activity",
+  github_activity: "/#github-activity",
+  analytics: "/analytics",
   work: "/work",
   contact: "/#contact",
   writing: "/writing",

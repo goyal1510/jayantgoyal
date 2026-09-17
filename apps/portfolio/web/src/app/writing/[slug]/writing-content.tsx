@@ -152,6 +152,8 @@ export function WritingContent({
   profileName,
   profileRole,
   articleContent,
+  contactCta,
+  contactContent,
 }: {
   post: WritingPost;
   nextPost: NextPost | null;
@@ -160,6 +162,8 @@ export function WritingContent({
   profileName: string;
   profileRole: string;
   articleContent: PortfolioSectionContent;
+  contactCta: string;
+  contactContent: PortfolioSectionContent;
 }) {
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const content = useMemo(
@@ -197,7 +201,11 @@ export function WritingContent({
 
   return (
     <main className="editorial-page">
-      <EditorialSubpageHeader brandLabel={brandLabel} navigation={navigation} />
+      <EditorialSubpageHeader
+        brandLabel={brandLabel}
+        navigation={navigation}
+        contact={contactContent}
+      />
 
       <article className="shell editorial-article">
         <header className="editorial-article__header">
@@ -288,8 +296,8 @@ export function WritingContent({
                   </div>
                 ) : null}
               </dl>
-              <Link href="/#contact">
-                Discuss an idea <ArrowUpRight aria-hidden="true" />
+              <Link href="/contact">
+                {contactCta} <ArrowUpRight aria-hidden="true" />
               </Link>
             </div>
           </aside>
@@ -305,8 +313,8 @@ export function WritingContent({
               {articleContent.description} Written by {profileName},{" "}
               {profileRole}.
             </p>
-            <Link href="/#contact">
-              Start a conversation <ArrowUpRight aria-hidden="true" />
+            <Link href="/contact">
+              {contactCta} <ArrowUpRight aria-hidden="true" />
             </Link>
           </div>
 

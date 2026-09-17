@@ -145,9 +145,9 @@ export function FeaturedWork({
         </div>
 
         <div className="featured-projects__archive-link">
-          <span>Four systems, each explained from problem to outcome</span>
+          <span>{content.supportingText}</span>
           <Link href="/work" data-cursor="Explore">
-            View all Work
+            {content.accent || "Browse the archive"}
             <ArrowUpRight aria-hidden="true" />
           </Link>
         </div>

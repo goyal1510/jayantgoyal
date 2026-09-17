@@ -14,12 +14,16 @@ import { TrafficDashboard } from "./traffic-dashboard";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = buildPublicPageMetadata({
-  title: "Live Site Analytics",
-  description:
-    "A privacy-conscious view of traffic, requests, caching, and bandwidth for this portfolio.",
-  pathname: "/analytics",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const { sectionContent } = await getPortfolioShellData();
+  const content = sectionContent.analytics;
+
+  return buildPublicPageMetadata({
+    title: content.accent || "Live Site Analytics",
+    description: content.supportingText || content.description,
+    pathname: "/analytics",
+  });
+}
 
 export default async function AnalyticsPage({
   searchParams,
@@ -33,26 +37,26 @@ export default async function AnalyticsPage({
     getCloudflareTraffic(range),
     getCloudflareWebVitals(range),
   ]);
+  const analytics = shell.sectionContent.analytics;
 
   return (
     <main className={`editorial-page ${styles.page}`}>
       <EditorialSubpageHeader
         brandLabel={shell.profile.displayName}
         navigation={shell.navigation}
+        contact={shell.sectionContent.contact}
       />
 
       <section className={`shell ${styles.hero}`}>
         <div>
-          <span className={styles.eyebrow}>Live site analytics</span>
-          <h1 id="traffic-heading">See the site at work.</h1>
+          <span className={styles.eyebrow}>
+            {analytics.eyebrow || "Live site analytics"}
+          </span>
+          <h1 id="traffic-heading">{analytics.accent || analytics.headline}</h1>
         </div>
         <div className={styles.heroNote}>
           <span className={styles.liveIndicator}>Cloudflare / live</span>
-          <p>
-            A public, privacy-conscious view of traffic, global reach, cache
-            efficiency, and the experience measured in real visitors&apos;
-            browsers.
-          </p>
+          <p>{analytics.supportingText || analytics.description}</p>
         </div>
       </section>
 

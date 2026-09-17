@@ -74,7 +74,7 @@ describe("Admin navigation domains", () => {
       "/portfolio/projects": "/portfolio/work",
       "/portfolio/education": "/portfolio/about",
       "/portfolio/certificates": "/portfolio/experience",
-      "/portfolio/github": "/portfolio/activity",
+      "/portfolio/activity": "/portfolio/github",
       "/portfolio/blog": "/portfolio/writing",
       "/blog": "/portfolio/writing",
       "/writing": "/portfolio/writing",

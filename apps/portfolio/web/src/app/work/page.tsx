@@ -30,17 +30,17 @@ export default async function WorkPage() {
       <EditorialSubpageHeader
         brandLabel={portfolio.profile.displayName}
         navigation={portfolio.navigation}
+        contact={portfolio.sectionContent.contact}
       />
       <section className="shell editorial-page-hero editorial-work-hero">
         <div>
-          <h1>Complete systems, built end to end.</h1>
+          <h1>{content.headline}</h1>
           <p>{content.description}</p>
           <div className="editorial-work-hero__meta">
             <span>
-              {String(portfolio.work.length).padStart(2, "0")} systems ·
-              explained end to end
+              {String(portfolio.work.length).padStart(2, "0")} public systems
             </span>
-            <Link href="#work-archive">Browse the systems</Link>
+            <Link href="#work-archive">{content.accent || "Browse the archive"}</Link>
           </div>
         </div>
       </section>
