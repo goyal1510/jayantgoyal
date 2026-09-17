@@ -14,7 +14,12 @@ export default async function WorkWorkspacePage() {
   return (
     <div className="mx-auto w-full max-w-6xl space-y-6">
       <PortfolioWorkspaceHeader workspace="work" />
-      <SectionEditorialPanel sectionKey="work" {...editorial} />
+      <SectionEditorialPanel
+        sectionKey="work"
+        title="Work presentation"
+        description="Featured work and archive framing. The count noun on the archive hero is the named label below, not a second phrase in Supporting text."
+        {...editorial}
+      />
       <WorkList
         initialData={work}
       />

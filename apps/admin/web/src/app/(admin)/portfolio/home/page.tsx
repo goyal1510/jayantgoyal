@@ -21,14 +21,25 @@ export default async function HomeWorkspacePage() {
         description="The public Home menu item. Visibility here is independent of the hero story below."
         {...editorialBySection.home!}
       />
-      <SectionEditorialPanel sectionKey="hero" {...editorial} />
-      <HeroForm initialData={hero} />
+      <SectionEditorialPanel
+        sectionKey="hero"
+        title="Hero presentation"
+        description="Eyebrow, résumé action, availability kicker, and the three fact labels on the home hero card. The large title still comes from the profile headline below."
+        {...editorial}
+      />
+      <SectionEditorialPanel
+        sectionKey="engineering"
+        title="Product proof strip"
+        description="The four-cell strip under the hero. Named labels own the delivery cell so those values are not hidden in supporting text."
+        {...editorialBySection.engineering!}
+      />
       <SectionEditorialPanel
         sectionKey="resume"
         title="Resume presentation"
         description="Shape the heading and supporting copy for the public resume page alongside its source link."
         {...editorialBySection.resume!}
       />
+      <HeroForm initialData={hero} />
     </div>
   );
 }

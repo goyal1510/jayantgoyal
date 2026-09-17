@@ -32,7 +32,7 @@ const WORKSPACE_COPY: Record<
       "Shape the first impression: the name, point of view, availability, and invitation visitors meet before they explore the work.",
     icon: UserRound,
     tone: "lavender",
-    detail: "Identity, hero story, resume, and search metadata",
+    detail: "Home menu, hero, proof strip, resume, and search metadata",
   },
   about: {
     title: "About",

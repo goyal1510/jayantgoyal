@@ -9,7 +9,7 @@ admission paths, and privileged route handlers.
 | ----------------------- | ------------------------ | ------------------------------------------------ |
 | `/`                     | `admin.console.enter`    | Admin landing/dashboard                          |
 | `/portfolio`            | `portfolio.content.read` | Portfolio CMS overview and section presentation  |
-| `/portfolio/home`       | `portfolio.content.read` | Hero/home editorial content                      |
+| `/portfolio/home`       | `portfolio.content.read` | Home, hero, proof strip, and resume presentation |
 | `/portfolio/about`      | `portfolio.content.read` | About and education content                      |
 | `/portfolio/skills`     | `portfolio.content.read` | Skill categories and skills                      |
 | `/portfolio/experience` | `portfolio.content.read` | Experience and credentials                       |

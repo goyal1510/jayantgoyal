@@ -108,6 +108,11 @@ const editorialRows = [
     is_visible: true,
   },
   {
+    section_key: "engineering",
+    eyebrow: "Product ownership",
+    is_visible: true,
+  },
+  {
     section_key: "work",
     eyebrow: "Work",
     is_visible: true,
@@ -147,6 +152,9 @@ describe("Portfolio CMS workspace loaders", () => {
     expect(result.editorialBySection.home?.sectionContent?.section_key).toBe(
       "home",
     );
+    expect(
+      result.editorialBySection.engineering?.sectionContent?.section_key,
+    ).toBe("engineering");
   });
 
   it("joins About education rows and Skills rows from their canonical tables", async () => {

@@ -178,7 +178,12 @@ export async function loadHomeWorkspace(
       .from("hero")
       .select(PORTFOLIO_ADMIN_SELECT_COLUMNS.hero)
       .maybeSingle(),
-    getSectionEditorialContexts(supabase, ["home", "hero", "resume"]),
+    getSectionEditorialContexts(supabase, [
+      "home",
+      "hero",
+      "resume",
+      "engineering",
+    ]),
   ]);
   throwWorkspaceLoadError("Home", [heroResult.error]);
 

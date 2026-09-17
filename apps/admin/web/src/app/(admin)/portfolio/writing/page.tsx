@@ -15,7 +15,12 @@ export default async function WritingWorkspacePage() {
   return (
     <div className="mx-auto w-full max-w-6xl space-y-6">
       <PortfolioWorkspaceHeader workspace="writing" />
-      <SectionEditorialPanel sectionKey="writing" {...editorial} />
+      <SectionEditorialPanel
+        sectionKey="writing"
+        title="Writing presentation"
+        description="Home writing block and index framing. The article-card action is the named label below, not a second phrase in Primary action."
+        {...editorial}
+      />
       <SectionEditorialPanel
         sectionKey="article"
         title="Writing article presentation"

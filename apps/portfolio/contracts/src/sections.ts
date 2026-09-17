@@ -67,7 +67,7 @@ export const PORTFOLIO_SECTION_WORKSPACES: Record<
   resume: "home",
   studio: "work",
   "case-studies": "work",
-  engineering: "skills",
+  engineering: "home",
 };
 
 export const PORTFOLIO_WORKSPACE_ROUTES: Record<PortfolioWorkspaceKey, string> =
