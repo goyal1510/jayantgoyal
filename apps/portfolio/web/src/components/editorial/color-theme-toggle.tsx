@@ -3,6 +3,8 @@
 import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { useHasHydrated } from "./use-has-hydrated";
+
 const THEME_STORAGE_KEY = "portfolio-color-theme";
 
 type ColorTheme = "light" | "dark";
@@ -13,19 +15,22 @@ function applyColorTheme(theme: ColorTheme) {
   root.style.colorScheme = theme;
 }
 
+function readColorTheme(): ColorTheme {
+  const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
+  if (storedTheme === "light" || storedTheme === "dark") return storedTheme;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+}
+
 export function ColorThemeToggle() {
+  const hasHydrated = useHasHydrated();
   const [theme, setTheme] = useState<ColorTheme>("light");
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     const syncTheme = () => {
-      const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
-      const nextTheme =
-        storedTheme === "light" || storedTheme === "dark"
-          ? storedTheme
-          : mediaQuery.matches
-            ? "dark"
-            : "light";
+      const nextTheme = readColorTheme();
       applyColorTheme(nextTheme);
       setTheme(nextTheme);
     };
@@ -35,23 +40,22 @@ export function ColorThemeToggle() {
     return () => mediaQuery.removeEventListener("change", syncTheme);
   }, []);
 
-  const toggleTheme = () => {
-    const nextTheme = theme === "dark" ? "light" : "dark";
-    window.localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
-    applyColorTheme(nextTheme);
-    setTheme(nextTheme);
-  };
-
-  const nextThemeLabel = theme === "dark" ? "light" : "dark";
+  const visibleTheme = hasHydrated ? theme : "light";
+  const nextThemeLabel = visibleTheme === "dark" ? "light" : "dark";
 
   return (
     <button
       type="button"
-      className={`color-theme-toggle${theme === "dark" ? " is-dark" : ""}`}
+      className={`color-theme-toggle${visibleTheme === "dark" ? " is-dark" : ""}`}
       aria-label={`Switch to ${nextThemeLabel} mode`}
-      aria-pressed={theme === "dark"}
       title={`Switch to ${nextThemeLabel} mode`}
-      onClick={toggleTheme}
+      aria-pressed={visibleTheme === "dark"}
+      onClick={() => {
+        const nextTheme = visibleTheme === "dark" ? "light" : "dark";
+        window.localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+        applyColorTheme(nextTheme);
+        setTheme(nextTheme);
+      }}
     >
       <Sun aria-hidden="true" />
       <Moon aria-hidden="true" />

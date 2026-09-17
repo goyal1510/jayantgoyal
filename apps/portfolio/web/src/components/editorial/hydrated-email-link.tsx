@@ -1,19 +1,9 @@
 "use client";
 
 import { Mail } from "lucide-react";
-import { useSyncExternalStore } from "react";
 
 import { buildEmailLinkPresentation } from "./hydrated-email-link-state";
-
-const subscribeToHydration = () => () => undefined;
-
-function useHasHydrated() {
-  return useSyncExternalStore(
-    subscribeToHydration,
-    () => true,
-    () => false,
-  );
-}
+import { useHasHydrated } from "./use-has-hydrated";
 
 export function HydratedEmailLink({
   emailCodePoints,
