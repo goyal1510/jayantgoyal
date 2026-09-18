@@ -112,7 +112,7 @@ const COPY_HINT_OVERRIDES: Partial<
     },
     supporting_text: {
       label: "Get in touch",
-      help: "Header and home contact-band action.",
+      help: "Home contact-band action. The header uses a separate conversation label.",
     },
   },
   engineering: {

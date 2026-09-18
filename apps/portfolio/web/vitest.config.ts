@@ -11,6 +11,6 @@ export default defineProject({
   test: {
     name: "portfolio-web",
     environment: "node",
-    include: ["src/**/*.test.ts"],
+    include: ["src/**/*.test.ts", "next.config.test.ts"],
   },
 });

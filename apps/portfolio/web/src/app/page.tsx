@@ -53,6 +53,7 @@ export default async function PortfolioPage() {
     name: PERSON_NAME,
     url: SITE_URL,
     jobTitle: portfolio.profile.role,
+    image: new URL(DEFAULT_OG_IMAGE, SITE_URL).toString(),
     sameAs: portfolio.profile.socials.map((social) => social.href),
   };
 

@@ -90,28 +90,25 @@ function WritingSection({
             ) : null}
             {writingPosts.map((post) => (
               <EditorialReveal key={post.slug} className="writing-entry">
-                <Link
-                  className="writing-entry__link"
-                  href={`/writing/${post.slug}`}
-                >
-                  <div className="writing-entry__meta">
-                    <span>{post.date}</span>
-                    <span>Published note</span>
-                  </div>
-                  <div className="writing-entry__title">
-                    <h3>{post.title}</h3>
-                    <ul aria-label="Topics">
-                      {post.tags.slice(0, 4).map((tag) => (
-                        <li key={tag}>{tag}</li>
-                      ))}
-                    </ul>
-                  </div>
-                  <p className="writing-entry__excerpt">{post.excerpt}</p>
-                  <span className="writing-entry__action">
-                    {readArticleLabel}{" "}
-                    <ArrowUpRight aria-hidden="true" />
-                  </span>
-                </Link>
+                <div className="writing-entry__meta">
+                  <span>{post.date}</span>
+                  <span>Published note</span>
+                </div>
+                <div className="writing-entry__title">
+                  <h3>
+                    <Link href={`/writing/${post.slug}`}>{post.title}</Link>
+                  </h3>
+                  <ul aria-label="Topics">
+                    {post.tags.slice(0, 4).map((tag) => (
+                      <li key={tag}>{tag}</li>
+                    ))}
+                  </ul>
+                </div>
+                <p className="writing-entry__excerpt">{post.excerpt}</p>
+                <span className="writing-entry__action">
+                  {readArticleLabel}{" "}
+                  <ArrowUpRight aria-hidden="true" />
+                </span>
               </EditorialReveal>
             ))}
           </div>
@@ -216,7 +213,7 @@ export function PortfolioExperience({
           />
           {sectionContent.contact.isVisible ? (
             <Link className="header-contact" href="/contact">
-              {sectionContent.contact.supportingText || "Get in touch"}{" "}
+              Start a conversation{" "}
               <ArrowDown aria-hidden="true" />
             </Link>
           ) : null}
@@ -301,10 +298,7 @@ export function PortfolioExperience({
         <AboutPreview
           about={about}
           content={sectionContent.about}
-          workCta={
-            navigation.find((item) => item.key === "about")?.note ||
-            "About, experience, and education"
-          }
+          workCta="About Jayant"
         />
       ) : null}
       {sectionContent.contact.isVisible ? (

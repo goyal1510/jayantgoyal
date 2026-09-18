@@ -211,7 +211,9 @@ export function HeroForm({ initialData }: HeroFormProps) {
               required
             />
             <p className="text-xs text-muted-foreground">
-              The complete sentence directly below the editorial headline.
+              The complete sentence directly below the editorial headline. Reuse
+              distinctive headline phrases so the H1 language also appears in
+              the page body.
             </p>
           </div>
 

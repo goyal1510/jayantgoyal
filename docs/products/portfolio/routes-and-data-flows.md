@@ -19,7 +19,12 @@ the Portfolio sitemap/robots rules.
 | `/writing/[slug]` | Published article                                                | Writing slug query and Markdown renderer |
 
 The app also owns `layout.tsx`, `error.tsx`, `not-found.tsx`, `manifest.ts`,
-`robots.ts`, and `sitemap.ts` for global presentation and discoverability.
+`robots.txt`, and `sitemap.ts` for global presentation and discoverability.
+
+The root `src/proxy.ts` rewrites HTML page requests with `Accept: text/markdown`
+to `/llms.txt`. Direct catalog, robots, API, and `auth.md` requests stay on
+their own handlers. The editorial layout registers WebMCP navigation tools when
+the browser exposes `navigator.modelContext`.
 
 The root layout renders one shared footer after the page content on every
 Portfolio page, including Contact and article/case-study detail pages. It uses
@@ -44,7 +49,12 @@ footer on other pages.
 | `GET /api/github-contributions` | Valid GitHub username and period         | Fetch contribution calendar with server token and bounded cache                         | Non-sensitive unavailable payload         |
 | `GET /api/github-loc`           | Valid GitHub username                    | Fetch language/code statistics through `@jayantgoyal/github`                            | `404` or `503`, no provider details       |
 | `GET /api/resume`               | Public request                           | Export Google document as PDF                                                           | Checked-in PDF, CMS URL, then safe error  |
-| `GET /llms.txt`                 | Public request                           | Generate current Portfolio/Studio discovery text from shared identity and URL contracts | Plain-text response                       |
+| `GET /llms.txt`                 | Public request; `Accept: text/markdown` uses markdown type | Generate current Portfolio discovery text from shared identity and URL contracts | Markdown or plain-text response           |
+| `GET /auth.md`                  | Public request                           | Explain that this origin is public and Auth owns human sign-in                  | Markdown response                         |
+| `GET /.well-known/api-catalog`  | Public request                           | RFC 9727 linkset of public Portfolio handlers                                   | `application/linkset+json`                |
+| `GET /.well-known/ai-catalog.json` | Public request                         | ARD capability catalog for llms.txt, API catalog, and auth.md                   | JSON with CORS `*`                        |
+| `GET /.well-known/oauth-protected-resource` | Public request              | RFC 9728 metadata pointing at the suite Auth issuer                             | JSON with CORS `*`                        |
+| `GET /robots.txt`               | Public request                           | Indexing rules, Content Signals, and Agentmap                                   | Plain-text response                       |
 
 ## Editorial read flow
 

@@ -315,7 +315,7 @@
     height: 40px;
   }
 
-  .writing-entry__link {
+  .writing-entry {
     height: auto;
     min-height: 0;
     grid-template-columns: 1fr;
@@ -323,7 +323,7 @@
     padding: 22px 0 26px;
   }
 
-  .writing-entry__link:hover {
+  .writing-entry:hover {
     padding-inline: 12px;
   }
 

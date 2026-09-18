@@ -57,7 +57,10 @@ export function CertificateDeck({
           >
             <img
               src={activeCertificate.image}
-              alt={activeCertificate.imageAlt}
+              alt={
+                activeCertificate.imageAlt.trim() ||
+                `${activeCertificate.name} credential`
+              }
             />
           </a>
         </div>

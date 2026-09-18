@@ -26,6 +26,7 @@ import {
 import { PERSON_BRAND } from "@jayantgoyal/web-brand";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
+import { echoHeadlineInBody } from "./headline-language";
 import {
   type PortfolioAbout,
   type PortfolioCredential,
@@ -103,7 +104,7 @@ function mapWork(row: WorkRow, index: number): PortfolioWork {
     year: row.year_label,
     image: images[0] ?? row.image_url,
     images,
-    imageAlt: row.image_alt,
+    imageAlt: (row.image_alt ?? "").trim() || `${row.name} product screenshot`,
     href: row.live_link,
     github: row.github_link,
     tags: readStringArray(row.tags),
@@ -134,7 +135,7 @@ function mapCredential(row: CertificateRow): PortfolioCredential {
     credentialUrl: row.credential_url,
     href: row.document_url,
     image: row.preview_url,
-    imageAlt: row.image_alt,
+    imageAlt: (row.image_alt ?? "").trim() || `${row.name} credential`,
   };
 }
 
@@ -150,7 +151,7 @@ function mapProfile(hero: HeroRow, contact: ContactRow): PortfolioProfile {
     displayName: PERSON_BRAND.displayName,
     role: hero.role,
     headline: hero.headline,
-    introduction: hero.blurb,
+    introduction: echoHeadlineInBody(hero.headline, hero.blurb),
     focus: hero.tagline,
     currentRole: hero.current_title,
     availability: hero.availability,

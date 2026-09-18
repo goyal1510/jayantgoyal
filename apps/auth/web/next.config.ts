@@ -43,6 +43,7 @@ const securityHeaders = [
 const publicPreviewHeaders = [{ key: "X-Robots-Tag", value: "index, follow" }];
 
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
   allowedDevOrigins,
   transpilePackages: [
     "@jayantgoyal/web-auth",

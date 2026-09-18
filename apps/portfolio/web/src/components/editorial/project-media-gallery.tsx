@@ -36,7 +36,11 @@ export function ProjectMediaGallery({
             index === activeIndex ? " project-media-gallery__image--active" : ""
           }`}
           src={source}
-          alt={index === activeIndex ? alt : ""}
+          alt={
+            sources.length > 1
+              ? `${alt} (${index + 1} of ${sources.length})`
+              : alt
+          }
           aria-hidden={index === activeIndex ? undefined : true}
           loading={eager || index === 0 ? "eager" : "lazy"}
         />

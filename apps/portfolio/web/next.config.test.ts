@@ -139,4 +139,27 @@ describe("Portfolio security headers", () => {
     expect(csp).not.toContain("github-contributions-api.jogruber.de");
     expect(csp).not.toContain("https://api.github.com");
   });
+
+  it("does not advertise the Next.js runtime in response headers", () => {
+    expect(nextConfig.poweredByHeader).toBe(false);
+  });
+
+  it("does not send Portfolio well-known discovery to Studio", async () => {
+    const redirects = await configuredRedirects();
+    const sources = redirects.map((redirect) => redirect.source);
+
+    expect(sources).not.toContain("/.well-known");
+    expect(sources).not.toContain("/.well-known/:path*");
+  });
+
+  it("advertises agent discovery Link relations on HTML responses", async () => {
+    const headers = await configuredHeaders();
+    const globalHeaders = headers.find((entry) => entry.source === "/(.*)");
+    const link = globalHeaders?.headers.find((header) => header.key === "Link")
+      ?.value;
+
+    expect(link).toContain('rel="api-catalog"');
+    expect(link).toContain("/.well-known/api-catalog");
+    expect(link).toContain("/llms.txt");
+  });
 });

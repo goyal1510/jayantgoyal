@@ -8,6 +8,7 @@ const allowedDevOrigins = localCookieDomain?.endsWith(".localhost")
   : [];
 
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
   allowedDevOrigins,
   transpilePackages: ["@jayantgoyal/web-ui"],
   async headers() {

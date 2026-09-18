@@ -10,7 +10,9 @@ import { buildAppRootMetadata } from "@jayantgoyal/web-seo";
 import { PageScrollProgress } from "@/components/editorial/page-scroll-progress";
 import { PortfolioAnalytics } from "@/components/editorial/portfolio-analytics";
 import { PortfolioFooter } from "@/components/editorial/portfolio-footer";
+import { PortfolioWebMcp } from "@/components/editorial/portfolio-webmcp";
 import { ScrollToTop } from "@/components/editorial/scroll-to-top";
+import { AGENT_DISCOVERY_PATHS } from "@/lib/agent-discovery";
 import { PERSON_NAME, SITE_URL } from "@/lib/seo/config";
 
 const sans = DM_Sans({
@@ -67,6 +69,16 @@ export default function RootLayout({
   return (
     <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
+        <link
+          rel="api-catalog"
+          href={AGENT_DISCOVERY_PATHS.apiCatalog}
+          type="application/linkset+json"
+        />
+        <link
+          rel="describedby"
+          href={AGENT_DISCOVERY_PATHS.aiCatalog}
+          type="application/json"
+        />
         <Script id="portfolio-color-theme" strategy="beforeInteractive">
           {colorThemeScript}
         </Script>
@@ -83,6 +95,7 @@ export default function RootLayout({
         className={`portfolio-site ${sans.variable} ${serif.variable} ${wordmark.variable}`}
       >
         <PortfolioAnalytics />
+        <PortfolioWebMcp />
         <PageScrollProgress />
         <ScrollToTop />
         <div className="portfolio-site__content">{children}</div>

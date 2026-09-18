@@ -17,7 +17,7 @@ Portfolio owns the professional narrative presented to public visitors:
 - contact enquiry validation, rate limiting, and email delivery;
 - public GitHub contribution and code-statistic presentation;
 - public, aggregate Cloudflare traffic, interactive geography, cache, security-signal, and real-user performance analytics;
-- public SEO, structured data, sitemap, robots, and web manifest behavior.
+- public SEO, structured data, sitemap, robots, agent discovery catalogs, and web manifest behavior.
 
 Portfolio does not own account entry, private Studio workspaces, access
 administration, or deployment operations. Admin edits Portfolio data but does
@@ -25,8 +25,8 @@ not become the owner of the Portfolio contract.
 
 ## Current web surface
 
-The client has nine public pages and five public route handlers. The complete
-route behavior and request flows are in [routes and data
+The client has nine public pages plus public API and agent-discovery route
+handlers. The complete route behavior and request flows are in [routes and data
 flows](routes-and-data-flows.md).
 
 | Area           | Routes                                         | Source of content                            |
@@ -39,7 +39,7 @@ flows](routes-and-data-flows.md).
 | Contact        | `/contact`, `/api/contact`                     | CMS contact data plus Resend delivery        |
 | Analytics      | `/analytics`                                   | Aggregate Cloudflare edge and Web Analytics  |
 | GitHub         | `/api/github-contributions`, `/api/github-loc` | GitHub provider APIs with caching            |
-| Discovery      | `/llms.txt`                                    | Registry-derived product summary             |
+| Discovery      | `/llms.txt`, `/auth.md`, `/.well-known/*`      | Agent catalogs, markdown negotiation, robots signals |
 
 ## Internal architecture
 

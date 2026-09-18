@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 import { applicationOrigin } from "@jayantgoyal/web-urls";
 import { createRequire } from "node:module";
 
+import { PORTFOLIO_AGENT_LINK_HEADER } from "./src/lib/agent-discovery";
+
 const STUDIO_URL = applicationOrigin(
   "studio",
   process.env.NEXT_PUBLIC_STUDIO_URL,
@@ -34,7 +36,6 @@ const studioSessionPagePrefixes = [
   "/reset-password",
   "/welcome",
   "/auth",
-  "/.well-known",
 ] as const;
 
 const studioApiPrefixes = [
@@ -106,6 +107,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  poweredByHeader: false,
   async redirects() {
     return [
       ...portfolioSectionRedirects.map(([source, destination]) => ({
@@ -237,7 +239,10 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/(.*)",
-        headers: securityHeaders,
+        headers: [
+          ...securityHeaders,
+          { key: "Link", value: PORTFOLIO_AGENT_LINK_HEADER },
+        ],
       },
       {
         source: "/assets/(.*)",

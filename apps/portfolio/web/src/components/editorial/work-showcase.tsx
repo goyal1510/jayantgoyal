@@ -53,7 +53,7 @@ function WorkLinks({
           data-analytics-item-id={project.id}
           data-analytics-item-name={project.title}
         >
-          Details <ArrowUpRight aria-hidden="true" />
+          {project.title} case study <ArrowUpRight aria-hidden="true" />
         </Link>
       ) : null}
       {project.href ? (
@@ -67,7 +67,9 @@ function WorkLinks({
           data-analytics-item-id={project.id}
           data-analytics-item-name={project.title}
         >
-          {project.id === "admin" ? "Private app" : "Open system"}{" "}
+          {project.id === "admin"
+            ? `${project.title} app`
+            : `${project.title} live`}{" "}
           <ArrowUpRight aria-hidden="true" />
         </a>
       ) : null}
@@ -82,7 +84,7 @@ function WorkLinks({
           data-analytics-item-id={project.id}
           data-analytics-item-name={project.title}
         >
-          Source <Github aria-hidden="true" />
+          {project.title} source <Github aria-hidden="true" />
         </a>
       ) : null}
     </div>

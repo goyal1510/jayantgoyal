@@ -31,6 +31,7 @@ const noindexHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
   allowedDevOrigins,
   transpilePackages: [
     "@jayantgoyal/web-urls",
