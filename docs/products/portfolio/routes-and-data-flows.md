@@ -57,6 +57,7 @@ footer on other pages.
 | `GET /.well-known/oauth-authorization-server` | Public request            | RFC 8414 metadata plus Auth.md `agent_auth` for anonymous public access               | JSON with CORS `*`                        |
 | `GET /.well-known/openid-configuration` | Public request                  | OIDC discovery fields for the same issuer                                             | JSON with CORS `*`                        |
 | `GET /.well-known/mcp/server-card.json` | Public request                   | MCP Server Card pointing at public `llms.txt` resources                               | JSON with CORS `*`                        |
+| `GET /.well-known/agent-card.json` | Public request                      | A2A Agent Card for public Portfolio discovery skills                                  | JSON with CORS `*`                        |
 | `GET /.well-known/agent-skills/index.json` | Public request                | Agent Skills discovery index                                                          | JSON with CORS `*`                        |
 | `GET /.well-known/agent-skills/portfolio-discovery/SKILL.md` | Public request | Portfolio discovery skill                                                             | Markdown response                         |
 | `GET/POST /agent/identity`      | Public JSON                          | Anonymous registration reply: no credential is issued                                 | `public_resource` JSON                    |

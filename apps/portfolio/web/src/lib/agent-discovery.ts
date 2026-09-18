@@ -16,6 +16,7 @@ export const AGENT_DISCOVERY_PATHS = {
   oauthAuthorizationServer: "/.well-known/oauth-authorization-server",
   openidConfiguration: "/.well-known/openid-configuration",
   mcpServerCard: "/.well-known/mcp/server-card.json",
+  a2aAgentCard: "/.well-known/agent-card.json",
   agentSkillsIndex: "/.well-known/agent-skills/index.json",
   agentSkill: "/.well-known/agent-skills/portfolio-discovery/SKILL.md",
   llms: "/llms.txt",
@@ -239,6 +240,59 @@ export function buildPortfolioMcpServerCard() {
       resources: true,
       prompts: false,
     },
+  };
+}
+
+export function buildPortfolioA2aAgentCard() {
+  const skillModes = {
+    inputModes: ["text/plain", "application/json"],
+    outputModes: ["text/markdown", "application/json"],
+  };
+
+  return {
+    name: `${PERSON_BRAND.displayName} Portfolio`,
+    version: "1.0.0",
+    description: APP_BRANDS.portfolio.description,
+    documentationUrl: `${SITE_URL}${AGENT_DISCOVERY_PATHS.llms}`,
+    provider: {
+      organization: PERSON_BRAND.displayName,
+      url: SITE_URL,
+    },
+    supportedInterfaces: [
+      {
+        url: SITE_URL,
+        protocolBinding: "HTTP+JSON",
+        protocolVersion: "0.3",
+        transport: "HTTP+JSON",
+      },
+    ],
+    capabilities: {
+      streaming: false,
+      pushNotifications: false,
+      extendedAgentCard: false,
+    },
+    defaultInputModes: skillModes.inputModes,
+    defaultOutputModes: skillModes.outputModes,
+    skills: [
+      {
+        id: "read-portfolio",
+        name: "Read Portfolio",
+        description:
+          "Read public editorial pages and discovery documents for Jayant's software work.",
+        tags: ["portfolio", "discovery", "editorial"],
+        examples: ["Who is Jayant?", "What products has Jayant shipped?"],
+        ...skillModes,
+      },
+      {
+        id: "contact-enquiry",
+        name: "Contact enquiry",
+        description:
+          "Send a public contact enquiry through POST /api/contact. No agent credential is required.",
+        tags: ["contact", "email"],
+        examples: ["How do I send Jayant a short product note?"],
+        ...skillModes,
+      },
+    ],
   };
 }
 

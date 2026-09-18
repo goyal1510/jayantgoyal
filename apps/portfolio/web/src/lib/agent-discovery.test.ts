@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   AGENT_DISCOVERY_PATHS,
   PORTFOLIO_AGENT_LINK_HEADER,
+  buildPortfolioA2aAgentCard,
   buildPortfolioAgentSkillsIndex,
   buildPortfolioAiCatalog,
   buildPortfolioApiCatalog,
@@ -89,5 +90,18 @@ describe("Portfolio agent discovery documents", () => {
     expect(index.$schema).toContain("0.2.0");
     expect(index.skills[0]?.type).toBe("skill-md");
     expect(index.skills[0]?.digest).toBe("sha256:abc");
+  });
+
+  it("publishes an A2A agent card for public Portfolio skills", () => {
+    const card = buildPortfolioA2aAgentCard();
+
+    expect(card.name).toContain("Portfolio");
+    expect(card.version).toBe("1.0.0");
+    expect(card.supportedInterfaces[0]?.url).toBeTruthy();
+    expect(card.supportedInterfaces[0]?.transport).toBe("HTTP+JSON");
+    expect(card.capabilities.streaming).toBe(false);
+    expect(card.skills.every((skill) => skill.id && skill.name && skill.description)).toBe(
+      true,
+    );
   });
 });
