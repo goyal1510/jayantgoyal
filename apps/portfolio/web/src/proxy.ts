@@ -18,6 +18,7 @@ function isMarkdownExempt(pathname: string) {
     pathname === "/llms.txt" ||
     pathname === "/auth.md" ||
     pathname === "/robots.txt" ||
+    pathname.startsWith("/agent/") ||
     MARKDOWN_EXEMPT_PREFIXES.some((prefix) => pathname.startsWith(prefix))
   );
 }

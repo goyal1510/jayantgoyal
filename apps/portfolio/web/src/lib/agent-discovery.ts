@@ -6,14 +6,22 @@ const SITE_URL = applicationOrigin(
   process.env.NEXT_PUBLIC_SITE_URL,
 );
 
-const AUTH_ISSUER = "https://orwfvyditlguqvxvztkw.supabase.co/auth/v1";
+export const AUTH_ISSUER =
+  "https://orwfvyditlguqvxvztkw.supabase.co/auth/v1";
 
 export const AGENT_DISCOVERY_PATHS = {
   apiCatalog: "/.well-known/api-catalog",
   aiCatalog: "/.well-known/ai-catalog.json",
   oauthProtectedResource: "/.well-known/oauth-protected-resource",
+  oauthAuthorizationServer: "/.well-known/oauth-authorization-server",
+  openidConfiguration: "/.well-known/openid-configuration",
+  mcpServerCard: "/.well-known/mcp/server-card.json",
+  agentSkillsIndex: "/.well-known/agent-skills/index.json",
+  agentSkill: "/.well-known/agent-skills/portfolio-discovery/SKILL.md",
   llms: "/llms.txt",
   authMd: "/auth.md",
+  agentIdentity: "/agent/identity",
+  agentClaim: "/agent/identity/claim",
 } as const;
 
 /** RFC 8288 Link values advertised on Portfolio HTML responses. */
@@ -168,10 +176,110 @@ export function buildPortfolioAiCatalog() {
 export function buildPortfolioProtectedResourceMetadata() {
   return {
     resource: SITE_URL,
-    authorization_servers: [AUTH_ISSUER],
+    authorization_servers: [SITE_URL],
     scopes_supported: ["openid", "email"],
     bearer_methods_supported: ["header"],
     resource_documentation: `${SITE_URL}${AGENT_DISCOVERY_PATHS.authMd}`,
+  };
+}
+
+export function buildPortfolioAuthorizationServerMetadata() {
+  return {
+    issuer: SITE_URL,
+    authorization_endpoint: `${AUTH_ISSUER}/authorize`,
+    token_endpoint: `${AUTH_ISSUER}/token`,
+    jwks_uri: `${AUTH_ISSUER}/.well-known/jwks.json`,
+    grant_types_supported: ["authorization_code", "refresh_token"],
+    response_types_supported: ["code"],
+    subject_types_supported: ["public"],
+    scopes_supported: ["openid", "email", "profile"],
+    revocation_endpoint: `${AUTH_ISSUER}/logout`,
+    agent_auth: {
+      skill: `${SITE_URL}${AGENT_DISCOVERY_PATHS.authMd}`,
+      register_uri: `${SITE_URL}${AGENT_DISCOVERY_PATHS.agentIdentity}`,
+      identity_endpoint: `${SITE_URL}${AGENT_DISCOVERY_PATHS.agentIdentity}`,
+      claim_uri: `${SITE_URL}${AGENT_DISCOVERY_PATHS.agentClaim}`,
+      claim_endpoint: `${SITE_URL}${AGENT_DISCOVERY_PATHS.agentClaim}`,
+      identity_types_supported: ["anonymous"],
+      anonymous: {
+        credential_types_supported: ["none"],
+        claim_uri: `${SITE_URL}${AGENT_DISCOVERY_PATHS.agentClaim}`,
+      },
+    },
+  };
+}
+
+export function buildPortfolioOpenIdConfiguration() {
+  const as = buildPortfolioAuthorizationServerMetadata();
+  return {
+    issuer: as.issuer,
+    authorization_endpoint: as.authorization_endpoint,
+    token_endpoint: as.token_endpoint,
+    jwks_uri: as.jwks_uri,
+    grant_types_supported: as.grant_types_supported,
+    response_types_supported: as.response_types_supported,
+    subject_types_supported: as.subject_types_supported,
+    scopes_supported: as.scopes_supported,
+  };
+}
+
+export function buildPortfolioMcpServerCard() {
+  return {
+    serverInfo: {
+      name: `${new URL(SITE_URL).hostname}-portfolio`,
+      version: "1.0.0",
+    },
+    transport: {
+      type: "streamable-http",
+      endpoint: `${SITE_URL}${AGENT_DISCOVERY_PATHS.llms}`,
+    },
+    endpoint: `${SITE_URL}${AGENT_DISCOVERY_PATHS.llms}`,
+    capabilities: {
+      tools: false,
+      resources: true,
+      prompts: false,
+    },
+  };
+}
+
+export function buildPortfolioDiscoverySkillMarkdown() {
+  return `---
+name: portfolio-discovery
+description: Read Jayant's public Portfolio discovery documents and pages.
+---
+
+# Portfolio discovery
+
+Use the public documents on ${SITE_URL}:
+
+1. Read \`${AGENT_DISCOVERY_PATHS.llms}\` for the product map.
+2. Read \`${AGENT_DISCOVERY_PATHS.apiCatalog}\` for public JSON handlers.
+3. Read \`${AGENT_DISCOVERY_PATHS.aiCatalog}\` for the capability catalog.
+4. Do not register an agent credential. Public pages do not require a token.
+`;
+}
+
+export function buildPortfolioAgentSkillsIndex(digestHex: string) {
+  return {
+    $schema: "https://schemas.agentskills.io/discovery/0.2.0/schema.json",
+    skills: [
+      {
+        name: "portfolio-discovery",
+        type: "skill-md",
+        description:
+          "Instructions for reading Jayant's public Portfolio pages and discovery documents.",
+        url: `${SITE_URL}${AGENT_DISCOVERY_PATHS.agentSkill}`,
+        digest: `sha256:${digestHex}`,
+      },
+    ],
+  };
+}
+
+export function buildAnonymousIdentityResponse() {
+  return {
+    error: "public_resource",
+    error_description:
+      "This origin does not issue agent credentials. Public Portfolio pages and JSON handlers do not require a token.",
   };
 }
 
@@ -180,15 +288,21 @@ export function buildPortfolioAuthMarkdown() {
 
 This origin (${SITE_URL}) is Jayant's public editorial Portfolio. HTML pages
 and the public JSON handlers listed in \`/.well-known/api-catalog\` do not
-require agent registration or an access token.
+require an access token.
 
-Human account entry, recovery, MFA, and session security are owned by Auth at
-${applicationUrl("auth", "/welcome")}. Tokens for Studio and Admin sessions are
-issued by ${AUTH_ISSUER}.
+## Discovery
 
-There is no \`/agent/auth\` registration endpoint on this origin. Agents should
-read \`/llms.txt\`, \`/.well-known/api-catalog\`, and
-\`/.well-known/ai-catalog.json\` instead of creating credentials here.
+1. Fetch \`${AGENT_DISCOVERY_PATHS.oauthProtectedResource}\`.
+2. Fetch \`${AGENT_DISCOVERY_PATHS.oauthAuthorizationServer}\` and read \`agent_auth\`.
+3. \`agent_auth.register_uri\` is \`${AGENT_DISCOVERY_PATHS.agentIdentity}\`.
+
+## Registration
+
+\`POST ${AGENT_DISCOVERY_PATHS.agentIdentity}\` with \`{"type":"anonymous"}\` returns
+\`public_resource\`. No credential is issued. Human sign-in stays at
+${applicationUrl("auth", "/welcome")}.
+
+Studio and Admin session tokens are issued by ${AUTH_ISSUER}.
 `;
 }
 

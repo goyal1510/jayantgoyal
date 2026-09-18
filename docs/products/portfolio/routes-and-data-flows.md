@@ -53,7 +53,14 @@ footer on other pages.
 | `GET /auth.md`                  | Public request                           | Explain that this origin is public and Auth owns human sign-in                  | Markdown response                         |
 | `GET /.well-known/api-catalog`  | Public request                           | RFC 9727 linkset of public Portfolio handlers                                   | `application/linkset+json`                |
 | `GET /.well-known/ai-catalog.json` | Public request                         | ARD capability catalog for llms.txt, API catalog, and auth.md                   | JSON with CORS `*`                        |
-| `GET /.well-known/oauth-protected-resource` | Public request              | RFC 9728 metadata pointing at the suite Auth issuer                             | JSON with CORS `*`                        |
+| `GET /.well-known/oauth-protected-resource` | Public request              | RFC 9728 metadata; `authorization_servers` is this origin                             | JSON with CORS `*`                        |
+| `GET /.well-known/oauth-authorization-server` | Public request            | RFC 8414 metadata plus Auth.md `agent_auth` for anonymous public access               | JSON with CORS `*`                        |
+| `GET /.well-known/openid-configuration` | Public request                  | OIDC discovery fields for the same issuer                                             | JSON with CORS `*`                        |
+| `GET /.well-known/mcp/server-card.json` | Public request                   | MCP Server Card pointing at public `llms.txt` resources                               | JSON with CORS `*`                        |
+| `GET /.well-known/agent-skills/index.json` | Public request                | Agent Skills discovery index                                                          | JSON with CORS `*`                        |
+| `GET /.well-known/agent-skills/portfolio-discovery/SKILL.md` | Public request | Portfolio discovery skill                                                             | Markdown response                         |
+| `GET/POST /agent/identity`      | Public JSON                          | Anonymous registration reply: no credential is issued                                 | `public_resource` JSON                    |
+| `GET/POST /agent/identity/claim` | Public JSON                         | Claim ceremony is not enabled on this public origin                                   | `404 claim_not_enabled`                   |
 | `GET /robots.txt`               | Public request                           | Indexing rules, Content Signals, and Agentmap                                   | Plain-text response                       |
 
 ## Editorial read flow

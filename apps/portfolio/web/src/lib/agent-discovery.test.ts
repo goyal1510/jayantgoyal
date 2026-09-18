@@ -3,10 +3,13 @@ import { describe, expect, it } from "vitest";
 import {
   AGENT_DISCOVERY_PATHS,
   PORTFOLIO_AGENT_LINK_HEADER,
+  buildPortfolioAgentSkillsIndex,
   buildPortfolioAiCatalog,
   buildPortfolioApiCatalog,
   buildPortfolioAuthMarkdown,
   buildPortfolioLlmsText,
+  buildPortfolioMcpServerCard,
+  buildPortfolioAuthorizationServerMetadata,
   buildPortfolioProtectedResourceMetadata,
   buildProductionRobotsText,
   estimateMarkdownTokens,
@@ -46,11 +49,25 @@ describe("Portfolio agent discovery documents", () => {
     );
   });
 
-  it("keeps auth.md self-contained and titled for Auth.md discovery", () => {
+  it("hosts authorization-server metadata with an anonymous agent_auth block", () => {
+    const as = buildPortfolioAuthorizationServerMetadata();
+    const prm = buildPortfolioProtectedResourceMetadata();
+
+    expect(prm.authorization_servers).toEqual([
+      as.issuer,
+    ]);
+    expect(as.agent_auth.skill).toContain("/auth.md");
+    expect(as.agent_auth.register_uri).toContain("/agent/identity");
+    expect(as.agent_auth.identity_types_supported).toEqual(["anonymous"]);
+    expect(as.authorization_endpoint).toContain("/authorize");
+    expect(as.jwks_uri).toContain("jwks.json");
+  });
+
+  it("keeps auth.md titled for Auth.md discovery", () => {
     const markdown = buildPortfolioAuthMarkdown();
 
     expect(markdown.startsWith("# auth.md")).toBe(true);
-    expect(markdown).toContain("no `/agent/auth`");
+    expect(markdown).toContain("agent_auth");
     expect(buildPortfolioProtectedResourceMetadata().bearer_methods_supported).toEqual(
       ["header"],
     );
@@ -61,5 +78,16 @@ describe("Portfolio agent discovery documents", () => {
     expect(body).toContain("/api/contact");
     expect(estimateMarkdownTokens(body)).toBeGreaterThan(10);
     expect(buildPortfolioApiCatalog().linkset.length).toBeGreaterThan(1);
+  });
+
+  it("publishes an MCP card and a hashed skill-md index", () => {
+    const card = buildPortfolioMcpServerCard();
+    const index = buildPortfolioAgentSkillsIndex("abc");
+
+    expect(card.serverInfo.name).toContain("portfolio");
+    expect(card.endpoint).toContain("/llms.txt");
+    expect(index.$schema).toContain("0.2.0");
+    expect(index.skills[0]?.type).toBe("skill-md");
+    expect(index.skills[0]?.digest).toBe("sha256:abc");
   });
 });
