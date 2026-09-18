@@ -135,7 +135,7 @@ export interface PortfolioSkillCategoryRecord {
 
 export type PortfolioSkillCategoryPublicRow = Pick<
   PortfolioSkillCategoryRecord,
-  "id" | "title" | "description"
+  "id" | "title" | "description" | "sort_order"
 >;
 
 export interface PortfolioSkillRecord {
@@ -155,6 +155,7 @@ export interface PortfolioSkillPublicRow {
   name: string;
   proficiency: string;
   evidence: string;
+  sort_order: number;
 }
 
 export interface PortfolioCaseStudyDecision {
@@ -350,8 +351,8 @@ export const PORTFOLIO_SELECT_COLUMNS: Record<PortfolioTable, string> = {
   education: "school, degree, period, location, detail",
   experience:
     "company, company_url, company_linkedin_url, role, period, location, summary, bullets",
-  skill_categories: "id, title, description",
-  skills: "category_id, name, proficiency, evidence",
+  skill_categories: "id, title, description, sort_order",
+  skills: "category_id, name, proficiency, evidence, sort_order",
   work: "name, slug, eyebrow, short_description, impact, contribution, year_label, image_url, image_alt, case_study, case_study_published, tags, github_link, live_link",
   certificates:
     "name, description, category, issuer, issued_at, credential_id, credential_url, document_url, preview_url, image_alt",

@@ -251,7 +251,9 @@ export async function loadSkillsWorkspace(
   return {
     categories: categories.map((category) => ({
       ...category,
-      skills: skills.filter((skill) => skill.category_id === category.id),
+      skills: skills
+        .filter((skill) => skill.category_id === category.id)
+        .sort((left, right) => left.sort_order - right.sort_order),
     })),
     editorial,
   };

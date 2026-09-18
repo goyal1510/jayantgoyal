@@ -355,17 +355,20 @@ const loadEditorialPortfolioData =
           outcomes: readStringArray(row.bullets),
         }),
       ),
-      skillGroups: categories.map((category) => ({
-        title: category.title,
-        description: category.description,
-        items: skills
-          .filter((skill) => skill.category_id === category.id)
-          .map((skill) => ({
-            name: skill.name,
-            proficiency: mapProficiency(skill.proficiency),
-            evidence: skill.evidence,
-          })),
-      })),
+      skillGroups: [...categories]
+        .sort((left, right) => left.sort_order - right.sort_order)
+        .map((category) => ({
+          title: category.title,
+          description: category.description,
+          items: skills
+            .filter((skill) => skill.category_id === category.id)
+            .sort((left, right) => left.sort_order - right.sort_order)
+            .map((skill) => ({
+              name: skill.name,
+              proficiency: mapProficiency(skill.proficiency),
+              evidence: skill.evidence,
+            })),
+        })),
       work: castData<WorkRow[]>(workResult.data ?? []).map(mapWork),
       credentials: castData<CertificateRow[]>(
         certificatesResult.data ?? [],

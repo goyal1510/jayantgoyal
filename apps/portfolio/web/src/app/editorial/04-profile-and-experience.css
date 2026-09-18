@@ -116,15 +116,16 @@
 }
 
 .technology-stack__group ul {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px clamp(18px, 3vw, 36px);
+  display: block;
+  columns: 2;
+  column-gap: clamp(18px, 3vw, 36px);
   margin: 4px 0 0;
   padding-left: 18px;
   list-style: disc;
 }
 
 .technology-stack__group li {
+  break-inside: avoid;
   padding-left: 2px;
   color: var(--ink-soft);
   font-size: 0.82rem;

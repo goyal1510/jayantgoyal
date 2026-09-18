@@ -121,7 +121,6 @@
 
   .technology-stack__group ul {
     grid-column: 2;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
     column-gap: 18px;
   }
 
